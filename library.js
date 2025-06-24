@@ -144,7 +144,7 @@ function findAllUpstreamOptions(questionCell) {
 function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   // Section jump detection (existing code)
 }
-window.exportGuiJson = function() {
+window.exportGuiJson = function(download = true) {
   // Renumber questions by Y position before export
   renumberQuestionIds();
   
@@ -312,9 +312,10 @@ window.exportGuiJson = function() {
   
   // Convert to string and download
   const jsonStr = JSON.stringify(output, null, 2);
-  downloadJson(jsonStr, "gui.json");
-  
-  return output;
+  if (download) {
+    downloadJson(jsonStr, "gui.json");
+  }
+  return jsonStr;
 };
 
 // Fix capitalization in jump/logic conditions

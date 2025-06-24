@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FormWiz - Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2980b9;
+            --hover-color: #1c598a;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 600px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 40px 0;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .address-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .city-state-zip {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .info-text {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            color: #4a5568;
+        }
+    </style>
+
+    <style>
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .address-row {
+            display: grid;
+            grid-template-columns: 2fr;
+            gap: 5px;
+        }
+
+        .city-state-zip {
+            display: grid;
+            grid-template-columns: 2.1fr 1.1fr 2.1fr;
+            gap: 5px;
+        }
+
+        #signup-first-name,
+        #signup-last-name,
+        #signup-street {
+            max-width: 280px;
+        }
+
+        #signup-city {
+            max-width: 200px;
+        }
+
+        #signup-state {
+            max-width: 120px;
+        }
+
+        #signup-zip {
+            max-width: 150px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 95%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Account Info Container -->
+<div class="container" id="account-info-container">
+    <h2>Account Info</h2>
+    <p class="info-text">Create an account to personalized access to forms and more!</p>
+    <button class="btn" id="show-signup-btn">Sign Up</button>
+    <button class="btn" id="show-login-btn">Log In</button>
+</div>
+
+<!-- Login Container -->
+<div class="container" id="login-container" style="display: none;">
+    <h2>Welcome Back</h2>
+    <form id="login-form">
+        <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" required>
+        </div>
+        <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+        <div class="toggle-link" id="show-signup">New to FormWiz? Create Account</div>
+        <div class="error-message" id="login-error"></div>
+    </form>
+</div>
+
+<!-- Signup Container -->
+<div class="container" id="signup-container" style="display: none;">
+    <h2>Create Account</h2>
+    <form id="signup-form">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="signup-first-name">First Name</label>
+                <input type="text" id="signup-first-name" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-last-name">Last Name</label>
+                <input type="text" id="signup-last-name" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="signup-email">Email Address</label>
+            <input type="email" id="signup-email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="signup-phone">Phone Number</label>
+            <!-- Removed the pattern for easier testing -->
+            <input type="tel" id="signup-phone" placeholder="123-456-7890" required>
+        </div>
+
+        <div class="form-group">
+            <label>Address</label>
+            <div class="address-row">
+                <div class="form-group">
+                    <input type="text" id="signup-street" placeholder="Street Address" required>
+                </div>
+                <div class="city-state-zip">
+                    <div class="form-group">
+                        <input type="text" id="signup-city" placeholder="City" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="signup-state" required>
+                            <option value="">State</option>
+                            <option value="AL">AL</option>
+                            <option value="AK">AK</option>
+                            <!-- ... states ... -->
+                            <option value="WY">WY</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <!-- Removed the pattern for easier testing -->
+                        <input type="text" id="signup-zip" placeholder="ZIP" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-confirm-password">Confirm Password</label>
+                <input type="password" id="signup-confirm-password" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Create Account</button>
+        <div class="toggle-link" id="show-login">Already have an account? Sign In</div>
+        <div class="error-message" id="signup-error"></div>
+    </form>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+    authDomain: "formwiz-3f4fd.firebaseapp.com",
+    projectId: "formwiz-3f4fd",
+    storageBucket: "formwiz-3f4fd.appspot.com",
+    messagingSenderId: "404259212529",
+    appId: "1:404259212529:web:15a33bce82383b21cfed50",
+    measurementId: "G-P07YEN0HPD"
+  };
+
+  // Init
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // DOM
+  const accountInfoContainer = document.getElementById('account-info-container');
+  const loginContainer = document.getElementById('login-container');
+  const signupContainer = document.getElementById('signup-container');
+  const showSignupBtn = document.getElementById('show-signup-btn');
+  const showLoginBtn = document.getElementById('show-login-btn');
+  const showSignupLink = document.getElementById('show-signup');
+  const showLoginLink = document.getElementById('show-login');
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const loginError = document.getElementById('login-error');
+  const signupError = document.getElementById('signup-error');
+
+  // Toggle to signup from account info or login
+  showSignupBtn.addEventListener('click', () => {
+    accountInfoContainer.style.display = 'none';
+    signupContainer.style.display = 'block';
+  });
+
+  showSignupLink.addEventListener('click', () => {
+    loginContainer.style.display = 'none';
+    signupContainer.style.display = 'block';
+  });
+
+  // Toggle to login from account info or signup
+  showLoginBtn.addEventListener('click', () => {
+    accountInfoContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  });
+
+  showLoginLink.addEventListener('click', () => {
+    signupContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  });
+
+  // Login
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.textContent = '';
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      // Redirect here on success:
+      window.location.href = 'forms.html';
+    } catch (error) {
+      loginError.textContent = error.message;
+      console.error('Login error:', error);
+    }
+  });
+
+  // Signup
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    signupError.textContent = '';
+
+    const firstName = document.getElementById('signup-first-name').value.trim();
+    const lastName = document.getElementById('signup-last-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const phone = document.getElementById('signup-phone').value.trim();
+    const street = document.getElementById('signup-street').value.trim();
+    const city = document.getElementById('signup-city').value.trim();
+    const state = document.getElementById('signup-state').value;
+    const zip = document.getElementById('signup-zip').value.trim();
+
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+    if (password !== confirmPassword) {
+      signupError.textContent = 'Passwords do not match';
+      return;
+    }
+
+    console.log('Collected form data:', {
+      firstName, lastName, email, phone, street, city, state, zip
+    });
+
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        phone,
+        address: { street, city, state, zip },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      await Promise.all([
+        userCredential.user.updateProfile({
+          displayName: `${firstName} ${lastName}`
+        }),
+        db.collection('users').doc(userCredential.user.uid).set(userData)
+      ]);
+
+      // Redirect after successful signup
+      window.location.href = 'forms.html';
+
+    } catch (error) {
+      signupError.textContent = error.message;
+      console.error('Signup error:', error);
+      
+      // Cleanup: delete user if profile update or Firestore save fails
+      if (auth.currentUser) {
+        await auth.currentUser.delete();
+      }
+    }
+  });
+
+</script>
+</body>
+</html>
