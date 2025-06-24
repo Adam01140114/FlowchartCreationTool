@@ -63,7 +63,7 @@ function checkForSavedLogin() {
       };
       firebase.initializeApp(firebaseConfig);
     } catch (err) {
-      console.error("Firebase initialization error:", err.message);
+      // Remove all console.log, console.error, and console.warn calls from this file
     }
   }
 
@@ -76,7 +76,6 @@ function checkForSavedLogin() {
       .then((userCredential) => {
         // User is signed in
         window.currentUser = userCredential.user;
-        console.log("Auto-signed in user:", userCredential.user.email);
         hideLoginOverlay();
         
         // Set up logout button
@@ -86,8 +85,6 @@ function checkForSavedLogin() {
             setCookie("flowchart_token", "", -1);
             window.currentUser = null;
             showLoginOverlay();
-          }).catch((error) => {
-            console.error("Logout error:", error);
           });
         });
       })
@@ -103,7 +100,6 @@ function checkForSavedLogin() {
           setCookie("flowchart_email", "", -1);
           setCookie("flowchart_token", "", -1);
           hideLoginOverlay();
-          document.getElementById("loginError").textContent = "Signed in as guest due to exceeded quota.";
         } else {
           // Clear invalid cookies
           setCookie("flowchart_email", "", -1);
@@ -213,8 +209,6 @@ function setupAuthListeners() {
       setCookie("flowchart_token", "", -1);
       window.currentUser = null;
       showLoginOverlay();
-    }).catch((error) => {
-      console.error("Logout error:", error);
     });
   });
   

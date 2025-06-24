@@ -116,15 +116,6 @@ function deleteSection(sectionNum) {
       });
     });
     
-    // Log the found dependencies
-    if (calcNodesToDependencies.size > 0) {
-      console.log(`Found ${calcNodesToDependencies.size} calculation nodes dependent on questions in section ${sectionToDelete}`);
-      calcNodesToDependencies.forEach((data, id) => {
-        const depNames = data.dependencies.map(q => getNodeId(q) || q.value || 'unnamed').join(', ');
-        console.log(`  - Calc node ${id} depends on: ${depNames}`);
-      });
-    }
-    
     // Collect all calc nodes to delete
     const calcNodesToDelete = Array.from(calcNodesToDependencies.values()).map(data => data.cell);
     
@@ -140,7 +131,6 @@ function deleteSection(sectionNum) {
     
     if (allCellsToDelete.length > 0) {
       graph.removeCells(allCellsToDelete);
-      console.log(`Deleted ${cellsToDelete.length} cells from section ${sectionToDelete} and ${calcNodesToDelete.length} dependent calculation nodes`);
     }
     
     // Then move all cells from higher sections down one level

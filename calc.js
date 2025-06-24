@@ -500,7 +500,6 @@ function findCalcNodesDependentOnQuestion(questionCell) {
  */
 function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId = null) {
   if (isDeleted && !oldNodeId) {
-    console.error("When deleting a question, must provide its oldNodeId");
     return;
   }
   
@@ -548,7 +547,6 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
       graph.getModel().beginUpdate();
       try {
         graph.removeCells(calcNodesToDelete);
-        console.log(`Deleted ${calcNodesToDelete.length} calculation nodes that depended on deleted question`);
       } finally {
         graph.getModel().endUpdate();
       }
@@ -564,8 +562,6 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
         dependentCalcNodes.forEach(calcNode => {
           updateCalculationNodeCell(calcNode);
         });
-        
-        console.log(`Updated ${dependentCalcNodes.length} calculation nodes that depend on modified question`);
       } finally {
         graph.getModel().endUpdate();
       }

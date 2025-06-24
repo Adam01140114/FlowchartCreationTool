@@ -3505,3 +3505,201 @@ function previewForm() {
   // Open the GUI preview in a new tab
   window.open('FormWiz%20GUI/gui.html', '_blank');
 }
+
+// AUTOSAVE FLOWCHART TO COOKIES FEATURE
+// --- AUTOSAVE CONSTANTS ---
+const AUTOSAVE_COOKIE_NAME = 'flowchart_autosave_json';
+const AUTOSAVE_COOKIE_DAYS = 30;
+
+// --- AUTOSAVE CORE FUNCTIONS ---
+function autosaveFlowchartToCookie() {
+  try {
+    if (!graph) return;
+    const parent = graph.getDefaultParent();
+    const cells = graph.getChildCells(parent, true, true);
+    const sectionPrefsCopy = JSON.parse(JSON.stringify(sectionPrefs));
+    const data = { cells: [], sectionPrefs: sectionPrefsCopy };
+    cells.forEach(cell => {
+      const cellData = {};
+      for (let key in cell) {
+        if (Object.prototype.hasOwnProperty.call(cell, key)) {
+          cellData[key] = cell[key];
+        }
+      }
+      // Remove graph/model references
+      delete cellData.parent;
+      delete cellData.children;
+      data.cells.push(cellData);
+    });
+    const json = JSON.stringify(data);
+    setCookie(AUTOSAVE_COOKIE_NAME, encodeURIComponent(json), AUTOSAVE_COOKIE_DAYS);
+    console.log('[AUTOSAVE] Flowchart autosaved to cookies. Length:', json.length);
+  } catch (e) {
+    console.log('[AUTOSAVE] Error during autosave:', e);
+  }
+}
+
+function clearAutosaveCookie() {
+  setCookie(AUTOSAVE_COOKIE_NAME, '', -1);
+  console.log('[AUTOSAVE] Cleared autosave cookie.');
+}
+
+// Patch setCookie and getCookie for autosave debugging
+const origSetCookie = window.setCookie;
+window.setCookie = function(name, value, days) {
+  if (name === AUTOSAVE_COOKIE_NAME) {
+    console.log('[AUTOSAVE][setCookie] Setting cookie:', name, 'length:', value ? value.length : 0, 'days:', days);
+    // Show a preview of the value (first 100 chars)
+    if (value) console.log('[AUTOSAVE][setCookie] Value preview:', value.substring(0, 100));
+  }
+  return origSetCookie.apply(this, arguments);
+};
+
+const origGetCookie = window.getCookie;
+window.getCookie = function(name) {
+  if (name === AUTOSAVE_COOKIE_NAME) {
+    console.log('[AUTOSAVE][getCookie] Getting cookie:', name);
+    console.log('[AUTOSAVE][getCookie] document.cookie:', document.cookie);
+  }
+  return origGetCookie.apply(this, arguments);
+};
+
+// Patch getAutosaveFlowchartFromCookie to log raw value
+function getAutosaveFlowchartFromCookie() {
+  const raw = getCookie(AUTOSAVE_COOKIE_NAME);
+  console.log('[AUTOSAVE][getAutosaveFlowchartFromCookie] Raw value:', raw ? raw.substring(0, 100) : raw);
+  if (!raw) {
+    console.log('[AUTOSAVE] No autosave cookie found.');
+    return null;
+  }
+  try {
+    const json = decodeURIComponent(raw);
+    const data = JSON.parse(json);
+    console.log('[AUTOSAVE] Loaded autosave JSON from cookie. Length:', json.length);
+    return data;
+  } catch (e) {
+    console.log('[AUTOSAVE] Error parsing autosave cookie:', e);
+    return null;
+  }
+}
+
+// --- AUTOSAVE HOOKS ---
+function setupAutosaveHooks() {
+  if (!graph) return;
+  // Save after any model change
+  graph.getModel().addListener(mxEvent.CHANGE, function() {
+    autosaveFlowchartToCookie();
+  });
+  // Save after refreshAllCells (in case of programmatic changes)
+  const origRefreshAllCells = window.refreshAllCells;
+  window.refreshAllCells = function() {
+    origRefreshAllCells.apply(this, arguments);
+    autosaveFlowchartToCookie();
+  };
+  // Save after loadFlowchartData
+  const origLoadFlowchartData = window.loadFlowchartData;
+  window.loadFlowchartData = function(data) {
+    origLoadFlowchartData.apply(this, arguments);
+    autosaveFlowchartToCookie();
+  };
+  console.log('[AUTOSAVE] Autosave hooks set up.');
+}
+
+// --- AUTOSAVE RESTORE PROMPT ---
+function showAutosaveRestorePrompt() {
+  // Create modal overlay
+  let modal = document.createElement('div');
+  modal.id = 'autosaveRestoreModal';
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100vw';
+  modal.style.height = '100vh';
+  modal.style.background = 'rgba(0,0,0,0.5)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '9999';
+
+  let box = document.createElement('div');
+  box.style.background = '#fff';
+  box.style.padding = '32px 40px';
+  box.style.borderRadius = '12px';
+  box.style.boxShadow = '0 4px 32px rgba(0,0,0,0.18)';
+  box.style.textAlign = 'center';
+  box.innerHTML = `<h2>Pick up where you left off?</h2><p>We found an autosaved flowchart. Would you like to continue editing it?</p>`;
+
+  let yesBtn = document.createElement('button');
+  yesBtn.textContent = 'Yes';
+  yesBtn.style.margin = '12px 24px 0 0';
+  yesBtn.style.padding = '10px 28px';
+  yesBtn.style.fontSize = '1.1em';
+  yesBtn.style.borderRadius = '6px';
+  yesBtn.style.background = '#1976d2';
+  yesBtn.style.color = '#fff';
+  yesBtn.style.border = 'none';
+  yesBtn.style.cursor = 'pointer';
+
+  let noBtn = document.createElement('button');
+  noBtn.textContent = 'No';
+  noBtn.style.margin = '12px 0 0 0';
+  noBtn.style.padding = '10px 28px';
+  noBtn.style.fontSize = '1.1em';
+  noBtn.style.borderRadius = '6px';
+  noBtn.style.background = '#bbb';
+  noBtn.style.color = '#222';
+  noBtn.style.border = 'none';
+  noBtn.style.cursor = 'pointer';
+
+  yesBtn.onclick = function() {
+    modal.remove();
+    const data = getAutosaveFlowchartFromCookie();
+    if (data) {
+      window.loadFlowchartData(data);
+      console.log('[AUTOSAVE] User chose YES: loaded autosaved flowchart.');
+    }
+    // Only set up autosave hooks after restoring
+    setTimeout(safeSetupAutosaveHooks, 500);
+  };
+  noBtn.onclick = function() {
+    modal.remove();
+    clearAutosaveCookie();
+    // Optionally, reload the page to start fresh
+    window.location.reload();
+    console.log('[AUTOSAVE] User chose NO: cleared autosave and reloaded.');
+    // No need to set up hooks, page will reload
+  };
+
+  box.appendChild(yesBtn);
+  box.appendChild(noBtn);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+  console.log('[AUTOSAVE] Restore prompt shown.');
+}
+
+// --- INIT AUTOSAVE ON PAGE LOAD ---
+// Remove the previous autosave setup from DOMContentLoaded
+// Instead, defer autosave hook setup until after restore prompt or graph init
+
+// Helper to ensure autosave hooks are only set up once
+let autosaveHooksSetup = false;
+function safeSetupAutosaveHooks() {
+  if (!autosaveHooksSetup) {
+    setupAutosaveHooks();
+    autosaveHooksSetup = true;
+  }
+}
+
+// On DOMContentLoaded, check for autosave and only set up hooks after graph is ready
+// (graph is created in the main DOMContentLoaded handler)
+document.addEventListener('DOMContentLoaded', function() {
+  // Check for autosave cookie
+  const autosaveData = getAutosaveFlowchartFromCookie();
+  if (autosaveData && autosaveData.cells && autosaveData.cells.length > 0) {
+    // Show restore prompt, hooks set up after user choice
+    showAutosaveRestorePrompt();
+  } else {
+    // No autosave, set up hooks after graph is ready
+    setTimeout(safeSetupAutosaveHooks, 1000); // Wait for graph to be initialized
+  }
+});
