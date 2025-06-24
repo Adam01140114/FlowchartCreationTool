@@ -16,14 +16,14 @@ let currentUser = null;
 
 // For "Reset" button (question colors)
 const defaultColors = {
-  amountOption: "#ffeb3b",
-  text: "#cce6ff",
-  checkbox: "#b3daff",
-  dropdown: "#99ccff",
-  money: "#80bfff",
-  date: "#4da6ff",
-  bigParagraph: "#1a8cff",
-  textColor: "#000000"
+  amountOption: "#e3f2fd", // very light blue
+  text: "#e3f2fd",        // Textbox
+  checkbox: "#bbdefb",    // Checkbox
+  dropdown: "#90caf9",    // Dropdown
+  money: "#64b5f6",       // Number
+  date: "#42a5f5",        // Date
+  bigParagraph: "#2196f3",// Big Paragraph
+  textColor: "#1976d2"    // Text Color
 };
 
 
@@ -881,8 +881,12 @@ graph.isCellEditable = function (cell) {
 
         // If question
         if (isQuestion(newVertex)) {
-          // Immediately force proper html for its actual type
-          setQuestionType(newVertex, getQuestionType(newVertex));
+          // Only set type if there is a questionType in the style
+          const qType = getQuestionType(newVertex);
+          if (qType) {
+            setQuestionType(newVertex, qType);
+          }
+          // Otherwise, leave as unassigned so the dropdown appears
         } else if (isOptions(newVertex)) {
           refreshOptionNodeId(newVertex);
         } else   if (isCalculationNode(newVertex)) {
@@ -6183,4 +6187,37 @@ document.addEventListener('change', function(e) {
 document.addEventListener('contextmenu', function(e) {
   if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
   e.preventDefault();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Map legend color box IDs to color picker IDs and colorPreferences keys
+  const colorMap = [
+    { box: 'colorText', picker: 'colorPickerText', key: 'text' },
+    { box: 'colorCheckbox', picker: 'colorPickerCheckbox', key: 'checkbox' },
+    { box: 'colorDropdown', picker: 'colorPickerDropdown', key: 'dropdown' },
+    { box: 'colorMoney', picker: 'colorPickerMoney', key: 'money' },
+    { box: 'colorDate', picker: 'colorPickerDate', key: 'date' },
+    { box: 'colorBigParagraph', picker: 'colorPickerBigParagraph', key: 'bigParagraph' },
+    { box: 'colorTextColor', picker: 'colorPickerTextColor', key: 'textColor' },
+    { box: 'colorDateRange', picker: 'colorPickerDate', key: 'date' }, // Date Range uses date color
+    { box: 'colorEmail', picker: 'colorPickerText', key: 'text' },     // Email uses text color
+    { box: 'colorPhone', picker: 'colorPickerText', key: 'text' }      // Phone uses text color
+  ];
+
+  colorMap.forEach(({ box, picker, key }) => {
+    const boxEl = document.getElementById(box);
+    const pickerEl = document.getElementById(picker);
+    if (boxEl && pickerEl) {
+      boxEl.addEventListener('click', function() {
+        pickerEl.value = rgbToHex(getComputedStyle(boxEl).backgroundColor);
+        pickerEl.click();
+      });
+      pickerEl.addEventListener('input', function(e) {
+        colorPreferences[key] = e.target.value;
+        updateLegendColors();
+        refreshAllCells();
+        saveUserColorPrefs();
+      });
+    }
+  });
 });

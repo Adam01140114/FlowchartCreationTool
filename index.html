@@ -36,11 +36,11 @@
 </div>
 
 <div class="toolbar">
-  <h3>Shapes</h3>
+  <h3>Drag And Drop Elements Below</h3>
   <div
     class="shape"
     data-type="question"
-    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;nodeId=Question_node;section=1;spacing=12;fontSize=16;"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;nodeId=Question_node;section=1;spacing=12;fontSize=16;"
   >
     Question Node
   </div>
@@ -50,13 +50,13 @@
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;nodeId=Option_node;section=1;spacing=12;fontSize=16;"
   >
     Options Node
-  </div>
+  </div><br>
   <div
     class="shape"
     data-type="imageOption"
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;nodeId=Image_node;section=1;spacing=12;fontSize=16;"
   >
-    Image Option Node
+    Image Node
   </div>
   <div 
     class="shape"
@@ -64,13 +64,13 @@
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;"
   >
     End Node
-  </div>
+  </div><br>
   <div 
     class="shape"
     data-type="amountOption"
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;"
   >
-    Amount Option Node
+    Amount Node
   </div>
 
   <!-- New: Calculation Node -->
@@ -159,7 +159,7 @@
 <div id="contextMenu" class="context-menu">
   <button id="copyNodeButton">Copy</button>
   <button id="deleteNode">Delete Node</button>
-  <button id="jumpNode">Jump</button>
+  <button id="jumpNode" style="display:none;">Jump</button>
   <button id="yesNoNode">Yes/No</button>
   <button id="changeType">Change Type &raquo;</button>
   <button id="newSectionNode">New Section</button>
