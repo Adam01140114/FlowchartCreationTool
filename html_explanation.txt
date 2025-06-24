@@ -1,0 +1,52 @@
+# HTML Editing Issue in FlowChart Application
+
+## Problem Description
+
+When double-clicking on certain question node types (phone number, email, or date range), the full HTML markup was being displayed in the editor instead of just the text content. This happened because these newer question types were not properly included in the HTML extraction logic.
+
+## Solution Implemented
+
+1. **Updated `isSimpleHtmlQuestion` Function**:
+   - Added the new question types ("dateRange", "email", "phone") to the array of simple HTML question types
+   - This function determines which question types should have their HTML stripped when editing
+
+2. **How It Works**:
+   - When a node is double-clicked, the `getEditingValue` function is called
+   - For nodes that return true from `isSimpleHtmlQuestion`, the HTML is stripped using a temporary div element
+   - This allows users to edit only the text content, not the HTML markup
+   - When saving, the text is properly wrapped back in HTML with appropriate styling
+
+3. **Legend Color Integration**:
+   - Added unique IDs for the legend color boxes for the new question types
+   - Updated the `updateLegendColors` function to set the colors for these elements
+   - Reused existing colors: date color for dateRange, text color for email and phone
+
+## Benefits
+
+- Consistent editing experience across all question types
+- Users no longer see HTML tags when editing nodes
+- Node text is properly preserved during editing
+
+## Technical Details
+
+The key components involved:
+
+1. **HTML Extraction**:
+   ```javascript
+   const tmp = document.createElement("div");
+   tmp.innerHTML = cell.value || "";
+   return tmp.textContent || tmp.innerText || "";
+   ```
+   This extracts plain text from HTML by using the DOM's text extraction capabilities.
+
+2. **HTML Reconstruction**:
+   ```javascript
+   value = mxUtils.htmlEntities(value || "");
+   graph.getModel().setValue(cell, `<div style="text-align:center;">${value}</div>`);
+   ```
+   This escapes HTML special characters and wraps the text in a properly styled div.
+
+3. **Event Handling**:
+   Double-click events are intercepted and appropriate editing behavior is applied based on the node type.
+
+This pattern could be extended to any new question types added in the future by following the same approach. 
