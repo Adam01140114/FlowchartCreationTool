@@ -3522,12 +3522,20 @@ function autosaveFlowchartToLocalStorage() {
       const cellData = {};
       for (let key in cell) {
         if (Object.prototype.hasOwnProperty.call(cell, key)) {
+          // Exclude graph/model references to avoid circular structure
+          if (["parent", "children", "edges", "mxTransient", "mxObjectId", "mxCellId", "mxCellEditor", "mxCellRenderer"].includes(key)) continue;
           cellData[key] = cell[key];
         }
       }
-      // Remove graph/model references
-      delete cellData.parent;
-      delete cellData.children;
+      // Also copy geometry
+      if (cell.geometry) {
+        cellData.geometry = {
+          x: cell.geometry.x,
+          y: cell.geometry.y,
+          width: cell.geometry.width,
+          height: cell.geometry.height
+        };
+      }
       data.cells.push(cellData);
     });
     const json = JSON.stringify(data);
@@ -3666,3 +3674,167 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(safeSetupAutosaveHooks, 1000);
   }
 });
+
+// --- COPY/PASTE NODE AS JSON ---
+let flowchartClipboard = null;
+
+function copySelectedNodeAsJson() {
+  const cells = graph.getSelectionCells();
+  if (!cells || cells.length === 0) return;
+  // Only copy vertices (nodes), not edges
+  const nodes = cells.filter(cell => cell.vertex);
+  if (nodes.length === 0) return;
+  // Deep clone node data (excluding graph/model references)
+  const data = nodes.map(cell => {
+    const cellData = {};
+    for (let key in cell) {
+      if (Object.prototype.hasOwnProperty.call(cell, key)) {
+        // Exclude parent/children/graph/model references
+        if (["parent", "children", "edges", "mxTransient", "mxObjectId", "mxCellId", "mxCellEditor", "mxCellRenderer"].includes(key)) continue;
+        cellData[key] = cell[key];
+      }
+    }
+    // Also copy geometry
+    if (cell.geometry) {
+      cellData.geometry = {
+        x: cell.geometry.x,
+        y: cell.geometry.y,
+        width: cell.geometry.width,
+        height: cell.geometry.height
+      };
+    }
+    return cellData;
+  });
+  flowchartClipboard = JSON.stringify(data);
+  // Optionally, copy to system clipboard
+  if (navigator.clipboard) navigator.clipboard.writeText(flowchartClipboard);
+}
+
+function pasteNodeFromJson(x, y) {
+  if (!flowchartClipboard) return;
+  let data;
+  try {
+    data = JSON.parse(flowchartClipboard);
+  } catch (e) {
+    alert("Clipboard data is invalid");
+    return;
+  }
+  if (!Array.isArray(data)) data = [data];
+  const parent = graph.getDefaultParent();
+  graph.getModel().beginUpdate();
+  try {
+    data.forEach((cellData, idx) => {
+      // Assign a new ID
+      cellData.id = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + idx;
+      // Offset geometry for each pasted node
+      let dx = 40 * idx;
+      let dy = 40 * idx;
+      let px = (typeof x === "number" ? x : (cellData.geometry?.x || 100)) + dx;
+      let py = (typeof y === "number" ? y : (cellData.geometry?.y || 100)) + dy;
+      const geo = new mxGeometry(px, py, cellData.geometry?.width || 160, cellData.geometry?.height || 80);
+      const newCell = new mxCell(cellData.value, geo, cellData.style);
+      newCell.vertex = true;
+      // Copy custom fields
+      ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        if (cellData[k] !== undefined) newCell[k] = cellData[k];
+      });
+      // Section
+      if (cellData.section !== undefined) newCell.section = cellData.section;
+      // Insert into graph
+      graph.addCell(newCell, parent);
+      // If image option, update rendering
+      if (getQuestionType(newCell) === "imageOption") {
+        updateImageOptionCell(newCell);
+      } else if (isOptions(newCell)) {
+        refreshOptionNodeId(newCell);
+      } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
+        if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+      }
+    });
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  refreshAllCells();
+}
+
+// --- UPDATE IMAGE OPTION NODE ---
+function updateImageOptionCell(cell) {
+  if (!cell || !isOptions(cell) || getQuestionType(cell) !== "imageOption") return;
+  // Ensure _image property exists
+  if (!cell._image) {
+    cell._image = { url: "", width: "100", height: "100" };
+  }
+  let imgUrl = cell._image.url || "";
+  let imgWidth = cell._image.width || "100";
+  let imgHeight = cell._image.height || "100";
+
+  // --- FOCUS PRESERVATION PATCH ---
+  // Find the currently focused input (if any) and its cursor position
+  let focusField = null, cursorPos = null, selectionEnd = null;
+  const active = document.activeElement;
+  if (active && active.tagName === 'INPUT' && active.type === 'text' || active.type === 'number') {
+    if (active.parentElement && active.parentElement.textContent.startsWith('URL')) focusField = 'url';
+    else if (active.parentElement && active.parentElement.textContent.startsWith('Width')) focusField = 'width';
+    else if (active.parentElement && active.parentElement.textContent.startsWith('Height')) focusField = 'height';
+    if (focusField) {
+      cursorPos = active.selectionStart;
+      selectionEnd = active.selectionEnd;
+    }
+  }
+
+  // Render image preview and three textboxes
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
+      <img src="${imgUrl}" alt="Image Preview" style="max-width:${imgWidth}px;max-height:${imgHeight}px;object-fit:contain;margin-bottom:8px;border:1px solid #ccc;background:#fff;" onerror="this.style.opacity=0.2" />
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
+        <label style="font-size:12px;width:100%;text-align:left;">URL:<input type="text" value="${escapeAttr(imgUrl)}" style="width:120px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','url',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Width:<input type="number" min="1" value="${escapeAttr(imgWidth)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','width',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Height:<input type="number" min="1" value="${escapeAttr(imgHeight)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','height',this.value)" /></label>
+      </div>
+    </div>
+  `;
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+
+  // --- RESTORE FOCUS AND CURSOR POSITION ---
+  if (focusField) {
+    setTimeout(() => {
+      // Find the correct input in the newly rendered node
+      const state = graph.view.getState(cell);
+      if (state && state.text && state.text.node) {
+        let input = null;
+        if (focusField === 'url') {
+          input = state.text.node.querySelector('input[type="text"]');
+        } else if (focusField === 'width') {
+          input = state.text.node.querySelectorAll('input[type="number"]')[0];
+        } else if (focusField === 'height') {
+          input = state.text.node.querySelectorAll('input[type="number"]')[1];
+        }
+        if (input) {
+          input.focus();
+          if (cursorPos !== null && selectionEnd !== null) {
+            input.setSelectionRange(cursorPos, selectionEnd);
+          }
+        }
+      }
+    }, 0);
+  }
+}
+
+// Handler for updating image node fields
+window.updateImageNodeField = function(cellId, field, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "imageOption") return;
+  if (!cell._image) cell._image = { url: "", width: "100", height: "100" };
+  if (field === "width" || field === "height") {
+    // Only allow positive integers
+    value = String(Math.max(1, parseInt(value) || 1));
+  }
+  cell._image[field] = value;
+  updateImageOptionCell(cell);
+};

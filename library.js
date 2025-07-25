@@ -200,11 +200,15 @@ window.exportGuiJson = function(download = true) {
       };
     }
     
-    const questionType = getQuestionType(cell);
+    let questionType = getQuestionType(cell);
+    let exportType = questionType;
+    // --- PATCH: treat text2 as dropdown ---
+    if (questionType === "text2") exportType = "dropdown";
+    
     const question = {
       questionId: cell._questionId || questionCounter++,
       text: cell._questionText || cell.value || "",
-      type: questionType,
+      type: exportType,
       logic: {
         enabled: false,
         conditions: []
@@ -260,18 +264,15 @@ window.exportGuiJson = function(download = true) {
         const targetCell = edge.target;
         if (targetCell && isOptions(targetCell)) {
           let optionText = targetCell.value || "";
-          
           // Clean HTML from option text
           if (optionText.includes("<")) {
             const temp = document.createElement("div");
             temp.innerHTML = optionText;
             optionText = temp.textContent || temp.innerText || optionText;
           }
-          
           const option = {
             text: optionText
           };
-          
           // Handle amount options
           if (getQuestionType(targetCell) === "amountOption") {
             option.amount = {
@@ -279,16 +280,100 @@ window.exportGuiJson = function(download = true) {
               placeholder: targetCell._amountPlaceholder || "Enter amount"
             };
           }
-          
           // Handle image options
           if (getQuestionType(targetCell) === "imageOption" && targetCell._image) {
             option.image = targetCell._image;
           }
-          
           question.options.push(option);
         }
       }
     }
+    
+    // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
+    if (exportType === "dropdown") {
+      let imageData = null;
+      // Convert options to array of strings, and extract image node if present
+      question.options = question.options.map(opt => {
+        if (typeof opt.text === 'string') {
+          // If this option is an image node, extract its image data
+          if (opt.image && typeof opt.image === 'object') {
+            imageData = opt.image;
+          }
+          return opt.text;
+        }
+        return "";
+      });
+      // Add linking field
+      question.linking = { enabled: false, targetId: "" };
+      // Add image field: use imageData if found, else default
+      question.image = imageData || { url: "", width: 0, height: 0 };
+    }
+    
+    // --- PATCH: Add full path conditional logic based on all parent chains ---
+    function collectAllLogicPaths(cell, pathSoFar) {
+      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      let found = false;
+      let allPaths = [];
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && isOptions(sourceCell)) {
+          // Find the parent question of this option node
+          const optionIncoming = graph.getIncomingEdges(sourceCell) || [];
+          for (const optEdge of optionIncoming) {
+            const parentQ = optEdge.source;
+            if (parentQ && isQuestion(parentQ)) {
+              const prevQuestionId = parentQ._questionId || "";
+              let optionLabel = sourceCell.value || "";
+              if (optionLabel.includes("<")) {
+                const temp = document.createElement("div");
+                temp.innerHTML = optionLabel;
+                optionLabel = temp.textContent || temp.innerText || optionLabel;
+              }
+              // Recursively collect parent logic paths
+              const parentPaths = collectAllLogicPaths(parentQ, pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
+              if (parentPaths.length > 0) {
+                found = true;
+                allPaths.push(...parentPaths);
+              } else {
+                found = true;
+                allPaths.push(pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
+              }
+            }
+          }
+        } else if (sourceCell && isQuestion(sourceCell)) {
+          // Recursively walk up question-to-question edges
+          const parentPaths = collectAllLogicPaths(sourceCell, pathSoFar);
+          if (parentPaths.length > 0) {
+            found = true;
+            allPaths.push(...parentPaths);
+          }
+        }
+      }
+      if (!found && pathSoFar.length > 0) {
+        return [pathSoFar];
+      }
+      return allPaths;
+    }
+    let logicPaths = collectAllLogicPaths(cell, []);
+    // Deduplicate logic conditions (by JSON string)
+    if (logicPaths.length > 0) {
+      question.logic.enabled = true;
+      const unique = [];
+      const seen = new Set();
+      for (const path of logicPaths) {
+        if (path.length > 0) {
+          // Only use the last condition in the path (the most recent branching)
+          const cond = path[path.length - 1];
+          const key = JSON.stringify(cond);
+          if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(cond);
+          }
+        }
+      }
+      question.logic.conditions = unique;
+    }
+    // --- END PATCH ---
     
     sectionMap[section].questions.push(question);
   }

@@ -106,11 +106,27 @@ function loadFormData(formData) {
     questionCounter = formData.questionCounter || 1;
     hiddenFieldCounter = formData.hiddenFieldCounter || 1;
 
-    // 3) Possibly set default PDF name
+    // 3) Set PDF name and other form settings
     if (formData.defaultPDFName) {
         const formPDFNameInput = document.getElementById('formPDFName');
         if (formPDFNameInput) {
             formPDFNameInput.value = formData.defaultPDFName;
+        }
+    }
+    
+    // Set PDF output name
+    if (formData.pdfOutputName) {
+        const pdfOutputNameInput = document.getElementById('pdfOutputName');
+        if (pdfOutputNameInput) {
+            pdfOutputNameInput.value = formData.pdfOutputName;
+        }
+    }
+    
+    // Set Stripe Price ID
+    if (formData.stripePriceId) {
+        const stripePriceIdInput = document.getElementById('stripePriceId');
+        if (stripePriceIdInput) {
+            stripePriceIdInput.value = formData.stripePriceId;
         }
     }
 
@@ -618,6 +634,12 @@ function exportForm() {
         hiddenFieldCounter: hiddenFieldCounter,
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
+            : '',
+        pdfOutputName: document.getElementById('pdfOutputName')
+            ? document.getElementById('pdfOutputName').value.trim()
+            : '',
+        stripePriceId: document.getElementById('stripePriceId')
+            ? document.getElementById('stripePriceId').value.trim()
             : '',
         additionalPDFs: [] // New field for additional PDFs
     };

@@ -305,6 +305,7 @@ logicScriptBuffer = "";
     "    <nav>",
     '        <a href="index.html">Home</a>',
     '        <a href="forms.html">Forms</a>',
+    '        <a href="cart.html" id="cart-link">Cart <span id="cart-count" style="background: #ff7043; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8em; margin-left: 5px;">0</span></a>',
     '        <a href="contact.html">Contact Us</a>',
     "    </nav>",
     "</header>",
@@ -315,10 +316,11 @@ logicScriptBuffer = "";
     '<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">',
     "",
     "<!-- Firebase includes -->",
-'<script src="https://js.stripe.com/v3/"></script>',
+    '<script src="https://js.stripe.com/v3/"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+    '<script src="cart.js"></script>',
     "",
     '<script>',
     
@@ -1232,7 +1234,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
         authDomain: "formwiz-3f4fd.firebaseapp.com",
         projectId: "formwiz-3f4fd",
-        storageBucket: "formwiz-3f4fd.appspot.com",
+        storageBucket: "formwiz-3f4fd.firebasestorage.app",
         messagingSenderId: "404259212529",
         appId: "1:404259212529:web:15a33bce82383b21cfed50",
         measurementId: "G-P07YEN0HPD"
@@ -2145,15 +2147,14 @@ if (typeof handleNext === 'function') {
         if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) return;
         const db = firebase.firestore();
         const urlParams = new URLSearchParams(window.location.search);
-        const formId = urlParams.get('formId') || window.formId || 'default';
+        const baseFormId = urlParams.get('formId') || window.formId || 'default';
+        const county = urlParams.get('county') || '';
+        // Create a unique form ID that includes county information for autosave separation
+        const formId = county ? baseFormId + '_' + county.replace(/\s+/g, '_') : baseFormId;
         let userId = null;
         let isUserLoggedIn = false;
 
-        // Stripe Keys - Placed within scope
-        // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
-        const STRIPE_PUBLIC_KEY = 'pk_live_51RcD0sFJeSRMFQ8X5rliD5AD1etCL6QwozQjkmUoCG5iULUAqPLFjm4aejihXCZNjsQF1cfSVug5lXe0NKns1TEY00SWDPlDAz';
-        // IMPORTANT: Replace this with the actual TEST Price ID for your product.
-        const STRIPE_PRICE_ID = stripePriceId || 'price_1RcDedFJeSRMFQ8XmelYMbkc';
+
 
         // Helper: get all form fields to save
         function getFormFields() {
@@ -2246,61 +2247,108 @@ if (typeof handleNext === 'function') {
 
 
         
-        // Payment Modal Logic
-        function showPaymentModal() {
-            const modal = document.createElement('div');
-            modal.id = 'stripe-payment-modal';
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100vw';
-            modal.style.height = '100vh';
-            modal.style.background = 'rgba(44,62,80,0.45)';
-            modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
-            modal.style.zIndex = '99999';
-            modal.innerHTML =
-    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
-      '<h2>Payment Required</h2>' +
-      '<p>To download your completed PDF, please complete payment.</p>' +
-      '<button id="stripeCheckoutBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Pay & Download</button>' +
-      '<br><br>' +
-      '<button id="cancelPaymentBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">Cancel</button>' +
-    '</div>';
+        // Cart Modal Logic
+        function showCartModal() {
+            const EXAMPLE_FORM_PRICE_ID = stripePriceId;
+            let exampleFormPrice = null;
 
-  document.body.appendChild(modal);
-
-  document.getElementById('cancelPaymentBtn').onclick = () => {
-    document.body.removeChild(modal);
-  };
-  document.getElementById('stripeCheckoutBtn').onclick = () => {
-    startStripeCheckout();
-  };
-}
-
-
-        async function startStripeCheckout() {
-            await saveAnswers();
-            const stripe = Stripe(STRIPE_PUBLIC_KEY);
-            try {
-                const response = await fetch('/create-checkout-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        priceId: STRIPE_PRICE_ID,
-                        formId: formId
-                    })
-                });
-                const data = await response.json();
-                if (data.sessionId) {
-                    stripe.redirectToCheckout({ sessionId: data.sessionId });
-                } else {
-                    alert('Error: Could not create payment session.');
+            async function fetchExampleFormPrice() {
+                try {
+                    const res = await fetch(\`/stripe-price/\${EXAMPLE_FORM_PRICE_ID}\`);
+                    if (!res.ok) return null;
+                    const data = await res.json();
+                    exampleFormPrice = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
+                    return exampleFormPrice;
+                } catch (e) {
+                    return null;
                 }
-            } catch (error) {
-                console.error('Payment Error:', error);
-                alert('A payment error occurred. Please try again.');
+            }
+
+            fetchExampleFormPrice().then(price => {
+                const priceDisplay = price ? \`\$\${price}\` : '...';
+                const modal = document.createElement('div');
+                modal.id = 'cart-modal';
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100vw';
+                modal.style.height = '100vh';
+                modal.style.background = 'rgba(44,62,80,0.45)';
+                modal.style.display = 'flex';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                modal.style.zIndex = '99999';
+                modal.innerHTML =
+                    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
+                    '<h2>Checkout</h2>' +
+                    \`<p>Your form has been completed! Add it to your cart to download .</p>\` +
+                    \`<button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Add to Cart - \${priceDisplay}</button>\` +
+                    '<br><br>' +
+                    '<button id="viewCartBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">View Cart</button>' +
+                    '<br><br>' +
+                    '<button id="cancelCartBtn" style="background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">Cancel</button>' +
+                    '</div>';
+
+                document.body.appendChild(modal);
+
+                document.getElementById('cancelCartBtn').onclick = () => {
+                    document.body.removeChild(modal);
+                };
+                document.getElementById('viewCartBtn').onclick = () => {
+                    document.body.removeChild(modal);
+                    window.location.href = 'cart.html';
+                };
+                document.getElementById('addToCartBtn').onclick = () => {
+                    addFormToCart(EXAMPLE_FORM_PRICE_ID);
+                    document.body.removeChild(modal);
+                };
+            });
+        }
+
+
+        // Cart functionality
+        function addFormToCart(priceId) {
+            // Get all form data
+            const form = document.getElementById('customForm');
+            const formData = {};
+            
+            if (form) {
+                const formElements = form.elements;
+                for (let i = 0; i < formElements.length; i++) {
+                    const element = formElements[i];
+                    if (element.name && !element.disabled && 
+                        ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName) &&
+                        !['hidden', 'button', 'submit', 'reset'].includes(element.type)) {
+                        
+                        if (element.type === 'checkbox' || element.type === 'radio') {
+                            formData[element.name] = element.checked;
+                        } else {
+                            formData[element.name] = element.value;
+                        }
+                    }
+                }
+            }
+
+            // Add to cart using the global cart manager
+           const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
+            
+           if (typeof addToCart === 'function') {
+                addToCart(formId || 'custom-form', formTitle, priceId, formData);
+                window.location.href = 'cart.html';
+            } else {
+                // Fallback: save to localStorage if cart manager not available
+                const cartItem = {
+                    formId: formId || 'custom-form',
+                    title: formTitle,
+                    priceId: priceId,
+                    formData: formData,
+                    timestamp: Date.now()
+                };
+                
+                let cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+                cart.push(cartItem);
+                localStorage.setItem('formwiz_cart', JSON.stringify(cart));
+                window.location.href = 'cart.html';
             }
         }
 
@@ -2330,10 +2378,27 @@ if (typeof handleNext === 'function') {
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                showPaymentModal();
+                showCartModal();
                 return false;
             });
         }
+
+        // Update cart count
+        function updateCartCount() {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement && typeof getCartCount === 'function') {
+                const count = getCartCount();
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+            }
+        }
+
+        // Update cart count on page load and periodically
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            // Update cart count every 5 seconds
+            setInterval(updateCartCount, 5000);
+        });
     });
 })();
 
