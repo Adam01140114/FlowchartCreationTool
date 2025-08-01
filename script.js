@@ -3931,13 +3931,26 @@ function copySelectedNodeAsJson() {
     
     console.log('Copy operation - Nodes:', nodes.length, 'Edges found:', edges.length, 'Edge data:', edgeData.length);
     
+    // Collect section preferences from the copied nodes
+    const copiedSectionPrefs = {};
+    nodes.forEach(cell => {
+      const section = cell.section || "1";
+      if (sectionPrefs[section]) {
+        copiedSectionPrefs[section] = {
+          name: sectionPrefs[section].name,
+          borderColor: sectionPrefs[section].borderColor
+        };
+      }
+    });
+    
     // Create the complete clipboard data
     const clipboardData = {
       nodes: nodeData,
       edges: edgeData,
       centerX: centerX,
       centerY: centerY,
-      isMultiCopy: true
+      isMultiCopy: true,
+      sectionPrefs: copiedSectionPrefs
     };
     
     const jsonData = JSON.stringify(clipboardData);
@@ -4088,6 +4101,23 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         console.log('No edges data found in clipboard');
       }
       
+      // Merge section preferences from clipboard with current ones
+      if (data.sectionPrefs) {
+        Object.keys(data.sectionPrefs).forEach(sectionNum => {
+          const clipboardSection = data.sectionPrefs[sectionNum];
+          // Always use the clipboard section data (prioritize updated names)
+          sectionPrefs[sectionNum] = {
+            name: clipboardSection.name,
+            borderColor: clipboardSection.borderColor
+          };
+        });
+        
+        // Update the section legend to reflect the new sections
+        if (typeof updateSectionLegend === 'function') {
+          updateSectionLegend();
+        }
+      }
+      
       // Show feedback with counts
       const nodeCount = data.nodes.length;
       const edgeCount = data.edges ? data.edges.length : 0;
@@ -4125,6 +4155,23 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
         }
       });
+      
+      // Merge section preferences from clipboard with current ones (for legacy format)
+      if (data.sectionPrefs) {
+        Object.keys(data.sectionPrefs).forEach(sectionNum => {
+          const clipboardSection = data.sectionPrefs[sectionNum];
+          // Always use the clipboard section data (prioritize updated names)
+          sectionPrefs[sectionNum] = {
+            name: clipboardSection.name,
+            borderColor: clipboardSection.borderColor
+          };
+        });
+        
+        // Update the section legend to reflect the new sections
+        if (typeof updateSectionLegend === 'function') {
+          updateSectionLegend();
+        }
+      }
       
       showPasteFeedback(legacyData.length, 0);
     }

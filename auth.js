@@ -118,6 +118,11 @@ function checkForSavedLogin() {
  * Sets up event listeners for login and signup buttons.
  */
 function setupAuthListeners() {
+  // Set up close button for login overlay
+  document.getElementById("closeLoginBtn").addEventListener("click", () => {
+    hideLoginOverlay();
+  });
+
   document.getElementById("loginButton").addEventListener("click", () => {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;

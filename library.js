@@ -343,14 +343,16 @@ window.exportGuiJson = function(download = true) {
       // Convert options to array of strings, and extract image node if present
       question.options = question.options.map(opt => {
         if (typeof opt.text === 'string') {
-          // If this option is an image node, extract its image data
+          // If this option is an image node, extract its image data and skip adding text
           if (opt.image && typeof opt.image === 'object') {
             imageData = opt.image;
+            return null; // Skip this option text
           }
           return opt.text;
         }
         return "";
-      });
+      }).filter(opt => opt !== null); // Remove null entries (image options)
+      
       // Add linking field
       question.linking = { enabled: false, targetId: "" };
       // Add image field: use imageData if found, else default
@@ -511,6 +513,15 @@ window.exportGuiJson = function(download = true) {
     // --- END PATCH ---
     
     sectionMap[section].questions.push(question);
+  }
+  
+  // Sort questions within each section by questionId
+  for (const secNum in sectionMap) {
+    sectionMap[secNum].questions.sort((a, b) => {
+      const aId = parseInt(a.questionId) || 0;
+      const bId = parseInt(b.questionId) || 0;
+      return aId - bId;
+    });
   }
   
   // Convert sectionMap to array and sort by sectionId
