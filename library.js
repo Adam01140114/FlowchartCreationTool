@@ -82,6 +82,22 @@ window.exportFlowchartJson = function () {
   };
 
   const jsonStr = JSON.stringify(exportObj, null, 2);
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(jsonStr).then(() => {
+    console.log('Flowchart JSON copied to clipboard');
+    // Show user feedback
+    const notification = document.createElement('div');
+    notification.textContent = 'Flowchart JSON copied to clipboard!';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+  }).catch(err => {
+    console.error('Failed to copy to clipboard:', err);
+  });
+  
   downloadJson(jsonStr, "flowchart.json");
 };
 
@@ -309,11 +325,11 @@ window.exportGuiJson = function(download = true) {
       question.image = imageData || { url: "", width: 0, height: 0 };
     }
     
-    // --- PATCH: Add full path conditional logic based on all parent chains ---
-    function collectAllLogicPaths(cell, pathSoFar) {
+    // --- PATCH: Add direct parent conditional logic with special handling for mult textbox/dropdown ---
+    function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
-      let found = false;
-      let allPaths = [];
+      const conditions = [];
+      
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
         if (sourceCell && isOptions(sourceCell)) {
@@ -329,49 +345,57 @@ window.exportGuiJson = function(download = true) {
                 temp.innerHTML = optionLabel;
                 optionLabel = temp.textContent || temp.innerText || optionLabel;
               }
-              // Recursively collect parent logic paths
-              const parentPaths = collectAllLogicPaths(parentQ, pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
-              if (parentPaths.length > 0) {
-                found = true;
-                allPaths.push(...parentPaths);
-              } else {
-                found = true;
-                allPaths.push(pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
-              }
+              conditions.push({
+                prevQuestion: String(prevQuestionId),
+                prevAnswer: optionLabel.trim()
+              });
             }
           }
         } else if (sourceCell && isQuestion(sourceCell)) {
-          // Recursively walk up question-to-question edges
-          const parentPaths = collectAllLogicPaths(sourceCell, pathSoFar);
-          if (parentPaths.length > 0) {
-            found = true;
-            allPaths.push(...parentPaths);
+          // This is a direct question-to-question connection
+          // Check if the source is a multiple textbox/dropdown question
+          const sourceQuestionType = getQuestionType(sourceCell);
+          if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType") {
+            // For multiple textbox/dropdown questions, we need to find their parent condition
+            const sourceParentCondition = findDirectParentCondition(sourceCell);
+            if (sourceParentCondition) {
+              conditions.push(sourceParentCondition);
+            }
           }
         }
       }
-      if (!found && pathSoFar.length > 0) {
-        return [pathSoFar];
+      
+      // Special case: If this question can be reached from multiple paths (including through mult textbox/dropdown),
+      // we need to include all the conditions that lead to it
+      if (conditions.length > 1) {
+        // Check if this is a case where the question should appear for both Yes/No answers
+        const uniqueQuestions = [...new Set(conditions.map(c => c.prevQuestion))];
+        if (uniqueQuestions.length === 1) {
+          // Same question, different answers - this means the question should appear for both paths
+          // Return all conditions to indicate it should appear for both Yes and No
+          return conditions;
+        } else {
+          // Different questions - prioritize "Yes" answers
+          const yesCondition = conditions.find(cond => cond.prevAnswer === "Yes");
+          if (yesCondition) {
+            return yesCondition;
+          }
+        }
       }
-      return allPaths;
+      
+      // Return the first condition if only one, or null if none
+      return conditions.length > 0 ? conditions[0] : null;
     }
-    let logicPaths = collectAllLogicPaths(cell, []);
-    // Deduplicate logic conditions (by JSON string)
-    if (logicPaths.length > 0) {
+    
+    const directParentCondition = findDirectParentCondition(cell);
+    if (directParentCondition) {
       question.logic.enabled = true;
-      const unique = [];
-      const seen = new Set();
-      for (const path of logicPaths) {
-        if (path.length > 0) {
-          // Only use the last condition in the path (the most recent branching)
-          const cond = path[path.length - 1];
-          const key = JSON.stringify(cond);
-          if (!seen.has(key)) {
-            seen.add(key);
-            unique.push(cond);
-          }
-        }
+      // Handle both single condition and array of conditions
+      if (Array.isArray(directParentCondition)) {
+        question.logic.conditions = directParentCondition;
+      } else {
+        question.logic.conditions = [directParentCondition];
       }
-      question.logic.conditions = unique;
     }
     // --- END PATCH ---
     
@@ -397,6 +421,22 @@ window.exportGuiJson = function(download = true) {
   
   // Convert to string and download
   const jsonStr = JSON.stringify(output, null, 2);
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(jsonStr).then(() => {
+    console.log('GUI JSON copied to clipboard');
+    // Show user feedback
+    const notification = document.createElement('div');
+    notification.textContent = 'GUI JSON copied to clipboard!';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+  }).catch(err => {
+    console.error('Failed to copy to clipboard:', err);
+  });
+  
   if (download) {
     downloadJson(jsonStr, "gui.json");
   }

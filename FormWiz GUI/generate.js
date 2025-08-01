@@ -96,6 +96,9 @@ labelMap.length = 0;
 amountMap.length = 0;
 logicScriptBuffer = "";
 
+// Check if test mode is enabled
+const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
+
 
 
   // Top HTML (head, body, header, etc.)
@@ -104,9 +107,406 @@ logicScriptBuffer = "";
     '<html lang="en">',
     "<head>",
     '    <meta charset="UTF-8">',
+    '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
     "    <title>Custom Form</title>",
+    '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     "    <style>",
+    "      /* Header and Navigation Styles */",
+    "      html, body {",
+    "        height: 100%;",
+    "        margin: 0;",
+    "        display: flex;",
+    "        flex-direction: column;",
+    "        font-family: 'Montserrat', sans-serif;",
+    "        color: #333;",
+    "        background-color: #eaf1f8;",
+    "        min-height: 100vh;",
+    "      }",
+    "      body {",
+    "        min-height: 100vh;",
+    "        display: flex;",
+    "        flex-direction: column;",
+    "      }",
+    "      header {",
+    "        background-color: #2c3e50;",
+    "        padding: 20px;",
+    "        display: flex;",
+    "        align-items: center;",
+    "        justify-content: space-between;",
+    "        position: relative;",
+    "      }",
+    "      header img {",
+    "        cursor: pointer;",
+    "      }",
+    "      nav {",
+    "        position: absolute;",
+    "        left: 50%;",
+    "        transform: translateX(-50%);",
+    "        display: flex;",
+    "        gap: 38px;",
+    "        z-index: 2;",
+    "      }",
+    "      nav a {",
+    "        color: #fff;",
+    "        text-decoration: none;",
+    "        font-weight: 700;",
+    "        font-size: 1.18em;",
+    "        letter-spacing: 0.02em;",
+    "        padding: 2px 8px;",
+    "        transition: color 0.2s, background 0.2s, box-shadow 0.2s;",
+    "        border-radius: 6px;",
+    "        display: flex;",
+    "        align-items: center;",
+    "      }",
+    "      nav a:hover {",
+    "        color: #ff7043;",
+    "        background: rgba(255,255,255,0.08);",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
+    "      }",
+    "      .nav-chevron {",
+    "        display: inline-block;",
+    "        margin-left: 6px;",
+    "        width: 14px;",
+    "        height: 14px;",
+    "        vertical-align: middle;",
+    "      }",
+    "      .nav-chevron svg {",
+    "        display: block;",
+    "        width: 100%;",
+    "        height: 100%;",
+    "      }",
+    "      .header-actions {",
+    "        display: flex;",
+    "        align-items: center;",
+    "        gap: 18px;",
+    "        margin-left: auto;",
+    "      }",
+    "      .sign-in-btn {",
+    "        background: #fff;",
+    "        color: #222;",
+    "        font-weight: 700;",
+    "        font-size: 1.08em;",
+    "        border: none;",
+    "        border-radius: 22px;",
+    "        padding: 8px 28px;",
+    "        margin-left: 18px;",
+    "        cursor: pointer;",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
+    "        transition: background 0.2s, color 0.2s, box-shadow 0.2s;",
+    "        text-decoration: none;",
+    "        outline: none;",
+    "      }",
+    "      .sign-in-btn:hover {",
+    "        background: #f4f4f4;",
+    "        color: #2980b9;",
+    "        box-shadow: 0 4px 16px rgba(44,62,80,0.13);",
+    "      }",
+    "      .nav-dropdown-wrapper {",
+    "        position: relative;",
+    "        display: inline-block;",
+    "      }",
+    "      .dropdown-menu {",
+    "        display: none;",
+    "        position: absolute;",
+    "        left: 0;",
+    "        top: 38px;",
+    "        background: #fff;",
+    "        min-width: 210px;",
+    "        box-shadow: 0 4px 24px rgba(44,62,80,0.13);",
+    "        border-radius: 10px;",
+    "        z-index: 10;",
+    "        padding: 12px 0;",
+    "        flex-direction: column;",
+    "        gap: 0;",
+    "      }",
+    "      .dropdown-menu a {",
+    "        color: #222;",
+    "        padding: 12px 28px;",
+    "        text-decoration: none;",
+    "        display: block;",
+    "        font-weight: 600;",
+    "        font-size: 1.08em;",
+    "        border-radius: 0;",
+    "        transition: background 0.18s, color 0.18s;",
+    "      }",
+    "      .dropdown-menu a:hover {",
+    "        background: #eaf1f8;",
+    "        color: #2980b9;",
+    "      }",
+    "      .nav-dropdown-wrapper.open .dropdown-menu {",
+    "        display: flex !important;",
+    "        animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);",
+    "      }",
+    "      @keyframes dropdownFadeIn {",
+    "        from { opacity: 0; transform: translateY(-10px); }",
+    "        to { opacity: 1; transform: translateY(0); }",
+    "      }",
+    "      .forms-chevron {",
+    "        transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);",
+    "      }",
+    "      .nav-dropdown-wrapper.open .forms-chevron {",
+    "        transform: rotate(-90deg);",
+    "      }",
+    "      /* Cart Icon Styles */",
+    "      #cart-icon-link .cart-circle {",
+    "        width: 54px !important;",
+    "        height: 54px !important;",
+    "        background: #2980b9;",
+    "        border-radius: 50%;",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
+    "        display: inline-flex;",
+    "        align-items: center;",
+    "        justify-content: center;",
+    "        position: relative;",
+    "      }",
+    "      #cart-icon {",
+    "        width: 32px !important;",
+    "        height: 32px !important;",
+    "        display: block;",
+    "      }",
+    "      /* Sliding Cart Menu Styles */",
+    "      .cart-overlay {",
+    "        position: fixed;",
+    "        top: 0;",
+    "        left: 0;",
+    "        width: 100%;",
+    "        height: 100%;",
+    "        background: rgba(0, 0, 0, 0.5);",
+    "        z-index: 9999;",
+    "        opacity: 0;",
+    "        visibility: hidden;",
+    "        transition: opacity 0.3s ease, visibility 0.3s ease;",
+    "      }",
+    "      .cart-overlay.active {",
+    "        opacity: 1;",
+    "        visibility: visible;",
+    "      }",
+    "      .cart-side-menu {",
+    "        position: fixed;",
+    "        top: 0;",
+    "        right: -400px;",
+    "        width: 400px;",
+    "        height: 100%;",
+    "        background: #fff;",
+    "        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);",
+    "        z-index: 10000;",
+    "        transition: right 0.3s ease;",
+    "        display: flex;",
+    "        flex-direction: column;",
+    "      }",
+    "      .cart-side-menu.active {",
+    "        right: 0;",
+    "      }",
+    "      .cart-header {",
+    "        background: #2c3e50;",
+    "        color: #fff;",
+    "        padding: 20px;",
+    "        display: flex;",
+    "        justify-content: space-between;",
+    "        align-items: center;",
+    "      }",
+    "      .cart-header h2 {",
+    "        margin: 0;",
+    "        font-size: 1.5em;",
+    "        font-weight: 700;",
+    "      }",
+    "      .cart-close-btn {",
+    "        background: none;",
+    "        border: none;",
+    "        color: #fff;",
+    "        font-size: 1.5em;",
+    "        cursor: pointer;",
+    "        padding: 0;",
+    "        width: 30px;",
+    "        height: 30px;",
+    "        display: flex;",
+    "        align-items: center;",
+    "        justify-content: center;",
+    "        border-radius: 50%;",
+    "        transition: background 0.2s;",
+    "      }",
+    "      .cart-close-btn:hover {",
+    "        background: rgba(255, 255, 255, 0.1);",
+    "      }",
+    "      .cart-content {",
+    "        flex: 1;",
+    "        padding: 30px;",
+    "        display: flex;",
+    "        flex-direction: column;",
+    "        justify-content: center;",
+    "        align-items: center;",
+    "        text-align: center;",
+    "      }",
+    "      .cart-icon-large {",
+    "        font-size: 4em;",
+    "        margin-bottom: 20px;",
+    "        color: #bdc3c7;",
+    "      }",
+    "      .cart-message {",
+    "        font-size: 1.3em;",
+    "        color: #2c3e50;",
+    "        margin-bottom: 15px;",
+    "        font-weight: 600;",
+    "        line-height: 1.4;",
+    "      }",
+    "      .cart-description {",
+    "        font-size: 1em;",
+    "        color: #7f8c8d;",
+    "        margin-bottom: 30px;",
+    "        line-height: 1.5;",
+    "      }",
+    "      .cart-signup-btn {",
+    "        background: #2980b9;",
+    "        color: #fff;",
+    "        border: none;",
+    "        border-radius: 8px;",
+    "        padding: 15px 40px;",
+    "        font-size: 1.1em;",
+    "        font-weight: 700;",
+    "        cursor: pointer;",
+    "        transition: background 0.2s;",
+    "        text-decoration: none;",
+    "        display: inline-block;",
+    "      }",
+    "      .cart-signup-btn:hover {",
+    "        background: #1c598a;",
+    "      }",
+    "      .cart-items-list {",
+    "        width: 100%;",
+    "        max-width: 320px;",
+    "        margin: 0 auto 18px auto;",
+    "        display: flex;",
+    "        flex-direction: column;",
+    "        align-items: center;",
+    "        gap: 18px;",
+    "      }",
+    "      .cart-item {",
+    "        background: #f8faff;",
+    "        border-radius: 18px;",
+    "        box-shadow: 0 2px 12px rgba(44,62,80,0.08);",
+    "        padding: 18px 18px 14px 18px;",
+    "        width: 100%;",
+    "        display: flex;",
+    "        align-items: center;",
+    "        justify-content: space-between;",
+    "        margin-bottom: 0;",
+    "        transition: box-shadow 0.18s, background 0.18s;",
+    "      }",
+    "      .cart-item-info {",
+    "        flex: 1;",
+    "        display: flex;",
+    "        flex-direction: column;",
+    "        gap: 2px;",
+    "        align-items: flex-start;",
+    "      }",
+    "      .cart-item-title {",
+    "        font-weight: 700;",
+    "        color: #22334a;",
+    "        font-size: 1.13em;",
+    "        margin-bottom: 2px;",
+    "      }",
+    "      .cart-item-price {",
+    "        color: #38d39f;",
+    "        font-weight: 700;",
+    "        font-size: 1.08em;",
+    "      }",
+    "      .remove-item {",
+    "        background: #ff5a5f;",
+    "        color: #fff;",
+    "        border: none;",
+    "        padding: 7px 13px 7px 11px;",
+    "        border-radius: 50px;",
+    "        cursor: pointer;",
+    "        font-size: 1em;",
+    "        font-weight: 600;",
+    "        display: flex;",
+    "        align-items: center;",
+    "        gap: 6px;",
+    "        transition: background 0.18s, box-shadow 0.18s;",
+    "        box-shadow: 0 2px 8px rgba(255,90,95,0.10);",
+    "      }",
+    "      .remove-item:hover {",
+    "        background: #d32f2f;",
+    "      }",
+    "      .remove-item svg {",
+    "        margin-right: 4px;",
+    "      }",
+    "      .cart-summary {",
+    "        margin-top: 18px;",
+    "        background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);",
+    "        color: #fff;",
+    "        border-radius: 16px;",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
+    "        padding: 24px 0 16px 0;",
+    "        text-align: center;",
+    "        width: 100%;",
+    "        max-width: 320px;",
+    "      }",
+    "      .summary-label {",
+    "        font-size: 1.18em;",
+    "        font-weight: 600;",
+    "        letter-spacing: 0.01em;",
+    "      }",
+    "      .total-amount {",
+    "        font-size: 2.1em;",
+    "        font-weight: 800;",
+    "        margin: 10px 0 0 0;",
+    "        letter-spacing: 0.01em;",
+    "      }",
+    "      .cart-checkout-btn {",
+    "        background: linear-gradient(90deg, #2980b9 0%, #38d39f 100%);",
+    "        color: #fff;",
+    "        border: none;",
+    "        border-radius: 12px;",
+    "        padding: 16px 0;",
+    "        font-size: 1.18em;",
+    "        font-weight: 700;",
+    "        cursor: pointer;",
+    "        margin: 24px auto 0 auto;",
+    "        width: 100%;",
+    "        max-width: 220px;",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
+    "        transition: background 0.18s, box-shadow 0.18s, transform 0.18s;",
+    "        display: block;",
+    "      }",
+    "      .cart-checkout-btn:hover {",
+    "        background: linear-gradient(90deg, #38d39f 0%, #2980b9 100%);",
+    "        transform: translateY(-2px) scale(1.03);",
+    "      }",
+    "      @media (max-width: 480px) {",
+    "        .cart-side-menu {",
+    "          width: 100%;",
+    "          right: -100%;",
+    "        }",
+    "        .cart-content {",
+    "          padding: 20px 0 0 0;",
+    "        }",
+    "        .cart-items-list, .cart-summary {",
+    "          max-width: 98vw;",
+    "        }",
+    "        .cart-message {",
+    "          font-size: 1.1em;",
+    "        }",
+    "      }",
+    "      @media (max-width: 768px) {",
+    "        header {",
+    "          flex-direction: column;",
+    "          padding: 10px;",
+    "        }",
+    "        nav {",
+    "          position: static;",
+    "          transform: none;",
+    "          margin-top: 10px;",
+    "        }",
+    "        .dropdown-menu {",
+    "          left: 0;",
+    "          right: 0;",
+    "          min-width: unset;",
+    "          width: 100vw;",
+    "          border-radius: 0 0 10px 10px;",
+    "        }",
+    "      }",
     "      /* Info icon and tooltip styles */",
     "      .question-header {",
     "        display: flex;",
@@ -286,29 +686,188 @@ logicScriptBuffer = "";
       }
       .custom-modal .modal-continue:hover {
         background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
+      }
+      /* Pro Footer Styles */
+      .pro-footer {
+        background: #2c3e50;
+        color: #f3f7f8;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 60px;
+        padding: 48px 10vw 32px 10vw;
+        border-top: 2px solid #2c3e50;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.18em;
+        margin-top: 0;
+      }
+      .pro-footer-col {
+        flex: 1 1 320px;
+        min-width: 220px;
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .address-col {
+        border-right: 1.5px solid #2c7a7d;
+        padding-right: 48px;
+        align-items: flex-start;
+      }
+      .nav-col {
+        align-items: flex-start;
+        padding-left: 32px;
+        padding-right: 32px;
+        border-right: 1.5px solid #2c7a7d;
+      }
+      .company-col {
+        align-items: flex-start;
+        padding-left: 48px;
+      }
+      .pro-footer-title {
+        font-weight: 700;
+        font-size: 1.25em;
+        margin-bottom: 6px;
+        color: #fff;
+        letter-spacing: 0.02em;
+      }
+      .company-title {
+        margin-top: 8px;
+        margin-bottom: 0;
+      }
+      .pro-footer-contact a {
+        color: #b6e2e6;
+        text-decoration: underline;
+        font-weight: 500;
+        margin-right: 18px;
+        transition: color 0.2s;
+      }
+      .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+        color: #ff7043;
+      }
+      .pro-footer-logo {
+        margin-bottom: 8px;
+      }
+      .pro-footer-desc {
+        color: #e0e6ea;
+        font-size: 1em;
+        margin-top: 0;
+        line-height: 1.5;
+      }
+      .pro-footer-col.nav-col a {
+        color: #b6e2e6;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 6px;
+        transition: color 0.2s;
+        font-size: 1em;
+      }
+      .pro-footer-col.nav-col a:not(:last-child) {
+        margin-bottom: 8px;
+      }
+      @media (max-width: 900px) {
+        .pro-footer {
+          flex-direction: column;
+          gap: 32px;
+          padding: 32px 4vw 18px 4vw;
+        }
+        .address-col, .company-col, .nav-col {
+          border: none;
+          padding: 0;
+          min-width: unset;
+          max-width: unset;
+        }
+        .company-col, .nav-col {
+          align-items: flex-start;
+        }
+      }
+      footer {
+        text-align: center;
+        padding: 20px;
+        background-color: #374656;
+        color: white;
       }</style>`,
     "</head>",
     "<body>",
-    // Insert modal HTML right after <body>
-    '<div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">\n' +
-    '  <div class="custom-modal">\n' +
-    '    <h2>Account Required</h2>\n' +
-    '    <p>You must create an account to continue filling out the form.</p>\n' +
-    '    <div class="modal-buttons">\n' +
-    '      <button class="modal-back" id="modalBackBtn" type="button">Back</button>\n' +
-    '      <button class="modal-continue" id="modalContinueBtn" type="button">Continue</button>\n' +
-    '    </div>\n' +
-    '  </div>\n' +
-    '</div>',
+    // Insert modal HTML right after <body> (only if not in test mode)
+    ...(isTestMode ? [] : [
+      '<div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">\n' +
+      '  <div class="custom-modal">\n' +
+      '    <h2>Account Required</h2>\n' +
+      '    <p>You must create an account to continue filling out the form.</p>\n' +
+      '    <div class="modal-buttons">\n' +
+      '      <button class="modal-back" id="modalBackBtn" type="button">Back</button>\n' +
+      '      <button class="modal-continue" id="modalContinueBtn" type="button">Continue</button>\n' +
+      '    </div>\n' +
+      '  </div>\n' +
+      '</div>'
+    ]),
     "<header>",
     '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'index.html\';">',
     "    <nav>",
-    '        <a href="index.html">Home</a>',
-    '        <a href="forms.html">Forms</a>',
-    '        <a href="cart.html" id="cart-link">Cart <span id="cart-count" style="background: #ff7043; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8em; margin-left: 5px;">0</span></a>',
-    '        <a href="contact.html">Contact Us</a>',
+    '        <a href="index.html">Home',
+    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
+    "        </a>",
+    '        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">',
+    '            <a href="#" id="forms-nav-link">Forms',
+    '                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
+    "            </a>",
+    '            <div class="dropdown-menu" id="forms-dropdown-menu">',
+    '                <a href="forms.html">My Forms</a>',
+    '                <a href="FreeForm.html">Free Form</a>',
+    '                <a href="Family.html">Family</a>',
+    '                <a href="Property.html">Property</a>',
+    '                <a href="Immigration.html">Immigration</a>',
+    '                <a href="smallclaims.html">Small Claims</a>',
+    '                <a href="Other.html">Other</a>',
+    "            </div>",
+    "        </div>",
+    '        <a href="about.html">About Us',
+    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
+    "        </a>",
+    '        <a href="contact.html">Contact Us',
+    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
+    "        </a>",
+    '        <a href="FAQ.html">FAQ',
+    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
+    "        </a>",
     "    </nav>",
+    '    <div class="header-actions">',
+    '        <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>',
+    '        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>',
+    '        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">',
+    '            <span class="cart-circle">',
+    '                <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">',
+    '                    <circle cx="10" cy="21" r="1.5"/>',
+    '                    <circle cx="18" cy="21" r="1.5"/>',
+    '                    <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>',
+    "                </svg>",
+    '                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>',
+    "            </span>",
+    "        </a>",
+    "    </div>",
     "</header>",
+    "",
+    "    <!-- Sliding Cart Menu -->",
+    '    <div class="cart-overlay" id="cart-overlay">',
+    '        <div class="cart-side-menu" id="cart-side-menu">',
+    "            <div class=\"cart-header\">",
+    "                <h2>🛒 Cart</h2>",
+    '                <button class="cart-close-btn" id="cart-close-btn">&times;</button>',
+    "            </div>",
+                '            <div class="cart-content" id="cart-content">',
+            '                <div class="cart-icon-large">🛒</div>',
+            '                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>',
+            '                <div class="cart-description" id="cart-description">',
+                                "                    To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. ",
+            "                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.",
+            "                </div>",
+            '                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>',
+            '                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>',
+            '                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>',
+            "            </div>",
+    "        </div>",
+    "    </div>",
     "",
     '<div id="pdfPreview" style="display:none;">',
     '    <iframe id="pdfFrame" style="display:none"></iframe>',
@@ -317,10 +876,12 @@ logicScriptBuffer = "";
     "",
     "<!-- Firebase includes -->",
     '<script src="https://js.stripe.com/v3/"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
-    '<script src="cart.js"></script>',
+    ...(isTestMode ? [] : [
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+      '<script src="cart.js"></script>'
+    ]),
     "",
     '<script>',
     
@@ -1191,9 +1752,33 @@ if (s > 1){
     "</div>",
     "</section>",
     "</div>",
-    "<footer>",
-    "    &copy; 2024 FormWiz. All rights reserved.",
-    "</footer>",
+    '<div class="pro-footer">',
+    '        <div class="pro-footer-col address-col">',
+    '            <div class="pro-footer-logo">',
+    '                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">',
+    '            </div>',
+    '            <div class="pro-footer-title">FormWiz</div>',
+    '            <div class="pro-footer-contact">',
+    '                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; ',
+    '                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>',
+    '            </div>',
+    '        </div>',
+    '        <div class="pro-footer-col nav-col">',
+    '            <div class="pro-footer-title">Navigation</div>',
+    '            <a href="index.html">Home</a>',
+    '            <a href="FreeForm.html">Forms</a>',
+    '            <a href="FAQ.html">FAQ</a>',
+    '            <a href="about.html">About Us</a>',
+    '            <a href="contact.html">Contact Us</a>',
+    '        </div>',
+    '        <div class="pro-footer-col company-col">',
+    '            <div class="pro-footer-title company-title">About FormWiz</div>',
+    '            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>',
+    '        </div>',
+    '    </div>',
+    '    <footer>',
+    '        &copy; 2024 FormWiz. All rights reserved.',
+    '    </footer>',
   ].join("\n");
 
   // Now we place ONE <script> block for everything:
@@ -1227,50 +1812,60 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
 
 
-  // 1) Firebase config and check
-  formHTML += `
-    let isUserLoggedIn = false;
-    const firebaseConfig = {
-        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-        authDomain: "formwiz-3f4fd.firebaseapp.com",
-        projectId: "formwiz-3f4fd",
-        storageBucket: "formwiz-3f4fd.firebasestorage.app",
-        messagingSenderId: "404259212529",
-        appId: "1:404259212529:web:15a33bce82383b21cfed50",
-        measurementId: "G-P07YEN0HPD"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const urlParams = new URLSearchParams(window.location.search);
-    const formId = urlParams.get("formId");
-    let userId = null;
-    firebase.auth().onAuthStateChanged(async function(user){
-        if(user){ 
-            isUserLoggedIn = true;
-            userId=user.uid;
-            // Fetch user data and display welcome message
-            try {
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if(userDoc.exists) {
-                    const userData = userDoc.data();
-                    document.getElementById('user_firstname').value = userData.firstName || '';
-                    document.getElementById('user_lastname').value = userData.lastName || '';
-                    document.getElementById('user_email').value = userData.email || '';
-                    document.getElementById('user_phone').value = userData.phone || '';
-                    document.getElementById('user_street').value = userData.address?.street || '';
-                    document.getElementById('user_city').value = userData.address?.city || '';
-                    document.getElementById('user_state').value = userData.address?.state || '';
-                    document.getElementById('user_zip').value = userData.address?.zip || '';
-                }
-            } catch(error) {
-                console.error("Error fetching user data:", error);
-            }
-        } else {
-            isUserLoggedIn = false;
-            // Do NOT redirect. Just let the user fill the form.
-        }
-    });
-  `;
+  // 1) Firebase config and check (only if not in test mode)
+  if (!isTestMode) {
+    formHTML += `
+      let isUserLoggedIn = false;
+      const firebaseConfig = {
+          apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+          authDomain: "formwiz-3f4fd.firebaseapp.com",
+          projectId: "formwiz-3f4fd",
+          storageBucket: "formwiz-3f4fd.firebasestorage.app",
+          messagingSenderId: "404259212529",
+          appId: "1:404259212529:web:15a33bce82383b21cfed50",
+          measurementId: "G-P07YEN0HPD"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const urlParams = new URLSearchParams(window.location.search);
+      const formId = urlParams.get("formId");
+      let userId = null;
+      firebase.auth().onAuthStateChanged(async function(user){
+          if(user){ 
+              isUserLoggedIn = true;
+              userId=user.uid;
+              // Fetch user data and display welcome message
+              try {
+                  const userDoc = await db.collection('users').doc(user.uid).get();
+                  if(userDoc.exists) {
+                      const userData = userDoc.data();
+                      document.getElementById('user_firstname').value = userData.firstName || '';
+                      document.getElementById('user_lastname').value = userData.lastName || '';
+                      document.getElementById('user_email').value = userData.email || '';
+                      document.getElementById('user_phone').value = userData.phone || '';
+                      document.getElementById('user_street').value = userData.address?.street || '';
+                      document.getElementById('user_city').value = userData.address?.city || '';
+                      document.getElementById('user_state').value = userData.address?.state || '';
+                      document.getElementById('user_zip').value = userData.address?.zip || '';
+                  }
+              } catch(error) {
+                  console.error("Error fetching user data:", error);
+              }
+          } else {
+              isUserLoggedIn = false;
+              // Do NOT redirect. Just let the user fill the form.
+          }
+      });
+    `;
+  } else {
+    // In test mode, set user as logged in by default
+    formHTML += `
+      let isUserLoggedIn = true;
+      let userId = 'test-user';
+      const urlParams = new URLSearchParams(window.location.search);
+      const formId = urlParams.get("formId");
+    `;
+  }
 
   // 2) Our global objects
   formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap)};\n`;
@@ -2329,11 +2924,16 @@ if (typeof handleNext === 'function') {
                 }
             }
 
+            // Extract county and defendant information from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const countyName = urlParams.get('county') || '';
+            const defendantName = urlParams.get('defendantName') || '';
+
             // Add to cart using the global cart manager
            const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
             
            if (typeof addToCart === 'function') {
-                addToCart(formId || 'custom-form', formTitle, priceId, formData);
+                addToCart(formId || 'custom-form', formTitle, priceId, formData, countyName, defendantName);
                 window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
@@ -2342,6 +2942,8 @@ if (typeof handleNext === 'function') {
                     title: formTitle,
                     priceId: priceId,
                     formData: formData,
+                    countyName: countyName,
+                    defendantName: defendantName,
                     timestamp: Date.now()
                 };
                 
@@ -2401,6 +3003,326 @@ if (typeof handleNext === 'function') {
         });
     });
 })();
+
+    // Header functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Use existing Firebase instance instead of creating a new one
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            // Function to update button display based on auth state
+            function updateAuthButtons(user) {
+                const signInBtn = document.getElementById('sign-in-btn');
+                const logoutBtn = document.getElementById('logout-btn');
+                
+                if (user) {
+                    // User is signed in
+                    if (signInBtn) signInBtn.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                } else {
+                    // User is signed out
+                    if (signInBtn) signInBtn.style.display = 'inline-block';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                }
+            }
+
+            // Authentication state observer
+            auth.onAuthStateChanged(function(user) {
+                updateAuthButtons(user);
+            });
+
+            // Check current auth state immediately with a small delay to ensure Firebase is ready
+            setTimeout(function() {
+                const currentUser = auth.currentUser;
+                updateAuthButtons(currentUser);
+            }, 200);
+
+            // Logout functionality
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(function() {
+                        window.location.href = 'index.html';
+                    }).catch(function(error) {
+                        console.error('Error signing out:', error);
+                    });
+                });
+            }
+
+            // Dropdown for Forms nav
+            const formsWrapper = document.getElementById('forms-dropdown-wrapper');
+            const formsLink = document.getElementById('forms-nav-link');
+            const dropdownMenu = document.getElementById('forms-dropdown-menu');
+            let dropdownOpen = false;
+
+            function openDropdown() {
+                formsWrapper.classList.add('open');
+                dropdownOpen = true;
+            }
+            function closeDropdown() {
+                formsWrapper.classList.remove('open');
+                dropdownOpen = false;
+            }
+            if (formsLink) {
+                formsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    dropdownOpen ? closeDropdown() : openDropdown();
+                });
+            }
+            document.addEventListener('mousedown', function(e) {
+                if (formsWrapper && !formsWrapper.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+            // Keyboard accessibility
+            if (formsLink) {
+                formsLink.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        dropdownOpen ? closeDropdown() : openDropdown();
+                    }
+                });
+            }
+
+            // Update cart count badge in header
+            function updateCartCountBadge() {
+                const cartCountElement = document.getElementById('cart-count-badge');
+                if (cartCountElement) {
+                    let count = 0;
+                    
+                    // Try to get count from getCartCount function first
+                    if (typeof getCartCount === 'function') {
+                        count = getCartCount();
+                    } else {
+                        // Fallback to localStorage
+                        try {
+                            const cartData = localStorage.getItem('formwiz_cart');
+                            if (cartData) {
+                                const cart = JSON.parse(cartData);
+                                count = Array.isArray(cart) ? cart.length : 0;
+                            }
+                        } catch (e) {
+                            count = 0;
+                        }
+                    }
+                    
+                    // Always update the text content, even if count is 0
+                    cartCountElement.textContent = count;
+                    
+                    if (count > 0) {
+                        cartCountElement.style.display = 'flex';
+                    } else {
+                        cartCountElement.style.display = 'none';
+                    }
+                }
+            }
+
+            // Also update auth buttons when cart count updates
+            function updateAuthButtonsAndCart() {
+                const currentUser = auth.currentUser;
+                updateAuthButtons(currentUser);
+                updateCartCountBadge();
+            }
+
+            // Initialize auth buttons and cart count badge with a small delay to ensure DOM is ready
+            setTimeout(updateAuthButtonsAndCart, 100);
+            // Update more frequently to ensure cart count is always current
+            setInterval(updateAuthButtonsAndCart, 2000);
+            // Also update cart count immediately when page loads
+            setTimeout(updateCartCountBadge, 500);
+
+            // Sliding Cart Menu
+            const cartIconLink = document.getElementById('cart-icon-link');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartSideMenu = document.getElementById('cart-side-menu');
+            const cartCloseBtn = document.getElementById('cart-close-btn');
+
+            function openCart() {
+                cartOverlay.classList.add('active');
+                cartSideMenu.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+                
+                // Update cart content based on auth state
+                updateCartContent();
+            }
+
+            function closeCart() {
+                cartOverlay.classList.remove('active');
+                cartSideMenu.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+
+            if (cartIconLink) {
+                cartIconLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openCart();
+                });
+            }
+
+            if (cartCloseBtn) {
+                cartCloseBtn.addEventListener('click', closeCart);
+            }
+            if (cartOverlay) {
+                cartOverlay.addEventListener('click', function(e) {
+                    if (e.target === cartOverlay) {
+                        closeCart();
+                    }
+                });
+            }
+
+            // Update cart content based on authentication state
+            function updateCartContent() {
+                const cartMessage = document.getElementById('cart-message');
+                const cartDescription = document.getElementById('cart-description');
+                const cartSignupBtn = document.getElementById('cart-signup-btn');
+                const cartItemsList = document.getElementById('cart-items-list');
+                const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+                const cartIconLarge = document.querySelector('.cart-icon-large');
+                
+                if (auth.currentUser) {
+                    // User is signed in - show cart items
+                    if (cartMessage) cartMessage.textContent = 'Your Cart';
+                    if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
+                    if (cartSignupBtn) cartSignupBtn.style.display = 'none';
+                    if (cartIconLarge) cartIconLarge.textContent = '🛒';
+                    
+                    // Load and display cart items
+                    loadCartItems();
+                } else {
+                    // User is not signed in - show signup message
+                    if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
+                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
+                    if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
+                    if (cartItemsList) cartItemsList.style.display = 'none';
+                    if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
+                    if (cartIconLarge) cartIconLarge.textContent = '🛒';
+                }
+            }
+            
+            // Load cart items for logged-in users
+            async function loadCartItems() {
+                const cartItemsList = document.getElementById('cart-items-list');
+                const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+                
+                if (!cartItemsList || !auth.currentUser) return;
+                
+                try {
+                    // Get cart data from cookies or localStorage
+                    function getCookie(name) {
+                        const value = '; ' + document.cookie;
+                        const parts = value.split('; ' + name + '=');
+                        if (parts.length === 2) return parts.pop().split(';').shift();
+                        return null;
+                    }
+                    
+                    const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
+                    let cart = [];
+                    
+                    if (cartData) {
+                        try {
+                            cart = JSON.parse(cartData);
+                        } catch (e) {
+                            console.error('Error parsing cart data:', e);
+                        }
+                    }
+                    
+                    if (cart.length === 0) {
+                        cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
+                        cartItemsList.style.display = 'block';
+                        if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Fetch Stripe prices for cart items
+                    async function fetchStripePrice(priceId) {
+                        try {
+                            const response = await fetch('/stripe-price/' + priceId);
+                            if (!response.ok) return null;
+                            const data = await response.json();
+                            return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
+                        } catch (e) {
+                            console.error('Error fetching Stripe price:', e);
+                            return null;
+                        }
+                    }
+                    
+                    // Render cart items
+                    let total = 0;
+                    let itemsHtml = '';
+                    let itemIndex = 0;
+                    for (const item of cart) {
+                        const price = await fetchStripePrice(item.priceId);
+                        const itemPrice = price ? parseFloat(price) : 0;
+                        total += itemPrice;
+                        // Defendant and county fields
+                        let defendantHtml = '';
+                        let countyHtml = '';
+                        if (item.defendantName) {
+                            const capName = String(item.defendantName)
+                              .split(/\s+/)
+                              .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                              .join(' ');
+                            defendantHtml = '<div style=\\"color:#e74c3c;font-weight:600;\\">Defendant: ' + capName + '</div>';
+                        }
+                        if (item.countyName) {
+                            const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
+                            countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
+                        }
+                        itemsHtml +=
+     '<div class="cart-item">' +
+       '<div class="cart-item-info">' +
+         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         defendantHtml +
+         countyHtml +
+       '</div>' +
+       '<div class="cart-item-price">$' + itemPrice.toFixed(2) + '</div>' +
+       '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
+         '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
+       '</button>' +
+     '</div>';
+                        itemIndex++;
+                    }
+                    cartItemsList.innerHTML = itemsHtml;
+                    cartItemsList.style.display = 'block';
+                    // Remove item event listeners
+                    const removeButtons = cartItemsList.querySelectorAll('.remove-item');
+                    removeButtons.forEach(btn => {
+                      btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const idx = parseInt(btn.getAttribute('data-cart-index'));
+                        if (!isNaN(idx)) {
+                          cart.splice(idx, 1);
+                          // Save updated cart
+                          document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+                          localStorage.setItem('formwiz_cart', JSON.stringify(cart));
+                          loadCartItems();
+                        }
+                      });
+                    });
+                    if (cartCheckoutBtn) {
+                        cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
+                        cartCheckoutBtn.style.display = 'block';
+                        cartCheckoutBtn.onclick = function() {
+                            window.location.href = 'cart.html';
+                        };
+                    }
+                } catch (error) {
+                    console.error('Error loading cart items:', error);
+                    cartItemsList.innerHTML = '<p style="color:#e74c3c;">Error loading cart items</p>';
+                    cartItemsList.style.display = 'block';
+                }
+            }
+
+            // Keyboard accessibility for cart menu
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeCart();
+                }
+            });
+        }
+    });
 
 </script>
 </body>
