@@ -403,19 +403,20 @@ window.exportGuiJson = function(download = true) {
       // Change type to numberedDropdown
       question.type = "numberedDropdown";
       
-      // Extract labels from textboxes
+      // Extract labels and amounts from textboxes
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
-        question.labels = cell._textboxes.map(tb => tb.nameId || tb.placeholder || "");
-        
-        // Only add amounts for textboxes that have isAmountOption: true
+        // Labels should only include non-amount options
+        question.labels = [];
+        // Amounts should be a simple array of strings for amount options
         question.amounts = [];
+        
         cell._textboxes.forEach(tb => {
           if (tb.isAmountOption === true) {
-            question.amounts.push({
-              name: tb.nameId || "",
-              placeholder: tb.placeholder || "Enter amount",
-              enabled: true
-            });
+            // Add to amounts as a simple string
+            question.amounts.push(tb.nameId || tb.placeholder || "");
+          } else {
+            // Add to labels as a simple string
+            question.labels.push(tb.nameId || tb.placeholder || "");
           }
         });
       } else {
@@ -563,6 +564,105 @@ window.exportGuiJson = function(download = true) {
     downloadJson(jsonStr, "gui.json");
   }
   return jsonStr;
+};
+
+// Export both flowchart and GUI JSON in a combined format
+window.exportBothJson = function() {
+  try {
+    // Get flowchart JSON
+    const parent = graph.getDefaultParent();
+    const encoder = new mxCodec();
+    const cells = graph.getChildCells(parent, true, true);
+
+    // Map cells, keeping only needed properties
+    const simplifiedCells = cells.map(cell => {
+      // Basic info about the cell
+      const cellData = {
+        id: cell.id,
+        vertex: cell.vertex,
+        edge: cell.edge,
+        value: cell.value,
+        style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
+      };
+
+      // Handle geometry 
+      if (cell.geometry) {
+        cellData.geometry = {
+          x: cell.geometry.x,
+          y: cell.geometry.y,
+          width: cell.geometry.width,
+          height: cell.geometry.height,
+        };
+      }
+
+      // Add source and target for edges
+      if (cell.edge && cell.source && cell.target) {
+        cellData.source = cell.source.id;
+        cellData.target = cell.target.id;
+      }
+
+      // Custom fields for specific nodes
+      if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+      if (cell._questionText) cellData._questionText = cell._questionText;
+      if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+      if (cell._nameId) cellData._nameId = cell._nameId;
+      if (cell._placeholder) cellData._placeholder = cell._placeholder;
+      if (cell._questionId) cellData._questionId = cell._questionId;
+      
+      // textbox properties
+      if (cell._amountName) cellData._amountName = cell._amountName;
+      if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+      
+      // image option
+      if (cell._image) cellData._image = cell._image;
+      
+      // calculation node properties
+      if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+      if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
+      if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+      if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+      if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+      if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+      
+      // subtitle & info nodes
+      if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
+      if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+
+      return cellData;
+    });
+
+    const flowchartExportObj = {
+      cells: simplifiedCells,
+      sectionPrefs: sectionPrefs
+    };
+
+    const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
+    
+    // Get GUI JSON (without downloading)
+    const guiJson = exportGuiJson(false);
+    
+    // Combine both JSONs in the specified format
+    const combinedText = `Okay great, here is my flowchart json: "${flowchartJson}" and here is the gui json produced: "${guiJson}"`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(combinedText).then(() => {
+      console.log('Both JSONs copied to clipboard');
+      // Show user feedback
+      const notification = document.createElement('div');
+      notification.textContent = 'Both JSONs copied to clipboard!';
+      notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+    }).catch(err => {
+      console.error('Failed to copy to clipboard:', err);
+    });
+    
+  } catch (error) {
+    console.error('Error in exportBothJson:', error);
+    alert('Error exporting both JSONs: ' + error.message);
+  }
 };
 
 // Fix capitalization in jump/logic conditions
@@ -999,6 +1099,9 @@ function loadFlowchartData(data) {
       }
     });
 
+    // Handle duplicate node IDs after all cells are created
+    resolveDuplicateNodeIds(Object.values(createdCells));
+
     // Second pass: Connect the edges
     data.cells.forEach(item => {
       if (item.edge && item.source && item.target) {
@@ -1085,4 +1188,39 @@ function loadFlowchartData(data) {
       }
     }
   }, 100); // Small delay to ensure all rendering is complete
+}
+
+/**
+ * Resolves duplicate node IDs by adding numbering to duplicates
+ */
+function resolveDuplicateNodeIds(cells) {
+  const nodeIdCounts = new Map();
+  const nodeIdToCells = new Map();
+  
+  // First pass: collect all node IDs and their occurrences
+  cells.forEach(cell => {
+    const nodeId = getNodeId(cell);
+    if (nodeId) {
+      if (!nodeIdCounts.has(nodeId)) {
+        nodeIdCounts.set(nodeId, 0);
+        nodeIdToCells.set(nodeId, []);
+      }
+      nodeIdCounts.set(nodeId, nodeIdCounts.get(nodeId) + 1);
+      nodeIdToCells.get(nodeId).push(cell);
+    }
+  });
+  
+  // Second pass: resolve duplicates by adding numbering
+  nodeIdCounts.forEach((count, nodeId) => {
+    if (count > 1) {
+      const cellsWithThisId = nodeIdToCells.get(nodeId);
+      
+      // Keep the first occurrence as is, number the rest
+      for (let i = 1; i < cellsWithThisId.length; i++) {
+        const cell = cellsWithThisId[i];
+        const newNodeId = `${nodeId}_${i}`;
+        setNodeId(cell, newNodeId);
+      }
+    }
+  });
 }

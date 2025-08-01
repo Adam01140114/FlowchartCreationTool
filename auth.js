@@ -108,7 +108,8 @@ function checkForSavedLogin() {
         }
       });
   } else {
-    showLoginOverlay();
+    // Don't show login overlay by default - let user access the tool without logging in
+    // showLoginOverlay();
   }
 
   setupAuthListeners();

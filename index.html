@@ -85,7 +85,6 @@
 
   <div class="button-bar">
     <button onclick="previewForm()">Preview Form</button><br>
-    <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
     <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
     <input
       type="file"
@@ -93,7 +92,9 @@
       accept=".json"
       onchange="importFlowchartJson(event)"
     />
-    <button onclick="exportGuiJson(true)">Export GUI JSON</button>
+    <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
+    <button onclick="exportGuiJson(true)">Export GUI JSON</button><br>
+    <button onclick="exportBothJson()">Export Both</button>
   </div>
 
   <div class="legend">

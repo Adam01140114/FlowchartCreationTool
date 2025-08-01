@@ -1390,6 +1390,8 @@ graph.isCellEditable = function (cell) {
     graph.getModel().beginUpdate();
     try {
       setNodeId(selectedCell, newId);
+      // Add a flag to prevent auto-update of this node's ID
+      addSkipReassign(selectedCell);
     } finally {
       graph.getModel().endUpdate();
     }
@@ -2099,6 +2101,11 @@ function updateInfoNodeCell(cell) {
  *******************************************************/
 function autoUpdateNodeIdBasedOnLabel(cell) {
   if (!cell.vertex) return;
+  
+  // Check if this cell has been manually assigned an ID and should skip reassignment
+  const style = cell.style || "";
+  if (style.includes("skipReassign=true")) return;
+  
   const label = (cell.value || "").trim();
   if (!label) return;
   if (isQuestion(cell)) {
@@ -2157,8 +2164,45 @@ function refreshNodeIdFromLabel(cell) {
     .replace(/\s+/g, "_")
     .toLowerCase();
 
-  const nodeId = cleanedText || "unnamed_node";
-  setNodeId(cell, nodeId);
+  const baseNodeId = cleanedText || "unnamed_node";
+  
+  // Check for duplicates and add numbering if needed
+  const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  setNodeId(cell, uniqueNodeId);
+}
+
+function generateUniqueNodeId(baseNodeId, currentCell) {
+  // Get all cells in the graph
+  const allCells = graph.getModel().cells;
+  const existingNodeIds = new Set();
+  
+  // Collect all existing node IDs except the current cell
+  for (let id in allCells) {
+    if (id === "0" || id === "1") continue; // Skip root cells
+    const cell = allCells[id];
+    if (cell && cell !== currentCell) {
+      const existingId = getNodeId(cell);
+      if (existingId) {
+        existingNodeIds.add(existingId);
+      }
+    }
+  }
+  
+  // If the base ID is unique, use it
+  if (!existingNodeIds.has(baseNodeId)) {
+    return baseNodeId;
+  }
+  
+  // If not unique, add numbering
+  let counter = 1;
+  let uniqueId = `${baseNodeId}_${counter}`;
+  
+  while (existingNodeIds.has(uniqueId)) {
+    counter++;
+    uniqueId = `${baseNodeId}_${counter}`;
+  }
+  
+  return uniqueId;
 }
 
 function refreshOptionNodeId(cell) {
@@ -2172,7 +2216,11 @@ function refreshOptionNodeId(cell) {
     }
   }
   let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
-  setNodeId(cell, parentNodeId + label);
+  const baseNodeId = parentNodeId + label;
+  
+  // Check for duplicates and add numbering if needed
+  const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  setNodeId(cell, uniqueNodeId);
 }
 
 function addSkipReassign(cell) {
@@ -3627,27 +3675,69 @@ function autosaveFlowchartToLocalStorage() {
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
     const sectionPrefsCopy = JSON.parse(JSON.stringify(sectionPrefs));
-    const data = { cells: [], sectionPrefs: sectionPrefsCopy };
-    cells.forEach(cell => {
-      const cellData = {};
-      for (let key in cell) {
-        if (Object.prototype.hasOwnProperty.call(cell, key)) {
-          // Exclude graph/model references to avoid circular structure
-          if (["parent", "children", "edges", "mxTransient", "mxObjectId", "mxCellId", "mxCellEditor", "mxCellRenderer"].includes(key)) continue;
-          cellData[key] = cell[key];
-        }
-      }
-      // Also copy geometry
+    
+    // Use the same safe serialization logic as exportFlowchartJson
+    const simplifiedCells = cells.map(cell => {
+      // Basic info about the cell
+      const cellData = {
+        id: cell.id,
+        vertex: cell.vertex,
+        edge: cell.edge,
+        value: cell.value,
+        style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
+      };
+
+      // Handle geometry 
       if (cell.geometry) {
         cellData.geometry = {
           x: cell.geometry.x,
           y: cell.geometry.y,
           width: cell.geometry.width,
-          height: cell.geometry.height
+          height: cell.geometry.height,
         };
       }
-      data.cells.push(cellData);
+
+      // Add source and target for edges
+      if (cell.edge && cell.source && cell.target) {
+        cellData.source = cell.source.id;
+        cellData.target = cell.target.id;
+      }
+
+      // Custom fields for specific nodes
+      if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+      if (cell._questionText) cellData._questionText = cell._questionText;
+      if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+      if (cell._nameId) cellData._nameId = cell._nameId;
+      if (cell._placeholder) cellData._placeholder = cell._placeholder;
+      if (cell._questionId) cellData._questionId = cell._questionId;
+      
+      // textbox properties
+      if (cell._amountName) cellData._amountName = cell._amountName;
+      if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+      
+      // image option
+      if (cell._image) cellData._image = cell._image;
+      
+      // calculation node properties
+      if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+      if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
+      if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+      if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+      if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+      if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+      
+      // subtitle & info nodes
+      if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
+      if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+
+      return cellData;
     });
+
+    const data = {
+      cells: simplifiedCells,
+      sectionPrefs: sectionPrefsCopy
+    };
+    
     const json = JSON.stringify(data);
     localStorage.setItem(AUTOSAVE_KEY, json);
     console.log('[AUTOSAVE][localStorage] Flowchart autosaved. Length:', json.length);
@@ -4267,70 +4357,7 @@ window.addEventListener('storage', function(e) {
   }
 });
 
-// Check for clipboard data on page load
-document.addEventListener('DOMContentLoaded', function() {
-  // Check if there's clipboard data available from other tabs
-  const clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
-  const timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
-  
-  if (clipboardData && timestamp) {
-    const age = Date.now() - parseInt(timestamp);
-    // Show indicator if clipboard data is less than 1 hour old
-    if (age < 3600000) {
-      try {
-        const data = JSON.parse(clipboardData);
-        let nodeCount = 1;
-        let edgeCount = 0;
-        
-        if (data.isMultiCopy && data.nodes) {
-          nodeCount = data.nodes.length;
-          edgeCount = data.edges ? data.edges.length : 0;
-        } else if (Array.isArray(data)) {
-          nodeCount = data.length;
-        }
-        
-        showClipboardIndicator(nodeCount, edgeCount);
-      } catch (e) {
-        showClipboardIndicator(1, 0);
-      }
-    }
-  }
-});
 
-function showClipboardIndicator(nodeCount = 1, edgeCount = 0) {
-  const indicator = document.createElement('div');
-  let message = '';
-  if (nodeCount === 1 && edgeCount === 0) {
-    message = '📋 Node data available from another tab (Ctrl+V to paste)';
-  } else if (nodeCount > 1 && edgeCount === 0) {
-    message = `📋 ${nodeCount} nodes available from another tab (Ctrl+V to paste)`;
-  } else if (nodeCount > 1 && edgeCount > 0) {
-    message = `📋 ${nodeCount} nodes and ${edgeCount} connections available from another tab (Ctrl+V to paste)`;
-  } else {
-    message = '📋 Selection data available from another tab (Ctrl+V to paste)';
-  }
-  
-  indicator.innerHTML = `
-    <div style="position: fixed; bottom: 20px; right: 20px; background: #FF9800; color: white; 
-                padding: 12px 20px; border-radius: 6px; font-size: 14px; z-index: 10000; 
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;">
-      ${message}
-    </div>
-  `;
-  
-  indicator.addEventListener('click', () => {
-    indicator.remove();
-  });
-  
-  document.body.appendChild(indicator);
-  
-  // Auto-remove after 10 seconds
-  setTimeout(() => {
-    if (indicator.parentNode) {
-      indicator.remove();
-    }
-  }, 10000);
-}
 
 // --- UPDATE IMAGE OPTION NODE ---
 function updateImageOptionCell(cell) {
