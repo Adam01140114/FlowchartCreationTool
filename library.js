@@ -396,7 +396,7 @@ window.exportGuiJson = function(download = true) {
       question.conditionalPDF.answer = "";
     }
     
-    // --- PATCH: Add direct parent conditional logic with special handling for mult textbox/dropdown ---
+    // --- PATCH: Add comprehensive parent conditional logic ---
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
       const conditions = [];
@@ -430,32 +430,34 @@ window.exportGuiJson = function(download = true) {
             // For multiple textbox/dropdown questions, we need to find their parent condition
             const sourceParentCondition = findDirectParentCondition(sourceCell);
             if (sourceParentCondition) {
-              conditions.push(sourceParentCondition);
+              if (Array.isArray(sourceParentCondition)) {
+                conditions.push(...sourceParentCondition);
+              } else {
+                conditions.push(sourceParentCondition);
+              }
             }
           }
         }
       }
       
-      // Special case: If this question can be reached from multiple paths (including through mult textbox/dropdown),
-      // we need to include all the conditions that lead to it
-      if (conditions.length > 1) {
-        // Check if this is a case where the question should appear for both Yes/No answers
-        const uniqueQuestions = [...new Set(conditions.map(c => c.prevQuestion))];
-        if (uniqueQuestions.length === 1) {
-          // Same question, different answers - this means the question should appear for both paths
-          // Return all conditions to indicate it should appear for both Yes and No
-          return conditions;
-        } else {
-          // Different questions - prioritize "Yes" answers
-          const yesCondition = conditions.find(cond => cond.prevAnswer === "Yes");
-          if (yesCondition) {
-            return yesCondition;
-          }
+      // Remove duplicates based on prevQuestion and prevAnswer combination
+      const uniqueConditions = [];
+      const seen = new Set();
+      for (const condition of conditions) {
+        const key = `${condition.prevQuestion}:${condition.prevAnswer}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          uniqueConditions.push(condition);
         }
       }
       
+      // If there are multiple conditions, return all of them
+      if (uniqueConditions.length > 1) {
+        return uniqueConditions;
+      }
+      
       // Return the first condition if only one, or null if none
-      return conditions.length > 0 ? conditions[0] : null;
+      return uniqueConditions.length > 0 ? uniqueConditions[0] : null;
     }
     
     const directParentCondition = findDirectParentCondition(cell);
