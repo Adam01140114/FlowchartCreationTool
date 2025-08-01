@@ -396,6 +396,44 @@ window.exportGuiJson = function(download = true) {
       question.conditionalPDF.answer = "";
     }
     
+    // --- PATCH: For multipleDropdownType, convert to numberedDropdown format ---
+    if (exportType === "multipleDropdownType") {
+      // Change type to numberedDropdown
+      question.type = "numberedDropdown";
+      
+      // Extract labels from textboxes
+      if (cell._textboxes && Array.isArray(cell._textboxes)) {
+        question.labels = cell._textboxes.map(tb => tb.nameId || tb.placeholder || "");
+        
+        // Only add amounts for textboxes that have isAmountOption: true
+        question.amounts = [];
+        cell._textboxes.forEach(tb => {
+          if (tb.isAmountOption === true) {
+            question.amounts.push({
+              name: tb.nameId || "",
+              placeholder: tb.placeholder || "Enter amount",
+              enabled: true
+            });
+          }
+        });
+      } else {
+        question.labels = [];
+        question.amounts = [];
+      }
+      
+      // Extract min and max from _twoNumbers
+      if (cell._twoNumbers) {
+        question.min = cell._twoNumbers.first || "1";
+        question.max = cell._twoNumbers.second || "1";
+      } else {
+        question.min = "1";
+        question.max = "1";
+      }
+      
+      // Clear options array for numberedDropdown
+      question.options = [];
+    }
+    
     // --- PATCH: Add comprehensive parent conditional logic ---
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
