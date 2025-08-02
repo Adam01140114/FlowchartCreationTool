@@ -458,6 +458,17 @@ window.exportGuiJson = function(download = true) {
       question.options = [];
     }
     
+    // --- PATCH: For number type questions, convert to money type ---
+    if (exportType === "number") {
+      // Number questions should be exported as money type
+      question.type = "money";
+      question.placeholder = cell._placeholder || "";
+      
+      // Clear options array for money questions
+      question.options = [];
+      question.labels = [];
+    }
+    
     // --- PATCH: Add comprehensive parent conditional logic ---
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
