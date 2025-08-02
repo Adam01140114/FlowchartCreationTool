@@ -254,7 +254,7 @@ window.exportGuiJson = function(download = true) {
       },
       options: [],
       labels: [],
-      nameId: sanitizeNameId(cell._nameId || cell._questionText || cell.value || "unnamed"),
+      nameId: sanitizeNameId(getNodeId(cell) || cell._nameId || cell._questionText || cell.value || "unnamed"),
       placeholder: cell._placeholder || ""
     };
     
@@ -293,19 +293,40 @@ window.exportGuiJson = function(download = true) {
             text: optionText
           };
           
-          // Check if this option leads to an end node
+          // Check if this option leads to an end node (directly or through multipleDropdownType/multipleTextboxes)
           const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
             for (const optionEdge of optionOutgoingEdges) {
               const optionTarget = optionEdge.target;
               if (optionTarget && isEndNode(optionTarget)) {
-                // This option leads to an end node
+                // This option leads directly to an end node
                 jumpConditions.push({
                   option: optionText.trim(),
                   to: "end"
                 });
                 endOption = optionText.trim();
                 break;
+              } else if (optionTarget && isQuestion(optionTarget)) {
+                // Check if this question leads to an end node
+                const questionType = getQuestionType(optionTarget);
+                if (questionType === "multipleDropdownType" || questionType === "multipleTextboxes") {
+                  // For multipleDropdownType/multipleTextboxes, check if they lead to an end node
+                  const questionOutgoingEdges = graph.getOutgoingEdges(optionTarget);
+                  if (questionOutgoingEdges) {
+                    for (const questionEdge of questionOutgoingEdges) {
+                      const questionTarget = questionEdge.target;
+                      if (questionTarget && isEndNode(questionTarget)) {
+                        // This option leads to a multipleDropdownType/multipleTextboxes that leads to an end node
+                        jumpConditions.push({
+                          option: optionText.trim(),
+                          to: "end"
+                        });
+                        endOption = optionText.trim();
+                        break;
+                      }
+                    }
+                  }
+                }
               }
             }
           }

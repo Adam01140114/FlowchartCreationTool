@@ -1223,6 +1223,7 @@ graph.isCellEditable = function (cell) {
   const regularOptionTypeBtn = document.getElementById("regularOptionType");
   const imageOptionTypeBtn = document.getElementById("imageOptionType");
   const amountOptionTypeBtn = document.getElementById("amountOptionType");
+  const endNodeTypeBtn = document.getElementById("endNodeType");
 
   regularOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
@@ -1243,6 +1244,14 @@ graph.isCellEditable = function (cell) {
   amountOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "amountOption");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  endNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "end");
       refreshAllCells();
     }
     hideContextMenu();
@@ -1387,6 +1396,11 @@ graph.isCellEditable = function (cell) {
 
   function onNodeIdFieldChange(newId) {
     if (!selectedCell) return;
+    
+    // Only update if the ID actually changed
+    const currentId = getNodeId(selectedCell);
+    if (currentId === newId) return;
+    
     graph.getModel().beginUpdate();
     try {
       setNodeId(selectedCell, newId);
@@ -1395,7 +1409,9 @@ graph.isCellEditable = function (cell) {
     } finally {
       graph.getModel().endUpdate();
     }
-    refreshAllCells();
+    
+    // Only refresh if necessary - don't refresh all cells for a single node ID change
+    // refreshAllCells();
   }
   function onNodeSectionFieldChange(newSec) {
     if (!selectedCell) return;
@@ -2519,6 +2535,15 @@ function setOptionType(cell, newType) {
         }
         // updateAmountOptionCell is handled in the existing code
         break;
+      case 'end':
+        // End node option - convert to end node
+        // Change the node type from options to end
+        let endStyle = (cell.style || '').replace(/nodeType=[^;]+/, '');
+        endStyle = endStyle.replace(/questionType=[^;]+/, '');
+        endStyle += ';nodeType=end;fillColor=#CCCCCC;fontColor=#000000;';
+        graph.getModel().setStyle(cell, endStyle);
+        updateEndNodeCell(cell);
+        break;
       default:
         updateOptionNodeCell(cell);
     }
@@ -2593,71 +2618,103 @@ function colorCell(cell) {
   graph.getModel().setStyle(cell, style);
 }
 
+// Performance optimization: prevent excessive refreshAllCells calls
+let refreshAllCellsTimeout = null;
+let isRefreshing = false;
+
 function refreshAllCells() {
-  const parent = graph.getDefaultParent();
-  const vertices = graph.getChildVertices(parent);
+  // Prevent multiple simultaneous calls
+  if (isRefreshing) {
+    return;
+  }
+  
+  // Throttle rapid successive calls
+  if (refreshAllCellsTimeout) {
+    clearTimeout(refreshAllCellsTimeout);
+  }
+  
+  refreshAllCellsTimeout = setTimeout(() => {
+    performRefreshAllCells();
+  }, 100); // 100ms throttle
+}
 
-  vertices.forEach(cell => {
-    colorCell(cell);
-
-    if (isEndNode(cell)) {
-      updateEndNodeCell(cell);
-    }
+function performRefreshAllCells() {
+  if (isRefreshing) return;
+  
+  isRefreshing = true;
+  
+  try {
+    const parent = graph.getDefaultParent();
+    const vertices = graph.getChildVertices(parent);
     
-    // Handle different option node types
-    if (isOptions(cell)) {
-      if (getQuestionType(cell) === "imageOption") {
-        updateImageOptionCell(cell);
-      } else if (getQuestionType(cell) === "amountOption") {
-        // Amount option has its own handling
-      } else {
-        // Regular option nodes
-        updateOptionNodeCell(cell);
+    // Batch updates for better performance
+    graph.getModel().beginUpdate();
+    
+    vertices.forEach(cell => {
+      colorCell(cell);
+
+      if (isEndNode(cell)) {
+        updateEndNodeCell(cell);
       }
-    }
-    
-    // If it's a text2 node, make sure we update _questionText from value
-    if (isQuestion(cell) && getQuestionType(cell) === "text2") {
-      // Extract text from HTML value if present
-      if (cell.value) {
-        const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-        if (cleanValue) {
-          cell._questionText = cleanValue;
+      
+      // Handle different option node types
+      if (isOptions(cell)) {
+        if (getQuestionType(cell) === "imageOption") {
+          updateImageOptionCell(cell);
+        } else if (getQuestionType(cell) === "amountOption") {
+          // Amount option has its own handling
+        } else {
+          // Regular option nodes
+          updateOptionNodeCell(cell);
         }
       }
-    }
+      
+      // If it's a text2 node, make sure we update _questionText from value
+      if (isQuestion(cell) && getQuestionType(cell) === "text2") {
+        // Extract text from HTML value if present
+        if (cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          if (cleanValue) {
+            cell._questionText = cleanValue;
+          }
+        }
+      }
+      
+      // If newly dropped question node is just placeholder or has empty value
+      if (isQuestion(cell) && (!cell.value || /^\s*$/.test(cell.value) || cell.value === "question node" || cell.value === "Question Node")) {
+        cell.value = `
+          <div style="display: flex; justify-content: center; align-items: center; height:100%;">
+            <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
+              onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
+              onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
+              onmouseover="this.style.borderColor='#4a90e2';"
+              onmouseout="this.style.borderColor='#b0b8c9';"
+              onchange="window.pickTypeForCell('${cell.id}', this.value)">
+              <option value="">-- Choose Question Type --</option>
+              <option value="text">Text</option>
+              <option value="text2">Dropdown</option>
+              <option value="checkbox">Checkbox</option>
+              <option value="number">Number</option>
+              <option value="date">Date</option>
+              <option value="bigParagraph">Big Paragraph</option>
+              <option value="multipleTextboxes">Multiple Textboxes</option>
+              <option value="multipleDropdownType">Multiple Dropdown Type</option>
+              <option value="dateRange">Date Range</option>
+              <option value="email">Email</option>
+              <option value="phone">Phone</option>
+            </select>
+          </div>`;
+      }
+    });
     
-
+    graph.getModel().endUpdate();
     
-    // If newly dropped question node is just placeholder or has empty value
-    if (isQuestion(cell) && (!cell.value || /^\s*$/.test(cell.value) || cell.value === "question node" || cell.value === "Question Node")) {
-      cell.value = `
-        <div style="display: flex; justify-content: center; align-items: center; height:100%;">
-          <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
-            onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
-            onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
-            onmouseover="this.style.borderColor='#4a90e2';"
-            onmouseout="this.style.borderColor='#b0b8c9';"
-            onchange="window.pickTypeForCell('${cell.id}', this.value)">
-            <option value="">-- Choose Question Type --</option>
-            <option value="text">Text</option>
-            <option value="text2">Dropdown</option>
-            <option value="checkbox">Checkbox</option>
-            <option value="number">Number</option>
-            <option value="date">Date</option>
-            <option value="bigParagraph">Big Paragraph</option>
-            <option value="multipleTextboxes">Multiple Textboxes</option>
-            <option value="multipleDropdownType">Multiple Dropdown Type</option>
-            <option value="dateRange">Date Range</option>
-            <option value="email">Email</option>
-            <option value="phone">Phone</option>
-          </select>
-        </div>`;
-    }
-  });
-
-  // Don't renumber question IDs automatically
-  // renumberQuestionIds();
+    // Don't renumber question IDs automatically
+    // renumberQuestionIds();
+    
+  } finally {
+    isRefreshing = false;
+  }
 }
 
 /*******************************************************
@@ -3769,25 +3826,43 @@ function getAutosaveFlowchartFromLocalStorage() {
 }
 
 // --- AUTOSAVE HOOKS ---
+let autosaveTimeout = null;
+let autosaveThrottleDelay = 2000; // 2 seconds
+
 function setupAutosaveHooks() {
   if (!graph) return;
-  // Save after any model change
+  
+  // Throttled autosave function
+  function throttledAutosave() {
+    if (autosaveTimeout) {
+      clearTimeout(autosaveTimeout);
+    }
+    autosaveTimeout = setTimeout(() => {
+      autosaveFlowchartToLocalStorage();
+      autosaveTimeout = null;
+    }, autosaveThrottleDelay);
+  }
+  
+  // Save after any model change (throttled)
   graph.getModel().addListener(mxEvent.CHANGE, function() {
-    autosaveFlowchartToLocalStorage();
+    throttledAutosave();
   });
-  // Save after refreshAllCells (in case of programmatic changes)
+  
+  // Save after refreshAllCells (in case of programmatic changes) - throttled
   const origRefreshAllCells = window.refreshAllCells;
   window.refreshAllCells = function() {
     origRefreshAllCells.apply(this, arguments);
-    autosaveFlowchartToLocalStorage();
+    throttledAutosave();
   };
-  // Save after loadFlowchartData
+  
+  // Save after loadFlowchartData (immediate, not throttled)
   const origLoadFlowchartData = window.loadFlowchartData;
   window.loadFlowchartData = function(data) {
     origLoadFlowchartData.apply(this, arguments);
-    autosaveFlowchartToLocalStorage();
+    autosaveFlowchartToLocalStorage(); // Immediate save for loading
   };
-  console.log('[AUTOSAVE][localStorage] Autosave hooks set up.');
+  
+  console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
 }
 
 // --- AUTOSAVE RESTORE PROMPT ---
