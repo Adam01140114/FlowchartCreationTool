@@ -495,22 +495,22 @@ window.exportGuiJson = function(download = true) {
               });
             }
           }
-        } else if (sourceCell && isQuestion(sourceCell)) {
-          // This is a direct question-to-question connection
-          // Check if the source is a multiple textbox/dropdown question
-          const sourceQuestionType = getQuestionType(sourceCell);
-          if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType") {
-            // For multiple textbox/dropdown questions, we need to find their parent condition
-            const sourceParentCondition = findDirectParentCondition(sourceCell);
-            if (sourceParentCondition) {
-              if (Array.isArray(sourceParentCondition)) {
-                conditions.push(...sourceParentCondition);
-              } else {
-                conditions.push(sourceParentCondition);
+                  } else if (sourceCell && isQuestion(sourceCell)) {
+            // This is a direct question-to-question connection
+            // Check if the source is a multiple textbox/dropdown question or number question
+            const sourceQuestionType = getQuestionType(sourceCell);
+            if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType" || sourceQuestionType === "number") {
+              // For multiple textbox/dropdown/number questions, we need to find their parent condition
+              const sourceParentCondition = findDirectParentCondition(sourceCell);
+              if (sourceParentCondition) {
+                if (Array.isArray(sourceParentCondition)) {
+                  conditions.push(...sourceParentCondition);
+                } else {
+                  conditions.push(sourceParentCondition);
+                }
               }
             }
           }
-        }
       }
       
       // Remove duplicates based on prevQuestion and prevAnswer combination
