@@ -1187,6 +1187,18 @@ function loadFlowchartData(data) {
     } finally {
       graph.getModel().endUpdate();
     }
+    
+    // Fourth pass: Ensure question nodes are editable
+    Object.values(createdCells).forEach(cell => {
+      if (isQuestion(cell)) {
+        // Make sure question nodes are editable
+        let style = cell.style || '';
+        if (!style.includes('editable=1') && !style.includes('editable=0')) {
+          style += ';editable=1;';
+          graph.getModel().setStyle(cell, style);
+        }
+      }
+    });
   } finally {
     graph.getModel().endUpdate();
   }
