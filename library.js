@@ -392,17 +392,21 @@ window.exportGuiJson = function(download = true) {
       // Get the proper base nameId from the question's nodeId
       const baseNameId = getNodeId(cell) || question.nameId || "unnamed";
       
-      // Convert options to checkbox format
+      // Convert options to checkbox format with proper amount handling
       question.options = question.options.map(opt => {
         if (typeof opt.text === 'string') {
           const optionText = opt.text.trim();
+          
+          // Check if this option has amount properties
+          const hasAmount = opt.amount && typeof opt.amount === 'object';
+          
           return {
             label: optionText,
             nameId: `${baseNameId}_${optionText.toLowerCase().replace(/\s+/g, '_')}`,
             value: "",
-            hasAmount: false,
-            amountName: "",
-            amountPlaceholder: ""
+            hasAmount: hasAmount,
+            amountName: hasAmount ? (opt.amount.name || optionText) : "",
+            amountPlaceholder: hasAmount ? (opt.amount.placeholder || "") : ""
           };
         }
         return {
