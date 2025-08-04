@@ -1056,20 +1056,78 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
         .replace(/"/g, '\\"')
   );
 
-  // Insert stepper progress bar above the form, only once
-  formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
-  for (let step = 1; step < sectionCounter; step++) {
-    formHTML += `<div class="stepper-step" data-step="${step}">`;
-    formHTML += `<div class="stepper-circle">${step}</div>`;
-    const sectionNameEl = document.getElementById("sectionBlock" + step)?.querySelector("#sectionName" + step);
-    const sectionName = sectionNameEl ? sectionNameEl.value : `Section ${step}`;
-    formHTML += `<div class="stepper-label">${sectionName}</div>`;
-    formHTML += `</div>`;
-    if (step < sectionCounter - 1) {
-      formHTML += `<div class="stepper-line"></div>`;
+  // Build group-to-section mapping and get group information
+  const groupToSectionMap = {};
+  const groupNames = {};
+  const sectionToGroupMap = {};
+  
+  // Find all groups
+  const groupBlocks = document.querySelectorAll('.group-block');
+  groupBlocks.forEach(groupBlock => {
+    const groupId = groupBlock.id.replace('groupBlock', '');
+    const groupNameEl = document.getElementById(`groupName${groupId}`);
+    const groupName = groupNameEl ? groupNameEl.value.trim() : `Group ${groupId}`;
+    groupNames[groupId] = groupName;
+    
+    // Get sections in this group
+    const groupSectionsDiv = document.getElementById(`groupSections${groupId}`);
+    if (groupSectionsDiv) {
+      const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+      const sectionsInGroup = [];
+      sectionItems.forEach(sectionItem => {
+        const select = sectionItem.querySelector('select');
+        if (select && select.value.trim()) {
+          sectionsInGroup.push(select.value.trim());
+          sectionToGroupMap[select.value.trim()] = groupId;
+        }
+      });
+      if (sectionsInGroup.length > 0) {
+        groupToSectionMap[groupId] = sectionsInGroup;
+      }
     }
+  });
+  
+  // If no groups are defined, fall back to section-based progress bar
+  const hasGroups = Object.keys(groupToSectionMap).length > 0;
+  
+  if (hasGroups) {
+    // Insert stepper progress bar based on groups
+    formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
+    const groupIds = Object.keys(groupToSectionMap).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    groupIds.forEach((groupId, index) => {
+      formHTML += `<div class="stepper-step" data-group="${groupId}" data-step="${index + 1}">`;
+      formHTML += `<div class="stepper-circle">${index + 1}</div>`;
+      formHTML += `<div class="stepper-label">${groupNames[groupId]}</div>`;
+      formHTML += `</div>`;
+      if (index < groupIds.length - 1) {
+        formHTML += `<div class="stepper-line"></div>`;
+      }
+    });
+    formHTML += `</div>`;
+    
+    // Store group mapping for progress bar logic
+    formHTML += `<script>`;
+    formHTML += `window.groupToSectionMap = ${JSON.stringify(groupToSectionMap)};`;
+    formHTML += `window.sectionToGroupMap = ${JSON.stringify(sectionToGroupMap)};`;
+    formHTML += `window.groupNames = ${JSON.stringify(groupNames)};`;
+    formHTML += `</script>`;
+  } else {
+    // Fallback to section-based progress bar
+    formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
+    for (let step = 1; step < sectionCounter; step++) {
+      formHTML += `<div class="stepper-step" data-step="${step}">`;
+      formHTML += `<div class="stepper-circle">${step}</div>`;
+      const sectionNameEl = document.getElementById("sectionBlock" + step)?.querySelector("#sectionName" + step);
+      const sectionName = sectionNameEl ? sectionNameEl.value : `Section ${step}`;
+      formHTML += `<div class="stepper-label">${sectionName}</div>`;
+      formHTML += `</div>`;
+      if (step < sectionCounter - 1) {
+        formHTML += `<div class="stepper-line"></div>`;
+      }
+    }
+    formHTML += `</div>`;
   }
-  formHTML += `</div>`;
 
   // Build each Section & its questions
   for (let s = 1; s < sectionCounter; s++) {
@@ -2643,29 +2701,75 @@ function updateProgressBar() {
   const stepper = document.getElementById('stepperProgressBar');
   if (!stepper) return;
   const steps = stepper.querySelectorAll('.stepper-step');
-  let activeStep = 1;
-  if (typeof currentSectionNumber === 'number') {
-    activeStep = currentSectionNumber;
-  } else if (currentSectionNumber === 'end') {
-    activeStep = steps.length;
+  
+  // Check if we're using group-based progress
+  if (window.groupToSectionMap && window.sectionToGroupMap) {
+    // Group-based progress bar
+    let activeGroupStep = 1;
+    
+    if (typeof currentSectionNumber === 'number') {
+      // Find which section we're currently on
+      const currentSectionEl = document.querySelector('#section' + currentSectionNumber);
+      if (currentSectionEl) {
+        const sectionTitleEl = currentSectionEl.querySelector('.section-title');
+        if (sectionTitleEl) {
+          const currentSectionName = sectionTitleEl.textContent.trim();
+          const currentGroupId = window.sectionToGroupMap[currentSectionName];
+          if (currentGroupId) {
+            // Find the step number for this group
+            const groupIds = Object.keys(window.groupToSectionMap).sort((a, b) => parseInt(a) - parseInt(b));
+            activeGroupStep = groupIds.indexOf(currentGroupId) + 1;
+          }
+        }
+      }
+    } else if (currentSectionNumber === 'end') {
+      activeGroupStep = steps.length;
+    }
+    
+    steps.forEach((step, idx) => {
+      step.classList.remove('active', 'completed');
+      if (idx + 1 < activeGroupStep) {
+        step.classList.add('completed');
+      } else if (idx + 1 === activeGroupStep) {
+        step.classList.add('active');
+      }
+    });
+    
+    // Animate lines between completed steps
+    const lines = stepper.querySelectorAll('.stepper-line');
+    lines.forEach((line, idx) => {
+      if (idx < activeGroupStep - 1) {
+        line.classList.add('filled');
+      } else {
+        line.classList.remove('filled');
+      }
+    });
+  } else {
+    // Section-based progress bar (fallback)
+    let activeStep = 1;
+    if (typeof currentSectionNumber === 'number') {
+      activeStep = currentSectionNumber;
+    } else if (currentSectionNumber === 'end') {
+      activeStep = steps.length;
+    }
+    steps.forEach((step, idx) => {
+      step.classList.remove('active', 'completed');
+      if (idx + 1 < activeStep) {
+        step.classList.add('completed');
+      } else if (idx + 1 === activeStep) {
+        step.classList.add('active');
+      }
+    });
+    // Animate lines between completed steps
+    const lines = stepper.querySelectorAll('.stepper-line');
+    lines.forEach((line, idx) => {
+      if (idx < activeStep - 1) {
+        line.classList.add('filled');
+      } else {
+        line.classList.remove('filled');
+      }
+    });
   }
-  steps.forEach((step, idx) => {
-    step.classList.remove('active', 'completed');
-    if (idx + 1 < activeStep) {
-      step.classList.add('completed');
-    } else if (idx + 1 === activeStep) {
-      step.classList.add('active');
-    }
-  });
-  // Animate lines between completed steps
-  const lines = stepper.querySelectorAll('.stepper-line');
-  lines.forEach((line, idx) => {
-    if (idx < activeStep - 1) {
-      line.classList.add('filled');
-    } else {
-      line.classList.remove('filled');
-    }
-  });
 }
 
 // Animate the progress bar fill width smoothly
