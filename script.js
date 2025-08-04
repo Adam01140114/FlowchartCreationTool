@@ -168,7 +168,7 @@ logoutBtn.addEventListener("click", () => {
       showLoginOverlay();
     })
     .catch(err => {
-      console.error("Logout error:", err);
+      // Logout error handled silently
       alert("Error logging out: " + err);
     });
 });
@@ -197,7 +197,7 @@ function loadUserColorPrefs() {
       refreshAllCells();
     })
     .catch(err => {
-      console.error("Error loading color prefs:", err);
+      // Error loading color preferences handled silently
     });
 }
 
@@ -344,143 +344,8 @@ function cleanStyle(style) {
     .replace(/;+$/, "");    // Clean trailing semicolons again (in case the previous operation created them)
 }
 
-// loadFlowchartData
-function loadFlowchartData(data) {
-  data.cells.forEach(item => {
-    if (item.style) {
-      item.style = cleanStyle(item.style);
-    }
-  });
-
-  graph.getModel().beginUpdate();
-  try {
-    const parent = graph.getDefaultParent();
-    graph.removeCells(graph.getChildVertices(parent));
-    const createdCells = {};
-
-    if (data.sectionPrefs) {
-      sectionPrefs = data.sectionPrefs;
-      // updateSectionLegend is defined in legend.js
-      updateSectionLegend();
-    }
-
-    // First pass: Create all cells
-    data.cells.forEach(item => {
-      if (item.vertex) {
-        const geo = new mxGeometry(
-          item.geometry.x,
-          item.geometry.y,
-          item.geometry.width,
-          item.geometry.height
-        );
-        const newCell = new mxCell(item.value, geo, item.style);
-        newCell.vertex = true;
-        newCell.id = item.id;
-        
-        // Restore custom fields
-        newCell._textboxes = item._textboxes || null;
-        newCell._questionText = item._questionText || null;
-        newCell._twoNumbers = item._twoNumbers || null;
-        newCell._nameId = item._nameId || null;
-        newCell._placeholder = item._placeholder || "";
-        newCell._questionId = item._questionId || null;
-        // image
-        if (item._image) newCell._image = item._image;
-        // calculation
-        if (item._calcTitle !== undefined) newCell._calcTitle = item._calcTitle;
-        if (item._calcAmountLabel !== undefined) newCell._calcAmountLabel = item._calcAmountLabel;
-        if (item._calcOperator !== undefined) newCell._calcOperator = item._calcOperator;
-        if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
-        if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
-        if (item._calcTerms !== undefined) newCell._calcTerms = item._calcTerms;
-        // subtitle
-        if (item._subtitleText !== undefined) newCell._subtitleText = item._subtitleText;
-        // info
-        if (item._infoText !== undefined) newCell._infoText = item._infoText;
-
-        graph.addCell(newCell, parent);
-        createdCells[item.id] = newCell;
-      }
-    });
-
-    // Second pass: Create all edges
-    data.cells.forEach(item => {
-      if (item.edge) {
-        const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
-        newEdge.edge = true;
-        newEdge.id = item.id;
-        const src = createdCells[item.source];
-        const trg = createdCells[item.target];
-        graph.addCell(newEdge, parent, undefined, src, trg);
-      }
-    });
-
-    // Third pass: Fix option node sections
-    const vertices = graph.getChildVertices(parent);
-    vertices.forEach(cell => {
-      if (isOptions(cell)) {
-        const incomingEdges = graph.getIncomingEdges(cell) || [];
-        for (const edge of incomingEdges) {
-          const sourceCell = edge.source;
-          if (sourceCell && isQuestion(sourceCell)) {
-            const questionSection = getSection(sourceCell);
-            const optionSection = getSection(cell);
-            if (questionSection !== optionSection) {
-              console.log(`Fixing option node ${cell.id} section from ${optionSection} to ${questionSection} to match parent question`);
-              // setSection is defined in legend.js
-              setSection(cell, questionSection);
-            }
-            break;
-          }
-        }
-      }
-    });
-  } finally {
-    graph.getModel().endUpdate();
-  }
-
-  // Renumber based on loaded positions
-  renumberQuestionIds();
-
-  // Rebuild HTML for special/certain nodes
-  const parent = graph.getDefaultParent();
-  const vertices = graph.getChildVertices(parent);
-  graph.getModel().beginUpdate();
-  try {
-    vertices.forEach(cell => {
-      if (isQuestion(cell)) {
-        const qType = getQuestionType(cell);
-        if (qType === "multipleTextboxes") {
-          updateMultipleTextboxesCell(cell);
-        } else if (qType === "multipleDropdownType") {
-          updatemultipleDropdownTypeCell(cell);
-        }
-      } else if (isOptions(cell) && getQuestionType(cell) === "imageOption") {
-        updateImageOptionCell(cell);
-      } else if (isCalculationNode(cell)) {
-        updateCalculationNodeCell(cell);
-      } else if (isSubtitleNode(cell)) {
-        // Extract text from HTML value if _subtitleText is not set
-        if (!cell._subtitleText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._subtitleText = cleanValue || "Subtitle text";
-        }
-        updateSubtitleNodeCell(cell);
-      } else if (isInfoNode(cell)) {
-        // Extract text from HTML value if _infoText is not set
-        if (!cell._infoText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._infoText = cleanValue || "Information text";
-        }
-        updateInfoNodeCell(cell);
-      }
-    });
-  } finally {
-    graph.getModel().endUpdate();
-  }
-
-  refreshAllCells();
-}
+// loadFlowchartData function removed - using the one from library.js instead
+// The library.js version properly handles groups data and all other functionality
 
 document.addEventListener("DOMContentLoaded", function() {
   checkForSavedLogin();
@@ -524,6 +389,12 @@ const phoneTypeBtn = document.getElementById("phoneType");
 
   // Create graph
   graph = new mxGraph(container);
+
+  // Set default edge style based on current setting (will be updated after settings load)
+  graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+  graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true; // Default to curved
+  graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+  graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_JETTY_SIZE] = 'auto';
 
   // When the user starts panning/dragging the canvas, hide any open menus.
   graph.addListener(mxEvent.PAN, function(sender, evt) {
@@ -1534,6 +1405,12 @@ keyHandler.bindControlKey(86, () => {
     const edge = evt.getProperty("cell");
     if (!edge) return;
 
+    // Apply current edge style setting to manually created edges
+    const edgeStyle = currentEdgeStyle === 'curved' ? 
+      "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" :
+      "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    graph.getModel().setStyle(edge, edgeStyle);
+
     const source = graph.getModel().getTerminal(edge, true);
     const target = graph.getModel().getTerminal(edge, false);
 
@@ -1626,6 +1503,14 @@ keyHandler.bindControlKey(86, () => {
     placeNodeAtClickLocation('end');
     hideContextMenu();
   });
+  
+  // Settings menu event listeners
+  document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsMenu);
+  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+  document.getElementById('cancelSettingsBtn').addEventListener('click', hideSettingsMenu);
+  
+  // Load settings on startup
+  loadSettingsFromLocalStorage();
   
   function placeNodeAtClickLocation(nodeType) {
     if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
@@ -2276,14 +2161,11 @@ function getQuestionType(cell) {
  * Define pickTypeForCell globally
  */
 window.pickTypeForCell = function(cellId, val) {
-  console.log('[pickTypeForCell] called with cellId:', cellId, 'val:', val); // DEBUG
   if (!val) {
-    console.log('[pickTypeForCell] No value selected, returning');
     return; // Do nothing if no type selected
   }
   const c = graph.getModel().getCell(cellId);
   if (!c) {
-    console.log('[pickTypeForCell] No cell found for id', cellId);
     return;
   }
 
@@ -2313,7 +2195,6 @@ window.pickTypeForCell = function(cellId, val) {
   graph.setSelectionCell(c);
   graph.startEditingAtCell(c);
   refreshAllCells();
-  console.log('[pickTypeForCell] Finished updating cell', c);
 };
 
 /******************************************************************
@@ -2794,14 +2675,12 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   const outgoingEdges = graph.getOutgoingEdges(cell) || [];
   
   const cellSection = parseInt(getSection(cell) || "1", 10);
-  console.log(`Checking section jumps for cell in section ${cellSection}`);
   
   for (const edge of outgoingEdges) {
     const targetCell = edge.target;
     if (!targetCell || !isOptions(targetCell)) continue;
     
     const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-    console.log(`  Checking option "${optionText}"`);
     
     const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
     
@@ -2812,8 +2691,6 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
       const sourceSection = parseInt(getSection(cell) || "1", 10);
       const targetSection = parseInt(getSection(targetQuestionCell) || "1", 10);
       
-      console.log(`    Option leads to question in section ${targetSection}`);
-      
       // If target section is more than 1 section away
       if (Math.abs(targetSection - sourceSection) > 1) {
         const targetQuestionId = questionIdMap.get(targetQuestionCell.id);
@@ -2821,7 +2698,6 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
           // Check if this jump already exists
           const exists = jumps.some(j => j.option === optionText && j.to === targetSection.toString());
           if (!exists) {
-            console.log(`    Adding jump: "${optionText}" -> section ${targetSection}`);
             jumps.push({
               option: optionText,
               to: targetSection.toString()
@@ -2830,10 +2706,6 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
         }
       }
     }
-  }
-  
-  if (jumps.length > 0) {
-    console.log(`Found ${jumps.length} section jumps:`, jumps);
   }
   
   return jumps;
@@ -2858,7 +2730,12 @@ function createYesNoOptions(parentCell) {
     if (parentCell !== jumpModeNode) {
       setSection(noNode, parentSection);
     }
-    graph.insertEdge(parent, null, "", parentCell, noNode);
+    const noEdge = graph.insertEdge(parent, null, "", parentCell, noNode);
+    // Apply current edge style
+    const edgeStyle = currentEdgeStyle === 'curved' ? 
+      "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" :
+      "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    graph.getModel().setStyle(noEdge, edgeStyle);
 
     const yesX = geo.x - 40;
     const yesY = geo.y + geo.height + 50;
@@ -2868,7 +2745,9 @@ function createYesNoOptions(parentCell) {
     if (parentCell !== jumpModeNode) {
       setSection(yesNode, parentSection);
     }
-    graph.insertEdge(parent, null, "", parentCell, yesNode);
+    const yesEdge = graph.insertEdge(parent, null, "", parentCell, yesNode);
+    // Apply current edge style
+    graph.getModel().setStyle(yesEdge, edgeStyle);
 
     // Make sure the option nodes are properly formatted
     updateOptionNodeCell(noNode);
@@ -2903,7 +2782,6 @@ window.importFlowchartJsonDirectly = function(jsonString) {
     try {
       jsonData = JSON.parse(jsonString);
     } catch (parseError) {
-      console.log("Initial parsing failed, trying workaround...", parseError);
       // Fallback approach for handling complex cases
       jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
     }
@@ -2915,16 +2793,12 @@ window.importFlowchartJsonDirectly = function(jsonString) {
     
     // Validate the JSON data
     if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
-      console.error("Invalid JSON structure:", jsonData);
       throw new Error("Invalid flowchart data: missing cells array");
     }
-    
-    console.log("Successfully parsed JSON with", jsonData.cells.length, "cells");
     loadFlowchartData(jsonData);
     currentFlowchartName = null;
     return true;
   } catch (error) {
-    console.error("Error importing flowchart:", error);
     alert("Error importing flowchart: " + error.message);
     return false;
   }
@@ -3278,7 +3152,7 @@ window.fixCapitalizationInJumps = function() {
                     jumpCondition.option && 
                     optionCapitalizationMap[jumpCondition.option.toLowerCase()]) {
                   jumpCondition.option = optionCapitalizationMap[jumpCondition.option.toLowerCase()];
-                  console.log(`Fixed capitalization: Changed jump condition option from "${jumpCondition.option}" to "${optionCapitalizationMap[jumpCondition.option.toLowerCase()]}"`);
+                  // Fixed capitalization for jump condition option
                 }
               }
             }
@@ -3298,7 +3172,6 @@ let fixIteration = 0;
 const maxIterations = 10; // Define maxIterations here instead of assuming it's already defined
 
 while (stillHaveIssues && fixIteration < maxIterations) {
-  console.log(`Processing iteration ${fixIteration} for logic fixes`);
   stillHaveIssues = false;
   fixIteration++;
 }
@@ -3403,9 +3276,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const btn = document.getElementById(id);
     if (btn) {
       btn.style.display = "block";
-      console.log(`Fixed ${id} display`);
-    } else {
-      console.error(`Button ${id} not found!`);
     }
   });
 });
@@ -3654,11 +3524,11 @@ document.addEventListener('change', function(e) {
   if (e.target && e.target.classList.contains('question-type-dropdown')) {
     const cellId = e.target.getAttribute('data-cell-id');
     const val = e.target.value;
-    console.log('[delegated change] .question-type-dropdown changed:', cellId, val); // DEBUG
+    // Removed: console.log('[delegated change] .question-type-dropdown changed:', cellId, val); // DEBUG
     if (window.pickTypeForCell) {
       window.pickTypeForCell(cellId, val);
     } else {
-      console.error('window.pickTypeForCell is not defined!');
+      // Removed: console.error('window.pickTypeForCell is not defined!');
     }
   }
 });
@@ -3792,35 +3662,40 @@ function autosaveFlowchartToLocalStorage() {
 
     const data = {
       cells: simplifiedCells,
-      sectionPrefs: sectionPrefsCopy
+      sectionPrefs: sectionPrefsCopy,
+      groups: getGroupsData()
     };
     
     const json = JSON.stringify(data);
     localStorage.setItem(AUTOSAVE_KEY, json);
-    console.log('[AUTOSAVE][localStorage] Flowchart autosaved. Length:', json.length);
+    // Removed: console.log('[AUTOSAVE][localStorage] Flowchart autosaved. Length:', json.length);
   } catch (e) {
-    console.log('[AUTOSAVE][localStorage] Error during autosave:', e);
+    // Removed: console.log('[AUTOSAVE][localStorage] Error during autosave:', e);
   }
 }
 
 function clearAutosaveLocalStorage() {
   localStorage.removeItem(AUTOSAVE_KEY);
-  console.log('[AUTOSAVE][localStorage] Cleared autosave.');
+  // Removed: console.log('[AUTOSAVE][localStorage] Cleared autosave.');
 }
 
 function getAutosaveFlowchartFromLocalStorage() {
   const raw = localStorage.getItem(AUTOSAVE_KEY);
-  console.log('[AUTOSAVE][localStorage][get] Raw value:', raw ? raw.substring(0, 100) : raw);
+  // Removed: console.log('[AUTOSAVE][localStorage][get] Raw value:', raw ? raw.substring(0, 100) : raw);
   if (!raw) {
-    console.log('[AUTOSAVE][localStorage] No autosave found.');
+    // Removed: console.log('[AUTOSAVE][localStorage] No autosave found.');
     return null;
   }
   try {
     const data = JSON.parse(raw);
-    console.log('[AUTOSAVE][localStorage] Loaded autosave JSON. Length:', raw.length);
+    // Removed: console.log('[AUTOSAVE][localStorage] Loaded autosave JSON. Length:', raw.length);
+    // Removed: console.log('[AUTOSAVE][localStorage] Autosave data has groups:', data.hasOwnProperty('groups'));
+    if (data.groups) {
+      // Removed: console.log('[AUTOSAVE][localStorage] Groups data:', data.groups);
+    }
     return data;
   } catch (e) {
-    console.log('[AUTOSAVE][localStorage] Error parsing autosave:', e);
+    // Removed: console.log('[AUTOSAVE][localStorage] Error parsing autosave:', e);
     return null;
   }
 }
@@ -3855,14 +3730,27 @@ function setupAutosaveHooks() {
     throttledAutosave();
   };
   
-  // Save after loadFlowchartData (immediate, not throttled)
+  // Save after loadFlowchartData (delayed to ensure groups are loaded)
   const origLoadFlowchartData = window.loadFlowchartData;
   window.loadFlowchartData = function(data) {
     origLoadFlowchartData.apply(this, arguments);
-    autosaveFlowchartToLocalStorage(); // Immediate save for loading
+    
+    // Apply groups from imported JSON if present
+    if (data && Array.isArray(data.groups)) {
+      if (typeof window.loadGroupsFromData === 'function') {
+        window.loadGroupsFromData(data.groups);
+      } else {
+        window.pendingGroupsData = data.groups;
+      }
+    }
+    
+    // Delay autosave to ensure groups are loaded
+    setTimeout(() => {
+      autosaveFlowchartToLocalStorage();
+    }, 500);
   };
   
-  console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
+  // Removed: console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
 }
 
 // --- AUTOSAVE RESTORE PROMPT ---
@@ -3915,22 +3803,25 @@ function showAutosaveRestorePrompt() {
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
       window.loadFlowchartData(data);
-      console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
+      // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
+      // Wait for groups to be loaded before setting up autosave hooks
+      setTimeout(safeSetupAutosaveHooks, 1000);
+    } else {
+      setTimeout(safeSetupAutosaveHooks, 500);
     }
-    setTimeout(safeSetupAutosaveHooks, 500);
   };
   noBtn.onclick = function() {
     modal.remove();
     clearAutosaveLocalStorage();
     window.location.reload();
-    console.log('[AUTOSAVE][localStorage] User chose NO: cleared autosave and reloaded.');
+    // Removed: console.log('[AUTOSAVE][localStorage] User chose NO: cleared autosave and reloaded.');
   };
 
   box.appendChild(yesBtn);
   box.appendChild(noBtn);
   modal.appendChild(box);
   document.body.appendChild(modal);
-  console.log('[AUTOSAVE][localStorage] Restore prompt shown.');
+  // Removed: console.log('[AUTOSAVE][localStorage] Restore prompt shown.');
 }
 
 // --- INIT AUTOSAVE ON PAGE LOAD ---
@@ -4247,6 +4138,14 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
             // Use the proper insertEdge method instead of manual creation
             const newEdge = graph.insertEdge(parent, null, edgeData.value || "", sourceCell, targetCell, edgeData.style);
             
+            // Apply current edge style if no style is provided
+            if (!edgeData.style || edgeData.style === "") {
+              const edgeStyle = currentEdgeStyle === 'curved' ? 
+                "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" :
+                "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+              graph.getModel().setStyle(newEdge, edgeStyle);
+            }
+            
             // Copy edge properties if they exist
             if (edgeData.geometry) {
               newEdge.geometry = new mxGeometry(
@@ -4515,3 +4414,411 @@ window.updateImageNodeField = function(cellId, field, value) {
   cell._image[field] = value;
   updateImageOptionCell(cell);
 };
+
+/**************************************************
+ *            GROUPS FUNCTIONALITY                *
+ **************************************************/
+
+// Global variables for groups
+let groupCounter = 1;
+let groups = {};
+
+/**
+ * Adds a new group to the groups container
+ */
+function addGroup(groupId = null) {
+  const groupsContainer = document.getElementById('groupsContainer');
+  if (!groupsContainer) return;
+
+  const currentGroupId = groupId || groupCounter;
+  
+  const block = document.createElement('div');
+  block.className = 'group-block';
+  block.id = 'groupBlock' + currentGroupId;
+
+  block.innerHTML = `
+    <h3>Group ${currentGroupId}</h3>
+    <label>Group Name: </label>
+    <input type="text" id="groupName${currentGroupId}" placeholder="Enter group name" 
+           value="Group ${currentGroupId}" oninput="updateGroupName(${currentGroupId})"><br><br>
+    <div id="groupSections${currentGroupId}">
+      <label>Sections in this group:</label><br>
+    </div>
+    <button type="button" onclick="addSectionToGroup(${currentGroupId})">Add Section to Group</button>
+    <button type="button" onclick="removeGroup(${currentGroupId})">Remove Group</button>
+  `;
+  groupsContainer.appendChild(block);
+
+  // Increment groupCounter only if not loading from JSON
+  if (!groupId) {
+    groupCounter++;
+  }
+}
+
+/**
+ * Removes a group block by ID
+ */
+function removeGroup(groupId) {
+  const block = document.getElementById('groupBlock' + groupId);
+  if (block) block.remove();
+  delete groups[groupId];
+}
+
+/**
+ * Updates the group name display
+ */
+function updateGroupName(groupId) {
+  const groupNameInput = document.getElementById('groupName' + groupId);
+  const groupHeader = document.getElementById('groupBlock' + groupId).querySelector('h3');
+  if (groupHeader && groupNameInput) {
+    groupHeader.textContent = groupNameInput.value;
+  }
+  
+  // Update groups object
+  if (!groups[groupId]) groups[groupId] = {};
+  groups[groupId].name = groupNameInput.value;
+}
+
+/**
+ * Adds a section to a group
+ */
+function addSectionToGroup(groupId, sectionName = '') {
+  const groupSectionsDiv = document.getElementById('groupSections' + groupId);
+  if (!groupSectionsDiv) return;
+
+  const sectionCount = groupSectionsDiv.querySelectorAll('.group-section-item').length + 1;
+  const sectionItem = document.createElement('div');
+  sectionItem.className = 'group-section-item';
+  sectionItem.id = 'groupSection' + groupId + '_' + sectionCount;
+
+  // Get all section names from the flowchart
+  const allSections = [];
+  Object.keys(sectionPrefs).forEach(sectionId => {
+    const sectionName = sectionPrefs[sectionId].name;
+    if (sectionName && sectionName.trim() !== 'Enter Name') {
+      allSections.push(sectionName.trim());
+    }
+  });
+  
+  let dropdownOptions = '<option value="">-- Select a section --</option>';
+  allSections.forEach(section => {
+    const selected = (section === sectionName) ? 'selected' : '';
+    dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+  });
+
+  sectionItem.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px; margin: 5px 0;">
+      <select id="groupSectionName${groupId}_${sectionCount}" 
+              onchange="handleGroupSectionChange()" 
+              style="flex: 1; padding: 5px;">
+        ${dropdownOptions}
+      </select>
+      <button type="button" onclick="removeSectionFromGroup(${groupId}, ${sectionCount})" 
+              style="padding: 5px 10px;">Remove</button>
+    </div>
+  `;
+  groupSectionsDiv.appendChild(sectionItem);
+
+  // Set the value if provided
+  if (sectionName) {
+    const select = sectionItem.querySelector('select');
+    if (select) {
+      select.value = sectionName;
+    }
+  }
+}
+
+/**
+ * Removes a section from a group
+ */
+function removeSectionFromGroup(groupId, sectionNumber) {
+  const sectionItem = document.getElementById('groupSection' + groupId + '_' + sectionNumber);
+  if (sectionItem) {
+    sectionItem.remove();
+    // Reindex remaining sections
+    updateGroupSectionNumbers(groupId);
+  }
+}
+
+/**
+ * Updates section numbers after removal
+ */
+function updateGroupSectionNumbers(groupId) {
+  const groupSectionsDiv = document.getElementById('groupSections' + groupId);
+  if (!groupSectionsDiv) return;
+
+  const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+  sectionItems.forEach((item, index) => {
+    const newNumber = index + 1;
+    const oldId = item.id;
+    item.id = 'groupSection' + groupId + '_' + newNumber;
+    
+    const select = item.querySelector('select');
+    if (select) {
+      select.id = 'groupSectionName' + groupId + '_' + newNumber;
+    }
+    
+    const button = item.querySelector('button');
+    if (button) {
+      button.setAttribute('onclick', `removeSectionFromGroup(${groupId}, ${newNumber})`);
+    }
+  });
+}
+
+/**
+ * Handles changes to group section dropdowns
+ */
+function handleGroupSectionChange() {
+  // Update groups object with current selections
+  updateGroupsObject();
+}
+
+/**
+ * Updates the groups object with current selections
+ */
+function updateGroupsObject() {
+  groups = {};
+  const groupBlocks = document.querySelectorAll('.group-block');
+  
+  groupBlocks.forEach(groupBlock => {
+    const groupId = groupBlock.id.replace('groupBlock', '');
+    const groupNameEl = document.getElementById('groupName' + groupId);
+    const groupName = groupNameEl ? groupNameEl.value.trim() : 'Group ' + groupId;
+    
+    groups[groupId] = {
+      name: groupName,
+      sections: []
+    };
+    
+    // Get sections in this group
+    const groupSectionsDiv = document.getElementById('groupSections' + groupId);
+    if (groupSectionsDiv) {
+      const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+      sectionItems.forEach(sectionItem => {
+        const select = sectionItem.querySelector('select');
+        if (select && select.value.trim()) {
+          groups[groupId].sections.push(select.value.trim());
+        }
+      });
+    }
+  });
+}
+
+/**
+ * Loads groups from JSON data
+ */
+function loadGroupsFromData(groupsData) {
+  console.log('loadGroupsFromData called with:', groupsData);
+  if (!groupsData || !Array.isArray(groupsData)) {
+    console.log('loadGroupsFromData: invalid data, returning');
+    return;
+  }
+  console.log('loadGroupsFromData: groupsData is valid array with length:', groupsData.length);
+  
+  // Clear existing groups
+  const groupsContainer = document.getElementById('groupsContainer');
+  if (groupsContainer) {
+    const existingGroups = groupsContainer.querySelectorAll('.group-block');
+    existingGroups.forEach(group => group.remove());
+  }
+  
+  // Reset counter
+  groupCounter = 1;
+  groups = {};
+  
+  // Load groups
+  groupsData.forEach(group => {
+    console.log('Loading group:', group);
+    addGroup(group.groupId);
+    console.log(`Created group block for groupId ${group.groupId}`);
+    
+    // Set group name
+    const groupNameInput = document.getElementById('groupName' + group.groupId);
+    if (groupNameInput && group.name) {
+      groupNameInput.value = group.name;
+      updateGroupName(group.groupId);
+      console.log(`Set group name to "${group.name}" for groupId ${group.groupId}`);
+    } else {
+      console.log(`Could not find groupName input for groupId ${group.groupId} or name is empty`);
+    }
+    
+    // Add sections to group
+    if (group.sections && group.sections.length > 0) {
+      group.sections.forEach(sectionName => {
+        console.log(`Adding section "${sectionName}" to group ${group.groupId}`);
+        addSectionToGroup(group.groupId, sectionName);
+      });
+    } else {
+      console.log(`No sections to add for group ${group.groupId}`);
+    }
+    
+    // Update counter
+    if (group.groupId >= groupCounter) {
+      groupCounter = group.groupId + 1;
+    }
+  });
+  
+  // Update groups object
+  updateGroupsObject();
+}
+
+/**
+ * Gets groups data for export
+ */
+function getGroupsData() {
+  updateGroupsObject();
+  const groupsArray = [];
+  
+  Object.keys(groups).forEach(groupId => {
+    // Export all groups, even if they have no sections
+    groupsArray.push({
+      groupId: parseInt(groupId),
+      name: groups[groupId].name,
+      sections: groups[groupId].sections
+    });
+  });
+  
+  return groupsArray;
+}
+
+/**
+ * Updates all group dropdowns with current section names
+ */
+function updateGroupDropdowns() {
+  const groupBlocks = document.querySelectorAll('.group-block');
+  
+  groupBlocks.forEach(groupBlock => {
+    const groupId = groupBlock.id.replace('groupBlock', '');
+    const groupSectionsDiv = document.getElementById('groupSections' + groupId);
+    
+    if (groupSectionsDiv) {
+      const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+      sectionItems.forEach(sectionItem => {
+        const select = sectionItem.querySelector('select');
+        if (select) {
+          const currentValue = select.value;
+          
+          // Get all section names from the flowchart
+          const allSections = [];
+          Object.keys(sectionPrefs).forEach(sectionId => {
+            const sectionName = sectionPrefs[sectionId].name;
+            if (sectionName && sectionName.trim() !== 'Enter Name') {
+              allSections.push(sectionName.trim());
+            }
+          });
+          
+          // Rebuild dropdown options
+          select.innerHTML = '<option value="">-- Select a section --</option>';
+          allSections.forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = section;
+            select.appendChild(option);
+          });
+          
+          // Restore current value if it still exists
+          if (currentValue && allSections.includes(currentValue)) {
+            select.value = currentValue;
+          }
+        }
+      });
+    }
+  });
+}
+
+/**
+ * Settings functionality
+ */
+let currentEdgeStyle = 'curved'; // Default to curved
+
+// Show settings menu
+window.showSettingsMenu = function() {
+  const settingsMenu = document.getElementById('settingsMenu');
+  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
+  
+  // Set current value
+  edgeStyleToggle.value = currentEdgeStyle;
+  
+  // Show menu
+  settingsMenu.classList.add('show');
+};
+
+// Hide settings menu
+function hideSettingsMenu() {
+  const settingsMenu = document.getElementById('settingsMenu');
+  settingsMenu.classList.remove('show');
+}
+
+// Save settings
+function saveSettings() {
+  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
+  const newEdgeStyle = edgeStyleToggle.value;
+  
+  if (newEdgeStyle !== currentEdgeStyle) {
+    currentEdgeStyle = newEdgeStyle;
+    updateEdgeStyle();
+    saveSettingsToLocalStorage();
+  }
+  
+  hideSettingsMenu();
+}
+
+// Update edge style based on current setting
+function updateEdgeStyle() {
+  // Update graph default edge style
+  if (currentEdgeStyle === 'curved') {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true;
+  } else {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+  }
+  
+  // Update existing edges
+  const edges = graph.getChildEdges(graph.getDefaultParent());
+  edges.forEach(edge => {
+    const currentStyle = edge.style || "";
+    let newStyle;
+    
+    if (currentEdgeStyle === 'curved') {
+      newStyle = currentStyle.replace(/rounded=0/g, 'rounded=1');
+      if (!newStyle.includes('rounded=')) {
+        newStyle += ';rounded=1';
+      }
+    } else {
+      newStyle = currentStyle.replace(/rounded=1/g, 'rounded=0');
+      if (!newStyle.includes('rounded=')) {
+        newStyle += ';rounded=0';
+      }
+    }
+    
+    graph.getModel().setStyle(edge, newStyle);
+  });
+  
+  // Refresh the display
+  graph.refresh();
+}
+
+// Save settings to localStorage
+function saveSettingsToLocalStorage() {
+  const settings = {
+    edgeStyle: currentEdgeStyle
+  };
+  localStorage.setItem('flowchartSettings', JSON.stringify(settings));
+}
+
+// Load settings from localStorage
+function loadSettingsFromLocalStorage() {
+  const settingsStr = localStorage.getItem('flowchartSettings');
+  if (settingsStr) {
+    try {
+      const settings = JSON.parse(settingsStr);
+      if (settings.edgeStyle) {
+        currentEdgeStyle = settings.edgeStyle;
+        updateEdgeStyle();
+      }
+    } catch (e) {
+      console.error('Error loading settings:', e);
+    }
+  }
+}

@@ -148,10 +148,18 @@
     <!-- Section items will be populated dynamically -->
   </div>
 
+  <!-- Groups Interface -->
+  <div id="groupsContainer">
+    <h4>Groups</h4>
+    <!-- Groups will be populated dynamically -->
+  </div>
+  <button type="button" onclick="addGroup()">Add Group</button>
+
   <!-- Below the legends -->
   <br>
   <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
   <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
+  <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button>
   <br>
   <button id="logoutBtn">Logout</button>
 </div>
@@ -238,6 +246,29 @@
     <p><strong>Amount Placeholder:</strong>
       <span id="propAmountPlaceholder" class="editable-field" tabindex="0"></span>
     </p>
+  </div>
+</div>
+
+<!-- Settings Menu -->
+<div id="settingsMenu" class="settings-menu">
+  <div class="settings-container">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button id="closeSettingsBtn" class="close-btn">&times;</button>
+    </div>
+    <div class="settings-content">
+      <div class="setting-item">
+        <label for="edgeStyleToggle">Edge Style:</label>
+        <select id="edgeStyleToggle">
+          <option value="curved">Curved</option>
+          <option value="straight">Straight</option>
+        </select>
+      </div>
+      <div class="settings-actions">
+        <button id="saveSettingsBtn">Save Settings</button>
+        <button id="cancelSettingsBtn">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 

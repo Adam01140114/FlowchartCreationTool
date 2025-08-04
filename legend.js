@@ -313,6 +313,9 @@ function updateSectionLegend() {
     const sec = getSection(selectedCell);
     highlightSectionInLegend(sec);
   }
+  
+  // Update group dropdowns with new section names
+  updateGroupDropdowns();
 }
 
 /**

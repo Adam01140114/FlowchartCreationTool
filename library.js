@@ -78,7 +78,8 @@ window.exportFlowchartJson = function () {
 
   const exportObj = {
     cells: simplifiedCells,
-    sectionPrefs: sectionPrefs
+    sectionPrefs: sectionPrefs,
+    groups: getGroupsData()
   };
 
   const jsonStr = JSON.stringify(exportObj, null, 2);
@@ -575,7 +576,8 @@ window.exportGuiJson = function(download = true) {
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
     defaultPDFName: defaultPDFName,
-    additionalPDFs: []
+    additionalPDFs: [],
+    groups: getGroupsData()
   };
   
   // Convert to string and download
@@ -669,7 +671,8 @@ window.exportBothJson = function() {
 
     const flowchartExportObj = {
       cells: simplifiedCells,
-      sectionPrefs: sectionPrefs
+      sectionPrefs: sectionPrefs,
+      groups: getGroupsData()
     };
 
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
@@ -754,6 +757,7 @@ window.saveFlowchart = function() {
     data.cells.push(cellData);
   }
   data.sectionPrefs = sectionPrefs;
+  data.groups = getGroupsData();
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ flowchart: data })
     .then(()=>alert("Flowchart saved as: " + flowchartName))
     .catch(err=>alert("Error saving: " + err));
@@ -892,9 +896,12 @@ function exportFlowchartJson() {
     return cellData;
   });
 
+  const groupsData = getGroupsData();
+  
   const exportObj = {
     cells: simplifiedCells,
-    sectionPrefs: sectionPrefs
+    sectionPrefs: sectionPrefs,
+    groups: groupsData
   };
 
   const jsonStr = JSON.stringify(exportObj, null, 2);
@@ -1090,6 +1097,8 @@ function loadFlowchartData(data) {
       updateSectionLegend();
     }
 
+
+
     // First pass: Create all cells
     data.cells.forEach(item => {
       if (item.vertex) {
@@ -1208,6 +1217,16 @@ function loadFlowchartData(data) {
   }
 
   refreshAllCells();
+  
+      // Load groups data if present (after sections are fully processed)
+    console.log('loadFlowchartData: checking for groups data');
+    console.log('loadFlowchartData: data.groups =', data.groups);
+    if (data.groups) {
+      console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
+      loadGroupsFromData(data.groups);
+    } else {
+      console.log('loadFlowchartData: no groups data found');
+    }
   
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {
