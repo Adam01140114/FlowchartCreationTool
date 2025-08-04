@@ -288,3 +288,65 @@ footer {
     background-color: #2c3e50;
     color: white;
 }
+
+/* Group styling */
+.group-block {
+    border: 2px solid #007AFF;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background-color: #f0f8ff;
+    transition: background-color 0.3s ease;
+}
+
+.group-block:hover {
+    background-color: #e6f3ff;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+}
+
+.group-block h3 {
+    color: #007AFF;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.group-section-item {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.group-section-item input,
+.group-section-item select {
+    border: 1px solid #d1d1d6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.group-section-item input:focus,
+.group-section-item select:focus {
+    outline: none;
+    border-color: #007AFF;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+}
+
+.group-section-item button {
+    background-color: #ff3b30;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.group-section-item button:hover {
+    background-color: #d70015;
+}

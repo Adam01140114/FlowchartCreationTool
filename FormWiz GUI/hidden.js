@@ -24,6 +24,9 @@ function initializeHiddenPDFFieldsModule() {
     hiddenFieldsModule.id = 'hiddenFieldsModule';
     hiddenFieldsModule.innerHTML = `
         <h2>Form Editor</h2>
+        <div id="groupsContainer"></div>
+        <button type="button" onclick="addGroup()">Add Group</button>
+        <hr>
         <div id="hiddenFieldsContainer"></div>
         <button type="button" onclick="addHiddenField()">Add Hidden Field</button>
         <hr>
@@ -32,6 +35,7 @@ function initializeHiddenPDFFieldsModule() {
 }
 
 var hiddenFieldCounter = 1; // track globally
+var groupCounter = 1; // track groups globally
 
 /**
  * Adds a new empty hidden field block
@@ -70,6 +74,417 @@ function addHiddenField() {
 function removeHiddenField(hiddenFieldId) {
     var block = document.getElementById('hiddenFieldBlock' + hiddenFieldId);
     if(block) block.remove();
+}
+
+// ============================================
+// ===========  GROUP FUNCTIONS  ==============
+// ============================================
+
+/**
+ * Adds a new empty group block
+ */
+function addGroup(groupId = null) {
+    var groupsContainer = document.getElementById('groupsContainer');
+    if(!groupsContainer) return;
+
+    var currentGroupId = groupId || groupCounter;
+    
+    var block = document.createElement('div');
+    block.className = 'group-block';
+    block.id = 'groupBlock' + currentGroupId;
+
+    block.innerHTML = `
+        <h3>Group ${currentGroupId}</h3>
+        <label>Group Name: </label>
+        <input type="text" id="groupName${currentGroupId}" placeholder="Enter group name" 
+               value="Group ${currentGroupId}" oninput="updateGroupName(${currentGroupId})"><br><br>
+        <div id="groupSections${currentGroupId}">
+            <label>Sections in this group:</label><br>
+        </div>
+        <button type="button" onclick="addSectionToGroup(${currentGroupId})">Add Section to Group</button>
+        <button type="button" onclick="removeGroup(${currentGroupId})">Remove Group</button>
+        <hr>
+    `;
+    groupsContainer.appendChild(block);
+
+    // Increment groupCounter only if not loading from JSON
+    if (!groupId) {
+        groupCounter++;
+    }
+}
+
+/**
+ * Removes a group block by ID
+ */
+function removeGroup(groupId) {
+    var block = document.getElementById('groupBlock' + groupId);
+    if(block) block.remove();
+    updateGroupLabels();
+}
+
+/**
+ * Updates the group name display
+ */
+function updateGroupName(groupId) {
+    const groupNameInput = document.getElementById('groupName' + groupId);
+    const groupHeader = document.getElementById('groupBlock' + groupId).querySelector('h3');
+    if (groupHeader && groupNameInput) {
+        groupHeader.textContent = groupNameInput.value;
+    }
+}
+
+/**
+ * Adds a section to a group
+ */
+function addSectionToGroup(groupId, sectionName = '') {
+    var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+    if(!groupSectionsDiv) return;
+
+    var sectionCount = groupSectionsDiv.querySelectorAll('.group-section-item').length + 1;
+    var sectionItem = document.createElement('div');
+    sectionItem.className = 'group-section-item';
+    sectionItem.id = 'groupSection' + groupId + '_' + sectionCount;
+
+    // Get ALL section names from the form (not just available ones)
+    var allSections = [];
+    var sectionBlocks = document.querySelectorAll('.section-block');
+    sectionBlocks.forEach(function(sectionBlock) {
+        var sectionId = sectionBlock.id.replace('sectionBlock', '');
+        var sectionNameInput = document.getElementById('sectionName' + sectionId);
+        if (sectionNameInput && sectionNameInput.value.trim()) {
+            allSections.push(sectionNameInput.value.trim());
+        }
+    });
+    
+    var dropdownOptions = '<option value="">-- Select a section --</option>';
+    allSections.forEach(function(section) {
+        var selected = (section === sectionName) ? 'selected' : '';
+        dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+    });
+
+    sectionItem.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; margin: 5px 0;">
+            <select id="groupSectionName${groupId}_${sectionCount}" 
+                    onchange="handleGroupSectionChange()" 
+                    style="flex: 1; padding: 5px;">
+                ${dropdownOptions}
+            </select>
+            <button type="button" onclick="removeSectionFromGroup(${groupId}, ${sectionCount})" 
+                    style="padding: 5px 10px;">Remove</button>
+        </div>
+    `;
+    groupSectionsDiv.appendChild(sectionItem);
+
+    // --- Fix: Ensure dropdown is set to sectionName after adding ---
+    if (sectionName) {
+        var select = sectionItem.querySelector('select');
+        if (select) {
+            // Always set the value, even if it wasn't in the original available sections
+            select.value = sectionName;
+            console.log('Set dropdown value to:', sectionName); // Debug log
+            console.log('Available options:', Array.from(select.options).map(opt => opt.value)); // Debug log
+        }
+    }
+}
+
+/**
+ * Removes a section from a group
+ */
+function removeSectionFromGroup(groupId, sectionNumber) {
+    var sectionItem = document.getElementById('groupSection' + groupId + '_' + sectionNumber);
+    if(sectionItem) {
+        var removedValue = '';
+        var select = sectionItem.querySelector('select');
+        if (select) {
+            removedValue = select.value;
+        }
+        
+        sectionItem.remove();
+        // Reindex remaining sections
+        updateGroupSectionNumbers(groupId);
+        
+        // If a section was removed, add it back to other groups' dropdowns
+        if (removedValue) {
+            addSectionToOtherGroupsDropdowns(removedValue);
+        }
+    }
+}
+
+/**
+ * Updates section numbers after removal
+ */
+function updateGroupSectionNumbers(groupId) {
+    var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+    if(!groupSectionsDiv) return;
+
+    var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+    sectionItems.forEach((item, index) => {
+        var newNumber = index + 1;
+        var oldId = item.id;
+        item.id = 'groupSection' + groupId + '_' + newNumber;
+        
+        var select = item.querySelector('select');
+        if(select) {
+            select.id = 'groupSectionName' + groupId + '_' + newNumber;
+        }
+        
+        var button = item.querySelector('button');
+        if(button) {
+            button.setAttribute('onclick', `removeSectionFromGroup(${groupId}, ${newNumber})`);
+        }
+    });
+}
+
+/**
+ * Re-label groups after moves/removals
+ */
+function updateGroupLabels() {
+    const groups = document.querySelectorAll('.group-block');
+    groups.forEach((block, index) => {
+        const h3Label = block.querySelector('h3');
+        if (h3Label) {
+            h3Label.textContent = `Group ${index + 1}`;
+        }
+    });
+}
+
+/**
+ * Handles changes to group section dropdowns
+ */
+function handleGroupSectionChange() {
+    // Get the current dropdown that changed
+    var changedSelect = event.target;
+    var selectedValue = changedSelect.value;
+    
+    if (selectedValue) {
+        // Update dropdowns in other groups to remove this selection from their options
+        updateOtherGroupsDropdowns(changedSelect, selectedValue);
+    }
+}
+
+/**
+ * Updates dropdowns in other groups to remove a selected section from their options
+ */
+function updateOtherGroupsDropdowns(changedSelect, selectedValue) {
+    // Find which group the changed select belongs to
+    var changedGroupItem = changedSelect.closest('.group-section-item');
+    var changedGroupBlock = changedGroupItem.closest('.group-block');
+    var changedGroupId = changedGroupBlock.id.replace('groupBlock', '');
+    
+    // Get all other groups
+    var otherGroupBlocks = document.querySelectorAll('.group-block');
+    otherGroupBlocks.forEach(function(groupBlock) {
+        var groupId = groupBlock.id.replace('groupBlock', '');
+        if (groupId !== changedGroupId) {
+            var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+            if (groupSectionsDiv) {
+                var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+                sectionItems.forEach(function(sectionItem) {
+                    var select = sectionItem.querySelector('select');
+                    if (select) {
+                        var currentValue = select.value;
+                        // Remove the selected value from this dropdown's options
+                        var options = select.querySelectorAll('option');
+                        options.forEach(function(option) {
+                            if (option.value === selectedValue) {
+                                option.remove();
+                            }
+                        });
+                        // If the current value was removed, clear the selection
+                        if (currentValue === selectedValue) {
+                            select.value = '';
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
+
+/**
+ * Adds a section back to other groups' dropdowns when it's removed from a group
+ */
+function addSectionToOtherGroupsDropdowns(sectionName) {
+    // Get all other groups
+    var otherGroupBlocks = document.querySelectorAll('.group-block');
+    otherGroupBlocks.forEach(function(groupBlock) {
+        var groupId = groupBlock.id.replace('groupBlock', '');
+        var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+        if (groupSectionsDiv) {
+            var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+            sectionItems.forEach(function(sectionItem) {
+                var select = sectionItem.querySelector('select');
+                if (select) {
+                    // Check if this section is not already in this group
+                    var isAlreadyInGroup = false;
+                    var allSelectsInGroup = groupSectionsDiv.querySelectorAll('select');
+                    allSelectsInGroup.forEach(function(groupSelect) {
+                        if (groupSelect.value === sectionName) {
+                            isAlreadyInGroup = true;
+                        }
+                    });
+                    
+                    // If not already in this group, add it to the dropdown
+                    if (!isAlreadyInGroup) {
+                        var option = document.createElement('option');
+                        option.value = sectionName;
+                        option.textContent = sectionName;
+                        select.appendChild(option);
+                    }
+                }
+            });
+        }
+    });
+}
+
+/**
+ * Gets all available section names that are not already in any group
+ */
+function getAvailableSectionNames() {
+    var availableSections = [];
+    var allSections = [];
+    
+    // Get all section names from the form
+    var sectionBlocks = document.querySelectorAll('.section-block');
+    sectionBlocks.forEach(function(sectionBlock) {
+        var sectionId = sectionBlock.id.replace('sectionBlock', '');
+        var sectionNameInput = document.getElementById('sectionName' + sectionId);
+        if (sectionNameInput && sectionNameInput.value.trim()) {
+            allSections.push(sectionNameInput.value.trim());
+        }
+    });
+    
+    // Get all sections that are already in groups
+    var usedSections = [];
+    var groupBlocks = document.querySelectorAll('.group-block');
+    groupBlocks.forEach(function(groupBlock) {
+        var groupId = groupBlock.id.replace('groupBlock', '');
+        var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+        if (groupSectionsDiv) {
+            var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+            sectionItems.forEach(function(sectionItem) {
+                var select = sectionItem.querySelector('select');
+                if (select && select.value.trim()) {
+                    usedSections.push(select.value.trim());
+                }
+            });
+        }
+    });
+    
+    // Return sections that are not used
+    availableSections = allSections.filter(function(section) {
+        return usedSections.indexOf(section) === -1;
+    });
+    
+    return availableSections;
+}
+
+/**
+ * Gets available section names for a specific group (excluding already selected ones in that group)
+ */
+function getAvailableSectionNamesForGroup(groupId) {
+    var allSections = [];
+    
+    // Get all section names from the form
+    var sectionBlocks = document.querySelectorAll('.section-block');
+    sectionBlocks.forEach(function(sectionBlock) {
+        var sectionId = sectionBlock.id.replace('sectionBlock', '');
+        var sectionNameInput = document.getElementById('sectionName' + sectionId);
+        if (sectionNameInput && sectionNameInput.value.trim()) {
+            allSections.push(sectionNameInput.value.trim());
+        }
+    });
+    
+    // Get sections already selected in this specific group
+    var usedInThisGroup = [];
+    var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+    if (groupSectionsDiv) {
+        var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+        sectionItems.forEach(function(sectionItem) {
+            var select = sectionItem.querySelector('select');
+            if (select && select.value.trim()) {
+                usedInThisGroup.push(select.value.trim());
+            }
+        });
+    }
+    
+    // Return sections that are not used in this group
+    return allSections.filter(function(section) {
+        return usedInThisGroup.indexOf(section) === -1;
+    });
+}
+
+/**
+ * Updates all group section dropdowns to reflect current available sections
+ */
+function updateGroupSectionDropdowns() {
+    // Get ALL section names from the form (not just available ones)
+    var allSections = [];
+    var sectionBlocks = document.querySelectorAll('.section-block');
+    sectionBlocks.forEach(function(sectionBlock) {
+        var sectionId = sectionBlock.id.replace('sectionBlock', '');
+        var sectionNameInput = document.getElementById('sectionName' + sectionId);
+        if (sectionNameInput && sectionNameInput.value.trim()) {
+            allSections.push(sectionNameInput.value.trim());
+        }
+    });
+    
+    var groupBlocks = document.querySelectorAll('.group-block');
+    
+    groupBlocks.forEach(function(groupBlock) {
+        var groupId = groupBlock.id.replace('groupBlock', '');
+        var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+        if (groupSectionsDiv) {
+            var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+            sectionItems.forEach(function(sectionItem) {
+                var select = sectionItem.querySelector('select');
+                if (select) {
+                    var currentValue = select.value;
+                    select.innerHTML = '<option value="">-- Select a section --</option>';
+                    allSections.forEach(function(sectionName) {
+                        var option = document.createElement('option');
+                        option.value = sectionName;
+                        option.textContent = sectionName;
+                        select.appendChild(option);
+                    });
+                    // Always restore the current value if it exists (even if not in available sections)
+                    if (currentValue) {
+                        select.value = currentValue;
+                    }
+                }
+            });
+        }
+    });
+}
+
+/**
+ * When loading from JSON, we call addGroupWithData
+ */
+function addGroupWithData(group) {
+    console.log('Loading group:', group); // Debug log
+    
+    var currentGroupId = group.groupId;
+    addGroup(currentGroupId);
+    
+    // Update groupCounter to ensure it's higher than any loaded group
+    if (currentGroupId >= groupCounter) {
+        groupCounter = currentGroupId + 1;
+    }
+    
+    // Set group name
+    var groupNameInput = document.getElementById('groupName' + currentGroupId);
+    if(groupNameInput) {
+        groupNameInput.value = group.name || 'Group ' + currentGroupId;
+        updateGroupName(currentGroupId);
+    }
+    
+    // Add sections to group
+    if(group.sections && group.sections.length > 0) {
+        console.log('Adding sections to group:', group.sections); // Debug log
+        group.sections.forEach(sectionName => {
+            addSectionToGroup(currentGroupId, sectionName);
+        });
+    }
 }
 
 /**

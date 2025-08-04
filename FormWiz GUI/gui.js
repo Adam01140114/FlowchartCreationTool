@@ -40,6 +40,11 @@ function addSection(sectionId = null) {
     if (!sectionId) {
         sectionCounter++;
     }
+    
+    // Update group section dropdowns when a new section is added
+    if (typeof updateGroupSectionDropdowns === 'function') {
+        updateGroupSectionDropdowns();
+    }
 }
 
 function removeSection(sectionId) {
@@ -47,6 +52,10 @@ function removeSection(sectionId) {
     if (sectionBlock) {
         sectionBlock.remove();
         updateSectionLabels();
+        // Update group section dropdowns when a section is removed
+        if (typeof updateGroupSectionDropdowns === 'function') {
+            updateGroupSectionDropdowns();
+        }
     }
 }
 
@@ -75,6 +84,10 @@ function updateSectionName(sectionId) {
     const sectionLabel = document.getElementById(`sectionLabel${sectionId}`);
     if (sectionLabel && sectionNameInput) {
         sectionLabel.textContent = sectionNameInput.value;
+    }
+    // Update group section dropdowns when section name changes
+    if (typeof updateGroupSectionDropdowns === 'function') {
+        updateGroupSectionDropdowns();
     }
 }
 

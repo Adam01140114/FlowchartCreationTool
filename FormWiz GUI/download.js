@@ -105,6 +105,7 @@ function loadFormData(formData) {
     sectionCounter = formData.sectionCounter || 1;
     questionCounter = formData.questionCounter || 1;
     hiddenFieldCounter = formData.hiddenFieldCounter || 1;
+    groupCounter = formData.groupCounter || 1;
 
     // 3) Set PDF name and other form settings
     if (formData.defaultPDFName) {
@@ -590,7 +591,17 @@ function loadFormData(formData) {
         });
     }
 
-    // 6) Build hidden fields from JSON (including multi-term calculations)
+    // 6) Build groups from JSON
+    if (formData.groups && formData.groups.length > 0) {
+        console.log('Importing groups:', formData.groups); // Debug log
+        formData.groups.forEach(group => {
+            addGroupWithData(group);
+        });
+    } else {
+        console.log('No groups found in import data'); // Debug log
+    }
+
+    // 7) Build hidden fields from JSON (including multi-term calculations)
     if (formData.hiddenFields && formData.hiddenFields.length > 0) {
         formData.hiddenFields.forEach(hiddenField => {
             // Before adding the hidden field, convert any question text references back to IDs
@@ -621,17 +632,19 @@ function loadFormData(formData) {
         });
     }
 
-    // 7) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
+    // 8) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
     updateFormAfterImport();
 }
 
 function exportForm() {
     const formData = {
         sections: [],
+        groups: [],
         hiddenFields: [],
         sectionCounter: sectionCounter,
         questionCounter: questionCounter,
         hiddenFieldCounter: hiddenFieldCounter,
+        groupCounter: groupCounter,
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
             : '',
@@ -928,6 +941,39 @@ function exportForm() {
 
         formData.sections.push(sectionData);
     }
+
+    // ========== Export groups ==========
+    formData.groups = [];
+    const groupBlocks = document.querySelectorAll('.group-block');
+    console.log('Found group blocks:', groupBlocks.length); // Debug log
+    
+    groupBlocks.forEach((groupBlock) => {
+        const groupId = parseInt(groupBlock.id.replace('groupBlock', ''), 10);
+        const groupName = document.getElementById(`groupName${groupId}`).value || `Group ${groupId}`;
+        
+        const groupData = {
+            groupId: groupId,
+            name: groupName,
+            sections: []
+        };
+        
+        // Collect sections in this group
+        const groupSectionsDiv = document.getElementById(`groupSections${groupId}`);
+        if (groupSectionsDiv) {
+            const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+            console.log(`Group ${groupId} has ${sectionItems.length} sections`); // Debug log
+            sectionItems.forEach((sectionItem) => {
+                const select = sectionItem.querySelector('select');
+                if (select && select.value.trim()) {
+                    groupData.sections.push(select.value.trim());
+                    console.log(`Added section "${select.value.trim()}" to group ${groupId}`); // Debug log
+                }
+            });
+        }
+        
+        formData.groups.push(groupData);
+        console.log('Exported group data:', groupData); // Debug log
+    });
 
     // ========== Export hidden fields with multi-term calculations ==========
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
@@ -1350,6 +1396,12 @@ function updateFormAfterImport() {
     if (typeof updateAllCalculationDropdowns === 'function') {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateAllCalculationDropdowns, 100);
+    }
+    
+    // Update group section dropdowns
+    if (typeof updateGroupSectionDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateGroupSectionDropdowns, 100);
     }
 }
 
