@@ -4538,8 +4538,14 @@ function addSectionToGroup(groupId, sectionName = '') {
     }
   });
   
+  // Exclude sections already chosen in this group (allow provided sectionName when loading)
+  const existingSelects = groupSectionsDiv.querySelectorAll('select');
+  const usedInGroup = new Set(Array.from(existingSelects).map(s => s.value).filter(v => v));
+  if (sectionName) usedInGroup.delete(sectionName);
+  const availableSections = allSections.filter(name => !usedInGroup.has(name));
+
   let dropdownOptions = '<option value="">-- Select a section --</option>';
-  allSections.forEach(section => {
+  availableSections.forEach(section => {
     const selected = (section === sectionName) ? 'selected' : '';
     dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
   });
@@ -4753,17 +4759,24 @@ function updateGroupDropdowns() {
             }
           });
           
-          // Rebuild dropdown options
+          // Rebuild dropdown options, excluding ones already used in this group
+          const groupSectionsDiv = select.closest('#' + 'groupSections' + groupId);
+          const existingSelects = groupSectionsDiv ? groupSectionsDiv.querySelectorAll('select') : [];
+          const usedInGroup = new Set(Array.from(existingSelects).map(s => s === select ? null : s.value).filter(v => v));
+          // Ensure the currentValue remains available while editing this row
+          if (currentValue) usedInGroup.delete(currentValue);
+          const availableSections = allSections.filter(name => !usedInGroup.has(name));
+
           select.innerHTML = '<option value="">-- Select a section --</option>';
-          allSections.forEach(section => {
+          availableSections.forEach(section => {
             const option = document.createElement('option');
             option.value = section;
             option.textContent = section;
             select.appendChild(option);
           });
           
-          // Restore current value if it still exists
-          if (currentValue && allSections.includes(currentValue)) {
+          // Restore current value if it still exists or was newly added
+          if (currentValue && availableSections.includes(currentValue)) {
             select.value = currentValue;
           }
         }
