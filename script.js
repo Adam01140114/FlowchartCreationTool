@@ -3660,12 +3660,24 @@ function autosaveFlowchartToLocalStorage() {
       return cellData;
     });
 
+    // Get current groups data without updating from DOM
+    const groupsArray = [];
+    Object.keys(groups).forEach(groupId => {
+      // Export all groups, even if they have no sections
+      groupsArray.push({
+        groupId: parseInt(groupId),
+        name: groups[groupId].name,
+        sections: groups[groupId].sections
+      });
+    });
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
-      groups: getGroupsData()
+      groups: groupsArray
     };
     
+    console.log('Autosaving with groups data:', groupsArray);
     const json = JSON.stringify(data);
     localStorage.setItem(AUTOSAVE_KEY, json);
     // Removed: console.log('[AUTOSAVE][localStorage] Flowchart autosaved. Length:', json.length);
@@ -3739,6 +3751,7 @@ function setupAutosaveHooks() {
     if (data && Array.isArray(data.groups)) {
       if (typeof window.loadGroupsFromData === 'function') {
         window.loadGroupsFromData(data.groups);
+        console.log('Groups loaded from data:', data.groups);
       } else {
         window.pendingGroupsData = data.groups;
       }
@@ -3746,8 +3759,9 @@ function setupAutosaveHooks() {
     
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
+      console.log('Autosaving after loadFlowchartData, current groups:', groups);
       autosaveFlowchartToLocalStorage();
-    }, 500);
+    }, 1000); // Increased delay to ensure groups are fully processed
   };
   
   // Removed: console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
@@ -3802,6 +3816,7 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
+      console.log('Restoring autosave with groups:', data.groups);
       window.loadFlowchartData(data);
       // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
       // Wait for groups to be loaded before setting up autosave hooks
