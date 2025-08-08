@@ -3716,6 +3716,22 @@ function getAutosaveFlowchartFromLocalStorage() {
 let autosaveTimeout = null;
 let autosaveThrottleDelay = 2000; // 2 seconds
 
+// Global helper to request a throttled autosave from anywhere (including Groups UI)
+function requestAutosave() {
+  try {
+    if (autosaveTimeout) {
+      clearTimeout(autosaveTimeout);
+    }
+    autosaveTimeout = setTimeout(() => {
+      autosaveFlowchartToLocalStorage();
+      autosaveTimeout = null;
+    }, autosaveThrottleDelay);
+  } catch (e) {
+    // Fallback to immediate autosave if throttling fails
+    autosaveFlowchartToLocalStorage();
+  }
+}
+
 function setupAutosaveHooks() {
   if (!graph) return;
   
@@ -4468,6 +4484,10 @@ function addGroup(groupId = null) {
   if (!groupId) {
     groupCounter++;
   }
+  
+  // Update in-memory model and trigger autosave
+  if (!groups[currentGroupId]) groups[currentGroupId] = { name: 'Group ' + currentGroupId, sections: [] };
+  requestAutosave();
 }
 
 /**
@@ -4477,6 +4497,7 @@ function removeGroup(groupId) {
   const block = document.getElementById('groupBlock' + groupId);
   if (block) block.remove();
   delete groups[groupId];
+  requestAutosave();
 }
 
 /**
@@ -4492,6 +4513,7 @@ function updateGroupName(groupId) {
   // Update groups object
   if (!groups[groupId]) groups[groupId] = {};
   groups[groupId].name = groupNameInput.value;
+  requestAutosave();
 }
 
 /**
@@ -4541,6 +4563,10 @@ function addSectionToGroup(groupId, sectionName = '') {
       select.value = sectionName;
     }
   }
+  
+  // Reflect in-memory groups and autosave
+  updateGroupsObject();
+  requestAutosave();
 }
 
 /**
@@ -4552,6 +4578,8 @@ function removeSectionFromGroup(groupId, sectionNumber) {
     sectionItem.remove();
     // Reindex remaining sections
     updateGroupSectionNumbers(groupId);
+    updateGroupsObject();
+    requestAutosave();
   }
 }
 
@@ -4586,6 +4614,7 @@ function updateGroupSectionNumbers(groupId) {
 function handleGroupSectionChange() {
   // Update groups object with current selections
   updateGroupsObject();
+  requestAutosave();
 }
 
 /**
