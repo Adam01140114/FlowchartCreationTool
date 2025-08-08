@@ -4530,9 +4530,10 @@ function addSectionToGroup(groupId, sectionName = '') {
 
   // Get all section names from the flowchart
   const allSections = [];
-  Object.keys(sectionPrefs).forEach(sectionId => {
-    const sectionName = sectionPrefs[sectionId].name;
-    if (sectionName && sectionName.trim() !== 'Enter Name') {
+  Object.keys(sectionPrefs).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(sectionId => {
+    const sectionName = (sectionPrefs[sectionId] && sectionPrefs[sectionId].name) ? sectionPrefs[sectionId].name : '';
+    // Only filter out if it is truly the default placeholder
+    if (sectionName.trim() !== '' && sectionName.trim().toLowerCase() !== 'enter section name') {
       allSections.push(sectionName.trim());
     }
   });
@@ -4744,9 +4745,10 @@ function updateGroupDropdowns() {
           
           // Get all section names from the flowchart
           const allSections = [];
-          Object.keys(sectionPrefs).forEach(sectionId => {
-            const sectionName = sectionPrefs[sectionId].name;
-            if (sectionName && sectionName.trim() !== 'Enter Name') {
+          Object.keys(sectionPrefs).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(sectionId => {
+            const sectionName = (sectionPrefs[sectionId] && sectionPrefs[sectionId].name) ? sectionPrefs[sectionId].name : '';
+            // Only filter out if it is truly the default placeholder
+            if (sectionName.trim() !== '' && sectionName.trim().toLowerCase() !== 'enter section name') {
               allSections.push(sectionName.trim());
             }
           });

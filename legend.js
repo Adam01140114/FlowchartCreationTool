@@ -292,6 +292,10 @@ function updateSectionLegend() {
       if (selectedCell && getSection(selectedCell) === sec) {
         document.getElementById("propSectionName").textContent = sectionPrefs[sec].name;
       }
+      // Keep Groups dropdowns in sync with latest section names
+      if (typeof updateGroupDropdowns === 'function') {
+        updateGroupDropdowns();
+      }
     });
     field.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
