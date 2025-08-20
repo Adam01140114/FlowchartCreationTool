@@ -44,6 +44,16 @@ window.exportFlowchartJson = function () {
     if (cell.edge && cell.source && cell.target) {
       cellData.source = cell.source.id;
       cellData.target = cell.target.id;
+      
+      // Save edge geometry (articulation points) if it exists
+      if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
+        cellData.edgeGeometry = {
+          points: cell.geometry.points.map(point => ({
+            x: point.x,
+            y: point.y
+          }))
+        };
+      }
     }
 
     // Custom fields for specific nodes
@@ -60,6 +70,15 @@ window.exportFlowchartJson = function () {
     
     // image option
     if (cell._image) cellData._image = cell._image;
+    
+    // PDF node properties
+    if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+    
+    // Notes node properties
+    if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+    
+    // Checklist node properties
+    if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
     
     // calculation node properties
     if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
@@ -741,6 +760,13 @@ window.saveFlowchart = function() {
       edge: !!cell.edge,
       source: cell.edge ? (cell.source? cell.source.id:null) : null,
       target: cell.edge ? (cell.target? cell.target.id:null) : null,
+      // Save edge geometry (articulation points) if it exists
+      edgeGeometry: cell.edge && cell.geometry && cell.geometry.points && cell.geometry.points.length > 0 ? {
+        points: cell.geometry.points.map(point => ({
+          x: point.x,
+          y: point.y
+        }))
+      } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
       _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
@@ -758,7 +784,10 @@ window.saveFlowchart = function() {
   }
   data.sectionPrefs = sectionPrefs;
   data.groups = getGroupsData();
-  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ flowchart: data })
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
+    flowchart: data,
+    lastUsed: Date.now()
+  })
     .then(()=>alert("Flowchart saved as: " + flowchartName))
     .catch(err=>alert("Error saving: " + err));
 };
@@ -768,18 +797,63 @@ window.viewSavedFlowcharts = function() {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to view saved flowcharts. Guest users cannot load."); return; }
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").get()
     .then(snapshot=>{
-      let html = snapshot.empty ? "<p>No saved flowcharts.</p>" : "";
+      let flowcharts = [];
       snapshot.forEach(doc=>{
         const name = doc.id;
-        html += `<div class="flowchart-item"><strong ondblclick="renameFlowchart('${name}', this)">${name}</strong>
-                  <button onclick="openSavedFlowchart('${name}')">Open</button>
-                  <button onclick="deleteSavedFlowchart('${name}')">Delete</button></div>`;
+        const data = doc.data();
+        const lastUsed = data.lastUsed || 0;
+        flowcharts.push({
+          name: name,
+          lastUsed: lastUsed,
+          data: data
+        });
       });
-      document.getElementById("flowchartList").innerHTML = html;
+      
+      // Sort by recently used (most recent first)
+      flowcharts.sort((a, b) => b.lastUsed - a.lastUsed);
+      
+      // Store flowcharts for search functionality
+      window.currentFlowcharts = flowcharts;
+      
+      // Display flowcharts
+      displayFlowcharts(flowcharts);
+      
+      // Set up search functionality
+      const searchInput = document.getElementById("flowchartSearchInput");
+      if (searchInput) {
+        searchInput.value = "";
+        searchInput.oninput = function() {
+          const searchTerm = this.value.toLowerCase();
+          const filteredFlowcharts = flowcharts.filter(fc => 
+            fc.name.toLowerCase().includes(searchTerm)
+          );
+          displayFlowcharts(filteredFlowcharts);
+        };
+      }
+      
       document.getElementById("flowchartListOverlay").style.display = "flex";
     })
     .catch(err=>alert("Error fetching: " + err));
 };
+
+// Display flowcharts in the list
+function displayFlowcharts(flowcharts) {
+  let html = flowcharts.length === 0 ? "<p>No saved flowcharts.</p>" : "";
+  flowcharts.forEach(fc => {
+    const lastUsedText = fc.lastUsed ? new Date(fc.lastUsed).toLocaleDateString() : "Never used";
+    html += `<div class="flowchart-item">
+              <div style="flex: 1;">
+                <strong ondblclick="renameFlowchart('${fc.name}', this)">${fc.name}</strong>
+                <br><small style="color: #666;">Last used: ${lastUsedText}</small>
+              </div>
+              <div>
+                <button onclick="openSavedFlowchart('${fc.name}')">Open</button>
+                <button onclick="deleteSavedFlowchart('${fc.name}')">Delete</button>
+              </div>
+            </div>`;
+  });
+  document.getElementById("flowchartList").innerHTML = html;
+}
 
 window.openSavedFlowchart = function(name) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
@@ -788,6 +862,12 @@ window.openSavedFlowchart = function(name) {
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
       loadFlowchartData(docSnap.data().flowchart);
       currentFlowchartName = name;
+      
+      // Update last used timestamp
+      db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
+        .update({ lastUsed: Date.now() })
+        .catch(err => console.log("Error updating last used timestamp:", err));
+      
       document.getElementById("flowchartListOverlay").style.display = "none";
     }).catch(err=>alert("Error loading: " + err));
 };
@@ -864,6 +944,16 @@ function exportFlowchartJson() {
     if (cell.edge && cell.source && cell.target) {
       cellData.source = cell.source.id;
       cellData.target = cell.target.id;
+      
+      // Save edge geometry (articulation points) if it exists
+      if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
+        cellData.edgeGeometry = {
+          points: cell.geometry.points.map(point => ({
+            x: point.x,
+            y: point.y
+          }))
+        };
+      }
     }
 
     // Custom fields for specific nodes
@@ -1127,6 +1217,15 @@ function loadFlowchartData(data) {
         // Image option
         if (item._image) newCell._image = item._image;
         
+        // PDF node properties
+        if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
+        
+        // Notes node properties
+        if (item._notesText !== undefined) newCell._notesText = item._notesText;
+        
+        // Checklist node properties
+        if (item._checklistText !== undefined) newCell._checklistText = item._checklistText;
+        
         // Calculation properties
         if (item._calcTitle !== undefined) newCell._calcTitle = item._calcTitle;
         if (item._calcAmountLabel !== undefined) newCell._calcAmountLabel = item._calcAmountLabel;
@@ -1155,6 +1254,12 @@ function loadFlowchartData(data) {
         
         if (source && target) {
           const geo = new mxGeometry();
+          
+          // Restore edge geometry (articulation points) if it exists
+          if (item.edgeGeometry && item.edgeGeometry.points && item.edgeGeometry.points.length > 0) {
+            geo.points = item.edgeGeometry.points.map(point => new mxPoint(point.x, point.y));
+          }
+          
           const edge = new mxCell("", geo, item.style);
           edge.edge = true;
           edge.id = item.id;
@@ -1179,6 +1284,12 @@ function loadFlowchartData(data) {
           // Amount options are handled in refreshAllCells
         } else if (getQuestionType(cell) === 'imageOption') {
         updateImageOptionCell(cell);
+              } else if (getQuestionType(cell) === 'notesNode') {
+        updateNotesNodeCell(cell);
+        } else if (getQuestionType(cell) === 'checklistNode') {
+        updateChecklistNodeCell(cell);
+      } else if (isPdfNode(cell)) {
+        updatePdfNodeCell(cell);
       } else if (isCalculationNode(cell)) {
         updateCalculationNodeCell(cell);
       } else if (isSubtitleNode(cell)) {

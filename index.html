@@ -30,6 +30,9 @@
 <div id="flowchartListOverlay">
   <div id="flowchartListPanel">
     <h3>Saved Flowcharts</h3>
+    <div style="margin-bottom: 15px;">
+      <input type="text" id="flowchartSearchInput" placeholder="Search flowcharts..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+    </div>
     <div id="flowchartList"></div>
     <br/>
     <button id="closeFlowchartListBtn">Close</button>
@@ -59,6 +62,13 @@
   >
     Image Node
   </div>
+  <div
+    class="shape"
+    data-type="pdfNode"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=12;fontSize=16;"
+  >
+    PDF Node
+  </div>
   <div 
     class="shape"
     data-type="end"
@@ -81,6 +91,20 @@
     data-style="shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;"
   >
     Calculation Node
+  </div>
+  <div
+    class="shape"
+    data-type="notesNode"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=notesNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;"
+  >
+    Notes Node
+  </div>
+  <div
+    class="shape"
+    data-type="checklistNode"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checklistNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;"
+  >
+    Checklist Node
   </div>
 
   <div class="button-bar">
@@ -183,9 +207,12 @@
   <button id="placeQuestionNode">Question Node</button>
   <button id="placeOptionNode">Option Node</button>
   <button id="placeCalcNode">Calc Node</button>
+  <button id="placeNotesNode">Notes Node</button>
+  <button id="placeChecklistNode">Checklist Node</button>
   <button id="placeSubtitleNode">Subtitle Node</button>
   <button id="placeInfoNode">Info Node</button>
   <button id="placeImageNode">Image Node</button>
+  <button id="placePdfNode">PDF Node</button>
   <button id="placeAmountNode">Amount Option Node</button>
   <button id="placeEndNode">End Node</button>
 </div>
@@ -216,6 +243,8 @@
   <button id="regularOptionType">Regular Option</button>
   <button id="imageOptionType">Image Option</button>
   <button id="amountOptionType">Amount Option</button>
+  <button id="notesNodeType">Notes Node</button>
+  <button id="checklistNodeType">Checklist Node</button>
   <button id="endNodeType">End Node</button>
 </div>
 

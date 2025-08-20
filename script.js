@@ -124,6 +124,11 @@ const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
 
 const logoutBtn = document.getElementById("logoutBtn");
 
+// Close flowchart list overlay
+closeFlowchartListBtn.addEventListener("click", function() {
+  document.getElementById("flowchartListOverlay").style.display = "none";
+});
+
 // Login overlay and cookie functions have been moved to auth.js
 
 loginButton.addEventListener("click", () => {
@@ -560,6 +565,10 @@ graph.isCellEditable = function (cell) {
       qt === 'dropdown') {          // new ✱
     return false;
   }
+  // Disable direct editing for PDF nodes (they use custom input fields)
+  if (isPdfNode(cell)) {
+    return false;
+  }
   // Allow text2 to be edited directly with double-click
   if (qt === 'text2') {
     return true;
@@ -583,6 +592,22 @@ graph.isCellEditable = function (cell) {
   graph.setPanning(true);
   graph.panningHandler.useLeftButtonForPanning = true;
 
+  // Add listener for cell editing to handle notes and checklist nodes
+  graph.getModel().addListener(mxEvent.CHANGE, function(sender, evt) {
+    const changes = evt.getProperty('edit').changes;
+    changes.forEach(change => {
+      if (change instanceof mxValueChange && change.cell) {
+        if (isNotesNode(change.cell)) {
+          // Update the _notesText property when the cell value changes
+          change.cell._notesText = change.value;
+        } else if (isChecklistNode(change.cell)) {
+          // Update the _checklistText property when the cell value changes
+          change.cell._checklistText = change.value;
+        }
+      }
+    });
+  });
+
   // Comment out the line that disables the context menu on the graph container
   // mxEvent.disableContextMenu(container);   // comment this out
   graph.setCellsMovable(true);
@@ -592,6 +617,85 @@ graph.isCellEditable = function (cell) {
   // We'll focus just on making right-click work properly
   // Customize rubberband handling (we'll skip selection box for now)
   const rubberband = new mxRubberband(graph);
+  
+  // Enhanced multi-selection functionality
+  graph.getSelectionModel().addListener(mxEvent.CHANGE, function(sender, evt) {
+    // Auto-select connecting edges when multiple nodes are selected
+    const selectedCells = graph.getSelectionCells();
+    const selectedVertices = selectedCells.filter(cell => cell.vertex);
+    
+    if (selectedVertices.length > 1) {
+      // Find all edges that connect selected vertices
+      const connectingEdges = [];
+      const selectedVertexIds = new Set(selectedVertices.map(v => v.id));
+      
+      graph.getModel().getEdges().forEach(edge => {
+        const sourceId = edge.source ? edge.source.id : null;
+        const targetId = edge.target ? edge.target.id : null;
+        
+        if (selectedVertexIds.has(sourceId) && selectedVertexIds.has(targetId)) {
+          connectingEdges.push(edge);
+        }
+      });
+      
+      // Add connecting edges to selection if they're not already selected
+      const selectionModel = graph.getSelectionModel();
+      connectingEdges.forEach(edge => {
+        if (!selectedCells.includes(edge)) {
+          selectionModel.addCell(edge);
+        }
+      });
+    }
+    
+    // Safeguard: If no cells are selected and we're in multi-selection mode,
+    // this might be an accidental deselection
+    if (selectedCells.length === 0 && document.body.classList.contains('ctrl-pressed')) {
+      // You could add a confirmation dialog here if needed
+      console.log('All nodes deselected in multi-selection mode');
+    }
+  });
+  
+  // Override the default cell selection behavior for better multi-selection
+  const originalSelectCellForEvent = graph.selectCellForEvent;
+  graph.selectCellForEvent = function(cell, evt) {
+    if (evt && (evt.ctrlKey || evt.metaKey)) {
+      // Ctrl+click: add/remove from selection
+      const selectionModel = graph.getSelectionModel();
+      const selectedCells = graph.getSelectionCells();
+      if (selectedCells.includes(cell)) {
+        // Remove from selection
+        selectionModel.removeCell(cell);
+      } else {
+        // Add to selection
+        selectionModel.addCell(cell);
+      }
+      return cell;
+    } else {
+      // Normal click: select only this cell
+      return originalSelectCellForEvent.call(this, cell, evt);
+    }
+  };
+  
+  // Also override the click handler to ensure proper behavior
+  graph.click = function(me) {
+    const cell = me.getCell();
+    if (cell && (me.ctrlKey || me.metaKey)) {
+      // Handle Ctrl+click manually
+      const selectionModel = graph.getSelectionModel();
+      const selectedCells = graph.getSelectionCells();
+      if (selectedCells.includes(cell)) {
+        selectionModel.removeCell(cell);
+      } else {
+        selectionModel.addCell(cell);
+      }
+      me.consume();
+      return;
+    }
+    // Call the original click handler for normal clicks
+    return mxGraph.prototype.click.call(this, me);
+  };
+  
+
   
   // Context menu handling
   graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
@@ -1094,6 +1198,8 @@ graph.isCellEditable = function (cell) {
   const regularOptionTypeBtn = document.getElementById("regularOptionType");
   const imageOptionTypeBtn = document.getElementById("imageOptionType");
   const amountOptionTypeBtn = document.getElementById("amountOptionType");
+  const notesNodeTypeBtn = document.getElementById("notesNodeType");
+  const checklistNodeTypeBtn = document.getElementById("checklistNodeType");
   const endNodeTypeBtn = document.getElementById("endNodeType");
 
   regularOptionTypeBtn.addEventListener("click", () => {
@@ -1115,6 +1221,22 @@ graph.isCellEditable = function (cell) {
   amountOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "amountOption");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  notesNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "notesNode");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  checklistNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "checklistNode");
       refreshAllCells();
     }
     hideContextMenu();
@@ -1479,6 +1601,16 @@ keyHandler.bindControlKey(86, () => {
     hideContextMenu();
   });
   
+  document.getElementById('placeNotesNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('notesNode');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeChecklistNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('checklistNode');
+    hideContextMenu();
+  });
+  
   document.getElementById('placeSubtitleNode').addEventListener('click', function() {
     placeNodeAtClickLocation('subtitle');
     hideContextMenu();
@@ -1491,6 +1623,11 @@ keyHandler.bindControlKey(86, () => {
   
   document.getElementById('placeImageNode').addEventListener('click', function() {
     placeNodeAtClickLocation('imageOption');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placePdfNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('pdfNode');
     hideContextMenu();
   });
   
@@ -1535,6 +1672,12 @@ keyHandler.bindControlKey(86, () => {
       } else if (nodeType === 'calculation') {
         style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
         label = "Calculation node";
+      } else if (nodeType === 'notesNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=notesNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;";
+        label = "Notes Node";
+      } else if (nodeType === 'checklistNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checklistNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;";
+        label = "Checklist Node";
       } else if (nodeType === 'subtitle') {
         style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=subtitle;spacing=12;fontSize=14;fontStyle=italic;";
         label = "Subtitle text";
@@ -1544,6 +1687,9 @@ keyHandler.bindControlKey(86, () => {
       } else if (nodeType === 'imageOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;spacing=12;fontSize=16;";
         label = "Image Option";
+      } else if (nodeType === 'pdfNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=12;fontSize=16;";
+        label = "PDF Node";
       } else if (nodeType === 'amountOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
         label = "Amount Option";
@@ -1590,6 +1736,12 @@ keyHandler.bindControlKey(86, () => {
         cell._calcThreshold = "0";
         cell._calcFinalText = "";
         updateCalculationNodeCell(cell);
+      } else if (nodeType === 'notesNode') {
+        cell._notesText = "Notes text";
+        updateNotesNodeCell(cell);
+      } else if (nodeType === 'checklistNode') {
+        cell._checklistText = "Checklist text";
+        updateChecklistNodeCell(cell);
       } else if (nodeType === 'subtitle') {
         cell._subtitleText = "Subtitle text";
         updateSubtitleNodeCell(cell);
@@ -1603,6 +1755,9 @@ keyHandler.bindControlKey(86, () => {
           height: "100"
         };
         updateImageOptionCell(cell);
+      } else if (nodeType === 'pdfNode') {
+        cell._pdfUrl = "";
+        updatePdfNodeCell(cell);
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
       }
@@ -1618,6 +1773,21 @@ keyHandler.bindControlKey(86, () => {
     window.emptySpaceClickX = undefined;
     window.emptySpaceClickY = undefined;
   }
+  
+  // Add keyboard event listeners for multi-selection
+  document.addEventListener('keydown', function(event) {
+    // Show visual indicator when Ctrl is pressed
+    if (event.ctrlKey || event.metaKey) {
+      document.body.classList.add('ctrl-pressed');
+    }
+  });
+  
+  document.addEventListener('keyup', function(event) {
+    // Hide visual indicator when Ctrl is released
+    if (!event.ctrlKey && !event.metaKey) {
+      document.body.classList.remove('ctrl-pressed');
+    }
+  });
   
   // Add keyboard event listener for delete key
   document.addEventListener('keydown', function(event) {
@@ -2416,6 +2586,31 @@ function setOptionType(cell, newType) {
         }
         // updateAmountOptionCell is handled in the existing code
         break;
+      case 'notesNode':
+        // Notes node - needs notes text and bold border
+        if (!cell._notesText) {
+          cell._notesText = 'Notes text';
+        }
+        // Add bold border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = st.replace(/strokeColor=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#000000;';
+        graph.getModel().setStyle(cell, st);
+        updateNotesNodeCell(cell);
+        break;
+      case 'checklistNode':
+        // Checklist node - needs checklist text and striped red border
+        if (!cell._checklistText) {
+          cell._checklistText = 'Checklist text';
+        }
+        // Add striped red border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = st.replace(/strokeColor=[^;]+/, '');
+        st = st.replace(/strokeDasharray=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;';
+        graph.getModel().setStyle(cell, st);
+        updateChecklistNodeCell(cell);
+        break;
       case 'end':
         // End node option - convert to end node
         // Change the node type from options to end
@@ -2480,9 +2675,15 @@ function colorCell(cell) {
       fillColor = colorPreferences.amountOption;
     } else if (getQuestionType(cell) === "imageOption") {
       fillColor = "#FFF8DC"; 
+    } else if (getQuestionType(cell) === "notesNode") {
+      fillColor = "#ffffff"; // Notes nodes are white with black border
+    } else if (getQuestionType(cell) === "checklistNode") {
+      fillColor = "#ffffff"; // Checklist nodes are white with striped red border
     } else {
       fillColor = "#ffffff";
     }
+  } else if (isPdfNode(cell)) {
+    fillColor = "#FFF8DC"; // Same color as image nodes
   } else if (isCalculationNode(cell)) {
     // You can pick a distinct color for calculation nodes
     fillColor = "#FFDDAA";
@@ -2544,10 +2745,19 @@ function performRefreshAllCells() {
           updateImageOptionCell(cell);
         } else if (getQuestionType(cell) === "amountOption") {
           // Amount option has its own handling
+        } else if (getQuestionType(cell) === "notesNode") {
+          updateNotesNodeCell(cell);
+        } else if (getQuestionType(cell) === "checklistNode") {
+          updateChecklistNodeCell(cell);
         } else {
           // Regular option nodes
           updateOptionNodeCell(cell);
         }
+      }
+      
+      // Handle PDF nodes
+      if (isPdfNode(cell)) {
+        updatePdfNodeCell(cell);
       }
       
       // If it's a text2 node, make sure we update _questionText from value
@@ -3628,6 +3838,16 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.edge && cell.source && cell.target) {
         cellData.source = cell.source.id;
         cellData.target = cell.target.id;
+        
+        // Save edge geometry (articulation points) if it exists
+        if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
+          cellData.edgeGeometry = {
+            points: cell.geometry.points.map(point => ({
+              x: point.x,
+              y: point.y
+            }))
+          };
+        }
       }
 
       // Custom fields for specific nodes
@@ -3644,6 +3864,15 @@ function autosaveFlowchartToLocalStorage() {
       
       // image option
       if (cell._image) cellData._image = cell._image;
+      
+      // PDF node properties
+      if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+      
+      // Notes node properties
+      if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+      
+      // Checklist node properties
+      if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
       
       // calculation node properties
       if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
@@ -4137,7 +4366,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4151,6 +4380,12 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         // Update rendering for special node types
         if (getQuestionType(newCell) === "imageOption") {
           updateImageOptionCell(newCell);
+        } else if (getQuestionType(newCell) === "notesNode") {
+          updateNotesNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "checklistNode") {
+          updateChecklistNodeCell(newCell);
+        } else if (isPdfNode(newCell)) {
+          updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
           refreshOptionNodeId(newCell);
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
@@ -4234,7 +4469,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -4244,6 +4479,12 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         // If image option, update rendering
         if (getQuestionType(newCell) === "imageOption") {
           updateImageOptionCell(newCell);
+        } else if (getQuestionType(newCell) === "notesNode") {
+          updateNotesNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "checklistNode") {
+          updateChecklistNodeCell(newCell);
+        } else if (isPdfNode(newCell)) {
+          updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
           refreshOptionNodeId(newCell);
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
@@ -4444,6 +4685,109 @@ window.updateImageNodeField = function(cellId, field, value) {
   }
   cell._image[field] = value;
   updateImageOptionCell(cell);
+};
+
+// PDF Node functions
+function isPdfNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=pdfNode");
+}
+
+function updatePdfNodeCell(cell) {
+  if (!cell || !isPdfNode(cell)) return;
+  
+  // Ensure _pdfUrl property exists
+  if (!cell._pdfUrl) {
+    cell._pdfUrl = "";
+  }
+
+  // Render PDF input field
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
+        <label style="font-size:12px;width:100%;text-align:left;">PDF:<input type="text" value="${escapeAttr(cell._pdfUrl)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfNodeField('${cell.id}',this.value)" /></label>
+      </div>
+    </div>
+  `;
+  
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating PDF node field
+window.updatePdfNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isPdfNode(cell)) return;
+  cell._pdfUrl = value;
+  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+};
+
+// Notes Node functions
+function isNotesNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=notesNode");
+}
+
+function updateNotesNodeCell(cell) {
+  if (!cell || !isNotesNode(cell)) return;
+  
+  // Ensure _notesText property exists
+  if (!cell._notesText) {
+    cell._notesText = "Notes text";
+  }
+
+  // Set the cell value directly to the notes text
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, cell._notesText);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating notes node field (called when user finishes editing)
+window.updateNotesNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isNotesNode(cell)) return;
+  cell._notesText = value;
+  // Update the cell value to reflect the new text
+  graph.getModel().setValue(cell, value);
+};
+
+// Checklist Node functions
+function isChecklistNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=checklistNode");
+}
+
+function updateChecklistNodeCell(cell) {
+  if (!cell || !isChecklistNode(cell)) return;
+  
+  // Ensure _checklistText property exists
+  if (!cell._checklistText) {
+    cell._checklistText = "Checklist text";
+  }
+
+  // Set the cell value directly to the checklist text
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, cell._checklistText);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating checklist node field (called when user finishes editing)
+window.updateChecklistNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isChecklistNode(cell)) return;
+  cell._checklistText = value;
+  // Update the cell value to reflect the new text
+  graph.getModel().setValue(cell, value);
 };
 
 /**************************************************

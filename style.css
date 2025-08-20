@@ -441,15 +441,36 @@ input[type="file"] {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px; /* Increased padding for better appearance */
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9f9;
 }
 .flowchart-item strong {
-  display: block;
-  margin-bottom: 6px;
   cursor: pointer;
+  color: #333;
 }
 .flowchart-item button {
   margin-right: 6px;
+}
+
+/* MULTI-SELECTION VISUAL INDICATOR */
+body.ctrl-pressed {
+  cursor: crosshair !important;
+}
+
+body.ctrl-pressed::after {
+  content: "Multi-Selection Mode";
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+  pointer-events: none;
 }
 
 /* MULTIPLE TEXTBOXES CUSTOM STYLES */
