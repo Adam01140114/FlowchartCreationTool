@@ -618,37 +618,33 @@ graph.isCellEditable = function (cell) {
   // Customize rubberband handling (we'll skip selection box for now)
   const rubberband = new mxRubberband(graph);
   
+  // Function to auto-select connecting edges
+  function autoSelectConnectingEdges() {
+    const sel = graph.getSelectionCells();
+    const verts = sel.filter(c => c && c.vertex);
+    if (verts.length < 2) return;
+  
+    const toAdd = [];
+    for (let i = 0; i < verts.length; i++) {
+      for (let j = i + 1; j < verts.length; j++) {
+        const between = graph.getEdgesBetween(verts[i], verts[j], false) || [];
+        for (const e of between) {
+          if (!sel.includes(e) && !toAdd.includes(e)) toAdd.push(e);
+        }
+      }
+    }
+    if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
+  }
+  
+
   // Enhanced multi-selection functionality
   graph.getSelectionModel().addListener(mxEvent.CHANGE, function(sender, evt) {
     // Auto-select connecting edges when multiple nodes are selected
-    const selectedCells = graph.getSelectionCells();
-    const selectedVertices = selectedCells.filter(cell => cell.vertex);
-    
-    if (selectedVertices.length > 1) {
-      // Find all edges that connect selected vertices
-      const connectingEdges = [];
-      const selectedVertexIds = new Set(selectedVertices.map(v => v.id));
-      
-      graph.getModel().getEdges().forEach(edge => {
-        const sourceId = edge.source ? edge.source.id : null;
-        const targetId = edge.target ? edge.target.id : null;
-        
-        if (selectedVertexIds.has(sourceId) && selectedVertexIds.has(targetId)) {
-          connectingEdges.push(edge);
-        }
-      });
-      
-      // Add connecting edges to selection if they're not already selected
-      const selectionModel = graph.getSelectionModel();
-      connectingEdges.forEach(edge => {
-        if (!selectedCells.includes(edge)) {
-          selectionModel.addCell(edge);
-        }
-      });
-    }
+    autoSelectConnectingEdges();
     
     // Safeguard: If no cells are selected and we're in multi-selection mode,
     // this might be an accidental deselection
+    const selectedCells = graph.getSelectionCells();
     if (selectedCells.length === 0 && document.body.classList.contains('ctrl-pressed')) {
       // You could add a confirmation dialog here if needed
       console.log('All nodes deselected in multi-selection mode');
@@ -710,6 +706,26 @@ graph.isCellEditable = function (cell) {
     
     // Right-click context menu
     if (mxEvent.isRightMouseButton(evt)) {
+      // Store current selection before showing menu
+      const currentSelection = graph.getSelectionCells();
+      
+      // If right-clicking on a cell that's not in the current selection,
+      // select it first (but preserve multi-selection if Ctrl is held)
+      if (cell && !currentSelection.includes(cell)) {
+        if (evt.ctrlKey || evt.metaKey) {
+          // Add to selection
+          graph.getSelectionModel().addCell(cell);
+        } else {
+          // Replace selection
+          graph.getSelectionModel().setCell(cell);
+        }
+        
+        // Manually trigger the selection change to ensure connecting edges are selected
+        setTimeout(() => {
+          autoSelectConnectingEdges();
+        }, 10);
+      }
+      
       const selectedCells = graph.getSelectionCells();
       
       if (selectedCells && selectedCells.length > 0) {
