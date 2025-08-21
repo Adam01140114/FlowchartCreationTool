@@ -45,6 +45,7 @@ function isUserTyping (evt = null) {
 // Global function for hiding context menus
 function hideContextMenu() {
   document.getElementById('contextMenu').style.display = 'none';
+  document.getElementById('notesContextMenu').style.display = 'none';
   document.getElementById('typeSubmenu').style.display = 'none';
   document.getElementById('calcSubmenu').style.display = 'none';
   document.getElementById('optionTypeSubmenu').style.display = 'none';
@@ -359,6 +360,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const container = document.getElementById("graphContainer");
   const contextMenu = document.getElementById("contextMenu");
+  const notesContextMenu = document.getElementById("notesContextMenu");
   const deleteNodeButton = document.getElementById("deleteNode");
   const jumpNodeButton = document.getElementById("jumpNode");
   const changeTypeButton = document.getElementById("changeType");
@@ -598,8 +600,10 @@ graph.isCellEditable = function (cell) {
     changes.forEach(change => {
       if (change instanceof mxValueChange && change.cell) {
         if (isNotesNode(change.cell)) {
-          // Update the _notesText property when the cell value changes
-          change.cell._notesText = change.value;
+          // Extract plain text from HTML when the cell value changes
+          const tmp = document.createElement("div");
+          tmp.innerHTML = change.value || "";
+          change.cell._notesText = (tmp.textContent || tmp.innerText || "").trim();
         } else if (isChecklistNode(change.cell)) {
           // Update the _checklistText property when the cell value changes
           change.cell._checklistText = change.value;
@@ -650,12 +654,53 @@ graph.isCellEditable = function (cell) {
       console.log('All nodes deselected in multi-selection mode');
     }
   });
+
+  // Reset edge geometry to default when nodes are moved
+  graph.addListener(mxEvent.CELLS_MOVED, function(sender, evt) {
+    const cells = evt.getProperty('cells');
+    const dx = evt.getProperty('dx');
+    const dy = evt.getProperty('dy');
+    
+    // Only process if we have cells and movement
+    if (cells && cells.length > 0 && (dx !== 0 || dy !== 0)) {
+      // Get all edges that might be affected
+      const allEdges = graph.getModel().getEdges();
+      
+      allEdges.forEach(edge => {
+        const geometry = edge.getGeometry();
+        if (geometry && geometry.points && geometry.points.length > 0) {
+          // Check if this edge connects to any of the moved cells
+          const sourceVertex = graph.getModel().getTerminal(edge, true);
+          const targetVertex = graph.getModel().getTerminal(edge, false);
+          
+          const isConnectedToMovedCell = cells.some(cell => 
+            (sourceVertex && cell.id === sourceVertex.id) || 
+            (targetVertex && cell.id === targetVertex.id)
+          );
+          
+          if (isConnectedToMovedCell) {
+            // Reset edge geometry to default (remove articulation points)
+            const newGeometry = new mxGeometry();
+            newGeometry.relative = geometry.relative;
+            
+            // Update the edge geometry
+            graph.getModel().setGeometry(edge, newGeometry);
+          }
+        }
+      });
+      
+      // Trigger autosave to persist the geometry changes
+      setTimeout(() => {
+        autosaveFlowchartToLocalStorage();
+      }, 100);
+    }
+  });
   
   // Override the default cell selection behavior for better multi-selection
   const originalSelectCellForEvent = graph.selectCellForEvent;
   graph.selectCellForEvent = function(cell, evt) {
-    if (evt && (evt.ctrlKey || evt.metaKey)) {
-      // Ctrl+click: add/remove from selection
+    if (evt && (evt.ctrlKey || evt.metaKey || evt.shiftKey)) {
+      // Ctrl/Shift+click: add/remove from selection
       const selectionModel = graph.getSelectionModel();
       const selectedCells = graph.getSelectionCells();
       if (selectedCells.includes(cell)) {
@@ -675,8 +720,8 @@ graph.isCellEditable = function (cell) {
   // Also override the click handler to ensure proper behavior
   graph.click = function(me) {
     const cell = me.getCell();
-    if (cell && (me.ctrlKey || me.metaKey)) {
-      // Handle Ctrl+click manually
+    if (cell && (me.ctrlKey || me.metaKey || me.shiftKey)) {
+      // Handle Ctrl/Shift+click manually
       const selectionModel = graph.getSelectionModel();
       const selectedCells = graph.getSelectionCells();
       if (selectedCells.includes(cell)) {
@@ -689,6 +734,56 @@ graph.isCellEditable = function (cell) {
     }
     // Call the original click handler for normal clicks
     return mxGraph.prototype.click.call(this, me);
+  };
+
+  // Proper double-click handler that handles all cases
+  const baseDblClick = graph.dblClick.bind(graph);
+  graph.dblClick = function(evt, cell) {
+    // a) Special cases for question nodes with custom editors
+    if (cell && isQuestion(cell)) {
+      const qt = getQuestionType(cell);
+      if (qt === 'multipleTextboxes' || qt === 'multipleDropdownType' || qt === 'dropdown') {
+        const state = graph.view.getState(cell);
+        if (state?.text?.node) {
+          const qDiv = state.text.node.querySelector('.question-text');
+          if (qDiv) {
+            graph.selectionModel.setCell(cell);
+            qDiv.focus();
+            mxEvent.consume(evt);
+            return;
+          }
+        }
+      }
+    }
+    
+    // b) Option nodes - start editing
+    if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
+      graph.startEditingAtCell(cell);
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // c) Subtitle and info nodes
+    if (cell && (isSubtitleNode(cell) || isInfoNode(cell))) {
+      graph.startEditingAtCell(cell);
+      mxEvent.consume(evt);
+      return;
+    }
+
+    // d) Edge double-click = reset geometry
+    if (cell?.edge) {
+      const g = cell.getGeometry();
+      if (g?.points?.length) {
+        const ng = new mxGeometry(); 
+        ng.relative = g.relative;
+        graph.getModel().setGeometry(cell, ng);
+        setTimeout(autosaveFlowchartToLocalStorage, 100);
+      }
+      // fall through to base handler
+    }
+
+    // e) Default behavior
+    return baseDblClick(evt, cell);
   };
   
 
@@ -710,9 +805,9 @@ graph.isCellEditable = function (cell) {
       const currentSelection = graph.getSelectionCells();
       
       // If right-clicking on a cell that's not in the current selection,
-      // select it first (but preserve multi-selection if Ctrl is held)
+      // select it first (but preserve multi-selection if Ctrl/Shift is held)
       if (cell && !currentSelection.includes(cell)) {
-        if (evt.ctrlKey || evt.metaKey) {
+        if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
           // Add to selection
           graph.getSelectionModel().addCell(cell);
         } else {
@@ -720,54 +815,70 @@ graph.isCellEditable = function (cell) {
           graph.getSelectionModel().setCell(cell);
         }
         
-        // Manually trigger the selection change to ensure connecting edges are selected
-        setTimeout(() => {
-          autoSelectConnectingEdges();
-        }, 10);
+        // Immediately trigger the selection change to ensure connecting edges are selected
+        autoSelectConnectingEdges();
       }
       
       const selectedCells = graph.getSelectionCells();
       
       if (selectedCells && selectedCells.length > 0) {
-        // Show context menu for cell(s)
-        const x = evt.clientX;
-        const y = evt.clientY;
-        
-        const menu = document.getElementById('contextMenu');
-        menu.style.display = 'block';
-        menu.style.left = x + 'px';
-        menu.style.top = y + 'px';
-        
-        // Update menu title to show number of selected items
-        if (selectedCells.length > 1) {
-          document.getElementById('deleteNode').textContent = `Delete ${selectedCells.length} Nodes`;
-          document.getElementById('copyNodeButton').textContent = `Copy ${selectedCells.length} Nodes`;
+        // Check if we have a single Notes node selected
+        if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+          // Show special Notes context menu
+          const x = evt.clientX;
+          const y = evt.clientY;
           
-          // Hide options that don't apply to multiple nodes
-          document.getElementById('yesNoNode').style.display = 'none';
-          document.getElementById('changeType').style.display = 'none';
-          document.getElementById('jumpNode').style.display = 'none';
-          document.getElementById('propertiesButton').style.display = 'none';
+          const notesMenu = document.getElementById('notesContextMenu');
+          notesMenu.style.display = 'block';
+          notesMenu.style.left = x + 'px';
+          notesMenu.style.top = y + 'px';
+          
+          // Update bold button text based on current state
+          const notesCell = selectedCells[0];
+          const isBold = notesCell._notesBold || false;
+          const boldButton = document.getElementById('notesBoldButton');
+          boldButton.textContent = isBold ? 'Unbold' : 'Bold';
         } else {
-          // Single node selection - restore original text and show/hide options based on node type
-          document.getElementById('deleteNode').textContent = "Delete Node";
-          document.getElementById('copyNodeButton').textContent = "Copy";
-          document.getElementById('jumpNode').style.display = 'block';
-          document.getElementById('propertiesButton').style.display = 'block';
+          // Show regular context menu for other cells
+          const x = evt.clientX;
+          const y = evt.clientY;
           
-          const cell = selectedCells[0];
-          if (getNodeType(cell) === 'question') {
-            document.getElementById('yesNoNode').style.display = 'block';
-            document.getElementById('changeType').style.display = 'block';
-            document.getElementById('changeType').textContent = 'Change Type &raquo;';
-          } else if (getNodeType(cell) === 'options') {
-            document.getElementById('yesNoNode').style.display = 'none';
-            document.getElementById('changeType').style.display = 'block';
-            // Change the text to indicate it's for option types
-            document.getElementById('changeType').textContent = 'Change Option Type &raquo;';
-          } else {
+          const menu = document.getElementById('contextMenu');
+          menu.style.display = 'block';
+          menu.style.left = x + 'px';
+          menu.style.top = y + 'px';
+          
+          // Update menu title to show number of selected items
+          if (selectedCells.length > 1) {
+            document.getElementById('deleteNode').textContent = `Delete ${selectedCells.length} Nodes`;
+            document.getElementById('copyNodeButton').textContent = `Copy ${selectedCells.length} Nodes`;
+            
+            // Hide options that don't apply to multiple nodes
             document.getElementById('yesNoNode').style.display = 'none';
             document.getElementById('changeType').style.display = 'none';
+            document.getElementById('jumpNode').style.display = 'none';
+            document.getElementById('propertiesButton').style.display = 'none';
+          } else {
+            // Single node selection - restore original text and show/hide options based on node type
+            document.getElementById('deleteNode').textContent = "Delete Node";
+            document.getElementById('copyNodeButton').textContent = "Copy";
+            document.getElementById('jumpNode').style.display = 'block';
+            document.getElementById('propertiesButton').style.display = 'block';
+            
+            const cell = selectedCells[0];
+            if (getNodeType(cell) === 'question') {
+              document.getElementById('yesNoNode').style.display = 'block';
+              document.getElementById('changeType').style.display = 'block';
+              document.getElementById('changeType').textContent = 'Change Type &raquo;';
+            } else if (getNodeType(cell) === 'options') {
+              document.getElementById('yesNoNode').style.display = 'none';
+              document.getElementById('changeType').style.display = 'block';
+              // Change the text to indicate it's for option types
+              document.getElementById('changeType').textContent = 'Change Option Type &raquo;';
+            } else {
+              document.getElementById('yesNoNode').style.display = 'none';
+              document.getElementById('changeType').style.display = 'none';
+            }
           }
         }
       } else {
@@ -797,6 +908,7 @@ graph.isCellEditable = function (cell) {
   document.addEventListener("click", e => {
     if (
       !contextMenu.contains(e.target) &&
+      !(notesContextMenu && notesContextMenu.contains(e.target)) &&
       !typeSubmenu.contains(e.target) &&
       !optionTypeSubmenu.contains(e.target) &&
       !propertiesMenu.contains(e.target)
@@ -811,6 +923,13 @@ graph.isCellEditable = function (cell) {
   style[mxConstants.STYLE_VERTICAL_ALIGN] = "top";
   style[mxConstants.STYLE_VERTICAL_LABEL_POSITION] = "middle";
   style[mxConstants.STYLE_SPACING_TOP] = 10;
+  
+  // Ensure vertices (nodes) are always displayed in front of edges (connectors)
+  style[mxConstants.STYLE_Z_INDEX] = 1;
+  
+  // Set edge z-index to be behind vertices
+  const edgeStyle = graph.getStylesheet().getDefaultEdgeStyle();
+  edgeStyle[mxConstants.STYLE_Z_INDEX] = 0;
 
   // Zoom with mouse wheel
   mxEvent.addMouseWheelListener(function(evt, up) {
@@ -1261,6 +1380,52 @@ graph.isCellEditable = function (cell) {
   endNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "end");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  // Notes context menu event handlers
+  document.getElementById('notesBoldButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      const notesCell = selectedCells[0];
+      notesCell._notesBold = !notesCell._notesBold;
+      updateNotesNodeCell(notesCell);
+      refreshAllCells();
+      autosaveFlowchartToLocalStorage();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('notesFontButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      const notesCell = selectedCells[0];
+      const currentFontSize = notesCell._notesFontSize || 14;
+      const newFontSize = prompt('Enter font size (number):', currentFontSize);
+      if (newFontSize && !isNaN(newFontSize) && newFontSize > 0) {
+        notesCell._notesFontSize = parseInt(newFontSize);
+        updateNotesNodeCell(notesCell);
+        refreshAllCells();
+        autosaveFlowchartToLocalStorage();
+      }
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('notesCopyButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      copySelectedNodeAsJson();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('notesDeleteButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      graph.removeCells(selectedCells);
       refreshAllCells();
     }
     hideContextMenu();
@@ -3886,6 +4051,8 @@ function autosaveFlowchartToLocalStorage() {
       
       // Notes node properties
       if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+      if (cell._notesBold !== undefined) cellData._notesBold = cell._notesBold;
+      if (cell._notesFontSize !== undefined) cellData._notesFontSize = cell._notesFontSize;
       
       // Checklist node properties
       if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
@@ -4206,7 +4373,8 @@ function copySelectedNodeAsJson() {
         'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
-        '_infoText', '_amountName', '_amountPlaceholder'
+        '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
+        '_checklistText', '_pdfUrl'
       ];
       
       safeProperties.forEach(prop => {
@@ -4382,7 +4550,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4485,7 +4653,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -4755,13 +4923,31 @@ function updateNotesNodeCell(cell) {
     cell._notesText = "Notes text";
   }
 
-  // Set the cell value directly to the notes text
+  const size = parseInt(cell._notesFontSize, 10) || 14;
+  const isBold = !!cell._notesBold;
+  const text = escapeHtml(cell._notesText || "Notes text");
+
+  // Inline styles so they win against theme CSS
+  const html =
+    `<div class="notes-body" style="font-size:${size}px !important;` +
+    `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:left;">` +
+    `${text}</div>`;
+
   graph.getModel().beginUpdate();
   try {
-    graph.getModel().setValue(cell, cell._notesText);
+    // Render HTML
+    graph.getModel().setValue(cell, html);
+
+    // Also set mxGraph container fontSize to match
+    let st = cell.style || "";
+    st = st.replace(/fontSize=\d+;?/, "");
+    st += `fontSize=${size};`;
+    graph.getModel().setStyle(cell, st);
   } finally {
     graph.getModel().endUpdate();
   }
+
+  colorCell(cell);          // keep your border and fill logic
   graph.updateCellSize(cell);
 }
 
@@ -4770,8 +4956,8 @@ window.updateNotesNodeField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isNotesNode(cell)) return;
   cell._notesText = value;
-  // Update the cell value to reflect the new text
-  graph.getModel().setValue(cell, value);
+  // Update the cell with proper formatting
+  updateNotesNodeCell(cell);
 };
 
 // Checklist Node functions

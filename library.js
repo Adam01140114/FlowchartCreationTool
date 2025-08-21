@@ -75,7 +75,9 @@ window.exportFlowchartJson = function () {
     if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
     
     // Notes node properties
-    if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+            if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+        if (cell._notesBold !== undefined) cellData._notesBold = cell._notesBold;
+        if (cell._notesFontSize !== undefined) cellData._notesFontSize = cell._notesFontSize;
     
     // Checklist node properties
     if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
@@ -770,7 +772,9 @@ window.saveFlowchart = function() {
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
       _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
-      _image: cell._image||null
+      _image: cell._image||null,
+      _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
+      _checklistText: cell._checklistText||null, _pdfUrl: cell._pdfUrl||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
@@ -1222,6 +1226,8 @@ function loadFlowchartData(data) {
         
         // Notes node properties
         if (item._notesText !== undefined) newCell._notesText = item._notesText;
+        if (item._notesBold !== undefined) newCell._notesBold = item._notesBold;
+        if (item._notesFontSize !== undefined) newCell._notesFontSize = item._notesFontSize;
         
         // Checklist node properties
         if (item._checklistText !== undefined) newCell._checklistText = item._checklistText;
