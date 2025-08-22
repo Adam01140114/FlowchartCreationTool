@@ -422,7 +422,7 @@ const phoneTypeBtn = document.getElementById("phoneType");
   // Optimize rendering for better performance
   graph.setHtmlLabels(true);
   graph.setTooltips(true);
-  graph.setAllowNegativeCoordinates(false);
+  // Removed setAllowNegativeCoordinates(false) to allow nodes to be placed above the origin
 
   // When the user starts panning/dragging the canvas, hide any open menus.
   graph.addListener(mxEvent.PAN, function(sender, evt) {
