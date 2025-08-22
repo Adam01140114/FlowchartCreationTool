@@ -82,6 +82,9 @@ window.exportFlowchartJson = function () {
     // Checklist node properties
     if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
     
+    // Alert node properties
+    if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
+    
     // calculation node properties
     if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
     if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
@@ -774,7 +777,7 @@ window.saveFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _pdfUrl: cell._pdfUrl||null
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfUrl: cell._pdfUrl||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
@@ -1232,6 +1235,9 @@ function loadFlowchartData(data) {
         // Checklist node properties
         if (item._checklistText !== undefined) newCell._checklistText = item._checklistText;
         
+        // Alert node properties
+        if (item._alertText !== undefined) newCell._alertText = item._alertText;
+        
         // Calculation properties
         if (item._calcTitle !== undefined) newCell._calcTitle = item._calcTitle;
         if (item._calcAmountLabel !== undefined) newCell._calcAmountLabel = item._calcAmountLabel;
@@ -1294,6 +1300,8 @@ function loadFlowchartData(data) {
         updateNotesNodeCell(cell);
         } else if (getQuestionType(cell) === 'checklistNode') {
         updateChecklistNodeCell(cell);
+        } else if (getQuestionType(cell) === 'alertNode') {
+        updateAlertNodeCell(cell);
       } else if (isPdfNode(cell)) {
         updatePdfNodeCell(cell);
       } else if (isCalculationNode(cell)) {

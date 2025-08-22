@@ -46,6 +46,8 @@ function isUserTyping (evt = null) {
 function hideContextMenu() {
   document.getElementById('contextMenu').style.display = 'none';
   document.getElementById('notesContextMenu').style.display = 'none';
+  document.getElementById('edgeContextMenu').style.display = 'none';
+  document.getElementById('edgeStyleSubmenu').style.display = 'none';
   document.getElementById('typeSubmenu').style.display = 'none';
   document.getElementById('calcSubmenu').style.display = 'none';
   document.getElementById('optionTypeSubmenu').style.display = 'none';
@@ -361,6 +363,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const container = document.getElementById("graphContainer");
   const contextMenu = document.getElementById("contextMenu");
   const notesContextMenu = document.getElementById("notesContextMenu");
+  const edgeContextMenu = document.getElementById("edgeContextMenu");
+  const edgeStyleSubmenu = document.getElementById("edgeStyleSubmenu");
   const deleteNodeButton = document.getElementById("deleteNode");
   const jumpNodeButton = document.getElementById("jumpNode");
   const changeTypeButton = document.getElementById("changeType");
@@ -839,8 +843,19 @@ graph.isCellEditable = function (cell) {
       const selectedCells = graph.getSelectionCells();
       
       if (selectedCells && selectedCells.length > 0) {
+        // Check if we have a single edge selected
+        if (selectedCells.length === 1 && selectedCells[0].edge) {
+          // Show edge context menu
+          const x = evt.clientX;
+          const y = evt.clientY;
+          
+          const edgeMenu = document.getElementById('edgeContextMenu');
+          edgeMenu.style.display = 'block';
+          edgeMenu.style.left = x + 'px';
+          edgeMenu.style.top = y + 'px';
+        }
         // Check if we have a single Notes node selected
-        if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+        else if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
           // Show special Notes context menu
           const x = evt.clientX;
           const y = evt.clientY;
@@ -926,6 +941,8 @@ graph.isCellEditable = function (cell) {
     if (
       !contextMenu.contains(e.target) &&
       !(notesContextMenu && notesContextMenu.contains(e.target)) &&
+      !edgeContextMenu.contains(e.target) &&
+      !edgeStyleSubmenu.contains(e.target) &&
       !typeSubmenu.contains(e.target) &&
       !optionTypeSubmenu.contains(e.target) &&
       !propertiesMenu.contains(e.target)
@@ -1246,7 +1263,7 @@ graph.isCellEditable = function (cell) {
   bigParagraphTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "bigParagraph");
-      selectedCell.value = "Big Paragraph question node";
+      selectedCell.value = "Please explain why";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1351,6 +1368,7 @@ graph.isCellEditable = function (cell) {
   const imageOptionTypeBtn = document.getElementById("imageOptionType");
   const amountOptionTypeBtn = document.getElementById("amountOptionType");
   const notesNodeTypeBtn = document.getElementById("notesNodeType");
+  const alertNodeTypeBtn = document.getElementById("alertNodeType");
   const checklistNodeTypeBtn = document.getElementById("checklistNodeType");
   const endNodeTypeBtn = document.getElementById("endNodeType");
 
@@ -1389,6 +1407,14 @@ graph.isCellEditable = function (cell) {
   checklistNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "checklistNode");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  alertNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "alertNode");
       refreshAllCells();
     }
     hideContextMenu();
@@ -1684,6 +1710,76 @@ keyHandler.bindControlKey(86, () => {
     hideContextMenu();
   });
 
+  // Edge context menu event listeners
+  document.getElementById('untangleEdge').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      const edge = selectedCells[0];
+      // Reset edge geometry to default (remove any custom points)
+      const geo = new mxGeometry();
+      graph.getModel().setGeometry(edge, geo);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('changeEdgeStyle').addEventListener('click', function() {
+    const rect = edgeContextMenu.getBoundingClientRect();
+    edgeStyleSubmenu.style.display = "block";
+    edgeStyleSubmenu.style.left = rect.right + "px";
+    edgeStyleSubmenu.style.top = rect.top + "px";
+  });
+
+  document.getElementById('deleteEdge').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      graph.removeCells(selectedCells);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  // Edge style submenu event listeners
+  document.getElementById('edgeStyleCurved').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      const edge = selectedCells[0];
+      let style = edge.style || "";
+      style = style.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
+      style = style.replace(/rounded=[^;]+/g, 'rounded=1');
+      style = style.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=1');
+      if (!style.includes('rounded=')) {
+        style += ';rounded=1';
+      }
+      if (!style.includes('orthogonalLoop=')) {
+        style += ';orthogonalLoop=1';
+      }
+      graph.getModel().setStyle(edge, style);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('edgeStyleDirect').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      const edge = selectedCells[0];
+      let style = edge.style || "";
+      style = style.replace(/edgeStyle=[^;]+/g, 'edgeStyle=none');
+      style = style.replace(/rounded=[^;]+/g, 'rounded=0');
+      style = style.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=0');
+      if (!style.includes('rounded=')) {
+        style += ';rounded=0';
+      }
+      if (!style.includes('orthogonalLoop=')) {
+        style += ';orthogonalLoop=0';
+      }
+      graph.getModel().setStyle(edge, style);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
   graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
     const changes = evt.getProperty("changes");
     if (!changes) return;
@@ -1726,9 +1822,16 @@ keyHandler.bindControlKey(86, () => {
     if (!edge) return;
 
     // Apply current edge style setting to manually created edges
-    const edgeStyle = currentEdgeStyle === 'curved' ? 
-      "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" :
-      "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    let edgeStyle;
+    if (currentEdgeStyle === 'curved') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'straight') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'direct') {
+      edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+    } else {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    }
     graph.getModel().setStyle(edge, edgeStyle);
 
     const source = graph.getModel().getTerminal(edge, true);
@@ -2806,11 +2909,24 @@ function setOptionType(cell, newType) {
         }
         // Add striped red border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
-        st = st.replace(/strokeColor=[^;]+/, '');
-        st = st.replace(/strokeDasharray=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
         st += ';strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;';
         graph.getModel().setStyle(cell, st);
         updateChecklistNodeCell(cell);
+        break;
+      case 'alertNode':
+        // Alert node - needs alert text and bold black and red checkered border
+        if (!cell._alertText) {
+          cell._alertText = 'Alert message';
+        }
+        // Add bold black and red checkered border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#000000;strokeDasharray=5,5;';
+        graph.getModel().setStyle(cell, st);
+        updateAlertNodeCell(cell);
         break;
       case 'end':
         // End node option - convert to end node
@@ -2952,6 +3068,8 @@ function performRefreshAllCells() {
           updateNotesNodeCell(cell);
         } else if (questionType === "checklistNode") {
           updateChecklistNodeCell(cell);
+        } else if (questionType === "alertNode") {
+          updateAlertNodeCell(cell);
         } else {
           // Regular option nodes
           updateOptionNodeCell(cell);
@@ -3148,9 +3266,16 @@ function createYesNoOptions(parentCell) {
     }
     const noEdge = graph.insertEdge(parent, null, "", parentCell, noNode);
     // Apply current edge style
-    const edgeStyle = currentEdgeStyle === 'curved' ? 
-      "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" :
-      "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    let edgeStyle;
+    if (currentEdgeStyle === 'curved') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'straight') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'direct') {
+      edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+    } else {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    }
     graph.getModel().setStyle(noEdge, edgeStyle);
 
     const yesX = geo.x - 40;
@@ -4099,6 +4224,9 @@ function autosaveFlowchartToLocalStorage() {
       // Checklist node properties
       if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
       
+      // Alert node properties
+      if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
+      
       // calculation node properties
       if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
       if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
@@ -4428,8 +4556,8 @@ function copySelectedNodeAsJson() {
         'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
-        '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-        '_checklistText', '_pdfUrl'
+              '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
+      '_checklistText', '_alertText', '_pdfUrl'
       ];
       
       safeProperties.forEach(prop => {
@@ -4605,7 +4733,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4623,6 +4751,8 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           updateNotesNodeCell(newCell);
         } else if (getQuestionType(newCell) === "checklistNode") {
           updateChecklistNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "alertNode") {
+          updateAlertNodeCell(newCell);
         } else if (isPdfNode(newCell)) {
           updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
@@ -4645,9 +4775,16 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
             
             // Apply current edge style if no style is provided
             if (!edgeData.style || edgeData.style === "") {
-              const edgeStyle = currentEdgeStyle === 'curved' ? 
-                "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" :
-                "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+              let edgeStyle;
+              if (currentEdgeStyle === 'curved') {
+                edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+              } else if (currentEdgeStyle === 'straight') {
+                edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+              } else if (currentEdgeStyle === 'direct') {
+                edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+              } else {
+                edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+              }
               graph.getModel().setStyle(newEdge, edgeStyle);
             }
             
@@ -4708,7 +4845,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -4722,6 +4859,8 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           updateNotesNodeCell(newCell);
         } else if (getQuestionType(newCell) === "checklistNode") {
           updateChecklistNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "alertNode") {
+          updateAlertNodeCell(newCell);
         } else if (isPdfNode(newCell)) {
           updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
@@ -5045,6 +5184,44 @@ window.updateChecklistNodeField = function(cellId, value) {
   cell._checklistText = value;
   // Update the cell value to reflect the new text
   graph.getModel().setValue(cell, value);
+};
+
+// Alert Node functions
+function isAlertNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=alertNode");
+}
+
+function updateAlertNodeCell(cell) {
+  if (!cell || !isAlertNode(cell)) return;
+  
+  // Ensure _alertText property exists
+  if (!cell._alertText) {
+    cell._alertText = "Alert message";
+  }
+
+  // Create the alert node display with bold black and red checkered border styling
+  const alertText = cell._alertText;
+  
+  let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
+  htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ ALERT</div>';
+  htmlContent += `<div style="color: #333; font-size: 14px; font-weight: bold;">${escapeHtml(alertText)}</div>`;
+  htmlContent += '</div>';
+  
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, htmlContent);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating alert node field (called when user finishes editing)
+window.updateAlertNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isAlertNode(cell)) return;
+  cell._alertText = value;
+  updateAlertNodeCell(cell);
 };
 
 /**************************************************
@@ -5429,9 +5606,15 @@ function updateEdgeStyle() {
   if (currentEdgeStyle === 'curved') {
     graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
     graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true;
-  } else {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+  } else if (currentEdgeStyle === 'straight') {
     graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
     graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+  } else if (currentEdgeStyle === 'direct') {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.None;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = false;
   }
   
   // Update existing edges
@@ -5441,14 +5624,32 @@ function updateEdgeStyle() {
     let newStyle;
     
     if (currentEdgeStyle === 'curved') {
-      newStyle = currentStyle.replace(/rounded=0/g, 'rounded=1');
+      newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
+      newStyle = newStyle.replace(/rounded=0/g, 'rounded=1');
       if (!newStyle.includes('rounded=')) {
         newStyle += ';rounded=1';
       }
-    } else {
-      newStyle = currentStyle.replace(/rounded=1/g, 'rounded=0');
+      if (!newStyle.includes('orthogonalLoop=')) {
+        newStyle += ';orthogonalLoop=1';
+      }
+    } else if (currentEdgeStyle === 'straight') {
+      newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
+      newStyle = newStyle.replace(/rounded=1/g, 'rounded=0');
       if (!newStyle.includes('rounded=')) {
         newStyle += ';rounded=0';
+      }
+      if (!newStyle.includes('orthogonalLoop=')) {
+        newStyle += ';orthogonalLoop=1';
+      }
+    } else if (currentEdgeStyle === 'direct') {
+      newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=none');
+      newStyle = newStyle.replace(/rounded=[^;]+/g, 'rounded=0');
+      newStyle = newStyle.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=0');
+      if (!newStyle.includes('rounded=')) {
+        newStyle += ';rounded=0';
+      }
+      if (!newStyle.includes('orthogonalLoop=')) {
+        newStyle += ';orthogonalLoop=0';
       }
     }
     
@@ -5553,7 +5754,7 @@ function clearCellTextCache() {
 
 // Get cell text with caching for performance
 function getCellText(cell) {
-  const cacheKey = `${cell.id}_${cell.value}_${cell._questionText}_${cell._subtitleText}_${cell._infoText}_${cell._notesText}_${cell._checklistText}_${cell._calcTitle}`;
+  const cacheKey = `${cell.id}_${cell.value}_${cell._questionText}_${cell._subtitleText}_${cell._infoText}_${cell._notesText}_${cell._checklistText}_${cell._alertText}_${cell._calcTitle}`;
   
   if (cellTextCache.has(cacheKey)) {
     return cellTextCache.get(cacheKey);
@@ -5574,6 +5775,8 @@ function getCellText(cell) {
     cellText = cell._notesText || cell.value || '';
   } else if (isChecklistNode(cell)) {
     cellText = cell._checklistText || cell.value || '';
+  } else if (isAlertNode(cell)) {
+    cellText = cell._alertText || cell.value || '';
   } else if (isCalculationNode(cell)) {
     cellText = cell._calcTitle || cell.value || '';
   } else {
