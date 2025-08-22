@@ -146,6 +146,53 @@ input[type="file"] {
   outline: 1px dashed #888;
 }
 
+/* SEARCH BOX */
+.search-container {
+  margin-top: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#clearSearchBtn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: none;
+}
+
+#clearSearchBtn:hover {
+  background: #f0f0f0;
+  color: #666;
+}
+
+#clearSearchBtn.show {
+  display: block;
+}
+
 /* LEGENDS */
 .legend {
   margin-top: 10px;
