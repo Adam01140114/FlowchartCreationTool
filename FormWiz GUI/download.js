@@ -345,6 +345,11 @@ function loadFormData(formData) {
                             });
                         });
                         updateJumpOptions(question.questionId);
+                        
+                        // Update checklist logic dropdowns after dropdown options are loaded
+                        if (typeof updateAllChecklistLogicDropdowns === 'function') {
+                            setTimeout(updateAllChecklistLogicDropdowns, 100);
+                        }
                     }
                     // Also restore Name/ID and Placeholder
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
@@ -573,6 +578,130 @@ function loadFormData(formData) {
                     }
                 }
 
+                // ============== PDF Logic ==============
+                if (question.pdfLogic && question.pdfLogic.enabled) {
+                    const pdfLogicCbox = questionBlock.querySelector(`#pdfLogic${question.questionId}`);
+                    if (pdfLogicCbox) {
+                        pdfLogicCbox.checked = true;
+                        togglePdfLogic(question.questionId);
+                    }
+                    const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}`);
+                    if (pdfLogicPdfNameInput) {
+                        pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
+                    }
+                    const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
+                    if (pdfLogicStripePriceIdInput) {
+                        pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId || "";
+                    }
+                    
+                    // Load PDF Logic conditions
+                    if (question.pdfLogic.conditions && question.pdfLogic.conditions.length > 0) {
+                        question.pdfLogic.conditions.forEach((condition, index) => {
+                            addPdfLogicCondition(question.questionId);
+                            const conditionIndex = index + 1;
+                            
+                            // Check if this is a Big Paragraph question with character limit logic
+                            if (question.type === 'bigParagraph' && condition.characterLimit) {
+                                const charLimitSelect = questionBlock.querySelector(`#pdfCharacterLimit${question.questionId}_${conditionIndex}`);
+                                const customCharLimitInput = questionBlock.querySelector(`#pdfCustomCharacterLimit${question.questionId}_${conditionIndex}`);
+                                
+                                if (charLimitSelect) {
+                                    // Check if the character limit matches a preset option
+                                    const presetLimits = ['50', '100', '200', '300', '500', '750', '1000', '1500', '2000'];
+                                    if (presetLimits.includes(condition.characterLimit.toString())) {
+                                        charLimitSelect.value = condition.characterLimit.toString();
+                                        if (customCharLimitInput) {
+                                            customCharLimitInput.style.display = 'none';
+                                        }
+                                    } else {
+                                        // Set to custom and show the custom input
+                                        charLimitSelect.value = 'custom';
+                                        if (customCharLimitInput) {
+                                            customCharLimitInput.style.display = 'block';
+                                            customCharLimitInput.value = condition.characterLimit.toString();
+                                        }
+                                    }
+                                }
+                            } else if (condition.prevQuestion && condition.prevAnswer) {
+                                // For other question types, use previous question logic
+                                const prevQuestionInput = questionBlock.querySelector(`#pdfPrevQuestion${question.questionId}_${conditionIndex}`);
+                                const prevAnswerSelect = questionBlock.querySelector(`#pdfPrevAnswer${question.questionId}_${conditionIndex}`);
+                                if (prevQuestionInput) {
+                                    prevQuestionInput.value = condition.prevQuestion;
+                                    updatePdfLogicAnswersForRow(question.questionId, conditionIndex);
+                                }
+                                if (prevAnswerSelect) {
+                                    prevAnswerSelect.value = condition.prevAnswer;
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // ============== Alert Logic ==============
+                if (question.alertLogic && question.alertLogic.enabled) {
+                    const alertLogicCbox = questionBlock.querySelector(`#alertLogic${question.questionId}`);
+                    if (alertLogicCbox) {
+                        alertLogicCbox.checked = true;
+                        toggleAlertLogic(question.questionId);
+                    }
+                    const alertLogicMessageInput = questionBlock.querySelector(`#alertLogicMessage${question.questionId}`);
+                    if (alertLogicMessageInput) {
+                        alertLogicMessageInput.value = question.alertLogic.message;
+                    }
+                    
+                    // Load Alert Logic conditions
+                    if (question.alertLogic.conditions && question.alertLogic.conditions.length > 0) {
+                        question.alertLogic.conditions.forEach((condition, index) => {
+                            addAlertLogicCondition(question.questionId);
+                            const conditionIndex = index + 1;
+                            const prevQuestionInput = questionBlock.querySelector(`#alertPrevQuestion${question.questionId}_${conditionIndex}`);
+                            const prevAnswerSelect = questionBlock.querySelector(`#alertPrevAnswer${question.questionId}_${conditionIndex}`);
+                            if (prevQuestionInput) {
+                                prevQuestionInput.value = condition.prevQuestion;
+                                updateAlertLogicAnswersForRow(question.questionId, conditionIndex);
+                            }
+                            if (prevAnswerSelect) {
+                                prevAnswerSelect.value = condition.prevAnswer;
+                            }
+                        });
+                    }
+                }
+
+                // ============== Checklist Logic ==============
+                if (question.checklistLogic && question.checklistLogic.enabled) {
+                    const checklistLogicCbox = questionBlock.querySelector(`#checklistLogic${question.questionId}`);
+                    if (checklistLogicCbox) {
+                        checklistLogicCbox.checked = true;
+                        toggleChecklistLogic(question.questionId);
+                    }
+                    
+                    // Load Checklist Logic conditions
+                    if (question.checklistLogic.conditions && question.checklistLogic.conditions.length > 0) {
+                        question.checklistLogic.conditions.forEach((condition, index) => {
+                            addChecklistLogicCondition(question.questionId);
+                            const conditionIndex = index + 1;
+                            const prevQuestionInput = questionBlock.querySelector(`#checklistPrevQuestion${question.questionId}_${conditionIndex}`);
+                            const prevAnswerSelect = questionBlock.querySelector(`#checklistPrevAnswer${question.questionId}_${conditionIndex}`);
+                            const checklistItemsTextarea = questionBlock.querySelector(`#checklistItemsToAdd${question.questionId}_${conditionIndex}`);
+                            
+                            if (prevQuestionInput) {
+                                prevQuestionInput.value = condition.prevQuestion;
+                                updateChecklistLogicAnswersForRow(question.questionId, conditionIndex, () => {
+                                    // Set the answer value after dropdown is populated
+                                    const prevAnswerSelect = questionBlock.querySelector(`#checklistPrevAnswer${question.questionId}_${conditionIndex}`);
+                                    if (prevAnswerSelect && condition.prevAnswer) {
+                                        prevAnswerSelect.value = condition.prevAnswer;
+                                    }
+                                });
+                            }
+                            if (checklistItemsTextarea && condition.checklistItems) {
+                                checklistItemsTextarea.value = condition.checklistItems.join('\n');
+                            }
+                        });
+                    }
+                }
+
                 // ============== Conditional Alert ==============
                 if (question.conditionalAlert && question.conditionalAlert.enabled) {
                     const alertCbox = questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`);
@@ -591,7 +720,29 @@ function loadFormData(formData) {
         });
     }
 
-    // 6) Build groups from JSON
+    // 6) Load checklist items if present
+    if (formData.checklistItems && formData.checklistItems.length > 0) {
+        // Create checklist container if it doesn't exist
+        addChecklist();
+        
+        // Load checklist items
+        formData.checklistItems.forEach((itemText, index) => {
+            addChecklistItem();
+            const checklistItemsContainer = document.getElementById('checklistItems');
+            if (checklistItemsContainer) {
+                const lastItem = checklistItemsContainer.lastElementChild;
+                if (lastItem) {
+                    const itemId = lastItem.id.replace('checklistItem', '');
+                    const itemInput = document.getElementById(`checklistText${itemId}`);
+                    if (itemInput) {
+                        itemInput.value = itemText;
+                    }
+                }
+            }
+        });
+    }
+
+    // 7) Build groups from JSON
     if (formData.groups && formData.groups.length > 0) {
         console.log('Importing groups:', formData.groups); // Debug log
         formData.groups.forEach(group => {
@@ -601,7 +752,7 @@ function loadFormData(formData) {
         console.log('No groups found in import data'); // Debug log
     }
 
-    // 7) Build hidden fields from JSON (including multi-term calculations)
+    // 8) Build hidden fields from JSON (including multi-term calculations)
     if (formData.hiddenFields && formData.hiddenFields.length > 0) {
         formData.hiddenFields.forEach(hiddenField => {
             // Before adding the hidden field, convert any question text references back to IDs
@@ -632,7 +783,7 @@ function loadFormData(formData) {
         });
     }
 
-    // 8) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
+    // 9) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
     updateFormAfterImport();
 }
 
@@ -654,7 +805,8 @@ function exportForm() {
         stripePriceId: document.getElementById('stripePriceId')
             ? document.getElementById('stripePriceId').value.trim()
             : '',
-        additionalPDFs: [] // New field for additional PDFs
+        additionalPDFs: [], // New field for additional PDFs
+        checklistItems: [] // New field for checklist items
     };
 
     // Collect all additional PDF names
@@ -667,6 +819,19 @@ function exportForm() {
             }
         }
     });
+
+    // Collect all checklist items
+    const checklistItemsContainer = document.getElementById('checklistItems');
+    if (checklistItemsContainer) {
+        const checklistItemDivs = checklistItemsContainer.querySelectorAll('.checklist-item');
+        checklistItemDivs.forEach(itemDiv => {
+            const itemId = itemDiv.id.replace('checklistItem', '');
+            const itemText = document.getElementById(`checklistText${itemId}`)?.value.trim();
+            if (itemText) {
+                formData.checklistItems.push(itemText);
+            }
+        });
+    }
 
     // Create a map of questionId to question text for easy lookup
     const questionTextMap = {};
@@ -731,6 +896,107 @@ function exportForm() {
             const condPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value || "";
             const condPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value || "";
 
+            // ---------- PDF Logic ----------
+            const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
+            const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
+            const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
+            
+            // Collect PDF Logic conditions
+            const pdfLogicConditionsArray = [];
+            if (pdfLogicEnabled) {
+                const pdfLogicConditionsDiv = questionBlock.querySelector(`#pdfLogicConditions${questionId}`);
+                if (pdfLogicConditionsDiv) {
+                    const pdfLogicConditionRows = pdfLogicConditionsDiv.querySelectorAll('.pdf-logic-condition-row');
+                    pdfLogicConditionRows.forEach((row, index) => {
+                        const conditionIndex = index + 1;
+                        
+                        // Check if this is a Big Paragraph question with character limit logic
+                        if (questionType === 'bigParagraph') {
+                            const charLimitSelect = row.querySelector(`#pdfCharacterLimit${questionId}_${conditionIndex}`);
+                            const customCharLimitInput = row.querySelector(`#pdfCustomCharacterLimit${questionId}_${conditionIndex}`);
+                            
+                            if (charLimitSelect) {
+                                let charLimit = charLimitSelect.value;
+                                if (charLimit === 'custom' && customCharLimitInput) {
+                                    charLimit = customCharLimitInput.value;
+                                }
+                                
+                                if (charLimit && charLimit !== '') {
+                                    pdfLogicConditionsArray.push({
+                                        characterLimit: parseInt(charLimit)
+                                    });
+                                }
+                            }
+                        } else {
+                            // For other question types, use previous question logic
+                            const prevQuestion = row.querySelector(`#pdfPrevQuestion${questionId}_${conditionIndex}`)?.value || "";
+                            const prevAnswer = row.querySelector(`#pdfPrevAnswer${questionId}_${conditionIndex}`)?.value || "";
+                            if (prevQuestion && prevAnswer) {
+                                pdfLogicConditionsArray.push({
+                                    prevQuestion: prevQuestion,
+                                    prevAnswer: prevAnswer
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+            // ---------- Alert Logic ----------
+            const alertLogicEnabled = questionBlock.querySelector(`#alertLogic${questionId}`)?.checked || false;
+            const alertLogicMessage = questionBlock.querySelector(`#alertLogicMessage${questionId}`)?.value || "";
+            
+            // Collect Alert Logic conditions
+            const alertLogicConditionsArray = [];
+            if (alertLogicEnabled) {
+                const alertLogicConditionsDiv = questionBlock.querySelector(`#alertLogicConditions${questionId}`);
+                if (alertLogicConditionsDiv) {
+                    const alertLogicConditionRows = alertLogicConditionsDiv.querySelectorAll('.alert-logic-condition-row');
+                    alertLogicConditionRows.forEach((row, index) => {
+                        const conditionIndex = index + 1;
+                        const prevQuestion = row.querySelector(`#alertPrevQuestion${questionId}_${conditionIndex}`)?.value || "";
+                        const prevAnswer = row.querySelector(`#alertPrevAnswer${questionId}_${conditionIndex}`)?.value || "";
+                        if (prevQuestion && prevAnswer) {
+                            alertLogicConditionsArray.push({
+                                prevQuestion: prevQuestion,
+                                prevAnswer: prevAnswer
+                            });
+                        }
+                    });
+                }
+            }
+
+            // ---------- Checklist Logic ----------
+            const checklistLogicEnabled = questionBlock.querySelector(`#checklistLogic${questionId}`)?.checked || false;
+            
+            // Collect Checklist Logic conditions
+            const checklistLogicConditionsArray = [];
+            if (checklistLogicEnabled) {
+                const checklistLogicContainer = questionBlock.querySelector(`#checklistLogicContainer${questionId}`);
+                if (checklistLogicContainer) {
+                    const checklistLogicConditionRows = checklistLogicContainer.querySelectorAll('.checklist-logic-condition-row');
+                    checklistLogicConditionRows.forEach((row, index) => {
+                        const conditionIndex = index + 1;
+                        const prevQuestion = row.querySelector(`#checklistPrevQuestion${questionId}_${conditionIndex}`)?.value || "";
+                        const prevAnswer = row.querySelector(`#checklistPrevAnswer${questionId}_${conditionIndex}`)?.value || "";
+                        const checklistItems = row.querySelector(`#checklistItemsToAdd${questionId}_${conditionIndex}`)?.value || "";
+                        
+                        if (prevQuestion && prevAnswer && checklistItems) {
+                            // Split checklist items by newlines and filter out empty lines
+                            const itemsArray = checklistItems.split('\n')
+                                .map(item => item.trim())
+                                .filter(item => item.length > 0);
+                            
+                            checklistLogicConditionsArray.push({
+                                prevQuestion: prevQuestion,
+                                prevAnswer: prevAnswer,
+                                checklistItems: itemsArray
+                            });
+                        }
+                    });
+                }
+            }
+
             // ---------- Conditional Alert logic ----------
             const alertEnabled = questionBlock.querySelector(`#enableConditionalAlert${questionId}`)?.checked || false;
             const alertPrevQ = questionBlock.querySelector(`#alertPrevQuestion${questionId}`)?.value || "";
@@ -754,6 +1020,21 @@ function exportForm() {
                     enabled: condPDFEnabled,
                     pdfName: condPDFName,
                     answer: condPDFAnswer
+                },
+                pdfLogic: {
+                    enabled: pdfLogicEnabled,
+                    pdfName: pdfLogicPdfName,
+                    stripePriceId: pdfLogicStripePriceId,
+                    conditions: pdfLogicConditionsArray
+                },
+                alertLogic: {
+                    enabled: alertLogicEnabled,
+                    message: alertLogicMessage,
+                    conditions: alertLogicConditionsArray
+                },
+                checklistLogic: {
+                    enabled: checklistLogicEnabled,
+                    conditions: checklistLogicConditionsArray
                 },
                 conditionalAlert: {
                     enabled: alertEnabled,
@@ -1171,6 +1452,25 @@ function exportForm() {
 
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
+    
+    // Also copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(jsonString).then(() => {
+            // Show a brief notification that it was copied
+            const exportButton = document.querySelector('button[onclick="exportForm()"]');
+            if (exportButton) {
+                const originalText = exportButton.textContent;
+                exportButton.textContent = 'Copied to clipboard!';
+                exportButton.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    exportButton.textContent = originalText;
+                    exportButton.style.backgroundColor = '';
+                }, 2000);
+            }
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
+    }
 }
 
 
@@ -1402,6 +1702,12 @@ function updateFormAfterImport() {
     if (typeof updateGroupSectionDropdowns === 'function') {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateGroupSectionDropdowns, 100);
+    }
+    
+    // Update checklist logic dropdowns
+    if (typeof updateAllChecklistLogicDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateAllChecklistLogicDropdowns, 100);
     }
 }
 

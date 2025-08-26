@@ -12,12 +12,16 @@ const questionSlugMap = {};
 const questionNameIds = {};
 const questionTypesMap = {};
 const conditionalPDFs = [];
+const pdfLogicPDFs = [];
+const alertLogics = [];
+let checklistLogics = [];
 const conditionalAlerts = [];
 const jumpLogics = [];
 const labelMap = {};
 const amountMap = {}; // used for numberedDropdown with amounts
 const linkedDropdowns = []; // For storing linked dropdown pairs
 
+// Cart functions are now included in the generated HTML
 
 /*------------------------------------------------------------------
  * HISTORY STACK for accurate "Back" navigation
@@ -89,6 +93,9 @@ Object.keys(questionSlugMap).forEach(key => delete questionSlugMap[key]);
 Object.keys(questionNameIds).forEach(key => delete questionNameIds[key]);
 Object.keys(questionTypesMap).forEach(key => delete questionTypesMap[key]);
 conditionalPDFs.length = 0;
+pdfLogicPDFs.length = 0;
+alertLogics.length = 0;
+checklistLogics.length = 0;
 conditionalAlerts.length = 0;
 jumpLogics.length = 0;
 linkedDropdowns.length = 0;
@@ -112,6 +119,90 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     "    <style>",
+    "      /* Checkbox option styling with beautiful blue border */",
+    "      .checkbox-inline {",
+    "        display: block;",
+    "        margin: 8px auto;",
+    "        padding: 12px 16px;",
+    "        border: 1px solid #d1d1d6;",
+    "        border-radius: 8px;",
+    "        background-color: #ffffff;",
+    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
+    "        transition: all 0.3s ease;",
+    "        width: 80%;",
+    "        max-width: 400px;",
+    "        text-align: center;",
+    "      }",
+    "      ",
+    "      .checkbox-inline:hover {",
+    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
+    "        transform: translateY(-1px);",
+    "      }",
+    "      ",
+    "      .checkbox-inline.checked {",
+    "        border-color: #0051a6;",
+    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
+    "        background-color: #f8fbff;",
+    "      }",
+    "      ",
+    "      .checkbox-label {",
+    "        display: flex;",
+    "        align-items: center;",
+    "        justify-content: flex-start;",
+    "        gap: 8px;",
+    "        cursor: pointer;",
+    "        font-size: 16px;",
+    "        color: #333;",
+    "        margin: 0;",
+    "        padding: 0 12px;",
+    "        width: 100%;",
+    "      }",
+    "      ",
+    "      .checkbox-label input[type=\"checkbox\"] {",
+    "        margin: 0;",
+    "        flex-shrink: 0;",
+    "      }",
+    "      ",
+    "      /* Form validation styles */",
+    "      .form-field-required {",
+    "        border-color: #e74c3c !important;",
+    "        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;",
+    "      }",
+    "      ",
+    "      .validation-error {",
+    "        color: #e74c3c;",
+    "        font-size: 14px;",
+    "        margin-top: 5px;",
+    "        display: none;",
+    "      }",
+    "      ",
+    "      .next-button:disabled {",
+    "        background: #bdc3c7 !important;",
+    "        cursor: not-allowed !important;",
+    "        opacity: 0.6;",
+    "      }",
+    "      /* Test Mode Visual Indicators */",
+    "      .test-mode-active .question-container {",
+    "        position: relative;",
+    "        cursor: context-menu;",
+    "      }",
+    "      .test-mode-active .question-container::before {",
+    "        content: \"🔍 Test Mode - Right-click for ID\";",
+    "        position: absolute;",
+    "        top: -25px;",
+    "        right: 0;",
+    "        background: #2980b9;",
+    "        color: white;",
+    "        padding: 2px 8px;",
+    "        border-radius: 4px;",
+    "        font-size: 11px;",
+    "        opacity: 0.8;",
+    "        pointer-events: none;",
+    "      }",
+    "      .test-mode-active .question-container:hover::before {",
+    "        opacity: 1;",
+    "      }",
+    "      ",
     "      /* Header and Navigation Styles */",
     "      html, body {",
     "        height: 100%;",
@@ -884,94 +975,6 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     ]),
     "",
     '<script>',
-    
-    '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
-    'function dropdownMirror(selectEl, baseName){',
-    '    const wrap = document.getElementById("dropdowntext_"+baseName);',
-    '    if(!wrap) return;',
-    '',
-    '    const val = selectEl.value.trim();',
-    '    if(!val) {',
-    '        wrap.innerHTML = "";',
-    '        return;',
-    '    }',
-    '',
-    '    const textId = baseName + "_dropdown";',
-    '    const textField = document.getElementById(textId);',
-    '    ',
-    '    if(textField) {',
-    '        textField.value = val;',
-    '        textField.style.display = "none";',
-    '    }',
-    '',
-    '    const existingCheckboxes = wrap.querySelectorAll("div");',
-    '    existingCheckboxes.forEach(div => div.remove());',
-    '',
-    '    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();',
-    '    const checkboxId = baseName + "_" + idSuffix;',
-    '    ',
-    '    const checkboxDiv = document.createElement("div");',
-    '    checkboxDiv.style.display = "none";',
-    '    checkboxDiv.innerHTML = "<input type=\'checkbox\' id=\'" + checkboxId + "\' name=\'" + checkboxId + "\' checked>" +',
-    '                     "<label for=\'" + checkboxId + "\'> " + baseName + "_" + idSuffix + "</label>";',
-    '    ',
-    '    wrap.appendChild(checkboxDiv);',
-    '    handleLinkedDropdowns(baseName, val);',
-    '}',
-    '',
-    // Add a flag to prevent recursive calls
-    'let isHandlingLink = false;',
-    '',
-    // Handle linked dropdown logic
-    'function handleLinkedDropdowns(sourceName, selectedValue) {',
-    '    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;',
-    '    ',
-    '    try {',
-    '        isHandlingLink = true;  // Set flag before handling links',
-    '        linkedDropdowns.forEach(linkPair => {',
-    '            if (linkPair.sourceNameId === sourceName) {',
-    '                const targetDropdown = document.getElementById(linkPair.targetNameId);',
-    '                if (targetDropdown && targetDropdown.value !== selectedValue) {  // Only if value is different',
-    '                    let optionExists = false;',
-    '                    for (let i = 0; i < targetDropdown.options.length; i++) {',
-    '                        if (targetDropdown.options[i].value === selectedValue) {',
-    '                            optionExists = true;',
-    '                            targetDropdown.value = selectedValue;',
-    '                            // Trigger change event only if value actually changed',
-    '                            const event = new Event("change");',
-    '                            targetDropdown.dispatchEvent(event);',
-    '                            break;',
-    '                        }',
-    '                    }',
-    '                    if (!optionExists && selectedValue) {',
-    '                        console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.targetNameId);',
-    '                    }',
-    '                }',
-    '            }',
-    '            else if (linkPair.targetNameId === sourceName) {',
-    '                const sourceDropdown = document.getElementById(linkPair.sourceNameId);',
-    '                if (sourceDropdown && sourceDropdown.value !== selectedValue) {  // Only if value is different',
-    '                    let optionExists = false;',
-    '                    for (let i = 0; i < sourceDropdown.options.length; i++) {',
-    '                        if (sourceDropdown.options[i].value === selectedValue) {',
-    '                            optionExists = true;',
-    '                            sourceDropdown.value = selectedValue;',
-    '                            // Trigger change event only if value actually changed',
-    '                            const event = new Event("change");',
-    '                            sourceDropdown.dispatchEvent(event);',
-    '                            break;',
-    '                        }',
-    '                    }',
-    '                    if (!optionExists && selectedValue) {',
-    '                        console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.sourceNameId);',
-    '                    }',
-    '                }',
-    '            }',
-    '        });',
-    '    } finally {',
-    '        isHandlingLink = false;  // Always reset flag when done',
-    '    }',
-    '}',
     '</script>',
     "",
     '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
@@ -1017,7 +1020,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '    <div id="result"></div>',
     "    <section>",
     '    <div id="box">',
-    '        <form id="customForm">',
+    '        <form id="customForm" onsubmit="return showThankYouMessage(event);">',
   ].join("\n");
 
   // Get all PDF names
@@ -1273,7 +1276,55 @@ questionSlugMap[questionId] = slug;
           nmEl2 && nmEl2.value ? nmEl2.value : "answer" + questionId;
         const ph2 = phEl2 && phEl2.value ? phEl2.value : "";
         questionNameIds[questionId] = nameId2;
+        
+        // Check if this Big Paragraph has PDF logic with character limits
+        let hasPdfLogic = false;
+        let characterLimits = [];
+        if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
+          const pdfLogic = pdfLogicPDFs.find(pdf => pdf.questionId === questionId && pdf.isBigParagraph);
+          if (pdfLogic && pdfLogic.conditions.length > 0) {
+            hasPdfLogic = true;
+            characterLimits = pdfLogic.conditions.map(condition => condition.characterLimit).filter(limit => limit);
+          }
+        }
+        
+        if (hasPdfLogic && characterLimits.length > 0) {
+          const maxLimit = Math.max(...characterLimits);
+          formHTML += `
+            <div class="big-paragraph-container">
+              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
+                        maxlength="${maxLimit * 2}" oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
+              <div class="character-count" id="charCount_${nameId2}">
+                <span class="current-count">0</span> / <span class="limit-display">${maxLimit}</span> characters
+              </div>
+            </div><br>
+            <script>
+              function updateCharacterCount(textareaId, limits) {
+                const textarea = document.getElementById(textareaId);
+                const countDisplay = document.getElementById('charCount_' + textareaId);
+                const currentCount = textarea.value.length;
+                const maxLimit = Math.max(...limits);
+                
+                if (countDisplay) {
+                  countDisplay.querySelector('.current-count').textContent = currentCount;
+                  countDisplay.querySelector('.limit-display').textContent = maxLimit;
+                  
+                  // Change color based on character count
+                  if (currentCount > maxLimit) {
+                    countDisplay.style.color = '#ff6b6b';
+                    countDisplay.style.fontWeight = 'bold';
+                  } else if (currentCount > maxLimit * 0.8) {
+                    countDisplay.style.color = '#ffa726';
+                  } else {
+                    countDisplay.style.color = '#666';
+                  }
+                }
+              }
+            </script>
+          `;
+        } else {
         formHTML += `<textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea><br>`;
+        }
       } else if (questionType === "money") {
         const mnNmEl = qBlock.querySelector("#textboxName" + questionId);
         const mnPhEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
@@ -1526,11 +1577,11 @@ for (let co = 0; co < cOptsDivs.length; co++){
 
     /* actual input */
     formHTML += `
-      <span class="checkbox-inline">
+      <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
         <label class="checkbox-label">
           <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}" 
-                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});"` : 
-                               `onchange="toggleNoneOption(this, ${questionId});"`}>
+                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"` : 
+                               `onchange="toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"`}>
           ${labelText}
         </label>
       </span>`;
@@ -1559,10 +1610,10 @@ if (noneEl?.checked){
     });
 
     formHTML += `
-      <span class="checkbox-inline">
+      <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
           <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}" 
-                 onchange="handleNoneOfTheAboveToggle(this, ${questionId});">
+                 onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);">
           ${noneStr}
         </label>
       </span>`;
@@ -1780,7 +1831,177 @@ formHTML += `</div><br></div>`;
           logicScriptBuffer += `})();\n`;
         }
       }
+
+      // If PDF Logic is enabled, gather "multiple-OR" conditions and collect PDF
+      const pdfLogicCheckbox = qBlock.querySelector("#pdfLogic" + questionId);
+      const pdfLogicEnabled = pdfLogicCheckbox && pdfLogicCheckbox.checked;
+      
+      if (pdfLogicEnabled) {
+        const pdfLogicRows = qBlock.querySelectorAll(".pdf-logic-condition-row");
+        const pdfLogicPdfNameEl = qBlock.querySelector("#pdfLogicPdfName" + questionId);
+        const pdfLogicPdfName = pdfLogicPdfNameEl ? pdfLogicPdfNameEl.value.trim() : "";
+        const pdfLogicStripePriceIdEl = qBlock.querySelector("#pdfLogicStripePriceId" + questionId);
+        const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
+        
+        if (pdfLogicRows.length > 0 && pdfLogicPdfName) {
+          // Add to PDF Logic array for later processing
+          pdfLogicPDFs.push({
+            questionId: questionId,
+            pdfName: pdfLogicPdfName,
+            stripePriceId: pdfLogicStripePriceId,
+            conditions: [],
+            isBigParagraph: questionType === "bigParagraph"
+          });
+          
+          // Process conditions
+          for (let lr = 0; lr < pdfLogicRows.length; lr++) {
+            const row = pdfLogicRows[lr];
+            const rowIndex = lr + 1;
+            
+            if (questionType === "bigParagraph") {
+              // For Big Paragraph, process character limit
+              const charLimitEl = row.querySelector(
+                "#pdfCharacterLimit" + questionId + "_" + rowIndex
+              );
+              const customCharLimitEl = row.querySelector(
+                "#pdfCustomCharacterLimit" + questionId + "_" + rowIndex
+              );
+              
+              if (!charLimitEl) continue;
+              
+              let charLimit = charLimitEl.value.trim();
+              if (charLimit === 'custom') {
+                charLimit = customCharLimitEl ? customCharLimitEl.value.trim() : '';
+              }
+              
+              if (!charLimit) continue;
+              
+              // Add character limit condition to the PDF Logic array
+              const pdfLogicIndex = pdfLogicPDFs.length - 1;
+              pdfLogicPDFs[pdfLogicIndex].conditions.push({
+                characterLimit: parseInt(charLimit)
+              });
+            } else {
+              // For other question types, process previous question logic
+            const pqEl = row.querySelector(
+              "#pdfPrevQuestion" + questionId + "_" + rowIndex
+            );
+            const paEl = row.querySelector(
+              "#pdfPrevAnswer" + questionId + "_" + rowIndex
+            );
+
+            if (!pqEl || !paEl) continue;
+            const pqVal = pqEl.value.trim();
+            const paVal = paEl.value.trim();
+            if (!pqVal || !paVal) continue;
+
+            // Add condition to the PDF Logic array
+            const pdfLogicIndex = pdfLogicPDFs.length - 1;
+            pdfLogicPDFs[pdfLogicIndex].conditions.push({
+              prevQuestion: pqVal,
+              prevAnswer: paVal
+            });
+            }
+          }
+        }
+      }
+
+      // If Alert Logic is enabled, gather "multiple-OR" conditions and collect alert
+      const alertLogicCheckbox = qBlock.querySelector("#alertLogic" + questionId);
+      const alertLogicEnabled = alertLogicCheckbox && alertLogicCheckbox.checked;
+      
+      if (alertLogicEnabled) {
+        const alertLogicRows = qBlock.querySelectorAll(".alert-logic-condition-row");
+        const alertLogicMessageEl = qBlock.querySelector("#alertLogicMessage" + questionId);
+        const alertLogicMessage = alertLogicMessageEl ? alertLogicMessageEl.value.trim() : "";
+        
+        if (alertLogicRows.length > 0 && alertLogicMessage) {
+          // Add to Alert Logic array for later processing
+          alertLogics.push({
+            questionId: questionId,
+            message: alertLogicMessage,
+            conditions: []
+          });
+          
+          // Process conditions
+          for (let lr = 0; lr < alertLogicRows.length; lr++) {
+            const row = alertLogicRows[lr];
+            const rowIndex = lr + 1;
+            const pqEl = row.querySelector(
+              "#alertPrevQuestion" + questionId + "_" + rowIndex
+            );
+            const paEl = row.querySelector(
+              "#alertPrevAnswer" + questionId + "_" + rowIndex
+            );
+
+            if (!pqEl || !paEl) continue;
+            const pqVal = pqEl.value.trim();
+            const paVal = paEl.value.trim();
+            if (!pqVal || !paVal) continue;
+
+            // Add condition to the Alert Logic array
+            const alertLogicIndex = alertLogics.length - 1;
+            alertLogics[alertLogicIndex].conditions.push({
+              prevQuestion: pqVal,
+              prevAnswer: paVal
+            });
+          }
+        }
+      }
+
+      // If Checklist Logic is enabled, gather "multiple-OR" conditions and collect checklist items
+      const checklistLogicCheckbox = qBlock.querySelector("#checklistLogic" + questionId);
+      const checklistLogicEnabled = checklistLogicCheckbox && checklistLogicCheckbox.checked;
+      
+      if (checklistLogicEnabled) {
+        const checklistLogicRows = qBlock.querySelectorAll(".checklist-logic-condition-row");
+        
+        if (checklistLogicRows.length > 0) {
+          // Add to Checklist Logic array for later processing
+          checklistLogics.push({
+            questionId: questionId,
+            conditions: []
+          });
+          
+          // Process conditions
+          for (let lr = 0; lr < checklistLogicRows.length; lr++) {
+            const row = checklistLogicRows[lr];
+            const conditionIndex = lr + 1;
+            const pqEl = row.querySelector(
+              "#checklistPrevQuestion" + questionId + "_" + conditionIndex
+            );
+            const paEl = row.querySelector(
+              "#checklistPrevAnswer" + questionId + "_" + conditionIndex
+            );
+            const checklistItemsEl = row.querySelector(
+              "#checklistItemsToAdd" + questionId + "_" + conditionIndex
+            );
+
+            if (!pqEl || !paEl || !checklistItemsEl) continue;
+            const pqVal = pqEl.value.trim();
+            const paVal = paEl.value.trim();
+            const checklistItemsText = checklistItemsEl.value.trim();
+            
+            if (!pqVal || !paVal || !checklistItemsText) continue;
+
+            // Split checklist items by newlines and filter out empty lines
+            const checklistItemsArray = checklistItemsText.split('\n')
+              .map(item => item.trim())
+              .filter(item => item.length > 0);
+
+            // Add condition to the Checklist Logic array
+            const checklistLogicIndex = checklistLogics.length - 1;
+            checklistLogics[checklistLogicIndex].conditions.push({
+              prevQuestion: pqVal,
+              prevAnswer: paVal,
+              checklistItems: checklistItemsArray
+            });
+          }
+        }
+      }
     } // end each question
+
+
 
     // Section nav
     formHTML += '<br><br><div class="navigation-buttons">';
@@ -1790,9 +2011,9 @@ if (s > 1){
 }
 
     if (s === sectionCounter - 1) {
-      formHTML += `<button type="submit">Submit</button>`;
+      formHTML += `<button type="submit" class="next-button">Submit</button>`;
     } else {
-      formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+      formHTML += `<button type="button" class="next-button" onclick="validateAndProceed(${s})" id="next-button-${s}">Next</button>`;
     }
     formHTML += "</div>";
 
@@ -1806,7 +2027,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey<br><br><button onclick="processAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="window.location.href=\'forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href=\'forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -1838,6 +2059,125 @@ if (s > 1){
     '        &copy; 2024 FormWiz. All rights reserved.',
     '    </footer>',
   ].join("\n");
+
+  // Add alert popup HTML and CSS
+  formHTML += `
+  <style>
+  .alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+  }
+  
+  .alert-popup {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+    padding: 32px 28px 24px 28px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    animation: modalPopIn 0.35s cubic-bezier(.4,1.4,.6,1);
+  }
+  
+  @keyframes modalPopIn {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .alert-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  
+  .alert-close-btn:hover {
+    background: rgba(44, 62, 80, 0.1);
+    color: #2c3e50;
+  }
+  
+  .alert-message {
+    margin-bottom: 28px;
+    font-size: 1.08rem;
+    line-height: 1.5;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 20px;
+    border: 2px solid #2980b9;
+    border-radius: 10px;
+    background: #e6f4ff;
+    box-shadow: inset 0 2px 8px rgba(41, 128, 185, 0.1);
+  }
+  
+  .alert-buttons {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+  }
+  
+  .alert-btn {
+    padding: 8px 22px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    min-width: 100px;
+  }
+  
+  .alert-btn-back {
+    background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
+    color: #fff;
+  }
+  
+  .alert-btn-back:hover {
+    background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
+  }
+  
+  .alert-btn-exit {
+    background: #e74c3c;
+    color: #fff;
+  }
+  
+  .alert-btn-exit:hover {
+    background: #c0392b;
+  }
+  </style>
+  
+  <div id="alertOverlay" class="alert-overlay">
+    <div class="alert-popup">
+      <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
+      <div id="alertMessage" class="alert-message"></div>
+      <div class="alert-buttons">
+        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
+        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
+      </div>
+    </div>
+  </div>
+  `;
 
   // Now we place ONE <script> block for everything:
   formHTML += "\n<script>\n";
@@ -1926,14 +2266,19 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   }
 
   // 2) Our global objects
-  formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap)};\n`;
-  formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds)};\n`;
-  formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics)};\n`;
-  formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs)};\n`;
-  formHTML += `var conditionalAlerts = ${JSON.stringify(conditionalAlerts)};\n`;
-  formHTML += `var labelMap = ${JSON.stringify(labelMap)};\n`;
-  formHTML += `var amountMap = ${JSON.stringify(amountMap)};\n`;
-  formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns)};\n`;
+  formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap || {})};\n`;
+  formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
+  formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
+  formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs || [])};\n`;
+  formHTML += `var pdfLogicPDFs = ${JSON.stringify(pdfLogicPDFs || [])};\n`;
+  formHTML += `var alertLogics = ${JSON.stringify(alertLogics || [])};\n`;
+  formHTML += `var checklistLogics = ${JSON.stringify(checklistLogics || [])};\n`;
+  formHTML += `var checklistItems = ${JSON.stringify(checklistItems || [])};\n`;
+  formHTML += `var conditionalAlerts = ${JSON.stringify(conditionalAlerts || [])};\n`;
+  formHTML += `var labelMap = ${JSON.stringify(labelMap || {})};\n`;
+  formHTML += `var amountMap = ${JSON.stringify(amountMap || {})};\n`;
+  formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
+  formHTML += `var isHandlingLink = false;\n`;
   
   /*---------------------------------------------------------------
  * HISTORY STACK – must exist in the final HTML before functions
@@ -1962,6 +2307,481 @@ formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditional
 
   // 3) Append the logicScriptBuffer
   formHTML += logicScriptBuffer + "\n";
+
+  // Add alert functions if any alert logic is enabled
+  if (alertLogics.length > 0) {
+    formHTML += `
+// Alert Logic Functions
+function showAlert(message) {
+    const alertOverlay = document.getElementById('alertOverlay');
+    const alertMessage = document.getElementById('alertMessage');
+    
+    if (alertOverlay && alertMessage) {
+        alertMessage.textContent = message;
+        alertOverlay.style.display = 'flex';
+    }
+}
+
+function closeAlert() {
+    const alertOverlay = document.getElementById('alertOverlay');
+    if (alertOverlay) {
+        alertOverlay.style.display = 'none';
+    }
+}
+
+function exitForm() {
+    window.location.reload();
+}
+
+function checkAlertLogic(changedElement) {
+    if (!alertLogics || alertLogics.length === 0) return;
+    
+    // Get the question ID from the changed element
+    let changedQuestionId = null;
+    if (changedElement) {
+        const elementId = changedElement.id;
+        // Try to extract question ID from element ID
+        for (const [qId, nameId] of Object.entries(questionNameIds)) {
+            if (elementId === nameId || elementId === 'answer' + qId) {
+                changedQuestionId = qId;
+                break;
+            }
+        }
+    }
+    
+    for (const alertLogic of alertLogics) {
+        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
+        
+        // Only check this alert logic if it's related to the changed element
+        let shouldCheckThisAlert = false;
+        if (changedQuestionId) {
+            // Check if any condition in this alert logic references the changed question
+            for (const condition of alertLogic.conditions) {
+                if (condition.prevQuestion === changedQuestionId) {
+                    shouldCheckThisAlert = true;
+                    break;
+                }
+            }
+        } else {
+            // If we can't determine which question changed, check all alerts (fallback)
+            shouldCheckThisAlert = true;
+        }
+        
+        if (!shouldCheckThisAlert) continue;
+        
+        let shouldShowAlert = false;
+        
+        // Check if ANY of the conditions match (OR logic)
+        for (const condition of alertLogic.conditions) {
+            const prevQuestionId = condition.prevQuestion;
+            const prevAnswer = condition.prevAnswer;
+            
+            // Get the previous question's value
+            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                      document.getElementById('answer' + prevQuestionId);
+            
+            if (prevQuestionElement) {
+                let prevValue = '';
+                
+                if (prevQuestionElement.type === 'checkbox') {
+                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                } else {
+                    prevValue = prevQuestionElement.value;
+                }
+                
+                // Check if the condition matches
+                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                    shouldShowAlert = true;
+                    break; // Found a match, no need to check other conditions
+                }
+            }
+        }
+        
+        // Show alert if conditions are met
+        if (shouldShowAlert && alertLogic.message) {
+            showAlert(alertLogic.message);
+            return; // Show only the first matching alert
+        }
+    }
+}
+
+// Add event listeners for alert logic
+document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('change', function() { checkAlertLogic(this); });
+        element.addEventListener('input', function() { checkAlertLogic(this); });
+    });
+    
+    // Initialize checkbox styling for beautiful blue borders
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
+});
+`;
+  }
+
+  // Always add cart functions (they're needed for the Continue button)
+  formHTML += `
+// Always-available Cart Modal (global)
+window.showCartModal = function () {
+  const EXAMPLE_FORM_PRICE_ID = window.stripePriceId || stripePriceId || '123';
+
+  // Try to fetch price, but still show a working modal if fetch fails
+  async function fetchExampleFormPrice() {
+    try {
+      const r = await fetch('/stripe-price/' + EXAMPLE_FORM_PRICE_ID);
+      if (!r.ok) return null;
+      const data = await r.json();
+      return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
+    } catch { return null; }
+  }
+
+  fetchExampleFormPrice().then((price) => {
+    const priceDisplay = price ? '$' + price : '...';
+    const modal = document.createElement('div');
+    modal.id = 'cart-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
+    modal.innerHTML = \`
+      <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
+        <h2>Checkout</h2>
+        <p>Your form has been completed! Add it to your cart to download.</p>
+        <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
+          Add to Cart - \${priceDisplay}
+        </button>
+        <br><br>
+        <button id="viewCartBtn" style="background:#e0e7ef;color:#2c3e50;border:none;border-radius:6px;padding:8px 22px;font-size:1em;font-weight:600;cursor:pointer;">
+          View Cart
+        </button>
+        <br><br>
+        <button id="cancelCartBtn" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:8px 22px;font-size:1em;font-weight:600;cursor:pointer;">
+          Cancel
+        </button>
+      </div>
+    \`;
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelCartBtn').onclick = () => modal.remove();
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('addToCartBtn').onclick   = () => {
+      window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
+      modal.remove();
+    };
+  });
+};
+
+// Add to cart helper (global, no Firebase required)
+window.addFormToCart = function (priceId) {
+  const form = document.getElementById('customForm');
+  const formData = {};
+  if (form) {
+    for (const el of form.elements) {
+      if (!el.name || el.disabled) continue;
+      if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
+      if (['hidden','button','submit','reset'].includes(el.type)) continue;
+      formData[el.name] = (el.type === 'checkbox' || el.type === 'radio') ? !!el.checked : el.value;
+    }
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const countyName    = urlParams.get('county') || '';
+  const defendantName = urlParams.get('defendantName') || '';
+  const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
+
+  // Check for PDF Logic PDFs that should be added to cart
+  const pdfLogicItems = [];
+  if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
+    for (const pdfLogic of pdfLogicPDFs) {
+      if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
+        // Check if conditions are met
+        let shouldAddToCart = false;
+        
+        pdfLogic.conditions.forEach(condition => {
+          const prevQuestionId = condition.prevQuestion;
+          const prevAnswer = condition.prevAnswer;
+          
+          // Get the previous question's value
+          const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                    document.getElementById('answer' + prevQuestionId);
+          
+          if (prevQuestionElement) {
+            let prevValue = '';
+            
+            if (prevQuestionElement.type === 'checkbox') {
+              prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+            } else {
+              prevValue = prevQuestionElement.value;
+            }
+            
+            // Check if the condition matches
+            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+              shouldAddToCart = true;
+            }
+          }
+        });
+        
+        // Add to cart if conditions are met
+        if (shouldAddToCart) {
+          pdfLogicItems.push({
+            formId: (window.formId || 'custom-form') + '_' + pdfLogic.questionId,
+            title: pdfLogic.pdfName.replace(/\\.pdf$/i, ''),
+            priceId: pdfLogic.stripePriceId,
+            formData: formData,
+            countyName: countyName,
+            defendantName: defendantName,
+            timestamp: Date.now()
+          });
+        }
+      }
+    }
+  }
+
+  // Prefer existing cart manager if present
+  if (typeof window.addToCart === 'function') {
+    const fid = (window.formId || 'custom-form');
+    window.addToCart(fid, formTitle, priceId, formData, countyName, defendantName);
+    
+    // Add PDF Logic items to cart
+    pdfLogicItems.forEach(item => {
+      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName);
+    });
+    
+    window.location.href = 'cart.html';
+    return;
+  }
+
+  // Fallback: localStorage/cookie
+  const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+  
+  // Add main form
+  const mainItem = {
+    formId: (window.formId || 'custom-form'),
+    title: formTitle,
+    priceId,
+    formData,
+    countyName,
+    defendantName,
+    timestamp: Date.now()
+  };
+  cart.push(mainItem);
+  
+  // Add PDF Logic items
+  pdfLogicItems.forEach(item => {
+    cart.push(item);
+  });
+  
+  localStorage.setItem('formwiz_cart', JSON.stringify(cart));
+  document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+  window.location.href = 'cart.html';
+};
+
+// Fallback cart count function (global, no Firebase required)
+window.getCartCount = function() {
+  try {
+    const cartData = localStorage.getItem('formwiz_cart');
+    if (cartData) {
+      const cart = JSON.parse(cartData);
+      return Array.isArray(cart) ? cart.length : 0;
+    }
+  } catch (e) {
+    console.error('Error getting cart count:', e);
+  }
+  return 0;
+};
+`;
+
+  // Add test mode functionality
+  if (isTestMode) {
+    formHTML += `
+// Test Mode Features
+function handleQuestionRightClick(event, questionId) {
+    event.preventDefault();
+    
+    // Get the question ID
+    let questionIdText = '';
+    let elementType = '';
+    
+    // Try to find the question element and its ID
+    const questionElement = event.target.closest('[id]');
+    if (questionElement) {
+        questionIdText = questionElement.id;
+        elementType = questionElement.tagName.toLowerCase();
+        
+        // If it's an input, select, or textarea, also get its name attribute
+        if (['input', 'select', 'textarea'].includes(elementType)) {
+            const nameAttr = questionElement.getAttribute('name');
+            if (nameAttr && nameAttr !== questionIdText) {
+                questionIdText += ' (name="' + nameAttr + '")';
+            }
+        }
+    } else {
+        // Fallback to the question number
+        questionIdText = 'answer' + questionId;
+    }
+    
+    // Show alert with the ID
+    alert('Element ID: ' + questionIdText + '\\nElement Type: ' + elementType + '\\n\\nThis ID has been copied to your clipboard!');
+    
+    // Copy to clipboard (just the ID part, not the name attribute)
+    const cleanId = questionIdText.split(' (name=')[0];
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cleanId).then(() => {
+            console.log('Element ID copied to clipboard:', cleanId);
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
+    } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = cleanId;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            console.log('Element ID copied to clipboard:', cleanId);
+        } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+        }
+        document.body.removeChild(textArea);
+    }
+}
+
+// Add right-click event listeners to all questions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add test mode class to body
+    document.body.classList.add('test-mode-active');
+    
+    // Function to add right-click listeners to elements
+    function addRightClickListeners() {
+        const elements = document.querySelectorAll('.question-container, [id^="answer"], [id^="question"], input, select, textarea, label');
+        elements.forEach(element => {
+            // Remove existing listener to prevent duplicates
+            element.removeEventListener('contextmenu', handleRightClick);
+            // Add new listener
+            element.addEventListener('contextmenu', handleRightClick);
+        });
+    }
+    
+    function handleRightClick(event) {
+        // Extract element ID
+        let elementId = '';
+        if (this.id) {
+            elementId = this.id;
+        } else {
+            // Try to find a parent with an ID
+            const parentWithId = this.closest('[id]');
+            if (parentWithId) {
+                elementId = parentWithId.id;
+            }
+        }
+        
+        if (elementId) {
+            handleQuestionRightClick(event, elementId);
+        }
+    }
+    
+    // Add listeners initially
+    addRightClickListeners();
+    
+    // Re-add listeners after dynamic content is loaded (for multi-step forms)
+    setTimeout(addRightClickListeners, 1000);
+});
+`;
+  }
+
+  // Add checklist functionality if any checklist logic is enabled
+  if (checklistLogics.length > 0) {
+    formHTML += `
+// Checklist Logic Functions
+let userChecklist = [];
+let staticChecklistItems = [];
+
+function checkChecklistLogic(changedElement) {
+    if (!checklistLogics || checklistLogics.length === 0) return;
+    
+    // Get the question ID from the changed element
+    let changedQuestionId = null;
+    if (changedElement) {
+        const elementId = changedElement.id;
+        // Try to extract question ID from element ID
+        for (const [qId, nameId] of Object.entries(questionNameIds)) {
+            if (elementId === nameId || elementId === 'answer' + qId) {
+                changedQuestionId = qId;
+                break;
+            }
+        }
+    }
+    
+    for (const checklistLogic of checklistLogics) {
+        if (!checklistLogic.conditions || checklistLogic.conditions.length === 0) continue;
+        
+        // Only check this checklist logic if it's related to the changed element
+        let shouldCheckThisLogic = false;
+        if (changedQuestionId) {
+            // Check if any condition in this checklist logic references the changed question
+            for (const condition of checklistLogic.conditions) {
+                if (condition.prevQuestion === changedQuestionId) {
+                    shouldCheckThisLogic = true;
+                    break;
+                }
+            }
+        } else {
+            // If we can't determine which question changed, check all logic (fallback)
+            shouldCheckThisLogic = true;
+        }
+        
+        if (!shouldCheckThisLogic) continue;
+        
+        // Check if ANY of the conditions match (OR logic)
+        for (const condition of checklistLogic.conditions) {
+            const prevQuestionId = condition.prevQuestion;
+            const prevAnswer = condition.prevAnswer;
+            
+            // Get the previous question's value
+            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                      document.getElementById('answer' + prevQuestionId);
+            
+            if (prevQuestionElement) {
+                let prevValue = '';
+                
+                if (prevQuestionElement.type === 'checkbox') {
+                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                } else {
+                    prevValue = prevQuestionElement.value;
+                }
+                
+                // Check if the condition matches
+                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                    // Add checklist items to user's checklist
+                    if (condition.checklistItems && condition.checklistItems.length > 0) {
+                        condition.checklistItems.forEach(item => {
+                            if (!userChecklist.includes(item)) {
+                                userChecklist.push(item);
+                            }
+                        });
+                    }
+                    break; // Found a match, no need to check other conditions
+                }
+            }
+        }
+    }
+}
+
+// Add event listeners for checklist logic
+document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('change', function() { checkChecklistLogic(this); });
+        element.addEventListener('input', function() { checkChecklistLogic(this); });
+    });
+    
+    // Initialize static checklist items
+    staticChecklistItems = ${JSON.stringify(checklistItems || [])};
+});
+`;
+  }
 
   // 4) The rest of the main JS code
   formHTML += `
@@ -2056,7 +2876,196 @@ function handleNoneOfTheAboveToggle(noneCheckbox, questionId) {
             toggleAmountField(amountId, false);
         }
     });
+    
+    // Update styling for all checkboxes
+    allCheckboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
 }
+
+/*──────────────────────────────────────────────────────────────*
+ * Update checkbox styling for beautiful blue border
+ *──────────────────────────────────────────────────────────────*/
+function updateCheckboxStyle(checkbox) {
+    const container = document.getElementById('checkbox-container-' + checkbox.id);
+    if (container) {
+        if (checkbox.checked) {
+            container.classList.add('checked');
+        } else {
+            container.classList.remove('checked');
+        }
+    }
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Form validation functions
+ *──────────────────────────────────────────────────────────────*/
+function validateAndProceed(sectionNumber) {
+    if (validateCurrentSection(sectionNumber)) {
+        handleNext(sectionNumber);
+    }
+}
+
+function validateCurrentSection(sectionNumber) {
+    const section = document.getElementById('section' + sectionNumber);
+    if (!section) return true;
+    
+    const questions = section.querySelectorAll('.question-container');
+    let isValid = true;
+    
+    questions.forEach(question => {
+        const questionId = question.id.replace('question-container-', '');
+        const questionType = getQuestionTypeFromContainer(question);
+        
+        if (!validateQuestion(question, questionType, questionId)) {
+            isValid = false;
+        }
+    });
+    
+    // Update next button state
+    const nextButton = document.getElementById('next-button-' + sectionNumber);
+    if (nextButton) {
+        nextButton.disabled = !isValid;
+    }
+    
+    return isValid;
+}
+
+function getQuestionTypeFromContainer(questionContainer) {
+    // Check for different input types to determine question type
+    if (questionContainer.querySelector('input[type="checkbox"]')) {
+        return 'checkbox';
+    } else if (questionContainer.querySelector('select')) {
+        return 'dropdown';
+    } else if (questionContainer.querySelector('input[type="text"]')) {
+        return 'text';
+    } else if (questionContainer.querySelector('input[type="email"]')) {
+        return 'email';
+    } else if (questionContainer.querySelector('input[type="tel"]')) {
+        return 'phone';
+    } else if (questionContainer.querySelector('input[type="number"]')) {
+        return 'number';
+    } else if (questionContainer.querySelector('input[type="date"]')) {
+        return 'date';
+    } else if (questionContainer.querySelector('textarea')) {
+        return 'bigParagraph';
+    }
+    return 'text'; // default
+}
+
+function validateQuestion(questionContainer, questionType, questionId) {
+    let isValid = true;
+    
+    switch (questionType) {
+        case 'checkbox':
+            isValid = validateCheckboxQuestion(questionContainer);
+            break;
+        case 'dropdown':
+            isValid = validateDropdownQuestion(questionContainer);
+            break;
+        case 'text':
+        case 'email':
+        case 'phone':
+        case 'number':
+        case 'date':
+        case 'bigParagraph':
+            isValid = validateTextQuestion(questionContainer);
+            break;
+        default:
+            isValid = true;
+    }
+    
+    // Add visual feedback
+    if (!isValid) {
+        questionContainer.classList.add('form-field-required');
+        showValidationError(questionContainer, 'This field is required');
+    } else {
+        questionContainer.classList.remove('form-field-required');
+        hideValidationError(questionContainer);
+    }
+    
+    return isValid;
+}
+
+function validateCheckboxQuestion(questionContainer) {
+    const checkboxes = questionContainer.querySelectorAll('input[type="checkbox"]');
+    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+    return checkedBoxes.length > 0;
+}
+
+function validateDropdownQuestion(questionContainer) {
+    const select = questionContainer.querySelector('select');
+    if (!select) return true;
+    return select.value && select.value.trim() !== '';
+}
+
+function validateTextQuestion(questionContainer) {
+    const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
+    if (inputs.length === 0) return true;
+    
+    for (let input of inputs) {
+        if (!input.value || input.value.trim() === '') {
+            return false;
+        }
+    }
+    return true;
+}
+
+function showValidationError(container, message) {
+    let errorDiv = container.querySelector('.validation-error');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'validation-error';
+        container.appendChild(errorDiv);
+    }
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function hideValidationError(container) {
+    const errorDiv = container.querySelector('.validation-error');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// Add validation listeners to all form fields
+function addValidationListeners() {
+    const currentSection = document.querySelector('.section.active');
+    if (!currentSection) return;
+    
+    const sectionNumber = currentSection.id.replace('section', '');
+    const formFields = currentSection.querySelectorAll('input, select, textarea');
+    
+    formFields.forEach(field => {
+        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
+        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+    });
+    
+    // Initial validation
+    validateCurrentSection(sectionNumber);
+}
+
+// Initialize validation when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    addValidationListeners();
+    
+    // Re-add listeners when sections change
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (mutation.target.classList.contains('section')) {
+                    setTimeout(addValidationListeners, 100);
+                }
+            }
+        });
+    });
+    
+    observer.observe(document.body, {
+        attributes: true,
+        subtree: true
+    });
+});
 
 
 function showTextboxLabels(questionId, count){
@@ -2094,7 +3103,7 @@ function showTextboxLabels(questionId, count){
 
 // Handle linked dropdown logic
 function handleLinkedDropdowns(sourceName, selectedValue) {
-    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;
+    if (typeof linkedDropdowns === 'undefined' || !linkedDropdowns || linkedDropdowns.length === 0 || typeof isHandlingLink !== 'undefined' && isHandlingLink) return;
     
     try {
         isHandlingLink = true;  // Set flag before handling links
@@ -2341,53 +3350,221 @@ function handleConditionalAlerts(){
 }
 
 /*──── main submit handler ────*/
-function showThankYouMessage () {
-    processAllPdfs().then(() => {
-        document.getElementById('customForm').style.display = 'none';
-        document.getElementById('thankYouMessage').style.display = 'block';
-    });
+function showThankYouMessage (event) {
+    // Safely prevent default if an event was provided
+    if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
+    }
+    
+    // Show thank you message immediately (no PDF processing)
+    document.getElementById('customForm').style.display = 'none';
+    document.getElementById('thankYouMessage').style.display = 'block';
+    
+    // Display checklist if there are items
+    const checklistDisplay = document.getElementById('checklistDisplay');
+    const checklistItemsContainer = document.getElementById('checklistItems');
+    
+    // Combine static and dynamic checklist items
+    const allChecklistItems = [...(checklistItems || []), ...(userChecklist || [])];
+    
+    if (checklistDisplay && checklistItemsContainer && allChecklistItems.length > 0) {
+        checklistDisplay.style.display = 'block';
+        
+        // Create checklist items HTML
+        let checklistHTML = '';
+        allChecklistItems.forEach((item, index) => {
+            checklistHTML += '<div style="margin: 8px 0; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #2980b9; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">' +
+                '<input type="checkbox" id="checklistItem' + index + '" style="margin-right: 10px;">' +
+                '<label for="checklistItem' + index + '" style="color: #2c3e50; font-weight: 500; cursor: pointer;">' + item + '</label>' +
+            '</div>';
+        });
+        
+        checklistItemsContainer.innerHTML = checklistHTML;
+    }
+    
     return false;                       // prevent page reload
 }
 
+// Form submission is now handled by the inline onsubmit attribute
+
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
+    // Process main PDFs
     for (const pdfName of allPdfFileNames) {
         if (pdfName) {
             await editAndDownloadPDF(pdfName);
+        }
+    }
+    
+    // Process Conditional PDFs
+    if (conditionalPDFs && conditionalPDFs.length > 0) {
+        for (const conditionalPDF of conditionalPDFs) {
+            if (conditionalPDF.pdfName) {
+                // Check if conditions are met
+                let shouldDownload = false;
+                
+                // Get the question element
+                const questionElement = document.getElementById(questionNameIds[conditionalPDF.questionId]) || 
+                                      document.getElementById('answer' + conditionalPDF.questionId);
+                
+                if (questionElement) {
+                    let questionValue = '';
+                    
+                    if (questionElement.type === 'checkbox') {
+                        questionValue = questionElement.checked ? questionElement.value : '';
+                    } else {
+                        questionValue = questionElement.value;
+                    }
+                    
+                    // Check if the condition matches
+                    if (questionValue.toString().toLowerCase() === conditionalPDF.conditionalAnswer.toLowerCase()) {
+                        shouldDownload = true;
+                    }
+                }
+                
+                // Download PDF if conditions are met
+                if (shouldDownload) {
+                    await editAndDownloadPDF(conditionalPDF.pdfName);
+                }
+            }
+        }
+    }
+    
+    // Process PDF Logic PDFs
+    if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
+        for (const pdfLogic of pdfLogicPDFs) {
+            if (pdfLogic.pdfName) {
+                // Check if conditions are met
+                let shouldDownload = false;
+                
+                if (pdfLogic.isBigParagraph) {
+                    // For Big Paragraph questions, check character limit
+                    pdfLogic.conditions.forEach(condition => {
+                        if (condition.characterLimit) {
+                            // Get the Big Paragraph question's value
+                            const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                  document.getElementById('answer' + pdfLogic.questionId);
+                            
+                            if (questionElement) {
+                                const questionValue = questionElement.value || '';
+                                
+                                // Check if the text length exceeds the character limit
+                                if (questionValue.length > condition.characterLimit) {
+                                    shouldDownload = true;
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // For other question types, check previous question conditions
+                pdfLogic.conditions.forEach(condition => {
+                    const prevQuestionId = condition.prevQuestion;
+                    const prevAnswer = condition.prevAnswer;
+                    
+                    // Get the previous question's value
+                    const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                              document.getElementById('answer' + prevQuestionId);
+                    
+                    if (prevQuestionElement) {
+                        let prevValue = '';
+                        
+                        if (prevQuestionElement.type === 'checkbox') {
+                            prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                        } else {
+                            prevValue = prevQuestionElement.value;
+                        }
+                        
+                        // Check if the condition matches
+                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                            shouldDownload = true;
+                        }
+                    }
+                });
+                }
+                
+                // Download PDF if conditions are met
+                if (shouldDownload) {
+                    await editAndDownloadPDF(pdfLogic.pdfName);
+                }
+            }
+        }
+    }
+}
+
+// Manual PDF download function (called when user clicks "Download PDF" button)
+async function downloadAllPdfs() {
+    try {
+        // Show loading state
+        const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+        if (downloadButton) {
+            downloadButton.textContent = 'Processing...';
+            downloadButton.disabled = true;
+        }
+        
+        await processAllPdfs();
+        
+        // Reset button
+        if (downloadButton) {
+            downloadButton.textContent = 'Download PDF';
+            downloadButton.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error downloading PDFs:', error);
+        // Reset button on error
+        const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+        if (downloadButton) {
+            downloadButton.textContent = 'Download PDF';
+            downloadButton.disabled = false;
         }
     }
 }
 
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
-    /* this grabs every control that belongs to <form id="customForm">,
-       including those specified with form="customForm" attributes   */
-    const fd = new FormData(document.getElementById('customForm'));
+    try {
+        /* this grabs every control that belongs to <form id="customForm">,
+           including those specified with form="customForm" attributes   */
+        const fd = new FormData(document.getElementById('customForm'));
 
-    // Use the /edit_pdf endpoint with the PDF name as a query parameter
-    // Remove the .pdf extension if present since server adds it automatically
-    const baseName = pdfName.replace(/\.pdf$/i, '');
-    const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
-        method: 'POST', 
-        body: fd 
-    });
-    
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+        // Use the /edit_pdf endpoint with the PDF name as a query parameter
+        // Remove the .pdf extension if present since server adds it automatically
+        const baseName = pdfName.replace(/\.pdf$/i, '');
+        const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
+            method: 'POST', 
+            body: fd 
+        });
+        
+        if (!res.ok) {
+            throw new Error("HTTP error! status: " + res.status);
+        }
+        
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
 
-    // trigger download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Edited_' + pdfName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+        // Trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Edited_' + pdfName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
-    // inline preview - only show the last one
-    const frame = document.getElementById('pdfFrame');
-    frame.src = url;
-    frame.style.display = 'block';
-    document.getElementById('pdfPreview').style.display = 'none';
+        // inline preview - only show the last one
+        const frame = document.getElementById('pdfFrame');
+        if (frame) {
+            frame.src = url;
+            frame.style.display = 'block';
+        }
+        const preview = document.getElementById('pdfPreview');
+        if (preview) {
+            preview.style.display = 'none';
+        }
+        
+        console.log("Successfully processed PDF: " + pdfName);
+    } catch (error) {
+        console.error("Error processing PDF " + pdfName + ":", error);
+        throw error; // Re-throw to be handled by the caller
+    }
 }
 
 
@@ -2946,117 +4123,7 @@ if (typeof handleNext === 'function') {
 
 
         
-        // Cart Modal Logic
-        function showCartModal() {
-            const EXAMPLE_FORM_PRICE_ID = stripePriceId;
-            let exampleFormPrice = null;
-
-            async function fetchExampleFormPrice() {
-                try {
-                    const res = await fetch(\`/stripe-price/\${EXAMPLE_FORM_PRICE_ID}\`);
-                    if (!res.ok) return null;
-                    const data = await res.json();
-                    exampleFormPrice = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-                    return exampleFormPrice;
-                } catch (e) {
-                    return null;
-                }
-            }
-
-            fetchExampleFormPrice().then(price => {
-                const priceDisplay = price ? \`\$\${price}\` : '...';
-                const modal = document.createElement('div');
-                modal.id = 'cart-modal';
-                modal.style.position = 'fixed';
-                modal.style.top = '0';
-                modal.style.left = '0';
-                modal.style.width = '100vw';
-                modal.style.height = '100vh';
-                modal.style.background = 'rgba(44,62,80,0.45)';
-                modal.style.display = 'flex';
-                modal.style.alignItems = 'center';
-                modal.style.justifyContent = 'center';
-                modal.style.zIndex = '99999';
-                modal.innerHTML =
-                    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
-                    '<h2>Checkout</h2>' +
-                    \`<p>Your form has been completed! Add it to your cart to download .</p>\` +
-                    \`<button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Add to Cart - \${priceDisplay}</button>\` +
-                    '<br><br>' +
-                    '<button id="viewCartBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">View Cart</button>' +
-                    '<br><br>' +
-                    '<button id="cancelCartBtn" style="background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">Cancel</button>' +
-                    '</div>';
-
-                document.body.appendChild(modal);
-
-                document.getElementById('cancelCartBtn').onclick = () => {
-                    document.body.removeChild(modal);
-                };
-                document.getElementById('viewCartBtn').onclick = () => {
-                    document.body.removeChild(modal);
-                    window.location.href = 'cart.html';
-                };
-                document.getElementById('addToCartBtn').onclick = () => {
-                    addFormToCart(EXAMPLE_FORM_PRICE_ID);
-                    document.body.removeChild(modal);
-                };
-            });
-        }
-
-
-        // Cart functionality
-        function addFormToCart(priceId) {
-            // Get all form data
-            const form = document.getElementById('customForm');
-            const formData = {};
-            
-            if (form) {
-                const formElements = form.elements;
-                for (let i = 0; i < formElements.length; i++) {
-                    const element = formElements[i];
-                    if (element.name && !element.disabled && 
-                        ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName) &&
-                        !['hidden', 'button', 'submit', 'reset'].includes(element.type)) {
-                        
-                        if (element.type === 'checkbox' || element.type === 'radio') {
-                            formData[element.name] = element.checked;
-                        } else {
-                            formData[element.name] = element.value;
-                        }
-                    }
-                }
-            }
-
-            // Extract county and defendant information from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const countyName = urlParams.get('county') || '';
-            const defendantName = urlParams.get('defendantName') || '';
-
-            // Add to cart using the global cart manager
-           const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
-            
-           if (typeof addToCart === 'function') {
-                addToCart(formId || 'custom-form', formTitle, priceId, formData, countyName, defendantName);
-                window.location.href = 'cart.html';
-            } else {
-                // Fallback: save to localStorage if cart manager not available
-                const cartItem = {
-                    formId: formId || 'custom-form',
-                    title: formTitle,
-                    priceId: priceId,
-                    formData: formData,
-                    countyName: countyName,
-                    defendantName: defendantName,
-                    timestamp: Date.now()
-                };
-                
-                let cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
-                cart.push(cartItem);
-                localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-                window.location.href = 'cart.html';
-            }
-        }
+        // Cart Modal Logic - now handled by global functions outside Firebase IIFE
 
         // On auth state change
         firebase.auth().onAuthStateChanged(function(user) {
@@ -3079,15 +4146,7 @@ if (typeof handleNext === 'function') {
             }
         });
 
-        // On form submit
-        const form = document.getElementById('customForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                showCartModal();
-                return false;
-            });
-        }
+        // Form submission now shows thank you message first, then user can continue to cart
 
         // Update cart count
         function updateCartCount() {
@@ -3598,4 +4657,6 @@ function generateHiddenPDFFields() {
     hiddenFieldsHTML += "\n</div>";
     return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
+
+
 

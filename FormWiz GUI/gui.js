@@ -8,6 +8,7 @@
 // ============================================
 let sectionCounter = 1;
 let questionCounter = 1;
+let checklistItems = [];
 
 // ============================================
 // ===========  SECTION FUNCTIONS  ============
@@ -77,6 +78,209 @@ function moveSectionDown(sectionId) {
         sectionBlock.parentNode.insertBefore(nextSibling, sectionBlock);
         updateSectionLabels();
     }
+}
+
+// ============================================
+// ===========  CHECKLIST FUNCTIONS  ===========
+// ============================================
+function addChecklist() {
+    const checklistContainer = document.getElementById('checklistContainer');
+    if (!checklistContainer) {
+        // Create checklist container if it doesn't exist
+        const formBuilder = document.getElementById('formBuilder');
+        const checklistDiv = document.createElement('div');
+        checklistDiv.id = 'checklistContainer';
+        checklistDiv.innerHTML = `
+            <h3>📋 Checklist Items</h3>
+            <div id="checklistItems"></div>
+            <button type="button" onclick="addChecklistItem()">Add Checklist Item</button>
+            <hr>
+        `;
+        formBuilder.insertBefore(checklistDiv, formBuilder.firstChild);
+    }
+    
+    addChecklistItem();
+}
+
+function addChecklistItem() {
+    const checklistItemsContainer = document.getElementById('checklistItems');
+    if (!checklistItemsContainer) return;
+    
+    const itemId = Date.now();
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'checklist-item';
+    itemDiv.id = `checklistItem${itemId}`;
+    itemDiv.innerHTML = `
+        <input type="text" id="checklistText${itemId}" placeholder="Enter checklist item text" style="width: 60%; margin-right: 10px;">
+        <button type="button" onclick="removeChecklistItem(${itemId})">Remove</button>
+        <br><br>
+    `;
+    
+    checklistItemsContainer.appendChild(itemDiv);
+}
+
+function removeChecklistItem(itemId) {
+    const itemDiv = document.getElementById(`checklistItem${itemId}`);
+    if (itemDiv) {
+        itemDiv.remove();
+    }
+}
+
+function addChecklistLogicCondition(questionId) {
+    const checklistLogicContainer = document.getElementById(`checklistLogicContainer${questionId}`);
+    if (!checklistLogicContainer) return;
+    
+    const numConditions = checklistLogicContainer.children.length + 1;
+    const conditionDiv = document.createElement('div');
+    conditionDiv.className = 'checklist-logic-condition-row';
+    conditionDiv.id = `checklistLogicCondition${questionId}_${numConditions}`;
+    conditionDiv.innerHTML = `
+        <span>Condition ${numConditions}:</span><br>
+        <input type="number" placeholder="Previous question number"
+               id="checklistPrevQuestion${questionId}_${numConditions}"
+               onchange="updateChecklistLogicAnswersForRow(${questionId}, ${numConditions})"><br>
+        <select id="checklistPrevAnswer${questionId}_${numConditions}" style="display: block;">
+            <option value="">-- Select an answer --</option>
+        </select><br>
+        <label>Checklist items to add (one per line):</label><br>
+        <textarea id="checklistItemsToAdd${questionId}_${numConditions}" placeholder="Enter checklist items to add when condition is met" 
+                  style="width: 100%; height: 80px; margin-top: 5px;"></textarea><br>
+        <button type="button" onclick="removeChecklistLogicCondition(${questionId}, ${numConditions})">Remove Condition</button>
+        <hr>
+    `;
+    
+    checklistLogicContainer.appendChild(conditionDiv);
+}
+
+function removeChecklistLogicCondition(questionId, conditionIndex) {
+    const row = document.getElementById(`checklistLogicCondition${questionId}_${conditionIndex}`);
+    if (row) row.remove();
+}
+
+function updateChecklistLogicAnswersForRow(questionId, conditionIndex, callback) {
+    const questionNumberInput = document.getElementById(`checklistPrevQuestion${questionId}_${conditionIndex}`);
+    const answerSelect = document.getElementById(`checklistPrevAnswer${questionId}_${conditionIndex}`);
+    if (!questionNumberInput || !answerSelect) {
+        if (callback) callback();
+        return;
+    }
+
+    const prevQNum = parseInt(questionNumberInput.value);
+    if (!prevQNum) {
+        answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        if (callback) callback();
+        return;
+    }
+    const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
+    if (!targetQuestionBlock) {
+        answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        if (callback) callback();
+        return;
+    }
+    const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
+    if (!questionType) {
+        if (callback) callback();
+        return;
+    }
+
+    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+
+    if (questionType === 'radio') {
+        answerSelect.innerHTML += `
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        `;
+        if (callback) callback();
+    } else if (questionType === 'dropdown') {
+        const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
+        dropOpts.forEach(opt => {
+            const val = opt.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+        if (callback) callback();
+    } else if (questionType === 'checkbox') {
+        const checkOpts = targetQuestionBlock.querySelectorAll(`#checkboxOptions${prevQNum} [id^="checkboxOptionText"]`);
+        checkOpts.forEach(optInput => {
+            const val = optInput.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+        const noneOfAbove = targetQuestionBlock.querySelector(`#noneOfTheAbove${prevQNum}`);
+        if (noneOfAbove && noneOfAbove.checked) {
+            const optionEl = document.createElement('option');
+            optionEl.value = 'None of the above';
+            optionEl.textContent = 'None of the above';
+            answerSelect.appendChild(optionEl);
+        }
+        if (callback) callback();
+    } else if (questionType === 'numberedDropdown') {
+        // Get the min and max values from the range inputs
+        const rangeStartEl = targetQuestionBlock.querySelector(`#numberRangeStart${prevQNum}`);
+        const rangeEndEl = targetQuestionBlock.querySelector(`#numberRangeEnd${prevQNum}`);
+        
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value) || 1;
+            const max = parseInt(rangeEndEl.value) || min;
+            
+            // Add each number in the range as an option
+            for (let i = min; i <= max; i++) {
+                const optionEl = document.createElement('option');
+                optionEl.value = i.toString();
+                optionEl.textContent = i.toString();
+                answerSelect.appendChild(optionEl);
+            }
+        }
+        if (callback) callback();
+    } else {
+        if (callback) callback();
+    }
+}
+
+function toggleChecklistLogic(questionId) {
+    const checklistLogicBlock = document.getElementById(`checklistLogicBlock${questionId}`);
+    const checklistLogicCheckbox = document.getElementById(`checklistLogic${questionId}`);
+    
+    if (checklistLogicBlock && checklistLogicCheckbox) {
+        checklistLogicBlock.style.display = checklistLogicCheckbox.checked ? 'block' : 'none';
+    }
+}
+
+// Function to update all checklist logic dropdowns
+function updateAllChecklistLogicDropdowns() {
+    // Find all checklist logic containers
+    const checklistLogicContainers = document.querySelectorAll('[id^="checklistLogicContainer"]');
+    
+    checklistLogicContainers.forEach(container => {
+        const questionId = container.id.replace('checklistLogicContainer', '');
+        const conditionRows = container.querySelectorAll('.checklist-logic-condition-row');
+        
+        conditionRows.forEach((row, index) => {
+            const conditionIndex = index + 1;
+            const prevQuestionInput = row.querySelector(`#checklistPrevQuestion${questionId}_${conditionIndex}`);
+            const prevAnswerSelect = row.querySelector(`#checklistPrevAnswer${questionId}_${conditionIndex}`);
+            
+            if (prevQuestionInput && prevAnswerSelect) {
+                const savedAnswer = prevAnswerSelect.value;
+                updateChecklistLogicAnswersForRow(questionId, conditionIndex, () => {
+                    // Restore the saved answer after updating dropdown options
+                    if (savedAnswer) {
+                        prevAnswerSelect.value = savedAnswer;
+                    }
+                });
+            } else {
+                updateChecklistLogicAnswersForRow(questionId, conditionIndex);
+            }
+        });
+    });
 }
 
 function updateSectionName(sectionId) {
@@ -360,6 +564,42 @@ function addQuestion(sectionId, questionId = null) {
             <button type="button" onclick="addLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
         </div><br>
 
+        <!-- PDF Logic -->
+        <label>Enable PDF Logic: </label>
+        <input type="checkbox" id="pdfLogic${currentQuestionId}" onchange="togglePdfLogic(${currentQuestionId})">
+        <div id="pdfLogicBlock${currentQuestionId}" style="display: none;">
+            <label>Show this question if ANY of these conditions match:</label><br>
+            <div id="pdfLogicConditions${currentQuestionId}"></div>
+            <button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
+            <br><br>
+            <label>Additional PDF to download:</label>
+            <input type="text" id="pdfLogicPdfName${currentQuestionId}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+            <br><br>
+            <label>Choose your Price ID:</label>
+            <input type="text" id="pdfLogicStripePriceId${currentQuestionId}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+        </div><br>
+
+        <!-- Alert Logic -->
+        <label>Enable Alert Logic: </label>
+        <input type="checkbox" id="alertLogic${currentQuestionId}" onchange="toggleAlertLogic(${currentQuestionId})">
+        <div id="alertLogicBlock${currentQuestionId}" style="display: none;">
+            <label>Show alert if ANY of these conditions match:</label><br>
+            <div id="alertLogicConditions${currentQuestionId}"></div>
+            <button type="button" onclick="addAlertLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
+            <br><br>
+            <label>Alert Message:</label>
+            <textarea id="alertLogicMessage${currentQuestionId}" placeholder="Enter alert message to display" rows="3" style="width: 100%;"></textarea>
+        </div><br>
+
+        <!-- Checklist Logic -->
+        <label>Enable Checklist Logic: </label>
+        <input type="checkbox" id="checklistLogic${currentQuestionId}" onchange="toggleChecklistLogic(${currentQuestionId})">
+        <div id="checklistLogicBlock${currentQuestionId}" style="display: none;">
+            <label>Add checklist items if ANY of these conditions match:</label><br>
+            <div id="checklistLogicContainer${currentQuestionId}"></div>
+            <button type="button" onclick="addChecklistLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
+        </div><br>
+
        <!-- Jump Logic -->
         <label>Enable Jump Logic: </label>
         <div id="jumpLogic${currentQuestionId}">
@@ -416,6 +656,9 @@ function addQuestion(sectionId, questionId = null) {
     if (!questionId) {
         questionCounter++;
     }
+    
+    // Update all checklist logic dropdowns to include the new question
+    updateAllChecklistLogicDropdowns();
 }
 
 /**
@@ -445,6 +688,9 @@ function removeQuestion(questionId) {
     
     // Update linking targets in case this was a dropdown question
     updateAllLinkingTargets();
+    
+    // Update all checklist logic dropdowns after removing a question
+    updateAllChecklistLogicDropdowns();
 }
 
 function toggleDropdownImageFields(questionId) {
@@ -637,6 +883,24 @@ function toggleOptions(questionId) {
     } else {
         pdfBlock.style.display = 'none';
     }
+
+    // Handle PDF Logic visibility - show for all question types
+    const pdfLogicBlock = document.getElementById(`pdfLogicBlock${questionId}`);
+    if (pdfLogicBlock) {
+        pdfLogicBlock.style.display = 'none'; // Reset visibility
+        // The actual visibility will be controlled by the checkbox toggle
+        
+        // If PDF Logic is currently enabled and we're switching to Big Paragraph, update the conditions
+        const pdfLogicCheckbox = document.getElementById(`pdfLogic${questionId}`);
+        if (pdfLogicCheckbox && pdfLogicCheckbox.checked && questionType === 'bigParagraph') {
+            const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
+            if (pdfLogicConditionsDiv) {
+                pdfLogicConditionsDiv.innerHTML = '';
+                // Add a default character limit condition for Big Paragraph
+                addPdfLogicCondition(questionId);
+            }
+        }
+    }
     
     // Update linking targets in case dropdown questions were added/changed
     updateAllLinkingTargets();
@@ -685,6 +949,267 @@ function addLogicCondition(questionId) {
 function removeLogicCondition(questionId, conditionIndex) {
     const row = document.getElementById(`logicConditionRow${questionId}_${conditionIndex}`);
     if (row) row.remove();
+}
+
+/** Add a row to the alert logic block */
+function addAlertLogicCondition(questionId) {
+    const alertLogicConditionsDiv = document.getElementById(`alertLogicConditions${questionId}`);
+    const numConditions = alertLogicConditionsDiv.children.length + 1;
+
+    const conditionRow = document.createElement('div');
+    conditionRow.className = 'alert-logic-condition-row';
+    conditionRow.id = `alertLogicConditionRow${questionId}_${numConditions}`;
+    conditionRow.innerHTML = `
+        <span>Condition ${numConditions}:</span><br>
+        <input type="number" placeholder="Previous question number"
+               id="alertPrevQuestion${questionId}_${numConditions}"
+               onchange="updateAlertLogicAnswersForRow(${questionId}, ${numConditions})"><br>
+        <select id="alertPrevAnswer${questionId}_${numConditions}" style="display: block;">
+            <option value="">-- Select an answer --</option>
+        </select><br>
+        <button type="button" onclick="removeAlertLogicCondition(${questionId}, ${numConditions})">Remove</button>
+        <hr>
+    `;
+    alertLogicConditionsDiv.appendChild(conditionRow);
+}
+
+function removeAlertLogicCondition(questionId, conditionIndex) {
+    const row = document.getElementById(`alertLogicConditionRow${questionId}_${conditionIndex}`);
+    if (row) row.remove();
+}
+
+/** On picking a "previous question" for alert logic, populate possible answers. */
+function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
+    const questionNumberInput = document.getElementById(`alertPrevQuestion${questionId}_${conditionIndex}`);
+    const answerSelect = document.getElementById(`alertPrevAnswer${questionId}_${conditionIndex}`);
+    if (!questionNumberInput || !answerSelect) return;
+
+    const prevQNum = parseInt(questionNumberInput.value);
+    if (!prevQNum) {
+        answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        return;
+    }
+    const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
+    if (!targetQuestionBlock) {
+        answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        return;
+    }
+    const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
+    if (!questionType) return;
+
+    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+
+    if (questionType === 'radio') {
+        answerSelect.innerHTML += `
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        `;
+    } else if (questionType === 'dropdown') {
+        const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
+        dropOpts.forEach(opt => {
+            const val = opt.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+    } else if (questionType === 'checkbox') {
+        const checkOpts = targetQuestionBlock.querySelectorAll(`#checkboxOptions${prevQNum} [id^="checkboxOptionText"]`);
+        checkOpts.forEach(optInput => {
+            const val = optInput.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+        const noneOfAbove = targetQuestionBlock.querySelector(`#noneOfTheAbove${prevQNum}`);
+        if (noneOfAbove && noneOfAbove.checked) {
+            const optionEl = document.createElement('option');
+            optionEl.value = 'None of the above';
+            optionEl.textContent = 'None of the above';
+            answerSelect.appendChild(optionEl);
+        }
+    } else if (questionType === 'numberedDropdown') {
+        // Get the min and max values from the range inputs
+        const rangeStartEl = targetQuestionBlock.querySelector(`#numberRangeStart${prevQNum}`);
+        const rangeEndEl = targetQuestionBlock.querySelector(`#numberRangeEnd${prevQNum}`);
+        
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value) || 1;
+            const max = parseInt(rangeEndEl.value) || min;
+            
+            // Add each number in the range as an option
+            for (let i = min; i <= max; i++) {
+                const optionEl = document.createElement('option');
+                optionEl.value = i.toString();
+                optionEl.textContent = i.toString();
+                answerSelect.appendChild(optionEl);
+            }
+        }
+    }
+}
+
+/** Add a row to the PDF logic block */
+function addPdfLogicCondition(questionId) {
+    const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
+    const numConditions = pdfLogicConditionsDiv.children.length + 1;
+    
+    // Check if this is a Big Paragraph question
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    
+    let conditionRow;
+    
+    if (questionType === 'bigParagraph') {
+        // For Big Paragraph, show character limit selector
+        conditionRow = document.createElement('div');
+        conditionRow.className = 'pdf-logic-condition-row';
+        conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
+        conditionRow.innerHTML = `
+            <span>Condition ${numConditions}:</span><br>
+            <label>Character Limit:</label><br>
+            <select id="pdfCharacterLimit${questionId}_${numConditions}" style="display: block;">
+                <option value="">-- Choose a character limit --</option>
+                <option value="50">50 characters</option>
+                <option value="100">100 characters</option>
+                <option value="200">200 characters</option>
+                <option value="300">300 characters</option>
+                <option value="500">500 characters</option>
+                <option value="750">750 characters</option>
+                <option value="1000">1000 characters</option>
+                <option value="1500">1500 characters</option>
+                <option value="2000">2000 characters</option>
+                <option value="custom">Custom limit</option>
+            </select><br>
+            <input type="number" id="pdfCustomCharacterLimit${questionId}_${numConditions}" 
+                   placeholder="Enter custom character limit" 
+                   style="display: none; margin-top: 5px;"
+                   min="1" max="10000"><br>
+            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
+            <hr>
+        `;
+        
+        // Add event listener for custom character limit
+        setTimeout(() => {
+            const limitSelect = document.getElementById(`pdfCharacterLimit${questionId}_${numConditions}`);
+            const customInput = document.getElementById(`pdfCustomCharacterLimit${questionId}_${numConditions}`);
+            
+            if (limitSelect && customInput) {
+                limitSelect.addEventListener('change', function() {
+                    if (this.value === 'custom') {
+                        customInput.style.display = 'block';
+                        customInput.focus();
+                    } else {
+                        customInput.style.display = 'none';
+                        customInput.value = '';
+                    }
+                });
+            }
+        }, 100);
+    } else {
+        // For other question types, show the original previous question logic
+        conditionRow = document.createElement('div');
+        conditionRow.className = 'pdf-logic-condition-row';
+        conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
+        conditionRow.innerHTML = `
+            <span>Condition ${numConditions}:</span><br>
+            <input type="number" placeholder="Previous question number"
+                   id="pdfPrevQuestion${questionId}_${numConditions}"
+                   onchange="updatePdfLogicAnswersForRow(${questionId}, ${numConditions})"><br>
+            <select id="pdfPrevAnswer${questionId}_${numConditions}" style="display: block;">
+                <option value="">-- Select an answer --</option>
+            </select><br>
+            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
+            <hr>
+        `;
+    }
+    
+    pdfLogicConditionsDiv.appendChild(conditionRow);
+}
+
+function removePdfLogicCondition(questionId, conditionIndex) {
+    const row = document.getElementById(`pdfLogicConditionRow${questionId}_${conditionIndex}`);
+    if (row) row.remove();
+}
+
+/** On picking a "previous question" for PDF logic, populate possible answers. */
+function updatePdfLogicAnswersForRow(questionId, conditionIndex) {
+    const questionNumberInput = document.getElementById(`pdfPrevQuestion${questionId}_${conditionIndex}`);
+    const answerSelect = document.getElementById(`pdfPrevAnswer${questionId}_${conditionIndex}`);
+    if (!questionNumberInput || !answerSelect) return;
+
+    const prevQNum = parseInt(questionNumberInput.value);
+    if (!prevQNum) {
+        answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        return;
+    }
+    const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
+    if (!targetQuestionBlock) {
+        answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        return;
+    }
+    const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
+    if (!questionType) return;
+
+    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+
+    if (questionType === 'radio') {
+        answerSelect.innerHTML += `
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        `;
+    } else if (questionType === 'dropdown') {
+        const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
+        dropOpts.forEach(opt => {
+            const val = opt.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+    } else if (questionType === 'checkbox') {
+        const checkOpts = targetQuestionBlock.querySelectorAll(`#checkboxOptions${prevQNum} [id^="checkboxOptionText"]`);
+        checkOpts.forEach(optInput => {
+            const val = optInput.value.trim();
+            if (val) {
+                const optionEl = document.createElement('option');
+                optionEl.value = val;
+                optionEl.textContent = val;
+                answerSelect.appendChild(optionEl);
+            }
+        });
+        const noneOfAbove = targetQuestionBlock.querySelector(`#noneOfTheAbove${prevQNum}`);
+        if (noneOfAbove && noneOfAbove.checked) {
+            const optionEl = document.createElement('option');
+            optionEl.value = 'None of the above';
+            optionEl.textContent = 'None of the above';
+            answerSelect.appendChild(optionEl);
+        }
+    } else if (questionType === 'numberedDropdown') {
+        // Get the min and max values from the range inputs
+        const rangeStartEl = targetQuestionBlock.querySelector(`#numberRangeStart${prevQNum}`);
+        const rangeEndEl = targetQuestionBlock.querySelector(`#numberRangeEnd${prevQNum}`);
+        
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value) || 1;
+            const max = parseInt(rangeEndEl.value) || min;
+            
+            // Add each number in the range as an option
+            for (let i = min; i <= max; i++) {
+                const optionEl = document.createElement('option');
+                optionEl.value = i.toString();
+                optionEl.textContent = i.toString();
+                answerSelect.appendChild(optionEl);
+            }
+        }
+    }
 }
 
 /** On picking a "previous question" for logic, populate possible answers. */
@@ -821,6 +1346,36 @@ function toggleConditionalPDFLogic(questionId) {
     conditionalPDFBlock.style.display = conditionalPDFEnabled ? 'block' : 'none';
 }
 
+// PDF Logic toggling
+function togglePdfLogic(questionId) {
+    const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`).checked;
+    const pdfLogicBlock = document.getElementById(`pdfLogicBlock${questionId}`);
+    pdfLogicBlock.style.display = pdfLogicEnabled ? 'block' : 'none';
+    
+    // If enabling PDF logic for a Big Paragraph question, clear any existing conditions
+    if (pdfLogicEnabled) {
+        const questionBlock = document.getElementById(`questionBlock${questionId}`);
+        const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+        const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+        
+        if (questionType === 'bigParagraph') {
+            const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
+            if (pdfLogicConditionsDiv) {
+                pdfLogicConditionsDiv.innerHTML = '';
+                // Add a default character limit condition for Big Paragraph
+                addPdfLogicCondition(questionId);
+            }
+        }
+    }
+}
+
+// Alert Logic toggling
+function toggleAlertLogic(questionId) {
+    const alertLogicEnabled = document.getElementById(`alertLogic${questionId}`).checked;
+    const alertLogicBlock = document.getElementById(`alertLogicBlock${questionId}`);
+    alertLogicBlock.style.display = alertLogicEnabled ? 'block' : 'none';
+}
+
 // Alert logic toggling
 function toggleConditionalAlertLogic(questionId) {
     const conditionalAlertEnabled = document.getElementById(`enableConditionalAlert${questionId}`).checked;
@@ -919,6 +1474,9 @@ function addDropdownOption(questionId) {
 
     // Update all existing jump conditions
     updateJumpOptions(questionId);
+    
+    // Update all checklist logic dropdowns
+    updateAllChecklistLogicDropdowns();
 }
 
 function removeDropdownOption(questionId, optionNumber) {
@@ -936,6 +1494,9 @@ function removeDropdownOption(questionId, optionNumber) {
         });
     }
     updateJumpOptions(questionId);
+    
+    // Update all checklist logic dropdowns
+    updateAllChecklistLogicDropdowns();
 }
 
 function addCheckboxOption(questionId) {
@@ -996,6 +1557,9 @@ function addCheckboxOption(questionId) {
 
     // Update all existing jump conditions
     updateJumpOptionsForCheckbox(questionId);
+    
+    // Update all checklist logic dropdowns
+    updateAllChecklistLogicDropdowns();
 }
 
 function toggleAmountPlaceholder(questionId, optionNumber) {
@@ -1032,6 +1596,9 @@ function removeCheckboxOption(questionId, optionNumber) {
     }
     updateConditionalPDFAnswersForCheckbox(questionId);
     updateJumpOptionsForCheckbox(questionId);
+    
+    // Update all checklist logic dropdowns
+    updateAllChecklistLogicDropdowns();
 }
 
 

@@ -153,6 +153,48 @@ input[type="checkbox"]:checked::before {
     font-size: 16px;
 }
 
+/* Checkbox option styling with beautiful blue border */
+.checkbox-inline {
+    display: inline-block;
+    margin: 8px 12px;
+    padding: 12px 16px;
+    border: 1px solid #d1d1d6;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    min-width: 200px;
+    text-align: center;
+}
+
+.checkbox-inline:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.checkbox-inline.checked {
+    border-color: #0051a6;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+    background-color: #f8fbff;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin: 0;
+    flex-shrink: 0;
+}
+
 
 
 /* Styling for "Previous question number" input */
@@ -349,4 +391,48 @@ footer {
 
 .group-section-item button:hover {
     background-color: #d70015;
+}
+
+/* Big Paragraph Character Count Styling */
+.big-paragraph-container {
+    position: relative;
+    width: 60%;
+    margin: 10px auto;
+    display: block;
+}
+
+.big-paragraph-container textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 1px solid #d1d1d6;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.big-paragraph-container textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+}
+
+.character-count {
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+    font-family: 'Montserrat', sans-serif;
+    transition: color 0.3s ease;
+}
+
+.character-count .current-count {
+    font-weight: 600;
+}
+
+.character-count .limit-display {
+    font-weight: 600;
 }

@@ -564,6 +564,21 @@ graph.dblClick = function (evt, cell) {
     mxEvent.consume(evt);
     return;
   }
+  
+  // Handle alert nodes - focus on the input field instead of editing the whole cell
+  if (cell && isAlertNode(cell)) {
+    const state = graph.view.getState(cell);
+    if (state && state.text && state.text.node) {
+      const inputField = state.text.node.querySelector('input[type="text"]');
+      if (inputField) {
+        graph.selectionModel.setCell(cell); // keep node selected
+        inputField.focus();                 // put caret inside input field
+        inputField.select();                // select all text for easy editing
+        mxEvent.consume(evt);
+        return;
+      }
+    }
+  }
 
   // anything else keeps the stock behaviour
   originalDblClick(evt, cell);
@@ -590,6 +605,10 @@ graph.isCellEditable = function (cell) {
   }
   // Disable direct editing for PDF nodes (they use custom input fields)
   if (isPdfNode(cell)) {
+    return false;
+  }
+  // Disable direct editing for alert nodes (they use custom input fields)
+  if (isAlertNode(cell)) {
     return false;
   }
   // Allow text2 to be edited directly with double-click
@@ -1079,7 +1098,7 @@ graph.isCellEditable = function (cell) {
     );
   });
 
-  // Listen for MOVE_CELLS to adjust option nodes
+  // Listen for MOVE_CELLS to adjust option nodes and notes nodes
   graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
     const movedCells = evt.getProperty('cells');
     const dx = evt.getProperty('dx');
@@ -1089,7 +1108,7 @@ graph.isCellEditable = function (cell) {
 
     const movedIds = new Set(movedCells.map(c => c.id));
     
-    // Function to get all connected descendants
+    // Function to get all connected descendants (including notes nodes)
     const getConnectedDescendants = (cell) => {
       const descendants = new Set();
       const queue = [cell];
@@ -1109,8 +1128,29 @@ graph.isCellEditable = function (cell) {
       return Array.from(descendants);
     };
 
+    // Function to get all connected ancestors (for notes nodes pointing to questions)
+    const getConnectedAncestors = (cell) => {
+      const ancestors = new Set();
+      const queue = [cell];
+      
+      while (queue.length > 0) {
+        const current = queue.shift();
+        const edges = graph.getIncomingEdges(current) || [];
+        
+        edges.forEach(edge => {
+          const source = edge.source;
+          if (!ancestors.has(source) && !movedIds.has(source.id)) {
+            ancestors.add(source);
+            queue.push(source);
+          }
+        });
+      }
+      return Array.from(ancestors);
+    };
+
     movedCells.forEach(cell => {
       if (isQuestion(cell)) {
+        // When dragging a question node, move all connected descendants (including notes nodes)
         const descendants = getConnectedDescendants(cell);
         descendants.forEach(descendant => {
           const geo = descendant.geometry;
@@ -1121,8 +1161,83 @@ graph.isCellEditable = function (cell) {
             graph.getModel().setGeometry(descendant, newGeo);
           }
         });
+      } else if (isNotesNode(cell) || isChecklistNode(cell) || isAlertNode(cell) || isPdfNode(cell) || isSubtitleNode(cell) || isInfoNode(cell)) {
+        // When dragging a notes/checklist/alert/pdf/subtitle/info node, check if it points to a question node
+        const incomingEdges = graph.getIncomingEdges(cell) || [];
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        
+        // If node has outgoing edges (points to other nodes), move those descendants
+        if (outgoingEdges.length > 0) {
+          const descendants = getConnectedDescendants(cell);
+          descendants.forEach(descendant => {
+            const geo = descendant.geometry;
+            if (geo) {
+              const newGeo = geo.clone();
+              newGeo.x += dx;
+              newGeo.y += dy;
+              graph.getModel().setGeometry(descendant, newGeo);
+            }
+          });
+        }
+        
+        // If node has incoming edges (is pointed to by other nodes), 
+        // check if any of those are question nodes and move them with their descendants
+        incomingEdges.forEach(edge => {
+          const source = edge.source;
+          if (isQuestion(source) && !movedIds.has(source.id)) {
+            // Move the question node and all its descendants
+            const questionAndDescendants = [source, ...getConnectedDescendants(source)];
+            questionAndDescendants.forEach(descendant => {
+              const geo = descendant.geometry;
+              if (geo) {
+                const newGeo = geo.clone();
+                newGeo.x += dx;
+                newGeo.y += dy;
+                graph.getModel().setGeometry(descendant, newGeo);
+              }
+            });
+          }
+        });
       }
     });
+
+    // After moving all cells, update edge geometries to fix curved connectors
+    setTimeout(() => {
+      const allMovedCells = new Set();
+      movedCells.forEach(cell => {
+        allMovedCells.add(cell);
+        if (isQuestion(cell)) {
+          const descendants = getConnectedDescendants(cell);
+          descendants.forEach(desc => allMovedCells.add(desc));
+        } else if (isNotesNode(cell) || isChecklistNode(cell) || isAlertNode(cell) || isPdfNode(cell) || isSubtitleNode(cell) || isInfoNode(cell)) {
+          const incomingEdges = graph.getIncomingEdges(cell) || [];
+          const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+          
+          if (outgoingEdges.length > 0) {
+            const descendants = getConnectedDescendants(cell);
+            descendants.forEach(desc => allMovedCells.add(desc));
+          }
+          
+          incomingEdges.forEach(edge => {
+            const source = edge.source;
+            if (isQuestion(source) && !movedIds.has(source.id)) {
+              const questionAndDescendants = [source, ...getConnectedDescendants(source)];
+              questionAndDescendants.forEach(desc => allMovedCells.add(desc));
+            }
+          });
+        }
+      });
+
+      // Update all edges connected to moved cells
+      allMovedCells.forEach(cell => {
+        const connectedEdges = graph.getConnections(cell) || [];
+        connectedEdges.forEach(edge => {
+          // Reset edge geometry to let mxGraph recalculate the curved path
+          const geo = new mxGeometry();
+          graph.getModel().setGeometry(edge, geo);
+        });
+      });
+    }, 0);
   });
 
   // Delete node
@@ -1204,7 +1319,6 @@ graph.isCellEditable = function (cell) {
   textTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "text");
-      selectedCell.value = "Text question node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1215,7 +1329,6 @@ graph.isCellEditable = function (cell) {
   text2TypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "text2");
-      selectedCell.value = "Textbox Dropdown node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1223,7 +1336,6 @@ graph.isCellEditable = function (cell) {
   moneyTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "number");
-      selectedCell.value = "Number question node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1231,7 +1343,6 @@ graph.isCellEditable = function (cell) {
   dateTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "date");
-      selectedCell.value = "Date question node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1239,7 +1350,6 @@ graph.isCellEditable = function (cell) {
   dateRangeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "dateRange");
-      selectedCell.value = "Date Range question node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1247,7 +1357,6 @@ graph.isCellEditable = function (cell) {
   emailTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "email");
-      selectedCell.value = "Email question node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1255,7 +1364,6 @@ graph.isCellEditable = function (cell) {
   phoneTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "phone");
-      selectedCell.value = "Phone question node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1263,7 +1371,6 @@ graph.isCellEditable = function (cell) {
   bigParagraphTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "bigParagraph");
-      selectedCell.value = "Please explain why";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1272,11 +1379,14 @@ graph.isCellEditable = function (cell) {
   // Calc submenu buttons
   calcTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
+      // Extract and preserve the current text content
+      const preservedText = extractTextFromCell(selectedCell);
+      
       // Convert to calculation node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=calculation");
-        selectedCell._calcTitle = "Calculation Title";
+        selectedCell._calcTitle = preservedText || "Calculation Title";
         selectedCell._calcAmountLabel = "";
         selectedCell._calcOperator = "=";
         selectedCell._calcThreshold = "0";
@@ -1293,11 +1403,14 @@ graph.isCellEditable = function (cell) {
 
   subtitleTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
+      // Extract and preserve the current text content
+      const preservedText = extractTextFromCell(selectedCell);
+      
       // Convert to subtitle node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=subtitle");
-        selectedCell._subtitleText = "Subtitle text";
+        selectedCell._subtitleText = preservedText || "Subtitle text";
         updateSubtitleNodeCell(selectedCell);
       } finally {
         graph.getModel().endUpdate();
@@ -1309,11 +1422,14 @@ graph.isCellEditable = function (cell) {
 
   infoTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
+      // Extract and preserve the current text content
+      const preservedText = extractTextFromCell(selectedCell);
+      
       // Convert to info node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=info");
-        selectedCell._infoText = "Information text";
+        selectedCell._infoText = preservedText || "Information text";
         updateInfoNodeCell(selectedCell);
       } finally {
         graph.getModel().endUpdate();
@@ -1871,6 +1987,15 @@ keyHandler.bindControlKey(86, () => {
         }
     }
 
+    // Update PDF nodes when connections change (to show/hide character limit field)
+    const allCells = graph.getModel().cells;
+    for (const cellId in allCells) {
+      const cell = allCells[cellId];
+      if (cell && isPdfNode(cell)) {
+        updatePdfNodeCell(cell);
+      }
+    }
+    
     refreshAllCells();
 });
 
@@ -1991,8 +2116,8 @@ keyHandler.bindControlKey(86, () => {
       } else if (nodeType === 'imageOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;spacing=12;fontSize=16;";
         label = "Image Option";
-      } else if (nodeType === 'pdfNode') {
-        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=12;fontSize=16;";
+          } else if (nodeType === 'pdfNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=6;fontSize=16;";
         label = "PDF Node";
       } else if (nodeType === 'amountOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
@@ -2807,6 +2932,9 @@ function updatemultipleDropdownTypeCell(cell) {
  **************************************************/
 /* ----------  REPLACE ENTIRE FUNCTION  ---------- */
 function setQuestionType (cell, newType) {
+  // Extract and preserve the current text content
+  const preservedText = extractTextFromCell(cell);
+  
   /* —— 1. update style —— */
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
   st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
@@ -2826,27 +2954,27 @@ function setQuestionType (cell, newType) {
     switch (newType) {
       case 'text': case 'date': case 'number': case 'bigParagraph':
       case 'dateRange': case 'email': case 'phone': case 'checkbox':
-        // Always clear _questionText and strip any HTML if present
-        cell._questionText = '';
+        // Preserve the text content
+        cell._questionText = preservedText || '';
         updateSimpleQuestionCell(cell);
         break;
       case 'text2':
-        cell._questionText = '';
+        cell._questionText = preservedText || '';
         updateText2Cell(cell);
         break;
       case 'multipleTextboxes':
-        cell._questionText = '';
+        cell._questionText = preservedText || '';
         cell._textboxes = [{ nameId:'', placeholder:'Enter value' }];
         updateMultipleTextboxesCell(cell);
         break;
       case 'multipleDropdownType':
-        cell._questionText = '';
+        cell._questionText = preservedText || '';
         cell._twoNumbers = { first:'0', second:'0' };
         cell._textboxes = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
         updatemultipleDropdownTypeCell(cell);
         break;
       default:
-        cell._questionText = '';
+        cell._questionText = preservedText || '';
         updateSimpleQuestionCell(cell);
     }
     refreshNodeIdFromLabel(cell);
@@ -2856,9 +2984,66 @@ function setQuestionType (cell, newType) {
   refreshAllCells();
 }
 
+// Helper function to extract text content from a cell
+function extractTextFromCell(cell) {
+  if (!cell) return '';
+  
+  // First, try to get text from _questionText property
+  if (cell._questionText && cell._questionText.trim()) {
+    return cell._questionText.trim();
+  }
+  
+  // Then try to extract from cell.value (HTML content)
+  if (cell.value) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = cell.value;
+    const extractedText = (tmp.textContent || tmp.innerText || "").trim();
+    if (extractedText) {
+      return extractedText;
+    }
+  }
+  
+  // For option nodes, try to extract from the option text
+  if (isOptions(cell) && cell.value) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = cell.value;
+    const extractedText = (tmp.textContent || tmp.innerText || "").trim();
+    if (extractedText && extractedText !== 'Option') {
+      return extractedText;
+    }
+  }
+  
+  // For special node types, try their specific text properties
+  if (isSubtitleNode(cell) && cell._subtitleText) {
+    return cell._subtitleText.trim();
+  }
+  
+  if (isInfoNode(cell) && cell._infoText) {
+    return cell._infoText.trim();
+  }
+  
+  if (isNotesNode(cell) && cell._notesText) {
+    return cell._notesText.trim();
+  }
+  
+  if (isChecklistNode(cell) && cell._checklistText) {
+    return cell._checklistText.trim();
+  }
+  
+  if (isAlertNode(cell) && cell._alertText) {
+    return cell._alertText.trim();
+  }
+  
+  // Return empty string if no text found
+  return '';
+}
+
 // Function to set option type for option nodes
 function setOptionType(cell, newType) {
   if (!cell || !isOptions(cell)) return;
+  
+  // Extract and preserve the current text content
+  const preservedText = extractTextFromCell(cell);
   
   /* —— 1. update style —— */
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
@@ -2871,30 +3056,31 @@ function setOptionType(cell, newType) {
   try {
     switch (newType) {
       case 'dropdown':
-        // Regular option - simple text
+        // Regular option - preserve text content
+        if (preservedText) {
+          cell.value = `<div style="text-align:center;">${mxUtils.htmlEntities(preservedText)}</div>`;
+        }
         updateOptionNodeCell(cell);
         break;
       case 'imageOption':
         // Image option - needs image URL and alt text
         if (!cell._imageUrl) {
           cell._imageUrl = '';
-          cell._imageAltText = 'Image description';
+          cell._imageAltText = preservedText || 'Image description';
         }
         updateImageOptionCell(cell);
         break;
       case 'amountOption':
         // Amount option - needs amount name and placeholder
         if (!cell._amountName) {
-          cell._amountName = 'Amount';
+          cell._amountName = preservedText || 'Amount';
           cell._amountPlaceholder = 'Enter amount';
         }
         // updateAmountOptionCell is handled in the existing code
         break;
       case 'notesNode':
-        // Notes node - needs notes text and bold border
-        if (!cell._notesText) {
-          cell._notesText = 'Notes text';
-        }
+        // Notes node - preserve text content
+        cell._notesText = preservedText || 'Notes text';
         // Add bold border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = st.replace(/strokeColor=[^;]+/, '');
@@ -2903,10 +3089,8 @@ function setOptionType(cell, newType) {
         updateNotesNodeCell(cell);
         break;
       case 'checklistNode':
-        // Checklist node - needs checklist text and striped red border
-        if (!cell._checklistText) {
-          cell._checklistText = 'Checklist text';
-        }
+        // Checklist node - preserve text content
+        cell._checklistText = preservedText || 'Checklist text';
         // Add striped red border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -2916,10 +3100,8 @@ function setOptionType(cell, newType) {
         updateChecklistNodeCell(cell);
         break;
       case 'alertNode':
-        // Alert node - needs alert text and bold black and red checkered border
-        if (!cell._alertText) {
-          cell._alertText = 'Alert message';
-        }
+        // Alert node - preserve text content
+        cell._alertText = preservedText || 'Alert message';
         // Add bold black and red checkered border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -3739,14 +3921,14 @@ function sanitizeNameId(str) {
  */
 function updateText2Cell(cell) {
   if (!cell) return;
-  // Ensure we have question text
-  if (!cell._questionText) {
+  // Ensure we have question text - only set default if it's completely undefined or null
+  if (cell._questionText === undefined || cell._questionText === null) {
     cell._questionText = "Enter dropdown question";
   }
   // Create the HTML content as a single line
   const html = `
     <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText)}</div>
+      <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText || "")}</div>
     </div>`;
   graph.getModel().setValue(cell, html);
 }
@@ -3893,50 +4075,7 @@ function updateSimpleQuestionCell(cell) {
   graph.getModel().setValue(cell, html);
 }
 
-// Patch setQuestionType to use new rendering for all question types
-function setQuestionType(cell, newType) {
-  let st = (cell.style || '').replace(/questionType=[^;]+/, '');
-  st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
-  if (newType === 'text2') {
-    st += 'editable=1;';
-  } else if (!/pointerEvents=/.test(st)) {
-    st += 'pointerEvents=1;overflow=fill;';
-  }
-  graph.getModel().setStyle(cell, st);
-  graph.getModel().beginUpdate();
-  try {
-    switch (newType) {
-      case 'text': case 'date': case 'number': case 'bigParagraph':
-      case 'dateRange': case 'email': case 'phone': case 'checkbox':
-        // Always clear _questionText and strip any HTML if present
-        cell._questionText = '';
-        updateSimpleQuestionCell(cell);
-        break;
-      case 'text2':
-        cell._questionText = '';
-        updateText2Cell(cell);
-        break;
-      case 'multipleTextboxes':
-        cell._questionText = '';
-        cell._textboxes = [{ nameId:'', placeholder:'Enter value' }];
-        updateMultipleTextboxesCell(cell);
-        break;
-      case 'multipleDropdownType':
-        cell._questionText = '';
-        cell._twoNumbers = { first:'0', second:'0' };
-        cell._textboxes = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
-        updatemultipleDropdownTypeCell(cell);
-        break;
-      default:
-        cell._questionText = '';
-        updateSimpleQuestionCell(cell);
-    }
-    refreshNodeIdFromLabel(cell);
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  refreshAllCells();
-}
+
 
 // Patch updateMultipleTextboxesCell to use <input> for title
 function updateMultipleTextboxesCell(cell) {
@@ -4123,13 +4262,23 @@ function previewForm() {
       guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
     }
   }
+  
   if (guiJsonStr) {
+    // Encode the JSON for URL transmission
+    const encodedJson = encodeURIComponent(guiJsonStr);
+    const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
+    
+    // Still copy to clipboard for manual use if needed
     navigator.clipboard.writeText(guiJsonStr).then(() => {
       // Optionally, show a message: copied!
     });
+    
+    // Open the GUI preview in a new tab with the JSON in the URL
+    window.open(guiUrl, '_blank');
+  } else {
+    // Fallback to regular GUI if no JSON generated
+    window.open('FormWiz%20GUI/gui.html', '_blank');
   }
-  // Open the GUI preview in a new tab
-  window.open('FormWiz%20GUI/gui.html', '_blank');
 }
 
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE
@@ -4215,6 +4364,7 @@ function autosaveFlowchartToLocalStorage() {
       
       // PDF node properties
       if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+      if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
       
       // Notes node properties
       if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
@@ -4557,7 +4707,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfUrl'
+      '_checklistText', '_alertText', '_pdfUrl', '_priceId'
       ];
       
       safeProperties.forEach(prop => {
@@ -4733,7 +4883,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4845,7 +4995,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -5077,12 +5227,36 @@ function updatePdfNodeCell(cell) {
   if (!cell._pdfUrl) {
     cell._pdfUrl = "";
   }
+  
+  // Ensure _priceId property exists
+  if (!cell._priceId) {
+    cell._priceId = "";
+  }
+  
+  // Ensure _characterLimit property exists
+  if (!cell._characterLimit) {
+    cell._characterLimit = "";
+  }
 
-  // Render PDF input field
-  const html = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
-      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
-        <label style="font-size:12px;width:100%;text-align:left;">PDF:<input type="text" value="${escapeAttr(cell._pdfUrl)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfNodeField('${cell.id}',this.value)" /></label>
+  // Check if this PDF node is connected to a Big Paragraph node
+  const isConnectedToBigParagraph = checkIfPdfConnectedToBigParagraph(cell);
+  
+  // Render PDF input field with Price ID field and optional Character Limit field
+  let html = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:2px;">
+        <label style="font-size:11px;width:100%;text-align:left;">PDF:<input type="text" value="${escapeAttr(cell._pdfUrl)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfNodeField('${cell.id}',this.value)" /></label>
+        <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
+  `;
+  
+  // Add Character Limit field if connected to Big Paragraph
+  if (isConnectedToBigParagraph) {
+    html += `
+        <label style="font-size:11px;width:100%;text-align:left;">Character limit:<input type="number" value="${escapeAttr(cell._characterLimit)}" style="width:120px;margin-left:4px;" min="1" max="10000" onblur="window.updatePdfCharacterLimitField('${cell.id}',this.value)" /></label>
+    `;
+  }
+  
+  html += `
       </div>
     </div>
   `;
@@ -5103,6 +5277,43 @@ window.updatePdfNodeField = function(cellId, value) {
   cell._pdfUrl = value;
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
+
+// Handler for updating PDF Price ID field
+window.updatePdfPriceIdField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isPdfNode(cell)) return;
+  cell._priceId = value;
+  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+};
+
+// Handler for updating PDF Character Limit field
+window.updatePdfCharacterLimitField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isPdfNode(cell)) return;
+  cell._characterLimit = value;
+  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+};
+
+// Function to check if a PDF node is connected to a Big Paragraph node
+function checkIfPdfConnectedToBigParagraph(pdfCell) {
+  if (!pdfCell || !isPdfNode(pdfCell)) return false;
+  
+  // Get all incoming edges to this PDF node
+  const incomingEdges = graph.getIncomingEdges(pdfCell) || [];
+  
+  for (const edge of incomingEdges) {
+    const sourceCell = edge.source;
+    if (sourceCell && isQuestion(sourceCell)) {
+      // Check if the source question is a Big Paragraph
+      const questionType = getQuestionType(sourceCell);
+      if (questionType === "bigParagraph") {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
 
 // Notes Node functions
 function isNotesNode(cell) {
@@ -5199,12 +5410,12 @@ function updateAlertNodeCell(cell) {
     cell._alertText = "Alert message";
   }
 
-  // Create the alert node display with bold black and red checkered border styling
+  // Create the alert node display with editable input field
   const alertText = cell._alertText;
   
   let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
   htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ ALERT</div>';
-  htmlContent += `<div style="color: #333; font-size: 14px; font-weight: bold;">${escapeHtml(alertText)}</div>`;
+  htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
   htmlContent += '</div>';
   
   graph.getModel().beginUpdate();
@@ -5221,7 +5432,7 @@ window.updateAlertNodeField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isAlertNode(cell)) return;
   cell._alertText = value;
-  updateAlertNodeCell(cell);
+  // Don't call updateAlertNodeCell here to avoid re-rendering while typing
 };
 
 /**************************************************

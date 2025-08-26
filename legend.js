@@ -13,7 +13,7 @@ function getDefaultSectionColor(sectionNum) {
 
 /**
  * Sets the section number for a cell and updates its style.
- * Also handles propagating section changes to connected cells.
+ * Also handles propagating section changes to connected cells recursively down the entire chain.
  */
 function setSection(cell, sectionNum) {
   let style = cell.style || "";
@@ -28,19 +28,9 @@ function setSection(cell, sectionNum) {
     updateSectionLegend();
   }
 
-  // If this is a question node, update all connected option nodes
+  // If this is a question node, cascade the section change down the entire chain
   if (isQuestion(cell)) {
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    outgoingEdges.forEach(edge => {
-      const targetCell = edge.target;
-      if (targetCell && isOptions(targetCell)) {
-        // Recursively set section without triggering infinite loop
-        let targetStyle = targetCell.style || "";
-        targetStyle = targetStyle.replace(/section=[^;]+/, "");
-        targetStyle += `;section=${sectionNum};`;
-        graph.getModel().setStyle(targetCell, targetStyle);
-      }
-    });
+    cascadeSectionChange(cell, sectionNum, new Set());
   }
   // If this is an option node, check if it's connected to a question and match its section
   else if (isOptions(cell)) {
@@ -59,6 +49,40 @@ function setSection(cell, sectionNum) {
       }
     }
   }
+}
+
+/**
+ * Recursively cascades section changes down the entire chain of connected nodes.
+ * This function traverses all connected descendants and updates their sections.
+ */
+function cascadeSectionChange(startCell, newSectionNum, visitedCells) {
+  // Prevent infinite loops by tracking visited cells
+  if (visitedCells.has(startCell.id)) {
+    return;
+  }
+  visitedCells.add(startCell.id);
+
+  // Get all outgoing edges from the current cell
+  const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+  
+  outgoingEdges.forEach(edge => {
+    const targetCell = edge.target;
+    if (!targetCell || visitedCells.has(targetCell.id)) {
+      return;
+    }
+
+    // Only update cells that are part of the flowchart (have styles)
+    if (targetCell.style) {
+      // Update the target cell's section
+      let targetStyle = targetCell.style || "";
+      targetStyle = targetStyle.replace(/section=[^;]+/, "");
+      targetStyle += `;section=${newSectionNum};`;
+      graph.getModel().setStyle(targetCell, targetStyle);
+    }
+
+    // Recursively cascade to all descendants of this target cell
+    cascadeSectionChange(targetCell, newSectionNum, visitedCells);
+  });
 }
 
 /**
@@ -230,11 +254,12 @@ function updateSectionLegend() {
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
   sections.forEach(sec => {
     innerHTML += `
-      <div class="section-item" data-section="${sec}">
+      <div class="section-item" data-section="${sec}" draggable="true">
         <div class="section-header">
-        <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
-        <span class="section-number">${sec}:</span>
-        <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
+          <span class="drag-handle">⋮⋮</span>
+          <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
+          <span class="section-number">${sec}:</span>
+          <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
         </div>
         <div class="section-buttons">
           <button class="delete-section-btn" onclick="deleteSection('${sec}')">Delete</button>
@@ -320,6 +345,9 @@ function updateSectionLegend() {
   
   // Update group dropdowns with new section names
   updateGroupDropdowns();
+  
+  // Add drag and drop event listeners
+  addDragAndDropListeners();
 }
 
 /**
@@ -362,4 +390,115 @@ document.addEventListener('DOMContentLoaded', () => {
       refreshAllCells();
     }
   });
-}); 
+});
+
+/**
+ * Adds drag and drop event listeners to section items
+ */
+function addDragAndDropListeners() {
+  const sectionItems = document.querySelectorAll('.section-item');
+  
+  sectionItems.forEach(item => {
+    // Drag start
+    item.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', item.getAttribute('data-section'));
+      item.classList.add('dragging');
+    });
+    
+    // Drag end
+    item.addEventListener('dragend', (e) => {
+      item.classList.remove('dragging');
+      document.querySelectorAll('.section-item').forEach(si => {
+        si.classList.remove('drag-over');
+      });
+    });
+    
+    // Drag over
+    item.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const draggingItem = document.querySelector('.dragging');
+      if (draggingItem && draggingItem !== item) {
+        item.classList.add('drag-over');
+      }
+    });
+    
+    // Drag leave
+    item.addEventListener('dragleave', (e) => {
+      item.classList.remove('drag-over');
+    });
+    
+    // Drop
+    item.addEventListener('drop', (e) => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      
+      const draggedSection = e.dataTransfer.getData('text/plain');
+      const targetSection = item.getAttribute('data-section');
+      
+      if (draggedSection !== targetSection) {
+        reorderSections(draggedSection, targetSection);
+      }
+    });
+  });
+}
+
+/**
+ * Reorders sections by moving the dragged section to the target position
+ * and updating all node section numbers accordingly
+ */
+function reorderSections(draggedSection, targetSection) {
+  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
+  const draggedIndex = sections.indexOf(draggedSection);
+  const targetIndex = sections.indexOf(targetSection);
+  
+  if (draggedIndex === -1 || targetIndex === -1) return;
+  
+  // Create new section order
+  const newSections = [...sections];
+  const [movedSection] = newSections.splice(draggedIndex, 1);
+  newSections.splice(targetIndex, 0, movedSection);
+  
+  // Create mapping from old section numbers to new section numbers
+  const sectionMapping = {};
+  newSections.forEach((section, index) => {
+    sectionMapping[section] = (index + 1).toString();
+  });
+  
+  // Start graph update
+  graph.getModel().beginUpdate();
+  try {
+    // Update all cells with new section numbers
+    const parent = graph.getDefaultParent();
+    const vertices = graph.getChildVertices(parent);
+    
+    vertices.forEach(cell => {
+      const currentSection = getSection(cell);
+      if (sectionMapping[currentSection]) {
+        const newSectionNum = sectionMapping[currentSection];
+        let style = cell.style || "";
+        style = style.replace(/section=[^;]+/, "");
+        style += `;section=${newSectionNum};`;
+        graph.getModel().setStyle(cell, style);
+      }
+    });
+    
+    // Update sectionPrefs with new section numbers
+    const newSectionPrefs = {};
+    newSections.forEach((section, index) => {
+      const newSectionNum = (index + 1).toString();
+      newSectionPrefs[newSectionNum] = {
+        ...sectionPrefs[section],
+        borderColor: getDefaultSectionColor(index + 1)
+      };
+    });
+    
+    sectionPrefs = newSectionPrefs;
+    
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  // Update the legend and refresh cells
+  updateSectionLegend();
+  refreshAllCells();
+} 
