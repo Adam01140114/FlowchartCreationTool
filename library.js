@@ -676,12 +676,14 @@ window.exportGuiJson = function(download = true) {
     // --- END PATCH ---
     
     // --- PATCH: Add PDF Logic detection ---
-    // Check if this question is connected to a PDF node
+    // Check if this question is connected to a PDF node (directly or through options)
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
+        
+        // Check for direct connection to PDF node
         if (targetCell && isPdfNode(targetCell)) {
-          // This question is connected to a PDF node
+          // This question is directly connected to a PDF node
           question.pdfLogic.enabled = true;
           question.pdfLogic.pdfName = targetCell._pdfUrl || "";
           question.pdfLogic.stripePriceId = targetCell._priceId || "";
@@ -691,8 +693,51 @@ window.exportGuiJson = function(download = true) {
             question.pdfLogic.conditions = [{
               characterLimit: parseInt(targetCell._characterLimit) || 0
             }];
+          } else {
+            // For regular questions, use the same logic conditions as the question logic
+            if (directParentCondition) {
+              if (Array.isArray(directParentCondition)) {
+                question.pdfLogic.conditions = directParentCondition;
+              } else {
+                question.pdfLogic.conditions = [directParentCondition];
+              }
+            }
           }
           break; // Only process the first PDF connection
+        }
+        
+        // Check for connection through options
+        if (targetCell && isOptions(targetCell)) {
+          // Check if this option leads to a PDF node
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const pdfCell = optionEdge.target;
+              if (pdfCell && isPdfNode(pdfCell)) {
+                // This question's option leads to a PDF node
+                question.pdfLogic.enabled = true;
+                question.pdfLogic.pdfName = pdfCell._pdfUrl || "";
+                question.pdfLogic.stripePriceId = pdfCell._priceId || "";
+                
+                // Extract the option text
+                let optionText = targetCell.value || "";
+                // Clean HTML from option text
+                if (optionText) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = optionText;
+                  optionText = temp.textContent || temp.innerText || optionText;
+                  optionText = optionText.trim();
+                }
+                
+                // Set the conditions based on the option
+                question.pdfLogic.conditions = [{
+                  prevQuestion: String(cell._questionId || ""),
+                  prevAnswer: optionText
+                }];
+                break; // Only process the first PDF connection
+              }
+            }
+          }
         }
       }
     }

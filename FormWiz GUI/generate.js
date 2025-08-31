@@ -163,12 +163,107 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "        flex-shrink: 0;",
     "      }",
     "      ",
-    "      /* Form validation styles */",
-    "      .form-field-required {",
-    "        border-color: #e74c3c !important;",
-    "        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;",
+    "      /* Beautiful text input styling to match checkboxes */",
+    "      .text-input-container {",
+    "        display: block;",
+    "        margin: 8px auto;",
+    "        width: 80%;",
+    "        max-width: 400px;",
     "      }",
     "      ",
+    "      .text-input-container input[type=\"text\"],",
+    "      .text-input-container input[type=\"email\"],",
+    "      .text-input-container input[type=\"tel\"],",
+    "      .text-input-container input[type=\"number\"],",
+    "      .text-input-container textarea {",
+    "        width: 100%;",
+    "        padding: 12px 16px;",
+    "        border: 1px solid #d1d1d6;",
+    "        border-radius: 8px;",
+    "        background-color: #ffffff;",
+    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
+    "        transition: all 0.3s ease;",
+    "        font-size: 16px;",
+    "        color: #333;",
+    "        font-family: 'Montserrat', sans-serif;",
+    "        box-sizing: border-box;",
+    "      }",
+    "      ",
+    "      .text-input-container input[type=\"text\"]:focus,",
+    "      .text-input-container input[type=\"email\"]:focus,",
+    "      .text-input-container input[type=\"tel\"]:focus,",
+    "      .text-input-container input[type=\"number\"]:focus,",
+    "      .text-input-container textarea:focus {",
+    "        outline: none;",
+    "        border-color: #0051a6;",
+    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
+    "        background-color: #f8fbff;",
+    "        transform: translateY(-1px);",
+    "      }",
+    "      ",
+    "      .text-input-container input[type=\"text\"]:hover,",
+    "      .text-input-container input[type=\"email\"]:hover,",
+    "      .text-input-container input[type=\"tel\"]:hover,",
+    "      .text-input-container input[type=\"number\"]:hover,",
+    "      .text-input-container textarea:hover {",
+    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
+    "        transform: translateY(-1px);",
+    "      }",
+    "      ",
+    "      /* Beautiful date input styling */",
+    "      .date-input-container {",
+    "        display: block;",
+    "        margin: 8px auto;",
+    "        width: 80%;",
+    "        max-width: 400px;",
+    "        position: relative;",
+    "      }",
+    "      ",
+    "      .date-input-container input[type=\"date\"] {",
+    "        width: 100%;",
+    "        padding: 12px 16px;",
+    "        border: 1px solid #d1d1d6;",
+    "        border-radius: 8px;",
+    "        background-color: #ffffff;",
+    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
+    "        transition: all 0.3s ease;",
+    "        font-size: 16px;",
+    "        color: #333;",
+    "        font-family: 'Montserrat', sans-serif;",
+    "        box-sizing: border-box;",
+    "        cursor: pointer;",
+    "      }",
+    "      ",
+    "      .date-input-container input[type=\"date\"]:focus {",
+    "        outline: none;",
+    "        border-color: #0051a6;",
+    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
+    "        background-color: #f8fbff;",
+    "        transform: translateY(-1px);",
+    "      }",
+    "      ",
+    "      .date-input-container input[type=\"date\"]:hover {",
+    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
+    "        transform: translateY(-1px);",
+    "      }",
+    "      ",
+    "      /* Custom date picker icon */",
+    "      .date-input-container::after {",
+    "        content: \"📅\";",
+    "        position: absolute;",
+    "        right: 16px;",
+    "        top: 50%;",
+    "        transform: translateY(-50%);",
+    "        pointer-events: none;",
+    "        font-size: 18px;",
+    "        opacity: 0.6;",
+    "      }",
+    "      ",
+    "      .date-input-container input[type=\"date\"]:focus + ::after {",
+    "        opacity: 1;",
+    "      }",
+    "      ",
+    "      /* Form validation styles */",
     "      .validation-error {",
     "        color: #e74c3c;",
     "        font-size: 14px;",
@@ -180,27 +275,6 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "        background: #bdc3c7 !important;",
     "        cursor: not-allowed !important;",
     "        opacity: 0.6;",
-    "      }",
-    "      /* Test Mode Visual Indicators */",
-    "      .test-mode-active .question-container {",
-    "        position: relative;",
-    "        cursor: context-menu;",
-    "      }",
-    "      .test-mode-active .question-container::before {",
-    "        content: \"🔍 Test Mode - Right-click for ID\";",
-    "        position: absolute;",
-    "        top: -25px;",
-    "        right: 0;",
-    "        background: #2980b9;",
-    "        color: white;",
-    "        padding: 2px 8px;",
-    "        border-radius: 4px;",
-    "        font-size: 11px;",
-    "        opacity: 0.8;",
-    "        pointer-events: none;",
-    "      }",
-    "      .test-mode-active .question-container:hover::before {",
-    "        opacity: 1;",
     "      }",
     "      ",
     "      /* Header and Navigation Styles */",
@@ -967,14 +1041,95 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "",
     "<!-- Firebase includes -->",
     '<script src="https://js.stripe.com/v3/"></script>',
-    ...(isTestMode ? [] : [
-      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
-      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
-      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
-      '<script src="cart.js"></script>'
-    ]),
+    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
+    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
+    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+    '<script src="cart.js"></script>',
     "",
     '<script>',
+    '// Firebase Configuration',
+    'const firebaseConfig = {',
+    '    apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",',
+    '    authDomain: "formwiz-3f4fd.firebaseapp.com",',
+    '    projectId: "formwiz-3f4fd",',
+    '    storageBucket: "formwiz-3f4fd.firebasestorage.app",',
+    '    messagingSenderId: "404259212529",',
+    '    appId: "1:404259212529:web:15a33bce82383b21cfed50",',
+    '    measurementId: "G-P07YEN0HPD"',
+    '};',
+    '',
+    '// Initialize Firebase',
+    'if (typeof firebase !== "undefined" && !firebase.apps.length) {',
+    '    firebase.initializeApp(firebaseConfig);',
+    '}',
+    'const auth = firebase.auth();',
+    '',
+    '// Auth state management',
+    'if (typeof firebase !== "undefined" && firebase.apps.length > 0) {',
+    '    auth.onAuthStateChanged(function(user) {',
+    '        isUserLoggedIn = !!user;',
+    '        userId = user ? user.uid : null;',
+    '        updateAuthButtons(user);',
+    '        updateCartCountBadge();',
+    '    });',
+    '} else {',
+    '    // Fallback for when Firebase is not available',
+    '    console.log("Firebase not available, using fallback authentication");',
+    '}',
+    '',
+    '// Function to update button display based on auth state',
+    'function updateAuthButtons(user) {',
+    '    const signInBtn = document.getElementById("sign-in-btn");',
+    '    const logoutBtn = document.getElementById("logout-btn");',
+    '    ',
+    '    if (user) {',
+    '        if (signInBtn) signInBtn.style.display = "none";',
+    '        if (logoutBtn) logoutBtn.style.display = "inline-block";',
+    '    } else {',
+    '        if (signInBtn) signInBtn.style.display = "inline-block";',
+    '        if (logoutBtn) logoutBtn.style.display = "none";',
+    '    }',
+    '}',
+    '',
+    '// Update cart count badge in header',
+    'function updateCartCountBadge() {',
+    '    const cartCountElement = document.getElementById("cart-count-badge");',
+    '    if (cartCountElement) {',
+    '        let count = 0;',
+    '        ',
+    '        // Try to get count from getCartCount function first',
+    '        if (typeof getCartCount === "function") {',
+    '            count = getCartCount();',
+    '        } else {',
+    '            // Fallback to localStorage',
+    '            try {',
+    '                const cartData = localStorage.getItem("formwiz_cart");',
+    '                if (cartData) {',
+    '                    const cart = JSON.parse(cartData);',
+    '                    count = Array.isArray(cart) ? cart.length : 0;',
+    '                }',
+    '            } catch (e) {',
+    '                count = 0;',
+    '            }',
+    '        }',
+    '        ',
+    '        // Always update the text content, even if count is 0',
+    '        cartCountElement.textContent = count;',
+    '        ',
+    '        if (count > 0) {',
+    '            cartCountElement.style.display = "flex";',
+    '        } else {',
+    '            cartCountElement.style.display = "none";',
+    '        }',
+    '    }',
+    '}',
+    '',
+    '// Initialize cart count badge on page load',
+    'document.addEventListener("DOMContentLoaded", function() {',
+    '    updateCartCountBadge();',
+    '    // Update cart count every 5 seconds',
+    '    setInterval(updateCartCountBadge, 5000);',
+    '});',
     '</script>',
     "",
     '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
@@ -1226,9 +1381,9 @@ questionSlugMap[questionId] = slug;
       }
 
       // Start the question container
-      formHTML += `<div id="question-container-${questionId}"${
-        logicEnabled ? ' class="hidden"' : ""
-      }>`;
+      formHTML += `<div id="question-container-${questionId}" class="question-container${
+        logicEnabled ? ' hidden' : ""
+      }">`;
       
       // Check if info box is enabled
       const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
@@ -1268,7 +1423,7 @@ questionSlugMap[questionId] = slug;
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
         const placeholder = phEl && phEl.value ? phEl.value : "";
         questionNameIds[questionId] = nameId;
-        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"><br>`;
+        formHTML += `<div class="text-input-container"><input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"></div>`;
       } else if (questionType === "bigParagraph") {
         const nmEl2 = qBlock.querySelector("#textboxName" + questionId);
         const phEl2 = qBlock.querySelector("#textboxPlaceholder" + questionId);
@@ -1323,7 +1478,7 @@ questionSlugMap[questionId] = slug;
             </script>
           `;
         } else {
-        formHTML += `<textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea><br>`;
+        formHTML += `<div class="text-input-container"><textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea></div>`;
         }
       } else if (questionType === "money") {
         const mnNmEl = qBlock.querySelector("#textboxName" + questionId);
@@ -1332,15 +1487,12 @@ questionSlugMap[questionId] = slug;
           mnNmEl && mnNmEl.value ? mnNmEl.value : "answer" + questionId;
         const mnPh = mnPhEl && mnPhEl.value ? mnPhEl.value : "Enter amount";
         questionNameIds[questionId] = mnName;
-        formHTML += `<input type="number" id="${mnName}" name="${mnName}" min="0" step="0.01" placeholder="${mnPh}"><br>`;
+        formHTML += `<div class="text-input-container"><input type="number" id="${mnName}" name="${mnName}" min="0" step="0.01" placeholder="${mnPh}"></div>`;
       } else if (questionType === "date") {
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
         questionNameIds[questionId] = nameId;
-        formHTML += `
-          <div class="date-container">
-            <input type="date" id="${nameId}" name="${nameId}" class="date-input">
-          </div><br>`;
+        formHTML += `<div class="date-input-container"><input type="date" id="${nameId}" name="${nameId}"></div>`;
       } else if (questionType === "dateRange") {
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
@@ -1348,17 +1500,17 @@ questionSlugMap[questionId] = slug;
         
         // Create two date inputs with IDs based on the slug (nameId_1 and nameId_2)
         formHTML += `
-          <div class="date-range-container">
-            <div class="date-input-group">
-              <label for="${nameId}_1">Start Date</label>
-              <input type="date" id="${nameId}_1" name="${nameId}_1" class="date-input start-date">
+          <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 8px auto; width: 80%; max-width: 400px;">
+            <div class="date-input-container" style="flex: 1;">
+              <label for="${nameId}_1" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Start Date</label>
+              <input type="date" id="${nameId}_1" name="${nameId}_1">
             </div>
-            <div class="date-range-separator">to</div>
-            <div class="date-input-group">
-              <label for="${nameId}_2">End Date</label>
-              <input type="date" id="${nameId}_2" name="${nameId}_2" class="date-input end-date">
+            <div style="font-weight: 600; color: #666; margin: 0 10px;">to</div>
+            <div class="date-input-container" style="flex: 1;">
+              <label for="${nameId}_2" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">End Date</label>
+              <input type="date" id="${nameId}_2" name="${nameId}_2">
             </div>
-          </div><br>
+          </div>
           <script>
             // Add validation for date range (end date >= start date)
             document.addEventListener('DOMContentLoaded', function() {
@@ -1391,53 +1543,14 @@ questionSlugMap[questionId] = slug;
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
         const placeholder = phEl && phEl.value ? phEl.value : "example@domain.com";
         questionNameIds[questionId] = nameId;
-        formHTML += `
-          <div class="email-input-container">
-            <input type="email" id="${nameId}" name="${nameId}" 
-                   placeholder="${placeholder}" 
-                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-                   class="email-input">
-            <div class="email-validation-icon"></div>
-          </div><br>
-          <script>
-            // Add validation feedback for email input
-            document.addEventListener('DOMContentLoaded', function() {
-              const emailInput = document.getElementById('${nameId}');
-              if (emailInput) {
-                emailInput.addEventListener('blur', function() {
-                  const isValid = emailInput.checkValidity();
-                  const container = emailInput.closest('.email-input-container');
-                  if (container) {
-                    if (emailInput.value === '') {
-                      container.classList.remove('valid', 'invalid');
-                    } else {
-                      container.classList.toggle('valid', isValid);
-                      container.classList.toggle('invalid', !isValid);
-                    }
-                  }
-                });
-                
-                emailInput.addEventListener('input', function() {
-                  const container = emailInput.closest('.email-input-container');
-                  if (container && (container.classList.contains('valid') || container.classList.contains('invalid'))) {
-                    const isValid = emailInput.checkValidity();
-                    container.classList.toggle('valid', isValid && emailInput.value !== '');
-                    container.classList.toggle('invalid', !isValid && emailInput.value !== '');
-                  }
-                });
-              }
-            });
-          </script>`;
+        formHTML += `<div class="text-input-container"><input type="email" id="${nameId}" name="${nameId}" placeholder="${placeholder}" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"></div>`;
       } else if (questionType === "phone") {
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
         const placeholder = phEl && phEl.value ? phEl.value : "(123) 456-7890";
         questionNameIds[questionId] = nameId;
-        formHTML += `
-          <div class="phone-input-container">
-            <input type="tel" id="${nameId}" name="${nameId}" placeholder="${placeholder}" class="phone-input" maxlength="14">
-          </div><br>`;
+        formHTML += `<div class="text-input-container"><input type="tel" id="${nameId}" name="${nameId}" placeholder="${placeholder}" maxlength="14"></div>`;
       } else if (questionType === "radio") {
         const radNameEl = qBlock.querySelector("#textboxName" + questionId);
         const radName =
@@ -1672,7 +1785,7 @@ formHTML += `</div><br></div>`;
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
-          formHTML += `<input type="text" id="${nmVal}" name="${nmVal}" placeholder="${phVal}" style="text-align:center;"><br>`;
+          formHTML += `<div class="text-input-container"><input type="text" id="${nmVal}" name="${nmVal}" placeholder="${phVal}"></div>`;
         }
         // Render amounts
         for (let ab = 0; ab < amountInputs.length; ab++) {
@@ -1694,7 +1807,7 @@ formHTML += `</div><br></div>`;
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
-          formHTML += `<input type="number" id="${nmVal}" name="${nmVal}" placeholder="${phVal}" style="text-align:center;" pattern="[0-9]*" inputmode="numeric"><br>`;
+          formHTML += `<div class="text-input-container"><input type="number" id="${nmVal}" name="${nmVal}" placeholder="${phVal}" pattern="[0-9]*" inputmode="numeric"></div>`;
         }
       } else if (questionType === "numberedDropdown") {
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
@@ -2258,8 +2371,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   } else {
     // In test mode, set user as logged in by default
     formHTML += `
-      let isUserLoggedIn = true;
-      let userId = 'test-user';
+      let isUserLoggedIn = false;
+      let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId");
     `;
@@ -2308,16 +2421,22 @@ formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditional
   // 3) Append the logicScriptBuffer
   formHTML += logicScriptBuffer + "\n";
 
-  // Add alert functions if any alert logic is enabled
-  if (alertLogics.length > 0) {
-    formHTML += `
+  // Add alert functions (always available for validation popups)
+  formHTML += `
 // Alert Logic Functions
 function showAlert(message) {
     const alertOverlay = document.getElementById('alertOverlay');
     const alertMessage = document.getElementById('alertMessage');
     
     if (alertOverlay && alertMessage) {
-        alertMessage.textContent = message;
+        // Check if this is a validation popup (HTML content) or regular alert (text)
+        if (message.includes('<div')) {
+            // This is HTML content (validation popup)
+            alertMessage.innerHTML = message;
+        } else {
+            // This is a regular text alert
+            alertMessage.textContent = message;
+        }
         alertOverlay.style.display = 'flex';
     }
 }
@@ -2330,9 +2449,34 @@ function closeAlert() {
 }
 
 function exitForm() {
-    window.location.reload();
+    // Check if this is a validation popup or regular alert
+    const alertMessage = document.getElementById('alertMessage');
+    if (alertMessage && alertMessage.innerHTML.includes('Please Complete All Questions')) {
+        // This is a validation popup - go back to forms page
+        if (confirm('Are you sure you want to exit? Your progress will be saved.')) {
+            window.location.href = 'forms.html';
+        }
+    } else {
+        // This is a regular alert - reload the page
+        window.location.reload();
+    }
 }
 
+// Show validation popup when user tries to proceed without answering all questions
+function showValidationPopup() {
+    const validationMessage = 
+        '<div style="text-align: center;">' +
+            '<div style="font-size: 2em; margin-bottom: 15px;">⚠️</div>' +
+            '<div style="font-weight: 700; margin-bottom: 10px; color: #e74c3c;">Please Complete All Questions</div>' +
+            '<div>You need to fill in all the questions on this page before you can proceed to the next section.</div>' +
+        '</div>';
+    showAlert(validationMessage);
+}
+`;
+
+  // Add alert logic functions only if alert logics are enabled
+  if (alertLogics.length > 0) {
+    formHTML += `
 function checkAlertLogic(changedElement) {
     if (!alertLogics || alertLogics.length === 0) return;
     
@@ -2591,113 +2735,19 @@ window.getCartCount = function() {
 };
 `;
 
-  // Add test mode functionality
-  if (isTestMode) {
-    formHTML += `
-// Test Mode Features
-function handleQuestionRightClick(event, questionId) {
-    event.preventDefault();
-    
-    // Get the question ID
-    let questionIdText = '';
-    let elementType = '';
-    
-    // Try to find the question element and its ID
-    const questionElement = event.target.closest('[id]');
-    if (questionElement) {
-        questionIdText = questionElement.id;
-        elementType = questionElement.tagName.toLowerCase();
-        
-        // If it's an input, select, or textarea, also get its name attribute
-        if (['input', 'select', 'textarea'].includes(elementType)) {
-            const nameAttr = questionElement.getAttribute('name');
-            if (nameAttr && nameAttr !== questionIdText) {
-                questionIdText += ' (name="' + nameAttr + '")';
-            }
-        }
-    } else {
-        // Fallback to the question number
-        questionIdText = 'answer' + questionId;
-    }
-    
-    // Show alert with the ID
-    alert('Element ID: ' + questionIdText + '\\nElement Type: ' + elementType + '\\n\\nThis ID has been copied to your clipboard!');
-    
-    // Copy to clipboard (just the ID part, not the name attribute)
-    const cleanId = questionIdText.split(' (name=')[0];
-    
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(cleanId).then(() => {
-            console.log('Element ID copied to clipboard:', cleanId);
-        }).catch(err => {
-            console.error('Failed to copy to clipboard:', err);
-        });
-    } else {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = cleanId;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            console.log('Element ID copied to clipboard:', cleanId);
-        } catch (err) {
-            console.error('Failed to copy to clipboard:', err);
-        }
-        document.body.removeChild(textArea);
-    }
-}
 
-// Add right-click event listeners to all questions
-document.addEventListener('DOMContentLoaded', function() {
-    // Add test mode class to body
-    document.body.classList.add('test-mode-active');
-    
-    // Function to add right-click listeners to elements
-    function addRightClickListeners() {
-        const elements = document.querySelectorAll('.question-container, [id^="answer"], [id^="question"], input, select, textarea, label');
-        elements.forEach(element => {
-            // Remove existing listener to prevent duplicates
-            element.removeEventListener('contextmenu', handleRightClick);
-            // Add new listener
-            element.addEventListener('contextmenu', handleRightClick);
-        });
-    }
-    
-    function handleRightClick(event) {
-        // Extract element ID
-        let elementId = '';
-        if (this.id) {
-            elementId = this.id;
-        } else {
-            // Try to find a parent with an ID
-            const parentWithId = this.closest('[id]');
-            if (parentWithId) {
-                elementId = parentWithId.id;
-            }
-        }
-        
-        if (elementId) {
-            handleQuestionRightClick(event, elementId);
-        }
-    }
-    
-    // Add listeners initially
-    addRightClickListeners();
-    
-    // Re-add listeners after dynamic content is loaded (for multi-step forms)
-    setTimeout(addRightClickListeners, 1000);
-});
+
+  // Always define checklist variables (needed for showThankYouMessage function)
+  formHTML += `
+// Checklist Variables (always defined)
+let userChecklist = [];
+let staticChecklistItems = [];
 `;
-  }
 
   // Add checklist functionality if any checklist logic is enabled
   if (checklistLogics.length > 0) {
     formHTML += `
 // Checklist Logic Functions
-let userChecklist = [];
-let staticChecklistItems = [];
-
 function checkChecklistLogic(changedElement) {
     if (!checklistLogics || checklistLogics.length === 0) return;
     
@@ -2903,24 +2953,67 @@ function updateCheckboxStyle(checkbox) {
 function validateAndProceed(sectionNumber) {
     if (validateCurrentSection(sectionNumber)) {
         handleNext(sectionNumber);
+    } else {
+        // Show validation popup when validation fails
+        showValidationPopup();
     }
+}
+
+// Show validation popup when user tries to proceed without answering all questions
+function showValidationPopup() {
+    const validationMessage = 
+        '<div style="text-align: center;">' +
+            '<div style="font-size: 2em; margin-bottom: 15px;">⚠️</div>' +
+            '<div style="font-weight: 700; margin-bottom: 10px; color: #e74c3c;">Please Complete All Questions</div>' +
+            '<div>You need to fill in all the questions on this page before you can proceed to the next section.</div>' +
+        '</div>';
+    showAlert(validationMessage);
+}
+
+// Global function to trigger visibility updates for dependent questions
+function triggerVisibilityUpdates() {
+    // Find all question containers and trigger their visibility logic
+    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
+    questionContainers.forEach(container => {
+        const questionId = container.id.replace('question-container-', '');
+        
+        // Find the question element that controls this container's visibility
+        const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                              document.getElementById('answer' + questionId);
+        
+        if (questionElement) {
+            // Trigger change event to update visibility
+            const event = new Event('change', { bubbles: true });
+            questionElement.dispatchEvent(event);
+        }
+    });
 }
 
 function validateCurrentSection(sectionNumber) {
     const section = document.getElementById('section' + sectionNumber);
     if (!section) return true;
     
-    const questions = section.querySelectorAll('.question-container');
+    // Only validate visible questions (not hidden ones)
+    const questions = section.querySelectorAll('.question-container:not(.hidden)');
     let isValid = true;
+    
+    console.log('Validating section', sectionNumber, 'with', questions.length, 'visible questions');
     
     questions.forEach(question => {
         const questionId = question.id.replace('question-container-', '');
         const questionType = getQuestionTypeFromContainer(question);
         
+        console.log('Validating question', questionId, 'of type', questionType);
+        
         if (!validateQuestion(question, questionType, questionId)) {
+            console.log('Question', questionId, 'failed validation');
             isValid = false;
+        } else {
+            console.log('Question', questionId, 'passed validation');
         }
     });
+    
+    console.log('Section validation result:', isValid);
     
     // Update next button state
     const nextButton = document.getElementById('next-button-' + sectionNumber);
@@ -2978,7 +3071,7 @@ function validateQuestion(questionContainer, questionType, questionId) {
     // Add visual feedback
     if (!isValid) {
         questionContainer.classList.add('form-field-required');
-        showValidationError(questionContainer, 'This field is required');
+        showValidationError(questionContainer, 'This field is required.');
     } else {
         questionContainer.classList.remove('form-field-required');
         hideValidationError(questionContainer);
@@ -2996,7 +3089,14 @@ function validateCheckboxQuestion(questionContainer) {
 function validateDropdownQuestion(questionContainer) {
     const select = questionContainer.querySelector('select');
     if (!select) return true;
-    return select.value && select.value.trim() !== '';
+    
+    // Debug logging
+    console.log('Validating dropdown:', select.id, 'Value:', select.value, 'Trimmed:', select.value.trim());
+    
+    // Check if the dropdown has a value and it's not the default empty/disabled option
+    const isValid = select.value && select.value.trim() !== '' && select.value !== 'Select an option';
+    console.log('Dropdown validation result:', isValid);
+    return isValid;
 }
 
 function validateTextQuestion(questionContainer) {
@@ -3049,6 +3149,13 @@ function addValidationListeners() {
 // Initialize validation when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     addValidationListeners();
+    
+    // Trigger visibility updates on DOM load to show dependent questions
+    setTimeout(() => {
+        if (typeof triggerVisibilityUpdates === 'function') {
+            triggerVisibilityUpdates();
+        }
+    }, 300);
     
     // Re-add listeners when sections change
     const observer = new MutationObserver(function(mutations) {
@@ -3328,6 +3435,13 @@ function setCurrentDate () {
 window.onload=function(){
     setCurrentDate();
     attachCalculationListeners();
+    
+    // Trigger visibility updates on page load to show dependent questions
+    setTimeout(() => {
+        if (typeof triggerVisibilityUpdates === 'function') {
+            triggerVisibilityUpdates();
+        }
+    }, 200);
 };
 
 function handleConditionalAlerts(){
@@ -4069,6 +4183,13 @@ if (typeof handleNext === 'function') {
                     const fields = getFormFields();
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
+                            // Check if this answer would trigger a jump to the end
+                            if (wouldTriggerJumpToEnd(el, data[el.name])) {
+                                // Don't autofill this answer - keep it as default
+                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
+                                return;
+                            }
+                            
                             if (el.type === 'checkbox' || el.type === 'radio') {
                                 el.checked = !!data[el.name];
                             } else {
@@ -4076,10 +4197,54 @@ if (typeof handleNext === 'function') {
                             }
                         }
                     });
+                    
+                    // After autofilling, trigger visibility updates for dependent questions
+                    setTimeout(() => {
+                        if (typeof triggerVisibilityUpdates === 'function') {
+                            triggerVisibilityUpdates();
+                        }
+                    }, 100);
                 }
             } catch (e) {
                 // ignore
             }
+        }
+        
+
+        
+        // Helper: check if an answer would trigger a jump to the end
+        function wouldTriggerJumpToEnd(element, answerValue) {
+            if (!jumpLogics || jumpLogics.length === 0) return false;
+            
+            // Find the question ID for this element
+            let questionId = null;
+            for (const [qId, nameId] of Object.entries(questionNameIds)) {
+                if (element.name === nameId || element.id === nameId) {
+                    questionId = qId;
+                    break;
+                }
+            }
+            
+            if (!questionId) return false;
+            
+            // Check if there's a jump logic for this question that would go to 'end'
+            const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId);
+            for (const jl of relevantJumps) {
+                if (jl.jumpTo.toLowerCase() === 'end') {
+                    // Check if the answer matches the jump condition
+                    if (jl.questionType === 'dropdown' || jl.questionType === 'radio' || jl.questionType === 'numberedDropdown') {
+                        if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
+                            return true;
+                        }
+                    } else if (jl.questionType === 'checkbox') {
+                        if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            return false;
         }
 
         // Helper: wipe answers
