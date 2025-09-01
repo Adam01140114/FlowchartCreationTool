@@ -2067,16 +2067,7 @@ keyHandler.bindControlKey(86, () => {
     hideContextMenu();
   });
   
-  // Settings menu event listeners
-  document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsMenu);
-  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-  document.getElementById('cancelSettingsBtn').addEventListener('click', hideSettingsMenu);
-  
-  // Load settings on startup
-  loadSettingsFromLocalStorage();
-  
-  // Initialize search functionality
-  initializeSearch();
+  // Settings and search are initialized in settings.js and search.js
   
   function placeNodeAtClickLocation(nodeType) {
     if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
@@ -5777,21 +5768,9 @@ function updateGroupDropdowns() {
 /**
  * Settings functionality
  */
-let currentEdgeStyle = 'curved'; // Default to curved
+/* currentEdgeStyle and showSettingsMenu moved to settings.js */
 
-// Show settings menu
-window.showSettingsMenu = function() {
-  const settingsMenu = document.getElementById('settingsMenu');
-  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
-  
-  // Set current value
-  edgeStyleToggle.value = currentEdgeStyle;
-  
-  // Show menu
-  settingsMenu.classList.add('show');
-};
-
-// Hide settings menu
+/* moved to settings.js
 function hideSettingsMenu() {
   const settingsMenu = document.getElementById('settingsMenu');
   settingsMenu.classList.remove('show');
@@ -5810,8 +5789,9 @@ function saveSettings() {
   
   hideSettingsMenu();
 }
+*/
 
-// Update edge style based on current setting
+/* moved to settings.js
 function updateEdgeStyle() {
   // Update graph default edge style
   if (currentEdgeStyle === 'curved') {
@@ -5871,7 +5851,6 @@ function updateEdgeStyle() {
   graph.refresh();
 }
 
-// Save settings to localStorage
 function saveSettingsToLocalStorage() {
   const settings = {
     edgeStyle: currentEdgeStyle
@@ -5879,7 +5858,6 @@ function saveSettingsToLocalStorage() {
   localStorage.setItem('flowchartSettings', JSON.stringify(settings));
 }
 
-// Load settings from localStorage
 function loadSettingsFromLocalStorage() {
   const settingsStr = localStorage.getItem('flowchartSettings');
   if (settingsStr) {
@@ -5894,254 +5872,12 @@ function loadSettingsFromLocalStorage() {
     }
   }
 }
+*/
 
-/**
- * Node Search Functionality
- */
-let searchTimeout = null;
-
-// Initialize search functionality
-function initializeSearch() {
-  const searchBox = document.getElementById('nodeSearchBox');
-  const clearBtn = document.getElementById('clearSearchBtn');
-  
-  if (searchBox) {
-    searchBox.addEventListener('input', function() {
-      const searchTerm = this.value.trim().toLowerCase();
-      
-      // Clear previous timeout
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-      
-      // Debounce the search to avoid excessive processing
-      searchTimeout = setTimeout(() => {
-        performNodeSearch(searchTerm);
-      }, 200); // Reduced from 300ms for better responsiveness
-      
-      // Show/hide clear button
-      if (searchTerm.length > 0) {
-        clearBtn.classList.add('show');
-      } else {
-        clearBtn.classList.remove('show');
-        clearSearch();
-      }
-    });
-    
-    // Handle Enter key to select first result
-    searchBox.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const searchTerm = this.value.trim().toLowerCase();
-        if (searchTerm.length > 0) {
-          selectFirstSearchResult(searchTerm);
-        }
-      }
-    });
-  }
-  
-  if (clearBtn) {
-    clearBtn.addEventListener('click', function() {
-      searchBox.value = '';
-      clearSearch();
-      clearBtn.classList.remove('show');
-      searchBox.focus();
-    });
-  }
-}
-
-// Cache for cell text to avoid repeated DOM operations
-const cellTextCache = new Map();
-let lastCacheClear = Date.now();
-
-// Clear cache periodically to prevent memory leaks
-function clearCellTextCache() {
-  const now = Date.now();
-  if (now - lastCacheClear > 30000) { // Clear every 30 seconds
-    cellTextCache.clear();
-    lastCacheClear = now;
-  }
-}
-
-// Get cell text with caching for performance
-function getCellText(cell) {
-  const cacheKey = `${cell.id}_${cell.value}_${cell._questionText}_${cell._subtitleText}_${cell._infoText}_${cell._notesText}_${cell._checklistText}_${cell._alertText}_${cell._calcTitle}`;
-  
-  if (cellTextCache.has(cacheKey)) {
-    return cellTextCache.get(cacheKey);
-  }
-  
-  let cellText = '';
-  
-  // Get text from different node types
-  if (isQuestion(cell)) {
-    cellText = cell._questionText || cell.value || '';
-  } else if (isOptions(cell)) {
-    cellText = cell.value || '';
-  } else if (isSubtitleNode(cell)) {
-    cellText = cell._subtitleText || cell.value || '';
-  } else if (isInfoNode(cell)) {
-    cellText = cell._infoText || cell.value || '';
-  } else if (isNotesNode(cell)) {
-    cellText = cell._notesText || cell.value || '';
-  } else if (isChecklistNode(cell)) {
-    cellText = cell._checklistText || cell.value || '';
-  } else if (isAlertNode(cell)) {
-    cellText = cell._alertText || cell.value || '';
-  } else if (isCalculationNode(cell)) {
-    cellText = cell._calcTitle || cell.value || '';
-  } else {
-    cellText = cell.value || '';
-  }
-  
-  // Clean HTML tags from text (only if needed)
-  if (cellText.includes('<')) {
-    const temp = document.createElement('div');
-    temp.innerHTML = cellText;
-    cellText = temp.textContent || temp.innerText || cellText;
-  }
-  
-  cellTextCache.set(cacheKey, cellText);
-  return cellText;
-}
-
-// Perform the actual search with optimizations
-function performNodeSearch(searchTerm) {
-  if (!searchTerm || searchTerm.length === 0) {
-    clearSearch();
-    return;
-  }
-  
-  // Clear cache periodically
-  clearCellTextCache();
-  
-  const vertices = graph.getChildVertices(graph.getDefaultParent());
-  const matchingCells = [];
-  const searchTermLower = searchTerm.toLowerCase();
-  
-  // Use for...of for better performance with large arrays
-  for (const cell of vertices) {
-    const cellText = getCellText(cell);
-    
-    // Check if search term is found in the text
-    if (cellText.toLowerCase().includes(searchTermLower)) {
-      matchingCells.push(cell);
-    }
-  }
-  
-  // Highlight matching cells
-  highlightSearchResults(matchingCells, searchTerm);
-}
-
-// Highlight search results
-function highlightSearchResults(matchingCells, searchTerm) {
-  // Clear existing selection first
-  graph.clearSelection();
-  
-  if (matchingCells.length === 0) {
-    return;
-  }
-  
-  // Use the same selection mechanism as section highlighting
-  graph.addSelectionCells(matchingCells);
-  
-  // Show search results count
-  showSearchResultsCount(matchingCells.length);
-  
-  // Center view on first result if there are results
-  if (matchingCells.length > 0) {
-    centerOnCell(matchingCells[0]);
-  }
-}
-
-// Clear search highlights
-function clearSearch() {
-  // Simply clear the selection - this will remove the neon green highlighting
-  graph.clearSelection();
-  
-  // Hide search results count
-  hideSearchResultsCount();
-}
-
-// Show search results count
-function showSearchResultsCount(count) {
-  let countElement = document.getElementById('searchResultsCount');
-  if (!countElement) {
-    countElement = document.createElement('div');
-    countElement.id = 'searchResultsCount';
-    countElement.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #007bff;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 14px;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    `;
-    document.body.appendChild(countElement);
-  }
-  
-  countElement.textContent = `${count} result${count !== 1 ? 's' : ''} found`;
-  countElement.style.display = 'block';
-}
-
-// Hide search results count
-function hideSearchResultsCount() {
-  const countElement = document.getElementById('searchResultsCount');
-  if (countElement) {
-    countElement.style.display = 'none';
-  }
-}
-
-// Center view on a specific cell with performance optimization
-function centerOnCell(cell) {
-  if (!cell || !cell.geometry) return;
-  
-  const centerX = cell.geometry.x + cell.geometry.width / 2;
-  const centerY = cell.geometry.y + cell.geometry.height / 2;
-  
-  const containerWidth = graph.container.clientWidth;
-  const containerHeight = graph.container.clientHeight;
-  const scale = graph.view.scale;
-  
-  const tx = (containerWidth / 2 - centerX * scale);
-  const ty = (containerHeight / 2 - centerY * scale);
-  
-  // Batch view updates for better performance
-  graph.view.setTranslate(tx / scale, ty / scale);
-  
-  // Use requestAnimationFrame for smooth scrolling
-  requestAnimationFrame(() => {
-    graph.view.refresh();
-  });
-}
-
-// Select first search result
-function selectFirstSearchResult(searchTerm) {
-  const vertices = graph.getChildVertices(graph.getDefaultParent());
-  const matchingCells = [];
-  const searchTermLower = searchTerm.toLowerCase();
-  
-  // Use for...of for better performance with large arrays
-  for (const cell of vertices) {
-    const cellText = getCellText(cell);
-    
-    if (cellText.toLowerCase().includes(searchTermLower)) {
-      matchingCells.push(cell);
-    }
-  }
-  
-  if (matchingCells.length > 0) {
-    // Select the first matching cell
-    graph.getSelectionModel().setCell(matchingCells[0]);
-    centerOnCell(matchingCells[0]);
-  }
-}
+/* moved to search.js: search and helpers */
 
 // Download flowchart as SVG with padding
+/* moved to export.js
 window.downloadFlowchartSvg = function() {
   try {
     // Get all cells in the graph
@@ -6405,3 +6141,4 @@ window.downloadFlowchartSvg = function() {
     alert('Error downloading SVG: ' + error.message);
   }
 };
+*/
