@@ -396,3 +396,7 @@ window.loadUserColorPrefs = function() {
 window.userSettings = userSettings;
 window.colorPreferences = colorPreferences;
 window.sectionPrefs = sectionPrefs;
+
+
+
+

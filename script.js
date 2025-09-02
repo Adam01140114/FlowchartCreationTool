@@ -1,30 +1,10 @@
 /**************************************************
  ************ Firebase Config & Basic Auth ********
  **************************************************/
- const firebaseConfig = {
-    apiKey: "AIzaSyBlxFmFD-rz1V_Q9_oV0DkLsENbmyJ1k-U",
-    authDomain: "flowchart-1eb90.firebaseapp.com",
-    projectId: "flowchart-1eb90",
-    storageBucket: "flowchart-1eb90.firebasestorage.app",
-    messagingSenderId: "546103281533",
-    appId: "1:546103281533:web:ae719cdbde727dcd94ee14",
-    measurementId: "G-8VSXRFREY9"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  let currentUser = null;
+// Firebase configuration moved to config.js module
+// const db and currentUser are now available from config.js
   
-  // For "Reset" button (question colors)
-  const defaultColors = {
-    amountOption: "#e3f2fd", // very light blue
-    text: "#e3f2fd",        // Textbox
-    checkbox: "#bbdefb",    // Checkbox
-    dropdown: "#90caf9",    // Dropdown
-    money: "#64b5f6",       // Number
-    date: "#42a5f5",        // Date
-    bigParagraph: "#2196f3",// Big Paragraph
-    textColor: "#1976d2"    // Text Color
-  };
+  // Colors moved to config.js module
   
   
   /**************************************************
@@ -77,42 +57,14 @@
            (cell && cell.id === "19");
   }
   
-  function updateEndNodeCell(cell) {
-    const html = `<div style="text-align:center;padding:8px;"><strong>END</strong></div>`;
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-      graph.setCellStyles(mxConstants.STYLE_EDITABLE, "0", [cell]);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  }
-  let colorPreferences = { ...defaultColors };
+  // updateEndNodeCell function moved inside DOMContentLoaded event listener
+  // colorPreferences moved to config.js module
   
-  // Section preferences: mapping section numbers to { borderColor, name }
-  // Ensure Section "1" exists by default.
-  let sectionPrefs = {
-    "1": { borderColor: getDefaultSectionColor(1), name: "Enter Name" }
-  };
+  // Section preferences moved to config.js module
   
-  // If user has opened a flowchart by name, store it here
-  let currentFlowchartName = null;
+  // currentFlowchartName moved to config.js module
   
-  /**
-   * Updates the legend squares to reflect current colorPreferences.
-   */
-  function updateLegendColors() {
-    document.getElementById("colorText").style.backgroundColor = colorPreferences.text;
-    document.getElementById("colorCheckbox").style.backgroundColor = colorPreferences.checkbox;
-    document.getElementById("colorDropdown").style.backgroundColor = colorPreferences.dropdown;
-    document.getElementById("colorMoney").style.backgroundColor = colorPreferences.money;
-    document.getElementById("colorDate").style.backgroundColor = colorPreferences.date;
-    document.getElementById("colorDateRange").style.backgroundColor = colorPreferences.date;
-    document.getElementById("colorEmail").style.backgroundColor = colorPreferences.text;
-    document.getElementById("colorPhone").style.backgroundColor = colorPreferences.text;
-    document.getElementById("colorBigParagraph").style.backgroundColor = colorPreferences.bigParagraph;
-    document.getElementById("colorTextColor").style.backgroundColor = colorPreferences.textColor;
-  }
+  // updateLegendColors function moved to config.js module
   
   const loginOverlay = document.getElementById("loginOverlay");
   const loginButton = document.getElementById("loginButton");
@@ -151,122 +103,35 @@
   let currentMouseEvent = null;
   let lastSelectedCell = null;
   let jumpModeNode = null;
-  const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
+  // jumpBorderStyle moved to config.js module
   
   // Add this at the top level to track mouse position
   let currentMouseX = 0;
   let currentMouseY = 0;
   
-  // Add this in the DOMContentLoaded event listener
-  document.addEventListener('mousemove', function(e) {
-    // Convert client coordinates to graph coordinates
-    const pt = graph.getPointForEvent(e, false);
-    currentMouseX = pt.x;
-    currentMouseY = pt.y;
+  // Graph-dependent functions will be defined after graph initialization
+  
+  // Helper function to get the current graph safely
+  function getCurrentGraph() {
+    return window.graph || graph;
+  }
+  
+  // Override the global graph variable to ensure it's always available
+  Object.defineProperty(window, 'graph', {
+    get: function() {
+      return graph;
+    },
+    set: function(value) {
+      graph = value;
+      // Also update the local variable
+      if (value) {
+        console.log('Graph initialized globally:', value);
+      }
+    }
   });
   
-  window.handleMultipleTextboxClick = function(event, cellId) {
-    event.stopPropagation();
-    const cell = graph.getModel().getCell(cellId);
-    graph.selectionModel.setCell(cell);
-  };
   
-  
-  
-  
-  window.handleMultipleTextboxFocus = function(event, cellId) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell) return;
-    const textDiv = event.target;
-    if (textDiv.innerText === "Enter question text") {
-      textDiv.innerText = "";
-    }
-  };
-  
-  
-  // ----------  ↓  NEW  ↓  (place after handleMultipleTextboxFocus) ----------
-  window.handleDropdownClick = function (event, cellId) {
-    // Only stop propagation if clicking on the container div
-    if (event.target.classList.contains('dropdown-question')) {
-      event.stopPropagation();
-      const cell = graph.getModel().getCell(cellId);
-      if (cell) graph.selectionModel.setCell(cell);
-    }
-    // Let all events bubble naturally for the contenteditable text
-  };
-  
-  // Helper to make text selection in dropdown nodes work
-  window.initDropdownTextEditing = function(element) {
-    if (!element) return;
-    
-    const textDiv = element.querySelector('.question-text');
-    if (!textDiv) return;
-    
-    // Override any parent styles that might interfere with text editing
-    textDiv.style.userSelect = 'text';
-    textDiv.style.webkitUserSelect = 'text';
-    textDiv.style.msUserSelect = 'text';
-    textDiv.style.mozUserSelect = 'text';
-    textDiv.style.pointerEvents = 'auto';
-    textDiv.style.cursor = 'text';
-    
-    // Remove any event handlers that might interfere
-    textDiv.onmousedown = null;
-    textDiv.onmousemove = null;
-    textDiv.onmouseup = null;
-    
-    // Prevent the default mxGraph handlers from running when clicking inside the text
-    textDiv.addEventListener('mousedown', function(e) {
-      e.stopPropagation();
-    });
-    
-    // Allow normal clipboard operations
-    textDiv.addEventListener('copy', function(e) {
-      e.stopPropagation();
-    });
-    
-    textDiv.addEventListener('cut', function(e) {
-      e.stopPropagation();
-    });
-    
-    textDiv.addEventListener('paste', function(e) {
-      e.stopPropagation();
-    });
-  };
-  
-  // Update handleDropdownFocus to initialize text editing
-  window.handleDropdownFocus = function (event, cellId) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell) return;
-    
-    // Initialize text editing capabilities
-    window.initDropdownTextEditing(event.target.parentElement);
-    
-    if (event.target.innerText === "Enter dropdown question") {
-      event.target.innerText = "";
-    }
-  };
-  // ----------  ↑  NEW  ↑  ----------------------------------------------------
-  // ----------  ↓  NEW  ↓  (place immediately after handleDropdownFocus) ----------
-  window.handleDropdownMouseDown = function (event) {
-    /* We're not using this handler anymore to allow normal text selection */
-    // No operation - existing for backward compatibility
-  };
-  // ----------  ↑  NEW  ↑  -------------------------------------------------------
-  
-  
-  /**
-   * Clean up redundant semicolons in style string
-   */
-  function cleanStyle(style) {
-    if (!style) return "";
-    
-    return style
-      .replace(/;+$/, "")     // Remove trailing semicolons
-      .replace(/;+;/g, ";")   // Replace double semicolons
-      .replace(/;{2,}/g, ";") // Replace multiple semicolons with a single one
-      .replace(/;+$/, "");    // Clean trailing semicolons again (in case the previous operation created them)
-  }
+  // cleanStyle function moved to config.js module
   
   // loadFlowchartData function removed - using the one from library.js instead
   // The library.js version properly handles groups data and all other functionality
@@ -314,36 +179,256 @@
   
     const resetBtn = document.getElementById("resetBtn");
   
-    // Create graph
-    graph = new mxGraph(container);
-  
-    // Set default edge style based on current setting (will be updated after settings load)
-    const defaultEdgeStyle = graph.getStylesheet().getDefaultEdgeStyle();
-    defaultEdgeStyle[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
-    defaultEdgeStyle[mxConstants.STYLE_ROUNDED] = true; // Default to curved
-    defaultEdgeStyle[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
-    defaultEdgeStyle[mxConstants.STYLE_JETTY_SIZE] = 'auto';
+    // Graph initialization moved to graph.js module
+    if (typeof initializeGraph === 'function') {
+      graph = initializeGraph();
+      console.log('Graph initialized:', graph);
+    } else {
+      console.error('initializeGraph function not found');
+      // Fallback: create graph directly
+      graph = new mxGraph(container);
+      console.log('Fallback graph created:', graph);
+    }
     
-    // Performance optimizations for large flowcharts
-    graph.setAllowLoops(false);
-    graph.setAllowDanglingEdges(false);
-    graph.setConnectable(true);
-    graph.setCellsEditable(true);
-    graph.setCellsResizable(true);
-    graph.setCellsMovable(true);
-    graph.setDropEnabled(false);
-    graph.setSplitEnabled(false);
-    graph.setDisconnectOnMove(false);
-    
-    // Optimize rendering for better performance
-    graph.setHtmlLabels(true);
-    graph.setTooltips(true);
-    // Removed setAllowNegativeCoordinates(false) to allow nodes to be placed above the origin
-  
     // When the user starts panning/dragging the canvas, hide any open menus.
-    graph.addListener(mxEvent.PAN, function(sender, evt) {
-      hideContextMenu();
+    if (graph) {
+      graph.addListener(mxEvent.PAN, function(sender, evt) {
+        hideContextMenu();
+      });
+    }
+    
+    // Add mouse move event listener for tracking mouse position
+  document.addEventListener('mousemove', function(e) {
+      if (graph) {
+    // Convert client coordinates to graph coordinates
+    const pt = graph.getPointForEvent(e, false);
+    currentMouseX = pt.x;
+    currentMouseY = pt.y;
+      }
+  });
+  
+    // Define graph-dependent functions after graph initialization
+  window.handleMultipleTextboxClick = function(event, cellId) {
+    event.stopPropagation();
+      if (graph) {
+    const cell = graph.getModel().getCell(cellId);
+    graph.selectionModel.setCell(cell);
+      }
+  };
+  
+  window.handleMultipleTextboxFocus = function(event, cellId) {
+      if (graph) {
+    const cell = graph.getModel().getCell(cellId);
+    if (!cell) return;
+    const textDiv = event.target;
+    if (textDiv.innerText === "Enter question text") {
+      textDiv.innerText = "";
+        }
+    }
+  };
+  
+  window.handleDropdownClick = function (event, cellId) {
+    // Only stop propagation if clicking on the container div
+    if (event.target.classList.contains('dropdown-question')) {
+      event.stopPropagation();
+        if (graph) {
+      const cell = graph.getModel().getCell(cellId);
+      if (cell) graph.selectionModel.setCell(cell);
+        }
+    }
+    // Let all events bubble naturally for the contenteditable text
+  };
+  
+  // Helper to make text selection in dropdown nodes work
+  window.initDropdownTextEditing = function(element) {
+    if (!element) return;
+    
+    const textDiv = element.querySelector('.question-text');
+    if (!textDiv) return;
+    
+    // Override any parent styles that might interfere with text editing
+    textDiv.style.userSelect = 'text';
+    textDiv.style.webkitUserSelect = 'text';
+    textDiv.style.msUserSelect = 'text';
+    textDiv.style.mozUserSelect = 'text';
+    textDiv.style.pointerEvents = 'auto';
+    textDiv.style.cursor = 'text';
+    
+    // Remove any event handlers that might interfere
+    textDiv.onmousedown = null;
+    textDiv.onmousemove = null;
+    textDiv.onmouseup = null;
+    
+    // Prevent the default mxGraph handlers from running when clicking inside the text
+    textDiv.addEventListener('mousedown', function(e) {
+      e.stopPropagation();
     });
+    
+    // Allow normal clipboard operations
+    textDiv.addEventListener('copy', function(e) {
+      e.stopPropagation();
+    });
+    
+    textDiv.addEventListener('cut', function(e) {
+      e.stopPropagation();
+    });
+    
+    textDiv.addEventListener('paste', function(e) {
+      e.stopPropagation();
+    });
+  };
+  
+  // Update handleDropdownFocus to initialize text editing
+  window.handleDropdownFocus = function (event, cellId) {
+      if (graph) {
+    const cell = graph.getModel().getCell(cellId);
+    if (!cell) return;
+    
+    // Initialize text editing capabilities
+    window.initDropdownTextEditing(event.target.parentElement);
+    
+    if (event.target.innerText === "Enter dropdown question") {
+      event.target.innerText = "";
+        }
+    }
+  };
+    
+  window.handleDropdownMouseDown = function (event) {
+    /* We're not using this handler anymore to allow normal text selection */
+    // No operation - existing for backward compatibility
+  };
+    
+    // Define updateEndNodeCell function after graph initialization
+    window.updateEndNodeCell = function(cell) {
+      if (graph) {
+        const html = `<div style="text-align:center;padding:8px;"><strong>END</strong></div>`;
+        graph.getModel().beginUpdate();
+        try {
+          graph.getModel().setValue(cell, html);
+          graph.setCellStyles(mxConstants.STYLE_EDITABLE, "0", [cell]);
+        } finally {
+          graph.getModel().endUpdate();
+        }
+      }
+    };
+    
+    // Define refreshAllCells and performRefreshAllCells functions after graph initialization
+    window.refreshAllCells = function() {
+      if (!graph) return;
+      
+      // Prevent multiple simultaneous calls
+      if (window.isRefreshing) {
+        return;
+      }
+      
+      // Throttle rapid successive calls
+      if (window.refreshAllCellsTimeout) {
+        clearTimeout(window.refreshAllCellsTimeout);
+      }
+      
+      window.refreshAllCellsTimeout = setTimeout(() => {
+        window.performRefreshAllCells();
+      }, 100); // 100ms throttle
+    };
+    
+    window.performRefreshAllCells = function() {
+      if (!graph || window.isRefreshing) return;
+      
+      window.isRefreshing = true;
+      
+      try {
+        const parent = graph.getDefaultParent();
+        const vertices = graph.getChildVertices(parent);
+        
+        // Batch updates for better performance
+        graph.getModel().beginUpdate();
+        
+        // Use for...of for better performance with large arrays
+        for (const cell of vertices) {
+          if (window.colorCell) {
+            window.colorCell(cell);
+          }
+    
+          if (isEndNode(cell)) {
+            window.updateEndNodeCell(cell);
+          }
+          
+          // Handle different option node types
+          if (isOptions(cell)) {
+            const questionType = getQuestionType(cell);
+            if (questionType === "imageOption") {
+              if (window.updateImageOptionCell) window.updateImageOptionCell(cell);
+            } else if (questionType === "amountOption") {
+              // Amount option has its own handling
+            } else if (questionType === "notesNode") {
+              if (window.updateNotesNodeCell) window.updateNotesNodeCell(cell);
+            } else if (questionType === "checklistNode") {
+              if (window.updateChecklistNodeCell) window.updateChecklistNodeCell(cell);
+            } else if (questionType === "alertNode") {
+              if (window.updateAlertNodeCell) window.updateAlertNodeCell(cell);
+            } else {
+              // Regular option nodes
+              if (window.updateOptionNodeCell) window.updateOptionNodeCell(cell);
+            }
+          }
+          
+          // Handle PDF nodes
+          if (isPdfNode(cell)) {
+            if (window.updatePdfNodeCell) window.updatePdfNodeCell(cell);
+          }
+          
+          // If it's a text2 node, make sure we update _questionText from value
+          if (isQuestion(cell) && getQuestionType(cell) === "text2") {
+            // Extract text from HTML value if present
+            if (cell.value) {
+              const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+              if (cleanValue) {
+                cell._questionText = cleanValue;
+              }
+            }
+          }
+          
+          // If newly dropped question node is just placeholder or has empty value
+          if (isQuestion(cell) && (!cell.value || /^\s*$/.test(cell.value) || cell.value === "question node" || cell.value === "Question Node")) {
+            cell.value = `
+              <div style="display: flex; justify-content: center; align-items: center; height:100%;">
+                <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
+                  onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
+                  onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
+                  onmouseover="this.style.borderColor='#4a90e2';"
+                  onmouseout="this.style.borderColor='#b0b8c9';"
+                  onchange="window.pickTypeForCell('${cell.id}', this.value)">
+                  <option value="">-- Choose Question Type --</option>
+                  <option value="text">Text</option>
+                  <option value="text2">Dropdown</option>
+                  <option value="checkbox">Checkbox</option>
+                  <option value="number">Number</option>
+                  <option value="date">Date</option>
+                  <option value="bigParagraph">Big Paragraph</option>
+                  <option value="multipleTextboxes">Multiple Textboxes</option>
+                  <option value="multipleDropdownType">Multiple Dropdown Type</option>
+                  <option value="dateRange">Date Range</option>
+                  <option value="email">Email</option>
+                  <option value="phone">Phone</option>
+                </select>
+              </div>`;
+          }
+        }
+        
+        graph.getModel().endUpdate();
+        
+        // Clear cell text cache when refreshing all cells
+        if (window.cellTextCache) {
+          window.cellTextCache.clear();
+        }
+        
+        // Don't renumber question IDs automatically
+        // renumberQuestionIds();
+        
+      } finally {
+        window.isRefreshing = false;
+      }
+    };
   
   
     /*****************************************************************
@@ -441,64 +526,11 @@
   });
   
   
-    // ----------  AFTER  ----------
-  const originalDblClick = graph.dblClick.bind(graph);
-  graph.dblClick = function (evt, cell) {
-  
-    // make multiple-textbox **and** dropdown-style questions
-    // jump straight into the inner <div class="question-text">
-    if (cell && isQuestion(cell)) {
-      const qt = getQuestionType(cell);
-      if (qt === 'multipleTextboxes' ||
-          qt === 'multipleDropdownType' ||   // numbered-dropdown
-          qt === 'dropdown') {               // simple dropdown
-        const state = graph.view.getState(cell);
-        if (state && state.text && state.text.node) {
-          const qDiv = state.text.node.querySelector('.question-text');
-          if (qDiv) {
-            graph.selectionModel.setCell(cell); // keep node selected
-            qDiv.focus();                       // put caret inside
-            mxEvent.consume(evt);
-            return;
-          }
-        }
-      }
-    }
-    
-    // Add direct editing for option nodes on double-click
-    if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
-      // Enable direct editing for option nodes
-      graph.startEditingAtCell(cell);
-      mxEvent.consume(evt);
-      return;
-    }
-    
-    // Add direct editing for subtitle and info nodes on double-click
-    if (cell && (isSubtitleNode(cell) || isInfoNode(cell))) {
-      // Enable direct editing
-      graph.startEditingAtCell(cell);
-      mxEvent.consume(evt);
-      return;
-    }
-    
-    // Handle alert nodes - focus on the input field instead of editing the whole cell
-    if (cell && isAlertNode(cell)) {
-      const state = graph.view.getState(cell);
-      if (state && state.text && state.text.node) {
-        const inputField = state.text.node.querySelector('input[type="text"]');
-        if (inputField) {
-          graph.selectionModel.setCell(cell); // keep node selected
-          inputField.focus();                 // put caret inside input field
-          inputField.select();                // select all text for easy editing
-          mxEvent.consume(evt);
-          return;
-        }
-      }
-    }
-  
-    // anything else keeps the stock behaviour
-    originalDblClick(evt, cell);
-  };
+    // Double-click behavior moved to graph.js module
+  // Custom double-click handling for specific node types
+  if (typeof setupCustomDoubleClickBehavior === 'function') {
+    setupCustomDoubleClickBehavior(graph);
+  }
   
   
     // Let mxGraph render cell labels as HTML
@@ -3116,119 +3148,9 @@
   }
   
   // Performance optimization: prevent excessive refreshAllCells calls
-  let refreshAllCellsTimeout = null;
-  let isRefreshing = false;
+  // refreshAllCellsTimeout and isRefreshing moved to config.js module
   
-  function refreshAllCells() {
-    // Prevent multiple simultaneous calls
-    if (isRefreshing) {
-      return;
-    }
-    
-    // Throttle rapid successive calls
-    if (refreshAllCellsTimeout) {
-      clearTimeout(refreshAllCellsTimeout);
-    }
-    
-    refreshAllCellsTimeout = setTimeout(() => {
-      performRefreshAllCells();
-    }, 100); // 100ms throttle
-  }
-  
-  function performRefreshAllCells() {
-    if (isRefreshing) return;
-    
-    isRefreshing = true;
-    
-    try {
-      const parent = graph.getDefaultParent();
-      const vertices = graph.getChildVertices(parent);
-      
-      // Batch updates for better performance
-      graph.getModel().beginUpdate();
-      
-      // Use for...of for better performance with large arrays
-      for (const cell of vertices) {
-        colorCell(cell);
-  
-        if (isEndNode(cell)) {
-          updateEndNodeCell(cell);
-        }
-        
-        // Handle different option node types
-        if (isOptions(cell)) {
-          const questionType = getQuestionType(cell);
-          if (questionType === "imageOption") {
-            updateImageOptionCell(cell);
-          } else if (questionType === "amountOption") {
-            // Amount option has its own handling
-          } else if (questionType === "notesNode") {
-            updateNotesNodeCell(cell);
-          } else if (questionType === "checklistNode") {
-            updateChecklistNodeCell(cell);
-          } else if (questionType === "alertNode") {
-            updateAlertNodeCell(cell);
-          } else {
-            // Regular option nodes
-            updateOptionNodeCell(cell);
-          }
-        }
-        
-        // Handle PDF nodes
-        if (isPdfNode(cell)) {
-          updatePdfNodeCell(cell);
-        }
-        
-        // If it's a text2 node, make sure we update _questionText from value
-        if (isQuestion(cell) && getQuestionType(cell) === "text2") {
-          // Extract text from HTML value if present
-          if (cell.value) {
-            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-            if (cleanValue) {
-              cell._questionText = cleanValue;
-            }
-          }
-        }
-        
-        // If newly dropped question node is just placeholder or has empty value
-        if (isQuestion(cell) && (!cell.value || /^\s*$/.test(cell.value) || cell.value === "question node" || cell.value === "Question Node")) {
-          cell.value = `
-            <div style="display: flex; justify-content: center; align-items: center; height:100%;">
-              <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
-                onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
-                onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
-                onmouseover="this.style.borderColor='#4a90e2';"
-                onmouseout="this.style.borderColor='#b0b8c9';"
-                onchange="window.pickTypeForCell('${cell.id}', this.value)">
-                <option value="">-- Choose Question Type --</option>
-                <option value="text">Text</option>
-                <option value="text2">Dropdown</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="number">Number</option>
-                <option value="date">Date</option>
-                <option value="bigParagraph">Big Paragraph</option>
-                <option value="multipleTextboxes">Multiple Textboxes</option>
-                <option value="multipleDropdownType">Multiple Dropdown Type</option>
-                <option value="dateRange">Date Range</option>
-                <option value="email">Email</option>
-                <option value="phone">Phone</option>
-              </select>
-            </div>`;
-        }
-      }
-      
-      graph.getModel().endUpdate();
-      
-      // Clear cell text cache when refreshing all cells
-      cellTextCache.clear();
-      
-      // Don't renumber question IDs automatically
-      // renumberQuestionIds();
-      
-    } finally {
-      isRefreshing = false;
-    }
-  }
+  // refreshAllCells and performRefreshAllCells functions moved inside DOMContentLoaded event listener
   
   /*******************************************************
    ************ Export/Import Flowchart JSON  ************
@@ -4199,12 +4121,11 @@
   
   // AUTOSAVE FLOWCHART TO COOKIES FEATURE
   // --- AUTOSAVE CONSTANTS ---
-  const AUTOSAVE_KEY = 'flowchart_autosave_json';
+  // AUTOSAVE_KEY moved to config.js module
   
   // --- AUTOSAVE CORE FUNCTIONS (localStorage version) ---
   // Cache for autosave data to avoid unnecessary processing
-  let lastAutosaveData = null;
-  let autosaveDataHash = null;
+  // lastAutosaveData and autosaveDataHash moved to config.js module
   
   function autosaveFlowchartToLocalStorage() {
     try {
@@ -4363,10 +4284,7 @@
   }
   
   // --- AUTOSAVE HOOKS ---
-  let autosaveTimeout = null;
-  let autosaveThrottleDelay = 3000; // Increased to 3 seconds for better performance
-  let lastAutosaveTime = 0;
-  let autosaveMinInterval = 1000; // Minimum 1 second between autosaves
+  // autosaveTimeout, autosaveThrottleDelay, lastAutosaveTime, and autosaveMinInterval moved to config.js module
   
   // Global helper to request a throttled autosave from anywhere (including Groups UI)
   function requestAutosave() {
@@ -4534,9 +4452,7 @@
   });
   
   // --- COPY/PASTE NODE AS JSON ---
-  let flowchartClipboard = null;
-  const FLOWCHART_CLIPBOARD_KEY = 'flowchart_clipboard_data';
-  const FLOWCHART_CLIPBOARD_TIMESTAMP_KEY = 'flowchart_clipboard_timestamp';
+  // flowchartClipboard, FLOWCHART_CLIPBOARD_KEY, and FLOWCHART_CLIPBOARD_TIMESTAMP_KEY moved to config.js module
   
   function copySelectedNodeAsJson() {
     try {
@@ -5356,8 +5272,7 @@
    **************************************************/
   
   // Global variables for groups
-  let groupCounter = 1;
-  let groups = {};
+  // groupCounter and groups moved to config.js module
   
   /**
    * Adds a new group to the groups container
@@ -5693,7 +5608,7 @@
   /**
    * Settings functionality
    */
-  let currentEdgeStyle = 'curved'; // Default to curved
+  // currentEdgeStyle moved to config.js module
   
   // Show settings menu
   window.showSettingsMenu = function() {
@@ -5814,7 +5729,7 @@
   /**
    * Node Search Functionality
    */
-  let searchTimeout = null;
+  // searchTimeout moved to config.js module
   
   // Initialize search functionality
   function initializeSearch() {
@@ -5867,8 +5782,7 @@
   }
   
   // Cache for cell text to avoid repeated DOM operations
-  const cellTextCache = new Map();
-  let lastCacheClear = Date.now();
+  // cellTextCache and lastCacheClear moved to config.js module
   
   // Clear cache periodically to prevent memory leaks
   function clearCellTextCache() {

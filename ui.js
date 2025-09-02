@@ -419,3 +419,7 @@ window.showEmptySpaceMenu = showEmptySpaceMenu;
 window.showPropertiesMenu = showPropertiesMenu;
 window.showSettingsMenu = showSettingsMenu;
 window.hideSettingsMenu = hideSettingsMenu;
+
+
+
+
