@@ -1,203 +1,334 @@
-// SVG export extracted from script.js
-window.downloadFlowchartSvg = function() {
-  try {
-    const parent = graph.getDefaultParent();
-    const cells = graph.getChildCells(parent, true, true);
-    if (cells.length === 0) { alert("No flowchart content to export"); return; }
+/**************************************************
+ ************ Import/Export Functions *************
+ **************************************************/
 
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    cells.forEach(cell => {
-      if (cell.geometry) {
-        minX = Math.min(minX, cell.geometry.x);
-        minY = Math.min(minY, cell.geometry.y);
-        maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
-        maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
-      }
-    });
+/**
+ * Export the flowchart structure as JSON
+ */
+window.exportFlowchartJson = function () {
+  if (!graph) {
+    console.error('Graph not initialized');
+    return;
+  }
+  
+  const parent = graph.getDefaultParent();
+  const encoder = new mxCodec();
+  const cells = graph.getChildCells(parent, true, true);
 
-    const padding = 100;
-    const width = maxX - minX + (padding * 2);
-    const height = maxY - minY + (padding * 2);
+  // Map cells, keeping only needed properties
+  const simplifiedCells = cells.map(cell => {
+    // Basic info about the cell
+    const cellData = {
+      id: cell.id,
+      vertex: cell.vertex,
+      edge: cell.edge,
+      value: cell.value,
+      style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
+    };
 
-    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <rect width="${width}" height="${height}" fill="white"/>
-      <defs>
-        <style>
-          .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
-          .edge { stroke: #424242; stroke-width: 2; fill: none; }
-        </style>
-      </defs>`;
-
-    function parseStyle(styleString) {
-      const style = {};
-      if (!styleString) return style;
-      const parts = styleString.split(';');
-      parts.forEach(part => {
-        const [key, value] = part.split('=');
-        if (key && value) style[key.trim()] = value.trim();
-      });
-      return style;
-    }
-
-    function getNodeStyling(cell) {
-      const style = parseStyle(cell.style);
-      const styling = {
-        fillColor: '#e1f5fe',
-        strokeColor: '#01579b',
-        strokeWidth: 2,
-        fontSize: 14,
-        fontFamily: 'Arial, sans-serif',
-        textAlign: 'center',
-        verticalAlign: 'middle',
-        rounded: 10,
-        dashed: false,
-        strokeDasharray: null
+    // Handle geometry 
+    if (cell.geometry) {
+      cellData.geometry = {
+        x: cell.geometry.x,
+        y: cell.geometry.y,
+        width: cell.geometry.width,
+        height: cell.geometry.height,
       };
-      if (cell.style && cell.style.includes('nodeType=question')) {
-        const questionType = getQuestionType(cell);
-        if (questionType === 'checkbox') styling.fillColor = colorPreferences.checkbox;
-        else if (questionType === 'dropdown' || questionType === 'text2') styling.fillColor = colorPreferences.dropdown;
-        else if (questionType === 'money' || questionType === 'number') styling.fillColor = colorPreferences.money;
-        else if (questionType === 'date' || questionType === 'dateRange') styling.fillColor = colorPreferences.date;
-        else if (questionType === 'bigParagraph') styling.fillColor = colorPreferences.bigParagraph;
-        else styling.fillColor = colorPreferences.text;
-      } else if (cell.style && cell.style.includes('nodeType=options')) {
-        styling.fillColor = '#ffffff';
-      } else if (cell.style && cell.style.includes('nodeType=end')) {
-        styling.fillColor = '#CCCCCC';
-      } else if (cell.style && cell.style.includes('nodeType=calculation')) {
-        styling.fillColor = '#e1f5fe';
-      }
-      const section = getSection(cell);
-      if (section && sectionPrefs[section] && sectionPrefs[section].borderColor) {
-        styling.strokeColor = sectionPrefs[section].borderColor;
-      }
-      if (style.fillColor) styling.fillColor = style.fillColor;
-      if (style.strokeColor) styling.strokeColor = style.strokeColor;
-      if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
-      if (style.fontSize) styling.fontSize = parseInt(style.fontSize);
-      if (style.fontFamily) styling.fontFamily = style.fontFamily;
-      if (style.arcSize) styling.rounded = parseInt(style.arcSize);
-      if (style.dashed === '1') styling.dashed = true;
-      if (style.strokeDasharray) styling.strokeDasharray = style.strokeDasharray;
-      return styling;
     }
 
-    function getEdgeStyling(cell) {
-      const style = parseStyle(cell.style);
-      const styling = { strokeColor: '#424242', strokeWidth: 2, edgeStyle: 'orthogonalEdgeStyle', rounded: 1, orthogonalLoop: 1 };
-      if (style.strokeColor) styling.strokeColor = style.strokeColor;
-      if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
-      if (style.edgeStyle) styling.edgeStyle = style.edgeStyle;
-      if (style.rounded !== undefined) styling.rounded = parseInt(style.rounded);
-      if (style.orthogonalLoop !== undefined) styling.orthogonalLoop = parseInt(style.orthogonalLoop);
-      return styling;
+    // Add source and target for edges
+    if (cell.edge && cell.source && cell.target) {
+      cellData.source = cell.source.id;
+      cellData.target = cell.target.id;
+      
+      // Save edge geometry (articulation points) if it exists
+      if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
+        cellData.edgeGeometry = {
+          points: cell.geometry.points.map(point => ({
+            x: point.x,
+            y: point.y
+          }))
+        };
+      }
     }
 
-    function createEdgePath(source, target, edgeStyle, edgeGeometry) {
-      const x1 = source.geometry.x - minX + padding + source.geometry.width / 2;
-      const y1 = source.geometry.y - minY + padding + source.geometry.height / 2;
-      const x2 = target.geometry.x - minX + padding + target.geometry.width / 2;
-      const y2 = target.geometry.y - minY + padding + target.geometry.height / 2;
-      if (edgeGeometry && edgeGeometry.points && edgeGeometry.points.length > 0) {
-        let path = `M ${x1} ${y1}`;
-        edgeGeometry.points.forEach(point => {
-          const px = point.x - minX + padding;
-          const py = point.y - minY + padding;
-          path += ` L ${px} ${py}`;
-        });
-        path += ` L ${x2} ${y2}`;
-        return path;
-      }
-      if (edgeStyle === 'orthogonalEdgeStyle') {
-        if (edgeStyle.rounded === 1) {
-          const dx = x2 - x1;
-          const dy = y2 - y1;
-          const midX = x1 + dx / 2;
-          const midY = y1 + dy / 2;
-          const controlOffset = Math.min(Math.abs(dx), Math.abs(dy)) * 0.3;
-          return `M ${x1} ${y1} Q ${midX} ${midY - controlOffset} ${x2} ${y2}`;
-        } else {
-          const dx = x2 - x1;
-          const dy = y2 - y1;
-          const midX = x1 + dx / 2;
-          const midY = y1 + dy / 2;
-          return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+    // Custom fields for specific nodes
+    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+    if (cell._questionText) cellData._questionText = cell._questionText;
+    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+    if (cell._nameId) cellData._nameId = cell._nameId;
+    if (cell._placeholder) cellData._placeholder = cell._placeholder;
+    if (cell._questionId) cellData._questionId = cell._questionId;
+    
+    // textbox properties
+    if (cell._amountName) cellData._amountName = cell._amountName;
+    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+    
+    // image option
+    if (cell._image) cellData._image = cell._image;
+    
+    // PDF node properties
+    if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+    if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
+    if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+    
+    // Notes node properties
+    if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+    if (cell._notesBold !== undefined) cellData._notesBold = cell._notesBold;
+    if (cell._notesFontSize !== undefined) cellData._notesFontSize = cell._notesFontSize;
+    
+    // Checklist node properties
+    if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
+    
+    // Calculation node properties
+    if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+    if (cell._calcTerms !== undefined) cellData._calcTerms = cell._calcTerms;
+    if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+    if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+    if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+    
+    return cellData;
+  });
+
+  // Create the export object
+  const exportData = {
+    version: "1.0",
+    exportDate: new Date().toISOString(),
+    cells: simplifiedCells,
+    metadata: {
+      totalCells: simplifiedCells.length,
+      questionNodes: simplifiedCells.filter(c => c.vertex && c.style && c.style.includes("nodeType=question")).length,
+      optionNodes: simplifiedCells.filter(c => c.vertex && c.style && c.style.includes("nodeType=options")).length,
+      calculationNodes: simplifiedCells.filter(c => c.vertex && c.style && c.style.includes("nodeType=calculation")).length
+    }
+  };
+
+  // Convert to JSON string
+  const jsonString = JSON.stringify(exportData, null, 2);
+  
+  // Download the file
+  downloadJson(jsonString, `flowchart_export_${new Date().toISOString().split('T')[0]}.json`);
+  
+  return exportData;
+};
+
+/**
+ * Import flowchart from JSON
+ */
+window.importFlowchartJson = function(jsonData) {
+  if (!graph) {
+    console.error('Graph not initialized');
+    return false;
+  }
+  
+  try {
+    // Clear existing graph
+    const parent = graph.getDefaultParent();
+    graph.removeCells(graph.getChildCells(parent, true, true));
+    
+    // Parse JSON if it's a string
+    const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    
+    if (!data.cells || !Array.isArray(data.cells)) {
+      throw new Error('Invalid flowchart data format');
+    }
+    
+    // Import cells
+    const importedCells = [];
+    data.cells.forEach(cellData => {
+      try {
+        const cell = importCell(cellData);
+        if (cell) {
+          importedCells.push(cell);
         }
-      } else if (edgeStyle === 'none') {
-        return `M ${x1} ${y1} L ${x2} ${y2}`;
+      } catch (error) {
+        console.error('Error importing cell:', error, cellData);
       }
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const midX = x1 + dx / 2;
-      const midY = y1 + dy / 2;
-      return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-    }
-
-    cells.forEach(cell => {
-      if (cell.edge && cell.source && cell.target) {
-        const source = cell.source;
-        const target = cell.target;
-        if (source.geometry && target.geometry) {
-          const edgeStyling = getEdgeStyling(cell);
-          const pathData = createEdgePath(source, target, edgeStyling.edgeStyle, cell.geometry);
-          const markerId = `arrow-${cell.id}`;
-          svgContent += `<defs>
-            <marker id="${markerId}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-              <polygon points="0,0 0,6 9,3" fill="${edgeStyling.strokeColor}"/>
-            </marker>
-          </defs>`;
-          const strokeDasharray = edgeStyling.strokeDasharray || 'none';
-          svgContent += `<path d="${pathData}" stroke="${edgeStyling.strokeColor}" stroke-width="${edgeStyling.strokeWidth}" fill="none" marker-end="url(#${markerId})" stroke-dasharray="${strokeDasharray}"/>`;
+    });
+    
+    // Import edges after all vertices are created
+    data.cells.forEach(cellData => {
+      if (cellData.edge && cellData.source && cellData.target) {
+        try {
+          importEdge(cellData);
+        } catch (error) {
+          console.error('Error importing edge:', error, cellData);
         }
       }
     });
-
-    cells.forEach(cell => {
-      if (cell.vertex) {
-        const x = cell.geometry.x - minX + padding;
-        const y = cell.geometry.y - minY + padding;
-        const w = cell.geometry.width;
-        const h = cell.geometry.height;
-        const styling = getNodeStyling(cell);
-        const strokeDasharray = styling.dashed ? '5,5' : 'none';
-        svgContent += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${styling.rounded}" ry="${styling.rounded}" fill="${styling.fillColor}" stroke="${styling.strokeColor}" stroke-width="${styling.strokeWidth}" stroke-dasharray="${strokeDasharray}"/>`;
-        let text = "";
-        if (cell.value) {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = cell.value;
-          text = tempDiv.textContent || tempDiv.innerText || "";
-        }
-        if (text) {
-          const textX = x + w / 2;
-          const textY = y + h / 2;
-          const textAlign = styling.textAlign === 'center' ? 'middle' : styling.textAlign;
-          const dominantBaseline = styling.verticalAlign === 'middle' ? 'middle' : styling.verticalAlign;
-          svgContent += `<text x="${textX}" y="${textY}" font-family="${styling.fontFamily}" font-size="${styling.fontSize}" text-anchor="${textAlign}" dominant-baseline="${dominantBaseline}" fill="black">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text>`;
-        }
-      }
-    });
-
-    svgContent += '</svg>';
-    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'flowchart.svg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    const notification = document.createElement('div');
-    notification.textContent = 'SVG downloaded successfully!';
-    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
-    document.body.appendChild(notification);
-    setTimeout(() => { document.body.removeChild(notification); }, 3000);
+    
+    console.log(`Successfully imported ${importedCells.length} cells`);
+    return true;
+    
   } catch (error) {
-    console.error('Error downloading SVG:', error);
-    alert('Error downloading SVG: ' + error.message);
+    console.error('Error importing flowchart:', error);
+    alert('Error importing flowchart: ' + error.message);
+    return false;
   }
 };
 
+/**
+ * Import a single cell
+ */
+function importCell(cellData) {
+  if (!graph) return null;
+  
+  const parent = graph.getDefaultParent();
+  let cell = null;
+  
+  if (cellData.vertex) {
+    const geometry = cellData.geometry || { x: 100, y: 100, width: 200, height: 100 };
+    cell = graph.insertVertex(parent, cellData.id, cellData.value, 
+      geometry.x, geometry.y, geometry.width, geometry.height, cellData.style);
+  }
+  
+  if (cell) {
+    // Restore custom properties
+    Object.keys(cellData).forEach(key => {
+      if (key.startsWith('_') && key !== 'id' && key !== 'vertex' && key !== 'edge') {
+        cell[key] = cellData[key];
+      }
+    });
+    
+    // Update cell display
+    if (window.updateCellDisplay) {
+      window.updateCellDisplay(cell);
+    }
+  }
+  
+  return cell;
+}
 
+/**
+ * Import an edge
+ */
+function importEdge(edgeData) {
+  if (!graph) return null;
+  
+  const parent = graph.getDefaultParent();
+  const source = graph.getModel().getCell(edgeData.source);
+  const target = graph.getModel().getCell(edgeData.target);
+  
+  if (!source || !target) {
+    console.warn('Source or target cell not found for edge:', edgeData);
+    return null;
+  }
+  
+  const edge = graph.insertEdge(parent, edgeData.id, edgeData.value, source, target, edgeData.style);
+  
+  // Restore edge geometry if it exists
+  if (edgeData.edgeGeometry && edgeData.edgeGeometry.points) {
+    const points = edgeData.edgeGeometry.points.map(point => new mxPoint(point.x, point.y));
+    edge.geometry.points = points;
+  }
+  
+  return edge;
+}
+
+/**
+ * Clean style string by removing excessive semicolons
+ */
+function cleanStyle(style) {
+  if (!style) return '';
+  return style.replace(/;+/g, ';').replace(/^;|;$/g, '');
+}
+
+/**
+ * Download JSON data as a file
+ */
+function downloadJson(str, filename) {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(str);
+  const dlAnchorElem = document.createElement("a");
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", filename);
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+/**
+ * Export flowchart as PNG image
+ */
+window.exportFlowchartPng = function() {
+  if (!graph) {
+    console.error('Graph not initialized');
+    return;
+  }
+  
+  try {
+    // Get graph bounds
+    const bounds = graph.getGraphBounds();
+    const width = Math.ceil(bounds.width + 50);
+    const height = Math.ceil(bounds.height + 50);
+    
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    
+    // Set background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Convert graph to image
+    const imgData = graph.getImageData(0, 0, width, height, '#ffffff', true);
+    
+    // Draw image to canvas
+    const img = new Image();
+    img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      
+      // Download the image
+      const link = document.createElement('a');
+      link.download = `flowchart_${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    };
+    img.src = imgData;
+    
+  } catch (error) {
+    console.error('Error exporting PNG:', error);
+    alert('Error exporting PNG: ' + error.message);
+  }
+};
+
+/**
+ * Export flowchart as SVG
+ */
+window.exportFlowchartSvg = function() {
+  if (!graph) {
+    console.error('Graph not initialized');
+    return;
+  }
+  
+  try {
+    // Get graph bounds
+    const bounds = graph.getGraphBounds();
+    const width = Math.ceil(bounds.width + 50);
+    const height = Math.ceil(bounds.height + 50);
+    
+    // Create SVG
+    const svg = graph.getSvg(0, 0, width, height, '#ffffff');
+    
+    // Convert SVG to string
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svg);
+    
+    // Download the SVG
+    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `flowchart_${new Date().toISOString().split('T')[0]}.svg`;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+  } catch (error) {
+    console.error('Error exporting SVG:', error);
+    alert('Error exporting SVG: ' + error.message);
+  }
+};
+
+// Export utility functions
+window.downloadJson = downloadJson;
