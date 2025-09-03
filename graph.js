@@ -549,6 +549,14 @@ function showQuestionTextPopup(cell) {
     textarea.style.boxShadow = '0 0 0 3px rgba(25, 118, 210, 0.1)';
   });
   
+  // Ensure textarea is immediately ready for typing
+  textarea.addEventListener('click', () => {
+    // If no text is selected, position cursor at end
+    if (textarea.selectionStart === textarea.selectionEnd) {
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    }
+  });
+  
   textarea.addEventListener('blur', () => {
     textarea.style.borderColor = '#e0e0e0';
     textarea.style.boxShadow = 'none';
@@ -566,9 +574,25 @@ function showQuestionTextPopup(cell) {
     }
   });
   
-  textarea.focus();
-  textarea.select();
-  console.log("Textarea focused and text selected");
+  // Ensure proper focus and cursor positioning using multiple approaches
+  requestAnimationFrame(() => {
+    // First attempt: standard focus and select
+    textarea.focus();
+    textarea.select();
+    
+    // Second attempt: ensure cursor is at end
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    
+    // Third attempt: force focus again after a tiny delay
+    setTimeout(() => {
+      textarea.focus();
+      textarea.select();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      console.log("Textarea focused, text selected, and cursor positioned (final attempt)");
+    }, 5);
+    
+    console.log("Textarea focused, text selected, and cursor positioned");
+  });
   
   // Handle submit button
   const submitBtn = popup.querySelector('#submitQuestionText');
