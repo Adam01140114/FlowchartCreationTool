@@ -216,8 +216,8 @@ function setupCustomDoubleClickBehavior(graph) {
       
       // Check if this is a double-click on the same cell
       if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
-        console.log("🎯 DOUBLE CLICK DETECTED manually!");
-        alert("double click detected");
+        //console.log("🎯 DOUBLE CLICK DETECTED manually!");
+        //alert("double click detected");
         
         // Show question text popup for question nodes
         if (typeof isQuestion === 'function' && isQuestion(cell)) {
