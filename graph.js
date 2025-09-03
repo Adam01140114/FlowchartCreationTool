@@ -204,28 +204,15 @@ function setupCustomDoubleClickBehavior(graph) {
       graph.setSelectionCell(cell);
     }
     
-    // make multiple-textbox **and** dropdown-style questions
-    // jump straight into the inner <div class="question-text">
+    // Handle question nodes with a popup for text editing
     if (cell && isQuestion(cell)) {
       const qt = getQuestionType(cell);
       console.log("Question type:", qt);
-      if (qt === 'multipleTextboxes' ||
-          qt === 'multipleDropdownType' ||   // numbered-dropdown
-          qt === 'dropdown') {               // simple dropdown
-        const state = graph.view.getState(cell);
-        if (state && state.text && state.text.node) {
-          const qDiv = state.text.node.querySelector('.question-text');
-          if (qDiv) {
-            console.log("Found question-text div, focusing on it");
-            graph.selectionModel.setCell(cell); // keep node selected
-            qDiv.focus();                       // put caret inside
-            mxEvent.consume(evt);
-            return;
-          }
-        }
-      }
-      // If no special handling for this question type, fall through to general editing
-      console.log("No special handling for question type, using general editing");
+      
+      // Show popup for question text editing
+      showQuestionTextPopup(cell);
+      mxEvent.consume(evt);
+      return;
     }
     
     // Add direct editing for option nodes on double-click
@@ -283,6 +270,174 @@ function setupCustomDoubleClickBehavior(graph) {
     // anything else keeps the stock behaviour
     originalDblClick(evt, cell);
   };
+}
+
+/**
+ * Show popup for editing question node text
+ */
+function showQuestionTextPopup(cell) {
+  console.log("=== SHOW QUESTION TEXT POPUP DEBUG ===");
+  console.log("showQuestionTextPopup called with cell:", cell);
+  console.log("Cell ID:", cell.id);
+  console.log("Cell style:", cell.style);
+  console.log("Cell _questionText:", cell._questionText);
+  console.log("Cell value:", cell.value);
+  
+  // Get current text from the cell
+  let currentText = "";
+  if (cell._questionText) {
+    currentText = cell._questionText;
+  } else if (cell.value) {
+    // Extract text from HTML value
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cell.value;
+    currentText = (tempDiv.textContent || tempDiv.innerText || "").trim();
+  }
+  
+  // Create popup container
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 10000;
+    min-width: 300px;
+    font-family: Arial, sans-serif;
+  `;
+  
+  // Create popup content
+  popup.innerHTML = `
+    <h3 style="margin: 0 0 15px 0; color: #1976d2;">Edit Question Text</h3>
+    <textarea 
+      id="questionTextInput" 
+      placeholder="Enter question text here..."
+      style="
+        width: 100%;
+        min-height: 100px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: inherit;
+        resize: vertical;
+        margin-bottom: 15px;
+      "
+    >${currentText}</textarea>
+    <div style="text-align: right;">
+      <button id="cancelQuestionText" style="
+        background: #f5f5f5;
+        border: 1px solid #ccc;
+        padding: 8px 16px;
+        margin-right: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      ">Cancel</button>
+      <button id="submitQuestionText" style="
+        background: #1976d2;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      ">Submit</button>
+    </div>
+  `;
+  
+  // Add popup to page
+  console.log("Adding popup to document body");
+  document.body.appendChild(popup);
+  console.log("Popup added to DOM");
+  
+  // Focus on textarea
+  const textarea = popup.querySelector('#questionTextInput');
+  console.log("Textarea element found:", textarea);
+  textarea.focus();
+  textarea.select();
+  console.log("Textarea focused and text selected");
+  
+  // Handle submit button
+  const submitBtn = popup.querySelector('#submitQuestionText');
+  console.log("Submit button found:", submitBtn);
+  submitBtn.addEventListener('click', () => {
+    console.log("Submit button clicked!");
+    const newText = textarea.value.trim();
+    console.log("New text from textarea:", newText);
+    console.log("Textarea value before trim:", textarea.value);
+    
+    if (newText) {
+      console.log("New text is valid, updating cell...");
+      
+      // Update the cell's question text
+      cell._questionText = newText;
+      console.log("Updated cell._questionText to:", cell._questionText);
+      
+      // Update the cell display based on question type
+      const qt = getQuestionType(cell);
+      console.log("Question type for update:", qt);
+      
+      if (qt === 'multipleTextboxes' || qt === 'multipleDropdownType') {
+        console.log("Complex question type detected, calling updateMultipleTextboxHandler");
+        // For complex question types, call the appropriate update function
+        if (typeof window.updateMultipleTextboxHandler === 'function') {
+          console.log("updateMultipleTextboxHandler function exists, calling it");
+          window.updateMultipleTextboxHandler(cell);
+        } else {
+          console.log("updateMultipleTextboxHandler function not found!");
+        }
+      } else {
+        console.log("Simple question type detected, calling updateSimpleQuestionCell");
+        // For simple question types, call updateSimpleQuestionCell
+        if (typeof window.updateSimpleQuestionCell === 'function') {
+          console.log("updateSimpleQuestionCell function exists, calling it");
+          window.updateSimpleQuestionCell(cell);
+        } else {
+          console.log("updateSimpleQuestionCell function not found!");
+        }
+      }
+      
+      // Refresh the display
+      if (typeof window.refreshAllCells === 'function') {
+        console.log("refreshAllCells function exists, calling it");
+        window.refreshAllCells();
+      } else {
+        console.log("refreshAllCells function not found!");
+      }
+    } else {
+      console.log("New text is empty or invalid, not updating");
+    }
+    
+    // Remove popup
+    document.body.removeChild(popup);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = popup.querySelector('#cancelQuestionText');
+  cancelBtn.addEventListener('click', () => {
+    console.log("Cancelling question text edit");
+    document.body.removeChild(popup);
+  });
+  
+  // Handle Enter key in textarea
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      submitBtn.click();
+    } else if (e.key === 'Escape') {
+      cancelBtn.click();
+    }
+  });
+  
+  // Handle clicking outside popup to close
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) {
+      cancelBtn.click();
+    }
+  });
 }
 
 /**
@@ -558,3 +713,4 @@ window.setupCustomGraphEditing = setupCustomGraphEditing;
 window.setupCustomDoubleClickBehavior = setupCustomDoubleClickBehavior;
 window.setupKeyboardNavigation = setupKeyboardNavigation;
 window.setupPanningAndZooming = setupPanningAndZooming;
+window.showQuestionTextPopup = showQuestionTextPopup;

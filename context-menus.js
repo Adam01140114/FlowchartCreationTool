@@ -40,6 +40,7 @@ function initializeContextMenuElements() {
   calcTypeBtn = document.getElementById('calcTypeBtn');
   subtitleTypeBtn = document.getElementById('subtitleTypeBtn');
   infoTypeBtn = document.getElementById('infoTypeBtn');
+  renameNode = document.getElementById('renameNode');
   propertiesButton = document.getElementById('propertiesButton');
   
   regularOptionType = document.getElementById('regularOptionType');
@@ -55,7 +56,8 @@ function initializeContextMenuElements() {
   notesCopyButton = document.getElementById('notesCopyButton');
   notesDeleteButton = document.getElementById('notesDeleteButton');
   
-  newSectionButton = document.getElementById('newSectionButton');
+  newSectionButton = document.getElementById('newSectionNode');
+  console.log("newSectionButton found:", newSectionButton);
   untangleEdge = document.getElementById('untangleEdge');
   changeEdgeStyle = document.getElementById('changeEdgeStyle');
   deleteEdge = document.getElementById('deleteEdge');
@@ -917,44 +919,139 @@ function setupContextMenuEventListeners(graph) {
     });
   }
 
+  // Rename node button event handler
+  if (document.getElementById('renameNode')) {
+    document.getElementById('renameNode').addEventListener("click", () => {
+      console.log("=== RENAME NODE BUTTON DEBUG ===");
+      console.log("Rename button clicked!");
+      if (window.selectedCell) {
+        console.log("Selected cell for rename:", window.selectedCell);
+        console.log("Cell type:", typeof window.isQuestion === 'function' ? (window.isQuestion(window.selectedCell) ? 'question' : 'other') : 'unknown');
+        
+        // Show rename popup for any node type
+        if (typeof window.showQuestionTextPopup === 'function') {
+          console.log("Calling showQuestionTextPopup for rename");
+          window.showQuestionTextPopup(window.selectedCell);
+        } else {
+          console.log("showQuestionTextPopup function not found!");
+          // Fallback: show a simple prompt
+          const newText = prompt("Enter new text for the node:", window.selectedCell._questionText || "Node text");
+          if (newText && newText.trim()) {
+            window.selectedCell._questionText = newText.trim();
+            if (typeof window.refreshAllCells === 'function') {
+              window.refreshAllCells();
+            }
+          }
+        }
+      } else {
+        console.log("No selected cell for rename!");
+      }
+      hideContextMenu();
+    });
+  }
+
   // Increase the "section number" for a question
-  if (newSectionButton) {
-    newSectionButton.addEventListener("click", () => {
+  if (document.getElementById('newSectionNode')) {
+    document.getElementById('newSectionNode').addEventListener("click", () => {
+      console.log("=== NEW SECTION BUTTON DEBUG ===");
       console.log("New Section button clicked!");
+      
       if (window.selectedCell) {
         console.log("Selected cell:", window.selectedCell);
-        // getSection is defined in legend.js
+        console.log("Selected cell ID:", window.selectedCell.id);
+        console.log("Selected cell style (before):", window.selectedCell.style);
+        console.log("Selected cell _questionText:", window.selectedCell._questionText);
+        
+        // Check if getSection function exists and works
         if (typeof window.getSection === 'function') {
-          const currentSection = parseInt(window.getSection(window.selectedCell) || "1", 10);
-          console.log("Current section:", currentSection);
-          const newSection = currentSection + 1;
-          console.log("New section will be:", newSection);
+          console.log("getSection function exists");
           
-          // setSection is defined in legend.js
+          // Try to get current section
+          const currentSection = window.getSection(window.selectedCell);
+          console.log("Raw current section from getSection:", currentSection);
+          
+          const currentSectionNum = parseInt(currentSection || "1", 10);
+          console.log("Parsed current section number:", currentSectionNum);
+          
+          const newSection = currentSectionNum + 1;
+          console.log("Calculated new section number:", newSection);
+          
+          // Check if setSection function exists
           if (typeof window.setSection === 'function') {
-            console.log("Calling setSection with:", window.selectedCell, newSection);
-            window.setSection(window.selectedCell, newSection);
-            console.log("setSection completed");
+            console.log("setSection function exists");
+            console.log("About to call setSection with cell:", window.selectedCell, "and new section:", newSection);
             
-            // Verify the change
-            const updatedSection = window.getSection(window.selectedCell);
-            console.log("Updated section is now:", updatedSection);
+            // Call setSection
+            try {
+              window.setSection(window.selectedCell, newSection);
+              console.log("setSection call completed without error");
+            } catch (error) {
+              console.error("Error calling setSection:", error);
+            }
+            
+            // Wait a moment then verify the change
+            setTimeout(() => {
+              console.log("=== VERIFICATION AFTER SETSECTION ===");
+              const updatedSection = window.getSection(window.selectedCell);
+              console.log("Updated section from getSection:", updatedSection);
+              console.log("Updated cell style (after):", window.selectedCell.style);
+              
+              // Check if the style actually changed
+              if (window.selectedCell.style.includes(`section=${newSection}`)) {
+                console.log("✅ SUCCESS: Cell style now contains the new section number!");
+              } else {
+                console.log("❌ FAILURE: Cell style does not contain the new section number");
+                console.log("Expected to find: section=" + newSection);
+                console.log("Actual style:", window.selectedCell.style);
+              }
+              
+              // Try to manually update the style if setSection didn't work
+              if (!window.selectedCell.style.includes(`section=${newSection}`)) {
+                console.log("Attempting manual style update...");
+                let style = window.selectedCell.style || "";
+                style = style.replace(/section=[^;]+/g, "");
+                style += `;section=${newSection};`;
+                window.selectedCell.style = style;
+                console.log("Manual style update completed. New style:", window.selectedCell.style);
+              }
+            }, 100);
+            
           } else {
-            console.log("setSection function not found!");
+            console.log("❌ setSection function not found!");
+            console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Section')));
           }
         } else {
-          console.log("getSection function not found!");
+          console.log("❌ getSection function not found!");
+          console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Section')));
         }
         
+        // Try to refresh the display
         if (typeof window.refreshAllCells === 'function') {
           console.log("Calling refreshAllCells");
           window.refreshAllCells();
         } else {
           console.log("refreshAllCells function not found!");
         }
+        
+        // Also try graph refresh
+        if (window.graph) {
+          console.log("Graph object exists, attempting refresh");
+          if (typeof window.graph.refresh === 'function') {
+            window.graph.refresh();
+            console.log("Graph refresh called");
+          } else {
+            console.log("Graph refresh method not found");
+          }
+        } else {
+          console.log("Graph object not found in window");
+        }
+        
       } else {
-        console.log("No selected cell!");
+        console.log("❌ No selected cell!");
+        console.log("window.selectedCell:", window.selectedCell);
       }
+      
+      console.log("=== END NEW SECTION BUTTON DEBUG ===");
       hideContextMenu();
     });
   }

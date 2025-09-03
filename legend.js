@@ -23,19 +23,32 @@ function getDefaultSectionColor(sectionNum) {
  * Also handles propagating section changes to connected cells recursively down the entire chain.
  */
 function setSection(cell, sectionNum) {
+  console.log("=== SETSECTION FUNCTION DEBUG ===");
+  console.log("setSection called with cell:", cell, "sectionNum:", sectionNum);
+  
   const graph = getGraph();
+  console.log("Graph from getGraph():", graph);
+  
   const sectionPrefs = getSectionPrefs();
+  console.log("Section prefs from getSectionPrefs():", sectionPrefs);
   
   if (!graph) {
     console.error('Graph not available for setSection');
     return;
   }
   
+  console.log("Cell style before modification:", cell.style);
   let style = cell.style || "";
   style = style.replace(/section=[^;]+/, "");
   style += `;section=${sectionNum};`;
+  console.log("Cell style after modification:", style);
+  
+  console.log("About to call graph.getModel().setStyle with cell:", cell, "and style:", style);
   graph.getModel().setStyle(cell, style);
+  console.log("setStyle completed");
+  
   if (!sectionPrefs[sectionNum]) {
+    console.log("Creating new section prefs for section:", sectionNum);
     sectionPrefs[sectionNum] = {
       borderColor: getDefaultSectionColor(parseInt(sectionNum)),
       name: "Enter section name"
@@ -111,9 +124,17 @@ function cascadeSectionChange(startCell, newSectionNum, visitedCells) {
  * Gets the section number from a cell's style.
  */
 function getSection(cell) {
+  console.log("=== GETSECTION FUNCTION DEBUG ===");
+  console.log("getSection called with cell:", cell);
+  console.log("Cell style:", cell.style);
+  
   const style = cell.style || "";
   const match = style.match(/section=([^;]+)/);
-  return match ? match[1] : "1";
+  console.log("Regex match result:", match);
+  
+  const result = match ? match[1] : "1";
+  console.log("getSection returning:", result);
+  return result;
 }
 
 /**
