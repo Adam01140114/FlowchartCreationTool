@@ -195,9 +195,131 @@ function setupCustomGraphEditing(graph) {
  * Set up custom double-click behavior for specific node types
  */
 function setupCustomDoubleClickBehavior(graph) {
-  const originalDblClick = graph.dblClick.bind(graph);
+  console.log("=== SETUP CUSTOM DOUBLE CLICK BEHAVIOR DEBUG ===");
+  console.log("Function called with graph:", graph);
+  console.log("Graph object type:", typeof graph);
+  
+  // Add double-click handler to the graph container with a delay to ensure DOM is ready
+  setTimeout(() => {
+    const graphContainer = document.getElementById('graphContainer');
+    if (graphContainer) {
+      console.log("Graph container found, adding double-click listener");
+      graphContainer.addEventListener('dblclick', function(evt) {
+        console.log("Graph container double-click event triggered");
+        console.log("Target:", evt.target);
+        
+        // Check if we clicked on a cell element
+        let cellElement = evt.target;
+        while (cellElement && !cellElement.classList.contains('mxCell')) {
+          cellElement = cellElement.parentElement;
+        }
+        
+        if (cellElement && cellElement.classList.contains('mxCell')) {
+          console.log("Cell element found:", cellElement);
+          console.log("Cell element ID:", cellElement.id);
+          
+          // Try to get the cell object from the graph
+          const cellId = cellElement.id;
+          if (cellId && cellId !== '0') {
+            try {
+              const cell = graph.getModel().getCell(cellId);
+              console.log("Cell object:", cell);
+              console.log("Is vertex:", cell && cell.vertex);
+              
+              if (cell && cell.vertex) {
+                console.log("Double-click detected on vertex:", cell);
+                alert("hello");
+              }
+            } catch (error) {
+              console.error("Error getting cell:", error);
+            }
+          }
+        }
+      });
+    } else {
+      console.log("Graph container not found");
+    }
+  }, 1000); // Wait 1 second for DOM to be ready
+  
+  // Add a simple test double-click handler to the document body
+  document.addEventListener('dblclick', function(evt) {
+    console.log("Document double-click event triggered");
+    console.log("Target:", evt.target);
+    console.log("Target tag:", evt.target.tagName);
+    console.log("Target classes:", evt.target.className);
+  });
+  
+  // Use mxGraph's event system to catch double-clicks
+  graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt) {
+    console.log("mxGraph DOUBLE_CLICK event triggered");
+    console.log("Event:", evt);
+    
+    // Get the cell from the event
+    const cell = evt.getProperty('cell');
+    if (cell && cell.vertex) {
+      console.log("Double-click on vertex via mxGraph event:", cell);
+      alert("hello");
+    }
+  });
+  
+  // Track clicks to detect double-clicks
+  let lastClickTime = 0;
+  let lastClickedCell = null;
+  const DOUBLE_CLICK_DELAY = 500; // 500ms = half a second
+  
+  // Add a simple click listener to test if mouse events work at all
+  graph.addListener(mxEvent.CLICK, function(sender, evt) {
+    console.log("mxGraph CLICK event triggered");
+    const cell = evt.getProperty('cell');
+    if (cell && cell.vertex) {
+      console.log("Click on vertex:", cell);
+      console.log("Cell ID:", cell.id);
+      
+      const currentTime = Date.now();
+      console.log("Current time:", currentTime);
+      console.log("Last click time:", lastClickTime);
+      console.log("Time difference:", currentTime - lastClickTime);
+      console.log("Last clicked cell:", lastClickedCell);
+      console.log("Same cell as last click:", lastClickedCell === cell);
+      
+      // Check if this is a double-click on the same cell
+      if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
+        console.log("🎯 DOUBLE CLICK DETECTED!");
+        console.log("Double-click on vertex:", cell);
+        alert("hello");
+        
+        // Reset the tracking
+        lastClickTime = 0;
+        lastClickedCell = null;
+      } else {
+        // Update tracking for next potential double-click
+        lastClickTime = currentTime;
+        lastClickedCell = cell;
+        console.log("Updated tracking - waiting for potential double-click");
+      }
+    }
+  });
+  
+  // Also keep the original dblClick override for compatibility
+  // Override the graph's dblClick method
+  const originalDblClick = graph.dblClick;
+  console.log("Original double-click handler bound:", originalDblClick);
+  console.log("Original handler type:", typeof originalDblClick);
   graph.dblClick = function (evt, cell) {
+    console.log("=== DOUBLE CLICK EVENT TRIGGERED ===");
+    console.log("Event:", evt);
+    console.log("Cell:", cell);
+    console.log("Event type:", evt.type);
+    console.log("Event target:", evt.target);
+    console.log("Event currentTarget:", evt.currentTarget);
+    console.log("This context:", this);
+    console.log("Graph object:", graph);
     console.log("Double-click detected on cell:", cell);
+    
+    // Show "hello" alert for all node double-clicks
+    if (cell && cell.vertex) {
+      alert("hello");
+    }
     
     // Ensure the cell is selected before editing
     if (cell && !graph.isCellSelected(cell)) {
@@ -205,14 +327,49 @@ function setupCustomDoubleClickBehavior(graph) {
     }
     
     // Handle question nodes with a popup for text editing
-    if (cell && isQuestion(cell)) {
-      const qt = getQuestionType(cell);
+    console.log("Checking if cell is a question node...");
+    console.log("isQuestion function exists:", typeof isQuestion === 'function');
+    console.log("isQuestion function available:", typeof window.isQuestion === 'function');
+    
+    if (cell && typeof isQuestion === 'function' && isQuestion(cell)) {
+      console.log("🎯 Question node detected via local isQuestion function!");
+      const qt = typeof getQuestionType === 'function' ? getQuestionType(cell) : 'unknown';
       console.log("Question type:", qt);
       
       // Show popup for question text editing
-      showQuestionTextPopup(cell);
-      mxEvent.consume(evt);
-      return;
+      console.log("About to call showQuestionTextPopup...");
+      if (typeof showQuestionTextPopup === 'function') {
+        console.log("✅ showQuestionTextPopup function found locally");
+        showQuestionTextPopup(cell);
+        console.log("✅ showQuestionTextPopup called successfully");
+        mxEvent.consume(evt);
+        return;
+      } else {
+        console.log("❌ showQuestionTextPopup function not found locally");
+        console.log("Available local functions:", Object.keys(this).filter(key => key.includes('Question')));
+      }
+    } else if (cell && typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+      console.log("🎯 Question node detected via window.isQuestion function!");
+      const qt = typeof window.getQuestionType === 'function' ? window.getQuestionType(cell) : 'unknown';
+      console.log("Question type:", qt);
+      
+      // Show popup for question text editing
+      console.log("About to call window.showQuestionTextPopup...");
+      if (typeof window.showQuestionTextPopup === 'function') {
+        console.log("✅ window.showQuestionTextPopup function found");
+        window.showQuestionTextPopup(cell);
+        console.log("✅ window.showQuestionTextPopup called successfully");
+        mxEvent.consume(evt);
+        return;
+      } else {
+        console.log("❌ window.showQuestionTextPopup function not found");
+        console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Question')));
+      }
+    } else {
+      console.log("ℹ️ Not a question node");
+      console.log("Cell exists:", !!cell);
+      console.log("Local isQuestion function:", typeof isQuestion);
+      console.log("Window isQuestion function:", typeof window.isQuestion);
     }
     
     // Add direct editing for option nodes on double-click
@@ -270,6 +427,10 @@ function setupCustomDoubleClickBehavior(graph) {
     // anything else keeps the stock behaviour
     originalDblClick(evt, cell);
   };
+  
+  console.log("✅ Custom double-click behavior set up successfully");
+  console.log("New dblClick function:", graph.dblClick);
+  console.log("Graph dblClick property after setup:", graph.dblClick);
 }
 
 /**
@@ -303,49 +464,62 @@ function showQuestionTextPopup(cell) {
     transform: translate(-50%, -50%);
     background: white;
     border: 2px solid #1976d2;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     z-index: 10000;
-    min-width: 300px;
-    font-family: Arial, sans-serif;
+    min-width: 450px;
+    max-width: 650px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   `;
   
   // Create popup content
   popup.innerHTML = `
-    <h3 style="margin: 0 0 15px 0; color: #1976d2;">Edit Question Text</h3>
+    <h3 style="margin: 0 0 20px 0; color: #1976d2; font-size: 20px; font-weight: 600; text-align: center;">Edit Question Text</h3>
     <textarea 
       id="questionTextInput" 
       placeholder="Enter question text here..."
       style="
         width: 100%;
-        min-height: 100px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
+        min-height: 120px;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
         font-family: inherit;
         resize: vertical;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+        line-height: 1.5;
+        transition: all 0.2s ease;
+        outline: none;
       "
     >${currentText}</textarea>
-    <div style="text-align: right;">
-      <button id="cancelQuestionText" style="
-        background: #f5f5f5;
-        border: 1px solid #ccc;
-        padding: 8px 16px;
-        margin-right: 10px;
-        border-radius: 4px;
-        cursor: pointer;
-      ">Cancel</button>
+    <div style="text-align: center;">
       <button id="submitQuestionText" style="
         background: #1976d2;
         color: white;
         border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
+        padding: 12px 24px;
+        border-radius: 8px;
         cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        display: block;
+        width: 100%;
+        transition: background-color 0.2s ease;
       ">Submit</button>
+      <button id="cancelQuestionText" style="
+        background: #1976d2;
+        color: white;
+        border: 1px solid #1976d2;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      ">Cancel</button>
     </div>
   `;
   
@@ -357,6 +531,30 @@ function showQuestionTextPopup(cell) {
   // Focus on textarea
   const textarea = popup.querySelector('#questionTextInput');
   console.log("Textarea element found:", textarea);
+  
+  // Add hover and focus effects
+  textarea.addEventListener('focus', () => {
+    textarea.style.borderColor = '#1976d2';
+    textarea.style.boxShadow = '0 0 0 3px rgba(25, 118, 210, 0.1)';
+  });
+  
+  textarea.addEventListener('blur', () => {
+    textarea.style.borderColor = '#e0e0e0';
+    textarea.style.boxShadow = 'none';
+  });
+  
+  textarea.addEventListener('mouseenter', () => {
+    if (document.activeElement !== textarea) {
+      textarea.style.borderColor = '#bdbdbd';
+    }
+  });
+  
+  textarea.addEventListener('mouseleave', () => {
+    if (document.activeElement !== textarea) {
+      textarea.style.borderColor = '#e0e0e0';
+    }
+  });
+  
   textarea.focus();
   textarea.select();
   console.log("Textarea focused and text selected");
@@ -364,6 +562,16 @@ function showQuestionTextPopup(cell) {
   // Handle submit button
   const submitBtn = popup.querySelector('#submitQuestionText');
   console.log("Submit button found:", submitBtn);
+  
+  // Add hover effects to submit button
+  submitBtn.addEventListener('mouseenter', () => {
+    submitBtn.style.background = '#1565c0';
+  });
+  
+  submitBtn.addEventListener('mouseleave', () => {
+    submitBtn.style.background = '#1976d2';
+  });
+  
   submitBtn.addEventListener('click', () => {
     console.log("Submit button clicked!");
     const newText = textarea.value.trim();
@@ -418,6 +626,18 @@ function showQuestionTextPopup(cell) {
   
   // Handle cancel button
   const cancelBtn = popup.querySelector('#cancelQuestionText');
+  
+  // Add hover effects to cancel button
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#1565c0';
+    cancelBtn.style.borderColor = '#1565c0';
+  });
+  
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = '#1976d2';
+    cancelBtn.style.borderColor = '#1976d2';
+  });
+  
   cancelBtn.addEventListener('click', () => {
     console.log("Cancelling question text edit");
     document.body.removeChild(popup);

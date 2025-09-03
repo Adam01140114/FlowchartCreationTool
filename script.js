@@ -301,11 +301,25 @@
   // Label changed event listener moved to events.js module
   
   
-    // Double-click behavior moved to graph.js module
-  // Custom double-click handling for specific node types
-  if (typeof setupCustomDoubleClickBehavior === 'function') {
-    setupCustomDoubleClickBehavior(graph);
-  }
+      // Double-click behavior moved to graph.js module
+    // Custom double-click handling for specific node types
+    console.log("=== SETTING UP DOUBLE CLICK BEHAVIOR ===");
+    console.log("Checking if window.setupCustomDoubleClickBehavior exists...");
+    console.log("Function exists:", typeof window.setupCustomDoubleClickBehavior === 'function');
+    console.log("Function value:", window.setupCustomDoubleClickBehavior);
+    
+    if (typeof window.setupCustomDoubleClickBehavior === 'function') {
+      console.log("✅ Calling window.setupCustomDoubleClickBehavior(graph)...");
+      try {
+        window.setupCustomDoubleClickBehavior(graph);
+        console.log("✅ window.setupCustomDoubleClickBehavior completed successfully");
+      } catch (error) {
+        console.error("❌ Error calling window.setupCustomDoubleClickBehavior:", error);
+      }
+    } else {
+      console.log("❌ window.setupCustomDoubleClickBehavior function not found!");
+      console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Double') || key.includes('Click')));
+    }
   
   
     // Let mxGraph render cell labels as HTML
