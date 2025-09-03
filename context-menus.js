@@ -1455,9 +1455,8 @@ function placeNodeAtClickLocation(graph, nodeType) {
     if (nodeType === 'question') {
       // Initialize as a simple text question
       cell._questionText = "";
-      if (typeof window.updateSimpleQuestionCell === 'function') {
-        window.updateSimpleQuestionCell(cell);
-      }
+      cell._questionType = ""; // Explicitly set to empty to trigger dropdown
+      // Don't call updateSimpleQuestionCell here - let refreshAllCells handle it
     } else if (nodeType === 'calculation') {
       // Initialize calculation node
       if (typeof window.initializeCalculationNode === 'function') {
@@ -1523,6 +1522,12 @@ function placeNodeAtClickLocation(graph, nodeType) {
   // Select the new cell
   if (cell) {
     graph.setSelectionCell(cell);
+    
+    // For question nodes, call refreshAllCells to show the dropdown
+    if (nodeType === 'question' && typeof window.refreshAllCells === 'function') {
+      window.refreshAllCells();
+    }
+    
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }

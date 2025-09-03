@@ -206,7 +206,7 @@ function setupCustomDoubleClickBehavior(graph) {
   // Track clicks to detect double-clicks manually
   let lastClickTime = 0;
   let lastClickedCell = null;
-  const DOUBLE_CLICK_DELAY = 500; // 500ms = half a second
+  const DOUBLE_CLICK_DELAY = 333; // 333ms = one-third of a second
   
   // Add click listener to detect double-clicks
   graph.addListener(mxEvent.CLICK, function(sender, evt) {

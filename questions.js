@@ -141,15 +141,43 @@ function updateSimpleQuestionCell(cell) {
   const graph = getGraph();
   if (!graph) return;
   
-  const placeholder = getQuestionType(cell).charAt(0).toUpperCase() + getQuestionType(cell).slice(1) + ' question node';
-  // Strip any HTML from _questionText before rendering
-  let text = cell._questionText || '';
-  text = text.replace(/<[^>]+>/g, '').trim();
-  cell._questionText = text; // keep it clean for future edits
-  const html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-    ${renderSimpleQuestionTitle(cell, placeholder)}
-  </div>`;
-  graph.getModel().setValue(cell, html);
+  // If the cell doesn't have a question type yet, show the dropdown
+  if (!cell._questionType || cell._questionType === '') {
+    const html = `
+      <div style="display: flex; justify-content: center; align-items: center; height:100%;">
+        <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
+          onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
+          onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
+          onmouseover="this.style.borderColor='#4a90e2';"
+          onmouseout="this.style.borderColor='#b0b8c9';"
+          onchange="window.pickTypeForCell('${cell.id}', this.value)">
+          <option value="">-- Choose Question Type --</option>
+          <option value="text">Text</option>
+          <option value="text2">Dropdown</option>
+          <option value="checkbox">Checkbox</option>
+          <option value="number">Number</option>
+          <option value="date">Date</option>
+          <option value="bigParagraph">Big Paragraph</option>
+          <option value="multipleTextboxes">Multiple Textboxes</option>
+          <option value="multipleDropdownType">Multiple Dropdown Type</option>
+          <option value="dateRange">Date Range</option>
+          <option value="email">Email</option>
+          <option value="phone">Phone</option>
+        </select>
+      </div>`;
+    graph.getModel().setValue(cell, html);
+  } else {
+    // If question type is already set, render the normal title
+    const placeholder = getQuestionType(cell).charAt(0).toUpperCase() + getQuestionType(cell).slice(1) + ' question node';
+    // Strip any HTML from _questionText before rendering
+    let text = cell._questionText || '';
+    text = text.replace(/<[^>]+>/g, '').trim();
+    cell._questionText = text; // keep it clean for future edits
+    const html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+      ${renderSimpleQuestionTitle(cell, placeholder)}
+    </div>`;
+    graph.getModel().setValue(cell, html);
+  }
 }
 
 // Multiple Textboxes Functions
