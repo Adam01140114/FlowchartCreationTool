@@ -197,10 +197,18 @@ function setupCustomGraphEditing(graph) {
 function setupCustomDoubleClickBehavior(graph) {
   const originalDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function (evt, cell) {
+    console.log("Double-click detected on cell:", cell);
+    
+    // Ensure the cell is selected before editing
+    if (cell && !graph.isCellSelected(cell)) {
+      graph.setSelectionCell(cell);
+    }
+    
     // make multiple-textbox **and** dropdown-style questions
     // jump straight into the inner <div class="question-text">
     if (cell && isQuestion(cell)) {
       const qt = getQuestionType(cell);
+      console.log("Question type:", qt);
       if (qt === 'multipleTextboxes' ||
           qt === 'multipleDropdownType' ||   // numbered-dropdown
           qt === 'dropdown') {               // simple dropdown
@@ -208,6 +216,7 @@ function setupCustomDoubleClickBehavior(graph) {
         if (state && state.text && state.text.node) {
           const qDiv = state.text.node.querySelector('.question-text');
           if (qDiv) {
+            console.log("Found question-text div, focusing on it");
             graph.selectionModel.setCell(cell); // keep node selected
             qDiv.focus();                       // put caret inside
             mxEvent.consume(evt);
@@ -215,10 +224,13 @@ function setupCustomDoubleClickBehavior(graph) {
           }
         }
       }
+      // If no special handling for this question type, fall through to general editing
+      console.log("No special handling for question type, using general editing");
     }
     
     // Add direct editing for option nodes on double-click
     if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
+      console.log("Option node detected, enabling direct editing");
       // Enable direct editing for option nodes
       graph.startEditingAtCell(cell);
       mxEvent.consume(evt);
@@ -227,6 +239,7 @@ function setupCustomDoubleClickBehavior(graph) {
     
     // Add direct editing for subtitle and info nodes on double-click
     if (cell && (isSubtitleNode(cell) || isInfoNode(cell))) {
+      console.log("Subtitle/Info node detected, enabling direct editing");
       // Enable direct editing
       graph.startEditingAtCell(cell);
       mxEvent.consume(evt);
@@ -235,6 +248,7 @@ function setupCustomDoubleClickBehavior(graph) {
     
     // Handle alert nodes - focus on the input field instead of editing the whole cell
     if (cell && isAlertNode(cell)) {
+      console.log("Alert node detected, focusing on input field");
       const state = graph.view.getState(cell);
       if (state && state.text && state.text.node) {
         const inputField = state.text.node.querySelector('input[type="text"]');
@@ -248,6 +262,24 @@ function setupCustomDoubleClickBehavior(graph) {
       }
     }
 
+    // For all other nodes, enable general text editing
+    if (cell && cell.vertex && !cell.edge) {
+      console.log("General vertex node detected, enabling text editing");
+      // Enable direct text editing for any vertex node
+      try {
+        graph.startEditingAtCell(cell);
+        console.log("startEditingAtCell called successfully");
+        mxEvent.consume(evt);
+        return;
+      } catch (error) {
+        console.error("Error calling startEditingAtCell:", error);
+        // Fall back to original behavior
+        originalDblClick(evt, cell);
+        return;
+      }
+    }
+
+    console.log("Using original double-click behavior");
     // anything else keeps the stock behaviour
     originalDblClick(evt, cell);
   };

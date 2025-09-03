@@ -3,6 +3,13 @@
  **************************************************/
 
 /**
+ * Section & Legend Management Module
+ * Handles section preferences, coloring, legend updates, and section grouping
+ */
+
+// Use shared dependency accessors from dependencies.js module
+
+/**
  * Determines the default color for a section based on its number.
  * Creates a color gradient where higher section numbers are darker.
  */
@@ -16,6 +23,14 @@ function getDefaultSectionColor(sectionNum) {
  * Also handles propagating section changes to connected cells recursively down the entire chain.
  */
 function setSection(cell, sectionNum) {
+  const graph = getGraph();
+  const sectionPrefs = getSectionPrefs();
+  
+  if (!graph) {
+    console.error('Graph not available for setSection');
+    return;
+  }
+  
   let style = cell.style || "";
   style = style.replace(/section=[^;]+/, "");
   style += `;section=${sectionNum};`;
@@ -56,6 +71,13 @@ function setSection(cell, sectionNum) {
  * This function traverses all connected descendants and updates their sections.
  */
 function cascadeSectionChange(startCell, newSectionNum, visitedCells) {
+  const graph = getGraph();
+  
+  if (!graph) {
+    console.error('Graph not available for cascadeSectionChange');
+    return;
+  }
+  
   // Prevent infinite loops by tracking visited cells
   if (visitedCells.has(startCell.id)) {
     return;
@@ -99,6 +121,14 @@ function getSection(cell) {
  * Also handles deletion of dependent cells.
  */
 function deleteSection(sectionNum) {
+  const graph = getGraph();
+  const sectionPrefs = getSectionPrefs();
+  
+  if (!graph) {
+    console.error('Graph not available for deleteSection');
+    return;
+  }
+  
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
   const sectionToDelete = parseInt(sectionNum);
   
@@ -189,13 +219,24 @@ function deleteSection(sectionNum) {
   }
   
   updateSectionLegend();
-  refreshAllCells();
+  const refreshAllCells = getRefreshAllCells();
+  if (refreshAllCells) {
+    refreshAllCells();
+  }
 }
 
 /**
  * Adds a new section after the specified section number.
  */
 function addSection(afterSectionNum) {
+  const graph = getGraph();
+  const sectionPrefs = getSectionPrefs();
+  
+  if (!graph) {
+    console.error('Graph not available for addSection');
+    return;
+  }
+  
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
   const insertAfter = parseInt(afterSectionNum);
   const newSectionNum = insertAfter + 1;
@@ -242,14 +283,24 @@ function addSection(afterSectionNum) {
   }
   
   updateSectionLegend();
-  refreshAllCells();
+  const refreshAllCells = getRefreshAllCells();
+  if (refreshAllCells) {
+    refreshAllCells();
+  }
 }
 
 /**
  * Updates the section legend UI based on current sectionPrefs.
  */
 function updateSectionLegend() {
+  const sectionPrefs = getSectionPrefs();
   const legend = document.getElementById("sectionLegend");
+  
+  if (!legend) {
+    console.error('Section legend element not found');
+    return;
+  }
+  
   let innerHTML = "<h4>Section Names</h4>";
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
   sections.forEach(sec => {
@@ -293,6 +344,12 @@ function updateSectionLegend() {
       }
       
       const sec = item.getAttribute("data-section");
+      const graph = getGraph();
+      
+      if (!graph) {
+        console.error('Graph not available for section selection');
+        return;
+      }
       
       // Select all cells in this section
       const vertices = graph.getChildVertices(graph.getDefaultParent());
@@ -334,7 +391,10 @@ function updateSectionLegend() {
       sectionPrefs[sec].borderColor = getDefaultSectionColor(parseInt(sec));
     });
     updateSectionLegend();
+    const refreshAllCells = getRefreshAllCells();
+  if (refreshAllCells) {
     refreshAllCells();
+  }
   });
   
   // If there's a currently selected cell, highlight its section
@@ -344,10 +404,14 @@ function updateSectionLegend() {
   }
   
   // Update group dropdowns with new section names
-  updateGroupDropdowns();
+  if (typeof updateGroupDropdowns === 'function') {
+    updateGroupDropdowns();
+  }
   
   // Add drag and drop event listeners
-  addDragAndDropListeners();
+  if (typeof addDragAndDropListeners === 'function') {
+    addDragAndDropListeners();
+  }
 }
 
 /**
@@ -387,7 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectedSectionForColor) {
       sectionPrefs[selectedSectionForColor].borderColor = e.target.value;
       updateSectionLegend();
-      refreshAllCells();
+      const refreshAllCells = getRefreshAllCells();
+  if (refreshAllCells) {
+    refreshAllCells();
+  }
     }
   });
 });
@@ -447,6 +514,14 @@ function addDragAndDropListeners() {
  * and updating all node section numbers accordingly
  */
 function reorderSections(draggedSection, targetSection) {
+  const graph = getGraph();
+  const sectionPrefs = getSectionPrefs();
+  
+  if (!graph) {
+    console.error('Graph not available for reorderSections');
+    return;
+  }
+  
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
   const draggedIndex = sections.indexOf(draggedSection);
   const targetIndex = sections.indexOf(targetSection);
@@ -500,5 +575,40 @@ function reorderSections(draggedSection, targetSection) {
   
   // Update the legend and refresh cells
   updateSectionLegend();
-  refreshAllCells();
-} 
+  const refreshAllCells = getRefreshAllCells();
+  if (refreshAllCells) {
+    refreshAllCells();
+  }
+}
+
+/**************************************************
+ ************ Module Exports **********************
+ **************************************************/
+
+// Export all functions to window object for global access
+window.legend = {
+  getDefaultSectionColor,
+  setSection,
+  cascadeSectionChange,
+  getSection,
+  deleteSection,
+  addSection,
+  updateSectionLegend,
+  highlightSectionInLegend,
+  rgbToHex,
+  reorderSections,
+  addDragAndDropListeners
+};
+
+// Export individual functions for backward compatibility
+window.getDefaultSectionColor = getDefaultSectionColor;
+window.setSection = setSection;
+window.cascadeSectionChange = cascadeSectionChange;
+window.getSection = getSection;
+window.deleteSection = deleteSection;
+window.addSection = addSection;
+window.updateSectionLegend = updateSectionLegend;
+window.highlightSectionInLegend = highlightSectionInLegend;
+window.rgbToHex = rgbToHex;
+window.reorderSections = reorderSections;
+window.addDragAndDropListeners = addDragAndDropListeners; 

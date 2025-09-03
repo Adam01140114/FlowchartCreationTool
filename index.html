@@ -313,6 +313,15 @@
       <span id="propAmountPlaceholder" class="editable-field" tabindex="0"></span>
     </p>
   </div>
+  
+  <div id="pdfProps" style="display: none;">
+    <p><strong>PDF Node:</strong>
+      <span id="propPdfNode" class="editable-field" tabindex="0"></span>
+    </p>
+    <p><strong>PDF Filename:</strong>
+      <span id="propPdfFilename" class="editable-field" tabindex="0"></span>
+    </p>
+  </div>
 </div>
 
 <!-- Settings Menu -->
@@ -354,15 +363,27 @@
 <script src="auth.js"></script>
 <!-- Configuration and setup - loaded second -->
 <script src="config.js"></script>
-<!-- Graph management - loaded third -->
+<!-- Shared dependencies - loaded third -->
+<script src="dependencies.js"></script>
+<!-- Graph management - loaded fourth -->
 <script src="graph.js"></script>
-<!-- Calculation functions - loaded fourth -->
+<!-- Calculation functions - loaded fifth -->
 <script src="calc.js"></script>
-<!-- Section/Legend functions - loaded fifth -->
+<!-- Question functions - loaded sixth -->
+<script src="questions.js"></script>
+<!-- Context menus - loaded seventh -->
+<script src="context-menus.js"></script>
+<!-- Properties panel - loaded eighth -->
+<script src="properties.js"></script>
+<!-- Event handlers - loaded ninth -->
+<script src="events.js"></script>
+<!-- Section/Legend functions - loaded tenth -->
 <script src="legend.js"></script>
-<!-- File I/O functions - loaded sixth -->
+<!-- Groups & Organization functions - loaded eleventh -->
+<script src="groups.js"></script>
+<!-- File I/O functions - loaded twelfth -->
 <script src="library.js"></script>
-<!-- URL sharing functions - loaded seventh -->
+<!-- URL sharing functions - loaded thirteenth -->
 <script src="url.js"></script>
 <!-- Main script - loaded last -->
 <script src="script.js"></script>
