@@ -594,6 +594,111 @@ function showQuestionTextPopup(cell) {
     console.log("Textarea focused, text selected, and cursor positioned");
   });
   
+  // Create a reliable submit function
+  function submitQuestionText() {
+    console.log("=== SUBMIT FUNCTION CALLED ===");
+    
+    // Force the textarea to lose focus to ensure value is captured
+    textarea.blur();
+    
+    // Small delay to ensure the value is properly captured
+    setTimeout(() => {
+      try {
+      const newText = textarea.value.trim();
+      console.log("New text from textarea (after blur):", newText);
+      console.log("Textarea value before trim:", textarea.value);
+      
+      if (newText) {
+        console.log("New text is valid, updating cell...");
+        
+        // Update the cell's question text
+        cell._questionText = newText;
+        console.log("Updated cell._questionText to:", cell._questionText);
+        
+        // Also update the cell's value directly for immediate visual update
+        if (cell.value && typeof cell.value === 'string' && cell.value.includes('<div')) {
+          // For HTML content, update the text content
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = cell.value;
+          const textElement = tempDiv.querySelector('.question-text, .question-title-input, div');
+          if (textElement) {
+            textElement.textContent = newText;
+            cell.value = tempDiv.innerHTML;
+          } else {
+            // Fallback: replace the entire content
+            cell.value = `<div style="text-align:center;">${newText}</div>`;
+          }
+        } else {
+          // For plain text, update directly
+          cell.value = newText;
+        }
+        
+        console.log("Updated cell.value to:", cell.value);
+        
+        // Update the cell display based on question type
+        const qt = getQuestionType(cell);
+        console.log("Question type for update:", qt);
+        
+        if (qt === 'multipleTextboxes' || qt === 'multipleDropdownType') {
+          console.log("Complex question type detected, calling updateMultipleTextboxHandler");
+          // For complex question types, call the appropriate update function
+          if (typeof window.updateMultipleTextboxHandler === 'function') {
+            console.log("updateMultipleTextboxHandler function exists, calling it");
+            window.updateMultipleTextboxHandler(cell);
+          } else {
+            console.log("updateMultipleTextboxHandler function not found!");
+          }
+        } else {
+          console.log("Simple question type detected, calling updateSimpleQuestionCell");
+          // For simple question types, call updateSimpleQuestionCell
+          if (typeof window.updateSimpleQuestionCell === 'function') {
+            console.log("updateSimpleQuestionCell function exists, calling it");
+            window.updateSimpleQuestionCell(cell);
+          } else {
+            console.log("updateSimpleQuestionCell function not found!");
+          }
+        }
+        
+        // Force the graph to refresh this specific cell
+        try {
+          graph.refresh(cell);
+          console.log("Graph.refresh(cell) called successfully");
+        } catch (error) {
+          console.log("Graph.refresh(cell) failed:", error);
+        }
+        
+        // Also try to trigger a model change event
+        try {
+          graph.getModel().beginUpdate();
+          graph.getModel().setValue(cell, cell.value);
+          graph.getModel().endUpdate();
+          console.log("Graph model updated successfully");
+        } catch (error) {
+          console.log("Graph model update failed:", error);
+        }
+        
+        // Refresh the display
+        if (typeof window.refreshAllCells === 'function') {
+          console.log("refreshAllCells function exists, calling it");
+          window.refreshAllCells();
+        } else {
+          console.log("refreshAllCells function not found!");
+        }
+        
+        // Final verification
+        console.log("Final cell._questionText:", cell._questionText);
+        console.log("Final cell.value:", cell.value);
+      } else {
+        console.log("New text is empty or invalid, not updating");
+      }
+      
+      } catch (error) {
+        console.error("Error in submit function:", error);
+      }
+      // Note: Popup removal is now handled by the Enter key handler calling cancelBtn.click()
+    }, 10); // Small delay to ensure value capture
+  }
+  
   // Handle submit button
   const submitBtn = popup.querySelector('#submitQuestionText');
   console.log("Submit button found:", submitBtn);
@@ -607,57 +712,7 @@ function showQuestionTextPopup(cell) {
     submitBtn.style.background = '#1976d2';
   });
   
-  submitBtn.addEventListener('click', () => {
-    console.log("Submit button clicked!");
-    const newText = textarea.value.trim();
-    console.log("New text from textarea:", newText);
-    console.log("Textarea value before trim:", textarea.value);
-    
-    if (newText) {
-      console.log("New text is valid, updating cell...");
-      
-      // Update the cell's question text
-      cell._questionText = newText;
-      console.log("Updated cell._questionText to:", cell._questionText);
-      
-      // Update the cell display based on question type
-      const qt = getQuestionType(cell);
-      console.log("Question type for update:", qt);
-      
-      if (qt === 'multipleTextboxes' || qt === 'multipleDropdownType') {
-        console.log("Complex question type detected, calling updateMultipleTextboxHandler");
-        // For complex question types, call the appropriate update function
-        if (typeof window.updateMultipleTextboxHandler === 'function') {
-          console.log("updateMultipleTextboxHandler function exists, calling it");
-          window.updateMultipleTextboxHandler(cell);
-        } else {
-          console.log("updateMultipleTextboxHandler function not found!");
-        }
-      } else {
-        console.log("Simple question type detected, calling updateSimpleQuestionCell");
-        // For simple question types, call updateSimpleQuestionCell
-        if (typeof window.updateSimpleQuestionCell === 'function') {
-          console.log("updateSimpleQuestionCell function exists, calling it");
-          window.updateSimpleQuestionCell(cell);
-        } else {
-          console.log("updateSimpleQuestionCell function not found!");
-        }
-      }
-      
-      // Refresh the display
-      if (typeof window.refreshAllCells === 'function') {
-        console.log("refreshAllCells function exists, calling it");
-        window.refreshAllCells();
-      } else {
-        console.log("refreshAllCells function not found!");
-      }
-    } else {
-      console.log("New text is empty or invalid, not updating");
-    }
-    
-    // Remove popup
-    document.body.removeChild(popup);
-  });
+  submitBtn.addEventListener('click', submitQuestionText);
   
   // Handle cancel button
   const cancelBtn = popup.querySelector('#cancelQuestionText');
@@ -681,11 +736,16 @@ function showQuestionTextPopup(cell) {
   // Handle Enter key in textarea
   textarea.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.ctrlKey) {
-      submitBtn.click();
+      e.preventDefault();
+      submitQuestionText();
+      // Close the menu after submitting
+      setTimeout(() => cancelBtn.click(), 50);
     } else if (e.key === 'Enter' && !e.shiftKey) {
       // Enter key (without Shift) submits the form
       e.preventDefault(); // Prevent new line
-      submitBtn.click();
+      submitQuestionText();
+      // Close the menu after submitting
+      setTimeout(() => cancelBtn.click(), 50);
     } else if (e.key === 'Escape') {
       cancelBtn.click();
     }
