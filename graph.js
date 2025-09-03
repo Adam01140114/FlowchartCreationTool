@@ -286,7 +286,18 @@ function setupCustomDoubleClickBehavior(graph) {
       if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
         console.log("🎯 DOUBLE CLICK DETECTED!");
         console.log("Double-click on vertex:", cell);
-        alert("hello");
+        
+        // Show the edit question text popup instead of alert
+        if (typeof showQuestionTextPopup === 'function') {
+          console.log("Calling showQuestionTextPopup for double-click");
+          showQuestionTextPopup(cell);
+        } else if (typeof window.showQuestionTextPopup === 'function') {
+          console.log("Calling window.showQuestionTextPopup for double-click");
+          window.showQuestionTextPopup(cell);
+        } else {
+          console.log("showQuestionTextPopup function not found, falling back to alert");
+          alert("hello");
+        }
         
         // Reset the tracking
         lastClickTime = 0;
@@ -468,8 +479,8 @@ function showQuestionTextPopup(cell) {
     padding: 30px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     z-index: 10000;
-    min-width: 450px;
-    max-width: 650px;
+    min-width: 500px;
+    max-width: 500px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   `;
   
@@ -480,7 +491,7 @@ function showQuestionTextPopup(cell) {
       id="questionTextInput" 
       placeholder="Enter question text here..."
       style="
-        width: 100%;
+        width: 400px;
         min-height: 120px;
         padding: 15px;
         border: 2px solid #e0e0e0;
@@ -646,6 +657,10 @@ function showQuestionTextPopup(cell) {
   // Handle Enter key in textarea
   textarea.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.ctrlKey) {
+      submitBtn.click();
+    } else if (e.key === 'Enter' && !e.shiftKey) {
+      // Enter key (without Shift) submits the form
+      e.preventDefault(); // Prevent new line
       submitBtn.click();
     } else if (e.key === 'Escape') {
       cancelBtn.click();
