@@ -199,104 +199,31 @@ function setupCustomDoubleClickBehavior(graph) {
   console.log("Function called with graph:", graph);
   console.log("Graph object type:", typeof graph);
   
-  // Add double-click handler to the graph container with a delay to ensure DOM is ready
-  setTimeout(() => {
-    const graphContainer = document.getElementById('graphContainer');
-    if (graphContainer) {
-      console.log("Graph container found, adding double-click listener");
-      graphContainer.addEventListener('dblclick', function(evt) {
-        console.log("Graph container double-click event triggered");
-        console.log("Target:", evt.target);
-        
-        // Check if we clicked on a cell element
-        let cellElement = evt.target;
-        while (cellElement && !cellElement.classList.contains('mxCell')) {
-          cellElement = cellElement.parentElement;
-        }
-        
-        if (cellElement && cellElement.classList.contains('mxCell')) {
-          console.log("Cell element found:", cellElement);
-          console.log("Cell element ID:", cellElement.id);
-          
-          // Try to get the cell object from the graph
-          const cellId = cellElement.id;
-          if (cellId && cellId !== '0') {
-            try {
-              const cell = graph.getModel().getCell(cellId);
-              console.log("Cell object:", cell);
-              console.log("Is vertex:", cell && cell.vertex);
-              
-              if (cell && cell.vertex) {
-                console.log("Double-click detected on vertex:", cell);
-                alert("hello");
-              }
-            } catch (error) {
-              console.error("Error getting cell:", error);
-            }
-          }
-        }
-      });
-    } else {
-      console.log("Graph container not found");
-    }
-  }, 1000); // Wait 1 second for DOM to be ready
+
   
-  // Add a simple test double-click handler to the document body
-  document.addEventListener('dblclick', function(evt) {
-    console.log("Document double-click event triggered");
-    console.log("Target:", evt.target);
-    console.log("Target tag:", evt.target.tagName);
-    console.log("Target classes:", evt.target.className);
-  });
+
   
-  // Use mxGraph's event system to catch double-clicks
-  graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt) {
-    console.log("mxGraph DOUBLE_CLICK event triggered");
-    console.log("Event:", evt);
-    
-    // Get the cell from the event
-    const cell = evt.getProperty('cell');
-    if (cell && cell.vertex) {
-      console.log("Double-click on vertex via mxGraph event:", cell);
-      alert("hello");
-    }
-  });
-  
-  // Track clicks to detect double-clicks
+  // Track clicks to detect double-clicks manually
   let lastClickTime = 0;
   let lastClickedCell = null;
   const DOUBLE_CLICK_DELAY = 500; // 500ms = half a second
   
-  // Add a simple click listener to test if mouse events work at all
+  // Add click listener to detect double-clicks
   graph.addListener(mxEvent.CLICK, function(sender, evt) {
-    console.log("mxGraph CLICK event triggered");
     const cell = evt.getProperty('cell');
     if (cell && cell.vertex) {
-      console.log("Click on vertex:", cell);
-      console.log("Cell ID:", cell.id);
-      
       const currentTime = Date.now();
-      console.log("Current time:", currentTime);
-      console.log("Last click time:", lastClickTime);
-      console.log("Time difference:", currentTime - lastClickTime);
-      console.log("Last clicked cell:", lastClickedCell);
-      console.log("Same cell as last click:", lastClickedCell === cell);
       
       // Check if this is a double-click on the same cell
       if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
-        console.log("🎯 DOUBLE CLICK DETECTED!");
-        console.log("Double-click on vertex:", cell);
+        console.log("🎯 DOUBLE CLICK DETECTED manually!");
+        alert("double click detected");
         
-        // Show the edit question text popup instead of alert
-        if (typeof showQuestionTextPopup === 'function') {
-          console.log("Calling showQuestionTextPopup for double-click");
+        // Show question text popup for question nodes
+        if (typeof isQuestion === 'function' && isQuestion(cell)) {
+          console.log("🎯 Question node detected, showing popup");
           showQuestionTextPopup(cell);
-        } else if (typeof window.showQuestionTextPopup === 'function') {
-          console.log("Calling window.showQuestionTextPopup for double-click");
-          window.showQuestionTextPopup(cell);
-        } else {
-          console.log("showQuestionTextPopup function not found, falling back to alert");
-          alert("hello");
+          return;
         }
         
         // Reset the tracking
@@ -306,7 +233,6 @@ function setupCustomDoubleClickBehavior(graph) {
         // Update tracking for next potential double-click
         lastClickTime = currentTime;
         lastClickedCell = cell;
-        console.log("Updated tracking - waiting for potential double-click");
       }
     }
   });
@@ -327,9 +253,14 @@ function setupCustomDoubleClickBehavior(graph) {
     console.log("Graph object:", graph);
     console.log("Double-click detected on cell:", cell);
     
-    // Show "hello" alert for all node double-clicks
+    // Show question text popup for question nodes
     if (cell && cell.vertex) {
-      alert("hello");
+      if (typeof isQuestion === 'function' && isQuestion(cell)) {
+        console.log("🎯 Question node detected, showing popup");
+        showQuestionTextPopup(cell);
+        mxEvent.consume(evt);
+        return;
+      }
     }
     
     // Ensure the cell is selected before editing
@@ -448,6 +379,16 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show popup for editing question node text
  */
 function showQuestionTextPopup(cell) {
+  // --- prevent duplicate popups ---
+  if (window.__questionTextPopupOpen) {
+    console.log("Popup already open; skipping duplicate");
+    return;
+  }
+  window.__questionTextPopupOpen = true;
+
+  // (optional: clean any zombie instances)
+  document.querySelectorAll('.question-text-modal').forEach(n => n.remove());
+
   console.log("=== SHOW QUESTION TEXT POPUP DEBUG ===");
   console.log("showQuestionTextPopup called with cell:", cell);
   console.log("Cell ID:", cell.id);
@@ -468,6 +409,7 @@ function showQuestionTextPopup(cell) {
   
   // Create popup container
   const popup = document.createElement('div');
+  popup.className = 'question-text-modal';
   popup.style.cssText = `
     position: fixed;
     top: 50%;
@@ -486,7 +428,10 @@ function showQuestionTextPopup(cell) {
   
   // Create popup content
   popup.innerHTML = `
-    <h3 style="margin: 0 0 20px 0; color: #1976d2; font-size: 20px; font-weight: 600; text-align: center;">Edit Question Text</h3>
+    <div style="position: relative; margin-bottom: 20px;">
+      <h3 style="margin: 0; color: #1976d2; font-size: 20px; font-weight: 600; text-align: center;">Edit Question Text</h3>
+      <button id="closeQuestionText" type="button" style="position: absolute; top: -10px; right: -10px; background: #f44336; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1;">×</button>
+    </div>
     <textarea 
       id="questionTextInput" 
       placeholder="Enter question text here..."
@@ -506,7 +451,7 @@ function showQuestionTextPopup(cell) {
       "
     >${currentText}</textarea>
     <div style="text-align: center;">
-      <button id="submitQuestionText" style="
+      <button id="submitQuestionText" type="button" style="
         background: #1976d2;
         color: white;
         border: none;
@@ -520,7 +465,7 @@ function showQuestionTextPopup(cell) {
         width: 100%;
         transition: background-color 0.2s ease;
       ">Submit</button>
-      <button id="cancelQuestionText" style="
+      <button id="cancelQuestionText" type="button" style="
         background: #1976d2;
         color: white;
         border: 1px solid #1976d2;
@@ -539,11 +484,146 @@ function showQuestionTextPopup(cell) {
   document.body.appendChild(popup);
   console.log("Popup added to DOM");
   
-  // Focus on textarea
-  const textarea = popup.querySelector('#questionTextInput');
-  console.log("Textarea element found:", textarea);
+  // Add CSS for enlarged hit area on close button
+  const style = document.createElement('style');
+  style.textContent = `
+    #closeQuestionText::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      z-index: -1;
+    }
+  `;
+  document.head.appendChild(style);
   
-  // Add hover and focus effects
+  // Get all DOM elements first
+  const textarea = popup.querySelector('#questionTextInput');
+  const submitBtn = popup.querySelector('#submitQuestionText');
+  const cancelBtn = popup.querySelector('#cancelQuestionText');
+  const closeBtn = popup.querySelector('#closeQuestionText');
+  
+  console.log("Textarea element found:", textarea);
+  console.log("Submit button found:", submitBtn);
+  console.log("Cancel button found:", cancelBtn);
+  console.log("Close button found:", closeBtn);
+  
+  // 🔧 1) Declare BEFORE closePopup to avoid TDZ on first submit
+  let focusTimeout = null;
+  let isClosing = false;
+  
+  // kill the delayed refocus before it can steal the click
+  const killFocusTimer = () => {
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
+      focusTimeout = null;
+    }
+  };
+
+  // Close fast on pointerdown; click remains as a fallback
+  const safeClose = (e) => { e.preventDefault(); e.stopPropagation(); killFocusTimer(); closePopup(); };
+  const safeSubmit = (e) => { e.preventDefault(); e.stopPropagation(); killFocusTimer(); submitQuestionText(); };
+  
+  // Create a dedicated close function to ensure consistent behavior
+  function closePopup() {
+    if (isClosing) return;
+    isClosing = true;
+
+    // Kill any pending focus work
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
+      focusTimeout = null;
+    }
+
+    // Immediately hide so the user sees it go away on the first click
+    popup.style.display = 'none';
+    popup.style.pointerEvents = 'none';
+    popup.style.opacity = '0';
+
+    // Remove on the next tick (avoids races with bubbling/focus)
+    setTimeout(() => {
+      try { 
+        if (popup && popup.parentNode) {
+          popup.remove();
+        }
+      } catch {
+        try { 
+          if (popup && popup.parentNode) {
+            document.body.removeChild(popup);
+          }
+        } catch {}
+      }
+      window.__questionTextPopupOpen = false;  // <-- clear the guard here
+    }, 0);
+  }
+  
+  // Now define the function, all elements are available in scope
+  function submitQuestionText() {
+    if (isClosing) return; // avoid double-submit re-entrancy
+    console.log("=== SUBMIT FUNCTION CALLED ===");
+
+    try {
+      const newText = textarea.value.trim();
+      console.log("New text from textarea:", newText);
+
+      // Always close the popup first to avoid it hanging open
+      closePopup();
+
+      if (newText) {
+        console.log("New text is valid, updating cell...");
+
+        cell._questionText = newText;
+
+        if (cell.value && typeof cell.value === 'string' && cell.value.includes('<div')) {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = cell.value;
+          const textElement = tempDiv.querySelector('.question-text, .question-title-input, div');
+          if (textElement) {
+            textElement.textContent = newText;
+            cell.value = tempDiv.innerHTML;
+          } else {
+            cell.value = `<div style="text-align:center;">${newText}</div>`;
+          }
+        } else {
+          cell.value = newText;
+        }
+
+        const qt = getQuestionType(cell);
+        if (qt === 'multipleTextboxes' || qt === 'multipleDropdownType') {
+          if (typeof window.updateMultipleTextboxHandler === 'function') {
+            window.updateMultipleTextboxHandler(cell);
+          }
+        } else {
+          if (typeof window.updateSimpleQuestionCell === 'function') {
+            window.updateSimpleQuestionCell(cell);
+          }
+        }
+
+        try {
+          graph.refresh(cell);
+        } catch (error) {
+          console.log("Graph.refresh(cell) failed:", error);
+        }
+
+        try {
+          graph.getModel().beginUpdate();
+          graph.getModel().setValue(cell, cell.value);
+          graph.getModel().endUpdate();
+        } catch (error) {
+          console.log("Graph model update failed:", error);
+        }
+
+        if (typeof window.refreshAllCells === 'function') {
+          window.refreshAllCells();
+        }
+      } else {
+        console.log("New text is empty, not updating cell.");
+      }
+    } catch (error) {
+      console.error("Error in submit function:", error);
+    }
+  }
+  
+  // Add hover and focus effects to textarea
   textarea.addEventListener('focus', () => {
     textarea.style.borderColor = '#1976d2';
     textarea.style.boxShadow = '0 0 0 3px rgba(25, 118, 210, 0.1)';
@@ -574,7 +654,7 @@ function showQuestionTextPopup(cell) {
     }
   });
   
-  // Ensure proper focus and cursor positioning using multiple approaches
+  // Ensure proper focus and cursor positioning with timer tracking
   requestAnimationFrame(() => {
     // First attempt: standard focus and select
     textarea.focus();
@@ -584,7 +664,7 @@ function showQuestionTextPopup(cell) {
     textarea.setSelectionRange(textarea.value.length, textarea.value.length);
     
     // Third attempt: force focus again after a tiny delay
-    setTimeout(() => {
+    focusTimeout = setTimeout(() => {
       textarea.focus();
       textarea.select();
       textarea.setSelectionRange(textarea.value.length, textarea.value.length);
@@ -593,115 +673,6 @@ function showQuestionTextPopup(cell) {
     
     console.log("Textarea focused, text selected, and cursor positioned");
   });
-  
-  // Create a reliable submit function
-  function submitQuestionText() {
-    console.log("=== SUBMIT FUNCTION CALLED ===");
-    
-    // Force the textarea to lose focus to ensure value is captured
-    textarea.blur();
-    
-    // Small delay to ensure the value is properly captured
-    setTimeout(() => {
-      try {
-      const newText = textarea.value.trim();
-      console.log("New text from textarea (after blur):", newText);
-      console.log("Textarea value before trim:", textarea.value);
-      
-      if (newText) {
-        console.log("New text is valid, updating cell...");
-        
-        // Update the cell's question text
-        cell._questionText = newText;
-        console.log("Updated cell._questionText to:", cell._questionText);
-        
-        // Also update the cell's value directly for immediate visual update
-        if (cell.value && typeof cell.value === 'string' && cell.value.includes('<div')) {
-          // For HTML content, update the text content
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = cell.value;
-          const textElement = tempDiv.querySelector('.question-text, .question-title-input, div');
-          if (textElement) {
-            textElement.textContent = newText;
-            cell.value = tempDiv.innerHTML;
-          } else {
-            // Fallback: replace the entire content
-            cell.value = `<div style="text-align:center;">${newText}</div>`;
-          }
-        } else {
-          // For plain text, update directly
-          cell.value = newText;
-        }
-        
-        console.log("Updated cell.value to:", cell.value);
-        
-        // Update the cell display based on question type
-        const qt = getQuestionType(cell);
-        console.log("Question type for update:", qt);
-        
-        if (qt === 'multipleTextboxes' || qt === 'multipleDropdownType') {
-          console.log("Complex question type detected, calling updateMultipleTextboxHandler");
-          // For complex question types, call the appropriate update function
-          if (typeof window.updateMultipleTextboxHandler === 'function') {
-            console.log("updateMultipleTextboxHandler function exists, calling it");
-            window.updateMultipleTextboxHandler(cell);
-          } else {
-            console.log("updateMultipleTextboxHandler function not found!");
-          }
-        } else {
-          console.log("Simple question type detected, calling updateSimpleQuestionCell");
-          // For simple question types, call updateSimpleQuestionCell
-          if (typeof window.updateSimpleQuestionCell === 'function') {
-            console.log("updateSimpleQuestionCell function exists, calling it");
-            window.updateSimpleQuestionCell(cell);
-          } else {
-            console.log("updateSimpleQuestionCell function not found!");
-          }
-        }
-        
-        // Force the graph to refresh this specific cell
-        try {
-          graph.refresh(cell);
-          console.log("Graph.refresh(cell) called successfully");
-        } catch (error) {
-          console.log("Graph.refresh(cell) failed:", error);
-        }
-        
-        // Also try to trigger a model change event
-        try {
-          graph.getModel().beginUpdate();
-          graph.getModel().setValue(cell, cell.value);
-          graph.getModel().endUpdate();
-          console.log("Graph model updated successfully");
-        } catch (error) {
-          console.log("Graph model update failed:", error);
-        }
-        
-        // Refresh the display
-        if (typeof window.refreshAllCells === 'function') {
-          console.log("refreshAllCells function exists, calling it");
-          window.refreshAllCells();
-        } else {
-          console.log("refreshAllCells function not found!");
-        }
-        
-        // Final verification
-        console.log("Final cell._questionText:", cell._questionText);
-        console.log("Final cell.value:", cell.value);
-      } else {
-        console.log("New text is empty or invalid, not updating");
-      }
-      
-      } catch (error) {
-        console.error("Error in submit function:", error);
-      }
-      // Note: Popup removal is now handled by the Enter key handler calling cancelBtn.click()
-    }, 10); // Small delay to ensure value capture
-  }
-  
-  // Handle submit button
-  const submitBtn = popup.querySelector('#submitQuestionText');
-  console.log("Submit button found:", submitBtn);
   
   // Add hover effects to submit button
   submitBtn.addEventListener('mouseenter', () => {
@@ -712,10 +683,16 @@ function showQuestionTextPopup(cell) {
     submitBtn.style.background = '#1976d2';
   });
   
-  submitBtn.addEventListener('click', submitQuestionText);
+  // Make the X and buttons cancel the focus timer before click
+  closeBtn.addEventListener('pointerdown', safeClose);
+  submitBtn.addEventListener('pointerdown', safeSubmit);
+  cancelBtn.addEventListener('pointerdown', safeClose);
   
-  // Handle cancel button
-  const cancelBtn = popup.querySelector('#cancelQuestionText');
+  submitBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    submitQuestionText();
+  });
   
   // Add hover effects to cancel button
   cancelBtn.addEventListener('mouseenter', () => {
@@ -728,33 +705,36 @@ function showQuestionTextPopup(cell) {
     cancelBtn.style.borderColor = '#1976d2';
   });
   
-  cancelBtn.addEventListener('click', () => {
-    console.log("Cancelling question text edit");
-    document.body.removeChild(popup);
+  cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closePopup();
   });
+  
+  closeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closePopup();
+  });
+
   
   // Handle Enter key in textarea
   textarea.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
+    if ((e.key === 'Enter' && !e.shiftKey) || (e.key === 'Enter' && e.ctrlKey)) {
       e.preventDefault();
+      e.stopPropagation();
       submitQuestionText();
-      // Close the menu after submitting
-      setTimeout(() => cancelBtn.click(), 50);
-    } else if (e.key === 'Enter' && !e.shiftKey) {
-      // Enter key (without Shift) submits the form
-      e.preventDefault(); // Prevent new line
-      submitQuestionText();
-      // Close the menu after submitting
-      setTimeout(() => cancelBtn.click(), 50);
     } else if (e.key === 'Escape') {
-      cancelBtn.click();
+      e.preventDefault();
+      e.stopPropagation();
+      closePopup();
     }
   });
   
   // Handle clicking outside popup to close
   popup.addEventListener('click', (e) => {
     if (e.target === popup) {
-      cancelBtn.click();
+      closePopup();
     }
   });
 }
@@ -1033,3 +1013,4 @@ window.setupCustomDoubleClickBehavior = setupCustomDoubleClickBehavior;
 window.setupKeyboardNavigation = setupKeyboardNavigation;
 window.setupPanningAndZooming = setupPanningAndZooming;
 window.showQuestionTextPopup = showQuestionTextPopup;
+
