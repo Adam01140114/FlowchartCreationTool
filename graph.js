@@ -376,6 +376,426 @@ function setupCustomDoubleClickBehavior(graph) {
 }
 
 /**
+ * Show the Properties popup for any node
+ */
+function showPropertiesPopup(cell) {
+  // Prevent multiple popups
+  if (window.__propertiesPopupOpen) {
+    return;
+  }
+  window.__propertiesPopupOpen = true;
+  
+  // Clean up any existing popups
+  document.querySelectorAll('.properties-modal').forEach(n => n.remove());
+  
+  // Create popup container
+  const popup = document.createElement('div');
+  popup.className = 'properties-modal';
+  popup.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #1976d2;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    min-width: 500px;
+    max-width: 600px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    pointer-events: auto;
+    opacity: 1;
+  `;
+  
+  // Create header
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  `;
+  
+  const title = document.createElement('h3');
+  title.textContent = 'Node Properties';
+  title.style.cssText = `
+    margin: 0;
+    color: #1976d2;
+    font-size: 18px;
+    font-weight: 600;
+  `;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.id = 'closePropertiesPopup';
+  closeBtn.style.cssText = `
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  `;
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  
+  // Create content area
+  const content = document.createElement('div');
+  content.style.cssText = `
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+  `;
+  
+  // Get cell properties
+  const nodeText = cell._questionText || (() => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cell.value || "";
+    return (tempDiv.textContent || tempDiv.innerText || "").trim();
+  })();
+  
+  const nodeId = cell.id || 'N/A';
+  const nodeType = cell.style ? cell.style.split(';')[0] : 'Unknown';
+  
+  // Get section information using the proper functions
+  const section = (() => {
+    if (typeof window.getSection === 'function') {
+      return window.getSection(cell) || '1';
+    }
+    // Fallback: extract from style
+    const style = cell.style || "";
+    const match = style.match(/section=([^;]+)/);
+    return match ? match[1] : '1';
+  })();
+  
+  // Get section name from section preferences
+  const sectionName = (() => {
+    const sectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+    return (sectionPrefs[section] && sectionPrefs[section].name) || 'Enter section name';
+  })();
+  
+  // Get question number - try multiple sources
+  const questionNumber = (() => {
+    if (cell._questionId) return cell._questionId;
+    if (cell._questionNumber) return cell._questionNumber;
+    // For question nodes, try to get from the question counter or position
+    if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+      // Try to find the question's position in the graph
+      const graph = window.graph;
+      if (graph) {
+        const questions = graph.getChildVertices(graph.getDefaultParent()).filter(c => 
+          typeof window.isQuestion === 'function' && window.isQuestion(c)
+        );
+        const index = questions.findIndex(c => c.id === cell.id);
+        return index >= 0 ? (index + 1).toString() : 'N/A';
+      }
+    }
+    return 'N/A';
+  })();
+  
+  // Create property fields
+  const properties = [
+    { label: 'Node Text', value: nodeText, id: 'propNodeText', editable: true },
+    { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: false },
+    { label: 'Node Type', value: nodeType, id: 'propNodeType', editable: false },
+    { label: 'Section', value: section, id: 'propNodeSection', editable: true },
+    { label: 'Section Name', value: sectionName, id: 'propSectionName', editable: true },
+    { label: 'Question Number', value: questionNumber, id: 'propQuestionNumber', editable: true }
+  ];
+  
+  properties.forEach(prop => {
+    const fieldDiv = document.createElement('div');
+    fieldDiv.style.cssText = `
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    `;
+    
+    const label = document.createElement('label');
+    label.textContent = prop.label + ':';
+    label.style.cssText = `
+      font-weight: 600;
+      color: #333;
+      min-width: 120px;
+      margin-right: 12px;
+    `;
+    
+    const valueSpan = document.createElement('span');
+    valueSpan.id = prop.id;
+    valueSpan.textContent = prop.value;
+    valueSpan.style.cssText = `
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
+      color: ${prop.editable ? '#333' : '#666'};
+      cursor: ${prop.editable ? 'text' : 'default'};
+      transition: all 0.2s ease;
+    `;
+    
+    if (prop.editable) {
+      valueSpan.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = prop.value;
+        input.style.cssText = `
+          width: 100%;
+          padding: 8px 12px;
+          border: 2px solid #1976d2;
+          border-radius: 6px;
+          font-size: 14px;
+          outline: none;
+        `;
+        
+        valueSpan.style.display = 'none';
+        valueSpan.parentNode.insertBefore(input, valueSpan);
+        input.focus();
+        input.select();
+        
+        const saveValue = () => {
+          const newValue = input.value.trim();
+          valueSpan.textContent = newValue;
+          valueSpan.style.display = 'block';
+          input.remove();
+          
+          // Update cell property
+          switch(prop.id) {
+            case 'propNodeText':
+              cell._questionText = newValue;
+              cell.value = newValue;
+              break;
+            case 'propNodeSection':
+              // Update section using the proper setSection function
+              if (typeof window.setSection === 'function') {
+                window.setSection(cell, newValue);
+              } else {
+                // Fallback: update style directly
+                let style = cell.style || "";
+                style = style.replace(/section=[^;]+/, "");
+                style += `;section=${newValue};`;
+                cell.style = style;
+              }
+              break;
+            case 'propSectionName':
+              // Update section name in section preferences
+              const sectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+              if (!sectionPrefs[section]) {
+                sectionPrefs[section] = { name: newValue, borderColor: '#cccccc' };
+              } else {
+                sectionPrefs[section].name = newValue;
+              }
+              // Update the global sectionPrefs
+              if (window.flowchartConfig) {
+                window.flowchartConfig.sectionPrefs = sectionPrefs;
+              } else {
+                window.sectionPrefs = sectionPrefs;
+              }
+              // Refresh the section legend if the function exists
+              if (typeof window.updateSectionLegend === 'function') {
+                window.updateSectionLegend();
+              }
+              break;
+            case 'propQuestionNumber':
+              cell._questionId = newValue;
+              break;
+          }
+          
+          // Refresh the graph
+          if (window.graph) {
+            window.graph.refresh(cell);
+            if (window.refreshAllCells) {
+              window.refreshAllCells();
+            }
+          }
+        };
+        
+        input.addEventListener('blur', saveValue);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveValue();
+          } else if (e.key === 'Escape') {
+            valueSpan.style.display = 'block';
+            input.remove();
+          }
+        });
+      });
+      
+      valueSpan.addEventListener('mouseenter', () => {
+        valueSpan.style.borderColor = '#1976d2';
+        valueSpan.style.backgroundColor = '#f0f8ff';
+      });
+      
+      valueSpan.addEventListener('mouseleave', () => {
+        valueSpan.style.borderColor = '#ddd';
+        valueSpan.style.backgroundColor = '#f9f9f9';
+      });
+    }
+    
+    fieldDiv.appendChild(label);
+    fieldDiv.appendChild(valueSpan);
+    content.appendChild(fieldDiv);
+  });
+  
+  // Create buttons
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.cssText = `
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+  `;
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Close';
+  cancelBtn.style.cssText = `
+    padding: 10px 20px;
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  `;
+  
+  buttonContainer.appendChild(cancelBtn);
+  
+  // Assemble popup
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(buttonContainer);
+  document.body.appendChild(popup);
+  
+  // Focus management
+  let focusTimeout = null;
+  let isClosing = false;
+  
+  const closePopup = () => {
+    if (isClosing) return;
+    isClosing = true;
+    
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
+      focusTimeout = null;
+    }
+    
+    popup.style.display = 'none';
+    popup.style.pointerEvents = 'none';
+    popup.style.opacity = '0';
+    
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.parentNode.removeChild(popup);
+      }
+      window.__propertiesPopupOpen = false;
+      isClosing = false;
+    }, 0);
+  };
+  
+  const killFocusTimer = () => {
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
+      focusTimeout = null;
+    }
+  };
+  
+  // Event listeners
+  closeBtn.addEventListener('pointerdown', killFocusTimer);
+  cancelBtn.addEventListener('pointerdown', killFocusTimer);
+  
+  closeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closePopup();
+  });
+  
+  cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closePopup();
+  });
+  
+  // Handle clicking outside popup
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) {
+      closePopup();
+    }
+  });
+  
+  // Handle Escape key
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      closePopup();
+    }
+  };
+  
+  document.addEventListener('keydown', handleEscape);
+  
+  // Clean up escape listener when popup closes
+  const originalClosePopup = closePopup;
+  closePopup = () => {
+    document.removeEventListener('keydown', handleEscape);
+    originalClosePopup();
+  };
+  
+  // Add hover effects for close button
+  closeBtn.addEventListener('mouseenter', () => {
+    closeBtn.style.backgroundColor = '#f0f0f0';
+    closeBtn.style.color = '#333';
+  });
+  
+  closeBtn.addEventListener('mouseleave', () => {
+    closeBtn.style.backgroundColor = 'transparent';
+    closeBtn.style.color = '#666';
+  });
+  
+  // Add hover effects for cancel button
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#e0e0e0';
+    cancelBtn.style.borderColor = '#bbb';
+  });
+  
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = '#f5f5f5';
+    cancelBtn.style.borderColor = '#ddd';
+  });
+  
+  // Add CSS for close button hit area
+  const style = document.createElement('style');
+  style.textContent = `
+    #closePropertiesPopup::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      z-index: -1;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/**
  * Show popup for editing question node text
  */
 function showQuestionTextPopup(cell) {
@@ -746,15 +1166,26 @@ function setupKeyboardNavigation(graph) {
   // Add keyboard event listener to the graph container
   const container = document.getElementById('graphContainer');
   
+  if (!container) {
+    console.error('graphContainer not found for keyboard navigation');
+    return;
+  }
+  
+  console.log('Setting up keyboard navigation for container:', container);
+  
   container.addEventListener('keydown', function(evt) {
     const key = evt.key;
     const ctrl = evt.ctrlKey;
     const shift = evt.shiftKey;
     
+    console.log('Key pressed:', key, 'Ctrl:', ctrl, 'Shift:', shift);
+    
     switch(key) {
       case 'Delete':
       case 'Backspace':
+        console.log('Delete/Backspace pressed, selection empty:', graph.isSelectionEmpty());
         if (graph.isSelectionEmpty()) break;
+        console.log('Deleting selected cells...');
         deleteSelectedCells(graph);
         evt.preventDefault();
         break;
@@ -807,6 +1238,17 @@ function setupKeyboardNavigation(graph) {
   
   // Make the container focusable
   container.setAttribute('tabindex', '0');
+  
+  // Ensure container gets focus when clicked
+  container.addEventListener('click', function() {
+    container.focus();
+    console.log('Container focused for keyboard input');
+  });
+  
+  // Also focus on mousedown to ensure immediate focus
+  container.addEventListener('mousedown', function() {
+    container.focus();
+  });
 }
 
 /**
@@ -1013,4 +1455,5 @@ window.setupCustomDoubleClickBehavior = setupCustomDoubleClickBehavior;
 window.setupKeyboardNavigation = setupKeyboardNavigation;
 window.setupPanningAndZooming = setupPanningAndZooming;
 window.showQuestionTextPopup = showQuestionTextPopup;
+window.showPropertiesPopup = showPropertiesPopup;
 

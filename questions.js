@@ -150,6 +150,8 @@ function updateSimpleQuestionCell(cell) {
           onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
           onmouseover="this.style.borderColor='#4a90e2';"
           onmouseout="this.style.borderColor='#b0b8c9';"
+          onmousedown="event.stopPropagation();"
+          onclick="event.stopPropagation();"
           onchange="window.pickTypeForCell('${cell.id}', this.value)">
           <option value="">-- Choose Question Type --</option>
           <option value="text">Text</option>

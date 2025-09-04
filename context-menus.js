@@ -838,10 +838,15 @@ function setupContextMenuEventListeners(graph) {
       console.log("Properties button clicked!");
       console.log("selectedCell:", window.selectedCell);
       console.log("currentMouseEvent:", window.currentMouseEvent);
-      if (window.selectedCell && window.currentMouseEvent) {
-        showPropertiesMenu(window.selectedCell, window.currentMouseEvent);
+      if (window.selectedCell) {
+        // Use the new popup instead of the old menu
+        if (window.showPropertiesPopup) {
+          window.showPropertiesPopup(window.selectedCell);
+        } else {
+          console.log("showPropertiesPopup function not available");
+        }
       } else {
-        console.log("Missing selectedCell or currentMouseEvent");
+        console.log("Missing selectedCell");
       }
       hideContextMenu();
     });
