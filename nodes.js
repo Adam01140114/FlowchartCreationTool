@@ -289,7 +289,7 @@ window.getQuestionType = function(cell) {
  */
 window.getNodeId = function(cell) {
   // Debug mode - set to true only when debugging node ID issues
-  const DEBUG_NODE_ID = true;
+  const DEBUG_NODE_ID = false;
   
   if (DEBUG_NODE_ID) {
     console.log("🌐 WINDOW GET NODE ID DEBUG START");
