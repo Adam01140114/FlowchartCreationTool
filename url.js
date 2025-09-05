@@ -184,7 +184,7 @@ function showFlowchartLoadedNotification() {
 /**
  * Exports flowchart JSON without downloading (returns the string)
  */
-function exportFlowchartJson(download = true) {
+window.exportFlowchartJson = function(download = true) {
   if (!graph) return null;
   
   const parent = graph.getDefaultParent();
@@ -269,6 +269,21 @@ function exportFlowchartJson(download = true) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      console.log('Flowchart JSON copied to clipboard');
+      // Show user feedback
+      const notification = document.createElement('div');
+      notification.textContent = 'Flowchart JSON copied to clipboard!';
+      notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+    }).catch(err => {
+      console.error('Failed to copy to clipboard:', err);
+    });
   }
   
   return jsonStr;

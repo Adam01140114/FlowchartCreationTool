@@ -465,8 +465,16 @@ window.getNodeId = function(cell) {
   if (pdfName && pdfName.trim()) {
     // Sanitize PDF name (remove .pdf extension and clean up)
     const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-    finalNodeId = `${cleanPdfName}_${baseNodeId}`;
-    console.log("Final nodeId with PDF prefix:", finalNodeId);
+    
+    // Check if the baseNodeId already starts with the PDF name to avoid stacking
+    const pdfPrefix = `${cleanPdfName}_`;
+    if (!baseNodeId.startsWith(pdfPrefix)) {
+      finalNodeId = `${cleanPdfName}_${baseNodeId}`;
+      console.log("Final nodeId with PDF prefix:", finalNodeId);
+    } else {
+      console.log("Base nodeId already has PDF prefix, no stacking needed:", baseNodeId);
+      finalNodeId = baseNodeId;
+    }
   }
   
   console.log("Returning final nodeId:", finalNodeId);
