@@ -1010,137 +1010,10 @@ function downloadJson(str, filename) {
   document.body.removeChild(dlAnchorElem);
 }
 
-
-
-
-
-  // Clean up the jumps - filter out any duplicate jumps for the same option leading to the same section
-  jumps = jumps.filter((jump, index, self) => 
-    index === self.findIndex(j => (j.from === jump.from && j.option === jump.option && j.to === jump.to))
-  );
-
-  // Sort questions by section number then question number
-  const sortedQuestions = [...questionCellMap.values()].sort((a, b) => {
-    const sectionA = parseInt(getSection(a) || "1");
-    const sectionB = parseInt(getSection(b) || "1");
-    if (sectionA !== sectionB) return sectionA - sectionB;
-    
-    // First try sorting by questionId if both have one
-    if (a._questionId && b._questionId) {
-      return parseInt(a._questionId) - parseInt(b._questionId);
-    }
-    
-    // Fall back to sorting by value if no questionId
-    return (a.value || "").localeCompare(b.value || "");
-  });
-
-  // Build the sections
-  const sections = {};
-  Object.keys(sectionPrefs).forEach(secNum => {
-    sections[secNum] = {
-      name: sectionPrefs[secNum].name,
-      color: sectionPrefs[secNum].borderColor,
-      questions: []
-    };
-  });
-
-  // Now format each question with its options
-  sortedQuestions.forEach(cell => {
-    const qType = getQuestionType(cell) || "dropdown";
-    const qId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || sanitizeNameId(cell.value || "unnamed");
-    const qSection = getSection(cell);
-    
-    const questionObj = {
-      id: qId,
-      text: cell._questionText || cell.value || "",
-      type: qType,
-      questionNumber: cell._questionId || "",
-      options: []
-    };
-    
-    // Special handling for multipleTextboxes
-    if (qType === "multipleTextboxes" && cell._textboxes) {
-      questionObj.textboxes = cell._textboxes;
-    }
-    
-    // Special handling for multipleDropdownType
-    if (qType === "multipleDropdownType" && cell._textboxes) {
-      questionObj.textboxes = cell._textboxes;
-    }
-    
-    // Get all options for this question
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    outgoingEdges.forEach(edge => {
-      const targetCell = edge.target;
-      if (targetCell && isOptions(targetCell)) {
-        const optionText = targetCell.value || "";
-        const targetOptions = graph.getOutgoingEdges(targetCell) || [];
-        
-        // Check if this option leads to another question
-        let nextQuestion = null;
-        if (targetOptions.length > 0) {
-          const firstOptionTarget = targetOptions[0].target;
-          if (firstOptionTarget && isQuestion(firstOptionTarget)) {
-            const targetId = (typeof window.getNodeId === 'function' ? window.getNodeId(firstOptionTarget) : '') || "";
-            // Only set nextQuestion if it's in a different section
-            if (getSection(firstOptionTarget) === qSection) {
-              nextQuestion = targetId;
-            }
-          }
-        }
-        
-        const optionObj = {
-          text: optionText,
-        };
-        
-        if (nextQuestion) optionObj.nextQuestion = nextQuestion;
-        
-        // If this is an amount option, add amount properties
-        if (getQuestionType(targetCell) === "amountOption") {
-          optionObj.amount = {
-            name: targetCell._amountName || "value",
-            placeholder: targetCell._amountPlaceholder || "Enter value"
-          };
-        }
-        
-        // If this is an image option, add image URL
-        if (getQuestionType(targetCell) === "imageOption" && targetCell._image) {
-          optionObj.image = targetCell._image;
-        }
-        
-        questionObj.options.push(optionObj);
-      }
-    });
-    
-    sections[qSection].questions.push(questionObj);
-  });
-  
-  // Add calculation nodes
-  const calcNodes = vertices.filter(cell => isCalculationNode(cell));
-  const calculationNodes = calcNodes.map(cell => {
-    return {
-      id: sanitizeNameId(cell._calcTitle || "calc"),
-      title: cell._calcTitle || "Calculation",
-      terms: cell._calcTerms || [],
-      operator: cell._calcOperator || "=",
-      threshold: cell._calcThreshold || "0",
-      resultText: cell._calcFinalText || ""
-    };
-  });
-
-  // Build the final output
-  const output = {
-    flowTitle: "Flowchart Title",
-    sections: Object.values(sections),
-    jumps: jumps,
-    calculations: calculationNodes
-  };
-
-
 /**
  * Load a flowchart from JSON data.
  */
-function loadFlowchartData(data) {
+window.loadFlowchartData = function(data) {
   if (!data.cells) {
     alert("Invalid flowchart data");
     return;
@@ -1162,10 +1035,13 @@ function loadFlowchartData(data) {
     if (data.sectionPrefs) {
       sectionPrefs = data.sectionPrefs;
       // updateSectionLegend is defined in legend.js
-      updateSectionLegend();
+      // Add a small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (typeof updateSectionLegend === 'function') {
+          updateSectionLegend();
+        }
+      }, 50);
     }
-
-
 
     // First pass: Create all cells
     data.cells.forEach(item => {
@@ -1256,8 +1132,8 @@ function loadFlowchartData(data) {
     });
 
     // Third pass: Update cell displays based on types
-  graph.getModel().beginUpdate();
-  try {
+    graph.getModel().beginUpdate();
+    try {
       Object.values(createdCells).forEach(cell => {
         if (getQuestionType(cell) === 'multipleTextboxes') {
           updateMultipleTextboxesCell(cell);
@@ -1268,33 +1144,33 @@ function loadFlowchartData(data) {
         } else if (getQuestionType(cell) === 'amountOption') {
           // Amount options are handled in refreshAllCells
         } else if (getQuestionType(cell) === 'imageOption') {
-        updateImageOptionCell(cell);
-              } else if (getQuestionType(cell) === 'notesNode') {
-        updateNotesNodeCell(cell);
+          updateImageOptionCell(cell);
+        } else if (getQuestionType(cell) === 'notesNode') {
+          updateNotesNodeCell(cell);
         } else if (getQuestionType(cell) === 'checklistNode') {
-        updateChecklistNodeCell(cell);
+          updateChecklistNodeCell(cell);
         } else if (getQuestionType(cell) === 'alertNode') {
-        updateAlertNodeCell(cell);
-      } else if (isPdfNode(cell)) {
-        updatePdfNodeCell(cell);
-      } else if (isCalculationNode(cell)) {
-        updateCalculationNodeCell(cell);
-      } else if (isSubtitleNode(cell)) {
+          updateAlertNodeCell(cell);
+        } else if (isPdfNode(cell)) {
+          updatePdfNodeCell(cell);
+        } else if (isCalculationNode(cell)) {
+          updateCalculationNodeCell(cell);
+        } else if (isSubtitleNode(cell)) {
           // Use the _subtitleText property if available, otherwise extract from value
-        if (!cell._subtitleText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._subtitleText = cleanValue || "Subtitle text";
-        }
-        updateSubtitleNodeCell(cell);
-      } else if (isInfoNode(cell)) {
+          if (!cell._subtitleText && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._subtitleText = cleanValue || "Subtitle text";
+          }
+          updateSubtitleNodeCell(cell);
+        } else if (isInfoNode(cell)) {
           // Use the _infoText property if available, otherwise extract from value
-        if (!cell._infoText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._infoText = cleanValue || "Information text";
+          if (!cell._infoText && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._infoText = cleanValue || "Information text";
+          }
+          updateInfoNodeCell(cell);
         }
-        updateInfoNodeCell(cell);
-      }
-    });
+      });
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1316,15 +1192,15 @@ function loadFlowchartData(data) {
 
   refreshAllCells();
   
-      // Load groups data if present (after sections are fully processed)
-    console.log('loadFlowchartData: checking for groups data');
-    console.log('loadFlowchartData: data.groups =', data.groups);
-    if (data.groups) {
-      console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
-      loadGroupsFromData(data.groups);
-    } else {
-      console.log('loadFlowchartData: no groups data found');
-    }
+  // Load groups data if present (after sections are fully processed)
+  console.log('loadFlowchartData: checking for groups data');
+  console.log('loadFlowchartData: data.groups =', data.groups);
+  if (data.groups) {
+    console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
+    loadGroupsFromData(data.groups);
+  } else {
+    console.log('loadFlowchartData: no groups data found');
+  }
   
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {
@@ -1353,7 +1229,7 @@ function loadFlowchartData(data) {
       }
     }
   }, 100); // Small delay to ensure all rendering is complete
-}
+};
 
 /**
  * Resolves duplicate node IDs by adding numbering to duplicates
@@ -1389,3 +1265,8 @@ function resolveDuplicateNodeIds(cells) {
     }
   });
 }
+
+
+
+
+

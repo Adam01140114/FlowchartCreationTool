@@ -89,7 +89,6 @@ function setupGraphEventHandlers(graph) {
     changes.forEach(change => {
       if (change instanceof mxValueChange) {
         // Cell display updates are handled in script.js
-        console.log('Cell value changed:', change.cell);
       }
     });
   });
@@ -1433,14 +1432,9 @@ function setupKeyboardNavigation(graph) {
     const ctrl = evt.ctrlKey;
     const shift = evt.shiftKey;
     
-    console.log('Key pressed:', key, 'Ctrl:', ctrl, 'Shift:', shift);
-    
     switch(key) {
       case 'Delete':
-      case 'Backspace':
-        console.log('Delete/Backspace pressed, selection empty:', graph.isSelectionEmpty());
         if (graph.isSelectionEmpty()) break;
-        console.log('Deleting selected cells...');
         deleteSelectedCells(graph);
         evt.preventDefault();
         break;

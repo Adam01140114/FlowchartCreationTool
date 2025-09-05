@@ -248,8 +248,9 @@ function updatemultipleDropdownTypeCell(cell) {
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
     html += `
-      <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
-        <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
+      <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
+        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">⋮⋮</div>
+        <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
         <label>
@@ -261,6 +262,9 @@ function updatemultipleDropdownTypeCell(cell) {
   html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
     </div>
   </div>`;
+  
+  // Add drop zone event listeners
+  html = html.replace('class="multiple-textboxes-container"', 'class="multiple-textboxes-container" ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, \'' + cell.id + '\')"');
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
@@ -272,6 +276,13 @@ function updatemultipleDropdownTypeCell(cell) {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
+  
+  // Force a refresh to ensure the new HTML is rendered
+  setTimeout(() => {
+    if (graph.getModel().getCell(cell.id)) {
+      graph.refresh(cell);
+    }
+  }, 10);
 }
 
 // Question Type Event Handlers
@@ -650,17 +661,16 @@ window.copyMultipleDropdownId = function(cellId, index) {
   
   const idString = `[${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}]`;
   
-  // Copy to clipboard
+  // Copy to clipboard (without brackets)
+  const textToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(idString).then(() => {
-      alert(`Copied to clipboard: ${idString}`);
-    }).catch(() => {
+    navigator.clipboard.writeText(textToCopy).catch(() => {
       // Fallback for older browsers
-      fallbackCopyToClipboard(idString);
+      fallbackCopyToClipboard(textToCopy);
     });
   } else {
     // Fallback for older browsers
-    fallbackCopyToClipboard(idString);
+    fallbackCopyToClipboard(textToCopy);
   }
 };
 
@@ -676,12 +686,180 @@ function fallbackCopyToClipboard(text) {
   
   try {
     document.execCommand('copy');
-    alert(`Copied to clipboard: ${text}`);
   } catch (err) {
-    alert(`Failed to copy. Please copy manually: ${text}`);
+    // Silent fail - user can manually copy if needed
   }
   
   document.body.removeChild(textArea);
+}
+
+// Drag and Drop functionality for reordering entries
+window.handleDragStart = function(event, cellId, index) {
+  // Prevent the event from bubbling up to the cell's drag handlers
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+  
+  event.dataTransfer.setData('text/plain', JSON.stringify({ cellId, index }));
+  event.dataTransfer.effectAllowed = 'move';
+  
+  // Add visual feedback
+  event.target.style.opacity = '0.5';
+  event.target.parentElement.style.backgroundColor = '#f0f0f0';
+  
+  // Store the dragged element for reference
+  window.draggedElement = event.target.parentElement;
+  
+  // Prevent the cell from being dragged
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (cell) {
+    cell.setConnectable(false);
+  }
+};
+
+window.handleDragEnd = function(event) {
+  // Prevent the event from bubbling up
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+  
+  // Remove visual feedback
+  if (event.target) {
+    event.target.style.opacity = '1';
+    if (event.target.parentElement) {
+      event.target.parentElement.style.backgroundColor = '';
+    }
+  }
+  
+  // Re-enable cell dragging
+  const cellId = event.target.getAttribute('data-cell-id') || 
+                 (event.target.parentElement && event.target.parentElement.getAttribute('data-cell-id'));
+  if (cellId) {
+    const cell = getGraph()?.getModel().getCell(cellId);
+    if (cell) {
+      cell.setConnectable(true);
+    }
+  }
+  
+  // Clear dragged element reference
+  window.draggedElement = null;
+};
+
+window.handleDragOver = function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  event.dataTransfer.dropEffect = 'move';
+  
+  // Add visual feedback for drop zones
+  const dropZone = event.currentTarget;
+  const rect = dropZone.getBoundingClientRect();
+  const y = event.clientY - rect.top;
+  
+  // Find the closest entry element
+  const entries = dropZone.querySelectorAll('.textbox-entry');
+  let closestEntry = null;
+  let closestDistance = Infinity;
+  
+  entries.forEach(entry => {
+    const entryRect = entry.getBoundingClientRect();
+    const entryY = entryRect.top - rect.top + (entryRect.height / 2);
+    const distance = Math.abs(y - entryY);
+    
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestEntry = entry;
+    }
+  });
+  
+  // Remove previous drop indicators
+  dropZone.querySelectorAll('.drop-indicator').forEach(indicator => {
+    indicator.remove();
+  });
+  
+  // Add drop indicator
+  if (closestEntry && window.draggedElement && closestEntry !== window.draggedElement) {
+    const indicator = document.createElement('div');
+    indicator.className = 'drop-indicator';
+    indicator.style.cssText = 'height: 2px; background-color: #4CAF50; margin: 2px 0; border-radius: 1px;';
+    
+    if (y < closestEntry.getBoundingClientRect().top - rect.top + (closestEntry.getBoundingClientRect().height / 2)) {
+      closestEntry.parentNode.insertBefore(indicator, closestEntry);
+    } else {
+      closestEntry.parentNode.insertBefore(indicator, closestEntry.nextSibling);
+    }
+  }
+};
+
+window.handleDrop = function(event, cellId) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  try {
+    const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+    const sourceCellId = data.cellId;
+    const sourceIndex = data.index;
+    
+    if (sourceCellId !== cellId) {
+      return; // Can only reorder within the same cell
+    }
+    
+    const dropZone = event.currentTarget;
+    const rect = dropZone.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    
+    // Find the target position
+    const entries = Array.from(dropZone.querySelectorAll('.textbox-entry'));
+    let targetIndex = entries.length; // Default to end
+    
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      const entryRect = entry.getBoundingClientRect();
+      const entryY = entryRect.top - rect.top + (entryRect.height / 2);
+      
+      if (y < entryY) {
+        targetIndex = i;
+        break;
+      }
+    }
+    
+    // Adjust target index if dropping after the source
+    if (targetIndex > sourceIndex) {
+      targetIndex--;
+    }
+    
+    // Reorder the entries
+    if (sourceIndex !== targetIndex) {
+      reorderMultipleDropdownEntries(sourceCellId, sourceIndex, targetIndex);
+    }
+    
+  } catch (error) {
+    console.error('Error handling drop:', error);
+  } finally {
+    // Clean up visual feedback
+    dropZone.querySelectorAll('.drop-indicator').forEach(indicator => {
+      indicator.remove();
+    });
+  }
+};
+
+function reorderMultipleDropdownEntries(cellId, sourceIndex, targetIndex) {
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "multipleDropdownType" || !cell._textboxes) {
+    return;
+  }
+  
+  getGraph().getModel().beginUpdate();
+  try {
+    // Remove the item from source position
+    const [movedItem] = cell._textboxes.splice(sourceIndex, 1);
+    
+    // Insert it at target position
+    cell._textboxes.splice(targetIndex, 0, movedItem);
+    
+    // Re-render the cell to reflect the new order
+    updatemultipleDropdownTypeCell(cell);
+    
+  } finally {
+    getGraph().getModel().endUpdate();
+  }
 }
 
 // Global function for type switching
@@ -725,6 +903,22 @@ window.pickTypeForCell = function(cellId, val) {
   getRefreshAllCells()();
 };
 
+// Function to refresh all existing multiple dropdown cells with drag handles
+window.refreshAllMultipleDropdownCells = function() {
+  const graph = getGraph();
+  if (!graph) return;
+  
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  
+  vertices.forEach(cell => {
+    if (getQuestionType(cell) === "multipleDropdownType") {
+      console.log('Refreshing multiple dropdown cell:', cell.id);
+      updatemultipleDropdownTypeCell(cell);
+    }
+  });
+};
+
 // Initialize the module
 function initializeQuestionsModule() {
   // Setup event listeners when DOM is ready
@@ -733,6 +927,13 @@ function initializeQuestionsModule() {
   } else {
     setupQuestionTypeEventListeners();
   }
+  
+  // Refresh existing multiple dropdown cells after a short delay
+  setTimeout(() => {
+    if (typeof window.refreshAllMultipleDropdownCells === 'function') {
+      window.refreshAllMultipleDropdownCells();
+    }
+  }, 1000);
 }
 
 // Export all functions to window.questions namespace

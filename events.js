@@ -435,7 +435,12 @@ function setupKeyboardEventListeners(graph) {
   
   // Additional keyboard event listeners
   document.addEventListener('keydown', function(event) {
-    if (event.key === 'Delete' || event.key === 'Backspace') {
+    // Only handle Delete key for node deletion, not Backspace
+    // Backspace should only work in input fields for text editing
+    if (event.key === 'Delete') {
+      // Check if user is typing in an input field
+      if (typeof window.isUserTyping === 'function' && window.isUserTyping(event)) return;
+      
       if (typeof window.deleteSelectedNode === 'function') {
         window.deleteSelectedNode();
       }
@@ -443,7 +448,7 @@ function setupKeyboardEventListeners(graph) {
   });
   
   document.addEventListener('keyup', function(event) {
-    if (event.key === 'Delete' || event.key === 'Backspace') {
+    if (event.key === 'Delete') {
       if (typeof window.refreshAllCells === 'function') {
         window.refreshAllCells();
       }
