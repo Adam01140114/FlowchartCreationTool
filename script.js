@@ -1403,6 +1403,9 @@ function setNodeId(cell, nodeId) {
   style = style.replace(/nodeId=[^;]+/, "");
   style += `;nodeId=${encodeURIComponent(nodeId)};`;
   graph.getModel().setStyle(cell, style);
+  
+  // Also update the _nameId property for consistency
+  cell._nameId = nodeId;
 }
 function getNodeId(cell) {
   // For question nodes, prefer _nameId over style-based nodeId

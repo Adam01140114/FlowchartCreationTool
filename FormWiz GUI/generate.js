@@ -3738,46 +3738,6 @@ function initializeDropdownHiddenCheckboxes() {
     });
 }
 
-/*──────── mirror a dropdown → textbox and checkbox ────────*/
-function dropdownMirror(selectEl, baseName){
-    const wrap = document.getElementById("dropdowntext_"+baseName);
-    if(!wrap) return;
-
-    const val = selectEl.value.trim();
-    if(!val) {
-        wrap.innerHTML = "";
-        // Uncheck all hidden checkboxes when no option is selected
-        updateHiddenDropdownCheckboxes(baseName, "");
-        return;
-    }
-
-    const textId = baseName + "_dropdown";
-    const textField = document.getElementById(textId);
-    
-    if(textField) {
-        textField.value = val;
-        textField.style.display = "none";
-    }
-
-    const existingCheckboxes = wrap.querySelectorAll("div");
-    existingCheckboxes.forEach(div => div.remove());
-
-    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
-    const checkboxId = baseName + "_" + idSuffix;
-    
-    const checkboxDiv = document.createElement("div");
-    checkboxDiv.style.display = "none";
-    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
-                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
-    
-    wrap.appendChild(checkboxDiv);
-    
-    // Update hidden checkboxes for dropdown options
-    updateHiddenDropdownCheckboxes(baseName, val);
-    
-    handleLinkedDropdowns(baseName, val);
-}
-
 function getQuestionInputs (questionId, type = null) {
   /* 1️⃣ First look inside the question container, if it exists */
   const container = document.getElementById('question-container-' + questionId);
