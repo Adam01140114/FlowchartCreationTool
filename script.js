@@ -1214,6 +1214,7 @@ function updatemultipleDropdownTypeCell(cell) {
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
         <label>
           <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
           Amount?
@@ -1326,6 +1327,63 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
   }
 };
 
+window.copyMultipleDropdownId = function(cellId, index) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "multipleDropdownType" || !cell._textboxes || !cell._textboxes[index]) {
+    return;
+  }
+  
+  // Get the question text and entry text
+  const questionText = cell._questionText || '';
+  const entryText = cell._textboxes[index].nameId || '';
+  
+  // Prompt user for number
+  const number = prompt('Enter a number for this ID:');
+  if (number === null || number.trim() === '') {
+    return; // User cancelled or entered empty
+  }
+  
+  // Create the ID string in the format: [question_text_number_entry_text]
+  const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  const sanitizedNumber = number.trim();
+  
+  const idString = `[${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}]`;
+  
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(idString).then(() => {
+      alert(`Copied to clipboard: ${idString}`);
+    }).catch(() => {
+      // Fallback for older browsers
+      fallbackCopyToClipboard(idString);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(idString);
+  }
+};
+
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    alert(`Copied to clipboard: ${text}`);
+  } catch (err) {
+    alert(`Failed to copy. Please copy manually: ${text}`);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
 /*******************************************************
  ************ Subtitle and Info Nodes: RENDER & EDITS *********
  *******************************************************/
@@ -1388,49 +1446,71 @@ function isAmountOption(cell) {
 }
 
 function setNodeId(cell, nodeId) {
-  console.log("🔧 SET NODE ID DEBUG START");
-  console.log("Cell:", cell);
-  console.log("Setting nodeId to:", nodeId);
-  console.log("Original style:", cell.style);
+  // Debug mode - set to true only when debugging node ID issues
+  const DEBUG_NODE_ID = false;
+  
+  if (DEBUG_NODE_ID) {
+    console.log("🔧 SET NODE ID DEBUG START");
+    console.log("Cell:", cell);
+    console.log("Setting nodeId to:", nodeId);
+    console.log("Original style:", cell.style);
+  }
   
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
   style += `;nodeId=${encodeURIComponent(nodeId)};`;
   
-  console.log("New style:", style);
-  console.log("Calling graph.getModel().setStyle");
+  if (DEBUG_NODE_ID) {
+    console.log("New style:", style);
+    console.log("Calling graph.getModel().setStyle");
+  }
   graph.getModel().setStyle(cell, style);
   
-  console.log("After setStyle - cell.style:", cell.style);
-  console.log("🔧 SET NODE ID DEBUG END");
+  if (DEBUG_NODE_ID) {
+    console.log("After setStyle - cell.style:", cell.style);
+    console.log("🔧 SET NODE ID DEBUG END");
+  }
 }
 // Local getNodeId function removed - now using global window.getNodeId function
 // which includes PDF name prefixing logic
 
 function refreshNodeIdFromLabel(cell) {
-  console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG START");
-  console.log("Cell:", cell);
-  console.log("Cell ID:", cell.id);
-  console.log("Cell value:", cell.value);
-  console.log("Cell _questionText:", cell._questionText);
+  // Debug mode - set to true only when debugging node ID issues
+  const DEBUG_NODE_ID = false;
+  
+  if (DEBUG_NODE_ID) {
+    console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG START");
+    console.log("Cell:", cell);
+    console.log("Cell ID:", cell.id);
+    console.log("Cell value:", cell.value);
+    console.log("Cell _questionText:", cell._questionText);
+  }
   
   let labelText = "";
 
   if (isQuestion(cell)) {
     const qType = getQuestionType(cell);
-    console.log("Question type:", qType);
+    if (DEBUG_NODE_ID) {
+      console.log("Question type:", qType);
+    }
     if (qType === "multipleTextboxes" || qType === "multipleDropdownType") {
       labelText = cell._questionText || "custom_question";
-      console.log("Using _questionText:", labelText);
+      if (DEBUG_NODE_ID) {
+        console.log("Using _questionText:", labelText);
+      }
     } else {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = cell.value || "";
       labelText = tempDiv.textContent || tempDiv.innerText || "";
-      console.log("Extracted from cell.value:", labelText);
+      if (DEBUG_NODE_ID) {
+        console.log("Extracted from cell.value:", labelText);
+      }
     }
   } else {
     labelText = cell.value || "";
-    console.log("Non-question node, using cell.value:", labelText);
+    if (DEBUG_NODE_ID) {
+      console.log("Non-question node, using cell.value:", labelText);
+    }
   }
 
   const cleanedText = labelText
@@ -1440,22 +1520,29 @@ function refreshNodeIdFromLabel(cell) {
     .replace(/\s+/g, "_")
     .toLowerCase();
 
-  console.log("Cleaned text:", cleanedText);
+  if (DEBUG_NODE_ID) {
+    console.log("Cleaned text:", cleanedText);
+  }
 
   const baseNodeId = cleanedText || "unnamed_node";
-  console.log("Base node ID:", baseNodeId);
+  if (DEBUG_NODE_ID) {
+    console.log("Base node ID:", baseNodeId);
+  }
   
   // Check for duplicates and add numbering if needed
   const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
-  console.log("Unique node ID:", uniqueNodeId);
-  
-  console.log("Calling setNodeId with:", uniqueNodeId);
+  if (DEBUG_NODE_ID) {
+    console.log("Unique node ID:", uniqueNodeId);
+    console.log("Calling setNodeId with:", uniqueNodeId);
+  }
   setNodeId(cell, uniqueNodeId);
   
   // Verify the ID was set
   const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
-  console.log("Verification - getNodeId returns:", verifyId);
-  console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END");
+  if (DEBUG_NODE_ID) {
+    console.log("Verification - getNodeId returns:", verifyId);
+    console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END");
+  }
 }
 
 function generateUniqueNodeId(baseNodeId, currentCell) {
@@ -1493,25 +1580,38 @@ function generateUniqueNodeId(baseNodeId, currentCell) {
 }
 
 function refreshOptionNodeId(cell) {
-  console.log("🔍 REFRESH OPTION NODE ID DEBUG START");
-  console.log("Cell:", cell);
-  console.log("Cell ID:", cell.id);
-  console.log("Cell value:", cell.value);
-  console.log("Cell style:", cell.style);
+  // Debug mode - set to true only when debugging node ID issues
+  const DEBUG_NODE_ID = false;
+  
+  if (DEBUG_NODE_ID) {
+    console.log("🔍 REFRESH OPTION NODE ID DEBUG START");
+    console.log("Cell:", cell);
+    console.log("Cell ID:", cell.id);
+    console.log("Cell value:", cell.value);
+    console.log("Cell style:", cell.style);
+  }
   
   const edges = graph.getIncomingEdges(cell) || [];
-  console.log("Incoming edges:", edges);
+  if (DEBUG_NODE_ID) {
+    console.log("Incoming edges:", edges);
+  }
   
   let parentNodeId = "ParentQuestion";
   for (let e of edges) {
     const p = e.source;
-    console.log("Checking edge source:", p);
-    console.log("Is question?", isQuestion(p));
+    if (DEBUG_NODE_ID) {
+      console.log("Checking edge source:", p);
+      console.log("Is question?", isQuestion(p));
+    }
     if (isQuestion(p)) {
       const parentId = (typeof window.getNodeId === 'function' ? window.getNodeId(p) : '') || "";
-      console.log("Parent node ID from getNodeId:", parentId);
+      if (DEBUG_NODE_ID) {
+        console.log("Parent node ID from getNodeId:", parentId);
+      }
       parentNodeId = parentId || "ParentQuestion";
-      console.log("Final parent node ID:", parentNodeId);
+      if (DEBUG_NODE_ID) {
+        console.log("Final parent node ID:", parentNodeId);
+      }
       break;
     }
   }
@@ -1522,7 +1622,9 @@ function refreshOptionNodeId(cell) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = cell.value;
     optionText = (tempDiv.textContent || tempDiv.innerText || "").trim();
-    console.log("Extracted option text:", optionText);
+    if (DEBUG_NODE_ID) {
+      console.log("Extracted option text:", optionText);
+    }
   }
   
   // Sanitize the option text: lowercase, replace spaces with underscores, remove special chars
@@ -1532,23 +1634,30 @@ function refreshOptionNodeId(cell) {
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
   
-  console.log("Sanitized option text:", sanitizedOptionText);
+  if (DEBUG_NODE_ID) {
+    console.log("Sanitized option text:", sanitizedOptionText);
+  }
   
   // Create the base node ID in format: parent_question_id_option_text
   const baseNodeId = `${parentNodeId}_${sanitizedOptionText}`;
-  console.log("Base node ID:", baseNodeId);
+  if (DEBUG_NODE_ID) {
+    console.log("Base node ID:", baseNodeId);
+  }
   
   // Check for duplicates and add numbering if needed
   const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
-  console.log("Unique node ID:", uniqueNodeId);
-  
-  console.log("Calling setNodeId with:", uniqueNodeId);
+  if (DEBUG_NODE_ID) {
+    console.log("Unique node ID:", uniqueNodeId);
+    console.log("Calling setNodeId with:", uniqueNodeId);
+  }
   setNodeId(cell, uniqueNodeId);
   
   // Verify the ID was set
   const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
-  console.log("Verification - getNodeId returns:", verifyId);
-  console.log("🔍 REFRESH OPTION NODE ID DEBUG END");
+  if (DEBUG_NODE_ID) {
+    console.log("Verification - getNodeId returns:", verifyId);
+    console.log("🔍 REFRESH OPTION NODE ID DEBUG END");
+  }
 }
 
 // Function to refresh all option node IDs in the graph
@@ -2832,6 +2941,7 @@ function updatemultipleDropdownTypeCell(cell) {
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
         <label>
           <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
           Amount?

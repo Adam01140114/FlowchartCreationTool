@@ -288,11 +288,16 @@ window.getQuestionType = function(cell) {
  * Get the node ID from a cell
  */
 window.getNodeId = function(cell) {
-  console.log("🌐 WINDOW GET NODE ID DEBUG START");
-  console.log("Cell:", cell);
-  console.log("Cell._nameId:", cell._nameId);
-  console.log("Cell.style:", cell.style);
-  console.log("Cell.id:", cell.id);
+  // Debug mode - set to true only when debugging node ID issues
+  const DEBUG_NODE_ID = false;
+  
+  if (DEBUG_NODE_ID) {
+    console.log("🌐 WINDOW GET NODE ID DEBUG START");
+    console.log("Cell:", cell);
+    console.log("Cell._nameId:", cell._nameId);
+    console.log("Cell.style:", cell.style);
+    console.log("Cell.id:", cell.id);
+  }
   
   // Helper function to get PDF name from cell
   const getPdfName = (cell) => {
@@ -354,78 +359,108 @@ window.getNodeId = function(cell) {
       
       // If no direct connection, trace the flow path to find PDF nodes
       // This handles cases where a question node should inherit PDF name from the flow
-      console.log("🔍 Starting flow path tracing for PDF detection");
+      if (DEBUG_NODE_ID) {
+        console.log("🔍 Starting flow path tracing for PDF detection");
+        console.log("🔍 Initial queue:", queue.map(node => ({ id: node.id, type: node.style?.includes('nodeType=') ? 'node' : 'unknown' })));
+      }
       const visited = new Set();
       const queue = [...incomingEdges.map(edge => edge.source)];
-      console.log("🔍 Initial queue:", queue.map(node => ({ id: node.id, type: node.style?.includes('nodeType=') ? 'node' : 'unknown' })));
       
       while (queue.length > 0) {
         const currentNode = queue.shift();
         if (!currentNode || visited.has(currentNode.id)) continue;
         visited.add(currentNode.id);
         
-        console.log("🔍 Checking node:", { id: currentNode.id, style: currentNode.style, _pdfUrl: currentNode._pdfUrl });
+        if (DEBUG_NODE_ID) {
+          console.log("🔍 Checking node:", { id: currentNode.id, style: currentNode.style, _pdfUrl: currentNode._pdfUrl });
+        }
         
         // Check if this node is a PDF node
         if (typeof window.isPdfNode === 'function' && window.isPdfNode(currentNode)) {
-          console.log("🔍 Found PDF node via isPdfNode function");
+          if (DEBUG_NODE_ID) {
+            console.log("🔍 Found PDF node via isPdfNode function");
+          }
           const pdfName = extractPdfName(currentNode);
           if (pdfName) {
-            console.log("🔍 Extracted PDF name:", pdfName);
+            if (DEBUG_NODE_ID) {
+              console.log("🔍 Extracted PDF name:", pdfName);
+            }
             return pdfName;
           }
         }
         
         // Check if this node has PDF properties
         if (currentNode._pdfName || currentNode._pdfFilename || currentNode._pdfUrl) {
-          console.log("🔍 Found node with PDF properties:", { _pdfName: currentNode._pdfName, _pdfFilename: currentNode._pdfFilename, _pdfUrl: currentNode._pdfUrl });
+          if (DEBUG_NODE_ID) {
+            console.log("🔍 Found node with PDF properties:", { _pdfName: currentNode._pdfName, _pdfFilename: currentNode._pdfFilename, _pdfUrl: currentNode._pdfUrl });
+          }
           const pdfName = extractPdfName(currentNode);
           if (pdfName) {
-            console.log("🔍 Extracted PDF name from properties:", pdfName);
+            if (DEBUG_NODE_ID) {
+              console.log("🔍 Extracted PDF name from properties:", pdfName);
+            }
             return pdfName;
           }
         }
         
         // Add incoming edges to continue tracing backwards
         const nodeIncomingEdges = graph.getIncomingEdges(currentNode) || [];
-        console.log("🔍 Node", currentNode.id, "has", nodeIncomingEdges.length, "incoming edges");
+        if (DEBUG_NODE_ID) {
+          console.log("🔍 Node", currentNode.id, "has", nodeIncomingEdges.length, "incoming edges");
+        }
         for (const edge of nodeIncomingEdges) {
           if (edge.source && !visited.has(edge.source.id)) {
             queue.push(edge.source);
-            console.log("🔍 Added to queue (incoming):", edge.source.id);
+            if (DEBUG_NODE_ID) {
+              console.log("🔍 Added to queue (incoming):", edge.source.id);
+            }
           }
         }
         
         // Also check outgoing edges to find PDF nodes connected to option nodes
         const nodeOutgoingEdges = graph.getOutgoingEdges(currentNode) || [];
-        console.log("🔍 Node", currentNode.id, "has", nodeOutgoingEdges.length, "outgoing edges");
+        if (DEBUG_NODE_ID) {
+          console.log("🔍 Node", currentNode.id, "has", nodeOutgoingEdges.length, "outgoing edges");
+        }
         for (const edge of nodeOutgoingEdges) {
           if (edge.target && !visited.has(edge.target.id)) {
             // Check if this outgoing edge leads to a PDF node
             if (typeof window.isPdfNode === 'function' && window.isPdfNode(edge.target)) {
-              console.log("🔍 Found PDF node via outgoing edge:", edge.target.id);
+              if (DEBUG_NODE_ID) {
+                console.log("🔍 Found PDF node via outgoing edge:", edge.target.id);
+              }
               const pdfName = extractPdfName(edge.target);
               if (pdfName) {
-                console.log("🔍 Extracted PDF name from outgoing edge:", pdfName);
+                if (DEBUG_NODE_ID) {
+                  console.log("🔍 Extracted PDF name from outgoing edge:", pdfName);
+                }
                 return pdfName;
               }
             }
             // Check if this outgoing edge leads to a node with PDF properties
             if (edge.target._pdfName || edge.target._pdfFilename || edge.target._pdfUrl) {
-              console.log("🔍 Found node with PDF properties via outgoing edge:", { id: edge.target.id, _pdfUrl: edge.target._pdfUrl });
+              if (DEBUG_NODE_ID) {
+                console.log("🔍 Found node with PDF properties via outgoing edge:", { id: edge.target.id, _pdfUrl: edge.target._pdfUrl });
+              }
               const pdfName = extractPdfName(edge.target);
               if (pdfName) {
-                console.log("🔍 Extracted PDF name from outgoing edge properties:", pdfName);
+                if (DEBUG_NODE_ID) {
+                  console.log("🔍 Extracted PDF name from outgoing edge properties:", pdfName);
+                }
                 return pdfName;
               }
             }
             // Add to queue for further tracing
             queue.push(edge.target);
-            console.log("🔍 Added to queue (outgoing):", edge.target.id);
+            if (DEBUG_NODE_ID) {
+              console.log("🔍 Added to queue (outgoing):", edge.target.id);
+            }
           }
         }
       }
-      console.log("🔍 Flow path tracing completed, no PDF found");
+      if (DEBUG_NODE_ID) {
+        console.log("🔍 Flow path tracing completed, no PDF found");
+      }
     }
     
     return null;
@@ -438,28 +473,38 @@ window.getNodeId = function(cell) {
   // This should take precedence over _nameId since it's the most current value
   if (cell.style) {
     const styleMatch = cell.style.match(/nodeId=([^;]+)/);
-    console.log("Style match:", styleMatch);
+    if (DEBUG_NODE_ID) {
+      console.log("Style match:", styleMatch);
+    }
     if (styleMatch) {
       baseNodeId = decodeURIComponent(styleMatch[1]);
-      console.log("Base nodeId from style:", baseNodeId);
+      if (DEBUG_NODE_ID) {
+        console.log("Base nodeId from style:", baseNodeId);
+      }
     }
   }
   
   // PRIORITY 2: For question nodes, use _nameId as fallback
   if (!baseNodeId && cell._nameId) {
     baseNodeId = cell._nameId;
-    console.log("Base nodeId from _nameId:", baseNodeId);
+    if (DEBUG_NODE_ID) {
+      console.log("Base nodeId from _nameId:", baseNodeId);
+    }
   }
   
   // PRIORITY 3: Fallback to cell.id
   if (!baseNodeId) {
     baseNodeId = cell.id || "";
-    console.log("Base nodeId from cell.id:", baseNodeId);
+    if (DEBUG_NODE_ID) {
+      console.log("Base nodeId from cell.id:", baseNodeId);
+    }
   }
   
   // Check for PDF name and prepend it if found
   const pdfName = getPdfName(cell);
-  console.log("PDF name found:", pdfName);
+  if (DEBUG_NODE_ID) {
+    console.log("PDF name found:", pdfName);
+  }
   
   let finalNodeId = baseNodeId;
   if (pdfName && pdfName.trim()) {
@@ -470,15 +515,21 @@ window.getNodeId = function(cell) {
     const pdfPrefix = `${cleanPdfName}_`;
     if (!baseNodeId.startsWith(pdfPrefix)) {
       finalNodeId = `${cleanPdfName}_${baseNodeId}`;
-      console.log("Final nodeId with PDF prefix:", finalNodeId);
+      if (DEBUG_NODE_ID) {
+        console.log("Final nodeId with PDF prefix:", finalNodeId);
+      }
     } else {
-      console.log("Base nodeId already has PDF prefix, no stacking needed:", baseNodeId);
+      if (DEBUG_NODE_ID) {
+        console.log("Base nodeId already has PDF prefix, no stacking needed:", baseNodeId);
+      }
       finalNodeId = baseNodeId;
     }
   }
   
-  console.log("Returning final nodeId:", finalNodeId);
-  console.log("🌐 WINDOW GET NODE ID DEBUG END");
+  if (DEBUG_NODE_ID) {
+    console.log("Returning final nodeId:", finalNodeId);
+    console.log("🌐 WINDOW GET NODE ID DEBUG END");
+  }
   return finalNodeId;
 };
 

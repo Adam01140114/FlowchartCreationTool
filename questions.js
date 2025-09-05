@@ -251,6 +251,7 @@ function updatemultipleDropdownTypeCell(cell) {
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
         <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
         <label>
           <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
           Amount?
@@ -625,6 +626,63 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
+
+window.copyMultipleDropdownId = function(cellId, index) {
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "multipleDropdownType" || !cell._textboxes || !cell._textboxes[index]) {
+    return;
+  }
+  
+  // Get the question text and entry text
+  const questionText = cell._questionText || '';
+  const entryText = cell._textboxes[index].nameId || '';
+  
+  // Prompt user for number
+  const number = prompt('Enter a number for this ID:');
+  if (number === null || number.trim() === '') {
+    return; // User cancelled or entered empty
+  }
+  
+  // Create the ID string in the format: [question_text_number_entry_text]
+  const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  const sanitizedNumber = number.trim();
+  
+  const idString = `[${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}]`;
+  
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(idString).then(() => {
+      alert(`Copied to clipboard: ${idString}`);
+    }).catch(() => {
+      // Fallback for older browsers
+      fallbackCopyToClipboard(idString);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(idString);
+  }
+};
+
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    alert(`Copied to clipboard: ${text}`);
+  } catch (err) {
+    alert(`Failed to copy. Please copy manually: ${text}`);
+  }
+  
+  document.body.removeChild(textArea);
+}
 
 // Global function for type switching
 window.pickTypeForCell = function(cellId, val) {
