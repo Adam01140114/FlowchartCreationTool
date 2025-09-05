@@ -1011,35 +1011,8 @@ function downloadJson(str, filename) {
 }
 
 
-  const parent = graph.getDefaultParent();
-  const questionCellMap = new Map();
-  const questionIdMap = new Map();
-  const optionCellMap = new Map();
-  const vertices = graph.getChildVertices(parent);
 
-  // Filter only question nodes
-  const questions = vertices.filter(cell => isQuestion(cell));
 
-  // Create a table for the question nodes first
-  questions.forEach(cell => {
-    // If this node has multiple textboxes, handle specially
-    const questionType = getQuestionType(cell); 
-    const sectionNum = getSection(cell);
-    
-    const uniqueNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "unnamed";
-    questionCellMap.set(cell.id, cell); // Map by ID
-    questionIdMap.set(uniqueNodeId, cell); // Map by text/nodeId
-    
-    const outgoingEdges = graph.getOutgoingEdges(cell);
-  });
-
-  // For more complex cases, identify & record section jumps
-  let jumps = [];
-  vertices.forEach(cell => {
-    if (isOptions(cell)) {
-      detectSectionJumps(cell, questionCellMap, questionIdMap, jumps);
-    }
-  });
 
   // Clean up the jumps - filter out any duplicate jumps for the same option leading to the same section
   jumps = jumps.filter((jump, index, self) => 
@@ -1163,10 +1136,6 @@ function downloadJson(str, filename) {
     calculations: calculationNodes
   };
 
-  // Download the JSON
-  const jsonStr = JSON.stringify(output, null, 2);
-  downloadJson(jsonStr, "flowchart_gui.json");
-}
 
 /**
  * Load a flowchart from JSON data.
