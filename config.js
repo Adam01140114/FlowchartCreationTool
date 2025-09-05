@@ -44,11 +44,11 @@ const AUTOSAVE_KEY = 'flowchart_autosave_json';
 const FLOWCHART_CLIPBOARD_KEY = 'flowchart_clipboard_data';
 const FLOWCHART_CLIPBOARD_TIMESTAMP_KEY = 'flowchart_clipboard_timestamp';
 
-// Autosave settings
+// Autosave settings - optimized for large flowcharts
 let autosaveTimeout = null;
-let autosaveThrottleDelay = 3000; // 3 seconds for better performance
+let autosaveThrottleDelay = 5000; // 5 seconds for better performance with large flowcharts
 let lastAutosaveTime = 0;
-let autosaveMinInterval = 1000; // Minimum 1 second between autosaves
+let autosaveMinInterval = 2000; // Minimum 2 seconds between autosaves
 
 // Edge style settings
 let currentEdgeStyle = 'curved'; // Default to curved
@@ -77,6 +77,14 @@ let flowchartClipboard = null;
 // Cell text cache for performance
 const cellTextCache = new Map();
 let lastCacheClear = Date.now();
+
+// Performance monitoring
+let performanceMetrics = {
+  refreshCount: 0,
+  lastRefreshTime: 0,
+  averageRefreshTime: 0,
+  cellCount: 0
+};
 
 /**************************************************
  ************ Utility Functions *******************
@@ -236,6 +244,18 @@ function clearCellTextCache() {
   }
 }
 
+/**
+ * Get performance metrics for debugging
+ */
+function getPerformanceMetrics() {
+  return {
+    ...performanceMetrics,
+    cacheSize: cellTextCache.size,
+    autosaveDelay: autosaveThrottleDelay,
+    refreshThrottle: 150
+  };
+}
+
 /**************************************************
  ************ Section Preferences & Legend ********
  **************************************************/
@@ -298,6 +318,7 @@ window.flowchartConfig = {
   flowchartClipboard,
   cellTextCache,
   lastCacheClear,
+  performanceMetrics,
   
   // Functions
   getDefaultSectionColor,
@@ -309,7 +330,8 @@ window.flowchartConfig = {
   saveSettingsToLocalStorage,
   loadSettingsFromLocalStorage,
   clearCellTextCache,
-  initializeSectionPrefs
+  initializeSectionPrefs,
+  getPerformanceMetrics
 };
 
 // Also export individual items for backward compatibility
@@ -330,3 +352,4 @@ window.saveSettingsToLocalStorage = saveSettingsToLocalStorage;
 window.loadSettingsFromLocalStorage = loadSettingsFromLocalStorage;
 window.clearCellTextCache = clearCellTextCache;
 window.initializeSectionPrefs = initializeSectionPrefs;
+window.getPerformanceMetrics = getPerformanceMetrics;

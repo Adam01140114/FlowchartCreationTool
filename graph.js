@@ -1645,7 +1645,11 @@ function cutSelectedCells(graph) {
  * Paste cells from clipboard
  */
 function pasteCells(graph) {
-  graph.pasteCells();
+  // Use the existing paste functionality from script.js
+  if (typeof window.pasteNodeFromJson === 'function') {
+    const mousePos = graph.getPointForEvent(graph.lastEvent);
+    window.pasteNodeFromJson(mousePos ? mousePos.x : undefined, mousePos ? mousePos.y : undefined);
+  }
 }
 
 /**

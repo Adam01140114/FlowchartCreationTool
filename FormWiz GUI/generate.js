@@ -1778,10 +1778,13 @@ formHTML += `</div><br></div>`;
             `#multipleTextboxPlaceholder${questionId}_${mb + 1}`
           );
           const lblVal = lblInput ? lblInput.value.trim() : "";
-          const nmVal = nmInput
-            ? nmInput.value.trim()
-            : "answer" + questionId + "_" + (mb + 1);
+          const rawNmVal = nmInput ? nmInput.value.trim() : "";
           const phVal = phInput ? phInput.value.trim() : "";
+          
+          // Build proper ID using question slug + textbox name
+          const questionSlug = questionSlugMap[questionId] || ('answer' + questionId);
+          const nmVal = rawNmVal ? `${questionSlug}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : `${questionSlug}_${mb + 1}`;
+          
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
@@ -1800,10 +1803,13 @@ formHTML += `</div><br></div>`;
             `#multipleAmountPlaceholder${questionId}_${ab + 1}`
           );
           const lblVal = lblInput ? lblInput.value.trim() : "";
-          const nmVal = nmInput
-            ? nmInput.value.trim()
-            : "amount" + questionId + "_" + (ab + 1);
+          const rawNmVal = nmInput ? nmInput.value.trim() : "";
           const phVal = phInput ? phInput.value.trim() : "";
+          
+          // Build proper ID using question slug + amount name
+          const questionSlug = questionSlugMap[questionId] || ('answer' + questionId);
+          const nmVal = rawNmVal ? `${questionSlug}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : `${questionSlug}_amount_${ab + 1}`;
+          
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }

@@ -223,9 +223,12 @@ window.exportGuiJson = function(download = true) {
     // For multiple textboxes, add the textboxes array
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       question.textboxes = cell._textboxes.map(tb => ({
+        label: "", // Empty label field as required
         nameId: tb.nameId || "",
-        placeholder: tb.placeholder || "Enter value"
+        placeholder: tb.nameId || "" // Use nameId as placeholder, not the generic "Enter value"
       }));
+      // Add empty amounts array for multipleTextboxes
+      question.amounts = [];
     }
     
     // Handle outgoing edges to option nodes

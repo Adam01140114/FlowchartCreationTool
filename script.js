@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
     
     // Define refreshAllCells and performRefreshAllCells functions after graph initialization
-    window.refreshAllCells = function() {
+    window.refreshAllCells = function(selectedCells = null) {
       if (!graph) return;
       
       // Prevent multiple simultaneous calls
@@ -173,25 +173,47 @@ document.addEventListener("DOMContentLoaded", function() {
         clearTimeout(window.refreshAllCellsTimeout);
       }
       
+      // Dynamic throttle delay based on cell count for better performance
+      const cellCount = graph.getModel().getChildCount(graph.getDefaultParent());
+      const throttleDelay = cellCount > 100 ? 300 : (cellCount > 50 ? 200 : 150);
+      
       window.refreshAllCellsTimeout = setTimeout(() => {
-        window.performRefreshAllCells();
-      }, 100); // 100ms throttle
+        window.performRefreshAllCells(selectedCells);
+      }, throttleDelay);
     };
     
-    window.performRefreshAllCells = function() {
+    window.performRefreshAllCells = function(selectedCells = null) {
       if (!graph || window.isRefreshing) return;
       
       window.isRefreshing = true;
+      const startTime = performance.now();
       
       try {
         const parent = graph.getDefaultParent();
-        const vertices = graph.getChildVertices(parent);
+        let vertices;
+        
+        // If specific cells are provided, only refresh those
+        if (selectedCells && selectedCells.length > 0) {
+          vertices = selectedCells;
+        } else {
+          vertices = graph.getChildVertices(parent);
+        }
+        
+        // Skip refresh if no cells to process
+        if (!vertices || vertices.length === 0) {
+          return;
+        }
         
         // Batch updates for better performance
-    graph.getModel().beginUpdate();
+        graph.getModel().beginUpdate();
         
         // Use for...of for better performance with large arrays
         for (const cell of vertices) {
+          // Skip cells that don't need updates (optimization for large flowcharts)
+          if (cell._skipRefresh) {
+            continue;
+          }
+          
           if (window.colorCell) {
             window.colorCell(cell);
           }
@@ -277,9 +299,53 @@ document.addEventListener("DOMContentLoaded", function() {
         // Don't renumber question IDs automatically
         // renumberQuestionIds();
         
+        // Performance monitoring
+        const endTime = performance.now();
+        const refreshTime = endTime - startTime;
+        if (window.performanceMetrics) {
+          window.performanceMetrics.refreshCount++;
+          window.performanceMetrics.lastRefreshTime = refreshTime;
+          window.performanceMetrics.cellCount = vertices.length;
+          window.performanceMetrics.averageRefreshTime = 
+            (window.performanceMetrics.averageRefreshTime * (window.performanceMetrics.refreshCount - 1) + refreshTime) / window.performanceMetrics.refreshCount;
+          
+          // Log performance warning for slow refreshes (adjusted thresholds for large flowcharts)
+          const warningThreshold = vertices.length > 100 ? 500 : (vertices.length > 50 ? 200 : 100);
+          if (refreshTime > warningThreshold && vertices.length > 20) {
+            console.warn(`Slow refresh detected: ${refreshTime.toFixed(2)}ms for ${vertices.length} cells`);
+          }
+        }
+        
       } finally {
         window.isRefreshing = false;
       }
+    };
+    
+    // Optimized function to refresh only specific cells
+    window.refreshSpecificCells = function(cells) {
+      if (!graph || !cells || cells.length === 0) return;
+      
+      // Prevent multiple simultaneous calls
+      if (window.isRefreshing) {
+        return;
+      }
+      
+      // Mark cells as needing refresh
+      cells.forEach(cell => {
+        if (cell) {
+          cell._needsRefresh = true;
+          cell._skipRefresh = false;
+        }
+      });
+      
+      // Throttle rapid successive calls
+      if (window.refreshAllCellsTimeout) {
+        clearTimeout(window.refreshAllCellsTimeout);
+      }
+      
+      window.refreshAllCellsTimeout = setTimeout(() => {
+        window.performRefreshAllCells(cells);
+      }, 100); // Faster throttle for specific cells
     };
   
   
@@ -570,7 +636,7 @@ graph.isCellEditable = function (cell) {
   regularOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "dropdown");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -578,7 +644,7 @@ graph.isCellEditable = function (cell) {
   imageOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "imageOption");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -586,7 +652,7 @@ graph.isCellEditable = function (cell) {
   amountOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "amountOption");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -594,7 +660,7 @@ graph.isCellEditable = function (cell) {
   notesNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "notesNode");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -602,7 +668,7 @@ graph.isCellEditable = function (cell) {
   checklistNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "checklistNode");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -610,7 +676,7 @@ graph.isCellEditable = function (cell) {
   alertNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "alertNode");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -618,7 +684,7 @@ graph.isCellEditable = function (cell) {
   endNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "end");
-      refreshAllCells();
+      refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
   });
@@ -630,8 +696,8 @@ graph.isCellEditable = function (cell) {
       const notesCell = selectedCells[0];
       notesCell._notesBold = !notesCell._notesBold;
       updateNotesNodeCell(notesCell);
-      refreshAllCells();
-      autosaveFlowchartToLocalStorage();
+      refreshSpecificCells([notesCell]);
+      requestAutosave();
     }
     hideContextMenu();
   });
@@ -645,8 +711,8 @@ graph.isCellEditable = function (cell) {
       if (newFontSize && !isNaN(newFontSize) && newFontSize > 0) {
         notesCell._notesFontSize = parseInt(newFontSize);
         updateNotesNodeCell(notesCell);
-        refreshAllCells();
-        autosaveFlowchartToLocalStorage();
+        refreshSpecificCells([notesCell]);
+        requestAutosave();
       }
     }
     hideContextMenu();
@@ -1180,10 +1246,14 @@ function renderTextboxes(cell) {
       `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
+        <button onclick="window.copyMultipleTextboxId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
       </div>`;
   });
   
-  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button></div>`;
+  html += `<div style="text-align:center; margin-top:8px;">
+      <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.showReorderModal('${cell.id}', 'multipleTextboxes')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
+    </div>`;
   
   return html;
 }
@@ -1222,7 +1292,10 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
-  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
+  html += `<div style="text-align:center; margin-top:8px;">
+      <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
+    </div>
     </div>
   </div>`;
   
@@ -1348,21 +1421,30 @@ window.copyMultipleDropdownId = function(cellId, index) {
   const questionText = cell._questionText || '';
   const entryText = cell._textboxes[index].nameId || '';
   
+  // Check if this question has a PDF property
+  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+  const sanitizedPdfName = window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  
   // Prompt user for number
   const number = prompt('Enter a number for this ID:');
   if (number === null || number.trim() === '') {
     return; // User cancelled or entered empty
   }
   
-  // Create the ID string in the format: [question_text_number_entry_text]
+  // Create the ID string
   const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   const sanitizedNumber = number.trim();
   
-  const idString = `[${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}]`;
+  // Build the final ID with PDF name if available
+  let textToCopy;
+  if (sanitizedPdfName) {
+    textToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+  } else {
+    textToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+  }
   
-  // Copy to clipboard (without brackets)
-  const textToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+  // Copy to clipboard
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(textToCopy).catch(() => {
       // Fallback for older browsers
@@ -1976,15 +2058,400 @@ function renderTextboxes(cell) {
       <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" />
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
+        <button onclick="window.copyMultipleTextboxId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
       </div>`;
   });
 
   html += `
     <div style="text-align:center;margin-top:8px;">
       <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.showReorderModal('${cell.id}', 'multipleTextboxes')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>`;
 
   return html;
+}
+
+// Copy ID function for multiple textboxes
+window.copyMultipleTextboxId = function(cellId, index) {
+  const cell = getGraph().getModel().getCell(cellId);
+  if (!cell || !cell._textboxes || !cell._textboxes[index]) return;
+  
+  const questionText = cell._questionText || '';
+  const entryText = cell._textboxes[index].nameId || '';
+  
+  // Check if this question has a PDF property
+  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+  const sanitizedPdfName = window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  
+  // Sanitize the text: convert to lowercase, replace non-alphanumeric with underscores
+  const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  const sanitizedEntry = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  
+  // Build the final ID with PDF name if available
+  let idToCopy;
+  if (sanitizedPdfName) {
+    idToCopy = `${sanitizedPdfName}_${sanitizedQuestion}_${sanitizedEntry}`;
+  } else {
+    idToCopy = `${sanitizedQuestion}_${sanitizedEntry}`;
+  }
+  
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(idToCopy).catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = idToCopy;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    });
+  } else {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = idToCopy;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  }
+};
+
+// Reorder Modal Functions
+window.showReorderModal = function(cellId, questionType) {
+  const cell = getGraph().getModel().getCell(cellId);
+  if (!cell) return;
+  
+  let entries = [];
+  let questionText = '';
+  
+  if (questionType === 'multipleTextboxes') {
+    entries = cell._textboxes || [];
+    questionText = cell._questionText || 'Multiple Textboxes';
+  } else if (questionType === 'multipleDropdownType') {
+    entries = cell._textboxes || [];
+    questionText = cell._questionText || 'Multiple Dropdown';
+  }
+  
+  if (entries.length === 0) {
+    alert('No entries to reorder');
+    return;
+  }
+  
+  // Create modal overlay
+  const modalOverlay = document.createElement('div');
+  modalOverlay.id = 'reorderModalOverlay';
+  modalOverlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+  `;
+  
+  // Create modal content
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  `;
+  
+  // Create header
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e0e0e0;
+  `;
+  
+  const title = document.createElement('h3');
+  title.textContent = `Reorder: ${questionText}`;
+  title.style.cssText = `
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+  `;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '×';
+  closeBtn.style.cssText = `
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  `;
+  closeBtn.onmouseover = () => closeBtn.style.backgroundColor = '#f0f0f0';
+  closeBtn.onmouseout = () => closeBtn.style.backgroundColor = 'transparent';
+  closeBtn.onclick = () => modalOverlay.remove();
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  
+  // Create instructions
+  const instructions = document.createElement('div');
+  instructions.textContent = 'Drag and drop the items below to reorder them:';
+  instructions.style.cssText = `
+    color: #666;
+    margin-bottom: 16px;
+    font-size: 14px;
+  `;
+  
+  // Create sortable list
+  const sortableList = document.createElement('div');
+  sortableList.id = 'reorderSortableList';
+  sortableList.style.cssText = `
+    margin-bottom: 20px;
+  `;
+  
+  // Create list items
+  entries.forEach((entry, index) => {
+    const listItem = document.createElement('div');
+    listItem.className = 'reorder-item';
+    listItem.draggable = true;
+    listItem.dataset.index = index;
+    listItem.style.cssText = `
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      cursor: move;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      user-select: none;
+    `;
+    
+    // Add hover effects
+    listItem.onmouseover = () => {
+      listItem.style.backgroundColor = '#e3f2fd';
+      listItem.style.borderColor = '#2196f3';
+      listItem.style.transform = 'translateY(-1px)';
+      listItem.style.boxShadow = '0 4px 12px rgba(33, 150, 243, 0.2)';
+    };
+    listItem.onmouseout = () => {
+      listItem.style.backgroundColor = '#f8f9fa';
+      listItem.style.borderColor = '#e9ecef';
+      listItem.style.transform = 'translateY(0)';
+      listItem.style.boxShadow = 'none';
+    };
+    
+    // Create content
+    const content = document.createElement('div');
+    content.style.cssText = `
+      display: flex;
+      align-items: center;
+      flex: 1;
+    `;
+    
+    const dragHandle = document.createElement('div');
+    dragHandle.innerHTML = '⋮⋮';
+    dragHandle.style.cssText = `
+      color: #999;
+      font-size: 16px;
+      margin-right: 12px;
+      cursor: move;
+    `;
+    
+    const entryText = document.createElement('span');
+    entryText.textContent = entry.nameId || `Entry ${index + 1}`;
+    entryText.style.cssText = `
+      font-weight: 500;
+      color: #333;
+    `;
+    
+    const placeholder = document.createElement('span');
+    if (entry.placeholder) {
+      placeholder.textContent = ` (${entry.placeholder})`;
+      placeholder.style.cssText = `
+        color: #666;
+        font-size: 14px;
+        margin-left: 8px;
+      `;
+    }
+    
+    content.appendChild(dragHandle);
+    content.appendChild(entryText);
+    content.appendChild(placeholder);
+    
+    // Create position indicator
+    const position = document.createElement('div');
+    position.textContent = `#${index + 1}`;
+    position.style.cssText = `
+      background: #007bff;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    `;
+    
+    listItem.appendChild(content);
+    listItem.appendChild(position);
+    
+    // Add drag event listeners
+    listItem.ondragstart = (e) => {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', listItem.outerHTML);
+      listItem.style.opacity = '0.5';
+    };
+    
+    listItem.ondragend = (e) => {
+      listItem.style.opacity = '1';
+    };
+    
+    listItem.ondragover = (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    };
+    
+    listItem.ondrop = (e) => {
+      e.preventDefault();
+      const draggedIndex = parseInt(e.dataTransfer.getData('text/plain') || e.target.dataset.index);
+      const targetIndex = parseInt(listItem.dataset.index);
+      
+      if (draggedIndex !== targetIndex) {
+        reorderEntries(cellId, questionType, draggedIndex, targetIndex);
+        modalOverlay.remove();
+        showReorderModal(cellId, questionType); // Refresh modal
+      }
+    };
+    
+    sortableList.appendChild(listItem);
+  });
+  
+  // Create buttons
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.cssText = `
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+  `;
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = `
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  `;
+  cancelBtn.onmouseover = () => cancelBtn.style.backgroundColor = '#5a6268';
+  cancelBtn.onmouseout = () => cancelBtn.style.backgroundColor = '#6c757d';
+  cancelBtn.onclick = () => modalOverlay.remove();
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save Order';
+  saveBtn.style.cssText = `
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  `;
+  saveBtn.onmouseover = () => saveBtn.style.backgroundColor = '#218838';
+  saveBtn.onmouseout = () => saveBtn.style.backgroundColor = '#28a745';
+  saveBtn.onclick = () => {
+    // Save the current order
+    saveReorderChanges(cellId, questionType);
+    modalOverlay.remove();
+  };
+  
+  buttonContainer.appendChild(cancelBtn);
+  buttonContainer.appendChild(saveBtn);
+  
+  // Assemble modal
+  modalContent.appendChild(header);
+  modalContent.appendChild(instructions);
+  modalContent.appendChild(sortableList);
+  modalContent.appendChild(buttonContainer);
+  modalOverlay.appendChild(modalContent);
+  
+  // Add to document
+  document.body.appendChild(modalOverlay);
+  
+  // Close on overlay click
+  modalOverlay.onclick = (e) => {
+    if (e.target === modalOverlay) {
+      modalOverlay.remove();
+    }
+  };
+  
+  // Close on Escape key
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      modalOverlay.remove();
+      document.removeEventListener('keydown', escapeHandler);
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+};
+
+// Helper function to reorder entries
+function reorderEntries(cellId, questionType, fromIndex, toIndex) {
+  const cell = getGraph().getModel().getCell(cellId);
+  if (!cell || !cell._textboxes) return;
+  
+  const entries = cell._textboxes;
+  const item = entries.splice(fromIndex, 1)[0];
+  entries.splice(toIndex, 0, item);
+  
+  // Update the cell
+  getGraph().getModel().beginUpdate();
+  try {
+    cell._textboxes = entries;
+    getRefreshAllCells()();
+    getRequestAutosave()();
+  } finally {
+    getGraph().getModel().endUpdate();
+  }
+}
+
+// Helper function to save reorder changes
+function saveReorderChanges(cellId, questionType) {
+  // The reordering is already applied in real-time, so this just refreshes the display
+  getRefreshAllCells()();
+  getRequestAutosave()();
 }
 
 /******************************************************************
@@ -2043,6 +2510,7 @@ function updatemultipleDropdownTypeCell(cell) {
   html += `
         <div style="text-align:center;margin-top:8px;">
           <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+          <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
         </div>
       </div>
     </div>`;
@@ -3127,7 +3595,10 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
-  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
+  html += `<div style="text-align:center; margin-top:8px;">
+      <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
+    </div>
     </div>
   </div>`;
   
@@ -3515,15 +3986,20 @@ function requestAutosave() {
 function setupAutosaveHooks() {
   if (!graph) return;
   
-  // Throttled autosave function
+  // Throttled autosave function - optimized for large flowcharts
   function throttledAutosave() {
     if (autosaveTimeout) {
       clearTimeout(autosaveTimeout);
     }
+    
+    // Use longer delay for large flowcharts
+    const cellCount = graph.getChildVertices(graph.getDefaultParent()).length;
+    const delay = cellCount > 50 ? autosaveThrottleDelay * 1.5 : autosaveThrottleDelay;
+    
     autosaveTimeout = setTimeout(() => {
       autosaveFlowchartToLocalStorage();
       autosaveTimeout = null;
-    }, autosaveThrottleDelay);
+    }, delay);
   }
   
   // Save after any model change (throttled)
@@ -5139,3 +5615,75 @@ window.downloadFlowchartSvg = function() {
     alert('Error downloading SVG: ' + error.message);
   }
 };
+
+// Helper function to find PDF name for a question node
+function findPdfNameForQuestion(cell) {
+  if (!cell) return null;
+  
+  const graph = getGraph();
+  if (!graph) return null;
+  
+  // Use the same logic as the Node Properties dialog
+  const findPdfProperties = (startCell, visited = new Set()) => {
+    // Avoid infinite loops
+    if (visited.has(startCell.id)) return null;
+    visited.add(startCell.id);
+    
+    // If this is an option node, check if it connects directly to a PDF
+    if (typeof window.isOptions === 'function' && window.isOptions(startCell)) {
+      const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+      const pdfNode = outgoingEdges.find(edge => {
+        const target = edge.target;
+        return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
+      });
+      
+      if (pdfNode) {
+        const targetCell = pdfNode.target;
+        return targetCell._pdfUrl || null;
+      }
+    }
+    
+    // If this is a question node, check all incoming option nodes
+    if (typeof window.isQuestion === 'function' && window.isQuestion(startCell)) {
+      const incomingEdges = graph.getIncomingEdges(startCell) || [];
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && typeof window.isOptions === 'function' && window.isOptions(sourceCell)) {
+          const pdfProps = findPdfProperties(sourceCell, visited);
+          if (pdfProps) return pdfProps;
+        }
+      }
+    }
+    
+    // If this is an option node, check the question it came from
+    if (typeof window.isOptions === 'function' && window.isOptions(startCell)) {
+      const incomingEdges = graph.getIncomingEdges(startCell) || [];
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && typeof window.isQuestion === 'function' && window.isQuestion(sourceCell)) {
+          const pdfProps = findPdfProperties(sourceCell, visited);
+          if (pdfProps) return pdfProps;
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  return findPdfProperties(cell);
+}
+
+// Helper function to sanitize PDF name for use in IDs
+function sanitizePdfName(pdfName) {
+  if (!pdfName) return '';
+  
+  // Remove file extension if present
+  const nameWithoutExt = pdfName.replace(/\.[^/.]+$/, '');
+  
+  // Sanitize the name: convert to lowercase, replace non-alphanumeric with underscores
+  return nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+}
+
+// Make helper functions globally accessible
+window.findPdfNameForQuestion = findPdfNameForQuestion;
+window.sanitizePdfName = sanitizePdfName;
