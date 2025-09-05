@@ -1063,7 +1063,14 @@ keyHandler.bindControlKey(86, () => {
       
       // Set IDs and section
       if (nodeType === 'question') {
-        setNodeId(cell, 'Question_' + Date.now().toString().slice(-4));
+        // Set default _nameId using naming convention based on question text
+        const questionText = cell._questionText || 'question';
+        const defaultNameId = questionText
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+        cell._nameId = defaultNameId || 'question';
         // Do NOT call setQuestionType or set questionType here; let refreshAllCells show the dropdown
       } else if (nodeType === 'options') {
         setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
@@ -1398,6 +1405,12 @@ function setNodeId(cell, nodeId) {
   graph.getModel().setStyle(cell, style);
 }
 function getNodeId(cell) {
+  // For question nodes, prefer _nameId over style-based nodeId
+  if (cell._nameId) {
+    return cell._nameId;
+  }
+  
+  // Fallback to style-based nodeId
   const style = cell.style || "";
   const m = style.match(/nodeId=([^;]+)/);
   return m ? decodeURIComponent(m[1]) : "";
@@ -1430,7 +1443,14 @@ function refreshNodeIdFromLabel(cell) {
   
   // Check for duplicates and add numbering if needed
   const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  
+  // Set both the style-based nodeId and the _nameId property
   setNodeId(cell, uniqueNodeId);
+  
+  // For question nodes, also set the _nameId property (used in GUI JSON export)
+  if (isQuestion(cell)) {
+    cell._nameId = uniqueNodeId;
+  }
 }
 
 function generateUniqueNodeId(baseNodeId, currentCell) {

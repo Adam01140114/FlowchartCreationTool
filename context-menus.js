@@ -104,6 +104,11 @@ function isEndNode(cell) {
 function getNodeId(cell) {
   if (!cell) return "";
   
+  // For all nodes, prefer _nameId over other properties
+  if (cell._nameId) {
+    return cell._nameId;
+  }
+  
   // For question nodes, use the _questionId property
   if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
     return cell._questionId || "";

@@ -479,7 +479,17 @@ function showPropertiesPopup(cell) {
     return (tempDiv.textContent || tempDiv.innerText || "").trim();
   })();
   
-  const nodeId = cell.id || 'N/A';
+  // Generate default Node ID based on question text if _nameId is not set
+  const generateDefaultNodeId = (text) => {
+    if (!text) return 'N/A';
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+  };
+  
+  const nodeId = cell._nameId || generateDefaultNodeId(nodeText) || cell.id || 'N/A';
   
   // Get actual node type name instead of style string
   const nodeType = (() => {
@@ -635,7 +645,7 @@ function showPropertiesPopup(cell) {
   // Create property fields
   const properties = [
     { label: 'Node Text', value: nodeText, id: 'propNodeText', editable: true },
-    { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: false },
+    { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: true },
     { 
       label: 'Node Type', 
       value: nodeType, 
@@ -830,6 +840,20 @@ function showPropertiesPopup(cell) {
               break;
             case 'propQuestionNumber':
               cell._questionId = newValue;
+              break;
+            case 'propNodeId':
+              // Update the _nameId property
+              cell._nameId = newValue;
+              // Also update the style-based nodeId if it exists
+              if (cell.style) {
+                let style = cell.style;
+                if (style.includes('nodeId=')) {
+                  style = style.replace(/nodeId=[^;]+/, `nodeId=${encodeURIComponent(newValue)}`);
+                } else {
+                  style += `;nodeId=${encodeURIComponent(newValue)};`;
+                }
+                cell.style = style;
+              }
               break;
           }
           
@@ -1252,6 +1276,11 @@ function showQuestionTextPopup(cell) {
           console.log("Graph model update failed:", error);
         }
 
+        // Update the _nameId based on the new question text
+        if (typeof window.refreshNodeIdFromLabel === 'function') {
+          window.refreshNodeIdFromLabel(cell);
+        }
+        
         if (typeof window.refreshAllCells === 'function') {
           window.refreshAllCells();
         }

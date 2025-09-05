@@ -83,6 +83,9 @@ function createQuestionNode(x, y) {
   vertex._questionText = "Enter question text";
   vertex._questionId = generateQuestionId();
   
+  // Set default _nameId using naming convention
+  vertex._nameId = "enter_question_text";
+  
   return vertex;
 }
 
@@ -285,6 +288,12 @@ window.getQuestionType = function(cell) {
  * Get the node ID from a cell
  */
 window.getNodeId = function(cell) {
+  // For question nodes, prefer _nameId over cell.id
+  if (cell._nameId) {
+    return cell._nameId;
+  }
+  
+  // Fallback to cell.id if _nameId is not available
   return cell.id || "";
 };
 
