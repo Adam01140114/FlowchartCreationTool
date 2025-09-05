@@ -3172,8 +3172,138 @@ document.addEventListener('DOMContentLoaded', function() {
         attributes: true,
         subtree: true
     });
+    
+    // Add Ctrl+Shift debug feature
+    addDebugKeyboardShortcut();
 });
 
+// Debug feature: Show all question and option IDs when pressing Ctrl+Shift
+function addDebugKeyboardShortcut() {
+    document.addEventListener('keydown', function(e) {
+        // Check for Ctrl+Shift combination
+        if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
+            e.preventDefault();
+            showQuestionIdsDebug();
+        }
+    });
+}
+
+function showQuestionIdsDebug() {
+    const form = document.getElementById('customForm');
+    if (!form) return;
+    
+    const allElements = form.querySelectorAll('input, select, textarea');
+    const questionIds = [];
+    const optionIds = [];
+    const otherIds = [];
+    
+    allElements.forEach(element => {
+        if (element.name && element.id) {
+            const elementInfo = {
+                id: element.id,
+                name: element.name,
+                type: element.type || element.tagName.toLowerCase(),
+                value: element.value || (element.checked ? 'checked' : 'unchecked')
+            };
+            
+            // Categorize based on naming patterns
+            if (element.id.startsWith('answer') || element.name.startsWith('answer')) {
+                questionIds.push(elementInfo);
+            } else if (element.id.includes('_') || element.name.includes('_')) {
+                optionIds.push(elementInfo);
+            } else {
+                otherIds.push(elementInfo);
+            }
+        }
+    });
+    
+    // Create debug modal
+    const modal = document.createElement('div');
+    modal.id = 'debugModal';
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: "Courier New", monospace;';
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = 'background: white; border-radius: 8px; padding: 20px; max-width: 80%; max-height: 80%; overflow-y: auto; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);';
+    
+    let html = '<h2 style="margin-top: 0; color: #2c3e50;">🔍 Form Debug: All Question & Option IDs</h2>';
+    html += '<p style="color: #7f8c8d; margin-bottom: 20px;">Press Ctrl+Shift again or click outside to close</p>';
+    
+    // Questions section
+    if (questionIds.length > 0) {
+        html += '<h3 style="color: #2980b9; border-bottom: 2px solid #2980b9; padding-bottom: 5px;">📝 Questions (' + questionIds.length + ')</h3>';
+        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
+        questionIds.forEach(item => {
+            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #2980b9;">';
+            html += '<strong>ID:</strong> ' + item.id + '<br>';
+            html += '<strong>Name:</strong> ' + item.name + '<br>';
+            html += '<strong>Type:</strong> ' + item.type + '<br>';
+            html += '<strong>Value:</strong> ' + item.value;
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // Options section
+    if (optionIds.length > 0) {
+        html += '<h3 style="color: #27ae60; border-bottom: 2px solid #27ae60; padding-bottom: 5px;">☑️ Options (' + optionIds.length + ')</h3>';
+        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
+        optionIds.forEach(item => {
+            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #27ae60;">';
+            html += '<strong>ID:</strong> ' + item.id + '<br>';
+            html += '<strong>Name:</strong> ' + item.name + '<br>';
+            html += '<strong>Type:</strong> ' + item.type + '<br>';
+            html += '<strong>Value:</strong> ' + item.value;
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // Other elements section
+    if (otherIds.length > 0) {
+        html += '<h3 style="color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 5px;">🔧 Other Elements (' + otherIds.length + ')</h3>';
+        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
+        otherIds.forEach(item => {
+            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #e74c3c;">';
+            html += '<strong>ID:</strong> ' + item.id + '<br>';
+            html += '<strong>Name:</strong> ' + item.name + '<br>';
+            html += '<strong>Type:</strong> ' + item.type + '<br>';
+            html += '<strong>Value:</strong> ' + item.value;
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // Summary
+    const totalElements = questionIds.length + optionIds.length + otherIds.length;
+    html += '<div style="background: #2c3e50; color: white; padding: 15px; border-radius: 4px; text-align: center;">';
+    html += '<strong>Total Elements: ' + totalElements + '</strong><br>';
+    html += '<small>Questions: ' + questionIds.length + ' | Options: ' + optionIds.length + ' | Other: ' + otherIds.length + '</small>';
+    html += '</div>';
+    
+    modalContent.innerHTML = html;
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Close modal on click outside or Ctrl+Shift
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeDebugModal();
+        }
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDebugModal();
+        }
+    });
+    
+    function closeDebugModal() {
+        if (modal && modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+        }
+    }
+}
 
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);

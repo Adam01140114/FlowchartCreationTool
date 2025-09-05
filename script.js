@@ -5,23 +5,23 @@
 // const db and currentUser are now available from config.js
   
   // Colors moved to config.js module
-  
-  
-  /**************************************************
-   *            GLOBAL  TYPING  HELPER              *
-   **************************************************/
-  function isUserTyping (evt = null) {
-    // Prefer the event target if we got one, otherwise fall back to activeElement
-    const el = (evt && evt.target) || document.activeElement;
-    if (!el) return false;
-    // Direct hit?
-    if (el.matches('input, textarea, [contenteditable="true"]')) return true;
-    // Something nested inside a foreignObject? walk up the DOM
-    return !!el.closest('input, textarea, [contenteditable="true"]');
-  }
-  
-  
-  
+
+
+/**************************************************
+ *            GLOBAL  TYPING  HELPER              *
+ **************************************************/
+function isUserTyping (evt = null) {
+  // Prefer the event target if we got one, otherwise fall back to activeElement
+  const el = (evt && evt.target) || document.activeElement;
+  if (!el) return false;
+  // Direct hit?
+  if (el.matches('input, textarea, [contenteditable="true"]')) return true;
+  // Something nested inside a foreignObject? walk up the DOM
+  return !!el.closest('input, textarea, [contenteditable="true"]');
+}
+
+
+
   // Context menu functions moved to context-menus.js module
   
   // updateEndNodeCell function moved inside DOMContentLoaded event listener
@@ -32,44 +32,44 @@
   // currentFlowchartName moved to config.js module
   
   // updateLegendColors function moved to config.js module
-  
-  const loginOverlay = document.getElementById("loginOverlay");
-  const loginButton = document.getElementById("loginButton");
-  const signupButton = document.getElementById("signupButton");
-  const loginEmail = document.getElementById("loginEmail");
-  const loginPassword = document.getElementById("loginPassword");
-  const loginError = document.getElementById("loginError");
-  
-  const flowchartListOverlay = document.getElementById("flowchartListOverlay");
-  const flowchartListDiv = document.getElementById("flowchartList");
-  const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
-  
-  const logoutBtn = document.getElementById("logoutBtn");
-  
-  // Close flowchart list overlay
-  closeFlowchartListBtn.addEventListener("click", function() {
-    document.getElementById("flowchartListOverlay").style.display = "none";
-  });
-  
+
+const loginOverlay = document.getElementById("loginOverlay");
+const loginButton = document.getElementById("loginButton");
+const signupButton = document.getElementById("signupButton");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginError = document.getElementById("loginError");
+
+const flowchartListOverlay = document.getElementById("flowchartListOverlay");
+const flowchartListDiv = document.getElementById("flowchartList");
+const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+// Close flowchart list overlay
+closeFlowchartListBtn.addEventListener("click", function() {
+  document.getElementById("flowchartListOverlay").style.display = "none";
+});
+
   // Authentication functions have been moved to auth.js
-  
-  /**************************************************
-   ************ Section Preferences & Legend ********
-   **************************************************/
-  // Section-related functions have been moved to legend.js
-  
-  // Add these functions at the top level
-  // Section-related functions have been moved to legend.js
-  let selectedSectionForColor = null;
-  
-  /**************************************************
-   ************  GRAPH, NODES, CONTEXT MENU, etc. ********
-   **************************************************/
-  let graph = null;
-  let selectedCell = null;
-  let currentMouseEvent = null;
-  let lastSelectedCell = null;
-  let jumpModeNode = null;
+
+/**************************************************
+ ************ Section Preferences & Legend ********
+ **************************************************/
+// Section-related functions have been moved to legend.js
+
+// Add these functions at the top level
+// Section-related functions have been moved to legend.js
+let selectedSectionForColor = null;
+
+/**************************************************
+ ************  GRAPH, NODES, CONTEXT MENU, etc. ********
+ **************************************************/
+let graph = null;
+let selectedCell = null;
+let currentMouseEvent = null;
+let lastSelectedCell = null;
+let jumpModeNode = null;
   // jumpBorderStyle moved to config.js module
   
   // Mouse position tracking moved to events.js module
@@ -97,39 +97,39 @@
   
   
   // cleanStyle function moved to config.js module
+
+// loadFlowchartData function removed - using the one from library.js instead
+// The library.js version properly handles groups data and all other functionality
+
+document.addEventListener("DOMContentLoaded", function() {
+  checkForSavedLogin();
   
-  // loadFlowchartData function removed - using the one from library.js instead
-  // The library.js version properly handles groups data and all other functionality
-  
-  document.addEventListener("DOMContentLoaded", function() {
-    checkForSavedLogin();
-    
-    // autoLogin has been moved to auth.js
-  
-    const container = document.getElementById("graphContainer");
-    const contextMenu = document.getElementById("contextMenu");
-    const notesContextMenu = document.getElementById("notesContextMenu");
-    const edgeContextMenu = document.getElementById("edgeContextMenu");
-    const edgeStyleSubmenu = document.getElementById("edgeStyleSubmenu");
-    const deleteNodeButton = document.getElementById("deleteNode");
-    const jumpNodeButton = document.getElementById("jumpNode");
-    const changeTypeButton = document.getElementById("changeType");
-    const propertiesButton = document.getElementById("propertiesButton");
-    const yesNoNodeButton = document.getElementById("yesNoNode");
-    const newSectionButton = document.getElementById("newSectionNode");
-  
-    const typeSubmenu = document.getElementById("typeSubmenu");
-    const calcSubmenu = document.getElementById("calcSubmenu");
-    const optionTypeSubmenu = document.getElementById("optionTypeSubmenu");
-    const calcTypeBtn = document.getElementById("calcType");
-    const subtitleTypeBtn = document.getElementById("subtitleType");
-    const infoTypeBtn = document.getElementById("infoType");
+  // autoLogin has been moved to auth.js
+
+  const container = document.getElementById("graphContainer");
+  const contextMenu = document.getElementById("contextMenu");
+  const notesContextMenu = document.getElementById("notesContextMenu");
+  const edgeContextMenu = document.getElementById("edgeContextMenu");
+  const edgeStyleSubmenu = document.getElementById("edgeStyleSubmenu");
+  const deleteNodeButton = document.getElementById("deleteNode");
+  const jumpNodeButton = document.getElementById("jumpNode");
+  const changeTypeButton = document.getElementById("changeType");
+  const propertiesButton = document.getElementById("propertiesButton");
+  const yesNoNodeButton = document.getElementById("yesNoNode");
+  const newSectionButton = document.getElementById("newSectionNode");
+
+  const typeSubmenu = document.getElementById("typeSubmenu");
+  const calcSubmenu = document.getElementById("calcSubmenu");
+  const optionTypeSubmenu = document.getElementById("optionTypeSubmenu");
+  const calcTypeBtn = document.getElementById("calcType");
+  const subtitleTypeBtn = document.getElementById("subtitleType");
+  const infoTypeBtn = document.getElementById("infoType");
       // Question type buttons moved to questions.js module
   
     // Properties panel elements moved to properties.js module
-  
-    const resetBtn = document.getElementById("resetBtn");
-  
+
+  const resetBtn = document.getElementById("resetBtn");
+
     // Graph initialization moved to graph.js module
     if (typeof initializeGraph === 'function') {
       graph = initializeGraph();
@@ -137,7 +137,7 @@
     } else {
       console.error('initializeGraph function not found');
       // Fallback: create graph directly
-    graph = new mxGraph(container);
+  graph = new mxGraph(container);
       console.log('Fallback graph created:', graph);
     }
     
@@ -188,7 +188,7 @@
         const vertices = graph.getChildVertices(parent);
         
         // Batch updates for better performance
-      graph.getModel().beginUpdate();
+    graph.getModel().beginUpdate();
         
         // Use for...of for better performance with large arrays
         for (const cell of vertices) {
@@ -321,87 +321,87 @@
       console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Double') || key.includes('Click')));
     }
   
-  
-    // Let mxGraph render cell labels as HTML
-    graph.setHtmlLabels(true);
-  
-    // Force all vertex labels to be interpreted as HTML
-    graph.isHtmlLabel = function(cell) {
-      return true;
-    };
-  
-    // Disable built-in label editing if it's multipleTextboxes or multipleDropdownType
-    // ----------  AFTER  ----------
-  graph.isCellEditable = function (cell) {
-    if (!cell) return false;
-    const qt = getQuestionType(cell);
-    if (qt === 'multipleTextboxes' ||
-        qt === 'multipleDropdownType' ||
-        qt === 'dropdown') {          // new ✱
-      return false;
-    }
-    // Disable direct editing for PDF nodes (they use custom input fields)
-    if (isPdfNode(cell)) {
-      return false;
-    }
-    // Disable direct editing for alert nodes (they use custom input fields)
-    if (isAlertNode(cell)) {
-      return false;
-    }
-    // Allow text2 to be edited directly with double-click
-    if (qt === 'text2') {
-      return true;
-    }
-    // Allow option nodes to be edited directly with double-click
-    if (isOptions(cell) && !qt.includes('image') && !qt.includes('amount')) {
-      return true;
-    }
-    // Allow subtitle and info nodes to be edited directly with double-click
-    if (isSubtitleNode(cell) || isInfoNode(cell)) {
-      return true;
-    }
+
+  // Let mxGraph render cell labels as HTML
+  graph.setHtmlLabels(true);
+
+  // Force all vertex labels to be interpreted as HTML
+  graph.isHtmlLabel = function(cell) {
     return true;
   };
-  
-  
-    // Enter => newline
-    graph.setEnterStopsCellEditing(false);
-  
-    // Set up proper panning with left button
-    graph.setPanning(true);
-    graph.panningHandler.useLeftButtonForPanning = true;
-  
+
+  // Disable built-in label editing if it's multipleTextboxes or multipleDropdownType
+  // ----------  AFTER  ----------
+graph.isCellEditable = function (cell) {
+  if (!cell) return false;
+  const qt = getQuestionType(cell);
+  if (qt === 'multipleTextboxes' ||
+      qt === 'multipleDropdownType' ||
+      qt === 'dropdown') {          // new ✱
+    return false;
+  }
+  // Disable direct editing for PDF nodes (they use custom input fields)
+  if (isPdfNode(cell)) {
+    return false;
+  }
+  // Disable direct editing for alert nodes (they use custom input fields)
+  if (isAlertNode(cell)) {
+    return false;
+  }
+  // Allow text2 to be edited directly with double-click
+  if (qt === 'text2') {
+    return true;
+  }
+  // Allow option nodes to be edited directly with double-click
+  if (isOptions(cell) && !qt.includes('image') && !qt.includes('amount')) {
+    return true;
+  }
+  // Allow subtitle and info nodes to be edited directly with double-click
+  if (isSubtitleNode(cell) || isInfoNode(cell)) {
+    return true;
+  }
+  return true;
+};
+
+
+  // Enter => newline
+  graph.setEnterStopsCellEditing(false);
+
+  // Set up proper panning with left button
+  graph.setPanning(true);
+  graph.panningHandler.useLeftButtonForPanning = true;
+
     // Cell editing listener moved to events.js module
+
+  // Comment out the line that disables the context menu on the graph container
+  // mxEvent.disableContextMenu(container);   // comment this out
+  graph.setCellsMovable(true);
+  graph.setConnectable(true);
+  graph.setCellsResizable(true);
+
+  // We'll focus just on making right-click work properly
+  // Customize rubberband handling (we'll skip selection box for now)
+  const rubberband = new mxRubberband(graph);
   
-    // Comment out the line that disables the context menu on the graph container
-    // mxEvent.disableContextMenu(container);   // comment this out
-    graph.setCellsMovable(true);
-    graph.setConnectable(true);
-    graph.setCellsResizable(true);
+  // Function to auto-select connecting edges
+  function autoSelectConnectingEdges() {
+    const sel = graph.getSelectionCells();
+    const verts = sel.filter(c => c && c.vertex);
+    if (verts.length < 2) return;
   
-    // We'll focus just on making right-click work properly
-    // Customize rubberband handling (we'll skip selection box for now)
-    const rubberband = new mxRubberband(graph);
-    
-    // Function to auto-select connecting edges
-    function autoSelectConnectingEdges() {
-      const sel = graph.getSelectionCells();
-      const verts = sel.filter(c => c && c.vertex);
-      if (verts.length < 2) return;
-    
-      const toAdd = [];
-      for (let i = 0; i < verts.length; i++) {
-        for (let j = i + 1; j < verts.length; j++) {
-          const between = graph.getEdgesBetween(verts[i], verts[j], false) || [];
-          for (const e of between) {
-            if (!sel.includes(e) && !toAdd.includes(e)) toAdd.push(e);
-          }
+    const toAdd = [];
+    for (let i = 0; i < verts.length; i++) {
+      for (let j = i + 1; j < verts.length; j++) {
+        const between = graph.getEdgesBetween(verts[i], verts[j], false) || [];
+        for (const e of between) {
+          if (!sel.includes(e) && !toAdd.includes(e)) toAdd.push(e);
         }
       }
-      if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
     }
-    
+    if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
+  }
   
+
     // Selection change listener moved to events.js module
   
     // Cells moved event listener moved to events.js module
@@ -426,29 +426,29 @@
     }
   
     // Global click listener for hiding menus moved to context-menus.js module
+
+  // Slight style tweaks to move label text away from top
+  const style = graph.getStylesheet().getDefaultVertexStyle();
+  style[mxConstants.STYLE_VERTICAL_ALIGN] = "top";
+  style[mxConstants.STYLE_VERTICAL_LABEL_POSITION] = "middle";
+  style[mxConstants.STYLE_SPACING_TOP] = 10;
   
-    // Slight style tweaks to move label text away from top
-    const style = graph.getStylesheet().getDefaultVertexStyle();
-    style[mxConstants.STYLE_VERTICAL_ALIGN] = "top";
-    style[mxConstants.STYLE_VERTICAL_LABEL_POSITION] = "middle";
-    style[mxConstants.STYLE_SPACING_TOP] = 10;
-    
-    // Ensure vertices (nodes) are always displayed in front of edges (connectors)
-    style[mxConstants.STYLE_Z_INDEX] = 1;
-    
-    // Set edge z-index to be behind vertices
-    const edgeStyle = graph.getStylesheet().getDefaultEdgeStyle();
-    edgeStyle[mxConstants.STYLE_Z_INDEX] = 0;
+  // Ensure vertices (nodes) are always displayed in front of edges (connectors)
+  style[mxConstants.STYLE_Z_INDEX] = 1;
   
-    // Zoom with mouse wheel
-    mxEvent.addMouseWheelListener(function(evt, up) {
-      if (!mxEvent.isConsumed(evt)) {
-        if (up) graph.zoomIn();
-        else graph.zoomOut();
-        mxEvent.consume(evt);
-      }
-    }, container);
-  
+  // Set edge z-index to be behind vertices
+  const edgeStyle = graph.getStylesheet().getDefaultEdgeStyle();
+  edgeStyle[mxConstants.STYLE_Z_INDEX] = 0;
+
+  // Zoom with mouse wheel
+  mxEvent.addMouseWheelListener(function(evt, up) {
+    if (!mxEvent.isConsumed(evt)) {
+      if (up) graph.zoomIn();
+      else graph.zoomOut();
+      mxEvent.consume(evt);
+    }
+  }, container);
+
     // Keyboard shortcuts and selection tracking moved to events.js module
   
     // Draggable shapes setup moved to events.js module
@@ -456,236 +456,236 @@
     // MOVE_CELLS event listener moved to events.js module
   
     // Delete node event handler moved to context-menus.js module
-  
-    // Mark/unmark jump node
-    jumpNodeButton.addEventListener("click", () => {
-      if (selectedCell) {
-        if (jumpModeNode && jumpModeNode !== selectedCell) {
-          removeJumpStyling(jumpModeNode);
-        }
-        jumpModeNode = selectedCell;
-        addJumpStyling(jumpModeNode);
+
+  // Mark/unmark jump node
+  jumpNodeButton.addEventListener("click", () => {
+    if (selectedCell) {
+      if (jumpModeNode && jumpModeNode !== selectedCell) {
+        removeJumpStyling(jumpModeNode);
       }
-      hideContextMenu();
-    });
-  
-    // Create yes/no child options
-    yesNoNodeButton.addEventListener("click", () => {
-      if (selectedCell && isQuestion(selectedCell)) {
-        createYesNoOptions(selectedCell);
-      }
-      hideContextMenu();
-    });
-  
-    // 'Change Type' -> Show submenu
-    changeTypeButton.addEventListener("click", () => {
-      const rect = contextMenu.getBoundingClientRect();
-      if (selectedCell && isQuestion(selectedCell)) {
-        typeSubmenu.style.display = "block";
-        typeSubmenu.style.left = rect.right + "px";
-        typeSubmenu.style.top = rect.top + "px";
-        calcSubmenu.style.display = "none";
-        optionTypeSubmenu.style.display = "none";
-      } else if (selectedCell && isOptions(selectedCell)) {
-        optionTypeSubmenu.style.display = "block";
-        optionTypeSubmenu.style.left = rect.right + "px";
-        optionTypeSubmenu.style.top = rect.top + "px";
-        typeSubmenu.style.display = "none";
-        calcSubmenu.style.display = "none";
-      } else if (selectedCell && (isCalculationNode(selectedCell) || isSubtitleNode(selectedCell) || isInfoNode(selectedCell))) {
-        calcSubmenu.style.display = "block";
-        calcSubmenu.style.left = rect.right + "px";
-        calcSubmenu.style.top = rect.top + "px";
-        typeSubmenu.style.display = "none";
-        optionTypeSubmenu.style.display = "none";
-      }
-    });
-  
+      jumpModeNode = selectedCell;
+      addJumpStyling(jumpModeNode);
+    }
+    hideContextMenu();
+  });
+
+  // Create yes/no child options
+  yesNoNodeButton.addEventListener("click", () => {
+    if (selectedCell && isQuestion(selectedCell)) {
+      createYesNoOptions(selectedCell);
+    }
+    hideContextMenu();
+  });
+
+  // 'Change Type' -> Show submenu
+  changeTypeButton.addEventListener("click", () => {
+    const rect = contextMenu.getBoundingClientRect();
+    if (selectedCell && isQuestion(selectedCell)) {
+      typeSubmenu.style.display = "block";
+      typeSubmenu.style.left = rect.right + "px";
+      typeSubmenu.style.top = rect.top + "px";
+      calcSubmenu.style.display = "none";
+      optionTypeSubmenu.style.display = "none";
+    } else if (selectedCell && isOptions(selectedCell)) {
+      optionTypeSubmenu.style.display = "block";
+      optionTypeSubmenu.style.left = rect.right + "px";
+      optionTypeSubmenu.style.top = rect.top + "px";
+      typeSubmenu.style.display = "none";
+      calcSubmenu.style.display = "none";
+    } else if (selectedCell && (isCalculationNode(selectedCell) || isSubtitleNode(selectedCell) || isInfoNode(selectedCell))) {
+      calcSubmenu.style.display = "block";
+      calcSubmenu.style.left = rect.right + "px";
+      calcSubmenu.style.top = rect.top + "px";
+      typeSubmenu.style.display = "none";
+      optionTypeSubmenu.style.display = "none";
+    }
+  });
+
     // Question type event handlers moved to questions.js module
-  
-    // Calc submenu buttons
-    calcTypeBtn.addEventListener("click", () => {
-      if (selectedCell) {
+
+  // Calc submenu buttons
+  calcTypeBtn.addEventListener("click", () => {
+    if (selectedCell) {
         // Extract and preserve the current text content
         const preservedText = extractTextFromCell(selectedCell);
         
-        // Convert to calculation node
-        graph.getModel().beginUpdate();
-        try {
+      // Convert to calculation node
+      graph.getModel().beginUpdate();
+      try {
           if (typeof window.convertToCalculationNode === 'function') {
             window.convertToCalculationNode(selectedCell, preservedText);
           }
-        } finally {
-          graph.getModel().endUpdate();
-        }
-        refreshAllCells();
+      } finally {
+        graph.getModel().endUpdate();
       }
-      hideContextMenu();
-    });
-  
-    subtitleTypeBtn.addEventListener("click", () => {
-      if (selectedCell) {
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  subtitleTypeBtn.addEventListener("click", () => {
+    if (selectedCell) {
         // Extract and preserve the current text content
         const preservedText = extractTextFromCell(selectedCell);
         
-        // Convert to subtitle node
-        graph.getModel().beginUpdate();
-        try {
-          selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=subtitle");
+      // Convert to subtitle node
+      graph.getModel().beginUpdate();
+      try {
+        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=subtitle");
           selectedCell._subtitleText = preservedText || "Subtitle text";
-          updateSubtitleNodeCell(selectedCell);
-        } finally {
-          graph.getModel().endUpdate();
-        }
-        refreshAllCells();
+        updateSubtitleNodeCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
       }
-      hideContextMenu();
-    });
-  
-    infoTypeBtn.addEventListener("click", () => {
-      if (selectedCell) {
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  infoTypeBtn.addEventListener("click", () => {
+    if (selectedCell) {
         // Extract and preserve the current text content
         const preservedText = extractTextFromCell(selectedCell);
         
-        // Convert to info node
-        graph.getModel().beginUpdate();
-        try {
-          selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=info");
+      // Convert to info node
+      graph.getModel().beginUpdate();
+      try {
+        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=info");
           selectedCell._infoText = preservedText || "Information text";
-          updateInfoNodeCell(selectedCell);
-        } finally {
-          graph.getModel().endUpdate();
-        }
-        refreshAllCells();
+        updateInfoNodeCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
       }
-      hideContextMenu();
-    });
-  
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
     // Multiple textboxes and dropdown event handlers moved to questions.js module
-  
-    // Option type submenu event handlers
-    const regularOptionTypeBtn = document.getElementById("regularOptionType");
-    const imageOptionTypeBtn = document.getElementById("imageOptionType");
-    const amountOptionTypeBtn = document.getElementById("amountOptionType");
-    const notesNodeTypeBtn = document.getElementById("notesNodeType");
-    const alertNodeTypeBtn = document.getElementById("alertNodeType");
-    const checklistNodeTypeBtn = document.getElementById("checklistNodeType");
-    const endNodeTypeBtn = document.getElementById("endNodeType");
-  
-    regularOptionTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "dropdown");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    imageOptionTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "imageOption");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    amountOptionTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "amountOption");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    notesNodeTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "notesNode");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    checklistNodeTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "checklistNode");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    alertNodeTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "alertNode");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    endNodeTypeBtn.addEventListener("click", () => {
-      if (selectedCell && isOptions(selectedCell)) {
-        setOptionType(selectedCell, "end");
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    // Notes context menu event handlers
-    document.getElementById('notesBoldButton').addEventListener("click", () => {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-        const notesCell = selectedCells[0];
-        notesCell._notesBold = !notesCell._notesBold;
+
+  // Option type submenu event handlers
+  const regularOptionTypeBtn = document.getElementById("regularOptionType");
+  const imageOptionTypeBtn = document.getElementById("imageOptionType");
+  const amountOptionTypeBtn = document.getElementById("amountOptionType");
+  const notesNodeTypeBtn = document.getElementById("notesNodeType");
+  const alertNodeTypeBtn = document.getElementById("alertNodeType");
+  const checklistNodeTypeBtn = document.getElementById("checklistNodeType");
+  const endNodeTypeBtn = document.getElementById("endNodeType");
+
+  regularOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "dropdown");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  imageOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "imageOption");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  amountOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "amountOption");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  notesNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "notesNode");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  checklistNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "checklistNode");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  alertNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "alertNode");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  endNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "end");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  // Notes context menu event handlers
+  document.getElementById('notesBoldButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      const notesCell = selectedCells[0];
+      notesCell._notesBold = !notesCell._notesBold;
+      updateNotesNodeCell(notesCell);
+      refreshAllCells();
+      autosaveFlowchartToLocalStorage();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('notesFontButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      const notesCell = selectedCells[0];
+      const currentFontSize = notesCell._notesFontSize || 14;
+      const newFontSize = prompt('Enter font size (number):', currentFontSize);
+      if (newFontSize && !isNaN(newFontSize) && newFontSize > 0) {
+        notesCell._notesFontSize = parseInt(newFontSize);
         updateNotesNodeCell(notesCell);
         refreshAllCells();
         autosaveFlowchartToLocalStorage();
       }
-      hideContextMenu();
-    });
-  
-    document.getElementById('notesFontButton').addEventListener("click", () => {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-        const notesCell = selectedCells[0];
-        const currentFontSize = notesCell._notesFontSize || 14;
-        const newFontSize = prompt('Enter font size (number):', currentFontSize);
-        if (newFontSize && !isNaN(newFontSize) && newFontSize > 0) {
-          notesCell._notesFontSize = parseInt(newFontSize);
-          updateNotesNodeCell(notesCell);
-          refreshAllCells();
-          autosaveFlowchartToLocalStorage();
-        }
-      }
-      hideContextMenu();
-    });
-  
-    document.getElementById('notesCopyButton').addEventListener("click", () => {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-        copySelectedNodeAsJson();
-      }
-      hideContextMenu();
-    });
-  
-    document.getElementById('notesDeleteButton').addEventListener("click", () => {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-        graph.removeCells(selectedCells);
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
-    // Increase the "section number" for a question
-    newSectionButton.addEventListener("click", () => {
-      if (selectedCell) {
-        // getSection is defined in legend.js
-        const currentSection = parseInt(getSection(selectedCell) || "1", 10);
-        // setSection is defined in legend.js
-        setSection(selectedCell, currentSection + 1);
-        refreshAllCells();
-      }
-      hideContextMenu();
-    });
-  
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('notesCopyButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      copySelectedNodeAsJson();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('notesDeleteButton').addEventListener("click", () => {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
+      graph.removeCells(selectedCells);
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  // Increase the "section number" for a question
+  newSectionButton.addEventListener("click", () => {
+    if (selectedCell) {
+      // getSection is defined in legend.js
+      const currentSection = parseInt(getSection(selectedCell) || "1", 10);
+      // setSection is defined in legend.js
+      setSection(selectedCell, currentSection + 1);
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
     // Properties menu function moved to properties.js module
   
     // Properties button event listener moved to properties.js module
@@ -693,204 +693,204 @@
     // Editable field function moved to properties.js module
   
     // Properties panel functions moved to properties.js module
-  /**************************************************
-   *              KEYBOARD  SHORTCUTS               *
-   **************************************************/
-  const keyHandler = new mxKeyHandler(graph);
+/**************************************************
+ *              KEYBOARD  SHORTCUTS               *
+ **************************************************/
+const keyHandler = new mxKeyHandler(graph);
+
+/* DELETE & BACKSPACE you already handled elsewhere ------------------- */
+
+/* Ctrl + C  – copy node (ONLY when not typing) */
+keyHandler.bindControlKey(67, () => {
+  if (isUserTyping()) return;                  // NEW / CHANGED
+  copySelectedNodeAsJson();
+});
+
+/* Ctrl + V  – paste node (ONLY when not typing) */
+keyHandler.bindControlKey(86, () => {
+  if (isUserTyping()) return;                  // NEW / CHANGED
+  const mousePos = graph.getPointForEvent(graph.lastEvent);
+  pasteNodeFromJson(mousePos ? mousePos.x : undefined,
+                    mousePos ? mousePos.y : undefined);
+});
+
   
-  /* DELETE & BACKSPACE you already handled elsewhere ------------------- */
-  
-  /* Ctrl + C  – copy node (ONLY when not typing) */
-  keyHandler.bindControlKey(67, () => {
-    if (isUserTyping()) return;                  // NEW / CHANGED
+  // Add listener for copy button
+  document.getElementById('copyNodeButton').addEventListener('click', function() {
     copySelectedNodeAsJson();
+    hideContextMenu();
   });
   
-  /* Ctrl + V  – paste node (ONLY when not typing) */
-  keyHandler.bindControlKey(86, () => {
-    if (isUserTyping()) return;                  // NEW / CHANGED
-    const mousePos = graph.getPointForEvent(graph.lastEvent);
-    pasteNodeFromJson(mousePos ? mousePos.x : undefined,
-                      mousePos ? mousePos.y : undefined);
+  // Add listener for paste here button
+  document.getElementById('pasteHereButton').addEventListener('click', function() {
+    if (window.emptySpaceClickX !== undefined && window.emptySpaceClickY !== undefined) {
+      pasteNodeFromJson(window.emptySpaceClickX, window.emptySpaceClickY);
+      window.emptySpaceClickX = undefined;
+      window.emptySpaceClickY = undefined;
+    } else {
+      pasteNodeFromJson();
+    }
+    hideContextMenu();
   });
-  
+
+  // Edge context menu event listeners
+  document.getElementById('untangleEdge').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      const edge = selectedCells[0];
+      // Reset edge geometry to default (remove any custom points)
+      const geo = new mxGeometry();
+      graph.getModel().setGeometry(edge, geo);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('changeEdgeStyle').addEventListener('click', function() {
+    const rect = edgeContextMenu.getBoundingClientRect();
+    edgeStyleSubmenu.style.display = "block";
+    edgeStyleSubmenu.style.left = rect.right + "px";
+    edgeStyleSubmenu.style.top = rect.top + "px";
+  });
+
+  document.getElementById('deleteEdge').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      graph.removeCells(selectedCells);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  // Edge style submenu event listeners
+  document.getElementById('edgeStyleCurved').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      const edge = selectedCells[0];
+      let style = edge.style || "";
+      style = style.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
+      style = style.replace(/rounded=[^;]+/g, 'rounded=1');
+      style = style.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=1');
+      if (!style.includes('rounded=')) {
+        style += ';rounded=1';
+      }
+      if (!style.includes('orthogonalLoop=')) {
+        style += ';orthogonalLoop=1';
+      }
+      graph.getModel().setStyle(edge, style);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  document.getElementById('edgeStyleDirect').addEventListener('click', function() {
+    const selectedCells = graph.getSelectionCells();
+    if (selectedCells.length === 1 && selectedCells[0].edge) {
+      const edge = selectedCells[0];
+      let style = edge.style || "";
+      style = style.replace(/edgeStyle=[^;]+/g, 'edgeStyle=none');
+      style = style.replace(/rounded=[^;]+/g, 'rounded=0');
+      style = style.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=0');
+      if (!style.includes('rounded=')) {
+        style += ';rounded=0';
+      }
+      if (!style.includes('orthogonalLoop=')) {
+        style += ';orthogonalLoop=0';
+      }
+      graph.getModel().setStyle(edge, style);
+      requestAutosave();
+    }
+    hideContextMenu();
+  });
+
+  graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
+    const changes = evt.getProperty("changes");
+    if (!changes) return;
     
-    // Add listener for copy button
-    document.getElementById('copyNodeButton').addEventListener('click', function() {
-      copySelectedNodeAsJson();
-      hideContextMenu();
-    });
+    const modifiedQuestionCells = new Set();
     
-    // Add listener for paste here button
-    document.getElementById('pasteHereButton').addEventListener('click', function() {
-      if (window.emptySpaceClickX !== undefined && window.emptySpaceClickY !== undefined) {
-        pasteNodeFromJson(window.emptySpaceClickX, window.emptySpaceClickY);
-        window.emptySpaceClickX = undefined;
-        window.emptySpaceClickY = undefined;
-      } else {
-        pasteNodeFromJson();
-      }
-      hideContextMenu();
-    });
-  
-    // Edge context menu event listeners
-    document.getElementById('untangleEdge').addEventListener('click', function() {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && selectedCells[0].edge) {
-        const edge = selectedCells[0];
-        // Reset edge geometry to default (remove any custom points)
-        const geo = new mxGeometry();
-        graph.getModel().setGeometry(edge, geo);
-        requestAutosave();
-      }
-      hideContextMenu();
-    });
-  
-    document.getElementById('changeEdgeStyle').addEventListener('click', function() {
-      const rect = edgeContextMenu.getBoundingClientRect();
-      edgeStyleSubmenu.style.display = "block";
-      edgeStyleSubmenu.style.left = rect.right + "px";
-      edgeStyleSubmenu.style.top = rect.top + "px";
-    });
-  
-    document.getElementById('deleteEdge').addEventListener('click', function() {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && selectedCells[0].edge) {
-        graph.removeCells(selectedCells);
-        requestAutosave();
-      }
-      hideContextMenu();
-    });
-  
-    // Edge style submenu event listeners
-    document.getElementById('edgeStyleCurved').addEventListener('click', function() {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && selectedCells[0].edge) {
-        const edge = selectedCells[0];
-        let style = edge.style || "";
-        style = style.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
-        style = style.replace(/rounded=[^;]+/g, 'rounded=1');
-        style = style.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=1');
-        if (!style.includes('rounded=')) {
-          style += ';rounded=1';
+    changes.forEach(change => {
+      if (change.constructor.name === "mxValueChange") {
+        const { cell, value } = change;
+        
+        // Track modified question cells
+        if (isQuestion(cell)) {
+          modifiedQuestionCells.add(cell);
         }
-        if (!style.includes('orthogonalLoop=')) {
-          style += ';orthogonalLoop=1';
-        }
-        graph.getModel().setStyle(edge, style);
-        requestAutosave();
-      }
-      hideContextMenu();
-    });
-  
-    document.getElementById('edgeStyleDirect').addEventListener('click', function() {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells.length === 1 && selectedCells[0].edge) {
-        const edge = selectedCells[0];
-        let style = edge.style || "";
-        style = style.replace(/edgeStyle=[^;]+/g, 'edgeStyle=none');
-        style = style.replace(/rounded=[^;]+/g, 'rounded=0');
-        style = style.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=0');
-        if (!style.includes('rounded=')) {
-          style += ';rounded=0';
-        }
-        if (!style.includes('orthogonalLoop=')) {
-          style += ';orthogonalLoop=0';
-        }
-        graph.getModel().setStyle(edge, style);
-        requestAutosave();
-      }
-      hideContextMenu();
-    });
-  
-    graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
-      const changes = evt.getProperty("changes");
-      if (!changes) return;
-      
-      const modifiedQuestionCells = new Set();
-      
-      changes.forEach(change => {
-        if (change.constructor.name === "mxValueChange") {
-          const { cell, value } = change;
-          
-          // Track modified question cells
-          if (isQuestion(cell)) {
-            modifiedQuestionCells.add(cell);
-          }
-          
-          if (value && typeof value === "string") {
-            // If a label ends with "?", treat as question
-            if (value.trim().endsWith("?")) {
-              if (!isQuestion(cell)) {
-                let style = cell.style || "";
-                style += ";nodeType=question;";
-                graph.getModel().setStyle(cell, style);
-                refreshNodeIdFromLabel(cell);
-              }
+        
+        if (value && typeof value === "string") {
+          // If a label ends with "?", treat as question
+          if (value.trim().endsWith("?")) {
+            if (!isQuestion(cell)) {
+              let style = cell.style || "";
+              style += ";nodeType=question;";
+              graph.getModel().setStyle(cell, style);
+              refreshNodeIdFromLabel(cell);
             }
           }
         }
-      });
-      
-      // Update calculation nodes that depend on modified questions
-      modifiedQuestionCells.forEach(questionCell => {
-        updateAllCalcNodesOnQuestionChange(questionCell, false);
-      });
-      
-      refreshAllCells();
-    });
-  
-    graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
-      const edge = evt.getProperty("cell");
-      if (!edge) return;
-  
-      // Apply current edge style setting to manually created edges
-      let edgeStyle;
-      if (currentEdgeStyle === 'curved') {
-        edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-      } else if (currentEdgeStyle === 'straight') {
-        edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
-      } else if (currentEdgeStyle === 'direct') {
-        edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
-      } else {
-        edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
       }
-      graph.getModel().setStyle(edge, edgeStyle);
-  
-      const source = graph.getModel().getTerminal(edge, true);
-      const target = graph.getModel().getTerminal(edge, false);
-  
-      if (source && target) {
-          // When connecting an option to a question, the option and its descendants
-          // should adopt the question's section only if it's a higher section number.
-          if (isOptions(source) && isQuestion(target)) {
-              const questionSection = getSection(target);
-              const sourceSection = getSection(source);
-  
-              // Only update if the question's section is greater.
-              // A null section can be treated as 0 for comparison.
-              if (questionSection !== null && questionSection > (sourceSection || 0)) {
-                  setSection(source, questionSection);
-  
-                  // Also apply to all downstream cells from this source, with the same condition.
-                  const downstreamCells = getConnectedDescendants(source); // Assuming getConnectedDescendants exists
-                  downstreamCells.forEach(cell => {
-                      const cellSection = getSection(cell);
-                      if ((isOptions(cell) || isQuestion(cell)) && (questionSection > (cellSection || 0))) {
-                          setSection(cell, questionSection);
-                      }
-                  });
-              }
-          }
-          // When connecting a question to an option (reverse case), the question should
-          // adopt the option's section only if it's a higher number.
-          else if (isQuestion(source) && isOptions(target)) {
-              const optionSection = getSection(target);
-              const questionSection = getSection(source);
-  
-              if (optionSection !== null && optionSection > (questionSection || 0)) {
-                  setSection(source, optionSection);
-              }
+    });
+    
+    // Update calculation nodes that depend on modified questions
+    modifiedQuestionCells.forEach(questionCell => {
+      updateAllCalcNodesOnQuestionChange(questionCell, false);
+    });
+    
+    refreshAllCells();
+  });
+
+  graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
+    const edge = evt.getProperty("cell");
+    if (!edge) return;
+
+    // Apply current edge style setting to manually created edges
+    let edgeStyle;
+    if (currentEdgeStyle === 'curved') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'straight') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'direct') {
+      edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+    } else {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    }
+    graph.getModel().setStyle(edge, edgeStyle);
+
+    const source = graph.getModel().getTerminal(edge, true);
+    const target = graph.getModel().getTerminal(edge, false);
+
+    if (source && target) {
+        // When connecting an option to a question, the option and its descendants
+        // should adopt the question's section only if it's a higher section number.
+        if (isOptions(source) && isQuestion(target)) {
+            const questionSection = getSection(target);
+            const sourceSection = getSection(source);
+
+            // Only update if the question's section is greater.
+            // A null section can be treated as 0 for comparison.
+            if (questionSection !== null && questionSection > (sourceSection || 0)) {
+                setSection(source, questionSection);
+
+                // Also apply to all downstream cells from this source, with the same condition.
+                const downstreamCells = getConnectedDescendants(source); // Assuming getConnectedDescendants exists
+                downstreamCells.forEach(cell => {
+                    const cellSection = getSection(cell);
+                    if ((isOptions(cell) || isQuestion(cell)) && (questionSection > (cellSection || 0))) {
+                        setSection(cell, questionSection);
+                    }
+                });
+            }
+        }
+        // When connecting a question to an option (reverse case), the question should
+        // adopt the option's section only if it's a higher number.
+        else if (isQuestion(source) && isOptions(target)) {
+            const optionSection = getSection(target);
+            const questionSection = getSection(source);
+
+            if (optionSection !== null && optionSection > (questionSection || 0)) {
+                setSection(source, optionSection);
+            }
           }
       }
   
@@ -901,890 +901,890 @@
         if (cell && isPdfNode(cell)) {
           updatePdfNodeCell(cell);
         }
-      }
-      
-      refreshAllCells();
+    }
+
+    refreshAllCells();
+});
+
+
+  resetBtn.addEventListener("click", () => {
+    colorPreferences = { ...defaultColors };
+    updateLegendColors();
+    refreshAllCells();
+    saveUserColorPrefs();
+  });
+
+  updateLegendColors();
+  // updateSectionLegend is defined in legend.js
+  updateSectionLegend();
+
+  // Add event listeners for empty space menu buttons
+  document.getElementById('placeQuestionNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('question');
+    hideContextMenu();
   });
   
+  document.getElementById('placeOptionNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('options');
+    hideContextMenu();
+  });
   
-    resetBtn.addEventListener("click", () => {
-      colorPreferences = { ...defaultColors };
-      updateLegendColors();
-      refreshAllCells();
-      saveUserColorPrefs();
-    });
-  
-    updateLegendColors();
-    // updateSectionLegend is defined in legend.js
-    updateSectionLegend();
-  
-    // Add event listeners for empty space menu buttons
-    document.getElementById('placeQuestionNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('question');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeOptionNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('options');
-      hideContextMenu();
-    });
-    
     // Calculation node placement now handled by calc.js
     if (typeof window.setupCalculationNodeEventListeners === 'function') {
       window.setupCalculationNodeEventListeners();
     }
+  
+  document.getElementById('placeNotesNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('notesNode');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeChecklistNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('checklistNode');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeSubtitleNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('subtitle');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeInfoNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('info');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeImageNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('imageOption');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placePdfNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('pdfNode');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeAmountNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('amountOption');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeEndNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('end');
+    hideContextMenu();
+  });
+  
+  // Settings menu event listeners
+  document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsMenu);
+  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+  document.getElementById('cancelSettingsBtn').addEventListener('click', hideSettingsMenu);
+  
+  // Load settings on startup
+  loadSettingsFromLocalStorage();
+  
+  // Initialize search functionality
+  initializeSearch();
+  
+  function placeNodeAtClickLocation(nodeType) {
+    if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
     
-    document.getElementById('placeNotesNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('notesNode');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeChecklistNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('checklistNode');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeSubtitleNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('subtitle');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeInfoNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('info');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeImageNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('imageOption');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placePdfNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('pdfNode');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeAmountNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('amountOption');
-      hideContextMenu();
-    });
-    
-    document.getElementById('placeEndNode').addEventListener('click', function() {
-      placeNodeAtClickLocation('end');
-      hideContextMenu();
-    });
-    
-    // Settings menu event listeners
-    document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsMenu);
-    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-    document.getElementById('cancelSettingsBtn').addEventListener('click', hideSettingsMenu);
-    
-    // Load settings on startup
-    loadSettingsFromLocalStorage();
-    
-    // Initialize search functionality
-    initializeSearch();
-    
-    function placeNodeAtClickLocation(nodeType) {
-      if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
+    const parent = graph.getDefaultParent();
+    graph.getModel().beginUpdate();
+    let cell;
+    try {
+      let style = "";
+      let label = "";
+      let width = 160;
+      let height = 80;
       
-      const parent = graph.getDefaultParent();
-      graph.getModel().beginUpdate();
-      let cell;
-      try {
-        let style = "";
-        let label = "";
-        let width = 160;
-        let height = 80;
-        
-        if (nodeType === 'question') {
-          // Use default style for question, but do not set a static label or questionType
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
-          label = ""; // No static label
-          width = 280; // Ensure wide enough for dropdown
-        } else if (nodeType === 'options') {
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
-          label = "Option Text";
-        } else if (nodeType === 'calculation') {
+      if (nodeType === 'question') {
+        // Use default style for question, but do not set a static label or questionType
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
+        label = ""; // No static label
+        width = 280; // Ensure wide enough for dropdown
+      } else if (nodeType === 'options') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
+        label = "Option Text";
+      } else if (nodeType === 'calculation') {
           // Calculation node style and label now handled by calc.js
           if (typeof window.getCalculationNodeStyle === 'function') {
             const calcStyle = window.getCalculationNodeStyle();
             style = calcStyle.style;
             label = calcStyle.label;
           } else {
-          style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
-          label = "Calculation node";
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
+        label = "Calculation node";
           }
-        } else if (nodeType === 'notesNode') {
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=notesNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;";
-          label = "Notes Node";
-        } else if (nodeType === 'checklistNode') {
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checklistNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;";
-          label = "Checklist Node";
-        } else if (nodeType === 'subtitle') {
-          style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=subtitle;spacing=12;fontSize=14;fontStyle=italic;";
-          label = "Subtitle text";
-        } else if (nodeType === 'info') {
-          style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=info;spacing=12;fontSize=14;";
-          label = "Information text";
-        } else if (nodeType === 'imageOption') {
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;spacing=12;fontSize=16;";
-          label = "Image Option";
-            } else if (nodeType === 'pdfNode') {
-        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=6;fontSize=16;";
-          label = "PDF Node";
-        } else if (nodeType === 'amountOption') {
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
-          label = "Amount Option";
-        } else if (nodeType === 'end') {
-          style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;";
-          label = "END";
-        }
-        
-        // Create cell with appropriate width/height based on type
-        if (nodeType === 'calculation') {
-          width = 300;
-          height = 250;
-        } else if (nodeType === 'end') {
-          width = 120;
-          height = 60;
-        }
-        
-        cell = graph.insertVertex(
-          parent, 
-          null, 
-          label, 
-          window.emptySpaceClickX, 
-          window.emptySpaceClickY, 
-          width,
-          height,
-          style
-        );
-        
-        // Set IDs and section
-        if (nodeType === 'question') {
-          setNodeId(cell, 'Question_' + Date.now().toString().slice(-4));
-          // Do NOT call setQuestionType or set questionType here; let refreshAllCells show the dropdown
-        } else if (nodeType === 'options') {
-          setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
-        }
-        
-        setSection(cell, "1");
-        
+      } else if (nodeType === 'notesNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=notesNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;";
+        label = "Notes Node";
+      } else if (nodeType === 'checklistNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=checklistNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;";
+        label = "Checklist Node";
+      } else if (nodeType === 'subtitle') {
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=subtitle;spacing=12;fontSize=14;fontStyle=italic;";
+        label = "Subtitle text";
+      } else if (nodeType === 'info') {
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=info;spacing=12;fontSize=14;";
+        label = "Information text";
+      } else if (nodeType === 'imageOption') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;spacing=12;fontSize=16;";
+        label = "Image Option";
+          } else if (nodeType === 'pdfNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=6;fontSize=16;";
+        label = "PDF Node";
+      } else if (nodeType === 'amountOption') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
+        label = "Amount Option";
+      } else if (nodeType === 'end') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;";
+        label = "END";
+      }
+      
+      // Create cell with appropriate width/height based on type
+      if (nodeType === 'calculation') {
+        width = 300;
+        height = 250;
+      } else if (nodeType === 'end') {
+        width = 120;
+        height = 60;
+      }
+      
+      cell = graph.insertVertex(
+        parent, 
+        null, 
+        label, 
+        window.emptySpaceClickX, 
+        window.emptySpaceClickY, 
+        width,
+        height,
+        style
+      );
+      
+      // Set IDs and section
+      if (nodeType === 'question') {
+        setNodeId(cell, 'Question_' + Date.now().toString().slice(-4));
+        // Do NOT call setQuestionType or set questionType here; let refreshAllCells show the dropdown
+      } else if (nodeType === 'options') {
+        setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
+      }
+      
+      setSection(cell, "1");
+      
         // Special handling for calculation nodes - now handled by calc.js
-        if (nodeType === 'calculation') {
+      if (nodeType === 'calculation') {
           if (typeof window.handleCalculationNodePlacement === 'function') {
             window.handleCalculationNodePlacement(cell);
           }
-        } else if (nodeType === 'notesNode') {
-          cell._notesText = "Notes text";
-          updateNotesNodeCell(cell);
-        } else if (nodeType === 'checklistNode') {
-          cell._checklistText = "Checklist text";
-          updateChecklistNodeCell(cell);
-        } else if (nodeType === 'subtitle') {
-          cell._subtitleText = "Subtitle text";
-          updateSubtitleNodeCell(cell);
-        } else if (nodeType === 'info') {
-          cell._infoText = "Information text";
-          updateInfoNodeCell(cell);
-        } else if (nodeType === 'imageOption') {
-          cell._image = {
-            url: "",
-            width: "100",
-            height: "100"
-          };
-          updateImageOptionCell(cell);
-        } else if (nodeType === 'pdfNode') {
-          cell._pdfUrl = "";
-          updatePdfNodeCell(cell);
-        } else if (nodeType === 'end') {
-          updateEndNodeCell(cell);
-        }
-        
-      } finally {
-        graph.getModel().endUpdate();
+      } else if (nodeType === 'notesNode') {
+        cell._notesText = "Notes text";
+        updateNotesNodeCell(cell);
+      } else if (nodeType === 'checklistNode') {
+        cell._checklistText = "Checklist text";
+        updateChecklistNodeCell(cell);
+      } else if (nodeType === 'subtitle') {
+        cell._subtitleText = "Subtitle text";
+        updateSubtitleNodeCell(cell);
+      } else if (nodeType === 'info') {
+        cell._infoText = "Information text";
+        updateInfoNodeCell(cell);
+      } else if (nodeType === 'imageOption') {
+        cell._image = {
+          url: "",
+          width: "100",
+          height: "100"
+        };
+        updateImageOptionCell(cell);
+      } else if (nodeType === 'pdfNode') {
+        cell._pdfUrl = "";
+        updatePdfNodeCell(cell);
+      } else if (nodeType === 'end') {
+        updateEndNodeCell(cell);
       }
       
-      // Apply coloring and show dropdown for question nodes
-      refreshAllCells();
-      
-      // Clear the click location
-      window.emptySpaceClickX = undefined;
-      window.emptySpaceClickY = undefined;
+    } finally {
+      graph.getModel().endUpdate();
     }
     
+    // Apply coloring and show dropdown for question nodes
+    refreshAllCells();
+    
+    // Clear the click location
+    window.emptySpaceClickX = undefined;
+    window.emptySpaceClickY = undefined;
+  }
+  
     // Keyboard event listeners moved to events.js module
   
    
   
     // Global keydown event listener moved to events.js module
   
+
+});
+
+/*******************************************************
+ ********** RENUMBERING QUESTIONS BY POSITION **********
+ *******************************************************/
+function renumberQuestionIds() {
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  const questions = vertices.filter(cell => isQuestion(cell));
   
+  // Sort questions by vertical position (Y coordinate)
+  questions.sort((a, b) => {
+    const aY = a.geometry.y;
+    const bY = b.geometry.y;
+    if (Math.abs(aY - bY) < 10) { // If Y positions are very close, sort by X
+      return a.geometry.x - b.geometry.x;
+    }
+    return aY - bY;
+  });
+
+  // Assign sequential IDs based on vertical position
+  questions.forEach((cell, index) => {
+    cell._questionId = index + 1;
   });
   
-  /*******************************************************
-   ********** RENUMBERING QUESTIONS BY POSITION **********
-   *******************************************************/
-  function renumberQuestionIds() {
-    const parent = graph.getDefaultParent();
-    const vertices = graph.getChildVertices(parent);
-    const questions = vertices.filter(cell => isQuestion(cell));
-    
-    // Sort questions by vertical position (Y coordinate)
-    questions.sort((a, b) => {
-      const aY = a.geometry.y;
-      const bY = b.geometry.y;
-      if (Math.abs(aY - bY) < 10) { // If Y positions are very close, sort by X
-        return a.geometry.x - b.geometry.x;
-      }
-      return aY - bY;
-    });
-  
-    // Assign sequential IDs based on vertical position
-    questions.forEach((cell, index) => {
-      cell._questionId = index + 1;
-    });
-    
-    // If properties menu is open for a selected question, update displayed ID
-    if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
-      document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
-    }
+  // If properties menu is open for a selected question, update displayed ID
+  if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
+    document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
+  }
+}
+
+/*******************************************************
+ ********** MULTIPLE TEXTBOXES: RENDERING & EDITS ******
+ *******************************************************/
+function escapeHtml(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/\n/g, "<br>");
+}
+function escapeAttr(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+// Helper function to render textboxes for multiple textboxes question
+function renderTextboxes(cell) {
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
   }
   
-  /*******************************************************
-   ********** MULTIPLE TEXTBOXES: RENDERING & EDITS ******
-   *******************************************************/
-  function escapeHtml(str) {
-    if (!str) return "";
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/\n/g, "<br>");
-  }
-  function escapeAttr(str) {
-    if (!str) return "";
-    return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-  }
+  let html = '';
   
-  // Helper function to render textboxes for multiple textboxes question
-  function renderTextboxes(cell) {
-    if (!cell._textboxes) {
-      cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
-    }
-    
-    let html = '';
-    
-    cell._textboxes.forEach((tb, index) => {
-      const val = tb.nameId || "";
-      const ph = tb.placeholder || "Enter value";
-      html += 
-        `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
-          <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
-          <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
-        </div>`;
-    });
-    
-    html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button></div>`;
-    
-    return html;
-  }
+  cell._textboxes.forEach((tb, index) => {
+    const val = tb.nameId || "";
+    const ph = tb.placeholder || "Enter value";
+    html += 
+      `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
+        <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
+      </div>`;
+  });
   
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button></div>`;
+  
+  return html;
+}
+
   // Multiple textboxes functions moved to questions.js module
-  
-  /*******************************************************
-   ********** multipleDropdownType: RENDER & EDITS *******
-   *******************************************************/
-  function updatemultipleDropdownTypeCell(cell) {
-    const qText = cell._questionText || '';
-    const twoNums = cell._twoNumbers || { first: '0', second: '0' };
-    if (!cell._textboxes) {
-      cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
+
+/*******************************************************
+ ********** multipleDropdownType: RENDER & EDITS *******
+ *******************************************************/
+function updatemultipleDropdownTypeCell(cell) {
+  const qText = cell._questionText || '';
+  const twoNums = cell._twoNumbers || { first: '0', second: '0' };
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
+  }
+  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+    <input class="question-title-input" type="text" value="${escapeAttr(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
+    <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
+      <input type="number" value="${escapeAttr(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
+      <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
+    </div>
+    <div class="multiple-textboxes-container" style="margin-top: 8px; width:100%;">`;
+  cell._textboxes.forEach((tb, index) => {
+    const val = tb.nameId || '';
+    const ph = tb.placeholder || 'Enter value';
+    const checked = tb.isAmountOption ? 'checked' : '';
+    html += `
+      <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
+        <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <label>
+          <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
+      </div>`;
+  });
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
+    </div>
+  </div>`;
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+    let st = cell.style || '';
+    if (!st.includes('verticalAlign=middle')) {
+      st += 'verticalAlign=middle;';
     }
-    let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-      <input class="question-title-input" type="text" value="${escapeAttr(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
-      <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
-        <input type="number" value="${escapeAttr(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
-        <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+window.updatemultipleDropdownTypeTextHandler = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      cell._questionText = text.trim() || "Enter question text";
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.updatemultipleDropdownTypeNumber = function(cellId, which, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      if (!cell._twoNumbers) {
+        cell._twoNumbers = { first: "0", second: "0" };
+      }
+      if (which === "first") {
+        cell._twoNumbers.first = value;
+      } else {
+        cell._twoNumbers.second = value;
+      }
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.updatemultipleDropdownTypeHandler = function(cellId, index, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
+    graph.getModel().beginUpdate();
+    try {
+      let existingPlaceholder = cell._textboxes[index].placeholder;
+      if (!existingPlaceholder || existingPlaceholder === "Enter value") {
+        cell._textboxes[index].placeholder = value || "";
+      }
+      cell._textboxes[index].nameId = value;
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.addmultipleDropdownTypeHandler = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      if (!cell._textboxes) cell._textboxes = [];
+      cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.deletemultipleDropdownTypeHandler = function(cellId, index) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
+    graph.getModel().beginUpdate();
+    try {
+      cell._textboxes.splice(index, 1);
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
+    graph.getModel().beginUpdate();
+    try {
+      cell._textboxes[index].isAmountOption = checked;
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+/*******************************************************
+ ************ Subtitle and Info Nodes: RENDER & EDITS *********
+ *******************************************************/
+// isCalculationNode is now in calc.js but referenced here
+// function isCalculationNode(cell) is defined in calc.js
+
+function isSubtitleNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=subtitle");
+}
+
+function isInfoNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=info");
+}
+
+function updateSubtitleNodeCell(cell) {
+  if (!cell) return;
+  cell._subtitleText = cell._subtitleText || "Add subtitle text";
+  cell.value = `<span style="font-size: 14px; font-style: italic;">${escapeHtml(cell._subtitleText)}</span>`;
+  colorCell(cell);
+}
+
+function updateInfoNodeCell(cell) {
+  if (!cell) return;
+  cell._infoText = cell._infoText || "Add information text";
+  cell.value = `<span style="font-size: 14px; color: #555;">${escapeHtml(cell._infoText)}</span>`;
+  colorCell(cell);
+}
+
+// The calculation node functions have been moved to calc.js
+
+/*******************************************************
+ ************  HELPER / STYLING / JSON Exports  ********
+ *******************************************************/
+function autoUpdateNodeIdBasedOnLabel(cell) {
+  if (!cell.vertex) return;
+  
+  // Check if this cell has been manually assigned an ID and should skip reassignment
+  const style = cell.style || "";
+  if (style.includes("skipReassign=true")) return;
+  
+  const label = (cell.value || "").trim();
+  if (!label) return;
+  if (isQuestion(cell)) {
+    refreshNodeIdFromLabel(cell);
+  } else if (isOptions(cell)) {
+    refreshOptionNodeId(cell);
+  }
+}
+  // isQuestion function moved to questions.js module
+function isOptions(cell) {
+  return cell && cell.style && (
+    cell.style.includes("nodeType=options") ||
+    cell.style.includes("questionType=amountOption") ||
+    cell.style.includes("questionType=imageOption")
+  );
+}
+
+function isAmountOption(cell) {
+  return cell && cell.style && cell.style.includes("questionType=amountOption");
+}
+
+function setNodeId(cell, nodeId) {
+  let style = cell.style || "";
+  style = style.replace(/nodeId=[^;]+/, "");
+  style += `;nodeId=${encodeURIComponent(nodeId)};`;
+  graph.getModel().setStyle(cell, style);
+}
+function getNodeId(cell) {
+  const style = cell.style || "";
+  const m = style.match(/nodeId=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : "";
+}
+
+function refreshNodeIdFromLabel(cell) {
+  let labelText = "";
+
+  if (isQuestion(cell)) {
+    const qType = getQuestionType(cell);
+    if (qType === "multipleTextboxes" || qType === "multipleDropdownType") {
+      labelText = cell._questionText || "custom_question";
+    } else {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cell.value || "";
+      labelText = tempDiv.textContent || tempDiv.innerText || "";
+    }
+  } else {
+    labelText = cell.value || "";
+  }
+
+  const cleanedText = labelText
+    .trim()
+    .replace(/<[^>]+>/g, "")  
+    .replace(/[^\w\s]/gi, "") 
+    .replace(/\s+/g, "_")
+    .toLowerCase();
+
+  const baseNodeId = cleanedText || "unnamed_node";
+  
+  // Check for duplicates and add numbering if needed
+  const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  setNodeId(cell, uniqueNodeId);
+}
+
+function generateUniqueNodeId(baseNodeId, currentCell) {
+  // Get all cells in the graph
+  const allCells = graph.getModel().cells;
+  const existingNodeIds = new Set();
+  
+  // Collect all existing node IDs except the current cell
+  for (let id in allCells) {
+    if (id === "0" || id === "1") continue; // Skip root cells
+    const cell = allCells[id];
+    if (cell && cell !== currentCell) {
+      const existingId = getNodeId(cell);
+      if (existingId) {
+        existingNodeIds.add(existingId);
+      }
+    }
+  }
+  
+  // If the base ID is unique, use it
+  if (!existingNodeIds.has(baseNodeId)) {
+    return baseNodeId;
+  }
+  
+  // If not unique, add numbering
+  let counter = 1;
+  let uniqueId = `${baseNodeId}_${counter}`;
+  
+  while (existingNodeIds.has(uniqueId)) {
+    counter++;
+    uniqueId = `${baseNodeId}_${counter}`;
+  }
+  
+  return uniqueId;
+}
+
+function refreshOptionNodeId(cell) {
+  const edges = graph.getIncomingEdges(cell) || [];
+  let parentNodeId = "ParentQuestion";
+  for (let e of edges) {
+    const p = e.source;
+    if (isQuestion(p)) {
+      parentNodeId = getNodeId(p) || "ParentQuestion";
+      break;
+    }
+  }
+  let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
+  const baseNodeId = parentNodeId + label;
+  
+  // Check for duplicates and add numbering if needed
+  const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  setNodeId(cell, uniqueNodeId);
+}
+
+function addSkipReassign(cell) {
+  if (!cell) return;
+  let style = cell.style || "";
+  style = style.replace(/skipReassign=[^;]+/, "");
+  style += ";skipReassign=true;";
+  graph.getModel().setStyle(cell, style);
+}
+function removeJumpStyling(cell) {
+  if (!cell) return;
+  let style = cell.style || "";
+  style = style.replace(/strokeWidth=\d+;?/, "");
+  style = style.replace(/strokeColor=[^;]+;?/, "");
+  style = style.replace(/dashed=\d;?/, "");
+  style = style.replace(/dashPattern=[^;]+;?/, "");
+  graph.getModel().setStyle(cell, style);
+}
+function addJumpStyling(cell) {
+  if (!cell) return;
+  let style = cell.style || "";
+  style = style.replace(/strokeWidth=\d+;?/, "");
+  style = style.replace(/strokeColor=[^;]+;?/, "");
+  style = style.replace(/dashed=\d;?/, "");
+  style = style.replace(/dashPattern=[^;]+;?/, "");
+  style += jumpBorderStyle;
+  graph.getModel().setStyle(cell, style);
+}
+
+  // getQuestionType function moved to questions.js module
+
+/**
+ * Define pickTypeForCell globally
+ */
+window.pickTypeForCell = function(cellId, val) {
+  if (!val) {
+    return; // Do nothing if no type selected
+  }
+  const c = graph.getModel().getCell(cellId);
+  if (!c) {
+    return;
+  }
+
+  graph.getModel().beginUpdate();
+  try {
+    setQuestionType(c, val);
+    if (!c._nameId) {
+      c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
+      c._placeholder = "";
+    }
+    // Only handle special cases for multi types
+    if (val === "multipleTextboxes") {
+      c._questionText = "Enter question text";
+      c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+      updateMultipleTextboxesCell(c);
+    } else if (val === "multipleDropdownType") {
+      c._questionText = "Enter question text";
+      c._twoNumbers = { first: "0", second: "0" };
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      updatemultipleDropdownTypeCell(c);
+    }
+    // For all other types, setQuestionType handles rendering
+  } finally {
+    graph.getModel().endUpdate();
+  }
+
+  graph.setSelectionCell(c);
+  graph.startEditingAtCell(c);
+  refreshAllCells();
+};
+
+/******************************************************************
+ * 1) Universal key-down guard – put this in your global helpers  *
+ ******************************************************************/
+window.handleTitleInputKeydown = function (evt) {
+  // Let the browser handle native shortcuts, but don't let mxGraph see them
+  if ((evt.ctrlKey || evt.metaKey) &&
+      ['c', 'v', 'x', 'a'].includes(evt.key.toLowerCase())) {
+    evt.stopPropagation(); // <-- added line
+    return;
+  }
+  evt.stopPropagation(); // existing line for all other keys
+  if (evt.key === 'Enter') {
+    evt.preventDefault();
+    evt.target.blur();
+  }
+};
+
+/******************************************************************
+ * 2) renderTextboxes() – used by multiple-textboxes questions     *
+ *    (full replacement)                                          *
+ ******************************************************************/
+function renderTextboxes(cell) {
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+  }
+
+  let html = "";
+
+  cell._textboxes.forEach((tb, index) => {
+    const val = tb.nameId || "";
+    const ph  = tb.placeholder || "Enter value";
+
+    html += `
+      <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" />
+        <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
+      </div>`;
+  });
+
+  html += `
+    <div style="text-align:center;margin-top:8px;">
+      <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+    </div>`;
+
+  return html;
+}
+
+/******************************************************************
+ * 3) updatemultipleDropdownTypeCell() – full replacement          *
+ ******************************************************************/
+function updatemultipleDropdownTypeCell(cell) {
+  const qText   = cell._questionText || "";
+  const twoNums = cell._twoNumbers   || { first: "0", second: "0" };
+
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+  }
+
+  let html = `
+    <div class="multiple-textboxes-node"
+         style="display:flex;flex-direction:column;align-items:center;">
+      <input class="question-title-input"
+             type="text"
+             value="${escapeAttr(qText)}"
+             placeholder="Enter question text"
+             onkeydown="window.handleTitleInputKeydown(event)"
+             onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)"
+             style="margin-bottom:8px;width:90%;text-align:center;" />
+
+      <div class="two-number-container"
+           style="display:flex;justify-content:center;gap:10px;margin-top:8px;width:100%;">
+        <input type="number"
+               value="${escapeAttr(twoNums.first)}"
+               onkeydown="window.handleTitleInputKeydown(event)"
+               onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)" />
+        <input type="number"
+               value="${escapeAttr(twoNums.second)}"
+               onkeydown="window.handleTitleInputKeydown(event)"
+               onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)" />
       </div>
-      <div class="multiple-textboxes-container" style="margin-top: 8px; width:100%;">`;
-    cell._textboxes.forEach((tb, index) => {
-      const val = tb.nameId || '';
-      const ph = tb.placeholder || 'Enter value';
-      const checked = tb.isAmountOption ? 'checked' : '';
-      html += `
-        <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
-          <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
-          <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
-          <label>
-            <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
-            Amount?
-          </label>
-        </div>`;
-    });
-    html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
+
+      <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
+
+  cell._textboxes.forEach((tb, index) => {
+    const val      = tb.nameId      || "";
+    const ph       = tb.placeholder || "Enter value";
+    const checked  = tb.isAmountOption ? "checked" : "";
+
+    html += `
+      <div class="textbox-entry" style="margin-bottom:4px;text-align:center;">
+        <input type="text"value="${escapeAttr(val)}"data-index="${index}"placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" />
+        <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <label>
+          <input type="checkbox" ${checked}
+                 onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
+      </div>`;
+  });
+
+  html += `
+        <div style="text-align:center;margin-top:8px;">
+          <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+        </div>
       </div>
     </div>`;
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-      let st = cell.style || '';
-      if (!st.includes('verticalAlign=middle')) {
-        st += 'verticalAlign=middle;';
-      }
-    } finally {
-      graph.getModel().endUpdate();
+
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+
+    // make sure the style keeps pointer events enabled
+    let st = cell.style || "";
+    if (!/pointerEvents=/.test(st)) {
+      st += "pointerEvents=1;overflow=fill;";
     }
-    graph.updateCellSize(cell);
+    if (!/verticalAlign=middle/.test(st)) {
+      st += "verticalAlign=middle;";
+    }
+    graph.getModel().setStyle(cell, st);
+  } finally {
+    graph.getModel().endUpdate();
   }
-  
-  window.updatemultipleDropdownTypeTextHandler = function(cellId, text) {
-    const cell = graph.getModel().getCell(cellId);
-    if (cell && getQuestionType(cell) === "multipleDropdownType") {
-      graph.getModel().beginUpdate();
-      try {
-        cell._questionText = text.trim() || "Enter question text";
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      updatemultipleDropdownTypeCell(cell);
-    }
-  };
-  
-  window.updatemultipleDropdownTypeNumber = function(cellId, which, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (cell && getQuestionType(cell) === "multipleDropdownType") {
-      graph.getModel().beginUpdate();
-      try {
-        if (!cell._twoNumbers) {
-          cell._twoNumbers = { first: "0", second: "0" };
-        }
-        if (which === "first") {
-          cell._twoNumbers.first = value;
-        } else {
-          cell._twoNumbers.second = value;
-        }
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      updatemultipleDropdownTypeCell(cell);
-    }
-  };
-  
-  window.updatemultipleDropdownTypeHandler = function(cellId, index, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
-      graph.getModel().beginUpdate();
-      try {
-        let existingPlaceholder = cell._textboxes[index].placeholder;
-        if (!existingPlaceholder || existingPlaceholder === "Enter value") {
-          cell._textboxes[index].placeholder = value || "";
-        }
-        cell._textboxes[index].nameId = value;
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      updatemultipleDropdownTypeCell(cell);
-    }
-  };
-  
-  window.addmultipleDropdownTypeHandler = function(cellId) {
-    const cell = graph.getModel().getCell(cellId);
-    if (cell && getQuestionType(cell) === "multipleDropdownType") {
-      graph.getModel().beginUpdate();
-      try {
-        if (!cell._textboxes) cell._textboxes = [];
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      updatemultipleDropdownTypeCell(cell);
-    }
-  };
-  
-  window.deletemultipleDropdownTypeHandler = function(cellId, index) {
-    const cell = graph.getModel().getCell(cellId);
-    if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
-      graph.getModel().beginUpdate();
-      try {
-        cell._textboxes.splice(index, 1);
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      updatemultipleDropdownTypeCell(cell);
-    }
-  };
-  
-  window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
-    const cell = graph.getModel().getCell(cellId);
-    if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
-      graph.getModel().beginUpdate();
-      try {
-        cell._textboxes[index].isAmountOption = checked;
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      updatemultipleDropdownTypeCell(cell);
-    }
-  };
-  
-  /*******************************************************
-   ************ Subtitle and Info Nodes: RENDER & EDITS *********
-   *******************************************************/
-  // isCalculationNode is now in calc.js but referenced here
-  // function isCalculationNode(cell) is defined in calc.js
-  
-  function isSubtitleNode(cell) {
-    return cell && cell.style && cell.style.includes("nodeType=subtitle");
-  }
-  
-  function isInfoNode(cell) {
-    return cell && cell.style && cell.style.includes("nodeType=info");
-  }
-  
-  function updateSubtitleNodeCell(cell) {
-    if (!cell) return;
-    cell._subtitleText = cell._subtitleText || "Add subtitle text";
-    cell.value = `<span style="font-size: 14px; font-style: italic;">${escapeHtml(cell._subtitleText)}</span>`;
-    colorCell(cell);
-  }
-  
-  function updateInfoNodeCell(cell) {
-    if (!cell) return;
-    cell._infoText = cell._infoText || "Add information text";
-    cell.value = `<span style="font-size: 14px; color: #555;">${escapeHtml(cell._infoText)}</span>`;
-    colorCell(cell);
-  }
-  
-  // The calculation node functions have been moved to calc.js
-  
-  /*******************************************************
-   ************  HELPER / STYLING / JSON Exports  ********
-   *******************************************************/
-  function autoUpdateNodeIdBasedOnLabel(cell) {
-    if (!cell.vertex) return;
-    
-    // Check if this cell has been manually assigned an ID and should skip reassignment
-    const style = cell.style || "";
-    if (style.includes("skipReassign=true")) return;
-    
-    const label = (cell.value || "").trim();
-    if (!label) return;
-    if (isQuestion(cell)) {
-      refreshNodeIdFromLabel(cell);
-    } else if (isOptions(cell)) {
-      refreshOptionNodeId(cell);
-    }
-  }
-  // isQuestion function moved to questions.js module
-  function isOptions(cell) {
-    return cell && cell.style && (
-      cell.style.includes("nodeType=options") ||
-      cell.style.includes("questionType=amountOption") ||
-      cell.style.includes("questionType=imageOption")
-    );
-  }
-  
-  function isAmountOption(cell) {
-    return cell && cell.style && cell.style.includes("questionType=amountOption");
-  }
-  
-  function setNodeId(cell, nodeId) {
-    let style = cell.style || "";
-    style = style.replace(/nodeId=[^;]+/, "");
-    style += `;nodeId=${encodeURIComponent(nodeId)};`;
-    graph.getModel().setStyle(cell, style);
-  }
-  function getNodeId(cell) {
-    const style = cell.style || "";
-    const m = style.match(/nodeId=([^;]+)/);
-    return m ? decodeURIComponent(m[1]) : "";
-  }
-  
-  function refreshNodeIdFromLabel(cell) {
-    let labelText = "";
-  
-    if (isQuestion(cell)) {
-      const qType = getQuestionType(cell);
-      if (qType === "multipleTextboxes" || qType === "multipleDropdownType") {
-        labelText = cell._questionText || "custom_question";
-      } else {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = cell.value || "";
-        labelText = tempDiv.textContent || tempDiv.innerText || "";
-      }
-    } else {
-      labelText = cell.value || "";
-    }
-  
-    const cleanedText = labelText
-      .trim()
-      .replace(/<[^>]+>/g, "")  
-      .replace(/[^\w\s]/gi, "") 
-      .replace(/\s+/g, "_")
-      .toLowerCase();
-  
-    const baseNodeId = cleanedText || "unnamed_node";
-    
-    // Check for duplicates and add numbering if needed
-    const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
-    setNodeId(cell, uniqueNodeId);
-  }
-  
-  function generateUniqueNodeId(baseNodeId, currentCell) {
-    // Get all cells in the graph
-    const allCells = graph.getModel().cells;
-    const existingNodeIds = new Set();
-    
-    // Collect all existing node IDs except the current cell
-    for (let id in allCells) {
-      if (id === "0" || id === "1") continue; // Skip root cells
-      const cell = allCells[id];
-      if (cell && cell !== currentCell) {
-        const existingId = getNodeId(cell);
-        if (existingId) {
-          existingNodeIds.add(existingId);
-        }
-      }
-    }
-    
-    // If the base ID is unique, use it
-    if (!existingNodeIds.has(baseNodeId)) {
-      return baseNodeId;
-    }
-    
-    // If not unique, add numbering
-    let counter = 1;
-    let uniqueId = `${baseNodeId}_${counter}`;
-    
-    while (existingNodeIds.has(uniqueId)) {
-      counter++;
-      uniqueId = `${baseNodeId}_${counter}`;
-    }
-    
-    return uniqueId;
-  }
-  
-  function refreshOptionNodeId(cell) {
-    const edges = graph.getIncomingEdges(cell) || [];
-    let parentNodeId = "ParentQuestion";
-    for (let e of edges) {
-      const p = e.source;
-      if (isQuestion(p)) {
-        parentNodeId = getNodeId(p) || "ParentQuestion";
-        break;
-      }
-    }
-    let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
-    const baseNodeId = parentNodeId + label;
-    
-    // Check for duplicates and add numbering if needed
-    const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
-    setNodeId(cell, uniqueNodeId);
-  }
-  
-  function addSkipReassign(cell) {
-    if (!cell) return;
-    let style = cell.style || "";
-    style = style.replace(/skipReassign=[^;]+/, "");
-    style += ";skipReassign=true;";
-    graph.getModel().setStyle(cell, style);
-  }
-  function removeJumpStyling(cell) {
-    if (!cell) return;
-    let style = cell.style || "";
-    style = style.replace(/strokeWidth=\d+;?/, "");
-    style = style.replace(/strokeColor=[^;]+;?/, "");
-    style = style.replace(/dashed=\d;?/, "");
-    style = style.replace(/dashPattern=[^;]+;?/, "");
-    graph.getModel().setStyle(cell, style);
-  }
-  function addJumpStyling(cell) {
-    if (!cell) return;
-    let style = cell.style || "";
-    style = style.replace(/strokeWidth=\d+;?/, "");
-    style = style.replace(/strokeColor=[^;]+;?/, "");
-    style = style.replace(/dashed=\d;?/, "");
-    style = style.replace(/dashPattern=[^;]+;?/, "");
-    style += jumpBorderStyle;
-    graph.getModel().setStyle(cell, style);
-  }
-  
-  // getQuestionType function moved to questions.js module
-  
-  /**
-   * Define pickTypeForCell globally
-   */
-  window.pickTypeForCell = function(cellId, val) {
-    if (!val) {
-      return; // Do nothing if no type selected
-    }
-    const c = graph.getModel().getCell(cellId);
-    if (!c) {
-      return;
-    }
-  
-    graph.getModel().beginUpdate();
-    try {
-      setQuestionType(c, val);
-      if (!c._nameId) {
-        c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
-        c._placeholder = "";
-      }
-      // Only handle special cases for multi types
-      if (val === "multipleTextboxes") {
-        c._questionText = "Enter question text";
-        c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
-        updateMultipleTextboxesCell(c);
-      } else if (val === "multipleDropdownType") {
-        c._questionText = "Enter question text";
-        c._twoNumbers = { first: "0", second: "0" };
-        c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
-        updatemultipleDropdownTypeCell(c);
-      }
-      // For all other types, setQuestionType handles rendering
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  
-    graph.setSelectionCell(c);
-    graph.startEditingAtCell(c);
-    refreshAllCells();
-  };
-  
-  /******************************************************************
-   * 1) Universal key-down guard – put this in your global helpers  *
-   ******************************************************************/
-  window.handleTitleInputKeydown = function (evt) {
-    // Let the browser handle native shortcuts, but don't let mxGraph see them
-    if ((evt.ctrlKey || evt.metaKey) &&
-        ['c', 'v', 'x', 'a'].includes(evt.key.toLowerCase())) {
-      evt.stopPropagation(); // <-- added line
-      return;
-    }
-    evt.stopPropagation(); // existing line for all other keys
-    if (evt.key === 'Enter') {
-      evt.preventDefault();
-      evt.target.blur();
-    }
-  };
-  
-  /******************************************************************
-   * 2) renderTextboxes() – used by multiple-textboxes questions     *
-   *    (full replacement)                                          *
-   ******************************************************************/
-  function renderTextboxes(cell) {
-    if (!cell._textboxes) {
-      cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
-    }
-  
-    let html = "";
-  
-    cell._textboxes.forEach((tb, index) => {
-      const val = tb.nameId || "";
-      const ph  = tb.placeholder || "Enter value";
-  
-      html += `
-        <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
-          <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" />
-          <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
-        </div>`;
-    });
-  
-    html += `
-      <div style="text-align:center;margin-top:8px;">
-        <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
-      </div>`;
-  
-    return html;
-  }
-  
-  /******************************************************************
-   * 3) updatemultipleDropdownTypeCell() – full replacement          *
-   ******************************************************************/
-  function updatemultipleDropdownTypeCell(cell) {
-    const qText   = cell._questionText || "";
-    const twoNums = cell._twoNumbers   || { first: "0", second: "0" };
-  
-    if (!cell._textboxes) {
-      cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
-    }
-  
-    let html = `
-      <div class="multiple-textboxes-node"
-           style="display:flex;flex-direction:column;align-items:center;">
-        <input class="question-title-input"
-               type="text"
-               value="${escapeAttr(qText)}"
-               placeholder="Enter question text"
-               onkeydown="window.handleTitleInputKeydown(event)"
-               onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)"
-               style="margin-bottom:8px;width:90%;text-align:center;" />
-  
-        <div class="two-number-container"
-             style="display:flex;justify-content:center;gap:10px;margin-top:8px;width:100%;">
-          <input type="number"
-                 value="${escapeAttr(twoNums.first)}"
-                 onkeydown="window.handleTitleInputKeydown(event)"
-                 onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)" />
-          <input type="number"
-                 value="${escapeAttr(twoNums.second)}"
-                 onkeydown="window.handleTitleInputKeydown(event)"
-                 onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)" />
-        </div>
-  
-        <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
-  
-    cell._textboxes.forEach((tb, index) => {
-      const val      = tb.nameId      || "";
-      const ph       = tb.placeholder || "Enter value";
-      const checked  = tb.isAmountOption ? "checked" : "";
-  
-      html += `
-        <div class="textbox-entry" style="margin-bottom:4px;text-align:center;">
-          <input type="text"value="${escapeAttr(val)}"data-index="${index}"placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" />
-          <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
-          <label>
-            <input type="checkbox" ${checked}
-                   onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
-            Amount?
-          </label>
-        </div>`;
-    });
-  
-    html += `
-          <div style="text-align:center;margin-top:8px;">
-            <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
-          </div>
-        </div>
-      </div>`;
-  
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-  
-      // make sure the style keeps pointer events enabled
-      let st = cell.style || "";
-      if (!/pointerEvents=/.test(st)) {
-        st += "pointerEvents=1;overflow=fill;";
-      }
-      if (!/verticalAlign=middle/.test(st)) {
-        st += "verticalAlign=middle;";
-      }
-      graph.getModel().setStyle(cell, st);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  
-    graph.updateCellSize(cell);
-  }
-  
-  /**************************************************
-   *                setQuestionType                 *
-   *  – now stores plain text for the simple types  *
-   **************************************************/
-  /**************************************************
-   *                setQuestionType                 *
-   **************************************************/
-  /* ----------  REPLACE ENTIRE FUNCTION  ---------- */
+
+  graph.updateCellSize(cell);
+}
+
+/**************************************************
+ *                setQuestionType                 *
+ *  – now stores plain text for the simple types  *
+ **************************************************/
+/**************************************************
+ *                setQuestionType                 *
+ **************************************************/
+/* ----------  REPLACE ENTIRE FUNCTION  ---------- */
   // setQuestionType function moved to questions.js module
   
   // extractTextFromCell function moved to questions.js module
-  
-  // Function to set option type for option nodes
-  function setOptionType(cell, newType) {
-    if (!cell || !isOptions(cell)) return;
+
+// Function to set option type for option nodes
+function setOptionType(cell, newType) {
+  if (!cell || !isOptions(cell)) return;
     
     // Extract and preserve the current text content
     const preservedText = extractTextFromCell(cell);
-    
-    /* —— 1. update style —— */
-    let st = (cell.style || '').replace(/questionType=[^;]+/, '');
-    st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
-    
-    graph.getModel().setStyle(cell, st);
   
-    /* —— 2. update internals —— */
-    graph.getModel().beginUpdate();
-    try {
-      switch (newType) {
-        case 'dropdown':
+  /* —— 1. update style —— */
+  let st = (cell.style || '').replace(/questionType=[^;]+/, '');
+  st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
+  
+  graph.getModel().setStyle(cell, st);
+
+  /* —— 2. update internals —— */
+  graph.getModel().beginUpdate();
+  try {
+    switch (newType) {
+      case 'dropdown':
           // Regular option - preserve text content
           if (preservedText) {
             cell.value = `<div style="text-align:center;">${mxUtils.htmlEntities(preservedText)}</div>`;
           }
-          updateOptionNodeCell(cell);
-          break;
-        case 'imageOption':
-          // Image option - needs image URL and alt text
-          if (!cell._imageUrl) {
-            cell._imageUrl = '';
+        updateOptionNodeCell(cell);
+        break;
+      case 'imageOption':
+        // Image option - needs image URL and alt text
+        if (!cell._imageUrl) {
+          cell._imageUrl = '';
             cell._imageAltText = preservedText || 'Image description';
-          }
-          updateImageOptionCell(cell);
-          break;
-        case 'amountOption':
-          // Amount option - needs amount name and placeholder
-          if (!cell._amountName) {
+        }
+        updateImageOptionCell(cell);
+        break;
+      case 'amountOption':
+        // Amount option - needs amount name and placeholder
+        if (!cell._amountName) {
             cell._amountName = preservedText || 'Amount';
-            cell._amountPlaceholder = 'Enter amount';
-          }
-          // updateAmountOptionCell is handled in the existing code
-          break;
-        case 'notesNode':
+          cell._amountPlaceholder = 'Enter amount';
+        }
+        // updateAmountOptionCell is handled in the existing code
+        break;
+      case 'notesNode':
           // Notes node - preserve text content
           cell._notesText = preservedText || 'Notes text';
-          // Add bold border style
-          st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
-          st = st.replace(/strokeColor=[^;]+/, '');
-          st += ';strokeWidth=3;strokeColor=#000000;';
-          graph.getModel().setStyle(cell, st);
-          updateNotesNodeCell(cell);
-          break;
-        case 'checklistNode':
+        // Add bold border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = st.replace(/strokeColor=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#000000;';
+        graph.getModel().setStyle(cell, st);
+        updateNotesNodeCell(cell);
+        break;
+      case 'checklistNode':
           // Checklist node - preserve text content
           cell._checklistText = preservedText || 'Checklist text';
-          // Add striped red border style
-          st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
-          st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
-          st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
-          st += ';strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;';
-          graph.getModel().setStyle(cell, st);
-          updateChecklistNodeCell(cell);
-          break;
-        case 'alertNode':
+        // Add striped red border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#FF0000;strokeDasharray=5,5;';
+        graph.getModel().setStyle(cell, st);
+        updateChecklistNodeCell(cell);
+        break;
+      case 'alertNode':
           // Alert node - preserve text content
           cell._alertText = preservedText || 'Alert message';
-          // Add bold black and red checkered border style
-          st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
-          st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
-          st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
-          st += ';strokeWidth=3;strokeColor=#000000;strokeDasharray=5,5;';
-          graph.getModel().setStyle(cell, st);
-          updateAlertNodeCell(cell);
-          break;
-        case 'end':
-          // End node option - convert to end node
-          // Change the node type from options to end
-          let endStyle = (cell.style || '').replace(/nodeType=[^;]+/, '');
-          endStyle = endStyle.replace(/questionType=[^;]+/, '');
-          endStyle += ';nodeType=end;fillColor=#CCCCCC;fontColor=#000000;';
-          graph.getModel().setStyle(cell, endStyle);
-          updateEndNodeCell(cell);
-          break;
-        default:
-          updateOptionNodeCell(cell);
-      }
-      refreshOptionNodeId(cell);
-    } finally {
-      graph.getModel().endUpdate();
+        // Add bold black and red checkered border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#000000;strokeDasharray=5,5;';
+        graph.getModel().setStyle(cell, st);
+        updateAlertNodeCell(cell);
+        break;
+      case 'end':
+        // End node option - convert to end node
+        // Change the node type from options to end
+        let endStyle = (cell.style || '').replace(/nodeType=[^;]+/, '');
+        endStyle = endStyle.replace(/questionType=[^;]+/, '');
+        endStyle += ';nodeType=end;fillColor=#CCCCCC;fontColor=#000000;';
+        graph.getModel().setStyle(cell, endStyle);
+        updateEndNodeCell(cell);
+        break;
+      default:
+        updateOptionNodeCell(cell);
     }
-    refreshAllCells();
+    refreshOptionNodeId(cell);
+  } finally {
+    graph.getModel().endUpdate();
   }
-  /* ----------  END OF REPLACEMENT  #2 ------------- */
-  
+  refreshAllCells();
+}
+/* ----------  END OF REPLACEMENT  #2 ------------- */
+
   // Export setOptionType to global scope
   window.setOptionType = setOptionType;
   
@@ -1799,105 +1799,130 @@
   window.updateAlertNodeCell = updateAlertNodeCell;
   window.refreshOptionNodeId = refreshOptionNodeId;
   window.updateSimpleQuestionCell = updateSimpleQuestionCell;
+
+
+/**************************************************
+ *           COLORING & REFRESHING CELLS          *
+ **************************************************/
+function colorCell(cell) {
+  if (!cell.vertex) return;
+  let fillColor = "#ADD8E6"; // fallback
   
-  
-  /**************************************************
-   *           COLORING & REFRESHING CELLS          *
-   **************************************************/
-  function colorCell(cell) {
-    if (!cell.vertex) return;
-    let fillColor = "#ADD8E6"; // fallback
-    
-    if (isEndNode(cell)) {
-      fillColor = "#CCCCCC";
-      const st = cell.style || "";
-      if (!st.includes("fillColor=#CCCCCC")) {
-        graph.getModel().setStyle(cell, st + "fillColor=#CCCCCC;");
-      }
-      return;
+  if (isEndNode(cell)) {
+    fillColor = "#CCCCCC";
+    const st = cell.style || "";
+    if (!st.includes("fillColor=#CCCCCC")) {
+      graph.getModel().setStyle(cell, st + "fillColor=#CCCCCC;");
     }
-  
-    if (isQuestion(cell)) {
-      const qType = getQuestionType(cell);
-      switch (qType) {
-        case "text":         fillColor = colorPreferences.text; break;
-        case "checkbox":     fillColor = colorPreferences.checkbox; break;
-        case "dropdown":     fillColor = colorPreferences.dropdown; break;
-        case "text2":        fillColor = colorPreferences.dropdown; break; // Text2 uses dropdown color
-        case "number":       fillColor = colorPreferences.money; break;
-        case "date":         fillColor = colorPreferences.date; break;
-        case "dateRange":    fillColor = colorPreferences.date; break; // Use date color for dateRange
-        case "email":        fillColor = colorPreferences.text; break; // Use text color for email
-        case "phone":        fillColor = colorPreferences.text; break; // Use text color for phone
-        case "bigParagraph": fillColor = colorPreferences.bigParagraph; break;
-        case "multipleTextboxes":
-        case "multipleDropdownType":
-          fillColor = colorPreferences.text;
-          break;
-        default:
-          fillColor = "#ADD8E6";
-          break;
-      }
-    } else if (isOptions(cell)) {
-      if (getQuestionType(cell) === "amountOption") {
-        fillColor = colorPreferences.amountOption;
-      } else if (getQuestionType(cell) === "imageOption") {
-        fillColor = "#FFF8DC"; 
-      } else if (getQuestionType(cell) === "notesNode") {
-        fillColor = "#ffffff"; // Notes nodes are white with black border
-      } else if (getQuestionType(cell) === "checklistNode") {
-        fillColor = "#ffffff"; // Checklist nodes are white with striped red border
-      } else {
-        fillColor = "#ffffff";
-      }
-    } else if (isPdfNode(cell)) {
-      fillColor = "#FFF8DC"; // Same color as image nodes
-    } else if (isCalculationNode(cell)) {
-      // You can pick a distinct color for calculation nodes
-      fillColor = "#FFDDAA";
-    }
-  
-    const fontColor = colorPreferences.textColor;
-    const sec = getSection(cell) || "1";
-    let borderColor = (sectionPrefs[sec] && sectionPrefs[sec].borderColor) || getDefaultSectionColor(parseInt(sec));
-    let style = cell.style || "";
-    style = style.replace(/fillColor=[^;]+/, "");
-    style = style.replace(/fontColor=[^;]+/, "");
-    style = style.replace(/strokeColor=[^;]+/, "");
-    style += `;fillColor=${fillColor};fontColor=${fontColor};strokeColor=${borderColor};`;
-    graph.getModel().setStyle(cell, style);
+    return;
   }
-  
-  // Performance optimization: prevent excessive refreshAllCells calls
+
+  if (isQuestion(cell)) {
+    const qType = getQuestionType(cell);
+    switch (qType) {
+      case "text":         fillColor = colorPreferences.text; break;
+      case "checkbox":     fillColor = colorPreferences.checkbox; break;
+      case "dropdown":     fillColor = colorPreferences.dropdown; break;
+      case "text2":        fillColor = colorPreferences.dropdown; break; // Text2 uses dropdown color
+      case "number":       fillColor = colorPreferences.money; break;
+      case "date":         fillColor = colorPreferences.date; break;
+      case "dateRange":    fillColor = colorPreferences.date; break; // Use date color for dateRange
+      case "email":        fillColor = colorPreferences.text; break; // Use text color for email
+      case "phone":        fillColor = colorPreferences.text; break; // Use text color for phone
+      case "bigParagraph": fillColor = colorPreferences.bigParagraph; break;
+      case "multipleTextboxes":
+      case "multipleDropdownType":
+        fillColor = colorPreferences.text;
+        break;
+      default:
+        fillColor = "#ADD8E6";
+        break;
+    }
+  } else if (isOptions(cell)) {
+    if (getQuestionType(cell) === "amountOption") {
+      fillColor = colorPreferences.amountOption;
+    } else if (getQuestionType(cell) === "imageOption") {
+      fillColor = "#FFF8DC"; 
+    } else if (getQuestionType(cell) === "notesNode") {
+      fillColor = "#ffffff"; // Notes nodes are white with black border
+    } else if (getQuestionType(cell) === "checklistNode") {
+      fillColor = "#ffffff"; // Checklist nodes are white with striped red border
+    } else {
+      fillColor = "#ffffff";
+    }
+  } else if (isPdfNode(cell)) {
+    fillColor = "#FFF8DC"; // Same color as image nodes
+  } else if (isCalculationNode(cell)) {
+    // You can pick a distinct color for calculation nodes
+    fillColor = "#FFDDAA";
+  }
+
+  const fontColor = colorPreferences.textColor;
+  const sec = getSection(cell) || "1";
+  let borderColor = (sectionPrefs[sec] && sectionPrefs[sec].borderColor) || getDefaultSectionColor(parseInt(sec));
+  let style = cell.style || "";
+  style = style.replace(/fillColor=[^;]+/, "");
+  style = style.replace(/fontColor=[^;]+/, "");
+  style = style.replace(/strokeColor=[^;]+/, "");
+  style += `;fillColor=${fillColor};fontColor=${fontColor};strokeColor=${borderColor};`;
+  graph.getModel().setStyle(cell, style);
+}
+
+// Performance optimization: prevent excessive refreshAllCells calls
   // refreshAllCellsTimeout and isRefreshing moved to config.js module
   
   // refreshAllCells and performRefreshAllCells functions moved inside DOMContentLoaded event listener
-  
-  /*******************************************************
-   ************ Export/Import Flowchart JSON  ************
-   *******************************************************/
-  // downloadJson, exportFlowchartJson, and importFlowchartJson have been moved to library.js
-  
-  /*******************************************************
-   ************ BFS + Export GUI JSON (with BFS) *********
-   *******************************************************/
-  function isJumpNode(cell) {
-    const style = cell.style || "";
-    return style.includes("strokeWidth=3") &&
-           style.includes("strokeColor=#ff0000") &&
-           style.includes("dashed=1");
-  }
-  
-  /**
-   * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple question→question).
-   */
-  function findAllUpstreamOptions(questionCell) {
-    const results = [];
-    const visited = new Set();
-    const queue = [];
-  
-    const incomings = graph.getIncomingEdges(questionCell) || [];
-    incomings.forEach(edge => {
+
+/*******************************************************
+ ************ Export/Import Flowchart JSON  ************
+ *******************************************************/
+// downloadJson, exportFlowchartJson, and importFlowchartJson have been moved to library.js
+
+/*******************************************************
+ ************ BFS + Export GUI JSON (with BFS) *********
+ *******************************************************/
+function isJumpNode(cell) {
+  const style = cell.style || "";
+  return style.includes("strokeWidth=3") &&
+         style.includes("strokeColor=#ff0000") &&
+         style.includes("dashed=1");
+}
+
+/**
+ * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple question→question).
+ */
+function findAllUpstreamOptions(questionCell) {
+  const results = [];
+  const visited = new Set();
+  const queue = [];
+
+  const incomings = graph.getIncomingEdges(questionCell) || [];
+  incomings.forEach(edge => {
+    const src = edge.source;
+    if (src && isOptions(src)) {
+      const optLabel = (src.value || "Option").replace(/<[^>]+>/g, "").trim();
+      const parentEdges = graph.getIncomingEdges(src) || [];
+      if (parentEdges.length > 0) {
+        const parentQ = parentEdges[0].source;
+        if (parentQ && isQuestion(parentQ)) {
+          results.push({
+            questionId: parentQ._questionId,
+            answerLabel: optLabel
+          });
+        }
+      }
+    } else if (src && isQuestion(src)) {
+      queue.push(src);
+    }
+  });
+
+  while (queue.length > 0) {
+    const currentQ = queue.shift();
+    if (!currentQ || visited.has(currentQ.id)) continue;
+    visited.add(currentQ.id);
+
+    const qIncomings = graph.getIncomingEdges(currentQ) || [];
+    qIncomings.forEach(edge => {
       const src = edge.source;
       if (src && isOptions(src)) {
         const optLabel = (src.value || "Option").replace(/<[^>]+>/g, "").trim();
@@ -1915,527 +1940,501 @@
         queue.push(src);
       }
     });
+  }
+
+  return results;
+}
+
+function detectSectionJumps(cell, questionCellMap, questionIdMap) {
+  const jumps = [];
+  const outgoingEdges = graph.getOutgoingEdges(cell) || [];
   
-    while (queue.length > 0) {
-      const currentQ = queue.shift();
-      if (!currentQ || visited.has(currentQ.id)) continue;
-      visited.add(currentQ.id);
+  const cellSection = parseInt(getSection(cell) || "1", 10);
   
-      const qIncomings = graph.getIncomingEdges(currentQ) || [];
-      qIncomings.forEach(edge => {
-        const src = edge.source;
-        if (src && isOptions(src)) {
-          const optLabel = (src.value || "Option").replace(/<[^>]+>/g, "").trim();
-          const parentEdges = graph.getIncomingEdges(src) || [];
-          if (parentEdges.length > 0) {
-            const parentQ = parentEdges[0].source;
-            if (parentQ && isQuestion(parentQ)) {
-              results.push({
-                questionId: parentQ._questionId,
-                answerLabel: optLabel
-              });
-            }
+  for (const edge of outgoingEdges) {
+    const targetCell = edge.target;
+    if (!targetCell || !isOptions(targetCell)) continue;
+    
+    const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+    
+    const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+    
+    for (const optionEdge of optionOutgoingEdges) {
+      const targetQuestionCell = optionEdge.target;
+      if (!targetQuestionCell || !isQuestion(targetQuestionCell)) continue;
+      
+      const sourceSection = parseInt(getSection(cell) || "1", 10);
+      const targetSection = parseInt(getSection(targetQuestionCell) || "1", 10);
+      
+      // If target section is more than 1 section away
+      if (Math.abs(targetSection - sourceSection) > 1) {
+        const targetQuestionId = questionIdMap.get(targetQuestionCell.id);
+        if (targetQuestionId) {
+          // Check if this jump already exists
+          const exists = jumps.some(j => j.option === optionText && j.to === targetSection.toString());
+          if (!exists) {
+            jumps.push({
+              option: optionText,
+              to: targetSection.toString()
+            });
           }
-        } else if (src && isQuestion(src)) {
-          queue.push(src);
         }
-      });
+      }
     }
-  
-    return results;
   }
   
-  function detectSectionJumps(cell, questionCellMap, questionIdMap) {
-    const jumps = [];
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    
-    const cellSection = parseInt(getSection(cell) || "1", 10);
-    
-    for (const edge of outgoingEdges) {
-      const targetCell = edge.target;
-      if (!targetCell || !isOptions(targetCell)) continue;
-      
-      const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-      
-      const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-      
-      for (const optionEdge of optionOutgoingEdges) {
-        const targetQuestionCell = optionEdge.target;
-        if (!targetQuestionCell || !isQuestion(targetQuestionCell)) continue;
-        
-        const sourceSection = parseInt(getSection(cell) || "1", 10);
-        const targetSection = parseInt(getSection(targetQuestionCell) || "1", 10);
-        
-        // If target section is more than 1 section away
-        if (Math.abs(targetSection - sourceSection) > 1) {
-          const targetQuestionId = questionIdMap.get(targetQuestionCell.id);
-          if (targetQuestionId) {
-            // Check if this jump already exists
-            const exists = jumps.some(j => j.option === optionText && j.to === targetSection.toString());
-            if (!exists) {
-              jumps.push({
-                option: optionText,
-                to: targetSection.toString()
-              });
-            }
-          }
-        }
-      }
+  return jumps;
+}
+
+/**************************************************
+ ************  CREATE YES/NO  OPTIONS  ************
+ **************************************************/
+function createYesNoOptions(parentCell) {
+  const geo = parentCell.geometry;
+  if (!geo) return;
+  const parent = graph.getDefaultParent();
+  graph.getModel().beginUpdate();
+  try {
+    const parentSection = getSection(parentCell) || "1";
+
+    const noX = geo.x + geo.width - 50;
+    const noY = geo.y + geo.height + 50;
+    let noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
+    const noNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">No</div>", noX, noY, 100, 60, noStyle);
+    refreshOptionNodeId(noNode);
+    if (parentCell !== jumpModeNode) {
+      setSection(noNode, parentSection);
     }
-    
-    return jumps;
-  }
-  
-  /**************************************************
-   ************  CREATE YES/NO  OPTIONS  ************
-   **************************************************/
-  function createYesNoOptions(parentCell) {
-    const geo = parentCell.geometry;
-    if (!geo) return;
-    const parent = graph.getDefaultParent();
-    graph.getModel().beginUpdate();
-    try {
-      const parentSection = getSection(parentCell) || "1";
-  
-      const noX = geo.x + geo.width - 50;
-      const noY = geo.y + geo.height + 50;
-      let noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
-      const noNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">No</div>", noX, noY, 100, 60, noStyle);
-      refreshOptionNodeId(noNode);
-      if (parentCell !== jumpModeNode) {
-        setSection(noNode, parentSection);
-      }
-      const noEdge = graph.insertEdge(parent, null, "", parentCell, noNode);
-      // Apply current edge style
-      let edgeStyle;
-      if (currentEdgeStyle === 'curved') {
-        edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-      } else if (currentEdgeStyle === 'straight') {
-        edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
-      } else if (currentEdgeStyle === 'direct') {
-        edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
-      } else {
-        edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-      }
-      graph.getModel().setStyle(noEdge, edgeStyle);
-  
-      const yesX = geo.x - 40;
-      const yesY = geo.y + geo.height + 50;
-      let yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
-      const yesNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">Yes</div>", yesX, yesY, 100, 60, yesStyle);
-      refreshOptionNodeId(yesNode);
-      if (parentCell !== jumpModeNode) {
-        setSection(yesNode, parentSection);
-      }
-      const yesEdge = graph.insertEdge(parent, null, "", parentCell, yesNode);
-      // Apply current edge style
-      graph.getModel().setStyle(yesEdge, edgeStyle);
-  
-      // Make sure the option nodes are properly formatted
-      updateOptionNodeCell(noNode);
-      updateOptionNodeCell(yesNode);
-  
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    refreshAllCells();
-  }
-  
-  
-  
-  // Add a function to directly import a JSON string
-  window.importFlowchartJsonDirectly = function(jsonString) {
-    try {
-      if (!jsonString) {
-        throw new Error("No data provided");
-      }
-      
-      console.log("Original input:", jsonString.substring(0, 100) + "...");
-      
-      // Check if the string starts and ends with quotes
-      if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
-        console.log("Detected quoted JSON string, unquoting...");
-        jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-        console.log("After unquoting:", jsonString.substring(0, 100) + "...");
-      }
-      
-      // Try to parse the JSON
-      let jsonData;
-      try {
-        jsonData = JSON.parse(jsonString);
-      } catch (parseError) {
-        // Fallback approach for handling complex cases
-        jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
-      }
-      
-      // Check if this is a GUI JSON instead of a flowchart JSON
-      if (jsonData.sections && Array.isArray(jsonData.sections) && !jsonData.cells) {
-        throw new Error("You are trying to import a GUI JSON. Please import a flowchart JSON that has a 'cells' property.");
-      }
-      
-      // Validate the JSON data
-      if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
-        throw new Error("Invalid flowchart data: missing cells array");
-      }
-      loadFlowchartData(jsonData);
-      currentFlowchartName = null;
-      return true;
-    } catch (error) {
-      alert("Error importing flowchart: " + error.message);
-      return false;
-    }
-  };
-  
-  // Add a UI element to import JSON directly
-  document.addEventListener('DOMContentLoaded', function() {
-    // Create keyboard navigation help tooltip
-    createKeyboardNavigationHelp();
-  });
-  
-  /**
-   * Creates a small tooltip in the bottom corner showing keyboard navigation instructions
-   */
-  function createKeyboardNavigationHelp() {
-    const helpDiv = document.createElement('div');
-    helpDiv.innerHTML = `
-      <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); 
-                  color: white; padding: 10px; border-radius: 5px; font-size: 12px; 
-                  z-index: 1000; max-width: 300px;">
-        <strong>Keyboard Navigation:</strong>
-        <ul style="margin: 5px 0; padding-left: 20px;">
-          <li>Arrow Keys / WASD: Pan canvas</li>
-          <li>Z: Zoom in</li>
-          <li>X: Zoom out</li>
-        </ul>
-        <button onclick="this.parentNode.style.display='none';" 
-                style="background: #444; border: none; color: white; padding: 3px 8px; 
-                      border-radius: 3px; cursor: pointer;">
-          Dismiss
-        </button>
-      </div>
-    `;
-    document.body.appendChild(helpDiv);
-  }
-  
-  /**************************************************
-   ********** KEYBOARD NAVIGATION CONTROLS **********
-   **************************************************/
-  // Track which movement keys are currently pressed
-  const keysPressed = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-    zoom: 0, // 1 for zoom in, -1 for zoom out
-    // Fast movement tracking
-    leftFast: false,
-    rightFast: false,
-    upFast: false,
-    downFast: false
-  };
-  
-  // Double-tap detection vars
-  const doubleTapTime = 300; // ms between taps to count as double-tap
-  const keyLastPressed = {
-    left: 0,
-    right: 0,
-    up: 0,
-    down: 0
-  };
-  
-  // Animation frame request ID for smooth movement
-  let animationFrameId = null;
-  
-  // Speed and smoothness settings
-  const MOVEMENT_SPEED = 2; // pixels per frame (much slower for single tap)
-  const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
-  const ZOOM_FACTOR = 1.01; // zoom factor per frame
-  
-  // Handle key down events - start movement
-  document.addEventListener('keydown', function(evt) {
-    // Skip if user is typing in a text field
-    if (isUserTyping(evt)) return;
-    
-    // Skip if modifier keys are pressed (to avoid interfering with browser shortcuts)
-    if (evt.ctrlKey || evt.altKey || evt.metaKey) return;
-    
-    const now = Date.now();
-    let keyHandled = true;
-    
-    switch (evt.key) {
-      // Arrow keys and WASD for panning
-      case 'ArrowLeft':
-      case 'a':
-      case 'A':
-        // Handle double-tap detection
-        if (!keysPressed.left) {
-          const lastPress = keyLastPressed.left;
-          keyLastPressed.left = now;
-          
-          // Check for double-tap (if pressed twice within doubleTapTime ms)
-          if (now - lastPress < doubleTapTime) {
-            keysPressed.leftFast = true;
-          }
-        }
-        keysPressed.left = true;
-        break;
-      case 'ArrowRight':
-      case 'd':
-      case 'D':
-        if (!keysPressed.right) {
-          const lastPress = keyLastPressed.right;
-          keyLastPressed.right = now;
-          
-          if (now - lastPress < doubleTapTime) {
-            keysPressed.rightFast = true;
-          }
-        }
-        keysPressed.right = true;
-        break;
-      case 'ArrowUp':
-      case 'w':
-      case 'W':
-        if (!keysPressed.up) {
-          const lastPress = keyLastPressed.up;
-          keyLastPressed.up = now;
-          
-          if (now - lastPress < doubleTapTime) {
-            keysPressed.upFast = true;
-          }
-        }
-        keysPressed.up = true;
-        break;
-      case 'ArrowDown':
-      case 's':
-      case 'S':
-        if (!keysPressed.down) {
-          const lastPress = keyLastPressed.down;
-          keyLastPressed.down = now;
-          
-          if (now - lastPress < doubleTapTime) {
-            keysPressed.downFast = true;
-          }
-        }
-        keysPressed.down = true;
-        break;
-      
-      // Z/X keys for zooming
-      case 'z':
-      case 'Z':
-        keysPressed.zoom = 1;
-        break;
-      case 'x':
-      case 'X':
-        keysPressed.zoom = -1;
-        break;
-      default:
-        keyHandled = false;
-    }
-    
-    if (keyHandled) {
-      evt.preventDefault();
-      // Start the animation if not already running
-      if (!animationFrameId) {
-        animationFrameId = requestAnimationFrame(updateCanvasPosition);
-      }
-    }
-  });
-  
-  // Handle key up events - stop movement
-  document.addEventListener('keyup', function(evt) {
-    switch (evt.key) {
-      case 'ArrowLeft':
-      case 'a':
-      case 'A':
-        keysPressed.left = false;
-        keysPressed.leftFast = false;
-        break;
-      case 'ArrowRight':
-      case 'd':
-      case 'D':
-        keysPressed.right = false;
-        keysPressed.rightFast = false;
-        break;
-      case 'ArrowUp':
-      case 'w':
-      case 'W':
-        keysPressed.up = false;
-        keysPressed.upFast = false;
-        break;
-      case 'ArrowDown':
-      case 's':
-      case 'S':
-        keysPressed.down = false;
-        keysPressed.downFast = false;
-        break;
-      case 'z':
-      case 'Z':
-      case 'x':
-      case 'X':
-        keysPressed.zoom = 0;
-        break;
-    }
-    
-    // If no keys are pressed, cancel the animation frame
-    if (!keysPressed.left && !keysPressed.right && !keysPressed.up && !keysPressed.down && keysPressed.zoom === 0) {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-    }
-  });
-  
-  // Animation function to update the canvas position
-  function updateCanvasPosition() {
-    const translator = graph.view.getTranslate();
-    let dx = 0;
-    let dy = 0;
-    
-    // Calculate the translation change, applying speed multiplier for fast movement
-    if (keysPressed.left) {
-      dx += keysPressed.leftFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-    }
-    if (keysPressed.right) {
-      dx -= keysPressed.rightFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-    }
-    if (keysPressed.up) {
-      dy += keysPressed.upFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-    }
-    if (keysPressed.down) {
-      dy -= keysPressed.downFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-    }
-    
-    // Apply translation change if needed
-    if (dx !== 0 || dy !== 0) {
-      graph.view.setTranslate(translator.x + dx / graph.view.scale, translator.y + dy / graph.view.scale);
-    }
-    
-    // Apply zoom change if needed (centered on mouse)
-    if (keysPressed.zoom !== 0) {
-      const container = graph.container;
-      const rect = container.getBoundingClientRect();
-      // Use the last mouse position relative to the container
-      // (If mouse is outside, just use center of container)
-      let mouseX = currentMouseX, mouseY = currentMouseY;
-      // Convert graph coordinates to screen coordinates
-      // But for zooming, we want the mouse position in container (screen) coordinates
-      let mx = 0, my = 0;
-      if (
-        typeof window.event !== 'undefined' &&
-        window.event.clientX !== undefined &&
-        window.event.clientY !== undefined &&
-        window.event.type &&
-        window.event.type.startsWith('mouse')
-      ) {
-        mx = window.event.clientX - rect.left;
-        my = window.event.clientY - rect.top;
-      } else {
-        // Fallback: use last known mouse position in graph coordinates, convert to screen
-        // (graphX, graphY) -> screen: (graphX + tx) * scale
-        mx = (mouseX + graph.view.getTranslate().x) * graph.view.scale;
-        my = (mouseY + graph.view.getTranslate().y) * graph.view.scale;
-        // If mouse is not over the container, fallback to center
-        if (mx < 0 || mx > container.clientWidth || my < 0 || my > container.clientHeight) {
-          mx = container.clientWidth / 2;
-          my = container.clientHeight / 2;
-        }
-      }
-      // Current scale and translation
-      const oldScale = graph.view.scale;
-      const oldTx = graph.view.getTranslate().x;
-      const oldTy = graph.view.getTranslate().y;
-      // Graph coordinates under mouse before zoom
-      const graphX = (mx / oldScale) - oldTx;
-      const graphY = (my / oldScale) - oldTy;
-      // New scale
-      let newScale;
-      if (keysPressed.zoom > 0) {
-        newScale = oldScale * ZOOM_FACTOR;
-      } else {
-        newScale = oldScale / ZOOM_FACTOR;
-      }
-      // New translation so that (graphX, graphY) stays under mouse
-      const newTx = mx / newScale - graphX;
-      const newTy = my / newScale - graphY;
-      graph.view.setScale(newScale);
-      graph.view.setTranslate(newTx, newTy);
-    }
-  
-    // Refresh the graph if any changes were made
-    if (dx !== 0 || dy !== 0 || keysPressed.zoom !== 0) {
-      graph.view.refresh();
-    }
-  
-    // Continue the animation if any key is still pressed
-    if (keysPressed.left || keysPressed.right || keysPressed.up || keysPressed.down || keysPressed.zoom !== 0) {
-      animationFrameId = requestAnimationFrame(updateCanvasPosition);
+    const noEdge = graph.insertEdge(parent, null, "", parentCell, noNode);
+    // Apply current edge style
+    let edgeStyle;
+    if (currentEdgeStyle === 'curved') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'straight') {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+    } else if (currentEdgeStyle === 'direct') {
+      edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
     } else {
+      edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    }
+    graph.getModel().setStyle(noEdge, edgeStyle);
+
+    const yesX = geo.x - 40;
+    const yesY = geo.y + geo.height + 50;
+    let yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
+    const yesNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">Yes</div>", yesX, yesY, 100, 60, yesStyle);
+    refreshOptionNodeId(yesNode);
+    if (parentCell !== jumpModeNode) {
+      setSection(yesNode, parentSection);
+    }
+    const yesEdge = graph.insertEdge(parent, null, "", parentCell, yesNode);
+    // Apply current edge style
+    graph.getModel().setStyle(yesEdge, edgeStyle);
+
+    // Make sure the option nodes are properly formatted
+    updateOptionNodeCell(noNode);
+    updateOptionNodeCell(yesNode);
+
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  refreshAllCells();
+}
+
+
+
+// Add a function to directly import a JSON string
+window.importFlowchartJsonDirectly = function(jsonString) {
+  try {
+    if (!jsonString) {
+      throw new Error("No data provided");
+    }
+    
+    console.log("Original input:", jsonString.substring(0, 100) + "...");
+    
+    // Check if the string starts and ends with quotes
+    if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
+      console.log("Detected quoted JSON string, unquoting...");
+      jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      console.log("After unquoting:", jsonString.substring(0, 100) + "...");
+    }
+    
+    // Try to parse the JSON
+    let jsonData;
+    try {
+      jsonData = JSON.parse(jsonString);
+    } catch (parseError) {
+      // Fallback approach for handling complex cases
+      jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
+    }
+    
+    // Check if this is a GUI JSON instead of a flowchart JSON
+    if (jsonData.sections && Array.isArray(jsonData.sections) && !jsonData.cells) {
+      throw new Error("You are trying to import a GUI JSON. Please import a flowchart JSON that has a 'cells' property.");
+    }
+    
+    // Validate the JSON data
+    if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
+      throw new Error("Invalid flowchart data: missing cells array");
+    }
+    loadFlowchartData(jsonData);
+    currentFlowchartName = null;
+    return true;
+  } catch (error) {
+    alert("Error importing flowchart: " + error.message);
+    return false;
+  }
+};
+
+// Add a UI element to import JSON directly
+document.addEventListener('DOMContentLoaded', function() {
+  // Create keyboard navigation help tooltip
+  createKeyboardNavigationHelp();
+});
+
+/**
+ * Creates a small tooltip in the bottom corner showing keyboard navigation instructions
+ */
+function createKeyboardNavigationHelp() {
+  const helpDiv = document.createElement('div');
+  helpDiv.innerHTML = `
+    <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); 
+                color: white; padding: 10px; border-radius: 5px; font-size: 12px; 
+                z-index: 1000; max-width: 300px;">
+      <strong>Keyboard Navigation:</strong>
+      <ul style="margin: 5px 0; padding-left: 20px;">
+        <li>Arrow Keys / WASD: Pan canvas</li>
+        <li>Z: Zoom in</li>
+        <li>X: Zoom out</li>
+      </ul>
+      <button onclick="this.parentNode.style.display='none';" 
+              style="background: #444; border: none; color: white; padding: 3px 8px; 
+                    border-radius: 3px; cursor: pointer;">
+        Dismiss
+      </button>
+    </div>
+  `;
+  document.body.appendChild(helpDiv);
+}
+
+/**************************************************
+ ********** KEYBOARD NAVIGATION CONTROLS **********
+ **************************************************/
+// Track which movement keys are currently pressed
+const keysPressed = {
+  left: false,
+  right: false,
+  up: false,
+  down: false,
+  zoom: 0, // 1 for zoom in, -1 for zoom out
+  // Fast movement tracking
+  leftFast: false,
+  rightFast: false,
+  upFast: false,
+  downFast: false
+};
+
+// Double-tap detection vars
+const doubleTapTime = 300; // ms between taps to count as double-tap
+const keyLastPressed = {
+  left: 0,
+  right: 0,
+  up: 0,
+  down: 0
+};
+
+// Animation frame request ID for smooth movement
+let animationFrameId = null;
+
+// Speed and smoothness settings
+const MOVEMENT_SPEED = 2; // pixels per frame (much slower for single tap)
+const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
+  const ZOOM_FACTOR = 1.005; // zoom factor per frame (reduced sensitivity)
+
+// Handle key down events - start movement
+document.addEventListener('keydown', function(evt) {
+  // Skip if user is typing in a text field
+  if (isUserTyping(evt)) return;
+  
+  // Skip if modifier keys are pressed (to avoid interfering with browser shortcuts)
+  if (evt.ctrlKey || evt.altKey || evt.metaKey) return;
+  
+  const now = Date.now();
+  let keyHandled = true;
+  
+  switch (evt.key) {
+    // Arrow keys and WASD for panning
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      // Handle double-tap detection
+      if (!keysPressed.left) {
+        const lastPress = keyLastPressed.left;
+        keyLastPressed.left = now;
+        
+        // Check for double-tap (if pressed twice within doubleTapTime ms)
+        if (now - lastPress < doubleTapTime) {
+          keysPressed.leftFast = true;
+        }
+      }
+      keysPressed.left = true;
+      break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      if (!keysPressed.right) {
+        const lastPress = keyLastPressed.right;
+        keyLastPressed.right = now;
+        
+        if (now - lastPress < doubleTapTime) {
+          keysPressed.rightFast = true;
+        }
+      }
+      keysPressed.right = true;
+      break;
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      if (!keysPressed.up) {
+        const lastPress = keyLastPressed.up;
+        keyLastPressed.up = now;
+        
+        if (now - lastPress < doubleTapTime) {
+          keysPressed.upFast = true;
+        }
+      }
+      keysPressed.up = true;
+      break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      if (!keysPressed.down) {
+        const lastPress = keyLastPressed.down;
+        keyLastPressed.down = now;
+        
+        if (now - lastPress < doubleTapTime) {
+          keysPressed.downFast = true;
+        }
+      }
+      keysPressed.down = true;
+      break;
+    
+    // Z/X keys for zooming
+    case 'z':
+    case 'Z':
+      keysPressed.zoom = 1;
+      break;
+    case 'x':
+    case 'X':
+      keysPressed.zoom = -1;
+      break;
+    default:
+      keyHandled = false;
+  }
+  
+  if (keyHandled) {
+    evt.preventDefault();
+    // Start the animation if not already running
+    if (!animationFrameId) {
+      animationFrameId = requestAnimationFrame(updateCanvasPosition);
+    }
+  }
+});
+
+// Handle key up events - stop movement
+document.addEventListener('keyup', function(evt) {
+  switch (evt.key) {
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      keysPressed.left = false;
+      keysPressed.leftFast = false;
+      break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      keysPressed.right = false;
+      keysPressed.rightFast = false;
+      break;
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      keysPressed.up = false;
+      keysPressed.upFast = false;
+      break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      keysPressed.down = false;
+      keysPressed.downFast = false;
+      break;
+    case 'z':
+    case 'Z':
+    case 'x':
+    case 'X':
+      keysPressed.zoom = 0;
+      break;
+  }
+  
+  // If no keys are pressed, cancel the animation frame
+  if (!keysPressed.left && !keysPressed.right && !keysPressed.up && !keysPressed.down && keysPressed.zoom === 0) {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
     }
   }
+});
+
+// Animation function to update the canvas position
+function updateCanvasPosition() {
+  const translator = graph.view.getTranslate();
+  let dx = 0;
+  let dy = 0;
   
-  // Fix the case sensitivity issue with the prevAnswer in logic conditions
-  // Add this code at the end of the sixth pass, just before creating the final JSON object
+  // Calculate the translation change, applying speed multiplier for fast movement
+  if (keysPressed.left) {
+    dx += keysPressed.leftFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
+  }
+  if (keysPressed.right) {
+    dx -= keysPressed.rightFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
+  }
+  if (keysPressed.up) {
+    dy += keysPressed.upFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
+  }
+  if (keysPressed.down) {
+    dy -= keysPressed.downFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
+  }
   
-  // Ensure checkbox options are properly capitalized in both the options and the conditions
-  // Access the 'sections' variable from the exportGuiJson function scope
-  window.fixCapitalizationInJumps = function() {
-    // Get reference to sections from the main exportGuiJson function
-    const sections = window.exportGuiJson.sections || [];
-    
-    for (const section of sections) {
-      for (const question of section.questions) {
-        // Fix capitalization of checkbox options
-        if (question.type === "checkbox" && Array.isArray(question.options)) {
-          // Create a mapping of lowercase option text to properly capitalized option text
-          const optionCapitalizationMap = {};
-          
-          // Special handling for checkbox questions and their options
-          if (Array.isArray(question.options)) {
-            for (const option of question.options) {
-              if (typeof option === 'object' && option.label) {
-                // Store both the lowercase and original versions
-                optionCapitalizationMap[option.label.toLowerCase()] = option.label;
-                
-                // Special case for "maybe" to ensure it's always properly capitalized
-                if (option.label.toLowerCase() === "maybe") {
-                  optionCapitalizationMap["maybe"] = "Maybe";
-                }
+  // Apply translation change if needed
+  if (dx !== 0 || dy !== 0) {
+    graph.view.setTranslate(translator.x + dx / graph.view.scale, translator.y + dy / graph.view.scale);
+  }
+  
+  // Apply zoom change if needed (centered on mouse)
+  if (keysPressed.zoom !== 0) {
+    const container = graph.container;
+    const rect = container.getBoundingClientRect();
+    // Use the last mouse position relative to the container
+    // (If mouse is outside, just use center of container)
+    let mouseX = currentMouseX, mouseY = currentMouseY;
+    // Convert graph coordinates to screen coordinates
+    // But for zooming, we want the mouse position in container (screen) coordinates
+    let mx = 0, my = 0;
+    if (
+      typeof window.event !== 'undefined' &&
+      window.event.clientX !== undefined &&
+      window.event.clientY !== undefined &&
+      window.event.type &&
+      window.event.type.startsWith('mouse')
+    ) {
+      mx = window.event.clientX - rect.left;
+      my = window.event.clientY - rect.top;
+    } else {
+      // Fallback: use last known mouse position in graph coordinates, convert to screen
+      // (graphX, graphY) -> screen: (graphX + tx) * scale
+      mx = (mouseX + graph.view.getTranslate().x) * graph.view.scale;
+      my = (mouseY + graph.view.getTranslate().y) * graph.view.scale;
+      // If mouse is not over the container, fallback to center
+      if (mx < 0 || mx > container.clientWidth || my < 0 || my > container.clientHeight) {
+        mx = container.clientWidth / 2;
+        my = container.clientHeight / 2;
+      }
+    }
+    // Current scale and translation
+    const oldScale = graph.view.scale;
+    const oldTx = graph.view.getTranslate().x;
+    const oldTy = graph.view.getTranslate().y;
+    // Graph coordinates under mouse before zoom
+    const graphX = (mx / oldScale) - oldTx;
+    const graphY = (my / oldScale) - oldTy;
+    // New scale
+    let newScale;
+    if (keysPressed.zoom > 0) {
+      newScale = oldScale * ZOOM_FACTOR;
+    } else {
+      newScale = oldScale / ZOOM_FACTOR;
+    }
+    // New translation so that (graphX, graphY) stays under mouse
+    const newTx = mx / newScale - graphX;
+    const newTy = my / newScale - graphY;
+    graph.view.setScale(newScale);
+    graph.view.setTranslate(newTx, newTy);
+  }
+
+  // Refresh the graph if any changes were made
+  if (dx !== 0 || dy !== 0 || keysPressed.zoom !== 0) {
+    graph.view.refresh();
+  }
+
+  // Continue the animation if any key is still pressed
+  if (keysPressed.left || keysPressed.right || keysPressed.up || keysPressed.down || keysPressed.zoom !== 0) {
+    animationFrameId = requestAnimationFrame(updateCanvasPosition);
+  } else {
+    animationFrameId = null;
+  }
+}
+
+// Fix the case sensitivity issue with the prevAnswer in logic conditions
+// Add this code at the end of the sixth pass, just before creating the final JSON object
+
+// Ensure checkbox options are properly capitalized in both the options and the conditions
+// Access the 'sections' variable from the exportGuiJson function scope
+window.fixCapitalizationInJumps = function() {
+  // Get reference to sections from the main exportGuiJson function
+  const sections = window.exportGuiJson.sections || [];
+  
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // Fix capitalization of checkbox options
+      if (question.type === "checkbox" && Array.isArray(question.options)) {
+        // Create a mapping of lowercase option text to properly capitalized option text
+        const optionCapitalizationMap = {};
+        
+        // Special handling for checkbox questions and their options
+        if (Array.isArray(question.options)) {
+          for (const option of question.options) {
+            if (typeof option === 'object' && option.label) {
+              // Store both the lowercase and original versions
+              optionCapitalizationMap[option.label.toLowerCase()] = option.label;
+              
+              // Special case for "maybe" to ensure it's always properly capitalized
+              if (option.label.toLowerCase() === "maybe") {
+                optionCapitalizationMap["maybe"] = "Maybe";
               }
             }
           }
-          
-          // Apply the capitalization fix to logic conditions
-          for (const section2 of sections) {
-            for (const question2 of section2.questions) {
-              // Fix logic conditions
-              if (question2.logic && question2.logic.conditions) {
-                for (const condition of question2.logic.conditions) {
-                  if (condition.prevQuestion === question.questionId.toString()) {
-                    // Special case for "maybe"
-                    if (condition.prevAnswer && condition.prevAnswer.toLowerCase() === "maybe") {
-                      condition.prevAnswer = "Maybe";
-                      console.log(`Fixed capitalization: Changed logic condition prevAnswer to "Maybe"`);
-                    }
-                    // General case
-                    else if (condition.prevAnswer && optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
-                      condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
-                      console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
-                    }
+        }
+        
+        // Apply the capitalization fix to logic conditions
+        for (const section2 of sections) {
+          for (const question2 of section2.questions) {
+            // Fix logic conditions
+            if (question2.logic && question2.logic.conditions) {
+              for (const condition of question2.logic.conditions) {
+                if (condition.prevQuestion === question.questionId.toString()) {
+                  // Special case for "maybe"
+                  if (condition.prevAnswer && condition.prevAnswer.toLowerCase() === "maybe") {
+                    condition.prevAnswer = "Maybe";
+                    console.log(`Fixed capitalization: Changed logic condition prevAnswer to "Maybe"`);
+                  }
+                  // General case
+                  else if (condition.prevAnswer && optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
+                    condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
+                    console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
                   }
                 }
               }
-              
-              // Also check jump conditions that might reference options
-              if (question2.jump && question2.jump.conditions) {
-                for (const jumpCondition of question2.jump.conditions) {
-                  // For checkbox questions, make sure jump condition options match the case of option labels
-                  if (question2.questionId === question.questionId && 
-                      jumpCondition.option && 
-                      optionCapitalizationMap[jumpCondition.option.toLowerCase()]) {
-                    jumpCondition.option = optionCapitalizationMap[jumpCondition.option.toLowerCase()];
-                    // Fixed capitalization for jump condition option
-                  }
+            }
+            
+            // Also check jump conditions that might reference options
+            if (question2.jump && question2.jump.conditions) {
+              for (const jumpCondition of question2.jump.conditions) {
+                // For checkbox questions, make sure jump condition options match the case of option labels
+                if (question2.questionId === question.questionId && 
+                    jumpCondition.option && 
+                    optionCapitalizationMap[jumpCondition.option.toLowerCase()]) {
+                  jumpCondition.option = optionCapitalizationMap[jumpCondition.option.toLowerCase()];
+                  // Fixed capitalization for jump condition option
                 }
               }
             }
@@ -2444,1349 +2443,1350 @@
       }
     }
   }
-  
-  // Call the function to fix capitalization
-  window.fixCapitalizationInJumps();
-  
-  // Final check - look for any remaining issues in our resulting logic constraints
-  let stillHaveIssues = true;
-  let fixIteration = 0;
-  const maxIterations = 10; // Define maxIterations here instead of assuming it's already defined
-  
-  while (stillHaveIssues && fixIteration < maxIterations) {
-    stillHaveIssues = false;
-    fixIteration++;
-  }
-  
-  // --- PATCH START: sanitize option nameId generation ---
-  function sanitizeNameId(str) {
-    return str
-      .toLowerCase()
-      .replace(/<[^>]+>/g, "")
-      .replace(/[^a-z0-9]+/gi, "_") // replace any sequence of non-alphanumeric chars with _
-      .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
-  }
-  // --- PATCH END ---
-  
-  // Calculation node dependency management functions have been moved to calc.js
-  
-  /**************************************************
-   *           COLORING & REFRESHING CELLS          *
-   **************************************************/
-  
-  /**
-   * Create a cell for text2 - a textbox that functions like a dropdown but 
-   * has better text editing capabilities
-   */
-  function updateText2Cell(cell) {
-    if (!cell) return;
+}
+
+// Call the function to fix capitalization
+window.fixCapitalizationInJumps();
+
+// Final check - look for any remaining issues in our resulting logic constraints
+let stillHaveIssues = true;
+let fixIteration = 0;
+const maxIterations = 10; // Define maxIterations here instead of assuming it's already defined
+
+while (stillHaveIssues && fixIteration < maxIterations) {
+  stillHaveIssues = false;
+  fixIteration++;
+}
+
+// --- PATCH START: sanitize option nameId generation ---
+function sanitizeNameId(str) {
+  return str
+    .toLowerCase()
+    .replace(/<[^>]+>/g, "")
+    .replace(/[^a-z0-9]+/gi, "_") // replace any sequence of non-alphanumeric chars with _
+    .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
+}
+// --- PATCH END ---
+
+// Calculation node dependency management functions have been moved to calc.js
+
+/**************************************************
+ *           COLORING & REFRESHING CELLS          *
+ **************************************************/
+
+/**
+ * Create a cell for text2 - a textbox that functions like a dropdown but 
+ * has better text editing capabilities
+ */
+function updateText2Cell(cell) {
+  if (!cell) return;
     // Ensure we have question text - only set default if it's completely undefined or null
     if (cell._questionText === undefined || cell._questionText === null) {
-      cell._questionText = "Enter dropdown question";
-    }
-    // Create the HTML content as a single line
-    const html = `
-      <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+    cell._questionText = "Enter dropdown question";
+  }
+  // Create the HTML content as a single line
+  const html = `
+    <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
         <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText || "")}</div>
-      </div>`;
-    graph.getModel().setValue(cell, html);
-  }
+    </div>`;
+  graph.getModel().setValue(cell, html);
+}
+
+/**
+ * Handler for text2 question text changes
+ */
+window.updateText2Handler = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "text2") return;
   
-  /**
-   * Handler for text2 question text changes
-   */
-  window.updateText2Handler = function(cellId, text) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || getQuestionType(cell) !== "text2") return;
-    
-        graph.getModel().beginUpdate();
-        try {
-      cell._questionText = text.trim() || "Enter dropdown question";
-      updateText2Cell(cell);
-        } finally {
-          graph.getModel().endUpdate();
-        }
-    
-    refreshNodeIdFromLabel(cell);
-  };
-  
-  /**
-   * Create or update a standard option node cell
-   * This ensures option nodes have consistent styling and behavior
-   */
-  function updateOptionNodeCell(cell) {
-    if (!cell || !isOptions(cell)) return;
-    
-    // Skip image and amount options as they have their own handlers
-    const qt = getQuestionType(cell);
-    if (qt === "imageOption" || qt === "amountOption") return;
-    
-    // Get the current label text
-    const currentValue = cell.value || "Option";
-    let labelText = currentValue;
-    
-    // If it's an HTML string, extract the text
-    if (typeof currentValue === 'string' && currentValue.includes('<')) {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = currentValue;
-      labelText = (tmp.textContent || tmp.innerText || "Option").trim();
-    }
-    
-    // Create a simple centered div with the text
-    const html = `<div style="text-align:center;">${escapeHtml(labelText)}</div>`;
-    
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  }
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    // Force refresh of the type submenu
-    const typeSubmenu = document.getElementById("typeSubmenu");
-    
-    // Make sure all type buttons are visible
-    const allButtons = typeSubmenu.querySelectorAll("button");
-    allButtons.forEach(button => {
-      button.style.display = "block";
-    });
-    
-    // Double-check specific buttons
-    ["dateRangeType", "emailType", "phoneType"].forEach(id => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.style.display = "block";
+      graph.getModel().beginUpdate();
+      try {
+    cell._questionText = text.trim() || "Enter dropdown question";
+    updateText2Cell(cell);
+      } finally {
+        graph.getModel().endUpdate();
       }
-    });
+  
+  refreshNodeIdFromLabel(cell);
+};
+
+/**
+ * Create or update a standard option node cell
+ * This ensures option nodes have consistent styling and behavior
+ */
+function updateOptionNodeCell(cell) {
+  if (!cell || !isOptions(cell)) return;
+  
+  // Skip image and amount options as they have their own handlers
+  const qt = getQuestionType(cell);
+  if (qt === "imageOption" || qt === "amountOption") return;
+  
+  // Get the current label text
+  const currentValue = cell.value || "Option";
+  let labelText = currentValue;
+  
+  // If it's an HTML string, extract the text
+  if (typeof currentValue === 'string' && currentValue.includes('<')) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = currentValue;
+    labelText = (tmp.textContent || tmp.innerText || "Option").trim();
+  }
+  
+  // Create a simple centered div with the text
+  const html = `<div style="text-align:center;">${escapeHtml(labelText)}</div>`;
+  
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Force refresh of the type submenu
+  const typeSubmenu = document.getElementById("typeSubmenu");
+  
+  // Make sure all type buttons are visible
+  const allButtons = typeSubmenu.querySelectorAll("button");
+  allButtons.forEach(button => {
+    button.style.display = "block";
   });
   
-  // --- Standardized Question Title Input (for all question types) ---
-  
-  // Helper: Render a single-line contenteditable div for simple question types
-  function renderSimpleQuestionTitle(cell, placeholder) {
-    const text = cell._questionText || '';
-    // Remove all inline styles, only use the class
-    return `<div class="question-title-input"  onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${escapeHtml(text) || placeholder}</div>`;
+  // Double-check specific buttons
+  ["dateRangeType", "emailType", "phoneType"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.style.display = "block";
+    }
+  });
+});
+
+// --- Standardized Question Title Input (for all question types) ---
+
+// Helper: Render a single-line contenteditable div for simple question types
+function renderSimpleQuestionTitle(cell, placeholder) {
+  const text = cell._questionText || '';
+  // Remove all inline styles, only use the class
+  return `<div class="question-title-input"  onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${escapeHtml(text) || placeholder}</div>`;
+}
+
+// Helper: Render a real <input> for multi-textbox/multi-dropdown types
+function renderInputQuestionTitle(cell, placeholder) {
+  const text = cell._questionText || '';
+  // Remove all inline styles, only use the class
+  return `<input class="question-title-input" type="text" value="${escapeAttr(text)}" placeholder="${placeholder}" oninput="window.updateInputQuestionTitle('${cell.id}', this.value)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')" />`;
+}
+
+// Update for simple question types
+window.updateSimpleQuestionTitle = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  graph.getModel().beginUpdate();
+  try {
+    cell._questionText = text.replace(/<[^>]+>/g, '').trim() || '';
+  } finally {
+    graph.getModel().endUpdate();
   }
-  
-  // Helper: Render a real <input> for multi-textbox/multi-dropdown types
-  function renderInputQuestionTitle(cell, placeholder) {
-    const text = cell._questionText || '';
-    // Remove all inline styles, only use the class
-    return `<input class="question-title-input" type="text" value="${escapeAttr(text)}" placeholder="${placeholder}" oninput="window.updateInputQuestionTitle('${cell.id}', this.value)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')" />`;
+  // Only re-render on blur, not on every input
+  updateSimpleQuestionCell(cell);
+  refreshNodeIdFromLabel(cell);
+};
+
+// Update for input-based question types
+window.updateInputQuestionTitle = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  graph.getModel().beginUpdate();
+  try {
+    cell._questionText = text.trim();
+  } finally {
+    graph.getModel().endUpdate();
   }
-  
-  // Update for simple question types
-  window.updateSimpleQuestionTitle = function(cellId, text) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell) return;
-    graph.getModel().beginUpdate();
-    try {
-      cell._questionText = text.replace(/<[^>]+>/g, '').trim() || '';
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    // Only re-render on blur, not on every input
-    updateSimpleQuestionCell(cell);
-    refreshNodeIdFromLabel(cell);
-  };
-  
-  // Update for input-based question types
-  window.updateInputQuestionTitle = function(cellId, text) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell) return;
-    graph.getModel().beginUpdate();
-    try {
-      cell._questionText = text.trim();
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    // Only re-render on blur, not on every input
-    if (getQuestionType(cell) === 'multipleTextboxes') {
-      updateMultipleTextboxesCell(cell);
-    } else if (getQuestionType(cell) === 'multipleDropdownType') {
-      updatemultipleDropdownTypeCell(cell);
-    }
-    refreshNodeIdFromLabel(cell);
-  };
-  
-  // Handle Enter key: blur on Enter
-  window.handleTitleInputKeydown = function(event, cellId) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      event.target.blur();
-    }
-    // Do not stop propagation for copy/cut/paste
-  };
-  
-  // Update rendering for simple question types
-  function updateSimpleQuestionCell(cell) {
-    const placeholder = getQuestionType(cell).charAt(0).toUpperCase() + getQuestionType(cell).slice(1) + ' question node';
-    // Strip any HTML from _questionText before rendering
-    let text = cell._questionText || '';
-    text = text.replace(/<[^>]+>/g, '').trim();
-    cell._questionText = text; // keep it clean for future edits
-    const html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      ${renderSimpleQuestionTitle(cell, placeholder)}
-    </div>`;
-    graph.getModel().setValue(cell, html);
+  // Only re-render on blur, not on every input
+  if (getQuestionType(cell) === 'multipleTextboxes') {
+    updateMultipleTextboxesCell(cell);
+  } else if (getQuestionType(cell) === 'multipleDropdownType') {
+    updatemultipleDropdownTypeCell(cell);
   }
-  
-  
-  
-  // Patch updateMultipleTextboxesCell to use <input> for title
-  function updateMultipleTextboxesCell(cell) {
-    graph.getModel().beginUpdate();
-    try {
-      let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-        <input class="question-title-input" type="text" value="${escapeAttr(cell._questionText || "")}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
-        <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
-      </div>`;
-      cell.value = html;
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
+  refreshNodeIdFromLabel(cell);
+};
+
+// Handle Enter key: blur on Enter
+window.handleTitleInputKeydown = function(event, cellId) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    event.target.blur();
   }
+  // Do not stop propagation for copy/cut/paste
+};
+
+// Update rendering for simple question types
+function updateSimpleQuestionCell(cell) {
+  const placeholder = getQuestionType(cell).charAt(0).toUpperCase() + getQuestionType(cell).slice(1) + ' question node';
+  // Strip any HTML from _questionText before rendering
+  let text = cell._questionText || '';
+  text = text.replace(/<[^>]+>/g, '').trim();
+  cell._questionText = text; // keep it clean for future edits
+  const html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+    ${renderSimpleQuestionTitle(cell, placeholder)}
+  </div>`;
+  graph.getModel().setValue(cell, html);
+}
+
   
-  // Patch updatemultipleDropdownTypeCell to use <input> for title
-  function updatemultipleDropdownTypeCell(cell) {
-    const qText = cell._questionText || '';
-    const twoNums = cell._twoNumbers || { first: '0', second: '0' };
-    if (!cell._textboxes) {
-      cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
-    }
+
+// Patch updateMultipleTextboxesCell to use <input> for title
+function updateMultipleTextboxesCell(cell) {
+  graph.getModel().beginUpdate();
+  try {
     let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-      <input class="question-title-input" type="text" value="${escapeAttr(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
-      <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
-        <input type="number" value="${escapeAttr(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
-        <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
-      </div>
-      <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
-    cell._textboxes.forEach((tb, index) => {
-      const val = tb.nameId || '';
-      const ph = tb.placeholder || 'Enter value';
-      const checked = tb.isAmountOption ? 'checked' : '';
-      html += `
-        <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
-          <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
-          <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
-          <label>
-            <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
-            Amount?
-          </label>
-        </div>`;
-    });
-    html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
-      </div>
+      <input class="question-title-input" type="text" value="${escapeAttr(cell._questionText || "")}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
+      <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
     </div>`;
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-      let st = cell.style || '';
-      if (!st.includes('verticalAlign=middle')) {
-        st += 'verticalAlign=middle;';
-      }
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
+    cell.value = html;
+  } finally {
+    graph.getModel().endUpdate();
   }
-  // ... existing code ...
-  
-  // Add this in the DOMContentLoaded event listener
-  
-  document.addEventListener("DOMContentLoaded", function() {
-    // ... existing code ...
-  
-    // Prevent browser context menu on empty space (graph background),
-    // but allow it inside input, textarea, or contenteditable elements
-    const container = document.getElementById("graphContainer");
-    container.addEventListener("contextmenu", function(e) {
-      // Allow native context menu in text fields/contenteditable
-      if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
-      e.preventDefault();
-    });
-  
-    // ... existing code ...
+  graph.updateCellSize(cell);
+}
+
+// Patch updatemultipleDropdownTypeCell to use <input> for title
+function updatemultipleDropdownTypeCell(cell) {
+  const qText = cell._questionText || '';
+  const twoNums = cell._twoNumbers || { first: '0', second: '0' };
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
+  }
+  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+    <input class="question-title-input" type="text" value="${escapeAttr(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
+    <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
+      <input type="number" value="${escapeAttr(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
+      <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
+    </div>
+    <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
+  cell._textboxes.forEach((tb, index) => {
+    const val = tb.nameId || '';
+    const ph = tb.placeholder || 'Enter value';
+    const checked = tb.isAmountOption ? 'checked' : '';
+    html += `
+      <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
+        <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <label>
+          <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
+      </div>`;
   });
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
+    </div>
+  </div>`;
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+    let st = cell.style || '';
+    if (!st.includes('verticalAlign=middle')) {
+      st += 'verticalAlign=middle;';
+    }
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+// ... existing code ...
+
+// Add this in the DOMContentLoaded event listener
+
+document.addEventListener("DOMContentLoaded", function() {
   // ... existing code ...
-  
-  /**
-   * Define pickTypeForCell globally
-   */
-  window.pickTypeForCell = function(cellId, val) {
-    console.log('[pickTypeForCell] called with cellId:', cellId, 'val:', val); // DEBUG
-    if (!val) {
-      console.log('[pickTypeForCell] No value selected, returning');
-      return; // Do nothing if no type selected
-    }
-    const c = graph.getModel().getCell(cellId);
-    if (!c) {
-      console.log('[pickTypeForCell] No cell found for id', cellId);
-      return;
-    }
-  
-    graph.getModel().beginUpdate();
-    try {
-      setQuestionType(c, val);
-      if (!c._nameId) {
-        c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
-        c._placeholder = "";
-      }
-      // Only handle special cases for multi types
-      if (val === "multipleTextboxes") {
-        c._questionText = "Enter question text";
-        c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
-        updateMultipleTextboxesCell(c);
-      } else if (val === "multipleDropdownType") {
-        c._questionText = "Enter question text";
-        c._twoNumbers = { first: "0", second: "0" };
-        c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
-        updatemultipleDropdownTypeCell(c);
-      }
-      // For all other types, setQuestionType handles rendering
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  
-    graph.setSelectionCell(c);
-    graph.startEditingAtCell(c);
-    refreshAllCells();
-    console.log('[pickTypeForCell] Finished updating cell', c);
-  };
-  
-  // --- Ensure event handler is attached for all .question-type-dropdown selects (event delegation) ---
-  document.addEventListener('change', function(e) {
-    if (e.target && e.target.classList.contains('question-type-dropdown')) {
-      const cellId = e.target.getAttribute('data-cell-id');
-      const val = e.target.value;
-      // Removed: console.log('[delegated change] .question-type-dropdown changed:', cellId, val); // DEBUG
-      if (window.pickTypeForCell) {
-        window.pickTypeForCell(cellId, val);
-      } else {
-        // Removed: console.error('window.pickTypeForCell is not defined!');
-      }
-    }
-  });
-  
-  document.addEventListener('contextmenu', function(e) {
+
+  // Prevent browser context menu on empty space (graph background),
+  // but allow it inside input, textarea, or contenteditable elements
+  const container = document.getElementById("graphContainer");
+  container.addEventListener("contextmenu", function(e) {
+    // Allow native context menu in text fields/contenteditable
     if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
     e.preventDefault();
   });
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    // Map legend color box IDs to color picker IDs and colorPreferences keys
-    const colorMap = [
-      { box: 'colorText', picker: 'colorPickerText', key: 'text' },
-      { box: 'colorCheckbox', picker: 'colorPickerCheckbox', key: 'checkbox' },
-      { box: 'colorDropdown', picker: 'colorPickerDropdown', key: 'dropdown' },
-      { box: 'colorMoney', picker: 'colorPickerMoney', key: 'money' },
-      { box: 'colorDate', picker: 'colorPickerDate', key: 'date' },
-      { box: 'colorBigParagraph', picker: 'colorPickerBigParagraph', key: 'bigParagraph' },
-      { box: 'colorTextColor', picker: 'colorPickerTextColor', key: 'textColor' },
-      { box: 'colorDateRange', picker: 'colorPickerDate', key: 'date' }, // Date Range uses date color
-      { box: 'colorEmail', picker: 'colorPickerText', key: 'text' },     // Email uses text color
-      { box: 'colorPhone', picker: 'colorPickerText', key: 'text' }      // Phone uses text color
-    ];
-  
-    colorMap.forEach(({ box, picker, key }) => {
-      const boxEl = document.getElementById(box);
-      const pickerEl = document.getElementById(picker);
-      if (boxEl && pickerEl) {
-        boxEl.addEventListener('click', function() {
-          pickerEl.value = rgbToHex(getComputedStyle(boxEl).backgroundColor);
-          pickerEl.click();
-        });
-        pickerEl.addEventListener('input', function(e) {
-          colorPreferences[key] = e.target.value;
-          updateLegendColors();
-          refreshAllCells();
-          saveUserColorPrefs();
-        });
-      }
-    });
-  });
-  
-  function previewForm() {
-    // Generate the GUI JSON string (do not download)
-    let guiJsonStr = "";
-    if (typeof window.exportGuiJson === "function") {
-      // exportGuiJson returns the JSON string if called directly
-      guiJsonStr = window.exportGuiJson(false);
-      if (typeof guiJsonStr !== "string") {
-        // If it returned an object, convert to string
-        guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
-      }
+
+  // ... existing code ...
+});
+// ... existing code ...
+
+/**
+ * Define pickTypeForCell globally
+ */
+window.pickTypeForCell = function(cellId, val) {
+  console.log('[pickTypeForCell] called with cellId:', cellId, 'val:', val); // DEBUG
+  if (!val) {
+    console.log('[pickTypeForCell] No value selected, returning');
+    return; // Do nothing if no type selected
+  }
+  const c = graph.getModel().getCell(cellId);
+  if (!c) {
+    console.log('[pickTypeForCell] No cell found for id', cellId);
+    return;
+  }
+
+  graph.getModel().beginUpdate();
+  try {
+    setQuestionType(c, val);
+    if (!c._nameId) {
+      c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
+      c._placeholder = "";
     }
+    // Only handle special cases for multi types
+    if (val === "multipleTextboxes") {
+      c._questionText = "Enter question text";
+      c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+      updateMultipleTextboxesCell(c);
+    } else if (val === "multipleDropdownType") {
+      c._questionText = "Enter question text";
+      c._twoNumbers = { first: "0", second: "0" };
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      updatemultipleDropdownTypeCell(c);
+    }
+    // For all other types, setQuestionType handles rendering
+  } finally {
+    graph.getModel().endUpdate();
+  }
+
+  graph.setSelectionCell(c);
+  graph.startEditingAtCell(c);
+  refreshAllCells();
+  console.log('[pickTypeForCell] Finished updating cell', c);
+};
+
+// --- Ensure event handler is attached for all .question-type-dropdown selects (event delegation) ---
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('question-type-dropdown')) {
+    const cellId = e.target.getAttribute('data-cell-id');
+    const val = e.target.value;
+    // Removed: console.log('[delegated change] .question-type-dropdown changed:', cellId, val); // DEBUG
+    if (window.pickTypeForCell) {
+      window.pickTypeForCell(cellId, val);
+    } else {
+      // Removed: console.error('window.pickTypeForCell is not defined!');
+    }
+  }
+});
+
+document.addEventListener('contextmenu', function(e) {
+  if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
+  e.preventDefault();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Map legend color box IDs to color picker IDs and colorPreferences keys
+  const colorMap = [
+    { box: 'colorText', picker: 'colorPickerText', key: 'text' },
+    { box: 'colorCheckbox', picker: 'colorPickerCheckbox', key: 'checkbox' },
+    { box: 'colorDropdown', picker: 'colorPickerDropdown', key: 'dropdown' },
+    { box: 'colorMoney', picker: 'colorPickerMoney', key: 'money' },
+    { box: 'colorDate', picker: 'colorPickerDate', key: 'date' },
+    { box: 'colorBigParagraph', picker: 'colorPickerBigParagraph', key: 'bigParagraph' },
+    { box: 'colorTextColor', picker: 'colorPickerTextColor', key: 'textColor' },
+    { box: 'colorDateRange', picker: 'colorPickerDate', key: 'date' }, // Date Range uses date color
+    { box: 'colorEmail', picker: 'colorPickerText', key: 'text' },     // Email uses text color
+    { box: 'colorPhone', picker: 'colorPickerText', key: 'text' }      // Phone uses text color
+  ];
+
+  colorMap.forEach(({ box, picker, key }) => {
+    const boxEl = document.getElementById(box);
+    const pickerEl = document.getElementById(picker);
+    if (boxEl && pickerEl) {
+      boxEl.addEventListener('click', function() {
+        pickerEl.value = rgbToHex(getComputedStyle(boxEl).backgroundColor);
+        pickerEl.click();
+      });
+      pickerEl.addEventListener('input', function(e) {
+        colorPreferences[key] = e.target.value;
+        updateLegendColors();
+        refreshAllCells();
+        saveUserColorPrefs();
+      });
+    }
+  });
+});
+
+function previewForm() {
+  // Generate the GUI JSON string (do not download)
+  let guiJsonStr = "";
+  if (typeof window.exportGuiJson === "function") {
+    // exportGuiJson returns the JSON string if called directly
+    guiJsonStr = window.exportGuiJson(false);
+    if (typeof guiJsonStr !== "string") {
+      // If it returned an object, convert to string
+      guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
+    }
+  }
     
-    if (guiJsonStr) {
+  if (guiJsonStr) {
       // Encode the JSON for URL transmission
       const encodedJson = encodeURIComponent(guiJsonStr);
       const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
       
       // Still copy to clipboard for manual use if needed
-      navigator.clipboard.writeText(guiJsonStr).then(() => {
-        // Optionally, show a message: copied!
-      });
+    navigator.clipboard.writeText(guiJsonStr).then(() => {
+      // Optionally, show a message: copied!
+    });
       
       // Open the GUI preview in a new tab with the JSON in the URL
       window.open(guiUrl, '_blank');
     } else {
       // Fallback to regular GUI if no JSON generated
-      window.open('FormWiz%20GUI/gui.html', '_blank');
+  window.open('FormWiz%20GUI/gui.html', '_blank');
     }
-  }
-  
-  // AUTOSAVE FLOWCHART TO COOKIES FEATURE
-  // --- AUTOSAVE CONSTANTS ---
+}
+
+// AUTOSAVE FLOWCHART TO COOKIES FEATURE
+// --- AUTOSAVE CONSTANTS ---
   // AUTOSAVE_KEY moved to config.js module
-  
-  // --- AUTOSAVE CORE FUNCTIONS (localStorage version) ---
-  // Cache for autosave data to avoid unnecessary processing
+
+// --- AUTOSAVE CORE FUNCTIONS (localStorage version) ---
+// Cache for autosave data to avoid unnecessary processing
   // lastAutosaveData and autosaveDataHash moved to config.js module
-  
-  function autosaveFlowchartToLocalStorage() {
-    try {
-      if (!graph) return;
-      const parent = graph.getDefaultParent();
-      const cells = graph.getChildCells(parent, true, true);
-      
-      // Quick check if data has actually changed
-      const currentHash = JSON.stringify({
-        cellCount: cells.length,
-        sectionPrefs: sectionPrefs,
-        groups: groups
-      });
-      
-      if (currentHash === autosaveDataHash && lastAutosaveData) {
-        // Data hasn't changed, skip autosave
-        return;
-      }
-      
-      const sectionPrefsCopy = JSON.parse(JSON.stringify(sectionPrefs));
-      
-      // Use the same safe serialization logic as exportFlowchartJson
-      const simplifiedCells = cells.map(cell => {
-        // Basic info about the cell
-        const cellData = {
-          id: cell.id,
-          vertex: cell.vertex,
-          edge: cell.edge,
-          value: cell.value,
-          style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
+
+function autosaveFlowchartToLocalStorage() {
+  try {
+    if (!graph) return;
+    const parent = graph.getDefaultParent();
+    const cells = graph.getChildCells(parent, true, true);
+    
+    // Quick check if data has actually changed
+    const currentHash = JSON.stringify({
+      cellCount: cells.length,
+      sectionPrefs: sectionPrefs,
+      groups: groups
+    });
+    
+    if (currentHash === autosaveDataHash && lastAutosaveData) {
+      // Data hasn't changed, skip autosave
+      return;
+    }
+    
+    const sectionPrefsCopy = JSON.parse(JSON.stringify(sectionPrefs));
+    
+    // Use the same safe serialization logic as exportFlowchartJson
+    const simplifiedCells = cells.map(cell => {
+      // Basic info about the cell
+      const cellData = {
+        id: cell.id,
+        vertex: cell.vertex,
+        edge: cell.edge,
+        value: cell.value,
+        style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
+      };
+
+      // Handle geometry 
+      if (cell.geometry) {
+        cellData.geometry = {
+          x: cell.geometry.x,
+          y: cell.geometry.y,
+          width: cell.geometry.width,
+          height: cell.geometry.height,
         };
-  
-        // Handle geometry 
-        if (cell.geometry) {
-          cellData.geometry = {
-            x: cell.geometry.x,
-            y: cell.geometry.y,
-            width: cell.geometry.width,
-            height: cell.geometry.height,
+      }
+
+      // Add source and target for edges
+      if (cell.edge && cell.source && cell.target) {
+        cellData.source = cell.source.id;
+        cellData.target = cell.target.id;
+        
+        // Save edge geometry (articulation points) if it exists
+        if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
+          cellData.edgeGeometry = {
+            points: cell.geometry.points.map(point => ({
+              x: point.x,
+              y: point.y
+            }))
           };
         }
-  
-        // Add source and target for edges
-        if (cell.edge && cell.source && cell.target) {
-          cellData.source = cell.source.id;
-          cellData.target = cell.target.id;
-          
-          // Save edge geometry (articulation points) if it exists
-          if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
-            cellData.edgeGeometry = {
-              points: cell.geometry.points.map(point => ({
-                x: point.x,
-                y: point.y
-              }))
-            };
-          }
-        }
-  
-        // Custom fields for specific nodes
-        if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
-        if (cell._questionText) cellData._questionText = cell._questionText;
-        if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
-        if (cell._nameId) cellData._nameId = cell._nameId;
-        if (cell._placeholder) cellData._placeholder = cell._placeholder;
-        if (cell._questionId) cellData._questionId = cell._questionId;
-        
-        // textbox properties
-        if (cell._amountName) cellData._amountName = cell._amountName;
-        if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
-        
-        // image option
-        if (cell._image) cellData._image = cell._image;
-        
-        // PDF node properties
-        if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
-        if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
-        
-        // Notes node properties
-        if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
-        if (cell._notesBold !== undefined) cellData._notesBold = cell._notesBold;
-        if (cell._notesFontSize !== undefined) cellData._notesFontSize = cell._notesFontSize;
-        
-        // Checklist node properties
-        if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
-        
-        // Alert node properties
-        if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
-        
-        // calculation node properties
+      }
+
+      // Custom fields for specific nodes
+      if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+      if (cell._questionText) cellData._questionText = cell._questionText;
+      if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+      if (cell._nameId) cellData._nameId = cell._nameId;
+      if (cell._placeholder) cellData._placeholder = cell._placeholder;
+      if (cell._questionId) cellData._questionId = cell._questionId;
+      
+      // textbox properties
+      if (cell._amountName) cellData._amountName = cell._amountName;
+      if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+      
+      // image option
+      if (cell._image) cellData._image = cell._image;
+      
+      // PDF node properties
+      if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+      if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
+      
+      // Notes node properties
+      if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
+      if (cell._notesBold !== undefined) cellData._notesBold = cell._notesBold;
+      if (cell._notesFontSize !== undefined) cellData._notesFontSize = cell._notesFontSize;
+      
+      // Checklist node properties
+      if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
+      
+      // Alert node properties
+      if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
+      
+      // calculation node properties
         // Calculation node data export now handled by calc.js
         if (typeof window.exportCalculationNodeData === 'function') {
           window.exportCalculationNodeData(cell, cellData);
         }
-        
-        // subtitle & info nodes
-        if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
-        if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
-  
-        return cellData;
+      
+      // subtitle & info nodes
+      if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
+      if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+
+      return cellData;
+    });
+
+    // Get current groups data without updating from DOM
+    const groupsArray = [];
+    Object.keys(groups).forEach(groupId => {
+      // Export all groups, even if they have no sections
+      groupsArray.push({
+        groupId: parseInt(groupId),
+        name: groups[groupId].name,
+        sections: groups[groupId].sections
       });
-  
-      // Get current groups data without updating from DOM
-      const groupsArray = [];
-      Object.keys(groups).forEach(groupId => {
-        // Export all groups, even if they have no sections
-        groupsArray.push({
-          groupId: parseInt(groupId),
-          name: groups[groupId].name,
-          sections: groups[groupId].sections
-        });
-      });
-      
-      const data = {
-        cells: simplifiedCells,
-        sectionPrefs: sectionPrefsCopy,
-        groups: groupsArray
-      };
-      
-      // Cache the data and hash for next comparison
-      lastAutosaveData = data;
-      autosaveDataHash = currentHash;
-      
-      const json = JSON.stringify(data);
-      localStorage.setItem(AUTOSAVE_KEY, json);
-    } catch (e) {
-      // Silently handle errors to avoid performance impact
-    }
-  }
-  
-  function clearAutosaveLocalStorage() {
-    localStorage.removeItem(AUTOSAVE_KEY);
-    // Removed: console.log('[AUTOSAVE][localStorage] Cleared autosave.');
-  }
-  
-  function getAutosaveFlowchartFromLocalStorage() {
-    const raw = localStorage.getItem(AUTOSAVE_KEY);
-    // Removed: console.log('[AUTOSAVE][localStorage][get] Raw value:', raw ? raw.substring(0, 100) : raw);
-    if (!raw) {
-      // Removed: console.log('[AUTOSAVE][localStorage] No autosave found.');
-      return null;
-    }
-    try {
-      const data = JSON.parse(raw);
-      // Removed: console.log('[AUTOSAVE][localStorage] Loaded autosave JSON. Length:', raw.length);
-      // Removed: console.log('[AUTOSAVE][localStorage] Autosave data has groups:', data.hasOwnProperty('groups'));
-      if (data.groups) {
-        // Removed: console.log('[AUTOSAVE][localStorage] Groups data:', data.groups);
-      }
-      return data;
-    } catch (e) {
-      // Removed: console.log('[AUTOSAVE][localStorage] Error parsing autosave:', e);
-      return null;
-    }
-  }
-  
-  // --- AUTOSAVE HOOKS ---
-  // autosaveTimeout, autosaveThrottleDelay, lastAutosaveTime, and autosaveMinInterval moved to config.js module
-  
-  // Global helper to request a throttled autosave from anywhere (including Groups UI)
-  function requestAutosave() {
-    try {
-      const now = Date.now();
-      
-      // Prevent too frequent autosaves
-      if (now - lastAutosaveTime < autosaveMinInterval) {
-        return;
-      }
-      
-      if (autosaveTimeout) {
-        clearTimeout(autosaveTimeout);
-      }
-      autosaveTimeout = setTimeout(() => {
-        autosaveFlowchartToLocalStorage();
-        autosaveTimeout = null;
-        lastAutosaveTime = Date.now();
-      }, autosaveThrottleDelay);
-    } catch (e) {
-      // Fallback to immediate autosave if throttling fails
-      autosaveFlowchartToLocalStorage();
-      lastAutosaveTime = Date.now();
-    }
-  }
-  
-  function setupAutosaveHooks() {
-    if (!graph) return;
-    
-    // Throttled autosave function
-    function throttledAutosave() {
-      if (autosaveTimeout) {
-        clearTimeout(autosaveTimeout);
-      }
-      autosaveTimeout = setTimeout(() => {
-        autosaveFlowchartToLocalStorage();
-        autosaveTimeout = null;
-      }, autosaveThrottleDelay);
-    }
-    
-    // Save after any model change (throttled)
-    graph.getModel().addListener(mxEvent.CHANGE, function() {
-      throttledAutosave();
     });
     
-    // Save after refreshAllCells (in case of programmatic changes) - throttled
-    const origRefreshAllCells = window.refreshAllCells;
-    window.refreshAllCells = function() {
-      origRefreshAllCells.apply(this, arguments);
-      throttledAutosave();
+    const data = {
+      cells: simplifiedCells,
+      sectionPrefs: sectionPrefsCopy,
+      groups: groupsArray
     };
     
-    // Save after loadFlowchartData (delayed to ensure groups are loaded)
-    const origLoadFlowchartData = window.loadFlowchartData;
-    window.loadFlowchartData = function(data) {
-      origLoadFlowchartData.apply(this, arguments);
-      
-      // Apply groups from imported JSON if present
-      if (data && Array.isArray(data.groups)) {
-        if (typeof window.loadGroupsFromData === 'function') {
-          window.loadGroupsFromData(data.groups);
-          console.log('Groups loaded from data:', data.groups);
-        } else {
-          window.pendingGroupsData = data.groups;
-        }
-      }
-      
-      // Delay autosave to ensure groups are loaded
-      setTimeout(() => {
-        console.log('Autosaving after loadFlowchartData, current groups:', groups);
-        autosaveFlowchartToLocalStorage();
-      }, 1000); // Increased delay to ensure groups are fully processed
-    };
+    // Cache the data and hash for next comparison
+    lastAutosaveData = data;
+    autosaveDataHash = currentHash;
     
-    // Removed: console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
+    const json = JSON.stringify(data);
+    localStorage.setItem(AUTOSAVE_KEY, json);
+  } catch (e) {
+    // Silently handle errors to avoid performance impact
   }
-  
-  // --- AUTOSAVE RESTORE PROMPT ---
-  function showAutosaveRestorePrompt() {
-    let modal = document.createElement('div');
-    modal.id = 'autosaveRestoreModal';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100vw';
-    modal.style.height = '100vh';
-    modal.style.background = 'rgba(0,0,0,0.5)';
-    modal.style.display = 'flex';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
-    modal.style.zIndex = '9999';
-  
-    let box = document.createElement('div');
-    box.style.background = '#fff';
-    box.style.padding = '32px 40px';
-    box.style.borderRadius = '12px';
-    box.style.boxShadow = '0 4px 32px rgba(0,0,0,0.18)';
-    box.style.textAlign = 'center';
-    box.innerHTML = `<h2>Pick up where you left off?</h2><p>We found an autosaved flowchart. Would you like to continue editing it?</p>`;
-  
-    let yesBtn = document.createElement('button');
-    yesBtn.textContent = 'Yes';
-    yesBtn.style.margin = '12px 24px 0 0';
-    yesBtn.style.padding = '10px 28px';
-    yesBtn.style.fontSize = '1.1em';
-    yesBtn.style.borderRadius = '6px';
-    yesBtn.style.background = '#1976d2';
-    yesBtn.style.color = '#fff';
-    yesBtn.style.border = 'none';
-    yesBtn.style.cursor = 'pointer';
-  
-    let noBtn = document.createElement('button');
-    noBtn.textContent = 'No';
-    noBtn.style.margin = '12px 0 0 0';
-    noBtn.style.padding = '10px 28px';
-    noBtn.style.fontSize = '1.1em';
-    noBtn.style.borderRadius = '6px';
-    noBtn.style.background = '#bbb';
-    noBtn.style.color = '#222';
-    noBtn.style.border = 'none';
-    noBtn.style.cursor = 'pointer';
-  
-    yesBtn.onclick = function() {
-      modal.remove();
-      const data = getAutosaveFlowchartFromLocalStorage();
-      if (data) {
-        console.log('Restoring autosave with groups:', data.groups);
-        window.loadFlowchartData(data);
-        // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
-        // Wait for groups to be loaded before setting up autosave hooks
-        setTimeout(safeSetupAutosaveHooks, 1000);
-      } else {
-        setTimeout(safeSetupAutosaveHooks, 500);
-      }
-    };
-    noBtn.onclick = function() {
-      modal.remove();
-      clearAutosaveLocalStorage();
-      window.location.reload();
-      // Removed: console.log('[AUTOSAVE][localStorage] User chose NO: cleared autosave and reloaded.');
-    };
-  
-    box.appendChild(yesBtn);
-    box.appendChild(noBtn);
-    modal.appendChild(box);
-    document.body.appendChild(modal);
-    // Removed: console.log('[AUTOSAVE][localStorage] Restore prompt shown.');
+}
+
+function clearAutosaveLocalStorage() {
+  localStorage.removeItem(AUTOSAVE_KEY);
+  // Removed: console.log('[AUTOSAVE][localStorage] Cleared autosave.');
+}
+
+function getAutosaveFlowchartFromLocalStorage() {
+  const raw = localStorage.getItem(AUTOSAVE_KEY);
+  // Removed: console.log('[AUTOSAVE][localStorage][get] Raw value:', raw ? raw.substring(0, 100) : raw);
+  if (!raw) {
+    // Removed: console.log('[AUTOSAVE][localStorage] No autosave found.');
+    return null;
   }
-  
-  // --- INIT AUTOSAVE ON PAGE LOAD ---
-  let autosaveHooksSetup = false;
-  function safeSetupAutosaveHooks() {
-    if (!autosaveHooksSetup) {
-      setupAutosaveHooks();
-      autosaveHooksSetup = true;
+  try {
+    const data = JSON.parse(raw);
+    // Removed: console.log('[AUTOSAVE][localStorage] Loaded autosave JSON. Length:', raw.length);
+    // Removed: console.log('[AUTOSAVE][localStorage] Autosave data has groups:', data.hasOwnProperty('groups'));
+    if (data.groups) {
+      // Removed: console.log('[AUTOSAVE][localStorage] Groups data:', data.groups);
     }
+    return data;
+  } catch (e) {
+    // Removed: console.log('[AUTOSAVE][localStorage] Error parsing autosave:', e);
+    return null;
   }
-  document.addEventListener('DOMContentLoaded', function() {
-    const autosaveData = getAutosaveFlowchartFromLocalStorage();
-    if (autosaveData && autosaveData.cells && autosaveData.cells.length > 0) {
-      showAutosaveRestorePrompt();
-    } else {
-      setTimeout(safeSetupAutosaveHooks, 1000);
+}
+
+// --- AUTOSAVE HOOKS ---
+  // autosaveTimeout, autosaveThrottleDelay, lastAutosaveTime, and autosaveMinInterval moved to config.js module
+
+// Global helper to request a throttled autosave from anywhere (including Groups UI)
+function requestAutosave() {
+  try {
+    const now = Date.now();
+    
+    // Prevent too frequent autosaves
+    if (now - lastAutosaveTime < autosaveMinInterval) {
+      return;
     }
+    
+    if (autosaveTimeout) {
+      clearTimeout(autosaveTimeout);
+    }
+    autosaveTimeout = setTimeout(() => {
+      autosaveFlowchartToLocalStorage();
+      autosaveTimeout = null;
+      lastAutosaveTime = Date.now();
+    }, autosaveThrottleDelay);
+  } catch (e) {
+    // Fallback to immediate autosave if throttling fails
+    autosaveFlowchartToLocalStorage();
+    lastAutosaveTime = Date.now();
+  }
+}
+
+function setupAutosaveHooks() {
+  if (!graph) return;
+  
+  // Throttled autosave function
+  function throttledAutosave() {
+    if (autosaveTimeout) {
+      clearTimeout(autosaveTimeout);
+    }
+    autosaveTimeout = setTimeout(() => {
+      autosaveFlowchartToLocalStorage();
+      autosaveTimeout = null;
+    }, autosaveThrottleDelay);
+  }
+  
+  // Save after any model change (throttled)
+  graph.getModel().addListener(mxEvent.CHANGE, function() {
+    throttledAutosave();
   });
   
-  // --- COPY/PASTE NODE AS JSON ---
-  // flowchartClipboard, FLOWCHART_CLIPBOARD_KEY, and FLOWCHART_CLIPBOARD_TIMESTAMP_KEY moved to config.js module
+  // Save after refreshAllCells (in case of programmatic changes) - throttled
+  const origRefreshAllCells = window.refreshAllCells;
+  window.refreshAllCells = function() {
+    origRefreshAllCells.apply(this, arguments);
+    throttledAutosave();
+  };
   
-  function copySelectedNodeAsJson() {
-    try {
-      const cells = graph.getSelectionCells();
-      if (!cells || cells.length === 0) {
-        console.log('No cells selected');
-        return;
-      }
+  // Save after loadFlowchartData (delayed to ensure groups are loaded)
+  const origLoadFlowchartData = window.loadFlowchartData;
+  window.loadFlowchartData = function(data) {
+    origLoadFlowchartData.apply(this, arguments);
     
-      // Separate vertices (nodes) and edges
-      const nodes = cells.filter(cell => cell.vertex);
-      let edges = cells.filter(cell => cell.edge);
-      
-      console.log('Total selected cells:', cells.length);
-      console.log('Selected nodes (vertex):', nodes.length);
-      console.log('Selected edges (edge):', edges.length);
-      console.log('All selected cells:', cells.map(c => ({ id: c.id, vertex: c.vertex, edge: c.edge })));
-      
-      // If no nodes are selected, we can't copy anything meaningful
-      if (nodes.length === 0) {
-        console.log('No nodes selected for copying');
-        return;
-      }
-      
-      // Get all node IDs for edge detection
-      const selectedNodeIds = new Set(nodes.map(node => node.id));
-      
-      // Find all edges that connect selected nodes (even if not explicitly selected)
-      const allEdges = graph.getModel().getEdges();
-      console.log('All edges in graph:', allEdges.length);
-      console.log('Sample edges:', allEdges.slice(0, 3).map(e => ({ 
-        id: e.id, 
-        source: e.source ? e.source.id : null, 
-        target: e.target ? e.target.id : null,
-        vertex: e.vertex,
-        edge: e.edge
-      })));
-      
-      const connectingEdges = allEdges.filter(edge => {
-        const sourceId = edge.source ? edge.source.id : null;
-        const targetId = edge.target ? edge.target.id : null;
-        const connectsSelected = selectedNodeIds.has(sourceId) && selectedNodeIds.has(targetId);
-        if (connectsSelected) {
-          console.log('Found connecting edge:', edge.id, 'from', sourceId, 'to', targetId);
-        }
-        return connectsSelected;
-      });
-      
-      // Debug logging for edge detection
-      console.log('Selected nodes:', Array.from(selectedNodeIds));
-      console.log('All edges in graph:', allEdges.length);
-      console.log('Connecting edges found:', connectingEdges.length);
-      console.log('Explicitly selected edges:', edges.length);
-      
-      // Combine explicitly selected edges with connecting edges
-      const allSelectedEdges = new Set([...edges, ...connectingEdges]);
-      edges = Array.from(allSelectedEdges);
-      
-      // Calculate the bounding box of all selected nodes to determine the center
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      nodes.forEach(cell => {
-        if (cell.geometry) {
-          minX = Math.min(minX, cell.geometry.x);
-          minY = Math.min(minY, cell.geometry.y);
-          maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
-          maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
-        }
-      });
-      
-      const centerX = (minX + maxX) / 2;
-      const centerY = (minY + maxY) / 2;
-      
-      // Create a map of old IDs to new IDs for edge reconstruction
-      const idMap = {};
-      const newIds = [];
-      
-      // Prepare node data with relative positioning
-      const nodeData = nodes.map(cell => {
-        const cellData = {};
-        
-        // Only copy specific properties we need, avoiding circular references
-        const safeProperties = [
-          'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
-          '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
-          '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
-                '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-        '_checklistText', '_alertText', '_pdfUrl', '_priceId'
-        ];
-        
-        safeProperties.forEach(prop => {
-          if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
-            cellData[prop] = cell[prop];
-          }
-        });
-        
-        // Store the original ID for edge mapping
-        const originalId = cell.id;
-        const newId = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + newIds.length;
-        idMap[originalId] = newId;
-        newIds.push(newId);
-        cellData.originalId = originalId;
-        cellData.newId = newId;
-        
-        // Calculate relative position from center
-        if (cell.geometry) {
-          cellData.geometry = {
-            x: cell.geometry.x - centerX,
-            y: cell.geometry.y - centerY,
-            width: cell.geometry.width,
-            height: cell.geometry.height
-          };
-        }
-        return cellData;
-      });
-      
-      // Prepare edge data with updated source/target IDs
-      const edgeData = edges.map(cell => {
-        const cellData = {};
-        
-        // Only copy specific edge properties we need, avoiding circular references
-        const safeEdgeProperties = [
-          'id', 'value', 'style', 'geometry'
-        ];
-        
-        safeEdgeProperties.forEach(prop => {
-          if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
-            cellData[prop] = cell[prop];
-          }
-        });
-        
-        // Update source and target IDs to use the new node IDs
-        if (cell.source && idMap[cell.source.id]) {
-          cellData.sourceId = idMap[cell.source.id];
-        }
-        if (cell.target && idMap[cell.target.id]) {
-          cellData.targetId = idMap[cell.target.id];
-        }
-        
-        return cellData;
-      });
-      
-      console.log('Copy operation - Nodes:', nodes.length, 'Edges found:', edges.length, 'Edge data:', edgeData.length);
-      
-      // Collect section preferences from the copied nodes
-      const copiedSectionPrefs = {};
-      nodes.forEach(cell => {
-        const section = cell.section || "1";
-        if (sectionPrefs[section]) {
-          copiedSectionPrefs[section] = {
-            name: sectionPrefs[section].name,
-            borderColor: sectionPrefs[section].borderColor
-          };
-        }
-      });
-      
-      // Create the complete clipboard data
-      const clipboardData = {
-        nodes: nodeData,
-        edges: edgeData,
-        centerX: centerX,
-        centerY: centerY,
-        isMultiCopy: true,
-        sectionPrefs: copiedSectionPrefs
-      };
-      
-      const jsonData = JSON.stringify(clipboardData);
-      const timestamp = Date.now();
-      
-      // Store in localStorage for cross-tab functionality
-      localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, jsonData);
-      localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
-      
-      // Also keep in memory for same-tab functionality
-      flowchartClipboard = jsonData;
-      
-      // Copy to system clipboard as well
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(jsonData).then(() => {
-          console.log('Nodes copied to clipboard and localStorage');
-        }).catch(err => {
-          console.log('Failed to copy to system clipboard:', err);
-        });
-      }
-      
-      // Show feedback to user
-      const nodeCount = nodes.length;
-      const edgeCount = edges.length;
-      showCopyFeedback(nodeCount, edgeCount);
-    } catch (error) {
-      console.error('Error in copySelectedNodeAsJson:', error);
-      throw error;
-    }
-  }
-  
-  function pasteNodeFromJson(x, y) {
-    // Try to get data from localStorage first (for cross-tab functionality)
-    let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
-    let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
-    
-    // If no localStorage data, fall back to memory clipboard
-    if (!clipboardData && flowchartClipboard) {
-      clipboardData = flowchartClipboard;
-    }
-    
-    if (!clipboardData) {
-      // Try to get from system clipboard as last resort
-      navigator.clipboard.readText().then(text => {
-        try {
-          JSON.parse(text); // Validate it's JSON
-          pasteNodeFromJsonData(text, x, y);
-        } catch (e) {
-          alert("No valid node data found in clipboard");
-        }
-      }).catch(err => {
-        alert("No node data found to paste");
-      });
-      return;
-    }
-    
-    pasteNodeFromJsonData(clipboardData, x, y);
-  }
-  
-  function pasteNodeFromJsonData(clipboardData, x, y) {
-    let data;
-    try {
-      data = JSON.parse(clipboardData);
-    } catch (e) {
-      alert("Clipboard data is invalid");
-      return;
-    }
-    
-    const parent = graph.getDefaultParent();
-    graph.getModel().beginUpdate();
-    
-    try {
-      // Handle new multi-copy format
-      if (data.isMultiCopy && data.nodes) {
-        // Use provided position or default to center of viewport
-        const pasteX = typeof x === "number" ? x : (data.centerX || 100);
-        const pasteY = typeof y === "number" ? y : (data.centerY || 100);
-        
-        // Create a map to store new cell instances
-        const newCells = {};
-        
-        // First, create all nodes
-        data.nodes.forEach((nodeData) => {
-          // Calculate absolute position based on relative position and paste location
-          const absX = pasteX + (nodeData.geometry?.x || 0);
-          const absY = pasteY + (nodeData.geometry?.y || 0);
-          
-          const geo = new mxGeometry(
-            absX, 
-            absY, 
-            nodeData.geometry?.width || 160, 
-            nodeData.geometry?.height || 80
-          );
-          
-          const newCell = new mxCell(nodeData.value, geo, nodeData.style);
-          newCell.vertex = true;
-          newCell.id = nodeData.newId;
-          
-          // Copy custom fields
-          ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
-            if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
-          });
-          
-          // Section
-          if (nodeData.section !== undefined) newCell.section = nodeData.section;
-          
-          // Insert into graph
-          graph.addCell(newCell, parent);
-          newCells[nodeData.newId] = newCell;
-          
-          // Update rendering for special node types
-          if (getQuestionType(newCell) === "imageOption") {
-            updateImageOptionCell(newCell);
-          } else if (getQuestionType(newCell) === "notesNode") {
-            updateNotesNodeCell(newCell);
-          } else if (getQuestionType(newCell) === "checklistNode") {
-            updateChecklistNodeCell(newCell);
-          } else if (getQuestionType(newCell) === "alertNode") {
-            updateAlertNodeCell(newCell);
-          } else if (isPdfNode(newCell)) {
-            updatePdfNodeCell(newCell);
-          } else if (isOptions(newCell)) {
-            refreshOptionNodeId(newCell);
-          } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
-            if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
-          }
-        });
-        
-        // Then, create all edges
-        if (data.edges) {
-          console.log('Paste operation - Creating', data.edges.length, 'edges');
-          data.edges.forEach((edgeData, index) => {
-            const sourceCell = newCells[edgeData.sourceId];
-            const targetCell = newCells[edgeData.targetId];
-            
-            if (sourceCell && targetCell) {
-              // Use the proper insertEdge method instead of manual creation
-              const newEdge = graph.insertEdge(parent, null, edgeData.value || "", sourceCell, targetCell, edgeData.style);
-              
-              // Apply current edge style if no style is provided
-              if (!edgeData.style || edgeData.style === "") {
-                let edgeStyle;
-                if (currentEdgeStyle === 'curved') {
-                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-                } else if (currentEdgeStyle === 'straight') {
-                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
-                } else if (currentEdgeStyle === 'direct') {
-                  edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
-                } else {
-                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-                }
-                graph.getModel().setStyle(newEdge, edgeStyle);
-              }
-              
-              // Copy edge properties if they exist
-              if (edgeData.geometry) {
-                newEdge.geometry = new mxGeometry(
-                  edgeData.geometry.x || 0,
-                  edgeData.geometry.y || 0,
-                  edgeData.geometry.width || 0,
-                  edgeData.geometry.height || 0
-                );
-              }
-              
-              console.log('Edge created successfully:', newEdge.id);
-            } else {
-              console.log('Failed to create edge - missing source or target');
-            }
-          });
-        } else {
-          console.log('No edges data found in clipboard');
-        }
-        
-        // Merge section preferences from clipboard with current ones
-        if (data.sectionPrefs) {
-          Object.keys(data.sectionPrefs).forEach(sectionNum => {
-            const clipboardSection = data.sectionPrefs[sectionNum];
-            // Always use the clipboard section data (prioritize updated names)
-            sectionPrefs[sectionNum] = {
-              name: clipboardSection.name,
-              borderColor: clipboardSection.borderColor
-            };
-          });
-          
-          // Update the section legend to reflect the new sections
-          if (typeof updateSectionLegend === 'function') {
-            updateSectionLegend();
-          }
-        }
-        
-        // Show feedback with counts
-        const nodeCount = data.nodes.length;
-        const edgeCount = data.edges ? data.edges.length : 0;
-        showPasteFeedback(nodeCount, edgeCount);
-        
+    // Apply groups from imported JSON if present
+    if (data && Array.isArray(data.groups)) {
+      if (typeof window.loadGroupsFromData === 'function') {
+        window.loadGroupsFromData(data.groups);
+        console.log('Groups loaded from data:', data.groups);
       } else {
-        // Handle legacy single-node format (backward compatibility)
-        let legacyData = Array.isArray(data) ? data : [data];
+        window.pendingGroupsData = data.groups;
+      }
+    }
+    
+    // Delay autosave to ensure groups are loaded
+    setTimeout(() => {
+      console.log('Autosaving after loadFlowchartData, current groups:', groups);
+      autosaveFlowchartToLocalStorage();
+    }, 1000); // Increased delay to ensure groups are fully processed
+  };
+  
+  // Removed: console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
+}
+
+// --- AUTOSAVE RESTORE PROMPT ---
+function showAutosaveRestorePrompt() {
+  let modal = document.createElement('div');
+  modal.id = 'autosaveRestoreModal';
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100vw';
+  modal.style.height = '100vh';
+  modal.style.background = 'rgba(0,0,0,0.5)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '9999';
+
+  let box = document.createElement('div');
+  box.style.background = '#fff';
+  box.style.padding = '32px 40px';
+  box.style.borderRadius = '12px';
+  box.style.boxShadow = '0 4px 32px rgba(0,0,0,0.18)';
+  box.style.textAlign = 'center';
+  box.innerHTML = `<h2>Pick up where you left off?</h2><p>We found an autosaved flowchart. Would you like to continue editing it?</p>`;
+
+  let yesBtn = document.createElement('button');
+  yesBtn.textContent = 'Yes';
+  yesBtn.style.margin = '12px 24px 0 0';
+  yesBtn.style.padding = '10px 28px';
+  yesBtn.style.fontSize = '1.1em';
+  yesBtn.style.borderRadius = '6px';
+  yesBtn.style.background = '#1976d2';
+  yesBtn.style.color = '#fff';
+  yesBtn.style.border = 'none';
+  yesBtn.style.cursor = 'pointer';
+
+  let noBtn = document.createElement('button');
+  noBtn.textContent = 'No';
+  noBtn.style.margin = '12px 0 0 0';
+  noBtn.style.padding = '10px 28px';
+  noBtn.style.fontSize = '1.1em';
+  noBtn.style.borderRadius = '6px';
+  noBtn.style.background = '#bbb';
+  noBtn.style.color = '#222';
+  noBtn.style.border = 'none';
+  noBtn.style.cursor = 'pointer';
+
+  yesBtn.onclick = function() {
+    modal.remove();
+    const data = getAutosaveFlowchartFromLocalStorage();
+    if (data) {
+      console.log('Restoring autosave with groups:', data.groups);
+      window.loadFlowchartData(data);
+      // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
+      // Wait for groups to be loaded before setting up autosave hooks
+      setTimeout(safeSetupAutosaveHooks, 1000);
+    } else {
+      setTimeout(safeSetupAutosaveHooks, 500);
+    }
+  };
+  noBtn.onclick = function() {
+    modal.remove();
+    clearAutosaveLocalStorage();
+    window.location.reload();
+    // Removed: console.log('[AUTOSAVE][localStorage] User chose NO: cleared autosave and reloaded.');
+  };
+
+  box.appendChild(yesBtn);
+  box.appendChild(noBtn);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+  // Removed: console.log('[AUTOSAVE][localStorage] Restore prompt shown.');
+}
+
+// --- INIT AUTOSAVE ON PAGE LOAD ---
+let autosaveHooksSetup = false;
+function safeSetupAutosaveHooks() {
+  if (!autosaveHooksSetup) {
+    setupAutosaveHooks();
+    autosaveHooksSetup = true;
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const autosaveData = getAutosaveFlowchartFromLocalStorage();
+  if (autosaveData && autosaveData.cells && autosaveData.cells.length > 0) {
+    showAutosaveRestorePrompt();
+  } else {
+    setTimeout(safeSetupAutosaveHooks, 1000);
+  }
+});
+
+// --- COPY/PASTE NODE AS JSON ---
+  // flowchartClipboard, FLOWCHART_CLIPBOARD_KEY, and FLOWCHART_CLIPBOARD_TIMESTAMP_KEY moved to config.js module
+
+function copySelectedNodeAsJson() {
+  try {
+    const cells = graph.getSelectionCells();
+    if (!cells || cells.length === 0) {
+      console.log('No cells selected');
+      return;
+    }
+  
+    // Separate vertices (nodes) and edges
+    const nodes = cells.filter(cell => cell.vertex);
+    let edges = cells.filter(cell => cell.edge);
+    
+    console.log('Total selected cells:', cells.length);
+    console.log('Selected nodes (vertex):', nodes.length);
+    console.log('Selected edges (edge):', edges.length);
+    console.log('All selected cells:', cells.map(c => ({ id: c.id, vertex: c.vertex, edge: c.edge })));
+    
+    // If no nodes are selected, we can't copy anything meaningful
+    if (nodes.length === 0) {
+      console.log('No nodes selected for copying');
+      return;
+    }
+    
+    // Get all node IDs for edge detection
+    const selectedNodeIds = new Set(nodes.map(node => node.id));
+    
+    // Find all edges that connect selected nodes (even if not explicitly selected)
+    const allEdges = graph.getModel().getEdges();
+    console.log('All edges in graph:', allEdges.length);
+    console.log('Sample edges:', allEdges.slice(0, 3).map(e => ({ 
+      id: e.id, 
+      source: e.source ? e.source.id : null, 
+      target: e.target ? e.target.id : null,
+      vertex: e.vertex,
+      edge: e.edge
+    })));
+    
+    const connectingEdges = allEdges.filter(edge => {
+      const sourceId = edge.source ? edge.source.id : null;
+      const targetId = edge.target ? edge.target.id : null;
+      const connectsSelected = selectedNodeIds.has(sourceId) && selectedNodeIds.has(targetId);
+      if (connectsSelected) {
+        console.log('Found connecting edge:', edge.id, 'from', sourceId, 'to', targetId);
+      }
+      return connectsSelected;
+    });
+    
+    // Debug logging for edge detection
+    console.log('Selected nodes:', Array.from(selectedNodeIds));
+    console.log('All edges in graph:', allEdges.length);
+    console.log('Connecting edges found:', connectingEdges.length);
+    console.log('Explicitly selected edges:', edges.length);
+    
+    // Combine explicitly selected edges with connecting edges
+    const allSelectedEdges = new Set([...edges, ...connectingEdges]);
+    edges = Array.from(allSelectedEdges);
+    
+    // Calculate the bounding box of all selected nodes to determine the center
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    nodes.forEach(cell => {
+      if (cell.geometry) {
+        minX = Math.min(minX, cell.geometry.x);
+        minY = Math.min(minY, cell.geometry.y);
+        maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
+        maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
+      }
+    });
+    
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    
+    // Create a map of old IDs to new IDs for edge reconstruction
+    const idMap = {};
+    const newIds = [];
+    
+    // Prepare node data with relative positioning
+    const nodeData = nodes.map(cell => {
+      const cellData = {};
+      
+      // Only copy specific properties we need, avoiding circular references
+      const safeProperties = [
+        'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
+        '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
+        '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
+              '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
+      '_checklistText', '_alertText', '_pdfUrl', '_priceId'
+      ];
+      
+      safeProperties.forEach(prop => {
+        if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
+          cellData[prop] = cell[prop];
+        }
+      });
+      
+      // Store the original ID for edge mapping
+      const originalId = cell.id;
+      const newId = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + newIds.length;
+      idMap[originalId] = newId;
+      newIds.push(newId);
+      cellData.originalId = originalId;
+      cellData.newId = newId;
+      
+      // Calculate relative position from center
+      if (cell.geometry) {
+        cellData.geometry = {
+          x: cell.geometry.x - centerX,
+          y: cell.geometry.y - centerY,
+          width: cell.geometry.width,
+          height: cell.geometry.height
+        };
+      }
+      return cellData;
+    });
+    
+    // Prepare edge data with updated source/target IDs
+    const edgeData = edges.map(cell => {
+      const cellData = {};
+      
+      // Only copy specific edge properties we need, avoiding circular references
+      const safeEdgeProperties = [
+        'id', 'value', 'style', 'geometry'
+      ];
+      
+      safeEdgeProperties.forEach(prop => {
+        if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
+          cellData[prop] = cell[prop];
+        }
+      });
+      
+      // Update source and target IDs to use the new node IDs
+      if (cell.source && idMap[cell.source.id]) {
+        cellData.sourceId = idMap[cell.source.id];
+      }
+      if (cell.target && idMap[cell.target.id]) {
+        cellData.targetId = idMap[cell.target.id];
+      }
+      
+      return cellData;
+    });
+    
+    console.log('Copy operation - Nodes:', nodes.length, 'Edges found:', edges.length, 'Edge data:', edgeData.length);
+    
+    // Collect section preferences from the copied nodes
+    const copiedSectionPrefs = {};
+    nodes.forEach(cell => {
+      const section = cell.section || "1";
+      if (sectionPrefs[section]) {
+        copiedSectionPrefs[section] = {
+          name: sectionPrefs[section].name,
+          borderColor: sectionPrefs[section].borderColor
+        };
+      }
+    });
+    
+    // Create the complete clipboard data
+    const clipboardData = {
+      nodes: nodeData,
+      edges: edgeData,
+      centerX: centerX,
+      centerY: centerY,
+      isMultiCopy: true,
+      sectionPrefs: copiedSectionPrefs
+    };
+    
+    const jsonData = JSON.stringify(clipboardData);
+    const timestamp = Date.now();
+    
+    // Store in localStorage for cross-tab functionality
+    localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, jsonData);
+    localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
+    
+    // Also keep in memory for same-tab functionality
+    flowchartClipboard = jsonData;
+    
+    // Copy to system clipboard as well
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(jsonData).then(() => {
+        console.log('Nodes copied to clipboard and localStorage');
+      }).catch(err => {
+        console.log('Failed to copy to system clipboard:', err);
+      });
+    }
+    
+    // Show feedback to user
+    const nodeCount = nodes.length;
+    const edgeCount = edges.length;
+    showCopyFeedback(nodeCount, edgeCount);
+  } catch (error) {
+    console.error('Error in copySelectedNodeAsJson:', error);
+    throw error;
+  }
+}
+
+function pasteNodeFromJson(x, y) {
+  // Try to get data from localStorage first (for cross-tab functionality)
+  let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
+  let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
+  
+  // If no localStorage data, fall back to memory clipboard
+  if (!clipboardData && flowchartClipboard) {
+    clipboardData = flowchartClipboard;
+  }
+  
+  if (!clipboardData) {
+    // Try to get from system clipboard as last resort
+    navigator.clipboard.readText().then(text => {
+      try {
+        JSON.parse(text); // Validate it's JSON
+        pasteNodeFromJsonData(text, x, y);
+      } catch (e) {
+        alert("No valid node data found in clipboard");
+      }
+    }).catch(err => {
+      alert("No node data found to paste");
+    });
+    return;
+  }
+  
+  pasteNodeFromJsonData(clipboardData, x, y);
+}
+
+function pasteNodeFromJsonData(clipboardData, x, y) {
+  let data;
+  try {
+    data = JSON.parse(clipboardData);
+  } catch (e) {
+    alert("Clipboard data is invalid");
+    return;
+  }
+  
+  const parent = graph.getDefaultParent();
+  graph.getModel().beginUpdate();
+  
+  try {
+    // Handle new multi-copy format
+    if (data.isMultiCopy && data.nodes) {
+      // Use provided position or default to center of viewport
+      const pasteX = typeof x === "number" ? x : (data.centerX || 100);
+      const pasteY = typeof y === "number" ? y : (data.centerY || 100);
+      
+      // Create a map to store new cell instances
+      const newCells = {};
+      
+      // First, create all nodes
+      data.nodes.forEach((nodeData) => {
+        // Calculate absolute position based on relative position and paste location
+        const absX = pasteX + (nodeData.geometry?.x || 0);
+        const absY = pasteY + (nodeData.geometry?.y || 0);
         
-        legacyData.forEach((cellData, idx) => {
-          // Assign a new ID
-          cellData.id = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + idx;
-          // Offset geometry for each pasted node
-          let dx = 40 * idx;
-          let dy = 40 * idx;
-          let px = (typeof x === "number" ? x : (cellData.geometry?.x || 100)) + dx;
-          let py = (typeof y === "number" ? y : (cellData.geometry?.y || 100)) + dy;
-          const geo = new mxGeometry(px, py, cellData.geometry?.width || 160, cellData.geometry?.height || 80);
-          const newCell = new mxCell(cellData.value, geo, cellData.style);
-          newCell.vertex = true;
-          // Copy custom fields
-          ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
-            if (cellData[k] !== undefined) newCell[k] = cellData[k];
-          });
-          // Section
-          if (cellData.section !== undefined) newCell.section = cellData.section;
-          // Insert into graph
-          graph.addCell(newCell, parent);
-          // If image option, update rendering
-          if (getQuestionType(newCell) === "imageOption") {
-            updateImageOptionCell(newCell);
-          } else if (getQuestionType(newCell) === "notesNode") {
-            updateNotesNodeCell(newCell);
-          } else if (getQuestionType(newCell) === "checklistNode") {
-            updateChecklistNodeCell(newCell);
-          } else if (getQuestionType(newCell) === "alertNode") {
-            updateAlertNodeCell(newCell);
-          } else if (isPdfNode(newCell)) {
-            updatePdfNodeCell(newCell);
-          } else if (isOptions(newCell)) {
-            refreshOptionNodeId(newCell);
-          } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
+        const geo = new mxGeometry(
+          absX, 
+          absY, 
+          nodeData.geometry?.width || 160, 
+          nodeData.geometry?.height || 80
+        );
+        
+        const newCell = new mxCell(nodeData.value, geo, nodeData.style);
+        newCell.vertex = true;
+        newCell.id = nodeData.newId;
+        
+        // Copy custom fields
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+          if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
+        });
+        
+        // Section
+        if (nodeData.section !== undefined) newCell.section = nodeData.section;
+        
+        // Insert into graph
+        graph.addCell(newCell, parent);
+        newCells[nodeData.newId] = newCell;
+        
+        // Update rendering for special node types
+        if (getQuestionType(newCell) === "imageOption") {
+          updateImageOptionCell(newCell);
+        } else if (getQuestionType(newCell) === "notesNode") {
+          updateNotesNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "checklistNode") {
+          updateChecklistNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "alertNode") {
+          updateAlertNodeCell(newCell);
+        } else if (isPdfNode(newCell)) {
+          updatePdfNodeCell(newCell);
+        } else if (isOptions(newCell)) {
+          refreshOptionNodeId(newCell);
+        } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
+          if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+        }
+      });
+      
+      // Then, create all edges
+      if (data.edges) {
+        console.log('Paste operation - Creating', data.edges.length, 'edges');
+        data.edges.forEach((edgeData, index) => {
+          const sourceCell = newCells[edgeData.sourceId];
+          const targetCell = newCells[edgeData.targetId];
+          
+          if (sourceCell && targetCell) {
+            // Use the proper insertEdge method instead of manual creation
+            const newEdge = graph.insertEdge(parent, null, edgeData.value || "", sourceCell, targetCell, edgeData.style);
+            
+            // Apply current edge style if no style is provided
+            if (!edgeData.style || edgeData.style === "") {
+              let edgeStyle;
+              if (currentEdgeStyle === 'curved') {
+                edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+              } else if (currentEdgeStyle === 'straight') {
+                edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+              } else if (currentEdgeStyle === 'direct') {
+                edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+              } else {
+                edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+              }
+              graph.getModel().setStyle(newEdge, edgeStyle);
+            }
+            
+            // Copy edge properties if they exist
+            if (edgeData.geometry) {
+              newEdge.geometry = new mxGeometry(
+                edgeData.geometry.x || 0,
+                edgeData.geometry.y || 0,
+                edgeData.geometry.width || 0,
+                edgeData.geometry.height || 0
+              );
+            }
+            
+            console.log('Edge created successfully:', newEdge.id);
+          } else {
+            console.log('Failed to create edge - missing source or target');
+          }
+        });
+      } else {
+        console.log('No edges data found in clipboard');
+      }
+      
+      // Merge section preferences from clipboard with current ones
+      if (data.sectionPrefs) {
+        Object.keys(data.sectionPrefs).forEach(sectionNum => {
+          const clipboardSection = data.sectionPrefs[sectionNum];
+          // Always use the clipboard section data (prioritize updated names)
+          sectionPrefs[sectionNum] = {
+            name: clipboardSection.name,
+            borderColor: clipboardSection.borderColor
+          };
+        });
+        
+        // Update the section legend to reflect the new sections
+        if (typeof updateSectionLegend === 'function') {
+          updateSectionLegend();
+        }
+      }
+      
+      // Show feedback with counts
+      const nodeCount = data.nodes.length;
+      const edgeCount = data.edges ? data.edges.length : 0;
+      showPasteFeedback(nodeCount, edgeCount);
+      
+    } else {
+      // Handle legacy single-node format (backward compatibility)
+      let legacyData = Array.isArray(data) ? data : [data];
+      
+      legacyData.forEach((cellData, idx) => {
+        // Assign a new ID
+        cellData.id = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + idx;
+        // Offset geometry for each pasted node
+        let dx = 40 * idx;
+        let dy = 40 * idx;
+        let px = (typeof x === "number" ? x : (cellData.geometry?.x || 100)) + dx;
+        let py = (typeof y === "number" ? y : (cellData.geometry?.y || 100)) + dy;
+        const geo = new mxGeometry(px, py, cellData.geometry?.width || 160, cellData.geometry?.height || 80);
+        const newCell = new mxCell(cellData.value, geo, cellData.style);
+        newCell.vertex = true;
+        // Copy custom fields
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+          if (cellData[k] !== undefined) newCell[k] = cellData[k];
+        });
+        // Section
+        if (cellData.section !== undefined) newCell.section = cellData.section;
+        // Insert into graph
+        graph.addCell(newCell, parent);
+        // If image option, update rendering
+        if (getQuestionType(newCell) === "imageOption") {
+          updateImageOptionCell(newCell);
+        } else if (getQuestionType(newCell) === "notesNode") {
+          updateNotesNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "checklistNode") {
+          updateChecklistNodeCell(newCell);
+        } else if (getQuestionType(newCell) === "alertNode") {
+          updateAlertNodeCell(newCell);
+        } else if (isPdfNode(newCell)) {
+          updatePdfNodeCell(newCell);
+        } else if (isOptions(newCell)) {
+          refreshOptionNodeId(newCell);
+        } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           // FIRST OCCURRENCE - Calculation node copy/paste now handled by calc.js
           if (typeof window.handleCalculationNodeCopyPaste === "function") {
             window.handleCalculationNodeCopyPaste(newCell);
           }
-          }
+        }
+      });
+      
+      // Merge section preferences from clipboard with current ones (for legacy format)
+      if (data.sectionPrefs) {
+        Object.keys(data.sectionPrefs).forEach(sectionNum => {
+          const clipboardSection = data.sectionPrefs[sectionNum];
+          // Always use the clipboard section data (prioritize updated names)
+          sectionPrefs[sectionNum] = {
+            name: clipboardSection.name,
+            borderColor: clipboardSection.borderColor
+          };
         });
         
-        // Merge section preferences from clipboard with current ones (for legacy format)
-        if (data.sectionPrefs) {
-          Object.keys(data.sectionPrefs).forEach(sectionNum => {
-            const clipboardSection = data.sectionPrefs[sectionNum];
-            // Always use the clipboard section data (prioritize updated names)
-            sectionPrefs[sectionNum] = {
-              name: clipboardSection.name,
-              borderColor: clipboardSection.borderColor
-            };
-          });
-          
-          // Update the section legend to reflect the new sections
-          if (typeof updateSectionLegend === 'function') {
-            updateSectionLegend();
-          }
+        // Update the section legend to reflect the new sections
+        if (typeof updateSectionLegend === 'function') {
+          updateSectionLegend();
         }
-        
-        showPasteFeedback(legacyData.length, 0);
       }
       
-    } finally {
-      graph.getModel().endUpdate();
+      showPasteFeedback(legacyData.length, 0);
     }
     
-    refreshAllCells();
+  } finally {
+    graph.getModel().endUpdate();
   }
   
-  // Add visual feedback for copy/paste operations
-  function showCopyFeedback(nodeCount = 1, edgeCount = 0) {
-    const feedback = document.createElement('div');
-    let message = '';
-    if (nodeCount === 1 && edgeCount === 0) {
-      message = 'Node copied! Available in other tabs.';
-    } else if (nodeCount > 1 && edgeCount === 0) {
-      message = `${nodeCount} nodes copied! Available in other tabs.`;
-    } else if (nodeCount > 1 && edgeCount > 0) {
-      message = `${nodeCount} nodes and ${edgeCount} connections copied! Available in other tabs.`;
-    } else {
-      message = 'Selection copied! Available in other tabs.';
-    }
-    
-    feedback.textContent = message;
-    feedback.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #4CAF50;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 14px;
-      z-index: 10000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      animation: slideIn 0.3s ease-out;
-    `;
-    
-    document.body.appendChild(feedback);
-    
-    setTimeout(() => {
-      feedback.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => feedback.remove(), 300);
-    }, 2000);
+  refreshAllCells();
+}
+
+// Add visual feedback for copy/paste operations
+function showCopyFeedback(nodeCount = 1, edgeCount = 0) {
+  const feedback = document.createElement('div');
+  let message = '';
+  if (nodeCount === 1 && edgeCount === 0) {
+    message = 'Node copied! Available in other tabs.';
+  } else if (nodeCount > 1 && edgeCount === 0) {
+    message = `${nodeCount} nodes copied! Available in other tabs.`;
+  } else if (nodeCount > 1 && edgeCount > 0) {
+    message = `${nodeCount} nodes and ${edgeCount} connections copied! Available in other tabs.`;
+  } else {
+    message = 'Selection copied! Available in other tabs.';
   }
   
-  function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
-    const feedback = document.createElement('div');
-    let message = '';
-    if (nodeCount === 1 && edgeCount === 0) {
-      message = 'Node pasted successfully!';
-    } else if (nodeCount > 1 && edgeCount === 0) {
-      message = `${nodeCount} nodes pasted successfully!`;
-    } else if (nodeCount > 1 && edgeCount > 0) {
-      message = `${nodeCount} nodes and ${edgeCount} connections pasted successfully!`;
-    } else {
-      message = 'Selection pasted successfully!';
-    }
-    
-    feedback.textContent = message;
-    feedback.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #2196F3;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 14px;
-      z-index: 10000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      animation: slideIn 0.3s ease-out;
-    `;
-    
-    document.body.appendChild(feedback);
-    
-    setTimeout(() => {
-      feedback.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => feedback.remove(), 300);
-    }, 2000);
+  feedback.textContent = message;
+  feedback.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  document.body.appendChild(feedback);
+  
+  setTimeout(() => {
+    feedback.style.animation = 'slideOut 0.3s ease-in';
+    setTimeout(() => feedback.remove(), 300);
+  }, 2000);
+}
+
+function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
+  const feedback = document.createElement('div');
+  let message = '';
+  if (nodeCount === 1 && edgeCount === 0) {
+    message = 'Node pasted successfully!';
+  } else if (nodeCount > 1 && edgeCount === 0) {
+    message = `${nodeCount} nodes pasted successfully!`;
+  } else if (nodeCount > 1 && edgeCount > 0) {
+    message = `${nodeCount} nodes and ${edgeCount} connections pasted successfully!`;
+  } else {
+    message = 'Selection pasted successfully!';
   }
   
-  // CSS animations are now in style.css
+  feedback.textContent = message;
+  feedback.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #2196F3;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+  `;
   
-  // Listen for storage events to detect when data is copied in other tabs
-  window.addEventListener('storage', function(e) {
-    if (e.key === FLOWCHART_CLIPBOARD_KEY && e.newValue) {
-      // Update the memory clipboard when data is copied in another tab
-      flowchartClipboard = e.newValue;
-      console.log('Node data updated from another tab');
-    }
-  });
+  document.body.appendChild(feedback);
   
-  
-  
-  // --- UPDATE IMAGE OPTION NODE ---
-  function updateImageOptionCell(cell) {
-    if (!cell || !isOptions(cell) || getQuestionType(cell) !== "imageOption") return;
-    // Ensure _image property exists
-    if (!cell._image) {
-      cell._image = { url: "", width: "100", height: "100" };
-    }
-    let imgUrl = cell._image.url || "";
-    let imgWidth = cell._image.width || "100";
-    let imgHeight = cell._image.height || "100";
-  
-    // --- FOCUS PRESERVATION PATCH ---
-    // Find the currently focused input (if any) and its cursor position
-    let focusField = null, cursorPos = null, selectionEnd = null;
-    const active = document.activeElement;
-    if (active && active.tagName === 'INPUT' && active.type === 'text' || active.type === 'number') {
-      if (active.parentElement && active.parentElement.textContent.startsWith('URL')) focusField = 'url';
-      else if (active.parentElement && active.parentElement.textContent.startsWith('Width')) focusField = 'width';
-      else if (active.parentElement && active.parentElement.textContent.startsWith('Height')) focusField = 'height';
-      if (focusField) {
-        cursorPos = active.selectionStart;
-        selectionEnd = active.selectionEnd;
-      }
-    }
-  
-    // Render image preview and three textboxes
-    const html = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
-        <img src="${imgUrl}" alt="Image Preview" style="max-width:${imgWidth}px;max-height:${imgHeight}px;object-fit:contain;margin-bottom:8px;border:1px solid #ccc;background:#fff;" onerror="this.style.opacity=0.2" />
-        <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
-          <label style="font-size:12px;width:100%;text-align:left;">URL:<input type="text" value="${escapeAttr(imgUrl)}" style="width:120px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','url',this.value)" /></label>
-          <label style="font-size:12px;width:100%;text-align:left;">Width:<input type="number" min="1" value="${escapeAttr(imgWidth)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','width',this.value)" /></label>
-          <label style="font-size:12px;width:100%;text-align:left;">Height:<input type="number" min="1" value="${escapeAttr(imgHeight)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','height',this.value)" /></label>
-        </div>
-      </div>
-    `;
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
-  
-    // --- RESTORE FOCUS AND CURSOR POSITION ---
+  setTimeout(() => {
+    feedback.style.animation = 'slideOut 0.3s ease-in';
+    setTimeout(() => feedback.remove(), 300);
+  }, 2000);
+}
+
+// CSS animations are now in style.css
+
+// Listen for storage events to detect when data is copied in other tabs
+window.addEventListener('storage', function(e) {
+  if (e.key === FLOWCHART_CLIPBOARD_KEY && e.newValue) {
+    // Update the memory clipboard when data is copied in another tab
+    flowchartClipboard = e.newValue;
+    console.log('Node data updated from another tab');
+  }
+});
+
+
+
+// --- UPDATE IMAGE OPTION NODE ---
+function updateImageOptionCell(cell) {
+  if (!cell || !isOptions(cell) || getQuestionType(cell) !== "imageOption") return;
+  // Ensure _image property exists
+  if (!cell._image) {
+    cell._image = { url: "", width: "100", height: "100" };
+  }
+  let imgUrl = cell._image.url || "";
+  let imgWidth = cell._image.width || "100";
+  let imgHeight = cell._image.height || "100";
+
+  // --- FOCUS PRESERVATION PATCH ---
+  // Find the currently focused input (if any) and its cursor position
+  let focusField = null, cursorPos = null, selectionEnd = null;
+  const active = document.activeElement;
+  if (active && active.tagName === 'INPUT' && active.type === 'text' || active.type === 'number') {
+    if (active.parentElement && active.parentElement.textContent.startsWith('URL')) focusField = 'url';
+    else if (active.parentElement && active.parentElement.textContent.startsWith('Width')) focusField = 'width';
+    else if (active.parentElement && active.parentElement.textContent.startsWith('Height')) focusField = 'height';
     if (focusField) {
-      setTimeout(() => {
-        // Find the correct input in the newly rendered node
-        const state = graph.view.getState(cell);
-        if (state && state.text && state.text.node) {
-          let input = null;
-          if (focusField === 'url') {
-            input = state.text.node.querySelector('input[type="text"]');
-          } else if (focusField === 'width') {
-            input = state.text.node.querySelectorAll('input[type="number"]')[0];
-          } else if (focusField === 'height') {
-            input = state.text.node.querySelectorAll('input[type="number"]')[1];
-          }
-          if (input) {
-            input.focus();
-            if (cursorPos !== null && selectionEnd !== null) {
-              input.setSelectionRange(cursorPos, selectionEnd);
-            }
+      cursorPos = active.selectionStart;
+      selectionEnd = active.selectionEnd;
+    }
+  }
+
+  // Render image preview and three textboxes
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
+      <img src="${imgUrl}" alt="Image Preview" style="max-width:${imgWidth}px;max-height:${imgHeight}px;object-fit:contain;margin-bottom:8px;border:1px solid #ccc;background:#fff;" onerror="this.style.opacity=0.2" />
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
+        <label style="font-size:12px;width:100%;text-align:left;">URL:<input type="text" value="${escapeAttr(imgUrl)}" style="width:120px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','url',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Width:<input type="number" min="1" value="${escapeAttr(imgWidth)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','width',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Height:<input type="number" min="1" value="${escapeAttr(imgHeight)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','height',this.value)" /></label>
+      </div>
+    </div>
+  `;
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+
+  // --- RESTORE FOCUS AND CURSOR POSITION ---
+  if (focusField) {
+    setTimeout(() => {
+      // Find the correct input in the newly rendered node
+      const state = graph.view.getState(cell);
+      if (state && state.text && state.text.node) {
+        let input = null;
+        if (focusField === 'url') {
+          input = state.text.node.querySelector('input[type="text"]');
+        } else if (focusField === 'width') {
+          input = state.text.node.querySelectorAll('input[type="number"]')[0];
+        } else if (focusField === 'height') {
+          input = state.text.node.querySelectorAll('input[type="number"]')[1];
+        }
+        if (input) {
+          input.focus();
+          if (cursorPos !== null && selectionEnd !== null) {
+            input.setSelectionRange(cursorPos, selectionEnd);
           }
         }
-      }, 0);
-    }
+      }
+    }, 0);
+  }
+}
+
+// Handler for updating image node fields
+window.updateImageNodeField = function(cellId, field, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "imageOption") return;
+  if (!cell._image) cell._image = { url: "", width: "100", height: "100" };
+  if (field === "width" || field === "height") {
+    // Only allow positive integers
+    value = String(Math.max(1, parseInt(value) || 1));
+  }
+  cell._image[field] = value;
+  updateImageOptionCell(cell);
+};
+
+// PDF Node functions
+function isPdfNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=pdfNode");
+}
+
+function updatePdfNodeCell(cell) {
+  if (!cell || !isPdfNode(cell)) return;
+  
+  // Ensure _pdfUrl property exists
+  if (!cell._pdfUrl) {
+    cell._pdfUrl = "";
   }
   
-  // Handler for updating image node fields
-  window.updateImageNodeField = function(cellId, field, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || getQuestionType(cell) !== "imageOption") return;
-    if (!cell._image) cell._image = { url: "", width: "100", height: "100" };
-    if (field === "width" || field === "height") {
-      // Only allow positive integers
-      value = String(Math.max(1, parseInt(value) || 1));
-    }
-    cell._image[field] = value;
-    updateImageOptionCell(cell);
-  };
-  
-  // PDF Node functions
-  function isPdfNode(cell) {
-    return cell && cell.style && cell.style.includes("nodeType=pdfNode");
+  // Ensure _priceId property exists
+  if (!cell._priceId) {
+    cell._priceId = "";
   }
-  
-  function updatePdfNodeCell(cell) {
-    if (!cell || !isPdfNode(cell)) return;
-    
-    // Ensure _pdfUrl property exists
-    if (!cell._pdfUrl) {
-      cell._pdfUrl = "";
-    }
-    
-    // Ensure _priceId property exists
-    if (!cell._priceId) {
-      cell._priceId = "";
-    }
-    
+
     // Ensure _characterLimit property exists
     if (!cell._characterLimit) {
       cell._characterLimit = "";
@@ -3797,10 +3797,10 @@
     
     // Render PDF input field with Price ID field and optional Character Limit field
     let html = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
-        <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:2px;">
-          <label style="font-size:11px;width:100%;text-align:left;">PDF:<input type="text" value="${escapeAttr(cell._pdfUrl)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfNodeField('${cell.id}',this.value)" /></label>
-          <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:2px;">
+        <label style="font-size:11px;width:100%;text-align:left;">PDF:<input type="text" value="${escapeAttr(cell._pdfUrl)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfNodeField('${cell.id}',this.value)" /></label>
+        <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
     `;
     
     // Add Character Limit field if connected to Big Paragraph
@@ -3811,34 +3811,34 @@
     }
     
     html += `
-        </div>
       </div>
-    `;
-    
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, html);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
+    </div>
+  `;
+  
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
   }
-  
-  // Handler for updating PDF node field
-  window.updatePdfNodeField = function(cellId, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || !isPdfNode(cell)) return;
-    cell._pdfUrl = value;
-    // Don't call updatePdfNodeCell here to avoid re-rendering while typing
-  };
-  
-  // Handler for updating PDF Price ID field
-  window.updatePdfPriceIdField = function(cellId, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || !isPdfNode(cell)) return;
-    cell._priceId = value;
-    // Don't call updatePdfNodeCell here to avoid re-rendering while typing
-  };
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating PDF node field
+window.updatePdfNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isPdfNode(cell)) return;
+  cell._pdfUrl = value;
+  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+};
+
+// Handler for updating PDF Price ID field
+window.updatePdfPriceIdField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isPdfNode(cell)) return;
+  cell._priceId = value;
+  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+};
   
   // Handler for updating PDF Character Limit field
   window.updatePdfCharacterLimitField = function(cellId, value) {
@@ -3868,765 +3868,765 @@
     
     return false;
   }
+
+// Notes Node functions
+function isNotesNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=notesNode");
+}
+
+function updateNotesNodeCell(cell) {
+  if (!cell || !isNotesNode(cell)) return;
   
-  // Notes Node functions
-  function isNotesNode(cell) {
-    return cell && cell.style && cell.style.includes("questionType=notesNode");
+  // Ensure _notesText property exists
+  if (!cell._notesText) {
+    cell._notesText = "Notes text";
   }
-  
-  function updateNotesNodeCell(cell) {
-    if (!cell || !isNotesNode(cell)) return;
-    
-    // Ensure _notesText property exists
-    if (!cell._notesText) {
-      cell._notesText = "Notes text";
-    }
-  
-    const size = parseInt(cell._notesFontSize, 10) || 14;
-    const isBold = !!cell._notesBold;
-    const text = escapeHtml(cell._notesText || "Notes text");
-  
-    // Inline styles so they win against theme CSS
-    const html =
-      `<div class="notes-body" style="font-size:${size}px !important;` +
-      `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:left;">` +
-      `${text}</div>`;
-  
-    graph.getModel().beginUpdate();
-    try {
-      // Render HTML
-      graph.getModel().setValue(cell, html);
-  
-      // Also set mxGraph container fontSize to match
-      let st = cell.style || "";
-      st = st.replace(/fontSize=\d+;?/, "");
-      st += `fontSize=${size};`;
-      graph.getModel().setStyle(cell, st);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-  
-    colorCell(cell);          // keep your border and fill logic
-    graph.updateCellSize(cell);
+
+  const size = parseInt(cell._notesFontSize, 10) || 14;
+  const isBold = !!cell._notesBold;
+  const text = escapeHtml(cell._notesText || "Notes text");
+
+  // Inline styles so they win against theme CSS
+  const html =
+    `<div class="notes-body" style="font-size:${size}px !important;` +
+    `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:left;">` +
+    `${text}</div>`;
+
+  graph.getModel().beginUpdate();
+  try {
+    // Render HTML
+    graph.getModel().setValue(cell, html);
+
+    // Also set mxGraph container fontSize to match
+    let st = cell.style || "";
+    st = st.replace(/fontSize=\d+;?/, "");
+    st += `fontSize=${size};`;
+    graph.getModel().setStyle(cell, st);
+  } finally {
+    graph.getModel().endUpdate();
   }
+
+  colorCell(cell);          // keep your border and fill logic
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating notes node field (called when user finishes editing)
+window.updateNotesNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isNotesNode(cell)) return;
+  cell._notesText = value;
+  // Update the cell with proper formatting
+  updateNotesNodeCell(cell);
+};
+
+// Checklist Node functions
+function isChecklistNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=checklistNode");
+}
+
+function updateChecklistNodeCell(cell) {
+  if (!cell || !isChecklistNode(cell)) return;
   
-  // Handler for updating notes node field (called when user finishes editing)
-  window.updateNotesNodeField = function(cellId, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || !isNotesNode(cell)) return;
-    cell._notesText = value;
-    // Update the cell with proper formatting
-    updateNotesNodeCell(cell);
-  };
-  
-  // Checklist Node functions
-  function isChecklistNode(cell) {
-    return cell && cell.style && cell.style.includes("questionType=checklistNode");
+  // Ensure _checklistText property exists
+  if (!cell._checklistText) {
+    cell._checklistText = "Checklist text";
   }
-  
-  function updateChecklistNodeCell(cell) {
-    if (!cell || !isChecklistNode(cell)) return;
-    
-    // Ensure _checklistText property exists
-    if (!cell._checklistText) {
-      cell._checklistText = "Checklist text";
-    }
-  
-    // Set the cell value directly to the checklist text
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, cell._checklistText);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
+
+  // Set the cell value directly to the checklist text
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, cell._checklistText);
+  } finally {
+    graph.getModel().endUpdate();
   }
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating checklist node field (called when user finishes editing)
+window.updateChecklistNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isChecklistNode(cell)) return;
+  cell._checklistText = value;
+  // Update the cell value to reflect the new text
+  graph.getModel().setValue(cell, value);
+};
+
+// Alert Node functions
+function isAlertNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=alertNode");
+}
+
+function updateAlertNodeCell(cell) {
+  if (!cell || !isAlertNode(cell)) return;
   
-  // Handler for updating checklist node field (called when user finishes editing)
-  window.updateChecklistNodeField = function(cellId, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || !isChecklistNode(cell)) return;
-    cell._checklistText = value;
-    // Update the cell value to reflect the new text
-    graph.getModel().setValue(cell, value);
-  };
-  
-  // Alert Node functions
-  function isAlertNode(cell) {
-    return cell && cell.style && cell.style.includes("questionType=alertNode");
+  // Ensure _alertText property exists
+  if (!cell._alertText) {
+    cell._alertText = "Alert message";
   }
+
+  // Create the alert node display with editable input field
+  const alertText = cell._alertText;
   
-  function updateAlertNodeCell(cell) {
-    if (!cell || !isAlertNode(cell)) return;
-    
-    // Ensure _alertText property exists
-    if (!cell._alertText) {
-      cell._alertText = "Alert message";
-    }
+  let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
+  htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ ALERT</div>';
+  htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
+  htmlContent += '</div>';
   
-    // Create the alert node display with editable input field
-    const alertText = cell._alertText;
-    
-    let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
-    htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ ALERT</div>';
-    htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
-    htmlContent += '</div>';
-    
-    graph.getModel().beginUpdate();
-    try {
-      graph.getModel().setValue(cell, htmlContent);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, htmlContent);
+  } finally {
+    graph.getModel().endUpdate();
   }
-  
-  // Handler for updating alert node field (called when user finishes editing)
-  window.updateAlertNodeField = function(cellId, value) {
-    const cell = graph.getModel().getCell(cellId);
-    if (!cell || !isAlertNode(cell)) return;
-    cell._alertText = value;
-    // Don't call updateAlertNodeCell here to avoid re-rendering while typing
-  };
-  
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating alert node field (called when user finishes editing)
+window.updateAlertNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isAlertNode(cell)) return;
+  cell._alertText = value;
+  // Don't call updateAlertNodeCell here to avoid re-rendering while typing
+};
+
   // Groups functionality moved to groups.js module
   
 
   
 
-  
-  /**
-   * Settings functionality
-   */
+
+/**
+ * Settings functionality
+ */
   // currentEdgeStyle moved to config.js module
+
+// Show settings menu
+window.showSettingsMenu = function() {
+  const settingsMenu = document.getElementById('settingsMenu');
+  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
   
-  // Show settings menu
-  window.showSettingsMenu = function() {
-    const settingsMenu = document.getElementById('settingsMenu');
-    const edgeStyleToggle = document.getElementById('edgeStyleToggle');
-    
-    // Set current value
-    edgeStyleToggle.value = currentEdgeStyle;
-    
-    // Show menu
-    settingsMenu.classList.add('show');
-  };
+  // Set current value
+  edgeStyleToggle.value = currentEdgeStyle;
   
-  // Hide settings menu
-  function hideSettingsMenu() {
-    const settingsMenu = document.getElementById('settingsMenu');
-    settingsMenu.classList.remove('show');
+  // Show menu
+  settingsMenu.classList.add('show');
+};
+
+// Hide settings menu
+function hideSettingsMenu() {
+  const settingsMenu = document.getElementById('settingsMenu');
+  settingsMenu.classList.remove('show');
+}
+
+// Save settings
+function saveSettings() {
+  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
+  const newEdgeStyle = edgeStyleToggle.value;
+  
+  if (newEdgeStyle !== currentEdgeStyle) {
+    currentEdgeStyle = newEdgeStyle;
+    updateEdgeStyle();
+    saveSettingsToLocalStorage();
   }
   
-  // Save settings
-  function saveSettings() {
-    const edgeStyleToggle = document.getElementById('edgeStyleToggle');
-    const newEdgeStyle = edgeStyleToggle.value;
-    
-    if (newEdgeStyle !== currentEdgeStyle) {
-      currentEdgeStyle = newEdgeStyle;
-      updateEdgeStyle();
-      saveSettingsToLocalStorage();
-    }
-    
-    hideSettingsMenu();
+  hideSettingsMenu();
+}
+
+// Update edge style based on current setting
+function updateEdgeStyle() {
+  // Update graph default edge style
+  if (currentEdgeStyle === 'curved') {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+  } else if (currentEdgeStyle === 'straight') {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+  } else if (currentEdgeStyle === 'direct') {
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.None;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+    graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = false;
   }
   
-  // Update edge style based on current setting
-  function updateEdgeStyle() {
-    // Update graph default edge style
+  // Update existing edges
+  const edges = graph.getChildEdges(graph.getDefaultParent());
+  edges.forEach(edge => {
+    const currentStyle = edge.style || "";
+    let newStyle;
+    
     if (currentEdgeStyle === 'curved') {
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true;
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+      newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
+      newStyle = newStyle.replace(/rounded=0/g, 'rounded=1');
+      if (!newStyle.includes('rounded=')) {
+        newStyle += ';rounded=1';
+      }
+      if (!newStyle.includes('orthogonalLoop=')) {
+        newStyle += ';orthogonalLoop=1';
+      }
     } else if (currentEdgeStyle === 'straight') {
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+      newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
+      newStyle = newStyle.replace(/rounded=1/g, 'rounded=0');
+      if (!newStyle.includes('rounded=')) {
+        newStyle += ';rounded=0';
+      }
+      if (!newStyle.includes('orthogonalLoop=')) {
+        newStyle += ';orthogonalLoop=1';
+      }
     } else if (currentEdgeStyle === 'direct') {
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.None;
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
-      graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = false;
+      newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=none');
+      newStyle = newStyle.replace(/rounded=[^;]+/g, 'rounded=0');
+      newStyle = newStyle.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=0');
+      if (!newStyle.includes('rounded=')) {
+        newStyle += ';rounded=0';
+      }
+      if (!newStyle.includes('orthogonalLoop=')) {
+        newStyle += ';orthogonalLoop=0';
+      }
     }
     
-    // Update existing edges
-    const edges = graph.getChildEdges(graph.getDefaultParent());
-    edges.forEach(edge => {
-      const currentStyle = edge.style || "";
-      let newStyle;
+    graph.getModel().setStyle(edge, newStyle);
+  });
+  
+  // Refresh the display
+  graph.refresh();
+}
+
+// Save settings to localStorage
+function saveSettingsToLocalStorage() {
+  const settings = {
+    edgeStyle: currentEdgeStyle
+  };
+  localStorage.setItem('flowchartSettings', JSON.stringify(settings));
+}
+
+// Load settings from localStorage
+function loadSettingsFromLocalStorage() {
+  const settingsStr = localStorage.getItem('flowchartSettings');
+  if (settingsStr) {
+    try {
+      const settings = JSON.parse(settingsStr);
+      if (settings.edgeStyle) {
+        currentEdgeStyle = settings.edgeStyle;
+        updateEdgeStyle();
+      }
+    } catch (e) {
+      console.error('Error loading settings:', e);
+    }
+  }
+}
+
+/**
+ * Node Search Functionality
+ */
+  // searchTimeout moved to config.js module
+
+// Initialize search functionality
+function initializeSearch() {
+  const searchBox = document.getElementById('nodeSearchBox');
+  const clearBtn = document.getElementById('clearSearchBtn');
+  
+  if (searchBox) {
+    searchBox.addEventListener('input', function() {
+      const searchTerm = this.value.trim().toLowerCase();
       
-      if (currentEdgeStyle === 'curved') {
-        newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
-        newStyle = newStyle.replace(/rounded=0/g, 'rounded=1');
-        if (!newStyle.includes('rounded=')) {
-          newStyle += ';rounded=1';
-        }
-        if (!newStyle.includes('orthogonalLoop=')) {
-          newStyle += ';orthogonalLoop=1';
-        }
-      } else if (currentEdgeStyle === 'straight') {
-        newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
-        newStyle = newStyle.replace(/rounded=1/g, 'rounded=0');
-        if (!newStyle.includes('rounded=')) {
-          newStyle += ';rounded=0';
-        }
-        if (!newStyle.includes('orthogonalLoop=')) {
-          newStyle += ';orthogonalLoop=1';
-        }
-      } else if (currentEdgeStyle === 'direct') {
-        newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=none');
-        newStyle = newStyle.replace(/rounded=[^;]+/g, 'rounded=0');
-        newStyle = newStyle.replace(/orthogonalLoop=[^;]+/g, 'orthogonalLoop=0');
-        if (!newStyle.includes('rounded=')) {
-          newStyle += ';rounded=0';
-        }
-        if (!newStyle.includes('orthogonalLoop=')) {
-          newStyle += ';orthogonalLoop=0';
-        }
+      // Clear previous timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
       }
       
-      graph.getModel().setStyle(edge, newStyle);
+      // Debounce the search to avoid excessive processing
+      searchTimeout = setTimeout(() => {
+        performNodeSearch(searchTerm);
+      }, 200); // Reduced from 300ms for better responsiveness
+      
+      // Show/hide clear button
+      if (searchTerm.length > 0) {
+        clearBtn.classList.add('show');
+      } else {
+        clearBtn.classList.remove('show');
+        clearSearch();
+      }
     });
     
-    // Refresh the display
-    graph.refresh();
-  }
-  
-  // Save settings to localStorage
-  function saveSettingsToLocalStorage() {
-    const settings = {
-      edgeStyle: currentEdgeStyle
-    };
-    localStorage.setItem('flowchartSettings', JSON.stringify(settings));
-  }
-  
-  // Load settings from localStorage
-  function loadSettingsFromLocalStorage() {
-    const settingsStr = localStorage.getItem('flowchartSettings');
-    if (settingsStr) {
-      try {
-        const settings = JSON.parse(settingsStr);
-        if (settings.edgeStyle) {
-          currentEdgeStyle = settings.edgeStyle;
-          updateEdgeStyle();
-        }
-      } catch (e) {
-        console.error('Error loading settings:', e);
-      }
-    }
-  }
-  
-  /**
-   * Node Search Functionality
-   */
-  // searchTimeout moved to config.js module
-  
-  // Initialize search functionality
-  function initializeSearch() {
-    const searchBox = document.getElementById('nodeSearchBox');
-    const clearBtn = document.getElementById('clearSearchBtn');
-    
-    if (searchBox) {
-      searchBox.addEventListener('input', function() {
+    // Handle Enter key to select first result
+    searchBox.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
         const searchTerm = this.value.trim().toLowerCase();
-        
-        // Clear previous timeout
-        if (searchTimeout) {
-          clearTimeout(searchTimeout);
-        }
-        
-        // Debounce the search to avoid excessive processing
-        searchTimeout = setTimeout(() => {
-          performNodeSearch(searchTerm);
-        }, 200); // Reduced from 300ms for better responsiveness
-        
-        // Show/hide clear button
         if (searchTerm.length > 0) {
-          clearBtn.classList.add('show');
-        } else {
-          clearBtn.classList.remove('show');
-          clearSearch();
+          selectFirstSearchResult(searchTerm);
         }
-      });
-      
-      // Handle Enter key to select first result
-      searchBox.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const searchTerm = this.value.trim().toLowerCase();
-          if (searchTerm.length > 0) {
-            selectFirstSearchResult(searchTerm);
-          }
-        }
-      });
-    }
-    
-    if (clearBtn) {
-      clearBtn.addEventListener('click', function() {
-        searchBox.value = '';
-        clearSearch();
-        clearBtn.classList.remove('show');
-        searchBox.focus();
-      });
-    }
+      }
+    });
   }
   
-  // Cache for cell text to avoid repeated DOM operations
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      searchBox.value = '';
+      clearSearch();
+      clearBtn.classList.remove('show');
+      searchBox.focus();
+    });
+  }
+}
+
+// Cache for cell text to avoid repeated DOM operations
   // cellTextCache and lastCacheClear moved to config.js module
+
+// Clear cache periodically to prevent memory leaks
+function clearCellTextCache() {
+  const now = Date.now();
+  if (now - lastCacheClear > 30000) { // Clear every 30 seconds
+    cellTextCache.clear();
+    lastCacheClear = now;
+  }
+}
+
+// Get cell text with caching for performance
+function getCellText(cell) {
+  const cacheKey = `${cell.id}_${cell.value}_${cell._questionText}_${cell._subtitleText}_${cell._infoText}_${cell._notesText}_${cell._checklistText}_${cell._alertText}_${cell._calcTitle}`;
   
-  // Clear cache periodically to prevent memory leaks
-  function clearCellTextCache() {
-    const now = Date.now();
-    if (now - lastCacheClear > 30000) { // Clear every 30 seconds
-      cellTextCache.clear();
-      lastCacheClear = now;
-    }
+  if (cellTextCache.has(cacheKey)) {
+    return cellTextCache.get(cacheKey);
   }
   
-  // Get cell text with caching for performance
-  function getCellText(cell) {
-    const cacheKey = `${cell.id}_${cell.value}_${cell._questionText}_${cell._subtitleText}_${cell._infoText}_${cell._notesText}_${cell._checklistText}_${cell._alertText}_${cell._calcTitle}`;
-    
-    if (cellTextCache.has(cacheKey)) {
-      return cellTextCache.get(cacheKey);
-    }
-    
-    let cellText = '';
-    
-    // Get text from different node types
-    if (isQuestion(cell)) {
-      cellText = cell._questionText || cell.value || '';
-    } else if (isOptions(cell)) {
-      cellText = cell.value || '';
-    } else if (isSubtitleNode(cell)) {
-      cellText = cell._subtitleText || cell.value || '';
-    } else if (isInfoNode(cell)) {
-      cellText = cell._infoText || cell.value || '';
-    } else if (isNotesNode(cell)) {
-      cellText = cell._notesText || cell.value || '';
-    } else if (isChecklistNode(cell)) {
-      cellText = cell._checklistText || cell.value || '';
-    } else if (isAlertNode(cell)) {
-      cellText = cell._alertText || cell.value || '';
-    } else if (isCalculationNode(cell)) {
+  let cellText = '';
+  
+  // Get text from different node types
+  if (isQuestion(cell)) {
+    cellText = cell._questionText || cell.value || '';
+  } else if (isOptions(cell)) {
+    cellText = cell.value || '';
+  } else if (isSubtitleNode(cell)) {
+    cellText = cell._subtitleText || cell.value || '';
+  } else if (isInfoNode(cell)) {
+    cellText = cell._infoText || cell.value || '';
+  } else if (isNotesNode(cell)) {
+    cellText = cell._notesText || cell.value || '';
+  } else if (isChecklistNode(cell)) {
+    cellText = cell._checklistText || cell.value || '';
+  } else if (isAlertNode(cell)) {
+    cellText = cell._alertText || cell.value || '';
+  } else if (isCalculationNode(cell)) {
           // Calculation node text now handled by calc.js
           if (typeof window.getCalculationNodeText === 'function') {
             cellText = window.getCalculationNodeText(cell);
           } else {
-      cellText = cell._calcTitle || cell.value || '';
+    cellText = cell._calcTitle || cell.value || '';
           }
-    } else {
-      cellText = cell.value || '';
-    }
-    
-    // Clean HTML tags from text (only if needed)
-    if (cellText.includes('<')) {
-      const temp = document.createElement('div');
-      temp.innerHTML = cellText;
-      cellText = temp.textContent || temp.innerText || cellText;
-    }
-    
-    cellTextCache.set(cacheKey, cellText);
-    return cellText;
+  } else {
+    cellText = cell.value || '';
   }
   
-  // Perform the actual search with optimizations
-  function performNodeSearch(searchTerm) {
-    if (!searchTerm || searchTerm.length === 0) {
-      clearSearch();
-      return;
-    }
-    
-    // Clear cache periodically
-    clearCellTextCache();
-    
-    const vertices = graph.getChildVertices(graph.getDefaultParent());
-    const matchingCells = [];
-    const searchTermLower = searchTerm.toLowerCase();
-    
-    // Use for...of for better performance with large arrays
-    for (const cell of vertices) {
-      const cellText = getCellText(cell);
-      
-      // Check if search term is found in the text
-      if (cellText.toLowerCase().includes(searchTermLower)) {
-        matchingCells.push(cell);
-      }
-    }
-    
-    // Highlight matching cells
-    highlightSearchResults(matchingCells, searchTerm);
+  // Clean HTML tags from text (only if needed)
+  if (cellText.includes('<')) {
+    const temp = document.createElement('div');
+    temp.innerHTML = cellText;
+    cellText = temp.textContent || temp.innerText || cellText;
   }
   
-  // Highlight search results
-  function highlightSearchResults(matchingCells, searchTerm) {
-    // Clear existing selection first
-    graph.clearSelection();
+  cellTextCache.set(cacheKey, cellText);
+  return cellText;
+}
+
+// Perform the actual search with optimizations
+function performNodeSearch(searchTerm) {
+  if (!searchTerm || searchTerm.length === 0) {
+    clearSearch();
+    return;
+  }
+  
+  // Clear cache periodically
+  clearCellTextCache();
+  
+  const vertices = graph.getChildVertices(graph.getDefaultParent());
+  const matchingCells = [];
+  const searchTermLower = searchTerm.toLowerCase();
+  
+  // Use for...of for better performance with large arrays
+  for (const cell of vertices) {
+    const cellText = getCellText(cell);
     
-    if (matchingCells.length === 0) {
-      return;
-    }
-    
-    // Use the same selection mechanism as section highlighting
-    graph.addSelectionCells(matchingCells);
-    
-    // Show search results count
-    showSearchResultsCount(matchingCells.length);
-    
-    // Center view on first result if there are results
-    if (matchingCells.length > 0) {
-      centerOnCell(matchingCells[0]);
+    // Check if search term is found in the text
+    if (cellText.toLowerCase().includes(searchTermLower)) {
+      matchingCells.push(cell);
     }
   }
   
-  // Clear search highlights
-  function clearSearch() {
-    // Simply clear the selection - this will remove the neon green highlighting
-    graph.clearSelection();
-    
-    // Hide search results count
-    hideSearchResultsCount();
+  // Highlight matching cells
+  highlightSearchResults(matchingCells, searchTerm);
+}
+
+// Highlight search results
+function highlightSearchResults(matchingCells, searchTerm) {
+  // Clear existing selection first
+  graph.clearSelection();
+  
+  if (matchingCells.length === 0) {
+    return;
   }
+  
+  // Use the same selection mechanism as section highlighting
+  graph.addSelectionCells(matchingCells);
   
   // Show search results count
-  function showSearchResultsCount(count) {
-    let countElement = document.getElementById('searchResultsCount');
-    if (!countElement) {
-      countElement = document.createElement('div');
-      countElement.id = 'searchResultsCount';
-      countElement.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #007bff;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        font-size: 14px;
-        z-index: 1000;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      `;
-      document.body.appendChild(countElement);
-    }
-    
-    countElement.textContent = `${count} result${count !== 1 ? 's' : ''} found`;
-    countElement.style.display = 'block';
+  showSearchResultsCount(matchingCells.length);
+  
+  // Center view on first result if there are results
+  if (matchingCells.length > 0) {
+    centerOnCell(matchingCells[0]);
   }
+}
+
+// Clear search highlights
+function clearSearch() {
+  // Simply clear the selection - this will remove the neon green highlighting
+  graph.clearSelection();
   
   // Hide search results count
-  function hideSearchResultsCount() {
-    const countElement = document.getElementById('searchResultsCount');
-    if (countElement) {
-      countElement.style.display = 'none';
+  hideSearchResultsCount();
+}
+
+// Show search results count
+function showSearchResultsCount(count) {
+  let countElement = document.getElementById('searchResultsCount');
+  if (!countElement) {
+    countElement = document.createElement('div');
+    countElement.id = 'searchResultsCount';
+    countElement.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #007bff;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    `;
+    document.body.appendChild(countElement);
+  }
+  
+  countElement.textContent = `${count} result${count !== 1 ? 's' : ''} found`;
+  countElement.style.display = 'block';
+}
+
+// Hide search results count
+function hideSearchResultsCount() {
+  const countElement = document.getElementById('searchResultsCount');
+  if (countElement) {
+    countElement.style.display = 'none';
+  }
+}
+
+// Center view on a specific cell with performance optimization
+function centerOnCell(cell) {
+  if (!cell || !cell.geometry) return;
+  
+  const centerX = cell.geometry.x + cell.geometry.width / 2;
+  const centerY = cell.geometry.y + cell.geometry.height / 2;
+  
+  const containerWidth = graph.container.clientWidth;
+  const containerHeight = graph.container.clientHeight;
+  const scale = graph.view.scale;
+  
+  const tx = (containerWidth / 2 - centerX * scale);
+  const ty = (containerHeight / 2 - centerY * scale);
+  
+  // Batch view updates for better performance
+  graph.view.setTranslate(tx / scale, ty / scale);
+  
+  // Use requestAnimationFrame for smooth scrolling
+  requestAnimationFrame(() => {
+    graph.view.refresh();
+  });
+}
+
+// Select first search result
+function selectFirstSearchResult(searchTerm) {
+  const vertices = graph.getChildVertices(graph.getDefaultParent());
+  const matchingCells = [];
+  const searchTermLower = searchTerm.toLowerCase();
+  
+  // Use for...of for better performance with large arrays
+  for (const cell of vertices) {
+    const cellText = getCellText(cell);
+    
+    if (cellText.toLowerCase().includes(searchTermLower)) {
+      matchingCells.push(cell);
     }
   }
   
-  // Center view on a specific cell with performance optimization
-  function centerOnCell(cell) {
-    if (!cell || !cell.geometry) return;
+  if (matchingCells.length > 0) {
+    // Select the first matching cell
+    graph.getSelectionModel().setCell(matchingCells[0]);
+    centerOnCell(matchingCells[0]);
+  }
+}
+
+// Download flowchart as SVG with padding
+window.downloadFlowchartSvg = function() {
+  try {
+    // Get all cells in the graph
+    const parent = graph.getDefaultParent();
+    const cells = graph.getChildCells(parent, true, true);
     
-    const centerX = cell.geometry.x + cell.geometry.width / 2;
-    const centerY = cell.geometry.y + cell.geometry.height / 2;
+    if (cells.length === 0) {
+      alert("No flowchart content to export");
+      return;
+    }
     
-    const containerWidth = graph.container.clientWidth;
-    const containerHeight = graph.container.clientHeight;
-    const scale = graph.view.scale;
+    // Calculate the bounding box of all cells
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     
-    const tx = (containerWidth / 2 - centerX * scale);
-    const ty = (containerHeight / 2 - centerY * scale);
-    
-    // Batch view updates for better performance
-    graph.view.setTranslate(tx / scale, ty / scale);
-    
-    // Use requestAnimationFrame for smooth scrolling
-    requestAnimationFrame(() => {
-      graph.view.refresh();
+    cells.forEach(cell => {
+      if (cell.geometry) {
+        minX = Math.min(minX, cell.geometry.x);
+        minY = Math.min(minY, cell.geometry.y);
+        maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
+        maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
+      }
     });
-  }
-  
-  // Select first search result
-  function selectFirstSearchResult(searchTerm) {
-    const vertices = graph.getChildVertices(graph.getDefaultParent());
-    const matchingCells = [];
-    const searchTermLower = searchTerm.toLowerCase();
     
-    // Use for...of for better performance with large arrays
-    for (const cell of vertices) {
-      const cellText = getCellText(cell);
-      
-      if (cellText.toLowerCase().includes(searchTermLower)) {
-        matchingCells.push(cell);
-      }
-    }
+    // Add 100px padding around all sides
+    const padding = 100;
+    const width = maxX - minX + (padding * 2);
+    const height = maxY - minY + (padding * 2);
     
-    if (matchingCells.length > 0) {
-      // Select the first matching cell
-      graph.getSelectionModel().setCell(matchingCells[0]);
-      centerOnCell(matchingCells[0]);
-    }
-  }
-  
-  // Download flowchart as SVG with padding
-  window.downloadFlowchartSvg = function() {
-    try {
-      // Get all cells in the graph
-      const parent = graph.getDefaultParent();
-      const cells = graph.getChildCells(parent, true, true);
+    // Create SVG content manually
+    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      <rect width="${width}" height="${height}" fill="white"/>
+      <defs>
+        <style>
+          .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
+          .edge { stroke: #424242; stroke-width: 2; fill: none; }
+        </style>
+      </defs>`;
+    
+    // Helper function to parse style string and extract properties
+    function parseStyle(styleString) {
+      const style = {};
+      if (!styleString) return style;
       
-      if (cells.length === 0) {
-        alert("No flowchart content to export");
-        return;
-      }
-      
-      // Calculate the bounding box of all cells
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      
-      cells.forEach(cell => {
-        if (cell.geometry) {
-          minX = Math.min(minX, cell.geometry.x);
-          minY = Math.min(minY, cell.geometry.y);
-          maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
-          maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
+      const parts = styleString.split(';');
+      parts.forEach(part => {
+        const [key, value] = part.split('=');
+        if (key && value) {
+          style[key.trim()] = value.trim();
         }
       });
+      return style;
+    }
+    
+    // Helper function to get exact node styling
+    function getNodeStyling(cell) {
+      const style = parseStyle(cell.style);
+      const styling = {
+        fillColor: '#e1f5fe',
+        strokeColor: '#01579b',
+        strokeWidth: 2,
+        fontSize: 14,
+        fontFamily: 'Arial, sans-serif',
+        textAlign: 'center',
+        verticalAlign: 'middle',
+        rounded: 10,
+        dashed: false,
+        strokeDasharray: null
+      };
       
-      // Add 100px padding around all sides
-      const padding = 100;
-      const width = maxX - minX + (padding * 2);
-      const height = maxY - minY + (padding * 2);
+      // Get fill color based on node type and preferences
+      if (cell.style && cell.style.includes('nodeType=question')) {
+        const questionType = getQuestionType(cell);
+        if (questionType === 'checkbox') styling.fillColor = colorPreferences.checkbox;
+        else if (questionType === 'dropdown' || questionType === 'text2') styling.fillColor = colorPreferences.dropdown;
+        else if (questionType === 'money' || questionType === 'number') styling.fillColor = colorPreferences.money;
+        else if (questionType === 'date' || questionType === 'dateRange') styling.fillColor = colorPreferences.date;
+        else if (questionType === 'bigParagraph') styling.fillColor = colorPreferences.bigParagraph;
+        else styling.fillColor = colorPreferences.text;
+      } else if (cell.style && cell.style.includes('nodeType=options')) {
+        styling.fillColor = '#ffffff';
+      } else if (cell.style && cell.style.includes('nodeType=end')) {
+        styling.fillColor = '#CCCCCC';
+      } else if (cell.style && cell.style.includes('nodeType=calculation')) {
+        styling.fillColor = '#e1f5fe';
+      }
       
-      // Create SVG content manually
-      let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-        <rect width="${width}" height="${height}" fill="white"/>
-        <defs>
-          <style>
-            .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
-            .edge { stroke: #424242; stroke-width: 2; fill: none; }
-          </style>
-        </defs>`;
+      // Get border color from section preferences
+      const section = getSection(cell);
+      if (section && sectionPrefs[section] && sectionPrefs[section].borderColor) {
+        styling.strokeColor = sectionPrefs[section].borderColor;
+      }
       
-      // Helper function to parse style string and extract properties
-      function parseStyle(styleString) {
-        const style = {};
-        if (!styleString) return style;
-        
-        const parts = styleString.split(';');
-        parts.forEach(part => {
-          const [key, value] = part.split('=');
-          if (key && value) {
-            style[key.trim()] = value.trim();
-          }
+      // Apply style overrides from cell style
+      if (style.fillColor) styling.fillColor = style.fillColor;
+      if (style.strokeColor) styling.strokeColor = style.strokeColor;
+      if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
+      if (style.fontSize) styling.fontSize = parseInt(style.fontSize);
+      if (style.fontFamily) styling.fontFamily = style.fontFamily;
+      if (style.arcSize) styling.rounded = parseInt(style.arcSize);
+      if (style.dashed === '1') styling.dashed = true;
+      if (style.strokeDasharray) styling.strokeDasharray = style.strokeDasharray;
+      
+      return styling;
+    }
+    
+    // Helper function to get exact edge styling
+    function getEdgeStyling(cell) {
+      const style = parseStyle(cell.style);
+      const styling = {
+        strokeColor: '#424242',
+        strokeWidth: 2,
+        edgeStyle: 'orthogonalEdgeStyle',
+        rounded: 1,
+        orthogonalLoop: 1
+      };
+      
+      // Apply style overrides from cell style
+      if (style.strokeColor) styling.strokeColor = style.strokeColor;
+      if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
+      if (style.edgeStyle) styling.edgeStyle = style.edgeStyle;
+      if (style.rounded !== undefined) styling.rounded = parseInt(style.rounded);
+      if (style.orthogonalLoop !== undefined) styling.orthogonalLoop = parseInt(style.orthogonalLoop);
+      
+      return styling;
+    }
+    
+    // Helper function to create edge path based on style
+    function createEdgePath(source, target, edgeStyle, edgeGeometry) {
+      const x1 = source.geometry.x - minX + padding + source.geometry.width / 2;
+      const y1 = source.geometry.y - minY + padding + source.geometry.height / 2;
+      const x2 = target.geometry.x - minX + padding + target.geometry.width / 2;
+      const y2 = target.geometry.y - minY + padding + target.geometry.height / 2;
+      
+      // If edge has custom geometry points, use them
+      if (edgeGeometry && edgeGeometry.points && edgeGeometry.points.length > 0) {
+        let path = `M ${x1} ${y1}`;
+        edgeGeometry.points.forEach(point => {
+          const px = point.x - minX + padding;
+          const py = point.y - minY + padding;
+          path += ` L ${px} ${py}`;
         });
-        return style;
+        path += ` L ${x2} ${y2}`;
+        return path;
       }
       
-      // Helper function to get exact node styling
-      function getNodeStyling(cell) {
-        const style = parseStyle(cell.style);
-        const styling = {
-          fillColor: '#e1f5fe',
-          strokeColor: '#01579b',
-          strokeWidth: 2,
-          fontSize: 14,
-          fontFamily: 'Arial, sans-serif',
-          textAlign: 'center',
-          verticalAlign: 'middle',
-          rounded: 10,
-          dashed: false,
-          strokeDasharray: null
-        };
-        
-        // Get fill color based on node type and preferences
-        if (cell.style && cell.style.includes('nodeType=question')) {
-          const questionType = getQuestionType(cell);
-          if (questionType === 'checkbox') styling.fillColor = colorPreferences.checkbox;
-          else if (questionType === 'dropdown' || questionType === 'text2') styling.fillColor = colorPreferences.dropdown;
-          else if (questionType === 'money' || questionType === 'number') styling.fillColor = colorPreferences.money;
-          else if (questionType === 'date' || questionType === 'dateRange') styling.fillColor = colorPreferences.date;
-          else if (questionType === 'bigParagraph') styling.fillColor = colorPreferences.bigParagraph;
-          else styling.fillColor = colorPreferences.text;
-        } else if (cell.style && cell.style.includes('nodeType=options')) {
-          styling.fillColor = '#ffffff';
-        } else if (cell.style && cell.style.includes('nodeType=end')) {
-          styling.fillColor = '#CCCCCC';
-        } else if (cell.style && cell.style.includes('nodeType=calculation')) {
-          styling.fillColor = '#e1f5fe';
+      // Otherwise create path based on edge style
+      if (edgeStyle === 'orthogonalEdgeStyle') {
+        if (edgeStyle.rounded === 1) {
+          // Curved orthogonal
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          const midX = x1 + dx / 2;
+          const midY = y1 + dy / 2;
+          const controlOffset = Math.min(Math.abs(dx), Math.abs(dy)) * 0.3;
+          return `M ${x1} ${y1} Q ${midX} ${midY - controlOffset} ${x2} ${y2}`;
+        } else {
+          // Straight orthogonal
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          const midX = x1 + dx / 2;
+          const midY = y1 + dy / 2;
+          return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
         }
-        
-        // Get border color from section preferences
-        const section = getSection(cell);
-        if (section && sectionPrefs[section] && sectionPrefs[section].borderColor) {
-          styling.strokeColor = sectionPrefs[section].borderColor;
-        }
-        
-        // Apply style overrides from cell style
-        if (style.fillColor) styling.fillColor = style.fillColor;
-        if (style.strokeColor) styling.strokeColor = style.strokeColor;
-        if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
-        if (style.fontSize) styling.fontSize = parseInt(style.fontSize);
-        if (style.fontFamily) styling.fontFamily = style.fontFamily;
-        if (style.arcSize) styling.rounded = parseInt(style.arcSize);
-        if (style.dashed === '1') styling.dashed = true;
-        if (style.strokeDasharray) styling.strokeDasharray = style.strokeDasharray;
-        
-        return styling;
+      } else if (edgeStyle === 'none') {
+        // Direct line
+        return `M ${x1} ${y1} L ${x2} ${y2}`;
       }
       
-      // Helper function to get exact edge styling
-      function getEdgeStyling(cell) {
-        const style = parseStyle(cell.style);
-        const styling = {
-          strokeColor: '#424242',
-          strokeWidth: 2,
-          edgeStyle: 'orthogonalEdgeStyle',
-          rounded: 1,
-          orthogonalLoop: 1
-        };
-        
-        // Apply style overrides from cell style
-        if (style.strokeColor) styling.strokeColor = style.strokeColor;
-        if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
-        if (style.edgeStyle) styling.edgeStyle = style.edgeStyle;
-        if (style.rounded !== undefined) styling.rounded = parseInt(style.rounded);
-        if (style.orthogonalLoop !== undefined) styling.orthogonalLoop = parseInt(style.orthogonalLoop);
-        
-        return styling;
-      }
-      
-      // Helper function to create edge path based on style
-      function createEdgePath(source, target, edgeStyle, edgeGeometry) {
-        const x1 = source.geometry.x - minX + padding + source.geometry.width / 2;
-        const y1 = source.geometry.y - minY + padding + source.geometry.height / 2;
-        const x2 = target.geometry.x - minX + padding + target.geometry.width / 2;
-        const y2 = target.geometry.y - minY + padding + target.geometry.height / 2;
-        
-        // If edge has custom geometry points, use them
-        if (edgeGeometry && edgeGeometry.points && edgeGeometry.points.length > 0) {
-          let path = `M ${x1} ${y1}`;
-          edgeGeometry.points.forEach(point => {
-            const px = point.x - minX + padding;
-            const py = point.y - minY + padding;
-            path += ` L ${px} ${py}`;
-          });
-          path += ` L ${x2} ${y2}`;
-          return path;
-        }
-        
-        // Otherwise create path based on edge style
-        if (edgeStyle === 'orthogonalEdgeStyle') {
-          if (edgeStyle.rounded === 1) {
-            // Curved orthogonal
-            const dx = x2 - x1;
-            const dy = y2 - y1;
-            const midX = x1 + dx / 2;
-            const midY = y1 + dy / 2;
-            const controlOffset = Math.min(Math.abs(dx), Math.abs(dy)) * 0.3;
-            return `M ${x1} ${y1} Q ${midX} ${midY - controlOffset} ${x2} ${y2}`;
-          } else {
-            // Straight orthogonal
-            const dx = x2 - x1;
-            const dy = y2 - y1;
-            const midX = x1 + dx / 2;
-            const midY = y1 + dy / 2;
-            return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-          }
-        } else if (edgeStyle === 'none') {
-          // Direct line
-          return `M ${x1} ${y1} L ${x2} ${y2}`;
-        }
-        
-        // Default to orthogonal
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const midX = x1 + dx / 2;
-        const midY = y1 + dy / 2;
-        return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-      }
-      
-      // Add edges first (so they appear behind nodes)
-      cells.forEach(cell => {
-        if (cell.edge && cell.source && cell.target) {
-          const source = cell.source;
-          const target = cell.target;
-          
-          if (source.geometry && target.geometry) {
-            const edgeStyling = getEdgeStyling(cell);
-            const pathData = createEdgePath(source, target, edgeStyling.edgeStyle, cell.geometry);
-            
-            // Create arrow marker
-            const markerId = `arrow-${cell.id}`;
-            svgContent += `<defs>
-              <marker id="${markerId}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                <polygon points="0,0 0,6 9,3" fill="${edgeStyling.strokeColor}"/>
-              </marker>
-            </defs>`;
-            
-            // Create edge path
-            const strokeDasharray = edgeStyling.strokeDasharray || 'none';
-            svgContent += `<path d="${pathData}" stroke="${edgeStyling.strokeColor}" stroke-width="${edgeStyling.strokeWidth}" fill="none" marker-end="url(#${markerId})" stroke-dasharray="${strokeDasharray}"/>`;
-          }
-        }
-      });
-      
-      // Add nodes (so they appear on top of edges)
-      cells.forEach(cell => {
-        if (cell.vertex) {
-          const x = cell.geometry.x - minX + padding;
-          const y = cell.geometry.y - minY + padding;
-          const w = cell.geometry.width;
-          const h = cell.geometry.height;
-          
-          const styling = getNodeStyling(cell);
-          
-          // Create rectangle for the node
-          const strokeDasharray = styling.dashed ? '5,5' : 'none';
-          svgContent += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${styling.rounded}" ry="${styling.rounded}" fill="${styling.fillColor}" stroke="${styling.strokeColor}" stroke-width="${styling.strokeWidth}" stroke-dasharray="${strokeDasharray}"/>`;
-          
-          // Add text
-          let text = "";
-          if (cell.value) {
-            // Extract text from HTML if present
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = cell.value;
-            text = tempDiv.textContent || tempDiv.innerText || "";
-          }
-          
-          if (text) {
-            const textX = x + w / 2;
-            const textY = y + h / 2;
-            const textAlign = styling.textAlign === 'center' ? 'middle' : styling.textAlign;
-            const dominantBaseline = styling.verticalAlign === 'middle' ? 'middle' : styling.verticalAlign;
-            
-            svgContent += `<text x="${textX}" y="${textY}" font-family="${styling.fontFamily}" font-size="${styling.fontSize}" text-anchor="${textAlign}" dominant-baseline="${dominantBaseline}" fill="black">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text>`;
-          }
-        }
-      });
-      
-      svgContent += '</svg>';
-      
-      // Download the SVG
-      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'flowchart.svg';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      // Show success notification
-      const notification = document.createElement('div');
-      notification.textContent = 'SVG downloaded successfully!';
-      notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
-      document.body.appendChild(notification);
-      setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 3000);
-      
-    } catch (error) {
-      console.error('Error downloading SVG:', error);
-      alert('Error downloading SVG: ' + error.message);
+      // Default to orthogonal
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const midX = x1 + dx / 2;
+      const midY = y1 + dy / 2;
+      return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
     }
-  };
+    
+    // Add edges first (so they appear behind nodes)
+    cells.forEach(cell => {
+      if (cell.edge && cell.source && cell.target) {
+        const source = cell.source;
+        const target = cell.target;
+        
+        if (source.geometry && target.geometry) {
+          const edgeStyling = getEdgeStyling(cell);
+          const pathData = createEdgePath(source, target, edgeStyling.edgeStyle, cell.geometry);
+          
+          // Create arrow marker
+          const markerId = `arrow-${cell.id}`;
+          svgContent += `<defs>
+            <marker id="${markerId}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+              <polygon points="0,0 0,6 9,3" fill="${edgeStyling.strokeColor}"/>
+            </marker>
+          </defs>`;
+          
+          // Create edge path
+          const strokeDasharray = edgeStyling.strokeDasharray || 'none';
+          svgContent += `<path d="${pathData}" stroke="${edgeStyling.strokeColor}" stroke-width="${edgeStyling.strokeWidth}" fill="none" marker-end="url(#${markerId})" stroke-dasharray="${strokeDasharray}"/>`;
+        }
+      }
+    });
+    
+    // Add nodes (so they appear on top of edges)
+    cells.forEach(cell => {
+      if (cell.vertex) {
+        const x = cell.geometry.x - minX + padding;
+        const y = cell.geometry.y - minY + padding;
+        const w = cell.geometry.width;
+        const h = cell.geometry.height;
+        
+        const styling = getNodeStyling(cell);
+        
+        // Create rectangle for the node
+        const strokeDasharray = styling.dashed ? '5,5' : 'none';
+        svgContent += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${styling.rounded}" ry="${styling.rounded}" fill="${styling.fillColor}" stroke="${styling.strokeColor}" stroke-width="${styling.strokeWidth}" stroke-dasharray="${strokeDasharray}"/>`;
+        
+        // Add text
+        let text = "";
+        if (cell.value) {
+          // Extract text from HTML if present
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = cell.value;
+          text = tempDiv.textContent || tempDiv.innerText || "";
+        }
+        
+        if (text) {
+          const textX = x + w / 2;
+          const textY = y + h / 2;
+          const textAlign = styling.textAlign === 'center' ? 'middle' : styling.textAlign;
+          const dominantBaseline = styling.verticalAlign === 'middle' ? 'middle' : styling.verticalAlign;
+          
+          svgContent += `<text x="${textX}" y="${textY}" font-family="${styling.fontFamily}" font-size="${styling.fontSize}" text-anchor="${textAlign}" dominant-baseline="${dominantBaseline}" fill="black">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text>`;
+        }
+      }
+    });
+    
+    svgContent += '</svg>';
+    
+    // Download the SVG
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'flowchart.svg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    // Show success notification
+    const notification = document.createElement('div');
+    notification.textContent = 'SVG downloaded successfully!';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Error downloading SVG:', error);
+    alert('Error downloading SVG: ' + error.message);
+  }
+};

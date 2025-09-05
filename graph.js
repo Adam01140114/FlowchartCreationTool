@@ -206,11 +206,18 @@ function setupCustomDoubleClickBehavior(graph) {
   // Track clicks to detect double-clicks manually
   let lastClickTime = 0;
   let lastClickedCell = null;
-  const DOUBLE_CLICK_DELAY = 333; // 333ms = one-third of a second
+  const DOUBLE_CLICK_DELAY = 250; // 250ms = quarter of a second
   
   // Add click listener to detect double-clicks
   graph.addListener(mxEvent.CLICK, function(sender, evt) {
     const cell = evt.getProperty('cell');
+    const domEvent = evt.getProperty('event'); // Get the original DOM event
+    
+    // Only process left clicks (button 0), ignore right clicks (button 2)
+    if (domEvent && domEvent.button !== 0) {
+      return;
+    }
+    
     if (cell && cell.vertex) {
       const currentTime = Date.now();
       
@@ -252,6 +259,12 @@ function setupCustomDoubleClickBehavior(graph) {
     console.log("This context:", this);
     console.log("Graph object:", graph);
     console.log("Double-click detected on cell:", cell);
+    
+    // Only process left clicks, ignore right clicks
+    if (evt && evt.button !== undefined && evt.button !== 0) {
+      console.log("Ignoring non-left click (button:", evt.button, ")");
+      return;
+    }
     
     // Show question text popup for question nodes
     if (cell && cell.vertex) {
@@ -467,7 +480,61 @@ function showPropertiesPopup(cell) {
   })();
   
   const nodeId = cell.id || 'N/A';
-  const nodeType = cell.style ? cell.style.split(';')[0] : 'Unknown';
+  
+  // Get actual node type name instead of style string
+  const nodeType = (() => {
+    if (!cell.style) return 'Unknown';
+    
+    // Check for specific node types
+    if (cell.style.includes('nodeType=question')) {
+      // For question nodes, get the specific question type
+      if (typeof window.getQuestionType === 'function') {
+        const questionType = window.getQuestionType(cell);
+        switch(questionType) {
+          case 'text': return 'Textbox';
+          case 'text2': return 'Dropdown';
+          case 'checkbox': return 'Checkbox';
+          case 'number': return 'Number';
+          case 'date': return 'Date';
+          case 'bigParagraph': return 'Big Paragraph';
+          case 'multipleTextboxes': return 'Multiple Textboxes';
+          case 'multipleDropdownType': return 'Multiple Dropdown';
+          case 'dateRange': return 'Date Range';
+          case 'email': return 'Email';
+          case 'phone': return 'Phone';
+          default: return 'Question';
+        }
+      }
+      return 'Question';
+    } else if (cell.style.includes('nodeType=options')) {
+      return 'Option Node';
+    } else if (cell.style.includes('nodeType=end')) {
+      return 'End Node';
+    } else if (cell.style.includes('nodeType=amountOption')) {
+      return 'Amount Option';
+    } else if (cell.style.includes('nodeType=alert')) {
+      return 'Alert Node';
+    } else if (cell.style.includes('nodeType=checklist')) {
+      return 'Checklist Node';
+    } else if (cell.style.includes('nodeType=image')) {
+      return 'Image Node';
+    } else if (cell.style.includes('nodeType=pdfNode')) {
+      return 'PDF Node';
+    } else if (cell.style.includes('nodeType=calculation')) {
+      return 'Calculation Node';
+    } else if (cell.style.includes('nodeType=notes')) {
+      return 'Notes Node';
+    } else if (cell.style.includes('nodeType=subtitle')) {
+      return 'Subtitle Node';
+    } else if (cell.style.includes('nodeType=info')) {
+      return 'Info Node';
+    } else if (cell.style.includes('nodeType=imageOption')) {
+      return 'Image Option';
+    }
+    
+    // Fallback to first style property
+    return cell.style.split(';')[0] || 'Unknown';
+  })();
   
   // Get section information using the proper functions
   const section = (() => {
@@ -505,15 +572,91 @@ function showPropertiesPopup(cell) {
     return 'N/A';
   })();
   
+  // Get PDF properties for option nodes and cascade through connected nodes
+  const pdfProperties = (() => {
+    const graph = window.graph;
+    if (!graph) return null;
+    
+    // Function to find PDF properties by traversing the graph
+    const findPdfProperties = (startCell, visited = new Set()) => {
+      // Avoid infinite loops
+      if (visited.has(startCell.id)) return null;
+      visited.add(startCell.id);
+      
+      // If this is an option node, check if it connects directly to a PDF
+      if (typeof window.isOptions === 'function' && window.isOptions(startCell)) {
+        const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+        const pdfNode = outgoingEdges.find(edge => {
+          const target = edge.target;
+          return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
+        });
+        
+        if (pdfNode) {
+          const targetCell = pdfNode.target;
+          return {
+            nodeId: targetCell.id,
+            filename: targetCell._pdfUrl || "",
+            pdfUrl: targetCell._pdfUrl || "",
+            priceId: targetCell._priceId || ""
+          };
+        }
+      }
+      
+      // If this is a question node, check all incoming option nodes
+      if (typeof window.isQuestion === 'function' && window.isQuestion(startCell)) {
+        const incomingEdges = graph.getIncomingEdges(startCell) || [];
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          if (sourceCell && typeof window.isOptions === 'function' && window.isOptions(sourceCell)) {
+            const pdfProps = findPdfProperties(sourceCell, visited);
+            if (pdfProps) return pdfProps;
+          }
+        }
+      }
+      
+      // If this is an option node, check the question it came from
+      if (typeof window.isOptions === 'function' && window.isOptions(startCell)) {
+        const incomingEdges = graph.getIncomingEdges(startCell) || [];
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          if (sourceCell && typeof window.isQuestion === 'function' && window.isQuestion(sourceCell)) {
+            const pdfProps = findPdfProperties(sourceCell, visited);
+            if (pdfProps) return pdfProps;
+          }
+        }
+      }
+      
+      return null;
+    };
+    
+    return findPdfProperties(cell);
+  })();
+  
   // Create property fields
   const properties = [
     { label: 'Node Text', value: nodeText, id: 'propNodeText', editable: true },
     { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: false },
-    { label: 'Node Type', value: nodeType, id: 'propNodeType', editable: false },
+    { 
+      label: 'Node Type', 
+      value: nodeType, 
+      id: 'propNodeType', 
+      editable: false,
+      isQuestionTypeDropdown: typeof window.isQuestion === 'function' && window.isQuestion(cell)
+    },
     { label: 'Section', value: section, id: 'propNodeSection', editable: true },
     { label: 'Section Name', value: sectionName, id: 'propSectionName', editable: true },
     { label: 'Question Number', value: questionNumber, id: 'propQuestionNumber', editable: true }
   ];
+  
+  // Add PDF properties if this is an option node connected to a PDF
+  if (pdfProperties) {
+    // Use the actual PDF filename directly from _pdfUrl
+    const pdfName = pdfProperties.filename || 'PDF Document';
+    
+    properties.push(
+      { label: 'PDF Name', value: pdfName, id: 'propPdfName', editable: false }
+    );
+  }
   
   properties.forEach(prop => {
     const fieldDiv = document.createElement('div');
@@ -531,6 +674,83 @@ function showPropertiesPopup(cell) {
       min-width: 120px;
       margin-right: 12px;
     `;
+    
+    // Special handling for question type dropdown
+    if (prop.isQuestionTypeDropdown) {
+      const dropdown = document.createElement('select');
+      dropdown.id = prop.id;
+      dropdown.style.cssText = `
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #f9f9f9;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      `;
+      
+      // Question type options
+      const questionTypes = [
+        { value: 'text', label: 'Textbox' },
+        { value: 'text2', label: 'Dropdown' },
+        { value: 'checkbox', label: 'Checkbox' },
+        { value: 'number', label: 'Number' },
+        { value: 'date', label: 'Date' },
+        { value: 'bigParagraph', label: 'Big Paragraph' },
+        { value: 'multipleTextboxes', label: 'Multiple Textboxes' },
+        { value: 'multipleDropdownType', label: 'Multiple Dropdown' },
+        { value: 'dateRange', label: 'Date Range' },
+        { value: 'email', label: 'Email' },
+        { value: 'phone', label: 'Phone' }
+      ];
+      
+      // Add options to dropdown
+      questionTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.value;
+        option.textContent = type.label;
+        dropdown.appendChild(option);
+      });
+      
+      // Set current value
+      const currentQuestionType = typeof window.getQuestionType === 'function' ? window.getQuestionType(cell) : 'text';
+      dropdown.value = currentQuestionType;
+      
+      // Handle change event
+      dropdown.addEventListener('change', () => {
+        const newType = dropdown.value;
+        console.log("Question type changed to:", newType);
+        
+        // Update the cell's question type
+        if (typeof window.setQuestionType === 'function') {
+          window.setQuestionType(cell, newType);
+        } else {
+          // Fallback: update the style directly
+          let style = cell.style || "";
+          style = style.replace(/questionType=[^;]+/, "");
+          style += `;questionType=${newType};`;
+          cell.style = style;
+        }
+        
+        // Refresh the cell display
+        if (typeof window.updateSimpleQuestionCell === 'function') {
+          window.updateSimpleQuestionCell(cell);
+        }
+        if (window.graph) {
+          window.graph.refresh(cell);
+        }
+        if (typeof window.refreshAllCells === 'function') {
+          window.refreshAllCells();
+        }
+      });
+      
+      fieldDiv.appendChild(label);
+      fieldDiv.appendChild(dropdown);
+      content.appendChild(fieldDiv);
+      return; // Skip the normal field creation
+    }
     
     const valueSpan = document.createElement('span');
     valueSpan.id = prop.id;
@@ -1074,24 +1294,27 @@ function showQuestionTextPopup(cell) {
     }
   });
   
-  // Ensure proper focus and cursor positioning with timer tracking
+  // Ensure proper focus and text selection with multiple attempts
   requestAnimationFrame(() => {
-    // First attempt: standard focus and select
+    // First attempt: focus and select all text
     textarea.focus();
     textarea.select();
+    console.log("First attempt: textarea focused and text selected");
     
-    // Second attempt: ensure cursor is at end
-    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    // Second attempt: ensure all text is selected (0 to end)
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(0, textarea.value.length);
+      console.log("Second attempt: all text selected from 0 to", textarea.value.length);
+    }, 10);
     
-    // Third attempt: force focus again after a tiny delay
+    // Third attempt: final focus and select after a longer delay
     focusTimeout = setTimeout(() => {
       textarea.focus();
       textarea.select();
-      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
-      console.log("Textarea focused, text selected, and cursor positioned (final attempt)");
-    }, 5);
-    
-    console.log("Textarea focused, text selected, and cursor positioned");
+      textarea.setSelectionRange(0, textarea.value.length);
+      console.log("Final attempt: textarea focused and all text selected");
+    }, 50);
   });
   
   // Add hover effects to submit button
@@ -1265,7 +1488,8 @@ function setupPanningAndZooming(graph) {
     if (evt.ctrlKey) {
       evt.preventDefault();
       
-      const delta = evt.deltaY > 0 ? 0.9 : 1.1;
+      // Reduced zoom sensitivity - smaller delta values
+      const delta = evt.deltaY > 0 ? 0.95 : 1.05;
       const scale = graph.view.scale * delta;
       
       // Limit zoom range
