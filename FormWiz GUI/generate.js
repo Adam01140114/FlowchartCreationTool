@@ -1041,9 +1041,9 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "",
     "<!-- Firebase includes -->",
     '<script src="https://js.stripe.com/v3/"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
+      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     '<script src="cart.js"></script>',
     "",
     '<script>',
@@ -2422,7 +2422,7 @@ formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditional
   formHTML += logicScriptBuffer + "\n";
 
   // Add alert functions (always available for validation popups)
-  formHTML += `
+    formHTML += `
 // Alert Logic Functions
 function showAlert(message) {
     const alertOverlay = document.getElementById('alertOverlay');
@@ -2435,7 +2435,7 @@ function showAlert(message) {
             alertMessage.innerHTML = message;
         } else {
             // This is a regular text alert
-            alertMessage.textContent = message;
+        alertMessage.textContent = message;
         }
         alertOverlay.style.display = 'flex';
     }
@@ -2458,7 +2458,7 @@ function exitForm() {
         }
     } else {
         // This is a regular alert - reload the page
-        window.location.reload();
+    window.location.reload();
     }
 }
 
@@ -3150,6 +3150,9 @@ function addValidationListeners() {
 document.addEventListener('DOMContentLoaded', function() {
     addValidationListeners();
     
+    // Initialize hidden checkboxes for all dropdowns
+    initializeDropdownHiddenCheckboxes();
+    
     // Trigger visibility updates on DOM load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -3392,6 +3395,61 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     }
 }
 
+/*──────────────────────────────────────────────────────────────*
+ * Update hidden checkboxes for dropdown options
+ *──────────────────────────────────────────────────────────────*/
+function updateHiddenDropdownCheckboxes(baseName, selectedValue) {
+    // Find the dropdown element to get its options
+    const dropdown = document.getElementById(baseName);
+    if (!dropdown || dropdown.tagName !== 'SELECT') return;
+    
+    // Get all options from the dropdown
+    const options = Array.from(dropdown.options).filter(option => option.value.trim() !== '');
+    
+    // For each option, create or update the corresponding hidden checkbox
+    options.forEach(option => {
+        const optionValue = option.value.trim();
+        if (!optionValue) return;
+        
+        // Create checkbox ID based on the option value
+        const checkboxId = baseName + "_" + optionValue.replace(/\W+/g, "_").toLowerCase();
+        
+        // Check if checkbox already exists
+        let checkbox = document.getElementById(checkboxId);
+        
+        if (!checkbox) {
+            // Create the hidden checkbox if it doesn't exist
+            checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.name = checkboxId;
+            checkbox.style.display = 'none';
+            
+            // Add it to the form or a hidden container
+            const form = document.getElementById('customForm');
+            if (form) {
+                form.appendChild(checkbox);
+            }
+        }
+        
+        // Set the checkbox state based on whether this option is selected
+        checkbox.checked = (optionValue === selectedValue);
+    });
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Initialize hidden checkboxes for all dropdowns on page load
+ *──────────────────────────────────────────────────────────────*/
+function initializeDropdownHiddenCheckboxes() {
+    // Find all dropdown elements in the form
+    const dropdowns = document.querySelectorAll('#customForm select');
+    
+    dropdowns.forEach(dropdown => {
+        // Initialize hidden checkboxes for this dropdown
+        updateHiddenDropdownCheckboxes(dropdown.id, dropdown.value);
+    });
+}
+
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
 function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById("dropdowntext_"+baseName);
@@ -3400,6 +3458,8 @@ function dropdownMirror(selectEl, baseName){
     const val = selectEl.value.trim();
     if(!val) {
         wrap.innerHTML = "";
+        // Uncheck all hidden checkboxes when no option is selected
+        updateHiddenDropdownCheckboxes(baseName, "");
         return;
     }
 
@@ -3423,6 +3483,10 @@ function dropdownMirror(selectEl, baseName){
                      "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
     
     wrap.appendChild(checkboxDiv);
+    
+    // Update hidden checkboxes for dropdown options
+    updateHiddenDropdownCheckboxes(baseName, val);
+    
     handleLinkedDropdowns(baseName, val);
 }
 
