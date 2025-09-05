@@ -147,7 +147,7 @@ function updateCalculationNodesOnQuestionChange(questionCell, isDeleted = false,
   const graph = window.graph;
   if (!graph) return;
   
-  const questionId = isDeleted ? oldNodeId : (getNodeId(questionCell) || "");
+  const questionId = isDeleted ? oldNodeId : ((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "");
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
@@ -264,7 +264,7 @@ function gatherAllAmountLabels() {
       } else if (qType === "money" || qType === "number") {
         // Add number/money type questions directly
         const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
-        const nodeId = getNodeId(cell) || "";
+        const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
         
         // Use answer{questionId} format for consistent JSON export
         const questionId = cell._questionId || nodeId.split('_').pop() || "";
@@ -626,7 +626,7 @@ function findCalcNodesDependentOnQuestion(questionCell) {
   if (!questionCell || !isQuestion(questionCell)) return [];
 
   const dependentCalcNodes = [];
-  const questionId = getNodeId(questionCell) || "";
+  const questionId = (typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "";
   const questionText = questionCell._questionText || questionCell.value || "";
   const cleanQuestionName = sanitizeNameId(questionText);
   
@@ -711,7 +711,7 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
     return;
   }
   
-  const questionId = isDeleted ? oldNodeId : (getNodeId(questionCell) || "");
+  const questionId = isDeleted ? oldNodeId : ((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "");
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));

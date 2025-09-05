@@ -2312,148 +2312,12 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
     if (!namePart.startsWith(slugPrefix)){
         namePart = slugPrefix + namePart;
     }
     return namePart;
-}
-
-/*──────────────────────────────────────────────────────────────*
- * Update hidden checkboxes for dropdown options
- *──────────────────────────────────────────────────────────────*/
-function updateHiddenDropdownCheckboxes(baseName, selectedValue) {
-    // Find the dropdown element to get its options
-    const dropdown = document.getElementById(baseName);
-    if (!dropdown || dropdown.tagName !== 'SELECT') return;
-    
-    // Get all options from the dropdown
-    const options = Array.from(dropdown.options).filter(option => option.value.trim() !== '');
-    
-    // For each option, create or update the corresponding hidden checkbox
-    options.forEach(option => {
-        const optionValue = option.value.trim();
-        if (!optionValue) return;
-        
-        // Create checkbox ID based on the option value
-        const checkboxId = baseName + "_" + optionValue.replace(/\W+/g, "_").toLowerCase();
-        
-        // Check if checkbox already exists
-        let checkbox = document.getElementById(checkboxId);
-        
-        if (!checkbox) {
-            // Create the hidden checkbox if it doesn't exist
-            checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = checkboxId;
-            checkbox.name = checkboxId;
-            checkbox.style.display = 'none';
-            
-            // Add it to the form or a hidden container
-            const form = document.getElementById('customForm');
-            if (form) {
-                form.appendChild(checkbox);
-            }
-        }
-        
-        // Set the checkbox state based on whether this option is selected
-        checkbox.checked = (optionValue === selectedValue);
-    });
-}
-
-/*──────── mirror a dropdown → textbox and checkbox ────────*/
-function dropdownMirror(selectEl, baseName){
-    const wrap = document.getElementById("dropdowntext_"+baseName);
-    if(!wrap) return;
-
-    const val = selectEl.value.trim();
-    if(!val) {
-        wrap.innerHTML = "";
-        // Uncheck all hidden checkboxes when no option is selected
-        updateHiddenDropdownCheckboxes(baseName, "");
-        return;
-    }
-
-    const textId = baseName + "_dropdown";
-    const textField = document.getElementById(textId);
-    
-    if(textField) {
-        textField.value = val;
-        textField.style.display = "none";
-    }
-
-    const existingCheckboxes = wrap.querySelectorAll("div");
-    existingCheckboxes.forEach(div => div.remove());
-
-    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
-    const checkboxId = baseName + "_" + idSuffix;
-    
-    const checkboxDiv = document.createElement("div");
-    checkboxDiv.style.display = "none";
-    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
-                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
-    
-    wrap.appendChild(checkboxDiv);
-    
-    // Update hidden checkboxes for dropdown options
-    updateHiddenDropdownCheckboxes(baseName, val);
-    
-    handleLinkedDropdowns(baseName, val);
-}
-
-// Handle linked dropdown logic
-function handleLinkedDropdowns(sourceName, selectedValue) {
-    if (typeof linkedDropdowns === 'undefined' || !linkedDropdowns || linkedDropdowns.length === 0 || typeof isHandlingLink !== 'undefined' && isHandlingLink) return;
-    
-    try {
-        isHandlingLink = true;  // Set flag before handling links
-        
-        linkedDropdowns.forEach(linkPair => {
-            if (linkPair.sourceNameId === sourceName) {
-                const targetDropdown = document.getElementById(linkPair.targetNameId);
-                if (targetDropdown && targetDropdown.value !== selectedValue) {  // Only if value is different
-                    let optionExists = false;
-                    for (let i = 0; i < targetDropdown.options.length; i++) {
-                        if (targetDropdown.options[i].value === selectedValue) {
-                            optionExists = true;
-                            targetDropdown.value = selectedValue;
-                            // Trigger change event only if value actually changed
-                            const event = new Event('change');
-                            targetDropdown.dispatchEvent(event);
-                            break;
-                        }
-                    }
-                    
-                    if (!optionExists && selectedValue) {
-                        console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
-                    }
-                }
-            }
-            else if (linkPair.targetNameId === sourceName) {
-                const sourceDropdown = document.getElementById(linkPair.sourceNameId);
-                if (sourceDropdown && sourceDropdown.value !== selectedValue) {  // Only if value is different
-                    let optionExists = false;
-                    for (let i = 0; i < sourceDropdown.options.length; i++) {
-                        if (sourceDropdown.options[i].value === selectedValue) {
-                            optionExists = true;
-                            sourceDropdown.value = selectedValue;
-                            // Trigger change event only if value actually changed
-                            const event = new Event('change');
-                            sourceDropdown.dispatchEvent(event);
-                            break;
-                        }
-                    }
-                    
-                    if (!optionExists && selectedValue) {
-                        console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.sourceNameId);
-                    }
-                }
-            }
-        });
-    } finally {
-        isHandlingLink = false;  // Always reset flag when done
-    }
 }
 `;
 
@@ -2976,7 +2840,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\W+/g, "_")   // ← single "\" for proper regex
+        .replace(/\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
         .replace(/^_+|_+$/g, "");
 }
 
@@ -3289,9 +3153,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize hidden checkboxes for all dropdowns
     initializeDropdownHiddenCheckboxes();
     
-    // Add right-click context menu for questions
-    addQuestionRightClickFeature();
-    
     // Trigger visibility updates on DOM load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -3318,155 +3179,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add Ctrl+Shift debug feature
     addDebugKeyboardShortcut();
 });
-
-/*──────────────────────────────────────────────────────────────*
- * Right-click feature for questions
- *──────────────────────────────────────────────────────────────*/
-function addQuestionRightClickFeature() {
-    // Add right-click event listeners to all question containers
-    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    
-    questionContainers.forEach(container => {
-        container.addEventListener('contextmenu', function(e) {
-            e.preventDefault(); // Prevent default browser context menu
-            
-            const questionId = container.id.replace('question-container-', '');
-            showQuestionInfo(questionId, container);
-        });
-    });
-    
-    // Also add right-click to individual form elements
-    const formElements = document.querySelectorAll('#customForm input, #customForm select, #customForm textarea');
-    formElements.forEach(element => {
-        element.addEventListener('contextmenu', function(e) {
-            e.preventDefault(); // Prevent default browser context menu
-            
-            // Find the question container this element belongs to
-            let questionContainer = element.closest('[id^="question-container-"]');
-            if (questionContainer) {
-                const questionId = questionContainer.id.replace('question-container-', '');
-                showQuestionInfo(questionId, questionContainer);
-            } else {
-                // If no container found, show info for the element itself
-                showElementInfo(element);
-            }
-        });
-    });
-}
-
-function showQuestionInfo(questionId, container) {
-    const questionTitle = container.querySelector('h3, h2, h1, label')?.textContent?.trim() || 'Unknown Question';
-    const questionNameId = questionNameIds[questionId] || 'answer' + questionId;
-    
-    let info = '📝 Question Information:' + '\n\n';
-    info += 'Question ID: ' + questionId + '\n';
-    info += 'Question Name/ID: ' + questionNameId + '\n';
-    info += 'Question Text: "' + questionTitle + '"' + '\n\n';
-    
-    // Find all form elements in this question container
-    const formElements = container.querySelectorAll('input, select, textarea');
-    const options = [];
-    const hiddenCheckboxes = [];
-    
-    formElements.forEach(element => {
-        if (element.type === 'checkbox' || element.type === 'radio') {
-            if (element.style.display === 'none' || element.offsetParent === null) {
-                // This is a hidden checkbox
-                hiddenCheckboxes.push({
-                    id: element.id,
-                    name: element.name,
-                    value: element.value,
-                    checked: element.checked
-                });
-            } else {
-                // This is a visible option
-                options.push({
-                    id: element.id,
-                    name: element.name,
-                    value: element.value,
-                    checked: element.checked,
-                    type: element.type
-                });
-            }
-        } else if (element.tagName === 'SELECT') {
-            // This is a dropdown
-            const selectOptions = Array.from(element.options).map(option => ({
-                value: option.value,
-                text: option.text,
-                selected: option.selected
-            }));
-            options.push({
-                id: element.id,
-                name: element.name,
-                type: 'dropdown',
-                options: selectOptions
-            });
-        } else {
-            // This is a text input, textarea, etc.
-            options.push({
-                id: element.id,
-                name: element.name,
-                value: element.value,
-                type: element.type
-            });
-        }
-    });
-    
-    // Add visible options
-    if (options.length > 0) {
-        info += '🔘 Visible Options:' + '\n';
-        options.forEach(option => {
-            if (option.type === 'dropdown') {
-                info += '  • ' + option.id + ' (' + option.name + ') - Dropdown' + '\n';
-                option.options.forEach(opt => {
-                    info += '    - "' + opt.value + '" (' + (opt.selected ? 'SELECTED' : 'not selected') + ')' + '\n';
-                });
-            } else {
-                const status = option.checked !== undefined ? (option.checked ? 'CHECKED' : 'unchecked') : 'value: "' + option.value + '"';
-                info += '  • ' + option.id + ' (' + option.name + ') - ' + option.type + ' - ' + status + '\n';
-            }
-        });
-        info += '\n';
-    }
-    
-    // Add hidden checkboxes (including dropdown hidden checkboxes)
-    const allHiddenCheckboxes = document.querySelectorAll('#customForm input[type="checkbox"][style*="display: none"], #customForm input[type="checkbox"]:not([style*="display: block"]):not([style*="display: inline"])');
-    const relevantHiddenCheckboxes = Array.from(allHiddenCheckboxes).filter(checkbox => 
-        checkbox.id.startsWith(questionNameId + '_') || 
-        checkbox.name.startsWith(questionNameId + '_')
-    );
-    
-    if (relevantHiddenCheckboxes.length > 0) {
-        info += '👻 Hidden Checkboxes:' + '\n';
-        relevantHiddenCheckboxes.forEach(checkbox => {
-            info += '  • ' + checkbox.id + ' (' + checkbox.name + ') - ' + (checkbox.checked ? 'CHECKED' : 'unchecked') + '\n';
-        });
-        info += '\n';
-    }
-    
-    // Add any other hidden checkboxes that might be related
-    if (hiddenCheckboxes.length > 0) {
-        info += '🔍 Other Hidden Elements:' + '\n';
-        hiddenCheckboxes.forEach(checkbox => {
-            info += '  • ' + checkbox.id + ' (' + checkbox.name + ') - ' + (checkbox.checked ? 'CHECKED' : 'unchecked') + '\n';
-        });
-        info += '\n';
-    }
-    
-    info += '💡 Tip: Right-click on any question to see its information!';
-    
-    alert(info);
-}
-
-function showElementInfo(element) {
-    let info = '🔧 Element Information:' + '\n\n';
-    info += 'Element ID: ' + (element.id || 'No ID') + '\n';
-    info += 'Element Name: ' + (element.name || 'No Name') + '\n';
-    info += 'Element Type: ' + (element.type || element.tagName) + '\n';
-    info += 'Element Value: "' + (element.value || (element.checked ? 'checked' : 'unchecked')) + '"' + '\n';
-    
-    alert(info);
-}
 
 // Debug feature: Show all question and option IDs when pressing Ctrl+Shift
 function addDebugKeyboardShortcut() {
@@ -3736,6 +3448,46 @@ function initializeDropdownHiddenCheckboxes() {
         // Initialize hidden checkboxes for this dropdown
         updateHiddenDropdownCheckboxes(dropdown.id, dropdown.value);
     });
+}
+
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    if(!val) {
+        wrap.innerHTML = "";
+        // Uncheck all hidden checkboxes when no option is selected
+        updateHiddenDropdownCheckboxes(baseName, "");
+        return;
+    }
+
+    const textId = baseName + "_dropdown";
+    const textField = document.getElementById(textId);
+    
+    if(textField) {
+        textField.value = val;
+        textField.style.display = "none";
+    }
+
+    const existingCheckboxes = wrap.querySelectorAll("div");
+    existingCheckboxes.forEach(div => div.remove());
+
+    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
+    const checkboxId = baseName + "_" + idSuffix;
+    
+    const checkboxDiv = document.createElement("div");
+    checkboxDiv.style.display = "none";
+    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+    
+    wrap.appendChild(checkboxDiv);
+    
+    // Update hidden checkboxes for dropdown options
+    updateHiddenDropdownCheckboxes(baseName, val);
+    
+    handleLinkedDropdowns(baseName, val);
 }
 
 function getQuestionInputs (questionId, type = null) {

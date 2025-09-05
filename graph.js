@@ -195,9 +195,6 @@ function setupCustomGraphEditing(graph) {
  * Set up custom double-click behavior for specific node types
  */
 function setupCustomDoubleClickBehavior(graph) {
-  console.log("=== SETUP CUSTOM DOUBLE CLICK BEHAVIOR DEBUG ===");
-  console.log("Function called with graph:", graph);
-  console.log("Graph object type:", typeof graph);
   
 
   
@@ -247,29 +244,16 @@ function setupCustomDoubleClickBehavior(graph) {
   // Also keep the original dblClick override for compatibility
   // Override the graph's dblClick method
   const originalDblClick = graph.dblClick;
-  console.log("Original double-click handler bound:", originalDblClick);
-  console.log("Original handler type:", typeof originalDblClick);
   graph.dblClick = function (evt, cell) {
-    console.log("=== DOUBLE CLICK EVENT TRIGGERED ===");
-    console.log("Event:", evt);
-    console.log("Cell:", cell);
-    console.log("Event type:", evt.type);
-    console.log("Event target:", evt.target);
-    console.log("Event currentTarget:", evt.currentTarget);
-    console.log("This context:", this);
-    console.log("Graph object:", graph);
-    console.log("Double-click detected on cell:", cell);
     
     // Only process left clicks, ignore right clicks
     if (evt && evt.button !== undefined && evt.button !== 0) {
-      console.log("Ignoring non-left click (button:", evt.button, ")");
       return;
     }
     
     // Show question text popup for question nodes
     if (cell && cell.vertex) {
       if (typeof isQuestion === 'function' && isQuestion(cell)) {
-        console.log("🎯 Question node detected, showing popup");
         showQuestionTextPopup(cell);
         mxEvent.consume(evt);
         return;
@@ -282,55 +266,22 @@ function setupCustomDoubleClickBehavior(graph) {
     }
     
     // Handle question nodes with a popup for text editing
-    console.log("Checking if cell is a question node...");
-    console.log("isQuestion function exists:", typeof isQuestion === 'function');
-    console.log("isQuestion function available:", typeof window.isQuestion === 'function');
-    
     if (cell && typeof isQuestion === 'function' && isQuestion(cell)) {
-      console.log("🎯 Question node detected via local isQuestion function!");
-      const qt = typeof getQuestionType === 'function' ? getQuestionType(cell) : 'unknown';
-      console.log("Question type:", qt);
-      
-      // Show popup for question text editing
-      console.log("About to call showQuestionTextPopup...");
       if (typeof showQuestionTextPopup === 'function') {
-        console.log("✅ showQuestionTextPopup function found locally");
         showQuestionTextPopup(cell);
-        console.log("✅ showQuestionTextPopup called successfully");
         mxEvent.consume(evt);
         return;
-      } else {
-        console.log("❌ showQuestionTextPopup function not found locally");
-        console.log("Available local functions:", Object.keys(this).filter(key => key.includes('Question')));
       }
     } else if (cell && typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-      console.log("🎯 Question node detected via window.isQuestion function!");
-      const qt = typeof window.getQuestionType === 'function' ? window.getQuestionType(cell) : 'unknown';
-      console.log("Question type:", qt);
-      
-      // Show popup for question text editing
-      console.log("About to call window.showQuestionTextPopup...");
       if (typeof window.showQuestionTextPopup === 'function') {
-        console.log("✅ window.showQuestionTextPopup function found");
         window.showQuestionTextPopup(cell);
-        console.log("✅ window.showQuestionTextPopup called successfully");
         mxEvent.consume(evt);
         return;
-      } else {
-        console.log("❌ window.showQuestionTextPopup function not found");
-        console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Question')));
       }
-    } else {
-      console.log("ℹ️ Not a question node");
-      console.log("Cell exists:", !!cell);
-      console.log("Local isQuestion function:", typeof isQuestion);
-      console.log("Window isQuestion function:", typeof window.isQuestion);
     }
     
     // Add direct editing for option nodes on double-click
     if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
-      console.log("Option node detected, enabling direct editing");
-      // Enable direct editing for option nodes
       graph.startEditingAtCell(cell);
       mxEvent.consume(evt);
       return;
@@ -338,8 +289,6 @@ function setupCustomDoubleClickBehavior(graph) {
     
     // Add direct editing for subtitle and info nodes on double-click
     if (cell && (isSubtitleNode(cell) || isInfoNode(cell))) {
-      console.log("Subtitle/Info node detected, enabling direct editing");
-      // Enable direct editing
       graph.startEditingAtCell(cell);
       mxEvent.consume(evt);
       return;
@@ -347,14 +296,13 @@ function setupCustomDoubleClickBehavior(graph) {
     
     // Handle alert nodes - focus on the input field instead of editing the whole cell
     if (cell && isAlertNode(cell)) {
-      console.log("Alert node detected, focusing on input field");
       const state = graph.view.getState(cell);
       if (state && state.text && state.text.node) {
         const inputField = state.text.node.querySelector('input[type="text"]');
         if (inputField) {
-          graph.selectionModel.setCell(cell); // keep node selected
-          inputField.focus();                 // put caret inside input field
-          inputField.select();                // select all text for easy editing
+          graph.selectionModel.setCell(cell);
+          inputField.focus();
+          inputField.select();
           mxEvent.consume(evt);
           return;
         }
@@ -363,29 +311,20 @@ function setupCustomDoubleClickBehavior(graph) {
 
     // For all other nodes, enable general text editing
     if (cell && cell.vertex && !cell.edge) {
-      console.log("General vertex node detected, enabling text editing");
-      // Enable direct text editing for any vertex node
       try {
         graph.startEditingAtCell(cell);
-        console.log("startEditingAtCell called successfully");
         mxEvent.consume(evt);
         return;
       } catch (error) {
-        console.error("Error calling startEditingAtCell:", error);
-        // Fall back to original behavior
         originalDblClick(evt, cell);
         return;
       }
     }
 
-    console.log("Using original double-click behavior");
     // anything else keeps the stock behaviour
     originalDblClick(evt, cell);
   };
   
-  console.log("✅ Custom double-click behavior set up successfully");
-  console.log("New dblClick function:", graph.dblClick);
-  console.log("Graph dblClick property after setup:", graph.dblClick);
 }
 
 /**
@@ -489,7 +428,23 @@ function showPropertiesPopup(cell) {
       .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
   };
   
-  const nodeId = cell._nameId || generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+  // Use the correct window.getNodeId function (same as the old properties menu)
+  let nodeId = 'N/A';
+  if (typeof window.getNodeId === 'function') {
+    nodeId = window.getNodeId(cell) || 'N/A';
+  } else {
+    // Fallback logic if window.getNodeId is not available
+    if (cell.style) {
+      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+      if (styleMatch) {
+        nodeId = decodeURIComponent(styleMatch[1]);
+      } else {
+        nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      }
+    } else {
+      nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+    }
+  }
   
   // Get actual node type name instead of style string
   const nodeType = (() => {
@@ -777,106 +732,154 @@ function showPropertiesPopup(cell) {
     `;
     
     if (prop.editable) {
-      valueSpan.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = prop.value;
-        input.style.cssText = `
-          width: 100%;
-          padding: 8px 12px;
-          border: 2px solid #1976d2;
-          border-radius: 6px;
-          font-size: 14px;
-          outline: none;
-        `;
-        
-        valueSpan.style.display = 'none';
-        valueSpan.parentNode.insertBefore(input, valueSpan);
-        input.focus();
-        input.select();
-        
-        const saveValue = () => {
-          const newValue = input.value.trim();
-          valueSpan.textContent = newValue;
-          valueSpan.style.display = 'block';
-          input.remove();
-          
-          // Update cell property
-          switch(prop.id) {
-            case 'propNodeText':
-              cell._questionText = newValue;
-              cell.value = newValue;
-              break;
-            case 'propNodeSection':
-              // Update section using the proper setSection function
-              if (typeof window.setSection === 'function') {
-                window.setSection(cell, newValue);
-              } else {
-                // Fallback: update style directly
-                let style = cell.style || "";
-                style = style.replace(/section=[^;]+/, "");
-                style += `;section=${newValue};`;
-                cell.style = style;
-              }
-              break;
-            case 'propSectionName':
-              // Update section name in section preferences
-              const sectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-              if (!sectionPrefs[section]) {
-                sectionPrefs[section] = { name: newValue, borderColor: '#cccccc' };
-              } else {
-                sectionPrefs[section].name = newValue;
-              }
-              // Update the global sectionPrefs
-              if (window.flowchartConfig) {
-                window.flowchartConfig.sectionPrefs = sectionPrefs;
-              } else {
-                window.sectionPrefs = sectionPrefs;
-              }
-              // Refresh the section legend if the function exists
-              if (typeof window.updateSectionLegend === 'function') {
-                window.updateSectionLegend();
-              }
-              break;
-            case 'propQuestionNumber':
-              cell._questionId = newValue;
-              break;
-            case 'propNodeId':
-              // Update the _nameId property
-              cell._nameId = newValue;
-              // Also update the style-based nodeId if it exists
-              if (cell.style) {
-                let style = cell.style;
-                if (style.includes('nodeId=')) {
-                  style = style.replace(/nodeId=[^;]+/, `nodeId=${encodeURIComponent(newValue)}`);
-                } else {
-                  style += `;nodeId=${encodeURIComponent(newValue)};`;
-                }
-                cell.style = style;
-              }
-              break;
-          }
-          
-          // Refresh the graph
-          if (window.graph) {
-            window.graph.refresh(cell);
-            if (window.refreshAllCells) {
-              window.refreshAllCells();
-            }
-          }
-        };
-        
-        input.addEventListener('blur', saveValue);
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            saveValue();
-          } else if (e.key === 'Escape') {
-            valueSpan.style.display = 'block';
-            input.remove();
+      // Special handling for Node ID field - copy to clipboard on click
+      if (prop.id === 'propNodeId') {
+        valueSpan.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(prop.value);
+            console.log('Node ID copied to clipboard:', prop.value);
+            
+            // Show visual feedback
+            const originalText = valueSpan.textContent;
+            valueSpan.textContent = 'Copied!';
+            valueSpan.style.backgroundColor = '#e8f5e8';
+            valueSpan.style.color = '#2e7d32';
+            
+            setTimeout(() => {
+              valueSpan.textContent = originalText;
+              valueSpan.style.backgroundColor = '#f9f9f9';
+              valueSpan.style.color = '#333';
+            }, 1000);
+          } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = prop.value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // Show visual feedback
+            const originalText = valueSpan.textContent;
+            valueSpan.textContent = 'Copied!';
+            valueSpan.style.backgroundColor = '#e8f5e8';
+            valueSpan.style.color = '#2e7d32';
+            
+            setTimeout(() => {
+              valueSpan.textContent = originalText;
+              valueSpan.style.backgroundColor = '#f9f9f9';
+              valueSpan.style.color = '#333';
+            }, 1000);
           }
         });
-      });
+        
+        // Add cursor pointer to indicate it's clickable
+        valueSpan.style.cursor = 'pointer';
+        valueSpan.title = 'Click to copy to clipboard';
+      } else {
+        // Regular editable field behavior for other fields
+        valueSpan.addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = prop.value;
+          input.style.cssText = `
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #1976d2;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+          `;
+          
+          valueSpan.style.display = 'none';
+          valueSpan.parentNode.insertBefore(input, valueSpan);
+          input.focus();
+          input.select();
+          
+          const saveValue = () => {
+            const newValue = input.value.trim();
+            valueSpan.textContent = newValue;
+            valueSpan.style.display = 'block';
+            input.remove();
+            
+            // Update cell property
+            switch(prop.id) {
+              case 'propNodeText':
+                cell._questionText = newValue;
+                cell.value = newValue;
+                break;
+              case 'propNodeSection':
+                // Update section using the proper setSection function
+                if (typeof window.setSection === 'function') {
+                  window.setSection(cell, newValue);
+                } else {
+                  // Fallback: update style directly
+                  let style = cell.style || "";
+                  style = style.replace(/section=[^;]+/, "");
+                  style += `;section=${newValue};`;
+                  cell.style = style;
+                }
+                break;
+              case 'propSectionName':
+                // Update section name in section preferences
+                const sectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+                if (!sectionPrefs[section]) {
+                  sectionPrefs[section] = { name: newValue, borderColor: '#cccccc' };
+                } else {
+                  sectionPrefs[section].name = newValue;
+                }
+                // Update the global sectionPrefs
+                if (window.flowchartConfig) {
+                  window.flowchartConfig.sectionPrefs = sectionPrefs;
+                } else {
+                  window.sectionPrefs = sectionPrefs;
+                }
+                // Refresh the section legend if the function exists
+                if (typeof window.updateSectionLegend === 'function') {
+                  window.updateSectionLegend();
+                }
+                break;
+              case 'propQuestionNumber':
+                cell._questionId = newValue;
+                break;
+              case 'propNodeId':
+                // Update the _nameId property
+                cell._nameId = newValue;
+                // Also update the style-based nodeId if it exists
+                if (cell.style) {
+                  let style = cell.style;
+                  if (style.includes('nodeId=')) {
+                    style = style.replace(/nodeId=[^;]+/, `nodeId=${encodeURIComponent(newValue)}`);
+                  } else {
+                    style += `;nodeId=${encodeURIComponent(newValue)};`;
+                  }
+                  cell.style = style;
+                }
+                break;
+            }
+            
+            // Refresh the graph
+            if (window.graph) {
+              window.graph.refresh(cell);
+              if (window.refreshAllCells) {
+                window.refreshAllCells();
+              }
+            }
+          };
+          
+          input.addEventListener('blur', saveValue);
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              saveValue();
+            } else if (e.key === 'Escape') {
+              valueSpan.style.display = 'block';
+              input.remove();
+            }
+          });
+        });
+      }
       
       valueSpan.addEventListener('mouseenter', () => {
         valueSpan.style.borderColor = '#1976d2';
@@ -967,19 +970,19 @@ function showPropertiesPopup(cell) {
   closeBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    closePopup();
+    newClosePopup();
   });
   
   cancelBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    closePopup();
+    newClosePopup();
   });
   
   // Handle clicking outside popup
   popup.addEventListener('click', (e) => {
     if (e.target === popup) {
-      closePopup();
+      newClosePopup();
     }
   });
   
@@ -996,7 +999,7 @@ function showPropertiesPopup(cell) {
   
   // Clean up escape listener when popup closes
   const originalClosePopup = closePopup;
-  closePopup = () => {
+  const newClosePopup = () => {
     document.removeEventListener('keydown', handleEscape);
     originalClosePopup();
   };

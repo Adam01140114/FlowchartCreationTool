@@ -191,7 +191,7 @@ window.exportGuiJson = function(download = true) {
       },
       options: [],
       labels: [],
-      nameId: sanitizeNameId(getNodeId(cell) || cell._nameId || cell._questionText || cell.value || "unnamed"),
+      nameId: sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed"),
       placeholder: cell._placeholder || ""
     };
     
@@ -372,7 +372,7 @@ window.exportGuiJson = function(download = true) {
       }
       
       // Get the proper base nameId from the question's nodeId
-      const baseNameId = getNodeId(cell) || question.nameId || "unnamed";
+      const baseNameId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || question.nameId || "unnamed";
       
       // Convert options to checkbox format with proper amount handling
       question.options = question.options.map(opt => {
@@ -1116,7 +1116,7 @@ function exportGuiJson() {
     const questionType = getQuestionType(cell); 
     const sectionNum = getSection(cell);
     
-    const uniqueNodeId = getNodeId(cell) || "unnamed";
+    const uniqueNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "unnamed";
     questionCellMap.set(cell.id, cell); // Map by ID
     questionIdMap.set(uniqueNodeId, cell); // Map by text/nodeId
     
@@ -1164,7 +1164,7 @@ function exportGuiJson() {
   // Now format each question with its options
   sortedQuestions.forEach(cell => {
     const qType = getQuestionType(cell) || "dropdown";
-    const qId = getNodeId(cell) || sanitizeNameId(cell.value || "unnamed");
+    const qId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || sanitizeNameId(cell.value || "unnamed");
     const qSection = getSection(cell);
     
     const questionObj = {
@@ -1198,7 +1198,7 @@ function exportGuiJson() {
         if (targetOptions.length > 0) {
           const firstOptionTarget = targetOptions[0].target;
           if (firstOptionTarget && isQuestion(firstOptionTarget)) {
-            const targetId = getNodeId(firstOptionTarget) || "";
+            const targetId = (typeof window.getNodeId === 'function' ? window.getNodeId(firstOptionTarget) : '') || "";
             // Only set nextQuestion if it's in a different section
             if (getSection(firstOptionTarget) === qSection) {
               nextQuestion = targetId;
@@ -1485,7 +1485,7 @@ function resolveDuplicateNodeIds(cells) {
   
   // First pass: collect all node IDs and their occurrences
   cells.forEach(cell => {
-    const nodeId = getNodeId(cell);
+    const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
     if (nodeId) {
       if (!nodeIdCounts.has(nodeId)) {
         nodeIdCounts.set(nodeId, 0);

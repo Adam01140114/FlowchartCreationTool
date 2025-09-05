@@ -100,36 +100,9 @@ function isEndNode(cell) {
          (cell && cell.id === "19");
 }
 
-// Helper function to get node ID
-function getNodeId(cell) {
-  if (!cell) return "";
-  
-  // For all nodes, prefer _nameId over other properties
-  if (cell._nameId) {
-    return cell._nameId;
-  }
-  
-  // For question nodes, use the _questionId property
-  if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-    return cell._questionId || "";
-  }
-  
-  // For option nodes, use the _optionId property
-  if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
-    return cell._optionId || "";
-  }
-  
-  // For other nodes, try to extract from the label
-  if (cell.value) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = cell.value;
-    const text = (tempDiv.textContent || tempDiv.innerText || "").trim();
-    // Extract first word as ID
-    return text.split(' ')[0] || "";
-  }
-  
-  return "";
-}
+// Helper function to get node ID - REMOVED
+// This function was causing conflicts with the global window.getNodeId function
+// The properties dialog now uses window.getNodeId directly
 
 // Function to auto-select connecting edges
 function autoSelectConnectingEdges() {
@@ -324,7 +297,7 @@ function setupContextMenuEventListeners(graph) {
       const questionCells = selectedCells.filter(cell => getNodeType(cell) === 'question');
       if (questionCells.length > 0) {
         questionCells.forEach(cell => {
-          const oldNodeId = getNodeId(cell);
+          const oldNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
           // Update or remove dependent calculation nodes
           if (typeof window.updateAllCalcNodesOnQuestionChange === 'function') {
             window.updateAllCalcNodesOnQuestionChange(null, true, oldNodeId);
@@ -1251,7 +1224,11 @@ function setupContextMenuEventListeners(graph) {
 
 // Properties Menu Functions
 function showPropertiesMenu(cell, evt) {
-  console.log("showPropertiesMenu called with:", cell, evt);
+  console.log("📋 CONTEXT MENU PROPERTIES DIALOG CALLED");
+  console.log("Cell:", cell);
+  console.log("Cell ID:", cell.id);
+  console.log("Cell style:", cell.style);
+  console.log("Cell value:", cell.value);
   if (!cell) {
     console.log("No cell provided");
     return;
@@ -1347,7 +1324,16 @@ function showPropertiesMenu(cell, evt) {
     if (pdfProps) pdfProps.style.display = "none";
   }
 
-  if (propNodeId) propNodeId.textContent = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : "") || "";
+  if (propNodeId) {
+    console.log("📋 PROPERTIES DIALOG DEBUG START");
+    console.log("Cell:", cell);
+    console.log("window.getNodeId function exists:", typeof window.getNodeId === 'function');
+    const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : "") || "";
+    console.log("Retrieved nodeId:", nodeId);
+    propNodeId.textContent = nodeId;
+    console.log("Set propNodeId.textContent to:", propNodeId.textContent);
+    console.log("📋 PROPERTIES DIALOG DEBUG END");
+  }
   if (propNodeSection) propNodeSection.textContent = (typeof window.getSection === 'function' ? window.getSection(cell) : "") || "1";
   
   const sec = typeof window.getSection === 'function' ? window.getSection(cell) : "1";
@@ -1564,7 +1550,6 @@ window.contextMenus = {
   hideContextMenu,
   getNodeType,
   isEndNode,
-  getNodeId,
   
   // Setup functions
   setupContextMenus,
@@ -1583,7 +1568,6 @@ Object.assign(window, {
   hideContextMenu,
   getNodeType,
   isEndNode,
-  getNodeId,
   showPropertiesMenu,
   placeNodeAtClickLocation
 });

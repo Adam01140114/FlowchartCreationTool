@@ -217,6 +217,11 @@ document.addEventListener("DOMContentLoaded", function() {
               // Regular option nodes
               if (window.updateOptionNodeCell) window.updateOptionNodeCell(cell);
             }
+            
+            // Refresh option node ID to ensure proper format
+            if (window.refreshOptionNodeId) {
+              window.refreshOptionNodeId(cell);
+            }
           }
           
           // Handle PDF nodes
@@ -303,22 +308,12 @@ document.addEventListener("DOMContentLoaded", function() {
   
       // Double-click behavior moved to graph.js module
     // Custom double-click handling for specific node types
-    console.log("=== SETTING UP DOUBLE CLICK BEHAVIOR ===");
-    console.log("Checking if window.setupCustomDoubleClickBehavior exists...");
-    console.log("Function exists:", typeof window.setupCustomDoubleClickBehavior === 'function');
-    console.log("Function value:", window.setupCustomDoubleClickBehavior);
-    
     if (typeof window.setupCustomDoubleClickBehavior === 'function') {
-      console.log("✅ Calling window.setupCustomDoubleClickBehavior(graph)...");
       try {
         window.setupCustomDoubleClickBehavior(graph);
-        console.log("✅ window.setupCustomDoubleClickBehavior completed successfully");
       } catch (error) {
-        console.error("❌ Error calling window.setupCustomDoubleClickBehavior:", error);
+        console.error("Error calling window.setupCustomDoubleClickBehavior:", error);
       }
-    } else {
-      console.log("❌ window.setupCustomDoubleClickBehavior function not found!");
-      console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Double') || key.includes('Click')));
     }
   
 
@@ -1063,14 +1058,8 @@ keyHandler.bindControlKey(86, () => {
       
       // Set IDs and section
       if (nodeType === 'question') {
-        // Set default _nameId using naming convention based on question text
-        const questionText = cell._questionText || 'question';
-        const defaultNameId = questionText
-          .toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
-        cell._nameId = defaultNameId || 'question';
+        // Set a temporary ID that will be updated when the user enters text
+        setNodeId(cell, 'new_question');
         // Do NOT call setQuestionType or set questionType here; let refreshAllCells show the dropdown
       } else if (nodeType === 'options') {
         setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
@@ -1399,40 +1388,49 @@ function isAmountOption(cell) {
 }
 
 function setNodeId(cell, nodeId) {
+  console.log("🔧 SET NODE ID DEBUG START");
+  console.log("Cell:", cell);
+  console.log("Setting nodeId to:", nodeId);
+  console.log("Original style:", cell.style);
+  
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
   style += `;nodeId=${encodeURIComponent(nodeId)};`;
+  
+  console.log("New style:", style);
+  console.log("Calling graph.getModel().setStyle");
   graph.getModel().setStyle(cell, style);
   
-  // Also update the _nameId property for consistency
-  cell._nameId = nodeId;
+  console.log("After setStyle - cell.style:", cell.style);
+  console.log("🔧 SET NODE ID DEBUG END");
 }
-function getNodeId(cell) {
-  // For question nodes, prefer _nameId over style-based nodeId
-  if (cell._nameId) {
-    return cell._nameId;
-  }
-  
-  // Fallback to style-based nodeId
-  const style = cell.style || "";
-  const m = style.match(/nodeId=([^;]+)/);
-  return m ? decodeURIComponent(m[1]) : "";
-}
+// Local getNodeId function removed - now using global window.getNodeId function
+// which includes PDF name prefixing logic
 
 function refreshNodeIdFromLabel(cell) {
+  console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG START");
+  console.log("Cell:", cell);
+  console.log("Cell ID:", cell.id);
+  console.log("Cell value:", cell.value);
+  console.log("Cell _questionText:", cell._questionText);
+  
   let labelText = "";
 
   if (isQuestion(cell)) {
     const qType = getQuestionType(cell);
+    console.log("Question type:", qType);
     if (qType === "multipleTextboxes" || qType === "multipleDropdownType") {
       labelText = cell._questionText || "custom_question";
+      console.log("Using _questionText:", labelText);
     } else {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = cell.value || "";
       labelText = tempDiv.textContent || tempDiv.innerText || "";
+      console.log("Extracted from cell.value:", labelText);
     }
   } else {
     labelText = cell.value || "";
+    console.log("Non-question node, using cell.value:", labelText);
   }
 
   const cleanedText = labelText
@@ -1442,18 +1440,22 @@ function refreshNodeIdFromLabel(cell) {
     .replace(/\s+/g, "_")
     .toLowerCase();
 
+  console.log("Cleaned text:", cleanedText);
+
   const baseNodeId = cleanedText || "unnamed_node";
+  console.log("Base node ID:", baseNodeId);
   
   // Check for duplicates and add numbering if needed
   const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  console.log("Unique node ID:", uniqueNodeId);
   
-  // Set both the style-based nodeId and the _nameId property
+  console.log("Calling setNodeId with:", uniqueNodeId);
   setNodeId(cell, uniqueNodeId);
   
-  // For question nodes, also set the _nameId property (used in GUI JSON export)
-  if (isQuestion(cell)) {
-    cell._nameId = uniqueNodeId;
-  }
+  // Verify the ID was set
+  const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
+  console.log("Verification - getNodeId returns:", verifyId);
+  console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END");
 }
 
 function generateUniqueNodeId(baseNodeId, currentCell) {
@@ -1466,7 +1468,7 @@ function generateUniqueNodeId(baseNodeId, currentCell) {
     if (id === "0" || id === "1") continue; // Skip root cells
     const cell = allCells[id];
     if (cell && cell !== currentCell) {
-      const existingId = getNodeId(cell);
+      const existingId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
       if (existingId) {
         existingNodeIds.add(existingId);
       }
@@ -1491,21 +1493,95 @@ function generateUniqueNodeId(baseNodeId, currentCell) {
 }
 
 function refreshOptionNodeId(cell) {
+  console.log("🔍 REFRESH OPTION NODE ID DEBUG START");
+  console.log("Cell:", cell);
+  console.log("Cell ID:", cell.id);
+  console.log("Cell value:", cell.value);
+  console.log("Cell style:", cell.style);
+  
   const edges = graph.getIncomingEdges(cell) || [];
+  console.log("Incoming edges:", edges);
+  
   let parentNodeId = "ParentQuestion";
   for (let e of edges) {
     const p = e.source;
+    console.log("Checking edge source:", p);
+    console.log("Is question?", isQuestion(p));
     if (isQuestion(p)) {
-      parentNodeId = getNodeId(p) || "ParentQuestion";
+      const parentId = (typeof window.getNodeId === 'function' ? window.getNodeId(p) : '') || "";
+      console.log("Parent node ID from getNodeId:", parentId);
+      parentNodeId = parentId || "ParentQuestion";
+      console.log("Final parent node ID:", parentNodeId);
       break;
     }
   }
-  let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
-  const baseNodeId = parentNodeId + label;
+  
+  // Extract option text from the cell value and sanitize it
+  let optionText = "Option";
+  if (cell.value) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cell.value;
+    optionText = (tempDiv.textContent || tempDiv.innerText || "").trim();
+    console.log("Extracted option text:", optionText);
+  }
+  
+  // Sanitize the option text: lowercase, replace spaces with underscores, remove special chars
+  const sanitizedOptionText = optionText
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+  
+  console.log("Sanitized option text:", sanitizedOptionText);
+  
+  // Create the base node ID in format: parent_question_id_option_text
+  const baseNodeId = `${parentNodeId}_${sanitizedOptionText}`;
+  console.log("Base node ID:", baseNodeId);
   
   // Check for duplicates and add numbering if needed
   const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
+  console.log("Unique node ID:", uniqueNodeId);
+  
+  console.log("Calling setNodeId with:", uniqueNodeId);
   setNodeId(cell, uniqueNodeId);
+  
+  // Verify the ID was set
+  const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
+  console.log("Verification - getNodeId returns:", verifyId);
+  console.log("🔍 REFRESH OPTION NODE ID DEBUG END");
+}
+
+// Function to refresh all option node IDs in the graph
+function refreshAllOptionNodeIds() {
+  console.log("🔄 REFRESH ALL OPTION NODE IDS DEBUG START");
+  if (!graph) {
+    console.log("No graph available");
+    return;
+  }
+  
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  console.log("Found vertices:", vertices.length);
+  
+  let updatedCount = 0;
+  vertices.forEach(cell => {
+    console.log("Checking cell:", cell);
+    console.log("Is options?", isOptions(cell));
+    if (isOptions(cell)) {
+      console.log("Refreshing option node ID for:", cell);
+      refreshOptionNodeId(cell);
+      updatedCount++;
+    }
+  });
+  
+  console.log(`Updated ${updatedCount} option node IDs`);
+  
+  // Refresh the graph to show changes
+  if (window.refreshAllCells) {
+    console.log("Calling refreshAllCells");
+    window.refreshAllCells();
+  }
+  console.log("🔄 REFRESH ALL OPTION NODE IDS DEBUG END");
 }
 
 function addSkipReassign(cell) {
@@ -1821,7 +1897,67 @@ function setOptionType(cell, newType) {
   window.updateOptionNodeCell = updateOptionNodeCell;
   window.updateAlertNodeCell = updateAlertNodeCell;
   window.refreshOptionNodeId = refreshOptionNodeId;
+  window.refreshAllOptionNodeIds = refreshAllOptionNodeIds;
+  window.refreshNodeIdFromLabel = refreshNodeIdFromLabel;
   window.updateSimpleQuestionCell = updateSimpleQuestionCell;
+  
+  // Debug function to test node ID retrieval
+  window.debugNodeId = function(cellId) {
+    console.log("🔍 DEBUG NODE ID FOR CELL:", cellId);
+    const cell = graph.getModel().getCell(cellId);
+    if (!cell) {
+      console.log("Cell not found");
+      return;
+    }
+    console.log("Cell found:", cell);
+    console.log("Cell style:", cell.style);
+    console.log("Cell value:", cell.value);
+    
+    // Test different getNodeId functions
+    console.log("getNodeId result:", (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "");
+    console.log("Window getNodeId result:", window.getNodeId(cell));
+    
+    // Test style parsing manually
+    const style = cell.style || "";
+    const match = style.match(/nodeId=([^;]+)/);
+    console.log("Manual style match:", match);
+    if (match) {
+      console.log("Manual decoded result:", decodeURIComponent(match[1]));
+    }
+  };
+  
+  // Function to refresh all question node IDs in the graph
+  window.refreshAllQuestionNodeIds = function() {
+    console.log("🔄 REFRESH ALL QUESTION NODE IDS DEBUG START");
+    if (!graph) {
+      console.log("No graph available");
+      return;
+    }
+    
+    const parent = graph.getDefaultParent();
+    const vertices = graph.getChildVertices(parent);
+    console.log("Found vertices:", vertices.length);
+    
+    let updatedCount = 0;
+    vertices.forEach(cell => {
+      console.log("Checking cell:", cell);
+      console.log("Is question?", isQuestion(cell));
+      if (isQuestion(cell)) {
+        console.log("Refreshing question node ID for:", cell);
+        refreshNodeIdFromLabel(cell);
+        updatedCount++;
+      }
+    });
+    
+    console.log(`Updated ${updatedCount} question node IDs`);
+    
+    // Refresh the graph to show changes
+    if (window.refreshAllCells) {
+      console.log("Calling refreshAllCells");
+      window.refreshAllCells();
+    }
+    console.log("🔄 REFRESH ALL QUESTION NODE IDS DEBUG END");
+  };
 
 
 /**************************************************
