@@ -1421,9 +1421,9 @@ window.copyMultipleDropdownId = function(cellId, index) {
   const questionText = cell._questionText || '';
   const entryText = cell._textboxes[index].nameId || '';
   
-  // Check if this question has a PDF property
+  // Check if this question has a PDF property (only for nodes that should have PDF properties)
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
-  const sanitizedPdfName = window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
   
   // Prompt user for number
   const number = prompt('Enter a number for this ID:');
@@ -2079,9 +2079,9 @@ window.copyMultipleTextboxId = function(cellId, index) {
   const questionText = cell._questionText || '';
   const entryText = cell._textboxes[index].nameId || '';
   
-  // Check if this question has a PDF property
+  // Check if this question has a PDF property (only for nodes that should have PDF properties)
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
-  const sanitizedPdfName = window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
   
   // Sanitize the text: convert to lowercase, replace non-alphanumeric with underscores
   const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
@@ -5623,46 +5623,82 @@ function findPdfNameForQuestion(cell) {
   const graph = getGraph();
   if (!graph) return null;
   
-  // Use the same logic as the Node Properties dialog
-  const findPdfProperties = (startCell, visited = new Set()) => {
-    // Avoid infinite loops
-    if (visited.has(startCell.id)) return null;
-    visited.add(startCell.id);
-    
-    // If this is an option node, check if it connects directly to a PDF
-    if (typeof window.isOptions === 'function' && window.isOptions(startCell)) {
-      const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
-      const pdfNode = outgoingEdges.find(edge => {
-        const target = edge.target;
-        return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
-      });
-      
-      if (pdfNode) {
-        const targetCell = pdfNode.target;
-        return targetCell._pdfUrl || null;
-      }
+  // Use the same logic as getPdfName function in nodes.js for consistency
+  const findPdfProperties = (startCell) => {
+    // Check if this node has direct PDF properties
+    if (startCell._pdfName || startCell._pdfFilename || startCell._pdfUrl) {
+      return {
+        nodeId: startCell.id,
+        filename: startCell._pdfUrl || startCell._pdfFilename || startCell._pdfName || "",
+        pdfUrl: startCell._pdfUrl || "",
+        priceId: startCell._priceId || ""
+      };
     }
     
-    // If this is a question node, check all incoming option nodes
-    if (typeof window.isQuestion === 'function' && window.isQuestion(startCell)) {
-      const incomingEdges = graph.getIncomingEdges(startCell) || [];
-      for (const edge of incomingEdges) {
-        const sourceCell = edge.source;
-        if (sourceCell && typeof window.isOptions === 'function' && window.isOptions(sourceCell)) {
-          const pdfProps = findPdfProperties(sourceCell, visited);
-          if (pdfProps) return pdfProps;
+    // Check if this is a PDF node
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(startCell)) {
+      return {
+        nodeId: startCell.id,
+        filename: startCell._pdfUrl || "",
+        pdfUrl: startCell._pdfUrl || "",
+        priceId: startCell._priceId || ""
+      };
+    }
+    
+    // Check direct outgoing connections to PDF nodes
+    const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+    const pdfNode = outgoingEdges.find(edge => {
+      const target = edge.target;
+      return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
+    });
+    
+    if (pdfNode) {
+      const targetCell = pdfNode.target;
+      return {
+        nodeId: targetCell.id,
+        filename: targetCell._pdfUrl || "",
+        pdfUrl: targetCell._pdfUrl || "",
+        priceId: targetCell._priceId || ""
+      };
+    }
+    
+    // Check incoming edges for PDF properties (nodes that point to this node)
+    const incomingEdges = graph.getIncomingEdges(startCell) || [];
+    for (const edge of incomingEdges) {
+      const sourceCell = edge.source;
+      if (sourceCell) {
+        // Check if the source node has PDF properties
+        if (sourceCell._pdfName || sourceCell._pdfFilename || sourceCell._pdfUrl) {
+          return {
+            nodeId: sourceCell.id,
+            filename: sourceCell._pdfUrl || sourceCell._pdfFilename || sourceCell._pdfName || "",
+            pdfUrl: sourceCell._pdfUrl || "",
+            priceId: sourceCell._priceId || ""
+          };
         }
-      }
-    }
-    
-    // If this is an option node, check the question it came from
-    if (typeof window.isOptions === 'function' && window.isOptions(startCell)) {
-      const incomingEdges = graph.getIncomingEdges(startCell) || [];
-      for (const edge of incomingEdges) {
-        const sourceCell = edge.source;
-        if (sourceCell && typeof window.isQuestion === 'function' && window.isQuestion(sourceCell)) {
-          const pdfProps = findPdfProperties(sourceCell, visited);
-          if (pdfProps) return pdfProps;
+        
+        // Check if the source node is a PDF node
+        if (typeof window.isPdfNode === 'function' && window.isPdfNode(sourceCell)) {
+          return {
+            nodeId: sourceCell.id,
+            filename: sourceCell._pdfUrl || "",
+            pdfUrl: sourceCell._pdfUrl || "",
+            priceId: sourceCell._priceId || ""
+          };
+        }
+        
+        // Check if the source node connects to PDF nodes
+        const sourceOutgoingEdges = graph.getOutgoingEdges(sourceCell) || [];
+        for (const sourceEdge of sourceOutgoingEdges) {
+          const sourceTarget = sourceEdge.target;
+          if (sourceTarget && typeof window.isPdfNode === 'function' && window.isPdfNode(sourceTarget)) {
+            return {
+              nodeId: sourceTarget.id,
+              filename: sourceTarget._pdfUrl || "",
+              pdfUrl: sourceTarget._pdfUrl || "",
+              priceId: sourceTarget._priceId || ""
+            };
+          }
         }
       }
     }
@@ -5670,7 +5706,14 @@ function findPdfNameForQuestion(cell) {
     return null;
   };
   
-  return findPdfProperties(cell);
+  const pdfProperties = findPdfProperties(cell);
+  
+  // Only return the PDF name if we found actual PDF properties (same as Node Properties dialog)
+  if (pdfProperties && pdfProperties.filename) {
+    return pdfProperties.filename;
+  }
+  
+  return null;
 }
 
 // Helper function to sanitize PDF name for use in IDs
