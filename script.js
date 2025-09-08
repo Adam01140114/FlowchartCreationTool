@@ -4389,6 +4389,17 @@ function showAutosaveRestorePrompt() {
   box.appendChild(noBtn);
   modal.appendChild(box);
   document.body.appendChild(modal);
+  
+  // Add click outside to close functionality
+  modal.addEventListener('click', function(event) {
+    if (event.target === modal) {
+      // User clicked on the modal background (outside the box)
+      modal.remove();
+      clearAutosaveLocalStorage();
+      window.location.reload();
+    }
+  });
+  
   // Removed: console.log('[AUTOSAVE][localStorage] Restore prompt shown.');
 }
 

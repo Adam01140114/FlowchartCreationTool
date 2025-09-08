@@ -498,28 +498,29 @@ function showPropertiesPopup(cell) {
   // Use the correct window.getNodeId function (same as the old properties menu)
   let nodeId = 'N/A';
   
-  // PRIORITY 1: Check if we have a saved Node ID in the style (this should be preserved)
-  if (cell.style) {
-    const styleMatch = cell.style.match(/nodeId=([^;]+)/);
-    if (styleMatch) {
-      nodeId = decodeURIComponent(styleMatch[1]);
-      console.log('🔧 [NODE ID DEBUG] Using saved Node ID from style:', nodeId);
+  // Always use getNodeId to ensure PDF naming convention is applied
+  if (typeof window.getNodeId === 'function') {
+    nodeId = window.getNodeId(cell) || 'N/A';
+    console.log('🔧 [NODE ID DEBUG] Using Node ID with PDF naming convention:', nodeId);
+  } else {
+    // Fallback logic if window.getNodeId is not available
+    // PRIORITY 1: Check if we have a saved Node ID in the style
+    if (cell.style) {
+      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+      if (styleMatch) {
+        nodeId = decodeURIComponent(styleMatch[1]);
+        console.log('🔧 [NODE ID DEBUG] Using saved Node ID from style:', nodeId);
+      }
     }
-  }
-  
-  // PRIORITY 2: Check _nameId property (this should also be preserved)
-  if (nodeId === 'N/A' && cell._nameId) {
-    nodeId = cell._nameId;
-    console.log('🔧 [NODE ID DEBUG] Using saved Node ID from _nameId:', nodeId);
-  }
-  
-  // PRIORITY 3: Only use getNodeId as fallback if no saved ID exists
-  if (nodeId === 'N/A') {
-    if (typeof window.getNodeId === 'function') {
-      nodeId = window.getNodeId(cell) || 'N/A';
-      console.log('🔧 [NODE ID DEBUG] Using generated Node ID from getNodeId:', nodeId);
-    } else {
-      // Fallback logic if window.getNodeId is not available
+    
+    // PRIORITY 2: Check _nameId property
+    if (nodeId === 'N/A' && cell._nameId) {
+      nodeId = cell._nameId;
+      console.log('🔧 [NODE ID DEBUG] Using saved Node ID from _nameId:', nodeId);
+    }
+    
+    // PRIORITY 3: Generate default Node ID
+    if (nodeId === 'N/A') {
       nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
       console.log('🔧 [NODE ID DEBUG] Using fallback generated Node ID:', nodeId);
     }
@@ -773,13 +774,13 @@ function showPropertiesPopup(cell) {
     });
   }
   
-  // Add PDF properties if this is an option node connected to a PDF
-  if (pdfProperties) {
-    // Use the actual PDF filename directly from _pdfUrl
-    const pdfName = pdfProperties.filename || 'PDF Document';
+  // Add PDF properties if this node has PDF properties OR if it's a question node
+  if (pdfProperties || (typeof window.isQuestion === 'function' && window.isQuestion(cell))) {
+    // Use the actual PDF filename directly from _pdfUrl, or empty string for new question nodes
+    const pdfName = pdfProperties ? (pdfProperties.filename || 'PDF Document') : (cell._pdfName || '');
     
     properties.push(
-      { label: 'PDF Name', value: pdfName, id: 'propPdfName', editable: false }
+      { label: 'PDF Name', value: pdfName, id: 'propPdfName', editable: true }
     );
   }
   
@@ -1167,6 +1168,31 @@ function showPropertiesPopup(cell) {
                     style += `;nodeId=${encodeURIComponent(newValue)};`;
                   }
                   cell.style = style;
+                }
+                break;
+              case 'propPdfName':
+                // Update the PDF name property
+                cell._pdfName = newValue;
+                // Apply PDF naming convention to the Node ID
+                if (typeof window.setNodeId === 'function') {
+                  // Get the current Node ID without PDF prefix
+                  const currentNodeId = document.getElementById('propNodeId');
+                  const baseNodeId = currentNodeId ? currentNodeId.textContent.trim() : cell._nameId || cell.id;
+                  
+                  // Remove any existing PDF prefix from the base Node ID
+                  const cleanNodeId = baseNodeId.replace(/^[^_]+_/, '');
+                  
+                  // Apply the PDF naming convention
+                  window.setNodeId(cell, cleanNodeId);
+                  
+                  // Update the Node ID field in the popup to show the new ID with PDF prefix
+                  if (currentNodeId) {
+                    const nodeIdSpan = currentNodeId.querySelector('span');
+                    if (nodeIdSpan) {
+                      const newNodeId = window.getNodeId ? window.getNodeId(cell) : cleanNodeId;
+                      nodeIdSpan.textContent = newNodeId;
+                    }
+                  }
                 }
                 break;
             }
