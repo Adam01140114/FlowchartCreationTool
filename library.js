@@ -334,12 +334,12 @@ window.exportGuiJson = function(download = true) {
                   }
                 }
                 
-                // Check for section jumps - if target question is in a section more than 1 away (forward or backward)
+                // Check for section jumps - if target question is in a different section
                 const sourceSection = parseInt(getSection(cell) || "1", 10);
                 const targetSection = parseInt(getSection(optionTarget) || "1", 10);
                 
-                // If target section is more than 1 section away from source section (in either direction)
-                if (Math.abs(targetSection - sourceSection) > 1) {
+                // If target section is different from source section (any difference)
+                if (targetSection !== sourceSection) {
                   // Check if this jump already exists
                   const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
                   if (!exists) {
@@ -511,9 +511,9 @@ window.exportGuiJson = function(download = true) {
             if (parentQ && isQuestion(parentQ)) {
               const sourceSection = parseInt(getSection(parentQ) || "1", 10);
               
-              // Only add conditional logic if the source section is adjacent (within 1 section)
-              // Connections from sections more than 1 away should be handled by jump logic
-              if (Math.abs(sourceSection - currentSection) <= 1) {
+              // Only add conditional logic if the source section is the same as current section
+              // Cross-section connections should be handled by jump logic
+              if (sourceSection === currentSection) {
                 const prevQuestionId = parentQ._questionId || "";
                 let optionLabel = sourceCell.value || "";
                 // Clean HTML entities and tags from option text
@@ -544,8 +544,8 @@ window.exportGuiJson = function(download = true) {
           // This is a direct question-to-question connection
           const sourceSection = parseInt(getSection(sourceCell) || "1", 10);
           
-          // Only add conditional logic if the source section is adjacent (within 1 section)
-          if (Math.abs(sourceSection - currentSection) <= 1) {
+          // Only add conditional logic if the source section is the same as current section
+          if (sourceSection === currentSection) {
             // Check if the source is a multiple textbox/dropdown question or number question
             const sourceQuestionType = getQuestionType(sourceCell);
             if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType" || sourceQuestionType === "number") {
