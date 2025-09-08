@@ -935,7 +935,9 @@ window.saveFlowchart = function() {
     }
     data.cells.push(cellData);
   }
-  data.sectionPrefs = sectionPrefs;
+  // Get current section preferences using the proper function
+  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
+  data.sectionPrefs = currentSectionPrefs;
   data.groups = getGroupsData();
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
@@ -1236,17 +1238,22 @@ window.loadFlowchartData = function(data) {
     const createdCells = {};
 
     if (data.sectionPrefs) {
+      console.log('🔍 [SECTION LOAD DEBUG] Loading section preferences:', JSON.stringify(data.sectionPrefs, null, 2));
+      
       // Update section preferences through the proper accessor
       
       if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
         window.flowchartConfig.sectionPrefs = data.sectionPrefs;
+        console.log('🔍 [SECTION LOAD DEBUG] Set window.flowchartConfig.sectionPrefs');
       } else {
         window.sectionPrefs = data.sectionPrefs;
+        console.log('🔍 [SECTION LOAD DEBUG] Set window.sectionPrefs');
       }
       
       // Test the getSectionPrefs function immediately after setting
       if (typeof getSectionPrefs === 'function') {
         const testResult = getSectionPrefs();
+        console.log('🔍 [SECTION LOAD DEBUG] getSectionPrefs() result:', JSON.stringify(testResult, null, 2));
       }
       
       // Add a watcher to detect if section preferences are modified after this point
@@ -1260,6 +1267,7 @@ window.loadFlowchartData = function(data) {
         const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
         
         if (typeof updateSectionLegend === 'function') {
+          console.log('🔍 [SECTION LOAD DEBUG] Calling updateSectionLegend()');
           updateSectionLegend();
         } else {
           console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
