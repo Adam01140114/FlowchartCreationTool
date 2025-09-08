@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forms - FormWiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2980b9;
+            --hover-color: #1c598a;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --header-color: #2c3e50;
+            --error-color: #e74c3c;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        header {
+            background-color: var(--header-color);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        header img {
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+            width: 130px;
+            height: 80px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 5px 10px;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .user-info {
+            position: absolute;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-message {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .settings-button {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+        }
+
+        .settings-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .logout-button {
+            background-color: var(--error-color);
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            width: 100px;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        section {
+            padding: 30px;
+            text-align: center;
+            flex: 1;
+        }
+
+        section h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .forms-section {
+            border: 4px solid lightblue;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            padding-left: 200px;
+            padding-right: 200px;
+       
+            max-width: 780px;
+            
+        }
+
+        .forms-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .forms-list li {
+            margin: 10px;
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: #EBE7D9;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            padding: 15px;
+            padding-top: 25px;
+            padding-left: 20px;
+            padding-right: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .forms-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .forms-list li a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .remove-button {
+            background-color: var(--error-color);
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            width: 100px;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .remove-button:hover {
+            background-color: #c0392b;
+        }
+
+        .no-forms-message {
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--header-color);
+            color: #EBE7D9;
+            margin-top: auto;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--error-color);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #4a5568;
+            text-align: left;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        .address-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .city-state-zip {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* New styles for form checkboxes and buttons */
+        .form-checkbox {
+            position: absolute;
+            top: 5px;
+            left: 3px;
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            z-index: 1;
+            margin-bottom: 5px;
+        }
+
+        .form-action-button {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            width: 100px;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-action-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        #remove-selected-button {
+            background-color: var(--error-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            display: none;
+            width:100%;
+            height:40px;
+        }
+
+        #remove-selected-button:hover {
+            background-color: #c0392b;
+        }
+
+        .protected-section { display: none; }
+    </style>
+</head>
+<body>
+    <header class="protected-section">
+        <img src="logo.png" alt="FormWiz Logo" onclick="location.href='index.html';">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="forms.html">Forms</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+        <div class="user-info">
+            <span class="welcome-message" id="welcome-message"></span>
+            <button class="settings-button" id="settings-button">👤</button>
+        </div>
+    </header>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal protected-section">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeSettings()">&times;</span>
+            <h2>User Information</h2>
+            <form id="user-settings-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="settings-first-name">First Name</label>
+                        <input type="text" id="settings-first-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-last-name">Last Name</label>
+                        <input type="text" id="settings-last-name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-email">Email</label>
+                    <input type="email" id="settings-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-phone">Phone Number</label>
+                    <input type="tel" id="settings-phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Address</label>
+                    <div class="address-row">
+                        <div class="form-group">
+                            <input type="text" id="settings-street" placeholder="Street Address" required>
+                        </div>
+                        <div class="city-state-zip">
+                            <div class="form-group">
+                                <input type="text" id="settings-city" placeholder="City" required>
+                            </div>
+                            <div class="form-group">
+                                <select id="settings-state" required>
+                                    <option value="">State</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AK">AK</option>
+                                    <option value="AZ">AZ</option>
+                                    <option value="AR">AR</option>
+                                    <option value="CA">CA</option>
+                                    <option value="CO">CO</option>
+                                    <option value="CT">CT</option>
+                                    <option value="DE">DE</option>
+                                    <option value="FL">FL</option>
+                                    <option value="GA">GA</option>
+                                    <option value="HI">HI</option>
+                                    <option value="ID">ID</option>
+                                    <option value="IL">IL</option>
+                                    <option value="IN">IN</option>
+                                    <option value="IA">IA</option>
+                                    <option value="KS">KS</option>
+                                    <option value="KY">KY</option>
+                                    <option value="LA">LA</option>
+                                    <option value="ME">ME</option>
+                                    <option value="MD">MD</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MI">MI</option>
+                                    <option value="MN">MN</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MO">MO</option>
+                                    <option value="MT">MT</option>
+                                    <option value="NE">NE</option>
+                                    <option value="NV">NV</option>
+                                    <option value="NH">NH</option>
+                                    <option value="NJ">NJ</option>
+                                    <option value="NM">NM</option>
+                                    <option value="NY">NY</option>
+                                    <option value="NC">NC</option>
+                                    <option value="ND">ND</option>
+                                    <option value="OH">OH</option>
+                                    <option value="OK">OK</option>
+                                    <option value="OR">OR</option>
+                                    <option value="PA">PA</option>
+                                    <option value="RI">RI</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SD">SD</option>
+                                    <option value="TN">TN</option>
+                                    <option value="TX">TX</option>
+                                    <option value="UT">UT</option>
+                                    <option value="VT">VT</option>
+                                    <option value="VA">VA</option>
+                                    <option value="WA">WA</option>
+                                    <option value="WV">WV</option>
+                                    <option value="WI">WI</option>
+                                    <option value="WY">WY</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="settings-zip" placeholder="ZIP" pattern="[0-9]{5}" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">Save Changes</button>
+                <div class="error-message" id="settings-error"></div>
+            </form>
+        </div>
+    </div>
+	
+	<br>
+	<center>
+	<h2 id="portfolio-welcome-message" class="protected-section" style="color: var(--text-color); margin-bottom: 10px;"></h2>
+	</center>
+	
+
+<section class="forms-section protected-section">
+
+ 
+ 
+ 
+    <h1>My Form Portfolio</h1>
+    <ul id="my-forms-list" class="forms-list">
+        <!-- User's forms will be dynamically inserted here -->
+    </ul>
+    <div id="no-forms-message" class="no-forms-message" style="display: none;">
+        You currently have no forms in your portfolio.
+    </div>
+    <center>
+    <button id="remove-selected-button" class="remove-button">Remove Forms</button>
+</section>
+
+    
+    <!-- Available Forms Section -->
+    <section class="forms-section">
+        <h1>Available Forms</h1>
+        <ul id="available-forms-list" class="forms-list">
+            <li><a href="#" data-form-id="fee-waiver" data-form-url="fee-waiver.html?formId=fee-waiver">Court Fees Waiver</a></li>
+            <li><a href="#" data-form-id="example" data-form-url="example.html?formId=example">Example</a></li>
+            <li><a href="#" data-form-id="example2" data-form-url="example2.html?formId=example2">Example2</a></li>
+            <li><a href="#" data-form-id="example3" data-form-url="example3.html?formId=example3">Example3</a></li>
+			<li><a href="#" data-form-id="smallclaims" data-form-url="smallclaims.html?formId=example3">Small Claims</a></li>
+        </ul>
+    </section>
+
+    <center>
+	<br>
+        <button class="logout-button protected-section" id="logout-button">Logout</button>
+    </center><br><br>
+
+    <footer>
+        &copy; 2024 FormWiz. All rights reserved.
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+ <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+        authDomain: "formwiz-3f4fd.firebaseapp.com",
+        projectId: "formwiz-3f4fd",
+        storageBucket: "formwiz-3f4fd.firebasestorage.app",
+        messagingSenderId: "404259212529",
+        appId: "1:404259212529:web:15a33bce82383b21cfed50",
+        measurementId: "G-P07YEN0HPD"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // DOM Elements
+    const welcomeMessage = document.getElementById('welcome-message');
+    const settingsButton = document.getElementById('settings-button');
+    const logoutButton = document.getElementById('logout-button');
+    const settingsModal = document.getElementById('settings-modal');
+    const userSettingsForm = document.getElementById('user-settings-form');
+    const settingsError = document.getElementById('settings-error');
+    const myFormsList = document.getElementById('my-forms-list');
+    const availableFormsList = document.getElementById('available-forms-list');
+    const noFormsMessage = document.getElementById('no-forms-message');
+    const removeSelectedButton = document.getElementById('remove-selected-button');
+
+    // Keep track of selected forms
+    const selectedForms = new Set();
+
+    // Modal Functions
+    function openSettings() {
+        settingsModal.style.display = 'block';
+    }
+
+    function closeSettings() {
+        settingsModal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == settingsModal) {
+            closeSettings();
+        }
+    };
+
+    // Logout Function
+    logoutButton.addEventListener('click', () => {
+        auth.signOut().then(() => {
+            window.location.href = 'index.html';
+        }).catch((error) => {
+            console.error('Sign Out Error', error);
+        });
+    });
+
+    // Form Management Functions
+    function renderMyForms(forms) {
+        myFormsList.innerHTML = '';
+        if (forms.length === 0) {
+            noFormsMessage.style.display = 'block';
+            removeSelectedButton.style.display = 'none';
+        } else {
+            noFormsMessage.style.display = 'none';
+            forms.forEach((form) => {
+                const li = document.createElement('li');
+                
+                // Add checkbox for selection
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('form-checkbox');
+                checkbox.dataset.formId = form.id;
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedForms.add(form.id);
+                    } else {
+                        selectedForms.delete(form.id);
+                    }
+                    updateRemoveSelectedButton();
+                });
+                
+                const a = document.createElement('a');
+                a.href = form.url;
+                a.textContent = form.name;
+                
+                // Create Open button
+                const openButton = document.createElement('button');
+                openButton.textContent = 'Open';
+                openButton.classList.add('form-action-button');
+                openButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = form.url;
+                });
+
+                li.appendChild(checkbox);
+                li.appendChild(a);
+                li.appendChild(openButton);
+                myFormsList.appendChild(li);
+            });
+        }
+    }
+
+    function updateRemoveSelectedButton() {
+        if (selectedForms.size > 0) {
+            removeSelectedButton.style.display = 'block';
+        } else {
+            removeSelectedButton.style.display = 'none';
+        }
+    }
+
+    // Remove selected forms
+    removeSelectedButton.addEventListener('click', async () => {
+        if (selectedForms.size === 0) return;
+        
+        const userId = auth.currentUser.uid;
+        const batch = db.batch();
+        
+        selectedForms.forEach(formId => {
+            const formRef = db.collection('users').doc(userId).collection('forms').doc(formId);
+            batch.delete(formRef);
+        });
+        
+        try {
+            await batch.commit();
+            selectedForms.clear();
+            fetchMyForms(userId);
+        } catch (error) {
+            console.error('Error removing selected forms:', error);
+        }
+    });
+
+    function fetchMyForms(userId) {
+        db.collection('users').doc(userId).collection('forms').get()
+            .then((querySnapshot) => {
+                const forms = [];
+                querySnapshot.forEach((doc) => {
+                    forms.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                renderMyForms(forms);
+                selectedForms.clear();
+                updateRemoveSelectedButton();
+            })
+            .catch((error) => {
+                console.error('Error fetching user forms:', error);
+            });
+    }
+
+    // Update Available Forms rendering
+    function renderAvailableForms() {
+        const formItems = availableFormsList.querySelectorAll('li');
+        
+        formItems.forEach(li => {
+            const anchor = li.querySelector('a');
+            if (anchor) {
+                const formId = anchor.getAttribute('data-form-id');
+                const formUrl = anchor.getAttribute('data-form-url');
+                const formName = anchor.textContent;
+                
+                // Create Click Here button
+                const addButton = document.createElement('button');
+                addButton.textContent = 'Click Here';
+                addButton.classList.add('form-action-button');
+                addButton.dataset.formId = formId;
+                addButton.dataset.formUrl = formUrl;
+                addButton.dataset.formName = formName;
+                
+                addButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    addFormToPortfolio(formId, formUrl, formName);
+                });
+                
+                li.appendChild(addButton);
+            }
+        });
+    }
+    
+    async function addFormToPortfolio(formId, formUrl, formName) {
+        const user = auth.currentUser;
+        if (!user) {
+            // Not signed in, just go to the form
+            window.location.href = formUrl;
+            return;
+        }
+        const userId = user.uid;
+        try {
+            // Check if form exists in user's collection
+            const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
+            if (formDoc.exists) {
+                // Instead of alert, redirect to the form page
+                window.location.href = formUrl;
+            } else {
+                // Add new form to user's collection
+                await db.collection('users').doc(userId).collection('forms').doc(formId).set({
+                    name: formName,
+                    url: formUrl,
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                // Refresh the forms list
+                fetchMyForms(userId);
+            }
+        } catch (error) {
+            console.error('Error handling form:', error);
+        }
+    }
+
+    // Available Forms Click Handler - Keep existing functionality
+    availableFormsList.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (e.target.tagName === 'A') {
+            const formId = e.target.getAttribute('data-form-id');
+            const formUrl = e.target.getAttribute('data-form-url');
+            const formName = e.target.textContent;
+            
+            addFormToPortfolio(formId, formUrl, formName);
+        }
+    });
+
+    // User Settings Form Handler
+    userSettingsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        settingsError.textContent = '';
+        
+        const userId = auth.currentUser.uid;
+        const updatedData = {
+            firstName: document.getElementById('settings-first-name').value.trim(),
+            lastName: document.getElementById('settings-last-name').value.trim(),
+            email: document.getElementById('settings-email').value.trim(),
+            phone: document.getElementById('settings-phone').value.trim(),
+            address: {
+                street: document.getElementById('settings-street').value.trim(),
+                city: document.getElementById('settings-city').value.trim(),
+                state: document.getElementById('settings-state').value,
+                zip: document.getElementById('settings-zip').value.trim()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            // Update user document (create if doesn't exist)
+            await db.collection('users').doc(userId).set(updatedData, { merge: true });
+            
+            // Update welcome message
+            welcomeMessage.textContent = `Welcome ${updatedData.firstName} ${updatedData.lastName}`;
+            
+            // Update auth email if changed
+            if (auth.currentUser.email !== updatedData.email) {
+                await auth.currentUser.updateEmail(updatedData.email);
+            }
+            
+            closeSettings();
+        } catch (error) {
+            settingsError.textContent = error.message;
+            console.error('Error updating profile:', error);
+        }
+    });
+
+    // Update the auth state listener in forms.html
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            // Show protected sections
+            document.querySelectorAll('.protected-section').forEach(el => el.style.display = '');
+            try {
+                // Get user document from Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    welcomeMessage.textContent = `${userData.firstName} ${userData.lastName}`;
+                    document.getElementById('portfolio-welcome-message').textContent = `Welcome, ${userData.firstName} ${userData.lastName}`;
+                    document.getElementById('settings-first-name').value = userData.firstName || '';
+                    document.getElementById('settings-last-name').value = userData.lastName || '';
+                    document.getElementById('settings-email').value = userData.email || user.email || '';
+                    document.getElementById('settings-phone').value = userData.phone || '';
+                    document.getElementById('settings-street').value = userData.address?.street || '';
+                    document.getElementById('settings-city').value = userData.address?.city || '';
+                    document.getElementById('settings-state').value = userData.address?.state || '';
+                    document.getElementById('settings-zip').value = userData.address?.zip || '';
+                    fetchMyForms(user.uid);
+                    renderAvailableForms();
+                } else {
+                    const newUserData = {
+                        firstName: '',
+                        lastName: '',
+                        email: user.email,
+                        phone: '',
+                        address: {
+                            street: '',
+                            city: '',
+                            state: '',
+                            zip: ''
+                        },
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    await db.collection('users').doc(user.uid).set(newUserData);
+                    welcomeMessage.textContent = `Welcome User`;
+                    renderAvailableForms();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                welcomeMessage.textContent = 'Welcome User';
+            }
+            settingsButton.addEventListener('click', openSettings);
+        } else {
+            // Hide protected sections
+            document.querySelectorAll('.protected-section').forEach(el => el.style.display = 'none');
+            // DO NOT redirect to account.html here anymore
+            // Only handle available forms section and click handlers
+            const availableSection = document.querySelectorAll('.forms-section')[1];
+            availableSection.querySelector('h1').textContent = 'Available Forms';
+            let desc = availableSection.querySelector('.available-desc');
+            if (!desc) {
+                desc = document.createElement('div');
+                desc.className = 'available-desc';
+                availableSection.insertBefore(desc, availableSection.querySelector('ul'));
+            }
+            desc.textContent = 'Browse through a wide variety of the forms we offer.';
+            // Remove all add buttons if present, then re-render with click handler
+            const availableFormsList = document.getElementById('available-forms-list');
+            availableFormsList.querySelectorAll('button.form-action-button').forEach(btn => btn.remove());
+            const formItems = availableFormsList.querySelectorAll('li');
+            formItems.forEach(li => {
+                const anchor = li.querySelector('a');
+                if (anchor) {
+                    // Remove any existing button
+                    const oldBtn = li.querySelector('button.form-action-button');
+                    if (oldBtn) oldBtn.remove();
+                    // Add Click Here button
+                    const addButton = document.createElement('button');
+                    addButton.textContent = 'Click Here';
+                    addButton.classList.add('form-action-button');
+                    addButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = 'account.html';
+                    });
+                    li.appendChild(addButton);
+                    // Also, clicking the form name should redirect
+                    anchor.onclick = (e) => {
+                        e.preventDefault();
+                        window.location.href = 'account.html';
+                    };
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

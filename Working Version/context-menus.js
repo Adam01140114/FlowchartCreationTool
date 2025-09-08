@@ -22,47 +22,26 @@ let placeQuestionNode, placeOptionNode, placeNotesNode, placeChecklistNode, plac
 
 // Initialize DOM element references
 function initializeContextMenuElements() {
-  console.log("🔧 [CONTEXT MENU DEBUG] ===== INITIALIZING DOM ELEMENTS =====");
   contextMenu = document.getElementById('contextMenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] contextMenu found:", !!contextMenu);
   notesContextMenu = document.getElementById('notesContextMenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] notesContextMenu found:", !!notesContextMenu);
   edgeContextMenu = document.getElementById('edgeContextMenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] edgeContextMenu found:", !!edgeContextMenu);
   edgeStyleSubmenu = document.getElementById('edgeStyleSubmenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] edgeStyleSubmenu found:", !!edgeStyleSubmenu);
   typeSubmenu = document.getElementById('typeSubmenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] typeSubmenu found:", !!typeSubmenu);
   calcSubmenu = document.getElementById('calcSubmenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] calcSubmenu found:", !!calcSubmenu);
   optionTypeSubmenu = document.getElementById('optionTypeSubmenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] optionTypeSubmenu found:", !!optionTypeSubmenu);
   emptySpaceMenu = document.getElementById('emptySpaceMenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] emptySpaceMenu found:", !!emptySpaceMenu);
   propertiesMenu = document.getElementById('propertiesMenu');
-  console.log("🔧 [CONTEXT MENU DEBUG] propertiesMenu found:", !!propertiesMenu);
   
   deleteNode = document.getElementById('deleteNode');
-  console.log("🔧 [CONTEXT MENU DEBUG] deleteNode found:", !!deleteNode);
   copyNodeButton = document.getElementById('copyNodeButton');
-  console.log("🔧 [CONTEXT MENU DEBUG] copyNodeButton found:", !!copyNodeButton);
   jumpNode = document.getElementById('jumpNode');
-  console.log("🔧 [CONTEXT MENU DEBUG] jumpNode found:", !!jumpNode);
   yesNoNode = document.getElementById('yesNoNode');
-  console.log("🔧 [CONTEXT MENU DEBUG] yesNoNode found:", !!yesNoNode);
   changeType = document.getElementById('changeType');
-  console.log("🔧 [CONTEXT MENU DEBUG] changeType found:", !!changeType);
   calcTypeBtn = document.getElementById('calcTypeBtn');
-  console.log("🔧 [CONTEXT MENU DEBUG] calcTypeBtn found:", !!calcTypeBtn);
   subtitleTypeBtn = document.getElementById('subtitleTypeBtn');
-  console.log("🔧 [CONTEXT MENU DEBUG] subtitleTypeBtn found:", !!subtitleTypeBtn);
   infoTypeBtn = document.getElementById('infoTypeBtn');
-  console.log("🔧 [CONTEXT MENU DEBUG] infoTypeBtn found:", !!infoTypeBtn);
   renameNode = document.getElementById('renameNode');
-  console.log("🔧 [CONTEXT MENU DEBUG] renameNode found:", !!renameNode);
   propertiesButton = document.getElementById('propertiesButton');
-  console.log("🔧 [CONTEXT MENU DEBUG] Properties button element found:", propertiesButton);
-  console.log("🔧 [CONTEXT MENU DEBUG] Properties button exists:", !!propertiesButton);
   
   regularOptionType = document.getElementById('regularOptionType');
   imageOptionType = document.getElementById('imageOptionType');
@@ -96,9 +75,6 @@ function initializeContextMenuElements() {
   placeAmountNode = document.getElementById('placeAmountNode');
   placeEndNode = document.getElementById('placeEndNode');
   
-  console.log("🔧 [CONTEXT MENU DEBUG] ===== DOM ELEMENTS INITIALIZATION COMPLETE =====");
-  console.log("🔧 [CONTEXT MENU DEBUG] Final propertiesButton status:", !!propertiesButton);
-  console.log("🔧 [CONTEXT MENU DEBUG] Final contextMenu status:", !!contextMenu);
 
 }
 
@@ -835,93 +811,25 @@ function setupContextMenuEventListeners(graph) {
 
   // Properties button event handler
   if (propertiesButton) {
-    console.log("🔧 [CONTEXT MENU DEBUG] Properties button found, adding event listener");
-    propertiesButton.addEventListener("click", (event) => {
-      console.log("🔧 [CONTEXT MENU DEBUG] ===== PROPERTIES BUTTON CLICKED =====");
-      console.log("🔧 [CONTEXT MENU DEBUG] Event object:", event);
-      console.log("🔧 [CONTEXT MENU DEBUG] Event target:", event.target);
-      console.log("🔧 [CONTEXT MENU DEBUG] Event currentTarget:", event.currentTarget);
-      console.log("🔧 [CONTEXT MENU DEBUG] selectedCell:", window.selectedCell);
-      console.log("🔧 [CONTEXT MENU DEBUG] selectedCell ID:", window.selectedCell?.id);
-      console.log("🔧 [CONTEXT MENU DEBUG] selectedCell type:", typeof window.selectedCell);
-      console.log("🔧 [CONTEXT MENU DEBUG] currentMouseEvent:", window.currentMouseEvent);
-      console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup function exists:", typeof window.showPropertiesPopup === 'function');
-      console.log("🔧 [CONTEXT MENU DEBUG] window.showPropertiesPopup:", window.showPropertiesPopup);
-      
-      // Check if the function is actually callable
-      if (typeof window.showPropertiesPopup === 'function') {
-        console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup is a function, checking if it's callable...");
-        try {
-          console.log("🔧 [CONTEXT MENU DEBUG] About to call showPropertiesPopup...");
-          const result = window.showPropertiesPopup(window.selectedCell);
-          console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup called successfully, result:", result);
-        } catch (error) {
-          console.error("🔧 [CONTEXT MENU DEBUG] Error calling showPropertiesPopup:", error);
-          console.error("🔧 [CONTEXT MENU DEBUG] Error stack:", error.stack);
-        }
-      } else {
-        console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup is not a function or not available");
-        console.log("🔧 [CONTEXT MENU DEBUG] Available window functions containing 'Properties':", 
-          Object.keys(window).filter(key => key.toLowerCase().includes('properties')));
-        console.log("🔧 [CONTEXT MENU DEBUG] Available window functions containing 'Popup':", 
-          Object.keys(window).filter(key => key.toLowerCase().includes('popup')));
-      }
-      
+    console.log("Properties button found, adding event listener");
+    propertiesButton.addEventListener("click", () => {
+      console.log("Properties button clicked!");
+      console.log("selectedCell:", window.selectedCell);
+      console.log("currentMouseEvent:", window.currentMouseEvent);
       if (window.selectedCell) {
-        console.log("🔧 [CONTEXT MENU DEBUG] selectedCell exists, proceeding with popup call");
         // Use the new popup instead of the old menu
         if (window.showPropertiesPopup) {
-          console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup exists, calling it with cell:", window.selectedCell);
-          try {
-            window.showPropertiesPopup(window.selectedCell);
-            console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup called successfully");
-          } catch (error) {
-            console.error("🔧 [CONTEXT MENU DEBUG] Error calling showPropertiesPopup:", error);
-            console.error("🔧 [CONTEXT MENU DEBUG] Error details:", {
-              name: error.name,
-              message: error.message,
-              stack: error.stack
-            });
-          }
+          window.showPropertiesPopup(window.selectedCell);
         } else {
-          console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup function not available");
-          console.log("🔧 [CONTEXT MENU DEBUG] Falling back to old properties menu...");
-          // Fallback to old properties menu
-          if (typeof showPropertiesMenu === 'function') {
-            console.log("🔧 [CONTEXT MENU DEBUG] Using fallback showPropertiesMenu");
-            showPropertiesMenu(window.selectedCell, window.currentMouseEvent || { clientX: 0, clientY: 0 });
-          } else {
-            console.log("🔧 [CONTEXT MENU DEBUG] No fallback available either");
-            // Try to wait a bit and check again for showPropertiesPopup
-            console.log("🔧 [CONTEXT MENU DEBUG] Waiting 100ms and trying showPropertiesPopup again...");
-            setTimeout(() => {
-              if (typeof window.showPropertiesPopup === 'function') {
-                console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup now available, calling it");
-                window.showPropertiesPopup(window.selectedCell);
-              } else {
-                console.log("🔧 [CONTEXT MENU DEBUG] showPropertiesPopup still not available after delay");
-              }
-            }, 100);
-          }
+          console.log("showPropertiesPopup function not available");
         }
       } else {
-        console.log("🔧 [CONTEXT MENU DEBUG] Missing selectedCell - cannot show properties");
-        console.log("🔧 [CONTEXT MENU DEBUG] Current graph selection:", graph?.getSelectionCells?.());
+        console.log("Missing selectedCell");
       }
-      
-      // Delay hiding the context menu to give the popup time to be created
-      setTimeout(() => {
-        console.log("🔧 [CONTEXT MENU DEBUG] Hiding context menu after delay");
-        hideContextMenu();
-      }, 100);
-      
-      console.log("🔧 [CONTEXT MENU DEBUG] ===== END PROPERTIES BUTTON CLICK =====");
+      hideContextMenu();
     });
   } else {
-    console.log("🔧 [CONTEXT MENU DEBUG] Properties button not found!");
-    console.log("🔧 [CONTEXT MENU DEBUG] Available buttons in context menu:", 
-      document.querySelectorAll('#contextMenu button, #contextMenu a').length);
-    console.log("🔧 [CONTEXT MENU DEBUG] Context menu HTML:", document.getElementById('contextMenu')?.innerHTML);
+    console.log("Properties button not found!");
   }
 
   // Notes context menu event handlers
@@ -1624,26 +1532,16 @@ function placeNodeAtClickLocation(graph, nodeType) {
 
 // Initialize the module
 function initializeContextMenusModule(graph) {
-  console.log("🔧 [CONTEXT MENU DEBUG] ===== INITIALIZING CONTEXT MENU MODULE =====");
-  if (!graph) {
-    console.log("🔧 [CONTEXT MENU DEBUG] No graph provided, returning early");
-    return;
-  }
-  console.log("🔧 [CONTEXT MENU DEBUG] Graph provided, proceeding with initialization");
+  if (!graph) return;
   
   // Initialize DOM element references first
-  console.log("🔧 [CONTEXT MENU DEBUG] Initializing DOM element references");
   initializeContextMenuElements();
   
   // Setup context menus
-  console.log("🔧 [CONTEXT MENU DEBUG] Setting up context menus");
   setupContextMenus(graph);
   
   // Setup event listeners
-  console.log("🔧 [CONTEXT MENU DEBUG] Setting up event listeners");
   setupContextMenuEventListeners(graph);
-  
-  console.log("🔧 [CONTEXT MENU DEBUG] ===== CONTEXT MENU MODULE INITIALIZATION COMPLETE =====");
 }
 
 // Export all functions to window.contextMenus namespace
@@ -1673,42 +1571,6 @@ Object.assign(window, {
   showPropertiesMenu,
   placeNodeAtClickLocation
 });
-
-// Test function for debugging context menu properties button
-window.testContextMenuProperties = function() {
-  console.log("🔧 [TEST] Testing context menu properties button...");
-  const graph = window.graph;
-  if (!graph) {
-    console.log("🔧 [TEST] No graph available");
-    return;
-  }
-  
-  const selectedCells = graph.getSelectionCells();
-  if (selectedCells.length === 0) {
-    console.log("🔧 [TEST] No cells selected, selecting first available cell");
-    const vertices = graph.getChildVertices(graph.getDefaultParent());
-    if (vertices.length > 0) {
-      graph.setSelectionCell(vertices[0]);
-      window.selectedCell = vertices[0];
-      console.log("🔧 [TEST] Selected cell:", vertices[0]);
-    } else {
-      console.log("🔧 [TEST] No vertices available");
-      return;
-    }
-  } else {
-    window.selectedCell = selectedCells[0];
-    console.log("🔧 [TEST] Using selected cell:", selectedCells[0]);
-  }
-  
-  // Simulate clicking the properties button
-  const propertiesButton = document.getElementById('propertiesButton');
-  if (propertiesButton) {
-    console.log("🔧 [TEST] Properties button found, simulating click");
-    propertiesButton.click();
-  } else {
-    console.log("🔧 [TEST] Properties button not found");
-  }
-};
 
 // Initialize the module when DOM is ready
 if (document.readyState === 'loading') {

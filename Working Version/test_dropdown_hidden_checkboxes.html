@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dropdown Hidden Checkboxes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .hidden-checkbox { display: none; }
+        .checkbox-info { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 3px; }
+        select { padding: 5px; margin: 10px 0; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Test: Dropdown Hidden Checkboxes</h1>
+    
+    <div class="test-section">
+        <h3>Test Dropdown</h3>
+        <label for="answer1">Are you currently employed?</label><br>
+        <select id="answer1" name="answer1" onchange="dropdownMirror(this, 'answer1')">
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+        
+        <div id="dropdowntext_answer1"></div>
+        <input type="text" id="answer1_dropdown" name="answer1_dropdown" readonly style="display:none;">
+    </div>
+    
+    <div class="test-section">
+        <h3>Hidden Checkbox Status</h3>
+        <div class="checkbox-info">
+            <strong>answer1_yes:</strong> <span id="status_yes">Not checked</span><br>
+            <strong>answer1_no:</strong> <span id="status_no">Not checked</span>
+        </div>
+        <button onclick="updateStatus()">Update Status</button>
+        <button onclick="showAllCheckboxes()">Show All Hidden Checkboxes</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>Instructions</h3>
+        <ol>
+            <li>Select "Yes" from the dropdown - answer1_yes should be checked, answer1_no should be unchecked</li>
+            <li>Select "No" from the dropdown - answer1_no should be checked, answer1_yes should be unchecked</li>
+            <li>Click "Update Status" to see the current state of hidden checkboxes</li>
+            <li>Click "Show All Hidden Checkboxes" to see all hidden checkboxes in the form</li>
+        </ol>
+    </div>
+
+    <form id="customForm">
+        <!-- Hidden checkboxes will be added here automatically -->
+    </form>
+
+    <script>
+        // Include the necessary functions from generate.js
+        function updateHiddenDropdownCheckboxes(baseName, selectedValue) {
+            // Find the dropdown element to get its options
+            const dropdown = document.getElementById(baseName);
+            if (!dropdown || dropdown.tagName !== 'SELECT') return;
+            
+            // Get all options from the dropdown
+            const options = Array.from(dropdown.options).filter(option => option.value.trim() !== '');
+            
+            // For each option, create or update the corresponding hidden checkbox
+            options.forEach(option => {
+                const optionValue = option.value.trim();
+                if (!optionValue) return;
+                
+                // Create checkbox ID based on the option value
+                const checkboxId = baseName + "_" + optionValue.replace(/\W+/g, "_").toLowerCase();
+                
+                // Check if checkbox already exists
+                let checkbox = document.getElementById(checkboxId);
+                
+                if (!checkbox) {
+                    // Create the hidden checkbox if it doesn't exist
+                    checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = checkboxId;
+                    checkbox.name = checkboxId;
+                    checkbox.style.display = 'none';
+                    
+                    // Add it to the form or a hidden container
+                    const form = document.getElementById('customForm');
+                    if (form) {
+                        form.appendChild(checkbox);
+                    }
+                }
+                
+                // Set the checkbox state based on whether this option is selected
+                checkbox.checked = (optionValue === selectedValue);
+            });
+        }
+
+        function initializeDropdownHiddenCheckboxes() {
+            // Find all dropdown elements in the form
+            const dropdowns = document.querySelectorAll('#customForm select');
+            
+            dropdowns.forEach(dropdown => {
+                // Initialize hidden checkboxes for this dropdown
+                updateHiddenDropdownCheckboxes(dropdown.id, dropdown.value);
+            });
+        }
+
+        function dropdownMirror(selectEl, baseName){
+            const wrap = document.getElementById("dropdowntext_"+baseName);
+            if(!wrap) return;
+
+            const val = selectEl.value.trim();
+            if(!val) {
+                wrap.innerHTML = "";
+                // Uncheck all hidden checkboxes when no option is selected
+                updateHiddenDropdownCheckboxes(baseName, "");
+                return;
+            }
+
+            const textId = baseName + "_dropdown";
+            const textField = document.getElementById(textId);
+            
+            if(textField) {
+                textField.value = val;
+                textField.style.display = "none";
+            }
+
+            const existingCheckboxes = wrap.querySelectorAll("div");
+            existingCheckboxes.forEach(div => div.remove());
+
+            const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+            const checkboxId = baseName + "_" + idSuffix;
+            
+            const checkboxDiv = document.createElement("div");
+            checkboxDiv.style.display = "none";
+            checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                             "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+            
+            wrap.appendChild(checkboxDiv);
+            
+            // Update hidden checkboxes for dropdown options
+            updateHiddenDropdownCheckboxes(baseName, val);
+        }
+
+        function updateStatus() {
+            const yesCheckbox = document.getElementById('answer1_yes');
+            const noCheckbox = document.getElementById('answer1_no');
+            
+            document.getElementById('status_yes').textContent = yesCheckbox ? (yesCheckbox.checked ? 'Checked' : 'Not checked') : 'Not found';
+            document.getElementById('status_no').textContent = noCheckbox ? (noCheckbox.checked ? 'Checked' : 'Not checked') : 'Not found';
+        }
+
+        function showAllCheckboxes() {
+            const form = document.getElementById('customForm');
+            const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+            
+            let info = '<h4>All Hidden Checkboxes:</h4>';
+            checkboxes.forEach(checkbox => {
+                info += `<div><strong>${checkbox.id}:</strong> ${checkbox.checked ? 'Checked' : 'Not checked'}</div>`;
+            });
+            
+            alert(info);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDropdownHiddenCheckboxes();
+            updateStatus();
+        });
+    </script>
+</body>
+</html>

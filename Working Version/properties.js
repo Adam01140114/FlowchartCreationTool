@@ -211,8 +211,17 @@ function onSectionNameFieldChange(newName) {
 
 // Setup Properties Panel Event Listeners
 function setupPropertiesPanelEventListeners() {
-  // Properties button event listener is now handled by context-menus.js
-  // No need to duplicate the event listener here
+  // Properties button event listener
+  const propertiesButton = document.getElementById("propertiesButton");
+  if (propertiesButton) {
+    propertiesButton.addEventListener("click", () => {
+      if (window.selectedCell && window.currentMouseEvent) {
+        if (typeof window.showPropertiesMenu === 'function') {
+          window.showPropertiesMenu(window.selectedCell, window.currentMouseEvent);
+        }
+      }
+    });
+  }
 }
 
 // Setup Editable Fields

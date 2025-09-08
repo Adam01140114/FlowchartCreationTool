@@ -222,12 +222,10 @@ function setupCustomDoubleClickBehavior(graph) {
         //console.log("🎯 DOUBLE CLICK DETECTED manually!");
         //alert("double click detected");
         
-        // Show properties popup for question nodes
+        // Show question text popup for question nodes
         if (typeof isQuestion === 'function' && isQuestion(cell)) {
-          console.log("🎯 Question node detected, showing properties popup");
-          if (typeof window.showPropertiesPopup === 'function') {
-            window.showPropertiesPopup(cell);
-          }
+          console.log("🎯 Question node detected, showing popup");
+          showQuestionTextPopup(cell);
           return;
         }
         
@@ -252,12 +250,10 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     
-    // Show properties popup for question nodes
+    // Show question text popup for question nodes
     if (cell && cell.vertex) {
       if (typeof isQuestion === 'function' && isQuestion(cell)) {
-        if (typeof window.showPropertiesPopup === 'function') {
-          window.showPropertiesPopup(cell);
-        }
+        showQuestionTextPopup(cell);
         mxEvent.consume(evt);
         return;
       }
@@ -268,26 +264,24 @@ function setupCustomDoubleClickBehavior(graph) {
       graph.setSelectionCell(cell);
     }
     
-    // Handle question nodes with properties popup
+    // Handle question nodes with a popup for text editing
     if (cell && typeof isQuestion === 'function' && isQuestion(cell)) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
+      if (typeof showQuestionTextPopup === 'function') {
+        showQuestionTextPopup(cell);
         mxEvent.consume(evt);
         return;
       }
     } else if (cell && typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
+      if (typeof window.showQuestionTextPopup === 'function') {
+        window.showQuestionTextPopup(cell);
         mxEvent.consume(evt);
         return;
       }
     }
     
-    // Show properties popup for option nodes on double-click
+    // Add direct editing for option nodes on double-click
     if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
-      }
+      graph.startEditingAtCell(cell);
       mxEvent.consume(evt);
       return;
     }
@@ -336,39 +330,16 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
-  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup CALLED =====");
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell parameter:", cell);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell ID:", cell?.id);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell type:", typeof cell);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell value:", cell?.value);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell style:", cell?.style);
-  
   // Prevent multiple popups
   if (window.__propertiesPopupOpen) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup already open, returning early");
     return;
   }
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup open flag");
   window.__propertiesPopupOpen = true;
   
   // Clean up any existing popups
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cleaning up existing popups");
-  const existingPopups = document.querySelectorAll('.properties-modal');
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Found existing popups:", existingPopups.length);
-  existingPopups.forEach(n => n.remove());
-  
-  // Hide any old properties menu that might be showing
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Hiding old properties menu");
-  const oldPropertiesMenu = document.getElementById('propertiesMenu');
-  if (oldPropertiesMenu) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Old properties menu found, hiding it");
-    oldPropertiesMenu.style.display = 'none';
-  } else {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] No old properties menu found");
-  }
+  document.querySelectorAll('.properties-modal').forEach(n => n.remove());
   
   // Create popup container
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating popup container");
   const popup = document.createElement('div');
   popup.className = 'properties-modal';
   popup.style.cssText = `
@@ -388,18 +359,8 @@ function showPropertiesPopup(cell) {
     pointer-events: auto;
     opacity: 1;
   `;
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup CSS styles applied (matching working version)");
-  
-  // Force the popup to be visible by setting styles directly
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup visibility styles");
-  popup.style.pointerEvents = 'auto';
-  popup.style.opacity = '1';
-  popup.style.display = 'block';
-  popup.style.visibility = 'visible';
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup styles set, adding to DOM");
   
   // Create header
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating header element");
   const header = document.createElement('div');
   header.style.cssText = `
     display: flex;
@@ -408,7 +369,6 @@ function showPropertiesPopup(cell) {
     margin-bottom: 20px;
     padding-bottom: 12px;
     border-bottom: 1px solid #e0e0e0;
-    min-height: 40px;
   `;
   
   const title = document.createElement('h3');
@@ -441,21 +401,14 @@ function showPropertiesPopup(cell) {
   
   header.appendChild(title);
   header.appendChild(closeBtn);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Header created with content");
   
   // Create content area
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating content area");
   const content = document.createElement('div');
   content.style.cssText = `
     max-height: 400px;
     overflow-y: auto;
     padding-right: 8px;
-    min-height: 200px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 15px;
   `;
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Content area created with styles");
   
   // Get cell properties
   const nodeText = cell._questionText || (() => {
@@ -700,11 +653,7 @@ function showPropertiesPopup(cell) {
     );
   }
   
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties array:", properties);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties count:", properties.length);
-  
-  properties.forEach((prop, index) => {
-    console.log(`🔧 [PROPERTIES POPUP DEBUG] Processing property ${index}:`, prop);
+  properties.forEach(prop => {
     const fieldDiv = document.createElement('div');
     fieldDiv.style.cssText = `
       margin-bottom: 16px;
@@ -889,27 +838,6 @@ function showPropertiesPopup(cell) {
               case 'propNodeText':
                 cell._questionText = newValue;
                 cell.value = newValue;
-                
-                // Auto-update node ID based on text for option nodes
-                if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
-                  const autoNodeId = newValue.toLowerCase()
-                    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-                    .replace(/\s+/g, '_') // Replace spaces with underscores
-                    .substring(0, 20); // Limit length
-                  
-                  if (autoNodeId) {
-                    cell._nameId = autoNodeId;
-                    // Update the node ID field in the popup if it exists
-                    const nodeIdField = document.getElementById('propNodeId');
-                    if (nodeIdField) {
-                      const nodeIdSpan = nodeIdField.querySelector('span');
-                      if (nodeIdSpan) {
-                        nodeIdSpan.textContent = autoNodeId;
-                      }
-                    }
-                    console.log('Auto-updated node ID to:', autoNodeId);
-                  }
-                }
                 break;
               case 'propNodeSection':
                 // Update section using the proper setSection function
@@ -997,33 +925,7 @@ function showPropertiesPopup(cell) {
     fieldDiv.appendChild(label);
     fieldDiv.appendChild(valueSpan);
     content.appendChild(fieldDiv);
-    console.log(`🔧 [PROPERTIES POPUP DEBUG] Added field ${index} to content, content now has ${content.children.length} children`);
   });
-  
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Finished processing properties, content has", content.children.length, "children");
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Content innerHTML length:", content.innerHTML.length);
-  
-  // Ensure content has some content even if properties array was empty
-  if (content.children.length === 0) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] No properties found, adding fallback content");
-    const fallbackDiv = document.createElement('div');
-    fallbackDiv.innerHTML = `
-      <div style="margin-bottom: 15px;">
-        <strong>Node ID:</strong> <span>${cell.id || 'Unknown'}</span>
-      </div>
-      <div style="margin-bottom: 15px;">
-        <strong>Node Type:</strong> <span>${cell.style?.includes('nodeType=question') ? 'Question' : 'Other'}</span>
-      </div>
-      <div style="margin-bottom: 15px;">
-        <strong>Node Value:</strong> <span>${cell.value ? 'Has content' : 'No content'}</span>
-      </div>
-      <div style="margin-bottom: 15px;">
-        <strong>Style:</strong> <span>${cell.style ? 'Has style' : 'No style'}</span>
-      </div>
-    `;
-    content.appendChild(fallbackDiv);
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Fallback content added");
-  }
   
   // Create buttons
   const buttonContainer = document.createElement('div');
@@ -1053,92 +955,10 @@ function showPropertiesPopup(cell) {
   buttonContainer.appendChild(cancelBtn);
   
   // Assemble popup
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Assembling popup elements");
   popup.appendChild(header);
   popup.appendChild(content);
   popup.appendChild(buttonContainer);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup assembled, adding to document body");
   document.body.appendChild(popup);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup added to DOM successfully");
-  
-  // Verify popup is actually in the DOM
-  const popupInDOM = document.querySelector('.properties-modal');
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup found in DOM:", popupInDOM);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup parent:", popup.parentNode);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup in document.body:", document.body.contains(popup));
-  
-  // Check popup dimensions immediately after adding to DOM
-  const initialRect = popup.getBoundingClientRect();
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Initial popup dimensions:", initialRect);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup children count:", popup.children.length);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Header children:", header.children.length);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Content children:", content.children.length);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Button container children:", buttonContainer.children.length);
-  
-  // Check for any conflicting CSS rules
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Checking for CSS conflicts...");
-  const allStyles = document.styleSheets;
-  let conflictingRules = [];
-  for (let i = 0; i < allStyles.length; i++) {
-    try {
-      const sheet = allStyles[i];
-      if (sheet.cssRules) {
-        for (let j = 0; j < sheet.cssRules.length; j++) {
-          const rule = sheet.cssRules[j];
-          if (rule.selectorText && rule.selectorText.includes('properties-modal')) {
-            conflictingRules.push({
-              selector: rule.selectorText,
-              styles: rule.style.cssText
-            });
-          }
-        }
-      }
-    } catch (e) {
-      // Skip stylesheets that can't be accessed (CORS issues)
-    }
-  }
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Conflicting CSS rules found:", conflictingRules);
-  
-  
-  // Popup should now be visible
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup should now be visible");
-  
-  // Simple visibility check (matching working version approach)
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup should be visible now");
-  const finalRect = popup.getBoundingClientRect();
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Final popup dimensions:", finalRect);
-  
-  // Popup should now be visible without the DOM re-insertion issue
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup creation completed successfully");
-  
-  // Temporary alert to confirm popup creation
-  setTimeout(() => {
-    // Check if popup still exists after 100ms
-    const popupStillExists = document.querySelector('.properties-modal');
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup still exists after 100ms:", popupStillExists);
-    if (popupStillExists) {
-      const rect = popupStillExists.getBoundingClientRect();
-      console.log("🔧 [PROPERTIES POPUP DEBUG] Popup dimensions after 100ms:", rect);
-      //alert("Properties popup created successfully! You should see the properties dialog in the center of the screen. Dimensions: " + rect.width + "x" + rect.height);
-    } else {
-      //alert("ERROR: Properties popup was created but disappeared after 100ms! Something is removing it.");
-    }
-  }, 100);
-  
-  // Auto-copy node ID to clipboard when popup opens
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Checking node ID for clipboard copy");
-  if (nodeId && nodeId.trim()) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Copying node ID to clipboard:", nodeId);
-    navigator.clipboard.writeText(nodeId).then(() => {
-      console.log('🔧 [PROPERTIES POPUP DEBUG] Node ID copied to clipboard:', nodeId);
-    }).catch(err => {
-      console.error('🔧 [PROPERTIES POPUP DEBUG] Failed to copy node ID to clipboard:', err);
-    });
-  } else {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] No node ID to copy to clipboard");
-  }
-  
-  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup COMPLETED =====");
   
   // Focus management
   let focusTimeout = null;
@@ -1190,24 +1010,11 @@ function showPropertiesPopup(cell) {
   });
   
   // Handle clicking outside popup
-  const handleOutsideClick = (e) => {
-    if (!popup.contains(e.target)) {
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) {
       newClosePopup();
     }
-  };
-  
-  // Add event listener to document for outside clicks with a delay to prevent immediate closure
-  setTimeout(() => {
-    document.addEventListener('click', handleOutsideClick);
-  }, 200);
-  
-  // Clean up the outside click listener when popup closes
-  const originalClosePopup = closePopup;
-  const newClosePopup = () => {
-    document.removeEventListener('click', handleOutsideClick);
-    document.removeEventListener('keydown', handleEscape);
-    originalClosePopup();
-  };
+  });
   
   // Handle Escape key
   const handleEscape = (e) => {
@@ -1219,6 +1026,13 @@ function showPropertiesPopup(cell) {
   };
   
   document.addEventListener('keydown', handleEscape);
+  
+  // Clean up escape listener when popup closes
+  const originalClosePopup = closePopup;
+  const newClosePopup = () => {
+    document.removeEventListener('keydown', handleEscape);
+    originalClosePopup();
+  };
   
   // Add hover effects for close button
   closeBtn.addEventListener('mouseenter', () => {
@@ -1932,30 +1746,4 @@ window.setupKeyboardNavigation = setupKeyboardNavigation;
 window.setupPanningAndZooming = setupPanningAndZooming;
 window.showQuestionTextPopup = showQuestionTextPopup;
 window.showPropertiesPopup = showPropertiesPopup;
-
-// Test function for debugging properties popup
-window.testPropertiesPopup = function() {
-  console.log("🔧 [TEST] Testing properties popup...");
-  const graph = window.graph;
-  if (!graph) {
-    console.log("🔧 [TEST] No graph available");
-    return;
-  }
-  
-  const selectedCells = graph.getSelectionCells();
-  if (selectedCells.length === 0) {
-    console.log("🔧 [TEST] No cells selected, selecting first available cell");
-    const vertices = graph.getChildVertices(graph.getDefaultParent());
-    if (vertices.length > 0) {
-      graph.setSelectionCell(vertices[0]);
-      console.log("🔧 [TEST] Selected cell:", vertices[0]);
-      showPropertiesPopup(vertices[0]);
-    } else {
-      console.log("🔧 [TEST] No vertices available");
-    }
-  } else {
-    console.log("🔧 [TEST] Using selected cell:", selectedCells[0]);
-    showPropertiesPopup(selectedCells[0]);
-  }
-};
 

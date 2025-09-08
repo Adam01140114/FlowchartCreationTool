@@ -901,40 +901,6 @@ keyHandler.bindControlKey(86, () => {
     refreshAllCells();
   });
 
-// Function to propagate PDF properties downstream through the flowchart
-function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new Set()) {
-    if (!startCell || visited.has(startCell.id)) return;
-    visited.add(startCell.id);
-    
-    const graph = window.graph;
-    if (!graph) return;
-    
-    // Get all outgoing edges from the start cell
-    const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
-    
-    for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (targetCell && !visited.has(targetCell.id)) {
-            // Check if target doesn't already have PDF properties
-            if (!targetCell._pdfName && !targetCell._pdfFilename && !targetCell._pdfUrl && 
-                !(typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell))) {
-                
-                // Copy PDF properties from source to target
-                if (sourceCell._pdfName) targetCell._pdfName = sourceCell._pdfName;
-                if (sourceCell._pdfFilename) targetCell._pdfFilename = sourceCell._pdfFilename;
-                if (sourceCell._pdfUrl) targetCell._pdfUrl = sourceCell._pdfUrl;
-                if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
-                if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
-                
-                console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
-                
-                // Recursively propagate to further downstream nodes
-                propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
-            }
-        }
-    }
-}
-
   graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
     const edge = evt.getProperty("cell");
     if (!edge) return;
@@ -986,34 +952,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
             if (optionSection !== null && optionSection > (questionSection || 0)) {
                 setSection(source, optionSection);
             }
-        }
-        
-        // PDF Property Inheritance: Propagate PDF properties from source to target
-        // This ensures PDF properties flow through the entire flowchart chain
-        if (source && target) {
-            // Check if source has PDF properties
-            const sourceHasPdfProperties = source._pdfName || source._pdfFilename || source._pdfUrl || 
-                                         (typeof window.isPdfNode === 'function' && window.isPdfNode(source));
-            
-            if (sourceHasPdfProperties) {
-                // Propagate PDF properties to target if it doesn't already have them
-                if (!target._pdfName && !target._pdfFilename && !target._pdfUrl && 
-                    !(typeof window.isPdfNode === 'function' && window.isPdfNode(target))) {
-                    
-                    // Copy PDF properties from source to target
-                    if (source._pdfName) target._pdfName = source._pdfName;
-                    if (source._pdfFilename) target._pdfFilename = source._pdfFilename;
-                    if (source._pdfUrl) target._pdfUrl = source._pdfUrl;
-                    if (source._priceId) target._priceId = source._priceId;
-                    if (source._characterLimit) target._characterLimit = source._characterLimit;
-                    
-                    console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${source.id} to ${target.id}`);
-                    
-                    // Also propagate to all downstream nodes from the target
-                    propagatePdfPropertiesDownstream(target, source);
-                }
-            }
-        }
+          }
       }
   
       // Update PDF nodes when connections change (to show/hide character limit field)
@@ -1905,6 +1844,7 @@ function refreshOptionNodeId(cell) {
   const DEBUG_NODE_ID = false;
   
   if (DEBUG_NODE_ID) {
+    console.log("🔍 REFRESH OPTION NODE ID DEBUG START");
     console.log("Cell:", cell);
     console.log("Cell ID:", cell.id);
     console.log("Cell value:", cell.value);
@@ -1976,6 +1916,7 @@ function refreshOptionNodeId(cell) {
   const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
   if (DEBUG_NODE_ID) {
     console.log("Verification - getNodeId returns:", verifyId);
+    console.log("🔍 REFRESH OPTION NODE ID DEBUG END");
   }
 }
 
@@ -2717,6 +2658,7 @@ function setOptionType(cell, newType) {
   
   // Debug function to test node ID retrieval
   window.debugNodeId = function(cellId) {
+    console.log("🔍 DEBUG NODE ID FOR CELL:", cellId);
     const cell = graph.getModel().getCell(cellId);
     if (!cell) {
       console.log("Cell not found");
@@ -2831,8 +2773,7 @@ function colorCell(cell) {
 
   const fontColor = colorPreferences.textColor;
   const sec = getSection(cell) || "1";
-  const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-  let borderColor = (currentSectionPrefs[sec] && currentSectionPrefs[sec].borderColor) || getDefaultSectionColor(parseInt(sec));
+  let borderColor = (sectionPrefs[sec] && sectionPrefs[sec].borderColor) || getDefaultSectionColor(parseInt(sec));
   let style = cell.style || "";
   style = style.replace(/fillColor=[^;]+/, "");
   style = style.replace(/fontColor=[^;]+/, "");
@@ -3050,9 +2991,6 @@ window.importFlowchartJsonDirectly = function(jsonString) {
     if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
       throw new Error("Invalid flowchart data: missing cells array");
     }
-    
-    // Debug: Log the sectionPrefs before passing to loadFlowchartData
-    
     loadFlowchartData(jsonData);
     currentFlowchartName = null;
     return true;
@@ -3881,8 +3819,7 @@ function autosaveFlowchartToLocalStorage() {
       return;
     }
     
-    const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-    const sectionPrefsCopy = JSON.parse(JSON.stringify(currentSectionPrefs));
+    const sectionPrefsCopy = JSON.parse(JSON.stringify(sectionPrefs));
     
     // Use the same safe serialization logic as exportFlowchartJson
     const simplifiedCells = cells.map(cell => {
@@ -4094,14 +4031,10 @@ function setupAutosaveHooks() {
     
     // Ensure section legend is updated after import
     if (data && data.sectionPrefs) {
-      console.log('🔍 [SCRIPT DEBUG] Autosave hook detected sectionPrefs, scheduling updateSectionLegend...');
       setTimeout(() => {
-        console.log('🔍 [SCRIPT DEBUG] Autosave hook calling updateSectionLegend after 100ms delay...');
         if (typeof window.updateSectionLegend === 'function') {
           window.updateSectionLegend();
-          console.log('🔍 [SCRIPT DEBUG] Autosave hook: Section legend updated after import');
-        } else {
-          console.error('❌ [SCRIPT DEBUG] Autosave hook: updateSectionLegend function not available!');
+          console.log('Section legend updated after import');
         }
       }, 100); // Small delay to ensure DOM is ready
     }
@@ -4352,13 +4285,12 @@ function copySelectedNodeAsJson() {
     
     // Collect section preferences from the copied nodes
     const copiedSectionPrefs = {};
-    const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
     nodes.forEach(cell => {
       const section = cell.section || "1";
-      if (currentSectionPrefs[section]) {
+      if (sectionPrefs[section]) {
         copiedSectionPrefs[section] = {
-          name: currentSectionPrefs[section].name,
-          borderColor: currentSectionPrefs[section].borderColor
+          name: sectionPrefs[section].name,
+          borderColor: sectionPrefs[section].borderColor
         };
       }
     });
@@ -4546,21 +4478,14 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
       
       // Merge section preferences from clipboard with current ones
       if (data.sectionPrefs) {
-        const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
         Object.keys(data.sectionPrefs).forEach(sectionNum => {
           const clipboardSection = data.sectionPrefs[sectionNum];
           // Always use the clipboard section data (prioritize updated names)
-          currentSectionPrefs[sectionNum] = {
+          sectionPrefs[sectionNum] = {
             name: clipboardSection.name,
             borderColor: clipboardSection.borderColor
           };
         });
-        // Update the section preferences in the proper location
-        if (window.flowchartConfig) {
-          window.flowchartConfig.sectionPrefs = currentSectionPrefs;
-        } else {
-          window.sectionPrefs = currentSectionPrefs;
-        }
         
         // Update the section legend to reflect the new sections
         if (typeof updateSectionLegend === 'function') {
@@ -4619,21 +4544,14 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
       
       // Merge section preferences from clipboard with current ones (for legacy format)
       if (data.sectionPrefs) {
-        const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
         Object.keys(data.sectionPrefs).forEach(sectionNum => {
           const clipboardSection = data.sectionPrefs[sectionNum];
           // Always use the clipboard section data (prioritize updated names)
-          currentSectionPrefs[sectionNum] = {
+          sectionPrefs[sectionNum] = {
             name: clipboardSection.name,
             borderColor: clipboardSection.borderColor
           };
         });
-        // Update the section preferences in the proper location
-        if (window.flowchartConfig) {
-          window.flowchartConfig.sectionPrefs = currentSectionPrefs;
-        } else {
-          window.sectionPrefs = currentSectionPrefs;
-        }
         
         // Update the section legend to reflect the new sections
         if (typeof updateSectionLegend === 'function') {
@@ -5522,9 +5440,8 @@ window.downloadFlowchartSvg = function() {
       
       // Get border color from section preferences
       const section = getSection(cell);
-      const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-      if (section && currentSectionPrefs[section] && currentSectionPrefs[section].borderColor) {
-        styling.strokeColor = currentSectionPrefs[section].borderColor;
+      if (section && sectionPrefs[section] && sectionPrefs[section].borderColor) {
+        styling.strokeColor = sectionPrefs[section].borderColor;
       }
       
       // Apply style overrides from cell style

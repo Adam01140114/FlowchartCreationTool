@@ -30,8 +30,7 @@ function getEscapeHtml() {
 
 // Section preferences accessor
 function getSectionPrefs() {
-  const result = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-  return result;
+  return window.sectionPrefs || {};
 }
 
 // Groups accessors

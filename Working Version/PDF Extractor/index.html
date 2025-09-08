@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>PDF Form Extractor (Exact Field Renaming via Low-Level AcroForm)</title>
+
+  <!-- PDF.js (core + worker) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  </script>
+
+  <!-- pdf-lib -->
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+  <style>
+    .renaming-btn { margin-top: 1rem; padding: 0.8rem 1.5rem; background-color: #48bb78; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+    .renaming-btn[disabled] { opacity:.6; cursor:not-allowed; }
+    .renaming-btn:hover { background-color: #38a169; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem; }
+    .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 90%; max-width: 900px; margin-top: 2rem; }
+    h1 { color: #2d3436; margin-bottom: 1.5rem; text-align: center; }
+    .upload-section { border: 2px dashed #a0aec0; border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 2rem; transition: all 0.3s ease; }
+    .upload-section:hover { border-color: #4299e1; background-color: #f8fafc; }
+    #pdfInput { display: none; }
+    .custom-upload-btn { background-color: #4299e1; color: white; padding: 0.8rem 1.5rem; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease; display: inline-block; margin-bottom: 1rem; }
+    .custom-upload-btn:hover { background-color: #3182ce; }
+    #loading { display: none; color: #718096; text-align: center; margin: 1rem 0; }
+    .extracted-text-container { margin-top: 1rem; background-color: #f8fafc; border-radius: 8px; padding: 1.5rem; }
+    .section-header { color: #2d3436; margin-bottom: 1rem; font-size: 1.2rem; }
+    .formatted-text { background: white; border-radius: 6px; padding: 1rem; max-height: 420px; overflow-y: auto; border: 1px solid #e2e8f0; }
+    .text-line { margin: 2px 0; line-height: 1.4; }
+    .page-break { height: 20px; border-bottom: 1px solid #e0e0e0; margin: 15px 0; }
+    .field-highlight { background-color: #e3f2fd; color: #1976d2; padding: 2px 4px; border-radius: 3px; font-weight: 600; cursor: pointer; }
+    .checkbox-highlight { background-color: #ffebee; color: #d32f2f; padding: 2px 4px; border-radius: 3px; font-weight: 600; cursor: pointer; }
+
+    .pdf-preview-container { margin-top: 2rem; background-color: #f8fafc; border-radius: 8px; padding: 1.5rem; }
+    .pdf-preview-wrapper { position: relative; display: inline-block; background: white; border-radius: 6px; padding: 1rem; border: 1px solid #e2e8f0; max-width: 100%; overflow-x: auto; }
+    #pdfCanvas { display: block; max-width: 100%; height: auto; border: 1px solid #ddd; }
+    .field-overlays { position: absolute; top: 0; left: 0; pointer-events: none; }
+    .field-overlay { position: absolute; border: 2px solid; border-radius: 3px; opacity: 0.7; pointer-events: auto; }
+    .field-overlay.text-field { border-color: #1976d2; background-color: rgba(227,242,253,.3); }
+    .field-overlay.checkbox-field { border-color: #d32f2f; background-color: rgba(255,235,238,.3); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📄 PDF Form Extractor (Exact Field Renaming via Low-Level AcroForm)</h1>
+
+    <div class="upload-section">
+      <label class="custom-upload-btn" for="pdfInput">Choose PDF File</label>
+      <p>or drag and drop PDF here</p>
+      <input type="file" id="pdfInput" accept=".pdf" />
+    </div>
+
+    <div id="loading">Analyzing PDF... Please wait</div>
+
+    <div class="extracted-text-container">
+      <h2 class="section-header">Extracted Document Content</h2>
+      <div class="formatted-text" id="formattedOutput"></div>
+    </div>
+
+    <div class="pdf-preview-container" id="pdfPreviewContainer" style="display:none;">
+      <h2 class="section-header">PDF Preview with Field Highlights</h2>
+      <div class="pdf-preview-wrapper">
+        <canvas id="pdfCanvas"></canvas>
+        <div id="fieldOverlays" class="field-overlays"></div>
+      </div>
+    </div>
+
+    <button class="renaming-btn" id="downloadBtn" disabled>Download Updated PDF</button>
+  </div>
+
+  <script>
+    const pdfInput = document.getElementById('pdfInput');
+    const loadingDiv = document.getElementById('loading');
+    const formattedOutput = document.getElementById('formattedOutput');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const pdfPreviewContainer = document.getElementById('pdfPreviewContainer');
+    const pdfCanvas = document.getElementById('pdfCanvas');
+    const fieldOverlays = document.getElementById('fieldOverlays');
+
+    let originalFile = null;
+    let originalPdfBytes = null;    // Uint8Array (stable copy)
+    let normalizedPdfBytes = null;  // Uint8Array starting at %PDF-
+    let uploadedFileName = 'updated-fields.pdf';
+    let renameMap = {};             // { oldFQN: newName }
+    let allFields = [];
+
+    const lineThreshold = 10;
+    const wordSpacingThreshold = 1;
+
+    // ---------- Byte helpers ----------
+    function toU8(buf) {
+      if (buf instanceof Uint8Array) return buf;
+      if (buf instanceof ArrayBuffer) return new Uint8Array(buf);
+      if (buf && buf.data instanceof Uint8Array) return buf.data;
+      throw new Error('Unsupported buffer type');
+    }
+
+    function findPdfHeaderOffset(u8) {
+      const sig = [37,80,68,70,45]; // %PDF-
+      const n = u8.length - sig.length;
+      outer: for (let i = 0; i <= n; i++) {
+        for (let j = 0; j < sig.length; j++) {
+          if (u8[i + j] !== sig[j]) continue outer;
+        }
+        return i;
+      }
+      return -1;
+    }
+
+    function strictHeaderCopy(u8) {
+      const off = findPdfHeaderOffset(u8);
+      if (off < 0) throw new Error('No %PDF- header found');
+      if (off === 0) { const out = new Uint8Array(u8.length); out.set(u8); return out; }
+      const out = new Uint8Array(u8.length - off); out.set(u8.subarray(off)); return out;
+    }
+
+    // ---------- Drag & drop ----------
+    document.addEventListener('dragover', e => { e.preventDefault(); document.querySelector('.upload-section').style.borderColor = '#4299e1'; });
+    document.addEventListener('dragleave', () => { document.querySelector('.upload-section').style.borderColor = '#a0aec0'; });
+    document.addEventListener('drop', e => {
+      e.preventDefault();
+      document.querySelector('.upload-section').style.borderColor = '#a0aec0';
+      const file = e.dataTransfer.files[0];
+      if (file) analyzePDF(file);
+    });
+
+    pdfInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) analyzePDF(file);
+    });
+
+    async function analyzePDF(file) {
+      loadingDiv.style.display = 'block';
+      formattedOutput.innerHTML = '';
+      pdfPreviewContainer.style.display = 'none';
+      fieldOverlays.innerHTML = '';
+      renameMap = {};
+      downloadBtn.disabled = true;
+
+      try {
+        originalFile = file;
+        uploadedFileName = file.name || 'updated-fields.pdf';
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            const raw = toU8(e.target.result);
+            originalPdfBytes = new Uint8Array(raw.length);
+            originalPdfBytes.set(raw);
+
+            try { normalizedPdfBytes = strictHeaderCopy(originalPdfBytes); }
+            catch (headerErr) { console.warn(headerErr.message); normalizedPdfBytes = null; }
+
+            // Preview via pdf.js
+            const pdf = await pdfjsLib.getDocument({ data: originalPdfBytes }).promise;
+
+            let allPagesContent = [];
+            allFields = [];
+
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+              const page = await pdf.getPage(pageNum);
+              const textContent = await page.getTextContent();
+              const annotations = await page.getAnnotations();
+
+              let textItems = textContent.items.map(item => ({
+                type: 'text', text: item.str,
+                xStart: item.transform[4],
+                xEnd: item.transform[4] + (item.str.length * 0.6 * Math.abs(item.transform[0])),
+                y: item.transform[5]
+              }));
+
+              textItems.sort((a, b) => b.y - a.y || a.xStart - b.xStart);
+
+              let lines = [];
+              let currentLine = { y: null, items: [] };
+
+              textItems.forEach(ti => {
+                if (!currentLine.y || Math.abs(currentLine.y - ti.y) < lineThreshold) {
+                  currentLine.items.push(ti);
+                  currentLine.y = currentLine.y || ti.y;
+                } else {
+                  lines.push(currentLine);
+                  currentLine = { y: ti.y, items: [ti] };
+                }
+              });
+              if (currentLine.items.length) lines.push(currentLine);
+
+              const pageFields = annotations
+                .filter(a => ['Tx', 'Btn'].includes(a.fieldType))
+                .map(a => ({
+                  name: a.fieldName || 'Unnamed Field',
+                  type: 'field',
+                  fieldType: a.fieldType,
+                  xStart: (a.rect[0] + a.rect[2]) / 2,
+                  xEnd: (a.rect[0] + a.rect[2]) / 2,
+                  centerY: (a.rect[1] + a.rect[3]) / 2,
+                  rect: a.rect,
+                  pageNum
+                }));
+
+              pageFields.sort((a, b) => b.centerY - a.centerY);
+              allFields.push(...pageFields);
+
+              pageFields.forEach(field => {
+                const closestLine = lines.reduce((closest, ln) =>
+                  Math.abs(ln.y - field.centerY) < Math.abs(closest.y - field.centerY) ? ln : closest
+                , { y: Infinity, items: [] });
+                field.text = field.fieldType === 'Btn' ? `{{${field.name}}}` : `[[${field.name}]]`;
+                closestLine.items.push(field);
+              });
+
+              const pageContent = lines.map(ln => {
+                ln.items.sort((a, b) => a.xStart - b.xStart);
+                let lineParts = [];
+                ln.items.forEach((item, i) => {
+                  if (item.type === 'field') {
+                    const className = item.fieldType === 'Btn' ? 'checkbox-highlight' : 'field-highlight';
+                    const dataAttr = `data-original-name="${item.name}" data-field-type="${item.fieldType}"`;
+                    lineParts.push(`<span class="${className} renameable-field" ${dataAttr} title="Double-click to rename">${item.text}</span>`);
+                  } else {
+                    const prev = ln.items[i - 1];
+                    const gap = prev ? item.xStart - prev.xEnd : 0;
+                    lineParts.push((gap > wordSpacingThreshold ? ' ' : '') + item.text);
+                  }
+                });
+                return `<div class="text-line">${lineParts.join('')}</div>`;
+              }).join('');
+
+              allPagesContent.push(pageContent);
+            }
+
+            formattedOutput.innerHTML = allPagesContent.join('<div class="page-break"></div>');
+            attachRenameListeners();
+            await renderPDFPreview(pdf);
+            loadingDiv.style.display = 'none';
+
+            downloadBtn.disabled = false;
+          } catch (innerErr) {
+            loadingDiv.style.display = 'none';
+            formattedOutput.innerHTML = `<div style="color:#e53e3e">Error processing PDF: ${innerErr.message}</div>`;
+            console.error(innerErr);
+          }
+        };
+
+        reader.readAsArrayBuffer(file);
+      } catch (err) {
+        loadingDiv.style.display = 'none';
+        formattedOutput.innerHTML = `<div style="color:#e53e3e">Error: ${err.message}</div>`;
+        console.error(err);
+      }
+    }
+
+    function attachRenameListeners() {
+      const fields = document.querySelectorAll('.renameable-field');
+      fields.forEach(fieldEl => {
+        fieldEl.addEventListener('dblclick', () => {
+          const oldName = fieldEl.getAttribute('data-original-name');
+          const fieldType = fieldEl.getAttribute('data-field-type');
+          const promptName = prompt("Enter a new name for this field (exact):", oldName);
+          const newName = (promptName || '').trim();
+
+          if (newName && newName !== oldName) {
+            renameMap[oldName] = newName;
+            fieldEl.textContent = fieldType === 'Btn' ? `{{${newName}}}` : `[[${newName}]]`;
+            fieldEl.setAttribute('data-original-name', newName);
+          }
+        });
+      });
+    }
+
+    // ---- Low-level AcroForm helpers (no reliance on field.acroField) ----
+    function getAcroFormAndFields(pdfDoc) {
+      const { PDFName, PDFDict, PDFArray } = PDFLib;
+      const context = pdfDoc.context;
+      const acroFormRef = pdfDoc.catalog.get(PDFName.of('AcroForm'));
+      if (!acroFormRef) throw new Error('No AcroForm found.');
+      const acroForm = context.lookup(acroFormRef, PDFDict);
+      let fieldsArrRef = acroForm.get(PDFName.of('Fields'));
+      let fieldsArr = fieldsArrRef ? context.lookup(fieldsArrRef, PDFArray) : null;
+      if (!fieldsArr) {
+        fieldsArr = PDFArray.withContext(context);
+        acroForm.set(PDFName.of('Fields'), fieldsArr);
+      }
+      return { acroForm, fieldsArr };
+    }
+
+    // Traverse by FQN segments: Fields[] -> Kids[] -> ... -> leaf
+    function findFieldNodeByFQN(pdfDoc, fqn) {
+      const { PDFName, PDFDict, PDFArray } = PDFLib;
+      const context = pdfDoc.context;
+      const { fieldsArr } = getAcroFormAndFields(pdfDoc);
+      const segments = fqn.split('.');
+
+      // search among an array of refs for a child with /T == seg
+      function findInArrayByT(arr, seg) {
+        for (let i = 0, n = arr.size(); i < n; i++) {
+          const ref = arr.get(i);
+          const dict = context.lookup(ref, PDFDict);
+          if (!dict) continue;
+          const t = dict.get(PDFName.of('T'));
+          if (t && t.decodeText ? t.decodeText() === seg : String(t) === seg) return { ref, dict };
+        }
+        return null;
+      }
+
+      // Starting level: root Fields
+      let parentRef = null;
+      let current = null;
+
+      current = findInArrayByT(fieldsArr, segments[0]);
+      if (!current) return null;
+
+      for (let si = 1; si < segments.length; si++) {
+        parentRef = current.ref;
+        const kidsRef = current.dict.get(PDFName.of('Kids'));
+        const kids = kidsRef ? context.lookup(kidsRef, PDFArray) : null;
+        if (!kids) return null; // no deeper nodes; FQN not found
+        const next = findInArrayByT(kids, segments[si]);
+        if (!next) return null;
+        current = next;
+      }
+      return { ref: current.ref, dict: current.dict, parentRef };
+    }
+
+    function makeNodeRootAndRename(pdfDoc, nodeRef, nodeDict, newName) {
+      const { PDFName, PDFString, PDFArray, PDFDict } = PDFLib;
+      const context = pdfDoc.context;
+      const { acroForm, fieldsArr } = getAcroFormAndFields(pdfDoc);
+
+      // 1) Remove from its parent /Kids if any
+      const parentRef = nodeDict.get(PDFName.of('Parent'));
+      if (parentRef) {
+        const parentDict = context.lookup(parentRef, PDFDict);
+        const kidsRef = parentDict.get(PDFName.of('Kids'));
+        const kids = kidsRef ? context.lookup(kidsRef, PDFArray) : null;
+        if (kids) {
+          const newKids = PDFArray.withContext(context);
+          for (let i = 0, n = kids.size(); i < n; i++) {
+            const k = kids.get(i);
+            if (k !== nodeRef) newKids.push(k);
+          }
+          parentDict.set(PDFName.of('Kids'), newKids);
+        }
+        nodeDict.delete(PDFName.of('Parent'));
+      }
+
+      // 2) Ensure node is present at root /Fields
+      let alreadyRoot = false;
+      for (let i = 0, n = fieldsArr.size(); i < n; i++) {
+        if (fieldsArr.get(i) === nodeRef) { alreadyRoot = true; break; }
+      }
+      if (!alreadyRoot) fieldsArr.push(nodeRef);
+
+      // 3) Set its local name /T to the exact target
+      nodeDict.set(PDFName.of('T'), PDFString.of(newName));
+    }
+
+    // Fallback: if FQN path fails, try to find by leaf name only (last segment)
+    function findByLeafNameDeep(pdfDoc, leafName) {
+      const { PDFName, PDFDict, PDFArray } = PDFLib;
+      const context = pdfDoc.context;
+      const { fieldsArr } = getAcroFormAndFields(pdfDoc);
+
+      function dfs(ref, parentRef) {
+        const dict = context.lookup(ref, PDFDict);
+        if (!dict) return null;
+        const t = dict.get(PDFName.of('T'));
+        const nameStr = t && t.decodeText ? t.decodeText() : (t ? String(t) : null);
+        if (nameStr === leafName) return { ref, dict, parentRef };
+
+        const kidsRef = dict.get(PDFName.of('Kids'));
+        const kids = kidsRef ? context.lookup(kidsRef, PDFArray) : null;
+        if (kids) {
+          for (let i = 0, n = kids.size(); i < n; i++) {
+            const childRef = kids.get(i);
+            const found = dfs(childRef, ref);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+
+      for (let i = 0, n = fieldsArr.size(); i < n; i++) {
+        const ref = fieldsArr.get(i);
+        const found = dfs(ref, null);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    downloadBtn.addEventListener('click', async () => {
+      if (!originalPdfBytes || !originalFile) { alert("No PDF loaded yet."); return; }
+
+      // If user didn’t rename anything, pass-through exact original file
+      if (Object.keys(renameMap).length === 0) {
+        downloadBlob(originalFile, uploadedFileName);
+        return;
+      }
+
+      // Need strict header-aligned bytes for pdf-lib editing
+      if (!normalizedPdfBytes) {
+        alert("This PDF's header isn't where pdf-lib expects it. Try 'Print to PDF' then re-upload.");
+        return;
+      }
+
+      try {
+        const { PDFDocument, PDFName, PDFString } = PDFLib;
+        const pdfDoc = await PDFDocument.load(normalizedPdfBytes);
+
+        for (const [oldFQN, newName] of Object.entries(renameMap)) {
+          // Try FQN traversal first
+          let node = findFieldNodeByFQN(pdfDoc, oldFQN);
+
+          // Fallback: search by leaf name only
+          if (!node) {
+            const leaf = oldFQN.split('.').pop();
+            node = findByLeafNameDeep(pdfDoc, leaf);
+          }
+
+          if (!node) {
+            console.warn(`Field not found: ${oldFQN}`);
+            continue;
+          }
+
+          try {
+            makeNodeRootAndRename(pdfDoc, node.ref, node.dict, newName);
+          } catch (e) {
+            console.warn(`Rename failed for "${oldFQN}" -> "${newName}":`, e);
+            // last-resort: strip ancestor names, then set /T
+            const context = pdfDoc.context;
+            const { PDFName, PDFDict } = PDFLib;
+            let parentRef = node.dict.get(PDFName.of('Parent'));
+            while (parentRef) {
+              const parentDict = context.lookup(parentRef, PDFDict);
+              if (!parentDict) break;
+              parentDict.delete(PDFName.of('T'));
+              parentRef = parentDict.get(PDFName.of('Parent'));
+            }
+            node.dict.set(PDFName.of('T'), PDFLib.PDFString.of(newName));
+          }
+        }
+
+        const newPdfBytes = await pdfDoc.save();
+        downloadBytes(newPdfBytes, "updated-fields.pdf");
+      } catch (err) {
+        alert("Error renaming fields: " + err.message);
+        console.error(err);
+      }
+    });
+
+    function downloadBlob(blobOrFile, fileName) {
+      const url = URL.createObjectURL(blobOrFile);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName || blobOrFile.name || 'file.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadBytes(u8, fileName) {
+      const blob = new Blob([u8], { type: 'application/pdf' });
+      downloadBlob(blob, fileName || 'file.pdf');
+    }
+
+    async function renderPDFPreview(pdf) {
+      try {
+        const page = await pdf.getPage(1);
+        const baseViewport = page.getViewport({ scale: 1.0 });
+        const scale = 1.5;
+        const viewport = page.getViewport({ scale });
+
+        pdfCanvas.width = viewport.width;
+        pdfCanvas.height = viewport.height;
+        const context = pdfCanvas.getContext('2d');
+        await page.render({ canvasContext: context, viewport }).promise;
+
+        fieldOverlays.innerHTML = '';
+        const firstPageFields = allFields.filter(f => f.pageNum === 1);
+
+        const toCanvasX = (x) => (x / baseViewport.width) * viewport.width;
+        const toCanvasY = (y) => viewport.height - (y / baseViewport.height) * viewport.height;
+
+        firstPageFields.forEach(field => {
+          const overlay = document.createElement('div');
+          overlay.className = `field-overlay ${field.fieldType === 'Btn' ? 'checkbox-field' : 'text-field'}`;
+
+          const [x0, y0, x1, y1] = field.rect;
+          const left = toCanvasX(Math.min(x0, x1));
+          const right = toCanvasX(Math.max(x0, x1));
+          const bottom = toCanvasY(Math.min(y0, y1));
+          const top = toCanvasY(Math.max(y0, y1));
+
+          overlay.style.left = `${left}px`;
+          overlay.style.top = `${top}px`;
+          overlay.style.width = `${right - left}px`;
+          overlay.style.height = `${bottom - top}px`;
+          overlay.title = `${field.fieldType === 'Btn' ? 'Checkbox' : 'Text Field'}: ${field.name}`;
+
+          fieldOverlays.appendChild(overlay);
+        });
+
+        const wrap = document.querySelector('.pdf-preview-wrapper');
+        wrap.style.width = viewport.width + 'px';
+        wrap.style.height = viewport.height + 'px';
+
+        pdfPreviewContainer.style.display = 'block';
+      } catch (error) {
+        console.error('Error rendering PDF preview:', error);
+      }
+    }
+  </script>
+</body>
+</html>
