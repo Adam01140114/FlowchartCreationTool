@@ -522,19 +522,19 @@ function setupCustomClickHandlers(graph) {
   // Proper double-click handler that handles all cases
   const baseDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
-    // a) Question double-click = show type dropdown
+    // a) Question double-click = show properties popup
     if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-      if (typeof window.showQuestionTypeDropdown === 'function') {
-        window.showQuestionTypeDropdown(cell, evt);
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
       }
       mxEvent.consume(evt);
       return;
     }
     
-    // b) Options double-click = show option type dropdown
+    // b) Options double-click = show properties popup
     if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
-      if (typeof window.showOptionTypeDropdown === 'function') {
-        window.showOptionTypeDropdown(cell, evt);
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
       }
       mxEvent.consume(evt);
       return;

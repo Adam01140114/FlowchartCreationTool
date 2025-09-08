@@ -449,6 +449,10 @@ window.getNodeId = function(cell) {
             const pdfName = extractPdfName(targetCell);
             if (pdfName) return pdfName;
           }
+          
+          // Recursively check downstream nodes for PDF properties (multi-level propagation)
+          const downstreamPdfName = getPdfName(targetCell, visited);
+          if (downstreamPdfName) return downstreamPdfName;
         }
       }
       

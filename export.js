@@ -90,11 +90,52 @@ window.exportFlowchartJson = function () {
     return cellData;
   });
 
+  // Collect all sections used by cells
+  const usedSections = new Set();
+  simplifiedCells.forEach(cell => {
+    if (cell.style) {
+      const sectionMatch = cell.style.match(/section=([^;]+)/);
+      if (sectionMatch) {
+        usedSections.add(sectionMatch[1]);
+      }
+    }
+  });
+  
+  console.log('🔍 [EXPORT DEBUG] Sections found in cells:', Array.from(usedSections));
+  
+  // Get current section preferences and filter to only include used sections
+  const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+  console.log('🔍 [EXPORT DEBUG] Current section preferences:', JSON.stringify(currentSectionPrefs, null, 2));
+  
+  const exportedSectionPrefs = {};
+  
+  // Always include section 1 if it exists
+  if (currentSectionPrefs["1"]) {
+    exportedSectionPrefs["1"] = currentSectionPrefs["1"];
+  }
+  
+  // Include all other sections that are actually used by cells
+  usedSections.forEach(sectionNum => {
+    if (currentSectionPrefs[sectionNum]) {
+      exportedSectionPrefs[sectionNum] = currentSectionPrefs[sectionNum];
+    } else {
+      // If a section is used by cells but not in sectionPrefs, create a default entry
+      exportedSectionPrefs[sectionNum] = {
+        borderColor: window.getDefaultSectionColor ? window.getDefaultSectionColor(parseInt(sectionNum)) : "#cccccc",
+        name: `Section ${sectionNum}`
+      };
+    }
+  });
+  
+  console.log('🔍 [EXPORT DEBUG] Exported section preferences:', JSON.stringify(exportedSectionPrefs, null, 2));
+
   // Create the export object
   const exportData = {
     version: "1.0",
     exportDate: new Date().toISOString(),
     cells: simplifiedCells,
+    sectionPrefs: exportedSectionPrefs,
+    groups: window.getGroupsData ? window.getGroupsData() : {},
     metadata: {
       totalCells: simplifiedCells.length,
       questionNodes: simplifiedCells.filter(c => c.vertex && c.style && c.style.includes("nodeType=question")).length,

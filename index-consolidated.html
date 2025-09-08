@@ -208,6 +208,7 @@
     <script src="export.js"></script>
     <script src="legend.js"></script>
     <script src="calc.js"></script>
+    <script src="context-menus.js"></script>
     <script src="library.js"></script>
     <script src="script.js"></script>
     
@@ -222,7 +223,9 @@
                 'createNode',
                 'exportFlowchartJson',
                 'showContextMenu',
-                'loadSettingsFromLocalStorage'
+                'loadSettingsFromLocalStorage',
+                'showPropertiesPopup',
+                'initializeContextMenusModule'
             ];
             
             const missingModules = requiredModules.filter(module => !window[module]);

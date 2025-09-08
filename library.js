@@ -1014,6 +1014,195 @@ function downloadJson(str, filename) {
 }
 
 /**
+ * Function to propagate PDF properties downstream through the flowchart
+ */
+function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new Set()) {
+    if (!startCell || visited.has(startCell.id)) return;
+    visited.add(startCell.id);
+    
+    const graph = window.graph;
+    if (!graph) return;
+    
+    // Get all outgoing edges from the start cell
+    const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+    console.log(`🔍 [PDF PROPAGATION DEBUG] Cell ${startCell.id} has ${outgoingEdges.length} outgoing edges`);
+    
+    // Fallback: If getOutgoingEdges doesn't work, manually find edges
+    if (outgoingEdges.length === 0) {
+      console.log(`🔍 [PDF PROPAGATION DEBUG] Fallback: Manually searching for edges from cell ${startCell.id}`);
+      const modelEdges = graph.getModel().getEdges();
+      const childEdges = graph.getChildEdges(graph.getDefaultParent());
+      const allEdges = childEdges.length > 0 ? childEdges : modelEdges;
+      const manualOutgoingEdges = allEdges.filter(edge => 
+        edge.source && edge.source.id === startCell.id
+      );
+      console.log(`🔍 [PDF PROPAGATION DEBUG] Manual search found ${manualOutgoingEdges.length} outgoing edges`);
+      
+      // Use manual edges if found
+      if (manualOutgoingEdges.length > 0) {
+        for (const edge of manualOutgoingEdges) {
+          const targetCell = edge.target;
+          console.log(`🔍 [PDF PROPAGATION DEBUG] Processing manual edge from ${startCell.id} to ${targetCell ? targetCell.id : 'null'}`);
+          if (targetCell && !visited.has(targetCell.id)) {
+            // Check if target doesn't already have PDF properties
+            if (!targetCell._pdfName && !targetCell._pdfFilename && !targetCell._pdfUrl && 
+                !(typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell))) {
+              
+              // Copy PDF properties from source to target
+              if (sourceCell._pdfName) targetCell._pdfName = sourceCell._pdfName;
+              if (sourceCell._pdfFilename) targetCell._pdfFilename = sourceCell._pdfFilename;
+              if (sourceCell._pdfUrl) targetCell._pdfUrl = sourceCell._pdfUrl;
+              if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
+              if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
+              
+              console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
+              
+              // Recursively propagate to further downstream nodes
+              propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
+            }
+          }
+        }
+        return; // Exit early since we handled the manual edges
+      }
+    }
+    
+    for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        console.log(`🔍 [PDF PROPAGATION DEBUG] Processing edge from ${startCell.id} to ${targetCell ? targetCell.id : 'null'}`);
+        if (targetCell && !visited.has(targetCell.id)) {
+            // Check if target doesn't already have PDF properties
+            if (!targetCell._pdfName && !targetCell._pdfFilename && !targetCell._pdfUrl && 
+                !(typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell))) {
+                
+                // Copy PDF properties from source to target
+                if (sourceCell._pdfName) targetCell._pdfName = sourceCell._pdfName;
+                if (sourceCell._pdfFilename) targetCell._pdfFilename = sourceCell._pdfFilename;
+                if (sourceCell._pdfUrl) targetCell._pdfUrl = sourceCell._pdfUrl;
+                if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
+                if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
+                
+                console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
+                
+                // Recursively propagate to further downstream nodes
+                propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
+            }
+        }
+    }
+}
+
+/**
+ * Propagate PDF properties through the flowchart after import
+ */
+function propagatePdfPropertiesAfterImport() {
+  const graph = window.graph;
+  if (!graph) return;
+  
+  console.log('🔍 [PDF IMPORT DEBUG] Starting PDF property propagation after import...');
+  
+  // Force graph model to update and refresh
+  graph.getModel().beginUpdate();
+  graph.getModel().endUpdate();
+  graph.refresh();
+  
+  // Get all cells in the graph
+  const allCells = graph.getModel().cells;
+  const cells = Object.values(allCells).filter(cell => cell && cell.vertex);
+  
+  // Find all PDF nodes
+  const pdfNodes = cells.filter(cell => {
+    return cell._pdfName || cell._pdfFilename || cell._pdfUrl || 
+           (typeof window.isPdfNode === 'function' && window.isPdfNode(cell));
+  });
+  
+  console.log('🔍 [PDF IMPORT DEBUG] Found PDF nodes:', pdfNodes.map(n => n.id));
+  
+  // For each PDF node, propagate its properties to all downstream nodes
+  pdfNodes.forEach(pdfNode => {
+    console.log(`🔍 [PDF IMPORT DEBUG] Propagating from PDF node ${pdfNode.id}`);
+    console.log(`🔍 [PDF IMPORT DEBUG] PDF node properties:`, {
+      _pdfName: pdfNode._pdfName,
+      _pdfFilename: pdfNode._pdfFilename,
+      _pdfUrl: pdfNode._pdfUrl,
+      _priceId: pdfNode._priceId,
+      _characterLimit: pdfNode._characterLimit
+    });
+    
+    // Debug: Check all edges in the graph using multiple methods
+    const modelEdges = graph.getModel().getEdges();
+    const childEdges = graph.getChildEdges(graph.getDefaultParent());
+    console.log(`🔍 [PDF IMPORT DEBUG] Model edges: ${modelEdges.length}, Child edges: ${childEdges.length}`);
+    
+    // Use childEdges as the primary source since it's more reliable
+    const allEdges = childEdges.length > 0 ? childEdges : modelEdges;
+    console.log(`🔍 [PDF IMPORT DEBUG] Using ${allEdges.length} edges for analysis`);
+    
+    allEdges.forEach(edge => {
+      console.log(`🔍 [PDF IMPORT DEBUG] Edge ${edge.id}: ${edge.source ? edge.source.id : 'null'} -> ${edge.target ? edge.target.id : 'null'}`);
+    });
+    
+    // Debug: Check edges specifically connected to this PDF node
+    const connectedEdges = allEdges.filter(edge => 
+      (edge.source && edge.source.id === pdfNode.id) || 
+      (edge.target && edge.target.id === pdfNode.id)
+    );
+    console.log(`🔍 [PDF IMPORT DEBUG] Edges connected to PDF node ${pdfNode.id}: ${connectedEdges.length}`);
+    connectedEdges.forEach(edge => {
+      console.log(`🔍 [PDF IMPORT DEBUG] Connected edge ${edge.id}: ${edge.source ? edge.source.id : 'null'} -> ${edge.target ? edge.target.id : 'null'}`);
+    });
+    
+    // Debug: Check if PDF node has incoming edges (should propagate to source)
+    const incomingEdges = allEdges.filter(edge => 
+      edge.target && edge.target.id === pdfNode.id
+    );
+    console.log(`🔍 [PDF IMPORT DEBUG] PDF node ${pdfNode.id} has ${incomingEdges.length} incoming edges`);
+    incomingEdges.forEach(edge => {
+      console.log(`🔍 [PDF IMPORT DEBUG] Incoming edge ${edge.id}: ${edge.source ? edge.source.id : 'null'} -> ${edge.target ? edge.target.id : 'null'}`);
+    });
+    
+    // Debug: Check if PDF node has outgoing edges (should propagate to targets)
+    const outgoingEdges = allEdges.filter(edge => 
+      edge.source && edge.source.id === pdfNode.id
+    );
+    console.log(`🔍 [PDF IMPORT DEBUG] PDF node ${pdfNode.id} has ${outgoingEdges.length} outgoing edges`);
+    outgoingEdges.forEach(edge => {
+      console.log(`🔍 [PDF IMPORT DEBUG] Outgoing edge ${edge.id}: ${edge.source ? edge.source.id : 'null'} -> ${edge.target ? edge.target.id : 'null'}`);
+    });
+    
+    // Try both directions: outgoing edges (PDF node as source) and incoming edges (PDF node as target)
+    if (outgoingEdges.length > 0) {
+      console.log(`🔍 [PDF IMPORT DEBUG] Propagating PDF properties downstream from PDF node ${pdfNode.id}`);
+      propagatePdfPropertiesDownstream(pdfNode, pdfNode, new Set());
+    } else if (incomingEdges.length > 0) {
+      console.log(`🔍 [PDF IMPORT DEBUG] PDF node ${pdfNode.id} has no outgoing edges, checking if we should propagate to source nodes`);
+      // If PDF node has no outgoing edges, check if we should propagate to its source nodes
+      const visited = new Set();
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && !visited.has(sourceCell.id)) {
+          visited.add(sourceCell.id);
+          console.log(`🔍 [PDF IMPORT DEBUG] Propagating PDF properties from PDF node ${pdfNode.id} to source node ${sourceCell.id}`);
+          // Copy PDF properties to the source node first
+          if (!sourceCell._pdfUrl) {
+            sourceCell._pdfUrl = pdfNode._pdfUrl;
+            sourceCell._priceId = pdfNode._priceId;
+            sourceCell._pdfName = pdfNode._pdfName;
+            sourceCell._pdfFilename = pdfNode._pdfFilename;
+            sourceCell._characterLimit = pdfNode._characterLimit;
+            console.log(`🔍 [PDF INHERITANCE] Copied PDF properties from PDF node ${pdfNode.id} to source node ${sourceCell.id}`);
+          }
+          // Then propagate from the source node downstream
+          propagatePdfPropertiesDownstream(sourceCell, pdfNode, new Set());
+        }
+      }
+    } else {
+      console.log(`🔍 [PDF IMPORT DEBUG] PDF node ${pdfNode.id} has no connected edges, skipping propagation`);
+    }
+  });
+  
+  console.log('🔍 [PDF IMPORT DEBUG] PDF property propagation complete');
+}
+
+/**
  * Load a flowchart from JSON data.
  */
 window.loadFlowchartData = function(data) {
@@ -1036,14 +1225,57 @@ window.loadFlowchartData = function(data) {
     const createdCells = {};
 
     if (data.sectionPrefs) {
-      sectionPrefs = data.sectionPrefs;
+      console.log('🔍 [SECTION IMPORT DEBUG] Starting section preferences import...');
+      console.log('🔍 [SECTION IMPORT DEBUG] Input sectionPrefs:', JSON.stringify(data.sectionPrefs, null, 2));
+      
+      // Update section preferences through the proper accessor
+      console.log('🔍 [SECTION IMPORT DEBUG] window.flowchartConfig exists:', !!window.flowchartConfig);
+      console.log('🔍 [SECTION IMPORT DEBUG] window.flowchartConfig.sectionPrefs exists:', !!(window.flowchartConfig && window.flowchartConfig.sectionPrefs));
+      console.log('🔍 [SECTION IMPORT DEBUG] window.sectionPrefs exists:', !!window.sectionPrefs);
+      
+      if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
+        console.log('🔍 [SECTION IMPORT DEBUG] Updating via window.flowchartConfig.sectionPrefs');
+        window.flowchartConfig.sectionPrefs = data.sectionPrefs;
+        console.log('🔍 [SECTION IMPORT DEBUG] After update - window.flowchartConfig.sectionPrefs:', JSON.stringify(window.flowchartConfig.sectionPrefs, null, 2));
+      } else {
+        console.log('🔍 [SECTION IMPORT DEBUG] Updating via window.sectionPrefs');
+        window.sectionPrefs = data.sectionPrefs;
+        console.log('🔍 [SECTION IMPORT DEBUG] After update - window.sectionPrefs:', JSON.stringify(window.sectionPrefs, null, 2));
+      }
+      
+      // Test the getSectionPrefs function immediately after setting
+      console.log('🔍 [SECTION IMPORT DEBUG] Testing getSectionPrefs immediately after update...');
+      if (typeof getSectionPrefs === 'function') {
+        const testResult = getSectionPrefs();
+        console.log('🔍 [SECTION IMPORT DEBUG] getSectionPrefs returned:', JSON.stringify(testResult, null, 2));
+      } else {
+        console.error('❌ [SECTION IMPORT DEBUG] getSectionPrefs function not available!');
+      }
+      
+      // Add a watcher to detect if section preferences are modified after this point
+      const originalSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
+      console.log('🔍 [SECTION IMPORT DEBUG] Setting up watcher for section preferences...');
+      console.log('🔍 [SECTION IMPORT DEBUG] Watcher will monitor:', JSON.stringify(originalSectionPrefs, null, 2));
+      
       // updateSectionLegend is defined in legend.js
       // Add a small delay to ensure DOM is ready
       setTimeout(() => {
+        console.log('🔍 [SECTION IMPORT DEBUG] Calling updateSectionLegend after 50ms delay...');
+        console.log('🔍 [SECTION IMPORT DEBUG] updateSectionLegend function available:', typeof updateSectionLegend === 'function');
+        
+        // Check if section preferences have changed since we set them
+        const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
+        console.log('🔍 [SECTION IMPORT DEBUG] Current section preferences before updateSectionLegend:', JSON.stringify(currentSectionPrefs, null, 2));
+        
         if (typeof updateSectionLegend === 'function') {
           updateSectionLegend();
+          console.log('🔍 [SECTION IMPORT DEBUG] updateSectionLegend called successfully');
+        } else {
+          console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
         }
       }, 50);
+    } else {
+      console.log('🔍 [SECTION IMPORT DEBUG] No sectionPrefs found in imported data');
     }
 
     // First pass: Create all cells
@@ -1055,13 +1287,30 @@ window.loadFlowchartData = function(data) {
           item.geometry.width,
           item.geometry.height
         );
-        const newCell = new mxCell(item.value, geo, item.style);
+        // Decode HTML entities in cell value to prevent double/triple encoding
+        let cellValue = item.value;
+        if (cellValue && typeof cellValue === 'string') {
+          // Create a temporary div to decode HTML entities
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = cellValue;
+          cellValue = tempDiv.textContent || tempDiv.innerText || cellValue;
+        }
+        const newCell = new mxCell(cellValue, geo, item.style);
         newCell.vertex = true;
         newCell.id = item.id;
         
         // Transfer all custom properties
         if (item._textboxes) newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
-        if (item._questionText) newCell._questionText = item._questionText;
+        if (item._questionText) {
+          // Decode HTML entities in _questionText as well
+          let questionText = item._questionText;
+          if (typeof questionText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = questionText;
+            questionText = tempDiv.textContent || tempDiv.innerText || questionText;
+          }
+          newCell._questionText = questionText;
+        }
         if (item._twoNumbers) newCell._twoNumbers = item._twoNumbers;
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;
@@ -1080,27 +1329,91 @@ window.loadFlowchartData = function(data) {
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
         
         // Notes node properties
-        if (item._notesText !== undefined) newCell._notesText = item._notesText;
+        if (item._notesText !== undefined) {
+          let notesText = item._notesText;
+          if (typeof notesText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = notesText;
+            notesText = tempDiv.textContent || tempDiv.innerText || notesText;
+          }
+          newCell._notesText = notesText;
+        }
         if (item._notesBold !== undefined) newCell._notesBold = item._notesBold;
         if (item._notesFontSize !== undefined) newCell._notesFontSize = item._notesFontSize;
         
         // Checklist node properties
-        if (item._checklistText !== undefined) newCell._checklistText = item._checklistText;
+        if (item._checklistText !== undefined) {
+          let checklistText = item._checklistText;
+          if (typeof checklistText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = checklistText;
+            checklistText = tempDiv.textContent || tempDiv.innerText || checklistText;
+          }
+          newCell._checklistText = checklistText;
+        }
         
         // Alert node properties
-        if (item._alertText !== undefined) newCell._alertText = item._alertText;
+        if (item._alertText !== undefined) {
+          let alertText = item._alertText;
+          if (typeof alertText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = alertText;
+            alertText = tempDiv.textContent || tempDiv.innerText || alertText;
+          }
+          newCell._alertText = alertText;
+        }
         
         // Calculation properties
-        if (item._calcTitle !== undefined) newCell._calcTitle = item._calcTitle;
-        if (item._calcAmountLabel !== undefined) newCell._calcAmountLabel = item._calcAmountLabel;
+        if (item._calcTitle !== undefined) {
+          let calcTitle = item._calcTitle;
+          if (typeof calcTitle === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = calcTitle;
+            calcTitle = tempDiv.textContent || tempDiv.innerText || calcTitle;
+          }
+          newCell._calcTitle = calcTitle;
+        }
+        if (item._calcAmountLabel !== undefined) {
+          let calcAmountLabel = item._calcAmountLabel;
+          if (typeof calcAmountLabel === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = calcAmountLabel;
+            calcAmountLabel = tempDiv.textContent || tempDiv.innerText || calcAmountLabel;
+          }
+          newCell._calcAmountLabel = calcAmountLabel;
+        }
         if (item._calcOperator !== undefined) newCell._calcOperator = item._calcOperator;
         if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
-        if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
+        if (item._calcFinalText !== undefined) {
+          let calcFinalText = item._calcFinalText;
+          if (typeof calcFinalText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = calcFinalText;
+            calcFinalText = tempDiv.textContent || tempDiv.innerText || calcFinalText;
+          }
+          newCell._calcFinalText = calcFinalText;
+        }
         if (item._calcTerms !== undefined) newCell._calcTerms = JSON.parse(JSON.stringify(item._calcTerms));
         
-        // Subtitle and info node properties - preserve exact text
-        if (item._subtitleText !== undefined) newCell._subtitleText = item._subtitleText;
-        if (item._infoText !== undefined) newCell._infoText = item._infoText;
+        // Subtitle and info node properties - decode HTML entities
+        if (item._subtitleText !== undefined) {
+          let subtitleText = item._subtitleText;
+          if (typeof subtitleText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = subtitleText;
+            subtitleText = tempDiv.textContent || tempDiv.innerText || subtitleText;
+          }
+          newCell._subtitleText = subtitleText;
+        }
+        if (item._infoText !== undefined) {
+          let infoText = item._infoText;
+          if (typeof infoText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = infoText;
+            infoText = tempDiv.textContent || tempDiv.innerText || infoText;
+          }
+          newCell._infoText = infoText;
+        }
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
@@ -1111,12 +1424,16 @@ window.loadFlowchartData = function(data) {
     resolveDuplicateNodeIds(Object.values(createdCells));
 
     // Second pass: Connect the edges
+    console.log('🔍 [EDGE IMPORT DEBUG] Starting edge creation...');
+    let edgesCreated = 0;
     data.cells.forEach(item => {
-      if (item.edge && item.source && item.target) {
+      if (item.edge === true && item.source && item.target) {
+        console.log(`🔍 [EDGE IMPORT DEBUG] Processing edge ${item.id}: ${item.source} -> ${item.target}`);
         const source = createdCells[item.source];
         const target = createdCells[item.target];
         
         if (source && target) {
+          console.log(`🔍 [EDGE IMPORT DEBUG] Creating edge ${item.id} from ${source.id} to ${target.id}`);
           const geo = new mxGeometry();
           
           // Restore edge geometry (articulation points) if it exists
@@ -1130,9 +1447,15 @@ window.loadFlowchartData = function(data) {
           edge.source = source;
           edge.target = target;
           graph.addCell(edge, parent);
+          edgesCreated++;
+        } else {
+          console.log(`🔍 [EDGE IMPORT DEBUG] Skipping edge ${item.id} - source or target not found`);
         }
+      } else {
+        console.log(`🔍 [EDGE IMPORT DEBUG] Skipping item ${item.id} - not an edge or missing source/target`);
       }
     });
+    console.log(`🔍 [EDGE IMPORT DEBUG] Created ${edgesCreated} edges`);
 
     // Third pass: Update cell displays based on types
     graph.getModel().beginUpdate();
@@ -1204,6 +1527,12 @@ window.loadFlowchartData = function(data) {
   } else {
     console.log('loadFlowchartData: no groups data found');
   }
+  
+  // Propagate PDF properties through the flowchart after all cells and edges are loaded
+  console.log('🔍 [PDF IMPORT DEBUG] Starting PDF property propagation...');
+  setTimeout(() => {
+    propagatePdfPropertiesAfterImport();
+  }, 500); // Increased delay to ensure all edges are fully processed in graph model
   
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {

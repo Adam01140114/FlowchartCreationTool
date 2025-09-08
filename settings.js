@@ -45,10 +45,32 @@ window.loadSettingsFromLocalStorage = function() {
       colorPreferences = { ...colorPreferences, ...JSON.parse(savedColors) };
     }
     
-    // Load section preferences
+    // Load section preferences - but don't override if they've already been set by import
     const savedSections = localStorage.getItem('flowchart_section_preferences');
     if (savedSections) {
-      sectionPrefs = { ...sectionPrefs, ...JSON.parse(savedSections) };
+      console.log('🔍 [SETTINGS DEBUG] Loading section preferences from localStorage:', savedSections);
+      const parsedSections = JSON.parse(savedSections);
+      console.log('🔍 [SETTINGS DEBUG] Parsed section preferences:', JSON.stringify(parsedSections, null, 2));
+      
+      // Check if section preferences have already been set by import
+      const existingSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+      console.log('🔍 [SETTINGS DEBUG] Existing section preferences:', JSON.stringify(existingSectionPrefs, null, 2));
+      
+      // Only merge if we don't have existing section preferences or if they're just the default
+      const hasOnlyDefaultSection = Object.keys(existingSectionPrefs).length === 1 && 
+                                   existingSectionPrefs["1"] && 
+                                   existingSectionPrefs["1"].name === "Enter Name";
+      
+      if (Object.keys(existingSectionPrefs).length === 0 || hasOnlyDefaultSection) {
+        console.log('🔍 [SETTINGS DEBUG] No existing section preferences or only default, loading from localStorage');
+        sectionPrefs = { ...sectionPrefs, ...parsedSections };
+        console.log('🔍 [SETTINGS DEBUG] Final sectionPrefs after merge:', JSON.stringify(sectionPrefs, null, 2));
+      } else {
+        console.log('🔍 [SETTINGS DEBUG] Existing section preferences found, not overriding with localStorage data');
+        sectionPrefs = existingSectionPrefs;
+      }
+    } else {
+      console.log('🔍 [SETTINGS DEBUG] No saved section preferences found in localStorage');
     }
     
     // Apply settings

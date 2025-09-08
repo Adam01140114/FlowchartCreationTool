@@ -35,7 +35,6 @@ function setSection(cell, sectionNum) {
   style = style.replace(/section=[^;]+/, "");
   style += `;section=${sectionNum};`;
   graph.getModel().setStyle(cell, style);
-  
   if (!sectionPrefs[sectionNum]) {
     sectionPrefs[sectionNum] = {
       borderColor: getDefaultSectionColor(parseInt(sectionNum)),
@@ -201,20 +200,26 @@ function deleteSection(sectionNum) {
     });
     
     // Update sectionPrefs
+    const currentSectionPrefs = getSectionPrefs();
     const newSectionPrefs = {};
-    Object.keys(sectionPrefs).forEach(sec => {
+    Object.keys(currentSectionPrefs).forEach(sec => {
       const secNum = parseInt(sec);
       if (secNum < sectionToDelete) {
-        newSectionPrefs[sec] = sectionPrefs[sec];
+        newSectionPrefs[sec] = currentSectionPrefs[sec];
       } else if (secNum > sectionToDelete) {
         // Move section down one level but keep its name
         newSectionPrefs[(secNum - 1).toString()] = {
-          ...sectionPrefs[sec],
+          ...currentSectionPrefs[sec],
           borderColor: getDefaultSectionColor(secNum - 1)
         };
       }
     });
-    sectionPrefs = newSectionPrefs;
+    // Update the section preferences in the proper location
+    if (window.flowchartConfig) {
+      window.flowchartConfig.sectionPrefs = newSectionPrefs;
+    } else {
+      window.sectionPrefs = newSectionPrefs;
+    }
     
   } finally {
     graph.getModel().endUpdate();
@@ -258,15 +263,16 @@ function addSection(afterSectionNum) {
     });
     
     // Update sectionPrefs
+    const currentSectionPrefs = getSectionPrefs();
     const newSectionPrefs = {};
-    Object.keys(sectionPrefs).forEach(sec => {
+    Object.keys(currentSectionPrefs).forEach(sec => {
       const secNum = parseInt(sec);
       if (secNum <= insertAfter) {
-        newSectionPrefs[sec] = sectionPrefs[sec];
+        newSectionPrefs[sec] = currentSectionPrefs[sec];
       } else {
         // Move section up one level but keep its name
         newSectionPrefs[(secNum + 1).toString()] = {
-          ...sectionPrefs[sec],
+          ...currentSectionPrefs[sec],
           borderColor: getDefaultSectionColor(secNum + 1)
         };
       }
@@ -278,7 +284,12 @@ function addSection(afterSectionNum) {
       name: `Section ${newSectionNum}`
     };
     
-    sectionPrefs = newSectionPrefs;
+    // Update the section preferences in the proper location
+    if (window.flowchartConfig) {
+      window.flowchartConfig.sectionPrefs = newSectionPrefs;
+    } else {
+      window.sectionPrefs = newSectionPrefs;
+    }
     
   } finally {
     graph.getModel().endUpdate();
@@ -295,17 +306,24 @@ function addSection(afterSectionNum) {
  * Updates the section legend UI based on current sectionPrefs.
  */
 function updateSectionLegend() {
+  console.log('🔍 [LEGEND DEBUG] updateSectionLegend called');
   const sectionPrefs = getSectionPrefs();
+  console.log('🔍 [LEGEND DEBUG] Retrieved sectionPrefs:', JSON.stringify(sectionPrefs, null, 2));
+  
   const legend = document.getElementById("sectionLegend");
   
   if (!legend) {
-    console.error('Section legend element not found');
+    console.error('❌ [LEGEND DEBUG] Section legend element not found');
     return;
   }
   
+  console.log('🔍 [LEGEND DEBUG] Section legend element found');
   let innerHTML = "<h4>Section Names</h4>";
   const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
+  console.log('🔍 [LEGEND DEBUG] Sections to render:', sections);
+  
   sections.forEach(sec => {
+    console.log(`🔍 [LEGEND DEBUG] Rendering section ${sec}:`, sectionPrefs[sec]);
     innerHTML += `
       <div class="section-item" data-section="${sec}" draggable="true">
         <div class="section-header">
@@ -322,7 +340,17 @@ function updateSectionLegend() {
     `;
   });
   innerHTML += `<button id="resetSectionColorsBtn">Reset Colors</button>`;
+  console.log('🔍 [LEGEND DEBUG] Setting legend innerHTML:', innerHTML);
   legend.innerHTML = innerHTML;
+  console.log('🔍 [LEGEND DEBUG] Legend innerHTML set successfully');
+  
+  // Final verification - check what sections are actually in the DOM
+  const renderedSections = legend.querySelectorAll('.section-item');
+  console.log('🔍 [LEGEND DEBUG] Number of sections rendered in DOM:', renderedSections.length);
+  renderedSections.forEach((section, index) => {
+    const sectionNum = section.getAttribute('data-section');
+    console.log(`🔍 [LEGEND DEBUG] Rendered section ${index + 1}: ${sectionNum}`);
+  });
 
   const colorBoxes = legend.querySelectorAll(".section-color-box");
   colorBoxes.forEach(box => {
@@ -372,9 +400,10 @@ function updateSectionLegend() {
   nameFields.forEach(field => {
     field.addEventListener("blur", (e) => {
       const sec = e.target.getAttribute("data-section");
-      sectionPrefs[sec].name = e.target.textContent.trim() || "Enter section name";
+      const currentSectionPrefs = getSectionPrefs();
+      currentSectionPrefs[sec].name = e.target.textContent.trim() || "Enter section name";
       if (selectedCell && getSection(selectedCell) === sec) {
-        document.getElementById("propSectionName").textContent = sectionPrefs[sec].name;
+        document.getElementById("propSectionName").textContent = currentSectionPrefs[sec].name;
       }
       // Keep Groups dropdowns in sync with latest section names
       if (typeof updateGroupDropdowns === 'function') {
@@ -389,8 +418,9 @@ function updateSectionLegend() {
     });
   });
   document.getElementById("resetSectionColorsBtn").addEventListener("click", () => {
-    Object.keys(sectionPrefs).forEach(sec => {
-      sectionPrefs[sec].borderColor = getDefaultSectionColor(parseInt(sec));
+    const currentSectionPrefs = getSectionPrefs();
+    Object.keys(currentSectionPrefs).forEach(sec => {
+      currentSectionPrefs[sec].borderColor = getDefaultSectionColor(parseInt(sec));
     });
     updateSectionLegend();
     const refreshAllCells = getRefreshAllCells();
@@ -451,7 +481,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event listener for section color picker
   document.getElementById("sectionColorPicker").addEventListener("input", (e) => {
     if (selectedSectionForColor) {
-      sectionPrefs[selectedSectionForColor].borderColor = e.target.value;
+      const currentSectionPrefs = getSectionPrefs();
+      currentSectionPrefs[selectedSectionForColor].borderColor = e.target.value;
       updateSectionLegend();
       const refreshAllCells = getRefreshAllCells();
   if (refreshAllCells) {
@@ -560,16 +591,22 @@ function reorderSections(draggedSection, targetSection) {
     });
     
     // Update sectionPrefs with new section numbers
+    const currentSectionPrefs = getSectionPrefs();
     const newSectionPrefs = {};
     newSections.forEach((section, index) => {
       const newSectionNum = (index + 1).toString();
       newSectionPrefs[newSectionNum] = {
-        ...sectionPrefs[section],
+        ...currentSectionPrefs[section],
         borderColor: getDefaultSectionColor(index + 1)
       };
     });
     
-    sectionPrefs = newSectionPrefs;
+    // Update the section preferences in the proper location
+    if (window.flowchartConfig) {
+      window.flowchartConfig.sectionPrefs = newSectionPrefs;
+    } else {
+      window.sectionPrefs = newSectionPrefs;
+    }
     
   } finally {
     graph.getModel().endUpdate();

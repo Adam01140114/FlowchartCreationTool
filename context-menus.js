@@ -816,17 +816,29 @@ function setupContextMenuEventListeners(graph) {
       console.log("Properties button clicked!");
       console.log("selectedCell:", window.selectedCell);
       console.log("currentMouseEvent:", window.currentMouseEvent);
+      console.log("showPropertiesPopup function exists:", typeof window.showPropertiesPopup === 'function');
+      
       if (window.selectedCell) {
         // Use the new popup instead of the old menu
         if (window.showPropertiesPopup) {
-          window.showPropertiesPopup(window.selectedCell);
+          console.log("Calling showPropertiesPopup with cell:", window.selectedCell);
+          try {
+            window.showPropertiesPopup(window.selectedCell);
+            console.log("showPropertiesPopup called successfully");
+          } catch (error) {
+            console.error("Error calling showPropertiesPopup:", error);
+          }
         } else {
           console.log("showPropertiesPopup function not available");
         }
       } else {
         console.log("Missing selectedCell");
       }
-      hideContextMenu();
+      
+      // Delay hiding the context menu to give the popup time to be created
+      setTimeout(() => {
+        hideContextMenu();
+      }, 100);
     });
   } else {
     console.log("Properties button not found!");

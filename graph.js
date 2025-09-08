@@ -222,10 +222,12 @@ function setupCustomDoubleClickBehavior(graph) {
         //console.log("🎯 DOUBLE CLICK DETECTED manually!");
         //alert("double click detected");
         
-        // Show question text popup for question nodes
+        // Show properties popup for question nodes
         if (typeof isQuestion === 'function' && isQuestion(cell)) {
-          console.log("🎯 Question node detected, showing popup");
-          showQuestionTextPopup(cell);
+          console.log("🎯 Question node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
           return;
         }
         
@@ -250,10 +252,12 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     
-    // Show question text popup for question nodes
+    // Show properties popup for question nodes
     if (cell && cell.vertex) {
       if (typeof isQuestion === 'function' && isQuestion(cell)) {
-        showQuestionTextPopup(cell);
+        if (typeof window.showPropertiesPopup === 'function') {
+          window.showPropertiesPopup(cell);
+        }
         mxEvent.consume(evt);
         return;
       }
@@ -264,24 +268,26 @@ function setupCustomDoubleClickBehavior(graph) {
       graph.setSelectionCell(cell);
     }
     
-    // Handle question nodes with a popup for text editing
+    // Handle question nodes with properties popup
     if (cell && typeof isQuestion === 'function' && isQuestion(cell)) {
-      if (typeof showQuestionTextPopup === 'function') {
-        showQuestionTextPopup(cell);
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
         mxEvent.consume(evt);
         return;
       }
     } else if (cell && typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-      if (typeof window.showQuestionTextPopup === 'function') {
-        window.showQuestionTextPopup(cell);
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
         mxEvent.consume(evt);
         return;
       }
     }
     
-    // Add direct editing for option nodes on double-click
+    // Show properties popup for option nodes on double-click
     if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
-      graph.startEditingAtCell(cell);
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
       mxEvent.consume(evt);
       return;
     }
@@ -330,14 +336,24 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
+  console.log("🔍 [PROPERTIES POPUP DEBUG] showPropertiesPopup called with cell:", cell);
+  
   // Prevent multiple popups
   if (window.__propertiesPopupOpen) {
+    console.log("🔍 [PROPERTIES POPUP DEBUG] Popup already open, returning");
     return;
   }
   window.__propertiesPopupOpen = true;
+  console.log("🔍 [PROPERTIES POPUP DEBUG] Setting popup open flag");
   
   // Clean up any existing popups
   document.querySelectorAll('.properties-modal').forEach(n => n.remove());
+  
+  // Hide any old properties menu that might be showing
+  const oldPropertiesMenu = document.getElementById('propertiesMenu');
+  if (oldPropertiesMenu) {
+    oldPropertiesMenu.style.display = 'none';
+  }
   
   // Create popup container
   const popup = document.createElement('div');
@@ -352,13 +368,21 @@ function showPropertiesPopup(cell) {
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    z-index: 10000;
+    z-index: 99999;
     min-width: 500px;
     max-width: 600px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     pointer-events: auto;
     opacity: 1;
+    display: block;
+    visibility: visible;
   `;
+  
+  // Force the popup to be visible by setting styles directly
+  popup.style.pointerEvents = 'auto';
+  popup.style.opacity = '1';
+  popup.style.display = 'block';
+  popup.style.visibility = 'visible';
   
   // Create header
   const header = document.createElement('div');
@@ -838,6 +862,27 @@ function showPropertiesPopup(cell) {
               case 'propNodeText':
                 cell._questionText = newValue;
                 cell.value = newValue;
+                
+                // Auto-update node ID based on text for option nodes
+                if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
+                  const autoNodeId = newValue.toLowerCase()
+                    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                    .replace(/\s+/g, '_') // Replace spaces with underscores
+                    .substring(0, 20); // Limit length
+                  
+                  if (autoNodeId) {
+                    cell._nameId = autoNodeId;
+                    // Update the node ID field in the popup if it exists
+                    const nodeIdField = document.getElementById('propNodeId');
+                    if (nodeIdField) {
+                      const nodeIdSpan = nodeIdField.querySelector('span');
+                      if (nodeIdSpan) {
+                        nodeIdSpan.textContent = autoNodeId;
+                      }
+                    }
+                    console.log('Auto-updated node ID to:', autoNodeId);
+                  }
+                }
                 break;
               case 'propNodeSection':
                 // Update section using the proper setSection function
@@ -960,6 +1005,44 @@ function showPropertiesPopup(cell) {
   popup.appendChild(buttonContainer);
   document.body.appendChild(popup);
   
+  console.log("🔍 [PROPERTIES POPUP DEBUG] Popup created and added to DOM");
+  console.log("🔍 [PROPERTIES POPUP DEBUG] Popup element:", popup);
+  
+  // Force visibility after DOM insertion with multiple attempts
+  setTimeout(() => {
+    popup.style.pointerEvents = 'auto';
+    popup.style.opacity = '1';
+    popup.style.display = 'block';
+    popup.style.visibility = 'visible';
+    popup.style.zIndex = '99999';
+    console.log("🔍 [PROPERTIES POPUP DEBUG] Forced visibility styles applied");
+    console.log("🔍 [PROPERTIES POPUP DEBUG] Final popup styles:", popup.style.cssText);
+    
+    // Double-check visibility after a short delay
+    setTimeout(() => {
+      if (popup.style.display === 'none' || popup.style.opacity === '0') {
+        console.log("🔍 [PROPERTIES POPUP DEBUG] Popup still not visible, forcing again");
+        popup.style.pointerEvents = 'auto';
+        popup.style.opacity = '1';
+        popup.style.display = 'block';
+        popup.style.visibility = 'visible';
+        popup.style.zIndex = '99999';
+      }
+    }, 50);
+  }, 10);
+  
+  // Temporary alert to confirm popup is being created
+  console.log("🔍 [PROPERTIES POPUP DEBUG] Popup should be visible now!");
+  
+  // Auto-copy node ID to clipboard when popup opens
+  if (nodeId && nodeId.trim()) {
+    navigator.clipboard.writeText(nodeId).then(() => {
+      console.log('Node ID copied to clipboard:', nodeId);
+    }).catch(err => {
+      console.error('Failed to copy node ID to clipboard:', err);
+    });
+  }
+  
   // Focus management
   let focusTimeout = null;
   let isClosing = false;
@@ -1010,11 +1093,22 @@ function showPropertiesPopup(cell) {
   });
   
   // Handle clicking outside popup
-  popup.addEventListener('click', (e) => {
-    if (e.target === popup) {
+  const handleOutsideClick = (e) => {
+    if (!popup.contains(e.target)) {
       newClosePopup();
     }
-  });
+  };
+  
+  // Add event listener to document for outside clicks
+  document.addEventListener('click', handleOutsideClick);
+  
+  // Clean up the outside click listener when popup closes
+  const originalClosePopup = closePopup;
+  const newClosePopup = () => {
+    document.removeEventListener('click', handleOutsideClick);
+    document.removeEventListener('keydown', handleEscape);
+    originalClosePopup();
+  };
   
   // Handle Escape key
   const handleEscape = (e) => {
@@ -1026,13 +1120,6 @@ function showPropertiesPopup(cell) {
   };
   
   document.addEventListener('keydown', handleEscape);
-  
-  // Clean up escape listener when popup closes
-  const originalClosePopup = closePopup;
-  const newClosePopup = () => {
-    document.removeEventListener('keydown', handleEscape);
-    originalClosePopup();
-  };
   
   // Add hover effects for close button
   closeBtn.addEventListener('mouseenter', () => {

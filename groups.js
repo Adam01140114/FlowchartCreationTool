@@ -95,8 +95,9 @@ function addSectionToGroup(groupId, sectionName = '') {
   // Get ALL section names from sectionPrefs
   const sectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs);
   const allSections = [];
-  Object.keys(sectionPrefs).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(sectionId => {
-    const sectionName = (sectionPrefs[sectionId] && sectionPrefs[sectionId].name) ? sectionPrefs[sectionId].name : '';
+  const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+  Object.keys(currentSectionPrefs).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(sectionId => {
+    const sectionName = (currentSectionPrefs[sectionId] && currentSectionPrefs[sectionId].name) ? currentSectionPrefs[sectionId].name : '';
     // Only filter out if it is truly the default placeholder
     if (sectionName.trim() !== '' && sectionName.trim().toLowerCase() !== 'enter section name') {
       allSections.push(sectionName.trim());
@@ -335,8 +336,9 @@ function updateGroupDropdowns() {
             // Get updated section names
           const sectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs);
           const allSections = [];
-          Object.keys(sectionPrefs).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(sectionId => {
-            const sectionName = (sectionPrefs[sectionId] && sectionPrefs[sectionId].name) ? sectionPrefs[sectionId].name : '';
+          const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+          Object.keys(currentSectionPrefs).sort((a,b)=>parseInt(a)-parseInt(b)).forEach(sectionId => {
+            const sectionName = (currentSectionPrefs[sectionId] && currentSectionPrefs[sectionId].name) ? currentSectionPrefs[sectionId].name : '';
             if (sectionName.trim() !== '' && sectionName.trim().toLowerCase() !== 'enter section name') {
               allSections.push(sectionName.trim());
             }
