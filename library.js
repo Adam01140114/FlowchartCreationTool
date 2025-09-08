@@ -107,16 +107,35 @@ window.exportGuiJson = function(download = true) {
 
   // Create sections array structure and get top level data
   const sectionMap = {};
-  for (const num in sectionPrefs) {
+  // Get current section preferences using the proper function
+  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.sectionPrefs || {});
+  
+  console.log('🔍 [GUI EXPORT DEBUG] Current section preferences:', JSON.stringify(currentSectionPrefs, null, 2));
+  
+  for (const num in currentSectionPrefs) {
     if (parseInt(num) >= sectionCounter) {
       sectionCounter = parseInt(num) + 1;
     }
     sectionMap[num] = {
       sectionId: parseInt(num),
-      sectionName: sectionPrefs[num].name || `Section ${num}`,
+      sectionName: currentSectionPrefs[num].name || `Section ${num}`,
       questions: []
     };
+    console.log(`🔍 [GUI EXPORT DEBUG] Section ${num} name: "${currentSectionPrefs[num].name || `Section ${num}`}"`);
   }
+  
+  // Find the maximum section number used by questions
+  let maxSectionNumber = 1;
+  for (const cell of questions) {
+    const section = getSection(cell) || "1";
+    const sectionNum = parseInt(section);
+    if (sectionNum > maxSectionNumber) {
+      maxSectionNumber = sectionNum;
+    }
+  }
+  
+  // Update sectionCounter to be the next available section number
+  sectionCounter = Math.max(sectionCounter, maxSectionNumber + 1);
 
   // Ensure section 1 always exists
   if (!sectionMap["1"]) {
@@ -144,7 +163,7 @@ window.exportGuiJson = function(download = true) {
     if (questionType === "text2") exportType = "dropdown";
     
     const question = {
-      questionId: cell._questionId || questionCounter++,
+      questionId: cell._questionId || questionCounter,
       text: cell._questionText || cell.value || "",
       type: exportType,
       logic: {
@@ -682,6 +701,20 @@ window.exportGuiJson = function(download = true) {
     sections.push(sectionMap[secNum]);
   }
   sections.sort((a, b) => a.sectionId - b.sectionId);
+  
+  // Calculate the maximum question ID found
+  let maxQuestionId = 0;
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const questionId = parseInt(question.questionId) || 0;
+      if (questionId > maxQuestionId) {
+        maxQuestionId = questionId;
+      }
+    }
+  }
+  
+  // Update questionCounter to be the next available question ID
+  questionCounter = maxQuestionId + 1;
   
   // Create final output object
   const output = {

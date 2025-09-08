@@ -6,6 +6,7 @@
  * Export the flowchart structure as JSON
  */
 window.exportFlowchartJson = function () {
+  console.log('🔍 [EXPORT DEBUG] ===== exportFlowchartJson FUNCTION CALLED =====');
   if (!graph) {
     console.error('Graph not initialized');
     return;
@@ -102,6 +103,11 @@ window.exportFlowchartJson = function () {
     }
   });
   
+  // Force debug output
+  console.log('🔍 [EXPORT DEBUG] ===== EXPORT FUNCTION CALLED =====');
+  console.log('🔍 [EXPORT DEBUG] Total cells to process:', simplifiedCells.length);
+  console.log('🔍 [EXPORT DEBUG] Used sections found:', Array.from(usedSections));
+  
   console.log('🔍 [EXPORT DEBUG] Sections found in cells:', Array.from(usedSections));
   console.log('🔍 [EXPORT DEBUG] Total cells processed:', simplifiedCells.length);
   
@@ -111,7 +117,7 @@ window.exportFlowchartJson = function () {
   console.log('🔍 [SECTION NAME DEBUG] Current section preferences from window.sectionPrefs:', JSON.stringify(window.sectionPrefs, null, 2));
   
   // Get current section preferences and filter to only include used sections
-  const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+  const currentSectionPrefs = getSectionPrefs();
   console.log('🔍 [EXPORT DEBUG] Current section preferences:', JSON.stringify(currentSectionPrefs, null, 2));
   
   const exportedSectionPrefs = {};
@@ -122,10 +128,15 @@ window.exportFlowchartJson = function () {
   }
   
   // Include all other sections that are actually used by cells
+  console.log('🔍 [EXPORT DEBUG] ===== PROCESSING SECTIONS =====');
+  console.log('🔍 [EXPORT DEBUG] Used sections to process:', Array.from(usedSections));
+  console.log('🔍 [EXPORT DEBUG] Current section preferences keys:', Object.keys(currentSectionPrefs));
+  
   usedSections.forEach(sectionNum => {
     console.log('🔍 [EXPORT DEBUG] Processing section', sectionNum);
+    console.log('🔍 [EXPORT DEBUG] Section', sectionNum, 'exists in currentSectionPrefs:', !!currentSectionPrefs[sectionNum]);
     if (currentSectionPrefs[sectionNum]) {
-      console.log('🔍 [EXPORT DEBUG] Section', sectionNum, 'exists in currentSectionPrefs, using it');
+      console.log('🔍 [EXPORT DEBUG] Section', sectionNum, 'exists in currentSectionPrefs, using it:', currentSectionPrefs[sectionNum]);
       exportedSectionPrefs[sectionNum] = currentSectionPrefs[sectionNum];
     } else {
       console.log('🔍 [EXPORT DEBUG] Section', sectionNum, 'not in currentSectionPrefs, creating default entry');

@@ -250,9 +250,14 @@ window.exportFlowchartJson = function(download = true) {
     return cellData;
   });
 
+  // Get current section preferences using the proper function
+  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.sectionPrefs || {});
+  
+  console.log('🔍 [URL.JS EXPORT DEBUG] Current section preferences:', JSON.stringify(currentSectionPrefs, null, 2));
+  
   const output = {
     cells: simplifiedCells,
-    sectionPrefs: JSON.parse(JSON.stringify(sectionPrefs)),
+    sectionPrefs: JSON.parse(JSON.stringify(currentSectionPrefs)),
     groups: JSON.parse(JSON.stringify(groups))
   };
 
