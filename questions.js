@@ -87,16 +87,30 @@ function setQuestionType(cell, newType) {
 function extractTextFromCell(cell) {
   if (!cell) return '';
   
-  // First, try to get text from _questionText property
+  // First, try to get text from _questionText property, but only if it's not dropdown options
   if (cell._questionText && cell._questionText.trim()) {
-    return cell._questionText.trim();
+    // Check if _questionText contains dropdown options
+    if (cell._questionText.includes('-- Choose Question Type --') || 
+        cell._questionText.includes('Text Dropdown Checkbox Number Date Big Paragraph')) {
+      // This is dropdown options, ignore it and try to extract from cell.value
+    } else {
+      return cell._questionText.trim();
+    }
   }
   
-  // If no _questionText, try to extract from the cell value
+  // If no valid _questionText, try to extract from the cell value
   if (cell.value) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = cell.value;
     const textContent = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Check if the extracted text is dropdown options
+    if (textContent.includes('-- Choose Question Type --') || 
+        textContent.includes('Text Dropdown Checkbox Number Date Big Paragraph')) {
+      // This is dropdown options, return empty string
+      return '';
+    }
+    
     return textContent.trim();
   }
   
@@ -129,6 +143,21 @@ function updateText2Cell(cell) {
 
 function renderSimpleQuestionTitle(cell, placeholder) {
   const text = cell._questionText || '';
+  const questionType = getQuestionType(cell);
+  
+  // Debug logging for date range nodes
+  console.log('🔧 [RENDER DEBUG] Cell ID:', cell.id, 'Question Type:', questionType, 'Cell style:', cell.style);
+  
+  // For date range nodes, add a copy ID button
+  if (questionType === 'dateRange') {
+    console.log('🔧 [RENDER DEBUG] Rendering date range node with copy ID button');
+    return `<div style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; justify-content: center;">
+      <div class="question-title-input" onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')" style="margin-bottom: 8px;">${getEscapeHtml()(text) || placeholder}</div>
+      <button onclick="window.showDateRangeCopyDialog('${cell.id}')" style="padding: 6px 12px; background-color: #007bff; color: white; border: 2px solid #0056b3; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" title="Copy ID" onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007bff'">Copy ID</button>
+    </div>`;
+  }
+  
+  console.log('🔧 [RENDER DEBUG] Rendering normal node without copy ID button');
   return `<div class="question-title-input" onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${getEscapeHtml()(text) || placeholder}</div>`;
 }
 
@@ -175,6 +204,7 @@ function updateSimpleQuestionCell(cell) {
     let text = cell._questionText || '';
     text = text.replace(/<[^>]+>/g, '').trim();
     cell._questionText = text; // keep it clean for future edits
+    
     const html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
       ${renderSimpleQuestionTitle(cell, placeholder)}
     </div>`;

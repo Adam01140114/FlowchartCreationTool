@@ -461,6 +461,20 @@ graph.isCellEditable = function (cell) {
     }
     if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
   }
+
+  // Add resize listener for notes nodes to update font size dynamically
+  graph.getModel().addListener(mxEvent.CHANGE, function(sender, evt) {
+    const changes = evt.getProperty('edit').changes;
+    changes.forEach(change => {
+      // Check for geometry changes (resize/move) on notes nodes
+      if (change instanceof mxGeometryChange && change.cell && isNotesNode(change.cell)) {
+        // Notes node was resized, update the font size
+        setTimeout(() => {
+          updateNotesNodeCell(change.cell);
+        }, 10); // Small delay to ensure geometry is updated
+      }
+    });
+  });
   
 
     // Selection change listener moved to events.js module
@@ -1807,6 +1821,27 @@ function refreshNodeIdFromLabel(cell) {
     console.log("Cell _questionText:", cell._questionText);
   }
   
+  // Check if there's already a custom Node ID that should be preserved
+  const existingNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
+  const hasCustomNodeId = existingNodeId && existingNodeId !== "unnamed_node" && 
+                         !existingNodeId.startsWith("node_") && 
+                         !existingNodeId.match(/^[a-z]+_question_node$/) &&
+                         !existingNodeId.match(/^\d+$/); // Don't preserve numeric IDs like "2"
+  
+  if (DEBUG_NODE_ID) {
+    console.log("Existing Node ID:", existingNodeId);
+    console.log("Has custom Node ID:", hasCustomNodeId);
+  }
+  
+  // If there's a custom Node ID, don't regenerate it
+  if (hasCustomNodeId) {
+    if (DEBUG_NODE_ID) {
+      console.log("Preserving custom Node ID:", existingNodeId);
+      console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END (PRESERVED)");
+    }
+    return;
+  }
+  
   let labelText = "";
 
   if (isQuestion(cell)) {
@@ -2056,8 +2091,19 @@ window.pickTypeForCell = function(cellId, val) {
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
-    if (!c._nameId) {
-      c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
+    // Always try to generate a proper Node ID from the cell's text content
+    // This ensures we get a meaningful ID instead of generic ones
+    if (typeof window.refreshNodeIdFromLabel === 'function') {
+      window.refreshNodeIdFromLabel(c);
+    } else if (!c._nameId) {
+      // Fallback to a proper default only if no Node ID generation function exists
+      c._nameId = "question_node";
+      if (typeof window.setNodeId === 'function') {
+        window.setNodeId(c, "question_node");
+      }
+    }
+    
+    if (!c._placeholder) {
       c._placeholder = "";
     }
     // Only handle special cases for multi types
@@ -3543,6 +3589,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // Helper: Render a single-line contenteditable div for simple question types
 function renderSimpleQuestionTitle(cell, placeholder) {
   const text = cell._questionText || '';
+  const questionType = getQuestionType(cell);
+  
+  // For date range nodes, add a copy ID button
+  if (questionType === 'dateRange') {
+    return `<div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+      <div class="question-title-input" onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${escapeHtml(text) || placeholder}</div>
+      <button onclick="window.showDateRangeCopyDialog('${cell.id}')" style="margin-top: 8px; padding: 4px 8px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;" title="Copy ID">Copy ID</button>
+    </div>`;
+  }
+  
   // Remove all inline styles, only use the class
   return `<div class="question-title-input"  onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${escapeHtml(text) || placeholder}</div>`;
 }
@@ -3558,16 +3614,120 @@ function renderInputQuestionTitle(cell, placeholder) {
 window.updateSimpleQuestionTitle = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
+  
+  // Debug logging for big paragraph nodes
+  if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Cell ID:', cellId);
+    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Input text:', text);
+    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Cell before update:', cell);
+  }
+  
   graph.getModel().beginUpdate();
   try {
     cell._questionText = text.replace(/<[^>]+>/g, '').trim() || '';
+    
+    // Debug logging after update
+    if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+      console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] cell._questionText after update:', cell._questionText);
+    }
   } finally {
     graph.getModel().endUpdate();
   }
   // Only re-render on blur, not on every input
   updateSimpleQuestionCell(cell);
-  refreshNodeIdFromLabel(cell);
+  
+  // Only refresh Node ID if it's not a custom one
+  const existingNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
+  const hasCustomNodeId = existingNodeId && existingNodeId !== "unnamed_node" && 
+                         !existingNodeId.startsWith("node_") && 
+                         !existingNodeId.match(/^[a-z]+_question_node$/);
+  
+  if (!hasCustomNodeId) {
+    refreshNodeIdFromLabel(cell);
+  }
 };
+
+// Show dialog for date range copy ID functionality
+window.showDateRangeCopyDialog = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  
+  // Get the question text and sanitize it
+  const questionText = cell._questionText || '';
+  const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  
+  // Check if this question has a PDF property
+  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  
+  // Create the base ID
+  let baseId;
+  if (sanitizedPdfName) {
+    baseId = `${sanitizedPdfName}_${sanitizedQuestionText}`;
+  } else {
+    baseId = sanitizedQuestionText;
+  }
+  
+  // Show the dialog
+  const choice = confirm('Copy ID for:\n\nOK = Start Date (_1)\nCancel = Finish Date (_2)');
+  
+  let idToCopy;
+  if (choice) {
+    // Start date
+    idToCopy = `${baseId}_1`;
+  } else {
+    // Finish date
+    idToCopy = `${baseId}_2`;
+  }
+  
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(idToCopy).then(() => {
+      // Show visual feedback
+      showCopyFeedback(idToCopy);
+    }).catch(() => {
+      // Fallback for older browsers
+      fallbackCopyToClipboard(idToCopy);
+      showCopyFeedback(idToCopy);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(idToCopy);
+    showCopyFeedback(idToCopy);
+  }
+};
+
+// Show visual feedback for copy operations
+function showCopyFeedback(copiedText) {
+  // Create a temporary notification
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 300px;
+    word-wrap: break-word;
+  `;
+  notification.textContent = `Copied: ${copiedText}`;
+  
+  document.body.appendChild(notification);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 3000);
+}
 
 // Update for input-based question types
 window.updateInputQuestionTitle = function(cellId, text) {
@@ -3723,8 +3883,19 @@ window.pickTypeForCell = function(cellId, val) {
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
-    if (!c._nameId) {
-      c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
+    // Always try to generate a proper Node ID from the cell's text content
+    // This ensures we get a meaningful ID instead of generic ones
+    if (typeof window.refreshNodeIdFromLabel === 'function') {
+      window.refreshNodeIdFromLabel(c);
+    } else if (!c._nameId) {
+      // Fallback to a proper default only if no Node ID generation function exists
+      c._nameId = "question_node";
+      if (typeof window.setNodeId === 'function') {
+        window.setNodeId(c, "question_node");
+      }
+    }
+    
+    if (!c._placeholder) {
       c._placeholder = "";
     }
     // Only handle special cases for multi types
@@ -4932,15 +5103,31 @@ function updateNotesNodeCell(cell) {
     cell._notesText = "Notes text";
   }
 
-  const size = parseInt(cell._notesFontSize, 10) || 14;
+  // Get current cell dimensions
+  const geometry = cell.getGeometry();
+  const cellWidth = geometry.width;
+  const cellHeight = geometry.height;
+  
+  // Calculate dynamic font size based on cell dimensions
+  // Base font size from user setting, but scale based on cell size
+  const baseFontSize = parseInt(cell._notesFontSize, 10) || 14;
+  const minFontSize = 8;
+  const maxFontSize = 48;
+  
+  // Scale font size based on cell area (width * height)
+  const cellArea = cellWidth * cellHeight;
+  const baseArea = 200 * 100; // Default notes node size
+  const scaleFactor = Math.sqrt(cellArea / baseArea);
+  const dynamicFontSize = Math.max(minFontSize, Math.min(maxFontSize, Math.round(baseFontSize * scaleFactor)));
+  
   const isBold = !!cell._notesBold;
   const text = escapeHtml(cell._notesText || "Notes text");
 
   // Inline styles so they win against theme CSS
   const html =
-    `<div class="notes-body" style="font-size:${size}px !important;` +
+    `<div class="notes-body" style="font-size:${dynamicFontSize}px !important;` +
     `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:left;` +
-    `cursor: pointer; user-select: text;" ondblclick="window.editNotesNodeText('${cell.id}')">` +
+    `cursor: pointer; user-select: text; width: 100%; height: 100%; box-sizing: border-box; padding: 8px;" ondblclick="window.editNotesNodeText('${cell.id}')">` +
     `${text}</div>`;
 
   graph.getModel().beginUpdate();
@@ -4951,14 +5138,15 @@ function updateNotesNodeCell(cell) {
     // Also set mxGraph container fontSize to match
     let st = cell.style || "";
     st = st.replace(/fontSize=\d+;?/, "");
-    st += `fontSize=${size};`;
+    st += `fontSize=${dynamicFontSize};`;
     graph.getModel().setStyle(cell, st);
   } finally {
     graph.getModel().endUpdate();
   }
 
   colorCell(cell);          // keep your border and fill logic
-  graph.updateCellSize(cell);
+  // Remove automatic resizing to allow manual resizing
+  // graph.updateCellSize(cell);
 }
 
 // Handler for updating notes node field (called when user finishes editing)

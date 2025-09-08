@@ -336,12 +336,6 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
-  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup CALLED =====");
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell parameter:", cell);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell ID:", cell?.id);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell type:", typeof cell);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell value:", cell?.value);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cell style:", cell?.style);
   
   // Prevent multiple popups
   if (window.__propertiesPopupOpen) {
@@ -457,12 +451,39 @@ function showPropertiesPopup(cell) {
   `;
   console.log("🔧 [PROPERTIES POPUP DEBUG] Content area created with styles");
   
-  // Get cell properties
-  const nodeText = cell._questionText || (() => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = cell.value || "";
-    return (tempDiv.textContent || tempDiv.innerText || "").trim();
+  // Get cell properties with improved text extraction
+  const nodeText = (() => {
+    // First try to get the text from _questionText property
+    if (cell._questionText && cell._questionText.trim()) {
+      return cell._questionText.trim();
+    }
+    
+    // If _questionText is empty, try to extract from cell.value
+    if (cell.value) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cell.value;
+      const extractedText = (tempDiv.textContent || tempDiv.innerText || "").trim();
+      
+      // If the extracted text looks like question type options, it's probably the dropdown HTML
+      if (extractedText.includes('-- Choose Question Type --') || 
+          extractedText.includes('Text Dropdown Checkbox Number Date Big Paragraph')) {
+        // This is the dropdown HTML, not the actual text
+        return '';
+      }
+      
+      return extractedText;
+    }
+    
+    return '';
   })();
+  
+  // Debug logging for big paragraph nodes
+  if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+    console.log('🔧 [BIG PARAGRAPH DEBUG] Cell:', cell);
+    console.log('🔧 [BIG PARAGRAPH DEBUG] cell._questionText:', cell._questionText);
+    console.log('🔧 [BIG PARAGRAPH DEBUG] cell.value:', cell.value);
+    console.log('🔧 [BIG PARAGRAPH DEBUG] Extracted nodeText:', nodeText);
+  }
   
   // Generate default Node ID based on question text if _nameId is not set
   const generateDefaultNodeId = (text) => {
@@ -476,19 +497,31 @@ function showPropertiesPopup(cell) {
   
   // Use the correct window.getNodeId function (same as the old properties menu)
   let nodeId = 'N/A';
-  if (typeof window.getNodeId === 'function') {
-    nodeId = window.getNodeId(cell) || 'N/A';
-  } else {
-    // Fallback logic if window.getNodeId is not available
-    if (cell.style) {
-      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
-      if (styleMatch) {
-        nodeId = decodeURIComponent(styleMatch[1]);
-      } else {
-        nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
-      }
+  
+  // PRIORITY 1: Check if we have a saved Node ID in the style (this should be preserved)
+  if (cell.style) {
+    const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+    if (styleMatch) {
+      nodeId = decodeURIComponent(styleMatch[1]);
+      console.log('🔧 [NODE ID DEBUG] Using saved Node ID from style:', nodeId);
+    }
+  }
+  
+  // PRIORITY 2: Check _nameId property (this should also be preserved)
+  if (nodeId === 'N/A' && cell._nameId) {
+    nodeId = cell._nameId;
+    console.log('🔧 [NODE ID DEBUG] Using saved Node ID from _nameId:', nodeId);
+  }
+  
+  // PRIORITY 3: Only use getNodeId as fallback if no saved ID exists
+  if (nodeId === 'N/A') {
+    if (typeof window.getNodeId === 'function') {
+      nodeId = window.getNodeId(cell) || 'N/A';
+      console.log('🔧 [NODE ID DEBUG] Using generated Node ID from getNodeId:', nodeId);
     } else {
+      // Fallback logic if window.getNodeId is not available
       nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      console.log('🔧 [NODE ID DEBUG] Using fallback generated Node ID:', nodeId);
     }
   }
   
@@ -690,6 +723,56 @@ function showPropertiesPopup(cell) {
     { label: 'Question Number', value: questionNumber, id: 'propQuestionNumber', editable: true }
   ];
   
+  // Add Copy ID dropdown and button for date range nodes
+  if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'dateRange') {
+    properties.push({
+      label: '',
+      value: '',
+      id: 'propCopyIdType',
+      editable: false,
+      isDropdown: true,
+      dropdownOptions: [
+        { value: '', text: 'Select Start or Finish...' },
+        { value: 'start', text: 'Start' },
+        { value: 'finish', text: 'Finish' }
+      ],
+      dropdownChange: (selectedValue) => {
+        const copyButton = document.getElementById('propCopyIdButton');
+        if (copyButton) {
+          copyButton.style.display = selectedValue ? 'block' : 'none';
+        }
+      }
+    });
+    
+    properties.push({
+      label: '',
+      value: '',
+      id: 'propCopyIdButton',
+      editable: false,
+      isButton: true,
+      buttonText: 'Copy ID',
+      buttonAction: () => {
+        const dropdown = document.getElementById('propCopyIdType');
+        const selectedValue = dropdown ? dropdown.value : '';
+        if (selectedValue) {
+          // Use the actual node ID from the properties, not the cell ID
+          const nodeIdField = document.getElementById('propNodeId');
+          const baseId = nodeIdField ? nodeIdField.textContent.trim() : cell.id;
+          const suffix = selectedValue === 'start' ? '_1' : '_2';
+          const fullId = baseId + suffix;
+          
+          navigator.clipboard.writeText(fullId).then(() => {
+            window.showCopyFeedback(fullId);
+          }).catch(err => {
+            console.error('Failed to copy ID:', err);
+            alert('Failed to copy ID to clipboard');
+          });
+        }
+      },
+      initiallyHidden: true
+    });
+  }
+  
   // Add PDF properties if this is an option node connected to a PDF
   if (pdfProperties) {
     // Use the actual PDF filename directly from _pdfUrl
@@ -812,10 +895,103 @@ function showPropertiesPopup(cell) {
       transition: all 0.2s ease;
     `;
     
-    if (prop.editable) {
-      // Special handling for Node ID field - copy to clipboard on click
+    if (prop.isDropdown) {
+      // Handle dropdown fields
+      const dropdown = document.createElement('select');
+      dropdown.id = prop.id;
+      dropdown.style.cssText = `
+        flex: 1 1 0%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      `;
+      
+      // Add options
+      if (prop.dropdownOptions) {
+        prop.dropdownOptions.forEach(option => {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.text;
+          dropdown.appendChild(optionElement);
+        });
+      }
+      
+      // Set initial value
+      if (prop.value) {
+        dropdown.value = prop.value;
+      }
+      
+      // Add change listener
+      dropdown.addEventListener('change', () => {
+        if (prop.dropdownChange) {
+          prop.dropdownChange(dropdown.value);
+        }
+      });
+      
+      // Center the dropdown if no label
+      if (!prop.label) {
+        fieldDiv.style.justifyContent = 'center';
+        fieldDiv.appendChild(dropdown);
+      } else {
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(dropdown);
+      }
+    } else if (prop.isButton) {
+      // Handle button fields
+      const button = document.createElement('button');
+      button.id = prop.id;
+      button.textContent = prop.buttonText || 'Button';
+      button.style.cssText = `
+        flex: 1 1 0%;
+        padding: 8px 12px;
+        border: 1px solid #1976d2;
+        border-radius: 6px;
+        background: #1976d2;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: ${prop.initiallyHidden ? 'none' : 'block'};
+      `;
+      
+      button.addEventListener('click', () => {
+        if (prop.buttonAction) {
+          prop.buttonAction();
+        }
+      });
+      
+      button.addEventListener('mouseover', () => {
+        button.style.backgroundColor = '#1565c0';
+      });
+      
+      button.addEventListener('mouseout', () => {
+        button.style.backgroundColor = '#1976d2';
+      });
+      
+      // Center the button if no label
+      if (!prop.label) {
+        fieldDiv.style.justifyContent = 'center';
+        fieldDiv.appendChild(button);
+      } else {
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(button);
+      }
+    } else if (prop.editable) {
+      // Special handling for Node ID field - make it editable with copy functionality
       if (prop.id === 'propNodeId') {
-        valueSpan.addEventListener('click', async () => {
+        // Make it contenteditable for editing
+        valueSpan.contentEditable = 'true';
+        valueSpan.style.cursor = 'text';
+        valueSpan.title = 'Click to edit, double-click to copy to clipboard';
+        
+        // Handle double-click to copy
+        valueSpan.addEventListener('dblclick', async (e) => {
+          e.preventDefault();
           try {
             await navigator.clipboard.writeText(prop.value);
             console.log('Node ID copied to clipboard:', prop.value);
@@ -855,9 +1031,43 @@ function showPropertiesPopup(cell) {
           }
         });
         
-        // Add cursor pointer to indicate it's clickable
-        valueSpan.style.cursor = 'pointer';
-        valueSpan.title = 'Click to copy to clipboard';
+        // Handle blur to save changes
+        valueSpan.addEventListener('blur', () => {
+          const newValue = valueSpan.textContent.trim();
+          if (newValue !== prop.value && newValue !== '') {
+            console.log('🔧 [NODE ID DEBUG] Saving Node ID change from', prop.value, 'to', newValue);
+            
+            // Update the cell's node ID using the proper method
+            if (typeof window.setNodeId === 'function') {
+              window.setNodeId(cell, newValue);
+            } else {
+              // Fallback: update the style directly
+              let style = cell.style || '';
+              style = style.replace(/nodeId=[^;]+/, '');
+              style += `nodeId=${encodeURIComponent(newValue)};`;
+              graph.getModel().setStyle(cell, style);
+            }
+            
+            // Also update the _nameId property if it exists
+            if (cell._nameId !== undefined) {
+              cell._nameId = newValue;
+            }
+            
+            // Update the cell's ID directly (mxGraph doesn't have setId method)
+            cell.id = newValue;
+            
+            // Force a refresh of all cells to update the display
+            if (typeof window.refreshAllCells === 'function') {
+              window.refreshAllCells();
+            }
+            
+            // Force a model change event to ensure the change is persisted
+            graph.getModel().beginUpdate();
+            graph.getModel().endUpdate();
+            
+            console.log('🔧 [NODE ID DEBUG] Node ID updated successfully');
+          }
+        });
       } else {
         // Regular editable field behavior for other fields
         valueSpan.addEventListener('click', () => {

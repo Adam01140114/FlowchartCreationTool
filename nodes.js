@@ -86,6 +86,11 @@ function createQuestionNode(x, y) {
   // Set default _nameId using naming convention
   vertex._nameId = "enter_question_text";
   
+  // Set the Node ID in the style to ensure it's properly saved
+  if (typeof window.setNodeId === 'function') {
+    window.setNodeId(vertex, "enter_question_text");
+  }
+  
   return vertex;
 }
 
@@ -133,6 +138,9 @@ function createNotesNode(x, y) {
   vertex._notesText = "Enter notes here";
   vertex._notesBold = false;
   vertex._notesFontSize = "14";
+  
+  // Initialize the notes node with proper styling
+  updateNotesNodeCell(vertex);
   
   return vertex;
 }
