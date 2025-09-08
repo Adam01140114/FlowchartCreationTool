@@ -512,7 +512,18 @@ function loadFormData(formData) {
                         const pa = questionBlock.querySelector(`#prevAnswer${question.questionId}_${rowId}`);
                         if (pq) pq.value = cond.prevQuestion;
                         updateLogicAnswersForRow(question.questionId, rowId);
-                        if (pa) pa.value = cond.prevAnswer;
+                        
+                        // Handle text questions with hidden inputs
+                        if (pa && pa.style.display === 'none') {
+                            // For text questions, set the hidden input value
+                            const hiddenInput = document.getElementById(`hiddenAnswer${question.questionId}_${rowId}`);
+                            if (hiddenInput) {
+                                hiddenInput.value = cond.prevAnswer || "Any Text";
+                            }
+                        } else if (pa) {
+                            // For other question types, set the select value
+                            pa.value = cond.prevAnswer;
+                        }
                     });
                 }
 
@@ -873,7 +884,20 @@ function exportForm() {
                 logicRows.forEach((row, idx) => {
                     const rowIndex = idx + 1;
                     const pqVal = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`)?.value.trim() || "";
-                    const paVal = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`)?.value.trim() || "";
+                    
+                    // Check if this is a text question (answer select is hidden)
+                    const answerSelect = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
+                    let paVal = "";
+                    
+                    if (answerSelect && answerSelect.style.display === 'none') {
+                        // For text questions, get the value from the hidden input
+                        const hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${rowIndex}`);
+                        paVal = hiddenInput ? hiddenInput.value.trim() : "Any Text";
+                    } else {
+                        // For other question types, get the value from the select dropdown
+                        paVal = answerSelect?.value.trim() || "";
+                    }
+                    
                     if (pqVal && paVal) {
                         conditionsArray.push({ prevQuestion: pqVal, prevAnswer: paVal });
                     }

@@ -1282,7 +1282,15 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
     const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
     if (!questionType) return;
 
+    // Reset the answer select to show it again (in case it was hidden for text questions)
+    answerSelect.style.display = 'block';
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+    
+    // Remove any existing condition labels and hidden inputs for text questions
+    const existingLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
+    const existingHiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
+    if (existingLabel) existingLabel.remove();
+    if (existingHiddenInput) existingHiddenInput.remove();
 
     if (questionType === 'radio') {
         answerSelect.innerHTML += `
@@ -1335,25 +1343,29 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
                 answerSelect.appendChild(optionEl);
             }
         }
-    } else if (questionType === 'text' || questionType === 'bigParagraph') {
-        // For textbox questions, add an "Any Text" option
-        const optionEl = document.createElement('option');
-        optionEl.value = 'Any Text';
-        optionEl.textContent = 'Any Text';
-        answerSelect.appendChild(optionEl);
-    } else if (questionType === 'money') {
-        // For money questions, add an "Any Amount" option
-        const optionEl = document.createElement('option');
-        optionEl.value = 'Any Amount';
-        optionEl.textContent = 'Any Amount';
-        answerSelect.appendChild(optionEl);
-        console.log('Money question selected, added "Any Amount" option');
-    } else if (questionType === 'date') {
-        // For date questions, add an "Any Date" option
-        const optionEl = document.createElement('option');
-        optionEl.value = 'Any Date';
-        optionEl.textContent = 'Any Date';
-        answerSelect.appendChild(optionEl);
+    } else if (questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange') {
+        // For textbox, money, and date questions, hide the answer dropdown since they don't have predefined options
+        answerSelect.style.display = 'none';
+        
+        // Add a hidden input to store the condition value
+        let hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
+        if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.id = `hiddenAnswer${questionId}_${conditionIndex}`;
+            hiddenInput.value = 'Any Text'; // Default value for text questions
+            answerSelect.parentNode.appendChild(hiddenInput);
+        }
+        
+        // Add a label to indicate the condition
+        let conditionLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
+        if (!conditionLabel) {
+            conditionLabel = document.createElement('div');
+            conditionLabel.id = `conditionLabel${questionId}_${conditionIndex}`;
+            conditionLabel.style.cssText = 'margin: 5px 0; padding: 5px; background: #e8f4fd; border-radius: 4px; color: #1976d2; font-size: 14px;';
+            conditionLabel.textContent = 'Will trigger when any text is entered';
+            answerSelect.parentNode.insertBefore(conditionLabel, answerSelect);
+        }
     }
 }
 

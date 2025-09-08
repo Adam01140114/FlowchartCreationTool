@@ -1,0 +1,140 @@
+{
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Enter Name",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "Enter your name",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "pdfName": "",
+            "stripePriceId": "",
+            "conditions": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "enter_your_name",
+          "placeholder": ""
+        },
+        {
+          "questionId": 2,
+          "text": "Are you hungry?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "pdfName": "",
+            "stripePriceId": "",
+            "conditions": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [
+            "No",
+            "Yes"
+          ],
+          "labels": [],
+          "nameId": "are_you_hungry",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
+        }
+      ]
+    }
+  ],
+  "groups": [],
+  "hiddenFields": [],
+  "sectionCounter": 2,
+  "questionCounter": 3,
+  "hiddenFieldCounter": 1,
+  "groupCounter": 1,
+  "defaultPDFName": "",
+  "pdfOutputName": "",
+  "stripePriceId": "",
+  "additionalPDFs": [],
+  "checklistItems": []
+}

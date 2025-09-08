@@ -1888,10 +1888,22 @@ formHTML += `</div><br></div>`;
               "#prevAnswer" + questionId + "_" + rowIndex
             );
 
-            if (!pqEl || !paEl) continue;
+            if (!pqEl) continue;
             const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim().toLowerCase();
-            if (!pqVal || !paVal) continue;
+            if (!pqVal) continue;
+            
+            // Handle text questions with hidden inputs
+            let paVal = "";
+            if (paEl && paEl.style.display === 'none') {
+                // For text questions, get the value from the hidden input
+                const hiddenInput = document.getElementById("hiddenAnswer" + questionId + "_" + rowIndex);
+                paVal = hiddenInput ? hiddenInput.value.trim().toLowerCase() : "any text";
+            } else if (paEl) {
+                // For other question types, get the value from the select dropdown
+                paVal = paEl.value.trim().toLowerCase();
+            }
+            
+            if (!paVal) continue;
 
             const pType = questionTypesMap[pqVal] || "text";
 
@@ -1907,6 +1919,10 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
             logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
+            logicScriptBuffer += `    } else if(cPrevType==="dateRange"){\n`;
+            logicScriptBuffer += `      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");\n`;
+            logicScriptBuffer += `      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");\n`;
+            logicScriptBuffer += `      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }\n`;
             logicScriptBuffer += `    } else {\n`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
@@ -1949,6 +1965,17 @@ formHTML += `</div><br></div>`;
               // IMPORTANT: Try questionNameIds first, then fallback to default naming
               logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
+              logicScriptBuffer += ` })();\n`;
+            } else if (pType2 === "dateRange") {
+              // Use "change" event for date range inputs
+              logicScriptBuffer += ` (function(){\n`;
+              // Use explicit question ID reference
+              logicScriptBuffer += `   var dateRangeQuestion = "${pqVal2}";\n`;
+              // Add listeners to both start and end date inputs
+              logicScriptBuffer += `   var startDateEl = document.getElementById(questionNameIds[dateRangeQuestion] + "_1");\n`;
+              logicScriptBuffer += `   var endDateEl = document.getElementById(questionNameIds[dateRangeQuestion] + "_2");\n`;
+              logicScriptBuffer += `   if(startDateEl){ startDateEl.addEventListener("change", function(){ updateVisibility();});}\n`;
+              logicScriptBuffer += `   if(endDateEl){ endDateEl.addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else {
               // Use "input" event for text fields
@@ -3570,13 +3597,17 @@ function handleNext(currentSection){
                 break;
             }
         } else if (jl.questionType === 'dateRange'){
-            // For dateRange questions, check if either date input has a value (or even if neither does)
+            // For dateRange questions, check if both date inputs have values
             const startDateEl = document.getElementById(nmId + '_1');
             const endDateEl = document.getElementById(nmId + '_2');
-            if ((startDateEl || endDateEl) && jl.jumpOption === "Any Text"){
-                // For dateRange questions, always jump if jump logic is enabled
-                nextSection = jl.jumpTo.toLowerCase();
-                break;
+            if (startDateEl && endDateEl && jl.jumpOption === "Any Text"){
+                const startVal = startDateEl.value.trim();
+                const endVal = endDateEl.value.trim();
+                // For dateRange questions, jump only if both dates are filled
+                if (startVal !== "" && endVal !== ""){
+                    nextSection = jl.jumpTo.toLowerCase();
+                    break;
+                }
             }
         }
     }
@@ -4479,9 +4510,16 @@ if (typeof handleNext === 'function') {
                             return true;
                         }
                     } else if (jl.questionType === 'dateRange') {
-                        // For dateRange questions, any input (or no input) triggers the jump
+                        // For dateRange questions, check if both dates are filled
                         if (jl.jumpOption === "Any Text") {
-                            return true;
+                            const startDateEl = document.getElementById(questionNameIds[questionId] + '_1');
+                            const endDateEl = document.getElementById(questionNameIds[questionId] + '_2');
+                            if (startDateEl && endDateEl) {
+                                const startVal = startDateEl.value.trim();
+                                const endVal = endDateEl.value.trim();
+                                // Only trigger jump if both dates are filled
+                                return startVal !== "" && endVal !== "";
+                            }
                         }
                     }
                 }
