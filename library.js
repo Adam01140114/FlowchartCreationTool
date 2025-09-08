@@ -1215,7 +1215,57 @@ window.loadFlowchartData = function(data) {
         }
       }, 50);
     } else {
+      // No section preferences in import data, but we need to check if cells have sections
+      console.log('🔍 [IMPORT DEBUG] No sectionPrefs in import data, checking cells for sections');
     }
+    
+    // After creating cells, check for missing section preferences and create them
+    setTimeout(() => {
+      const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+      const usedSections = new Set();
+      
+      // Collect all sections used by cells
+      data.cells.forEach(cell => {
+        if (cell.style) {
+          const sectionMatch = cell.style.match(/section=([^;]+)/);
+          if (sectionMatch) {
+            usedSections.add(sectionMatch[1]);
+          }
+        }
+      });
+      
+      console.log('🔍 [IMPORT DEBUG] Sections found in imported cells:', Array.from(usedSections));
+      console.log('🔍 [IMPORT DEBUG] Current section preferences:', Object.keys(currentSectionPrefs));
+      
+      // Create missing section preferences
+      let needsUpdate = false;
+      usedSections.forEach(sectionNum => {
+        if (!currentSectionPrefs[sectionNum]) {
+          console.log(`🔍 [IMPORT DEBUG] Creating missing section preference for section ${sectionNum}`);
+          currentSectionPrefs[sectionNum] = {
+            borderColor: window.getDefaultSectionColor ? window.getDefaultSectionColor(parseInt(sectionNum)) : "#cccccc",
+            name: `Section ${sectionNum}`
+          };
+          needsUpdate = true;
+        }
+      });
+      
+      if (needsUpdate) {
+        console.log('🔍 [IMPORT DEBUG] Updated section preferences:', currentSectionPrefs);
+        
+        // Update the section preferences
+        if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
+          window.flowchartConfig.sectionPrefs = currentSectionPrefs;
+        } else {
+          window.sectionPrefs = currentSectionPrefs;
+        }
+        
+        // Update the legend
+        if (typeof updateSectionLegend === 'function') {
+          updateSectionLegend();
+        }
+      }
+    }, 100);
 
     // First pass: Create all cells
     data.cells.forEach(item => {

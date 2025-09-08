@@ -393,6 +393,24 @@ function updateSectionLegend() {
       const sec = e.target.getAttribute("data-section");
       const currentSectionPrefs = getSectionPrefs();
       currentSectionPrefs[sec].name = e.target.textContent.trim() || "Enter section name";
+      
+      // Auto-save section preferences to localStorage
+      console.log('🔍 [SECTION NAME DEBUG] Section name changed to:', currentSectionPrefs[sec].name);
+      console.log('🔍 [SECTION NAME DEBUG] Full section preferences before save:', JSON.stringify(currentSectionPrefs, null, 2));
+      
+      if (typeof window.saveSettings === 'function') {
+        window.saveSettings();
+        console.log('🔍 [SECTION NAME DEBUG] Called window.saveSettings()');
+      } else {
+        // Fallback: save directly to localStorage
+        try {
+          localStorage.setItem('flowchart_section_preferences', JSON.stringify(currentSectionPrefs));
+          console.log('🔍 [SECTION NAME DEBUG] Auto-saved section preferences to localStorage');
+        } catch (error) {
+          console.error('Error auto-saving section preferences:', error);
+        }
+      }
+      
       if (selectedCell && getSection(selectedCell) === sec) {
         document.getElementById("propSectionName").textContent = currentSectionPrefs[sec].name;
       }
@@ -413,6 +431,20 @@ function updateSectionLegend() {
     Object.keys(currentSectionPrefs).forEach(sec => {
       currentSectionPrefs[sec].borderColor = getDefaultSectionColor(parseInt(sec));
     });
+    
+    // Auto-save section preferences to localStorage
+    if (typeof window.saveSettings === 'function') {
+      window.saveSettings();
+    } else {
+      // Fallback: save directly to localStorage
+      try {
+        localStorage.setItem('flowchart_section_preferences', JSON.stringify(currentSectionPrefs));
+        console.log('🔍 [SECTION DEBUG] Auto-saved section preferences to localStorage after color reset');
+      } catch (error) {
+        console.error('Error auto-saving section preferences:', error);
+      }
+    }
+    
     updateSectionLegend();
     const refreshAllCells = getRefreshAllCells();
   if (refreshAllCells) {

@@ -1791,9 +1791,42 @@ function setNodeId(cell, nodeId) {
     console.log("Original style:", cell.style);
   }
   
+  // Apply PDF prefix logic if the cell has PDF properties
+  let finalNodeId = nodeId;
+  if (typeof window.getNodeId === 'function') {
+    // Get the PDF name using the same logic as getNodeId
+    const getPdfName = (cell, visited = new Set()) => {
+      // Check for PDF properties in various formats
+      if (cell._pdfName) return cell._pdfName;
+      if (cell._pdfFilename) return cell._pdfFilename;
+      if (cell._pdfUrl) {
+        // Extract filename from URL
+        const urlParts = cell._pdfUrl.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        return filename.replace(/\.pdf$/i, ''); // Remove .pdf extension
+      }
+      return null;
+    };
+    
+    const pdfName = getPdfName(cell);
+    if (pdfName && pdfName.trim()) {
+      // Sanitize PDF name (remove .pdf extension and clean up)
+      const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+      
+      // Check if the nodeId already starts with the PDF name to avoid stacking
+      const pdfPrefix = `${cleanPdfName}_`;
+      if (!nodeId.startsWith(pdfPrefix)) {
+        finalNodeId = `${cleanPdfName}_${nodeId}`;
+        if (DEBUG_NODE_ID) {
+          console.log("Applied PDF prefix:", finalNodeId);
+        }
+      }
+    }
+  }
+  
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
-  style += `;nodeId=${encodeURIComponent(nodeId)};`;
+  style += `;nodeId=${encodeURIComponent(finalNodeId)};`;
   
   if (DEBUG_NODE_ID) {
     console.log("New style:", style);
@@ -5112,7 +5145,7 @@ function updateNotesNodeCell(cell) {
   // Base font size from user setting, but scale based on cell size
   const baseFontSize = parseInt(cell._notesFontSize, 10) || 14;
   const minFontSize = 8;
-  const maxFontSize = 48;
+  const maxFontSize = 200; // Increased from 48 to allow much larger font sizes
   
   // Scale font size based on cell area (width * height)
   const cellArea = cellWidth * cellHeight;

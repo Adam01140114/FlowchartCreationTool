@@ -97,11 +97,18 @@ window.exportFlowchartJson = function () {
       const sectionMatch = cell.style.match(/section=([^;]+)/);
       if (sectionMatch) {
         usedSections.add(sectionMatch[1]);
+        console.log('🔍 [EXPORT DEBUG] Found section', sectionMatch[1], 'in cell style:', cell.style);
       }
     }
   });
   
   console.log('🔍 [EXPORT DEBUG] Sections found in cells:', Array.from(usedSections));
+  console.log('🔍 [EXPORT DEBUG] Total cells processed:', simplifiedCells.length);
+  
+  // Debug section preferences
+  console.log('🔍 [SECTION NAME DEBUG] Current section preferences from getSectionPrefs():', JSON.stringify(getSectionPrefs(), null, 2));
+  console.log('🔍 [SECTION NAME DEBUG] Current section preferences from window.flowchartConfig:', JSON.stringify(window.flowchartConfig?.sectionPrefs, null, 2));
+  console.log('🔍 [SECTION NAME DEBUG] Current section preferences from window.sectionPrefs:', JSON.stringify(window.sectionPrefs, null, 2));
   
   // Get current section preferences and filter to only include used sections
   const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -116,9 +123,12 @@ window.exportFlowchartJson = function () {
   
   // Include all other sections that are actually used by cells
   usedSections.forEach(sectionNum => {
+    console.log('🔍 [EXPORT DEBUG] Processing section', sectionNum);
     if (currentSectionPrefs[sectionNum]) {
+      console.log('🔍 [EXPORT DEBUG] Section', sectionNum, 'exists in currentSectionPrefs, using it');
       exportedSectionPrefs[sectionNum] = currentSectionPrefs[sectionNum];
     } else {
+      console.log('🔍 [EXPORT DEBUG] Section', sectionNum, 'not in currentSectionPrefs, creating default entry');
       // If a section is used by cells but not in sectionPrefs, create a default entry
       exportedSectionPrefs[sectionNum] = {
         borderColor: window.getDefaultSectionColor ? window.getDefaultSectionColor(parseInt(sectionNum)) : "#cccccc",
