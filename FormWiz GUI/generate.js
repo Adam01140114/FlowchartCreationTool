@@ -1332,14 +1332,30 @@ questionSlugMap[questionId] = slug;
         jumpConditions.forEach((condition) => {
           const jumpOptionEl = condition.querySelector("select");
           const jumpToEl = condition.querySelector('input[type="text"]');
-          if (jumpOptionEl && jumpToEl && jumpToEl.value.trim()) {
-            jumpLogics.push({
-              questionId: questionId,
-              questionType: questionType,
-              jumpOption: jumpOptionEl.value.trim(),
-              jumpTo: jumpToEl.value.trim(),
-              section: s,
-            });
+          
+          // For textbox and date questions, we only need the jumpTo field (no dropdown)
+          const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+          
+          if (jumpToEl && jumpToEl.value.trim()) {
+            if (isTextboxQuestion) {
+              // For textbox questions, use "Any Text" as the jump option
+              jumpLogics.push({
+                questionId: questionId,
+                questionType: questionType,
+                jumpOption: "Any Text",
+                jumpTo: jumpToEl.value.trim(),
+                section: s,
+              });
+            } else if (jumpOptionEl && jumpOptionEl.value.trim()) {
+              // For other question types, require both dropdown and jumpTo
+              jumpLogics.push({
+                questionId: questionId,
+                questionType: questionType,
+                jumpOption: jumpOptionEl.value.trim(),
+                jumpTo: jumpToEl.value.trim(),
+                section: s,
+              });
+            }
           }
         });
       }
@@ -3545,6 +3561,23 @@ function handleNext(currentSection){
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
             }
+        } else if (['text','bigParagraph','money','date'].includes(jl.questionType)){
+            // For textbox and single date questions, jump logic triggers regardless of input content
+            const el = document.getElementById(nmId);
+            if (el && jl.jumpOption === "Any Text"){
+                // For textbox and date questions, always jump if jump logic is enabled
+                nextSection = jl.jumpTo.toLowerCase();
+                break;
+            }
+        } else if (jl.questionType === 'dateRange'){
+            // For dateRange questions, check if either date input has a value (or even if neither does)
+            const startDateEl = document.getElementById(nmId + '_1');
+            const endDateEl = document.getElementById(nmId + '_2');
+            if ((startDateEl || endDateEl) && jl.jumpOption === "Any Text"){
+                // For dateRange questions, always jump if jump logic is enabled
+                nextSection = jl.jumpTo.toLowerCase();
+                break;
+            }
         }
     }
 
@@ -4438,6 +4471,16 @@ if (typeof handleNext === 'function') {
                         }
                     } else if (jl.questionType === 'checkbox') {
                         if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
+                            return true;
+                        }
+                    } else if (['text','bigParagraph','money','date'].includes(jl.questionType)) {
+                        // For textbox and single date questions, any input (or no input) triggers the jump
+                        if (jl.jumpOption === "Any Text") {
+                            return true;
+                        }
+                    } else if (jl.questionType === 'dateRange') {
+                        // For dateRange questions, any input (or no input) triggers the jump
+                        if (jl.jumpOption === "Any Text") {
                             return true;
                         }
                     }

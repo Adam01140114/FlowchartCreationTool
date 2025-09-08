@@ -539,23 +539,31 @@ function loadFormData(formData) {
                         addJumpCondition(question.questionId);
                         const conditionId = index + 1;
                         
-                        // Update options for the dropdown based on question type
-                        if (question.type === 'dropdown') {
-                            updateJumpOptions(question.questionId, conditionId);
-                        } else if (question.type === 'radio') {
-                            updateJumpOptionsForRadio(question.questionId, conditionId);
-                        } else if (question.type === 'checkbox') {
-                            updateJumpOptionsForCheckbox(question.questionId, conditionId);
-                        } else if (question.type === 'numberedDropdown') {
-                            updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                        // Update options for the dropdown based on question type (skip for textbox and date questions)
+                        const isTextboxQuestion = question.type === 'text' || question.type === 'bigParagraph' || question.type === 'money' || question.type === 'date' || question.type === 'dateRange';
+                        
+                        if (!isTextboxQuestion) {
+                            if (question.type === 'dropdown') {
+                                updateJumpOptions(question.questionId, conditionId);
+                            } else if (question.type === 'radio') {
+                                updateJumpOptionsForRadio(question.questionId, conditionId);
+                            } else if (question.type === 'checkbox') {
+                                updateJumpOptionsForCheckbox(question.questionId, conditionId);
+                            } else if (question.type === 'numberedDropdown') {
+                                updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                            }
                         }
                         
-                        // After options are populated, set the selected value
+                        // Set the values based on question type
                         const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
                         const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
                         
-                        if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
-                        if (jumpToInput) jumpToInput.value = cond.to;
+                        if (!isTextboxQuestion && jumpOptionSelect) {
+                            jumpOptionSelect.value = cond.option;
+                        }
+                        if (jumpToInput) {
+                            jumpToInput.value = cond.to;
+                        }
                     });
                 }
               
@@ -882,7 +890,17 @@ function exportForm() {
                     const jumpOption = condDiv.querySelector(`#jumpOption${questionId}_${conditionId}`)?.value || '';
                     const jumpTo = condDiv.querySelector(`#jumpTo${questionId}_${conditionId}`)?.value || '';
 
-                    if (jumpOption && jumpTo) {
+                    // For textbox and date questions, we only need the jumpTo field (no dropdown)
+                    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+                    
+                    if (isTextboxQuestion && jumpTo) {
+                        // For textbox and date questions, use "Any Text" as the option
+                        jumpConditions.push({
+                            option: "Any Text",
+                            to: jumpTo
+                        });
+                    } else if (!isTextboxQuestion && jumpOption && jumpTo) {
+                        // For other question types, require both option and jumpTo
                         jumpConditions.push({
                             option: jumpOption,
                             to: jumpTo

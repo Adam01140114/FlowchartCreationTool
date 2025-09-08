@@ -363,34 +363,54 @@ function addJumpCondition(questionId) {
     const existingConditions = jumpConditionsDiv.querySelectorAll('.jump-condition');
     const conditionId = existingConditions.length + 1;
     
+    // Check if this is a textbox or date question type
+    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+    
     const conditionDiv = document.createElement('div');
     conditionDiv.className = 'jump-condition';
     conditionDiv.id = `jumpCondition${questionId}_${conditionId}`;
-    conditionDiv.innerHTML = `
-        <label>If selected:</label>
-        <select id="jumpOption${questionId}_${conditionId}">
-            <option value="" disabled selected>Select an option</option>
-        </select>
-        <label>Jump to:</label>
-        <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
-        <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
-        <hr>
-    `;
+    
+    if (isTextboxQuestion) {
+        // For textbox questions, skip the "If selected" dropdown
+        conditionDiv.innerHTML = `
+            <label>Jump to:</label>
+            <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
+            <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
+            <hr>
+        `;
+    } else {
+        // For other question types, keep the original structure
+        conditionDiv.innerHTML = `
+            <label>If selected:</label>
+            <select id="jumpOption${questionId}_${conditionId}">
+                <option value="" disabled selected>Select an option</option>
+            </select>
+            <label>Jump to:</label>
+            <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
+            <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
+            <hr>
+        `;
+    }
+    
     jumpConditionsDiv.appendChild(conditionDiv);
     
-    // Populate the jump options based on question type
-    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
-    if (questionTypeSelect) {
-        const questionType = questionTypeSelect.value;
-        
-        if (questionType === 'dropdown') {
-            updateJumpOptions(questionId, conditionId);
-        } else if (questionType === 'radio') {
-            updateJumpOptionsForRadio(questionId, conditionId);
-        } else if (questionType === 'checkbox') {
-            updateJumpOptionsForCheckbox(questionId, conditionId);
-        } else if (questionType === 'numberedDropdown') {
-            updateJumpOptionsForNumberedDropdown(questionId, conditionId);
+    // Populate the jump options based on question type (skip for textbox questions)
+    if (!isTextboxQuestion) {
+        const questionTypeSelect = document.getElementById(`questionType${questionId}`);
+        if (questionTypeSelect) {
+            const questionType = questionTypeSelect.value;
+            
+            if (questionType === 'dropdown') {
+                updateJumpOptions(questionId, conditionId);
+            } else if (questionType === 'radio') {
+                updateJumpOptionsForRadio(questionId, conditionId);
+            } else if (questionType === 'checkbox') {
+                updateJumpOptionsForCheckbox(questionId, conditionId);
+            } else if (questionType === 'numberedDropdown') {
+                updateJumpOptionsForNumberedDropdown(questionId, conditionId);
+            }
         }
     }
 }
@@ -398,6 +418,30 @@ function addJumpCondition(questionId) {
 function removeJumpCondition(questionId, conditionId) {
     const conditionDiv = document.getElementById(`jumpCondition${questionId}_${conditionId}`);
     if (conditionDiv) conditionDiv.remove();
+}
+
+// Update existing jump conditions to use simplified format for textbox and date questions
+function updateJumpConditionsForTextbox(questionId) {
+    const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
+    jumpConditions.forEach(condition => {
+        const conditionId = condition.id.split('_')[1];
+        const jumpToInput = document.getElementById(`jumpTo${questionId}_${conditionId}`);
+        
+        // If the condition has a dropdown (old format), convert it to simplified format
+        const selectElement = condition.querySelector('select');
+        if (selectElement) {
+            // Get the current "Jump to" value
+            const currentJumpTo = jumpToInput ? jumpToInput.value : '';
+            
+            // Replace the condition HTML with simplified format
+            condition.innerHTML = `
+                <label>Jump to:</label>
+                <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'" value="${currentJumpTo}">
+                <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
+                <hr>
+            `;
+        }
+    });
 }
 
 // This is the CORRECT version—supports multiple conditions.
@@ -816,11 +860,16 @@ function toggleOptions(questionId) {
     switch (questionType) {
         case 'text':
         case 'bigParagraph':
+        case 'date':
+        case 'dateRange':
+            textboxOptionsBlock.style.display = 'block';
+            // Update existing jump conditions to use simplified format for textbox and date questions
+            updateJumpConditionsForTextbox(questionId);
+            break;
         case 'radio':
         case 'dropdown':
         case 'email':
         case 'phone':
-        case 'dateRange':
             textboxOptionsBlock.style.display = 'block';
             if (questionType === 'radio' || questionType === 'dropdown') {
                 if (questionType === 'dropdown') {
@@ -868,6 +917,8 @@ function toggleOptions(questionId) {
 
         case 'money':
             textboxOptionsBlock.style.display = 'block';
+            // Update existing jump conditions to use simplified format for textbox questions
+            updateJumpConditionsForTextbox(questionId);
             break;
     }
 
@@ -1321,15 +1372,18 @@ function toggleJumpLogic(questionId) {
         if (jumpConditionsDiv && jumpConditionsDiv.children.length === 0) {
             addJumpCondition(questionId); // Add first condition automatically
             
-            // Make sure options are populated based on question type
-            if (questionType === 'numberedDropdown') {
-                updateJumpOptionsForNumberedDropdown(questionId);
-            } else if (questionType === 'dropdown') {
-                updateJumpOptions(questionId);
-            } else if (questionType === 'radio') {
-                updateJumpOptionsForRadio(questionId);
-            } else if (questionType === 'checkbox') {
-                updateJumpOptionsForCheckbox(questionId);
+            // Make sure options are populated based on question type (skip for textbox and date questions)
+            const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+            if (!isTextboxQuestion) {
+                if (questionType === 'numberedDropdown') {
+                    updateJumpOptionsForNumberedDropdown(questionId);
+                } else if (questionType === 'dropdown') {
+                    updateJumpOptions(questionId);
+                } else if (questionType === 'radio') {
+                    updateJumpOptionsForRadio(questionId);
+                } else if (questionType === 'checkbox') {
+                    updateJumpOptionsForCheckbox(questionId);
+                }
             }
         } else if (questionType === 'numberedDropdown') {
             // If conditions already exist but we're re-enabling jump logic,
