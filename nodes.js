@@ -312,14 +312,15 @@ window.getNodeId = function(cell) {
     if (DEBUG_NODE_ID) {
       console.log("🔍 GET PDF NAME DEBUG START for cell:", cell.id);
     }
-    // Check for PDF properties in various formats
-    if (cell._pdfName) return cell._pdfName;
-    if (cell._pdfFilename) return cell._pdfFilename;
-    if (cell._pdfUrl) {
+    // Check for PDF properties in various formats - only if they're not empty
+    if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
+    if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
+    if (cell._pdfUrl && cell._pdfUrl.trim()) {
       // Extract filename from URL
       const urlParts = cell._pdfUrl.split('/');
       const filename = urlParts[urlParts.length - 1];
-      return filename.replace(/\.pdf$/i, ''); // Remove .pdf extension
+      const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
+      return cleanFilename || null; // Return null if filename is empty after cleaning
     }
     
     // Check if this node is connected to a PDF node (either directly or through flow path)
@@ -327,19 +328,21 @@ window.getNodeId = function(cell) {
     if (graph) {
       // Helper function to extract PDF name from a cell
       const extractPdfName = (targetCell) => {
-        if (targetCell._pdfName) return targetCell._pdfName;
-        if (targetCell._pdfFilename) return targetCell._pdfFilename;
-        if (targetCell._pdfUrl) {
+        if (targetCell._pdfName && targetCell._pdfName.trim()) return targetCell._pdfName.trim();
+        if (targetCell._pdfFilename && targetCell._pdfFilename.trim()) return targetCell._pdfFilename.trim();
+        if (targetCell._pdfUrl && targetCell._pdfUrl.trim()) {
           const urlParts = targetCell._pdfUrl.split('/');
           const filename = urlParts[urlParts.length - 1];
-          return filename.replace(/\.pdf$/i, ''); // Remove .pdf extension
+          const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
+          return cleanFilename || null; // Return null if filename is empty after cleaning
         }
         // Try to extract from the PDF node's value
         if (targetCell.value) {
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = targetCell.value || "";
           const pdfText = (tempDiv.textContent || tempDiv.innerText || "").trim();
-          return pdfText.replace(/\.pdf$/i, ''); // Remove .pdf extension
+          const cleanPdfText = pdfText.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
+          return cleanPdfText || null; // Return null if text is empty after cleaning
         }
         return null;
       };
@@ -447,7 +450,9 @@ window.getNodeId = function(cell) {
           visited.add(targetCell.id);
           
           // Check if the target node has PDF properties (one level of downward propagation)
-          if (targetCell._pdfName || targetCell._pdfFilename || targetCell._pdfUrl) {
+          if ((targetCell._pdfName && targetCell._pdfName.trim()) || 
+              (targetCell._pdfFilename && targetCell._pdfFilename.trim()) || 
+              (targetCell._pdfUrl && targetCell._pdfUrl.trim())) {
             const pdfName = extractPdfName(targetCell);
             if (pdfName) return pdfName;
           }
@@ -532,7 +537,15 @@ window.getNodeId = function(cell) {
   }
   
   let finalNodeId = baseNodeId;
-  if (pdfName && pdfName.trim()) {
+  
+  // Only apply PDF naming convention if:
+  // 1. A PDF name was found AND
+  // 2. The cell actually has a PDF name property set (not just inherited from connections)
+  const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
+                          (cell._pdfFilename && cell._pdfFilename.trim()) || 
+                          (cell._pdfUrl && cell._pdfUrl.trim());
+  
+  if (pdfName && pdfName.trim() && hasDirectPdfName) {
     // Sanitize PDF name (remove .pdf extension and clean up)
     const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
     
@@ -548,6 +561,10 @@ window.getNodeId = function(cell) {
         console.log("Base nodeId already has PDF prefix, no stacking needed:", baseNodeId);
       }
       finalNodeId = baseNodeId;
+    }
+  } else {
+    if (DEBUG_NODE_ID) {
+      console.log("No PDF naming convention applied - PDF name found:", pdfName, "Has direct PDF name:", hasDirectPdfName);
     }
   }
   

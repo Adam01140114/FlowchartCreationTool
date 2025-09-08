@@ -1796,20 +1796,27 @@ function setNodeId(cell, nodeId) {
   if (typeof window.getNodeId === 'function') {
     // Get the PDF name using the same logic as getNodeId
     const getPdfName = (cell, visited = new Set()) => {
-      // Check for PDF properties in various formats
-      if (cell._pdfName) return cell._pdfName;
-      if (cell._pdfFilename) return cell._pdfFilename;
-      if (cell._pdfUrl) {
+      // Check for PDF properties in various formats - only if they're not empty
+      if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
+      if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
+      if (cell._pdfUrl && cell._pdfUrl.trim()) {
         // Extract filename from URL
         const urlParts = cell._pdfUrl.split('/');
         const filename = urlParts[urlParts.length - 1];
-        return filename.replace(/\.pdf$/i, ''); // Remove .pdf extension
+        const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
+        return cleanFilename || null; // Return null if filename is empty after cleaning
       }
       return null;
     };
     
     const pdfName = getPdfName(cell);
-    if (pdfName && pdfName.trim()) {
+    
+    // Only apply PDF naming convention if the cell actually has a PDF name property set
+    const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
+                            (cell._pdfFilename && cell._pdfFilename.trim()) || 
+                            (cell._pdfUrl && cell._pdfUrl.trim());
+    
+    if (pdfName && pdfName.trim() && hasDirectPdfName) {
       // Sanitize PDF name (remove .pdf extension and clean up)
       const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
       
@@ -1820,6 +1827,10 @@ function setNodeId(cell, nodeId) {
         if (DEBUG_NODE_ID) {
           console.log("Applied PDF prefix:", finalNodeId);
         }
+      }
+    } else {
+      if (DEBUG_NODE_ID) {
+        console.log("No PDF naming convention applied - PDF name found:", pdfName, "Has direct PDF name:", hasDirectPdfName);
       }
     }
   }
