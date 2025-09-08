@@ -4364,10 +4364,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Modal logic
 function showLoginRequiredModal() {
-  document.getElementById('loginRequiredModal').style.display = 'flex';
+  const modal = document.getElementById('loginRequiredModal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
 }
 function hideLoginRequiredModal() {
-  document.getElementById('loginRequiredModal').style.display = 'none';
+  const modal = document.getElementById('loginRequiredModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 document.addEventListener('DOMContentLoaded', function() {
   var backBtn = document.getElementById('modalBackBtn');
@@ -4382,7 +4388,10 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
-    if (!isUserLoggedIn) {
+    // Check if we're in preview mode (no login modal exists)
+    const isPreviewMode = !document.getElementById('loginRequiredModal');
+    
+    if (!isUserLoggedIn && !isPreviewMode) {
       showLoginRequiredModal();
       return;
     }
