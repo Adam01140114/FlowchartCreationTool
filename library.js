@@ -255,6 +255,24 @@ window.exportGuiJson = function(download = true) {
     const jumpConditions = [];
     let endOption = null;
     
+    // Check for direct connections to END nodes (for text-based questions)
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (targetCell && isEndNode(targetCell)) {
+          // This question connects directly to an END node
+          // For text-based questions, add "Any Text" jump condition
+          if (exportType === "text" || exportType === "bigParagraph" || exportType === "money" || exportType === "date" || exportType === "dateRange") {
+            jumpConditions.push({
+              option: "Any Text",
+              to: "end"
+            });
+            endOption = "Any Text";
+          }
+        }
+      }
+    }
+    
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
