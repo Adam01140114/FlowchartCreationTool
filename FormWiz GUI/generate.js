@@ -2290,6 +2290,7 @@ if (s > 1){
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
+    margin-bottom: 20px;
   }
   
   .alert-close-btn:hover {
@@ -2298,6 +2299,7 @@ if (s > 1){
   }
   
   .alert-message {
+    margin-top: 20px;
     margin-bottom: 28px;
     font-size: 1.08rem;
     line-height: 1.5;
@@ -2312,37 +2314,27 @@ if (s > 1){
   
   .alert-buttons {
     display: flex;
-    gap: 18px;
     justify-content: center;
   }
   
   .alert-btn {
-    padding: 8px 22px;
+    padding: 12px 32px;
     border-radius: 6px;
     border: none;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
-    min-width: 100px;
+    min-width: 120px;
   }
   
-  .alert-btn-back {
+  .alert-btn-continue {
     background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
     color: #fff;
   }
   
-  .alert-btn-back:hover {
+  .alert-btn-continue:hover {
     background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-  }
-  
-  .alert-btn-exit {
-    background: #e74c3c;
-    color: #fff;
-  }
-  
-  .alert-btn-exit:hover {
-    background: #c0392b;
   }
   </style>
   
@@ -2351,8 +2343,7 @@ if (s > 1){
       <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
-        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
-        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
+        <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
       </div>
     </div>
   </div>
