@@ -334,7 +334,7 @@ window.exportGuiJson = function(download = true) {
               if (shouldAddJump) {
                 jumpConditions.push({
                   option: "Any Text",
-                  to: targetQuestionId.toString()
+                  to: targetSection.toString()
                 });
               }
             }
@@ -429,11 +429,11 @@ window.exportGuiJson = function(download = true) {
                   
                   if (shouldAddJump) {
                     // Check if this jump already exists
-                    const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetQuestionId.toString());
+                    const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
                     if (!exists) {
                       jumpConditions.push({
                         option: optionText.trim(),
-                        to: targetQuestionId.toString()
+                        to: targetSection.toString()
                       });
                     }
                   }
