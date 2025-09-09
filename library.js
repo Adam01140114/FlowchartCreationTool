@@ -245,10 +245,14 @@ window.exportGuiJson = function(download = true) {
         text: ""
       },
       options: [],
-      labels: [],
-      nameId: sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed"),
-      placeholder: cell._placeholder || ""
+      labels: []
     };
+    
+    // Add nameId and placeholder for non-multiple textboxes questions
+    if (questionType !== "multipleTextboxes") {
+      question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
+      question.placeholder = cell._placeholder || "";
+    }
     
     // For text2, clean the text from HTML
     if (questionType === "text2" && question.text) {
@@ -275,7 +279,7 @@ window.exportGuiJson = function(download = true) {
       question.text = cleanedText;
     }
     
-    // For multiple textboxes, add the textboxes array
+    // For multiple textboxes, add the textboxes array and nodeId
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       question.textboxes = cell._textboxes.map(tb => ({
         label: "", // Empty label field as required
@@ -284,6 +288,9 @@ window.exportGuiJson = function(download = true) {
       }));
       // Add empty amounts array for multipleTextboxes
       question.amounts = [];
+      
+      // Add nodeId for multiple textboxes (use the sanitized nameId)
+      question.nodeId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
     }
     
     // Handle outgoing edges to option nodes
@@ -811,7 +818,39 @@ window.exportGuiJson = function(download = true) {
               if (targetCell && isAlertNode(targetCell)) {
                 // This question's option leads to an alert node
                 question.alertLogic.enabled = true;
-                question.alertLogic.message = targetCell._alertText || "";
+                
+                // Extract alert text from the alert node's HTML content
+                let alertText = "";
+                
+                // First, try the _questionText property (most current user-entered text)
+                if (targetCell._questionText) {
+                  alertText = targetCell._questionText;
+                }
+                // If no _questionText, try _alertText
+                else if (targetCell._alertText) {
+                  alertText = targetCell._alertText;
+                }
+                // If no stored properties, try to extract from the HTML input field
+                else if (targetCell.value) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = targetCell.value;
+                  const input = temp.querySelector('input[type="text"]');
+                  if (input) {
+                    alertText = input.value || input.getAttribute('value') || "";
+                  }
+                }
+                
+                // Clean up the alert text (remove any HTML entities or extra whitespace)
+                if (alertText) {
+                  alertText = alertText.replace(/&amp;/g, '&')
+                                    .replace(/&lt;/g, '<')
+                                    .replace(/&gt;/g, '>')
+                                    .replace(/&quot;/g, '"')
+                                    .replace(/&#39;/g, "'")
+                                    .trim();
+                }
+                
+                question.alertLogic.message = alertText;
                 
                 // Extract the option text
                 let optionText = optionCell.value || "";

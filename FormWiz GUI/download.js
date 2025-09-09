@@ -77,6 +77,26 @@ function showPreview() {
     }
     
     const formHTML = getFormHTML();
+    
+    // Copy HTML to clipboard automatically when previewing
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(formHTML).then(() => {
+            // Show a brief notification that it was copied
+            const previewButton = document.getElementById('previewButton');
+            if (previewButton) {
+                const originalText = previewButton.textContent;
+                previewButton.textContent = 'Copied to clipboard!';
+                previewButton.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    previewButton.textContent = originalText;
+                    previewButton.style.backgroundColor = '';
+                }, 2000);
+            }
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
+    }
+    
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
     previewFrame.srcdoc = formHTML;
@@ -396,6 +416,12 @@ function loadFormData(formData) {
                     }
                 }
                 else if (question.type === 'multipleTextboxes') {
+                    // Load custom Node ID if it exists
+                    const nodeIdInput = questionBlock.querySelector(`#multipleTextboxesNodeId${question.questionId}`);
+                    if (nodeIdInput && question.nodeId) {
+                        nodeIdInput.value = question.nodeId;
+                    }
+                    
                     // Rebuild multiple textboxes
                     const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
                     if (multipleTextboxesBlock) {
@@ -1210,6 +1236,12 @@ function exportForm() {
                 questionData.amounts = amounts;
             }
             else if (questionType === 'multipleTextboxes') {
+                // Export custom Node ID if it exists
+                const nodeIdInput = questionBlock.querySelector(`#multipleTextboxesNodeId${questionId}`);
+                if (nodeIdInput && nodeIdInput.value.trim()) {
+                    questionData.nodeId = nodeIdInput.value.trim();
+                }
+                
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 questionData.amounts = [];

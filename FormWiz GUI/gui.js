@@ -565,6 +565,8 @@ function addQuestion(sectionId, questionId = null) {
         
         <!-- Multiple Textboxes Options -->
         <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
+            <label>Node ID: </label>
+            <input type="text" id="multipleTextboxesNodeId${currentQuestionId}" placeholder="Enter custom node ID" oninput="updateMultipleTextboxesNodeId(${currentQuestionId})"><br><br>
             <label>Textboxes: </label>
             <div id="multipleTextboxesOptions${currentQuestionId}"></div>
             <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
@@ -1754,6 +1756,28 @@ function addMultipleTextboxOption(questionId) {
         <hr>
     `;
     multipleTextboxesOptionsDiv.appendChild(optionDiv);
+    
+    // Update the Name/ID field with the custom Node ID if it exists
+    updateMultipleTextboxesNodeId(questionId);
+}
+
+// Function to update all textbox Name/ID fields with the custom Node ID
+function updateMultipleTextboxesNodeId(questionId) {
+    const nodeIdInput = document.getElementById(`multipleTextboxesNodeId${questionId}`);
+    if (!nodeIdInput) return;
+    
+    const customNodeId = nodeIdInput.value.trim();
+    if (!customNodeId) return;
+    
+    // Update all existing textbox Name/ID fields
+    const textboxOptions = document.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+    textboxOptions.forEach((option, index) => {
+        const nameInput = option.querySelector(`input[id^="multipleTextboxName"]`);
+        if (nameInput && !nameInput.value.trim()) {
+            // Only update if the field is empty
+            nameInput.value = customNodeId;
+        }
+    });
 }
 
 function removeMultipleTextboxOption(questionId, optionNumber) {

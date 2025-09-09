@@ -2760,6 +2760,7 @@ function setOptionType(cell, newType) {
       case 'alertNode':
           // Alert node - preserve text content
           cell._alertText = preservedText || 'Alert message';
+          cell._questionText = preservedText || 'Alert message';
         // Add bold black and red checkered border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -5275,7 +5276,8 @@ function updateAlertNodeCell(cell) {
   }
 
   // Create the alert node display with editable input field
-  const alertText = cell._alertText;
+  // Use _questionText as primary source, fallback to _alertText
+  const alertText = cell._questionText || cell._alertText;
   
   let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
   htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ ALERT</div>';
@@ -5295,6 +5297,8 @@ function updateAlertNodeCell(cell) {
 window.updateAlertNodeField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isAlertNode(cell)) return;
+  // Update both _questionText (primary) and _alertText (fallback)
+  cell._questionText = value;
   cell._alertText = value;
   // Don't call updateAlertNodeCell here to avoid re-rendering while typing
 };
@@ -5517,7 +5521,7 @@ function getCellText(cell) {
   } else if (isChecklistNode(cell)) {
     cellText = cell._checklistText || cell.value || '';
   } else if (isAlertNode(cell)) {
-    cellText = cell._alertText || cell.value || '';
+    cellText = cell._questionText || cell._alertText || cell.value || '';
   } else if (isCalculationNode(cell)) {
           // Calculation node text now handled by calc.js
           if (typeof window.getCalculationNodeText === 'function') {

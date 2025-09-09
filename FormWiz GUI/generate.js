@@ -72,6 +72,12 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
     // if the designer left the name blank, derive it from the label
     let namePart = (rawNameId || '').trim();
+    
+    // If nameId is provided and already contains the full identifier, use it directly
+    if (namePart && (namePart.startsWith(slugPrefix) || namePart.includes('_'))) {
+        return namePart;
+    }
+    
     if (!namePart){
         namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
@@ -1781,6 +1787,10 @@ formHTML += `</div><br></div>`;
             textboxInputs.push(dEl);
           }
         }
+        // Get custom Node ID if it exists
+        const nodeIdInput = qBlock.querySelector(`#multipleTextboxesNodeId${questionId}`);
+        const customNodeId = nodeIdInput ? nodeIdInput.value.trim() : "";
+        
         // Render textboxes
         for (let mb = 0; mb < textboxInputs.length; mb++) {
           const dEl = textboxInputs[mb];
@@ -1797,9 +1807,16 @@ formHTML += `</div><br></div>`;
           const rawNmVal = nmInput ? nmInput.value.trim() : "";
           const phVal = phInput ? phInput.value.trim() : "";
           
-          // Build proper ID using question slug + textbox name
-          const questionSlug = questionSlugMap[questionId] || ('answer' + questionId);
-          const nmVal = rawNmVal ? `${questionSlug}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : `${questionSlug}_${mb + 1}`;
+          // Build proper ID using custom Node ID if available, otherwise use question slug + textbox name
+          let nmVal;
+          if (customNodeId && rawNmVal) {
+            nmVal = `${customNodeId}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+          } else if (customNodeId) {
+            nmVal = `${customNodeId}_${mb + 1}`;
+          } else {
+            const questionSlug = questionSlugMap[questionId] || ('answer' + questionId);
+            nmVal = rawNmVal ? `${questionSlug}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : `${questionSlug}_${mb + 1}`;
+          }
           
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
@@ -2360,6 +2377,12 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
+    
+    // If nameId is provided and already contains the full identifier, use it directly
+    if (namePart && (namePart.startsWith(slugPrefix) || namePart.includes('_'))) {
+        return namePart;
+    }
+    
     if (!namePart){
         namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
@@ -2528,6 +2551,9 @@ function showValidationPopup() {
     formHTML += `
 function checkAlertLogic(changedElement) {
     if (!alertLogics || alertLogics.length === 0) return;
+    
+    // Don't show alerts during autofill process
+    if (window.isAutofilling) return;
     
     // Get the question ID from the changed element
     let changedQuestionId = null;
@@ -4454,6 +4480,10 @@ if (typeof handleNext === 'function') {
                 if (doc.exists) {
                     const data = doc.data();
                     const fields = getFormFields();
+                    
+                    // Set flag to prevent alerts during autofill
+                    window.isAutofilling = true;
+                    
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
                             // Check if this answer would trigger a jump to the end
@@ -4471,8 +4501,11 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
-                    // After autofilling, trigger visibility updates for dependent questions
+                    // Clear the autofill flag after a short delay to ensure all events have fired
                     setTimeout(() => {
+                        window.isAutofilling = false;
+                        
+                        // After autofilling, trigger visibility updates for dependent questions
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
