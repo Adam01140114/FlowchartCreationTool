@@ -116,9 +116,15 @@ window.exportGuiJson = function(download = true) {
     if (parseInt(num) >= sectionCounter) {
       sectionCounter = parseInt(num) + 1;
     }
+    // Handle default section names
+    let sectionName = currentSectionPrefs[num].name || `Section ${num}`;
+    if (sectionName === "Enter section name" || sectionName === "Enter Name") {
+      sectionName = `Section ${num}`;
+    }
+    
     sectionMap[num] = {
       sectionId: parseInt(num),
-      sectionName: currentSectionPrefs[num].name || `Section ${num}`,
+      sectionName: sectionName,
       questions: []
     };
     console.log(`🔍 [GUI EXPORT DEBUG] Section ${num} name: "${currentSectionPrefs[num].name || `Section ${num}`}"`);
@@ -139,20 +145,50 @@ window.exportGuiJson = function(download = true) {
 
   // Ensure section 1 always exists
   if (!sectionMap["1"]) {
+    // Get the section name from sectionPrefs, with fallback to default
+    let sectionName = "Section 1";
+    if (currentSectionPrefs["1"] && currentSectionPrefs["1"].name) {
+      sectionName = currentSectionPrefs["1"].name;
+      // Handle default section names
+      if (sectionName === "Enter section name" || sectionName === "Enter Name") {
+        sectionName = "Section 1";
+      }
+    }
+    
     sectionMap["1"] = {
       sectionId: 1,
-      sectionName: "Enter Name",
+      sectionName: sectionName,
       questions: []
     };
   }
 
   // Add questions to sections by their section number
   for (const cell of questions) {
-    const section = getSection(cell) || "1";
+    let section = getSection(cell) || "1";
+    
+    // Special case: If this is the first question (lowest Y position), put it in Section 1
+    const isFirstQuestion = questions.every(otherCell => 
+      otherCell === cell || cell.geometry.y <= otherCell.geometry.y
+    );
+    
+    if (isFirstQuestion && section !== "1") {
+      section = "1";
+    }
+    
     if (!sectionMap[section]) {
+      // Get the section name from sectionPrefs, with fallback to default
+      let sectionName = `Section ${section}`;
+      if (currentSectionPrefs[section] && currentSectionPrefs[section].name) {
+        sectionName = currentSectionPrefs[section].name;
+        // Handle default section names
+        if (sectionName === "Enter section name" || sectionName === "Enter Name") {
+          sectionName = `Section ${section}`;
+        }
+      }
+      
       sectionMap[section] = {
         sectionId: parseInt(section),
-        sectionName: `Section ${section}`,
+        sectionName: sectionName,
         questions: []
       };
     }
@@ -255,7 +291,7 @@ window.exportGuiJson = function(download = true) {
     const jumpConditions = [];
     let endOption = null;
     
-    // Check for direct connections to END nodes (for text-based questions)
+    // Check for direct connections to END nodes or other questions (for text-based questions)
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
@@ -268,6 +304,40 @@ window.exportGuiJson = function(download = true) {
               to: "end"
             });
             endOption = "Any Text";
+          }
+        } else if (targetCell && isQuestion(targetCell)) {
+          // This question connects directly to another question
+          // For text-based questions, add "Any Text" jump condition to the target question
+          // but only if the target is in a different section that meets the jump criteria
+          if (exportType === "text" || exportType === "bigParagraph" || exportType === "money" || exportType === "date" || exportType === "dateRange") {
+            const targetQuestionId = targetCell._questionId || "";
+            if (targetQuestionId) {
+              // Get the target question's section using the same logic as section assignment
+              let targetSection = parseInt(getSection(targetCell) || "1", 10);
+              
+              // Apply the same section assignment logic for the target question
+              const targetIsFirstQuestion = questions.every(otherCell => 
+                otherCell === targetCell || targetCell.geometry.y <= otherCell.geometry.y
+              );
+              
+              if (targetIsFirstQuestion && targetSection !== 1) {
+                targetSection = 1;
+              }
+              
+              const currentSection = parseInt(section || "1", 10);
+              
+              // Only add jump logic if:
+              // 1. Target is in a section before current section, OR
+              // 2. Target is more than 1 section above current section
+              const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
+              
+              if (shouldAddJump) {
+                jumpConditions.push({
+                  option: "Any Text",
+                  to: targetQuestionId.toString()
+                });
+              }
+            }
           }
         }
       }
@@ -334,19 +404,38 @@ window.exportGuiJson = function(download = true) {
                   }
                 }
                 
-                // Check for section jumps - if target question is in a different section
-                const sourceSection = parseInt(getSection(cell) || "1", 10);
-                const targetSection = parseInt(getSection(optionTarget) || "1", 10);
-                
-                // If target section is different from source section (any difference)
-                if (targetSection !== sourceSection) {
-                  // Check if this jump already exists
-                  const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
-                  if (!exists) {
-                    jumpConditions.push({
-                      option: optionText.trim(),
-                      to: targetSection.toString()
-                    });
+                // Check for jumps to other questions - only add jump logic if target is in a different section
+                // that is either before the current section or more than 1 section above
+                const targetQuestionId = optionTarget._questionId || "";
+                if (targetQuestionId) {
+                  // Get the target question's section using the same logic as section assignment
+                  let targetSection = parseInt(getSection(optionTarget) || "1", 10);
+                  
+                  // Apply the same section assignment logic for the target question
+                  const targetIsFirstQuestion = questions.every(otherCell => 
+                    otherCell === optionTarget || optionTarget.geometry.y <= otherCell.geometry.y
+                  );
+                  
+                  if (targetIsFirstQuestion && targetSection !== 1) {
+                    targetSection = 1;
+                  }
+                  
+                  const currentSection = parseInt(section || "1", 10);
+                  
+                  // Only add jump logic if:
+                  // 1. Target is in a section before current section, OR
+                  // 2. Target is more than 1 section above current section
+                  const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
+                  
+                  if (shouldAddJump) {
+                    // Check if this jump already exists
+                    const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetQuestionId.toString());
+                    if (!exists) {
+                      jumpConditions.push({
+                        option: optionText.trim(),
+                        to: targetQuestionId.toString()
+                      });
+                    }
                   }
                 }
               }
@@ -383,6 +472,49 @@ window.exportGuiJson = function(download = true) {
     // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
     if (exportType === "dropdown") {
       let imageData = null;
+      
+      // Sort options by their position (X coordinate, then Y coordinate)
+      question.options.sort((a, b) => {
+        // Find the option cells to get their positions
+        const optionCells = [];
+        if (outgoingEdges) {
+          for (const edge of outgoingEdges) {
+            const targetCell = edge.target;
+            if (targetCell && isOptions(targetCell)) {
+              let optionText = targetCell.value || "";
+              // Clean HTML entities and tags from option text
+              if (optionText) {
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = optionText;
+                let cleanedText = textarea.value;
+                const temp = document.createElement("div");
+                temp.innerHTML = cleanedText;
+                cleanedText = temp.textContent || temp.innerText || cleanedText;
+                cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+                optionText = cleanedText;
+              }
+              
+              if (optionText === a.text || optionText === b.text) {
+                optionCells.push({ text: optionText, cell: targetCell });
+              }
+            }
+          }
+        }
+        
+        const aCell = optionCells.find(oc => oc.text === a.text)?.cell;
+        const bCell = optionCells.find(oc => oc.text === b.text)?.cell;
+        
+        if (aCell && bCell) {
+          const aX = aCell.geometry?.x || 0;
+          const bX = bCell.geometry?.x || 0;
+          if (aX !== bX) return aX - bX;
+          const aY = aCell.geometry?.y || 0;
+          const bY = bCell.geometry?.y || 0;
+          return aY - bY;
+        }
+        return 0;
+      });
+      
       // Convert options to array of strings, and extract image node if present
       question.options = question.options.map(opt => {
         if (typeof opt.text === 'string') {
@@ -499,6 +631,8 @@ window.exportGuiJson = function(download = true) {
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
       const conditions = [];
+      // For conditional logic, we need to check if the source and target are in the same logical flow
+      // Since we're processing questions in order, we can determine this by position
       const currentSection = parseInt(getSection(cell) || "1", 10);
       
       for (const edge of incomingEdges) {
