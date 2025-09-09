@@ -2568,22 +2568,19 @@ function checkAlertLogic(changedElement) {
         }
     }
     
+    // Only check alert logic if we can identify which question changed
+    if (!changedQuestionId) return;
+    
     for (const alertLogic of alertLogics) {
         if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
         
-        // Only check this alert logic if it's related to the changed element
+        // Only check this alert logic if it's specifically for the changed question
         let shouldCheckThisAlert = false;
-        if (changedQuestionId) {
-            // Check if any condition in this alert logic references the changed question
-            for (const condition of alertLogic.conditions) {
-                if (condition.prevQuestion === changedQuestionId) {
-                    shouldCheckThisAlert = true;
-                    break;
-                }
+        for (const condition of alertLogic.conditions) {
+            if (condition.prevQuestion === changedQuestionId) {
+                shouldCheckThisAlert = true;
+                break;
             }
-        } else {
-            // If we can't determine which question changed, check all alerts (fallback)
-            shouldCheckThisAlert = true;
         }
         
         if (!shouldCheckThisAlert) continue;
@@ -2594,6 +2591,9 @@ function checkAlertLogic(changedElement) {
         for (const condition of alertLogic.conditions) {
             const prevQuestionId = condition.prevQuestion;
             const prevAnswer = condition.prevAnswer;
+            
+            // Only check conditions for the question that actually changed
+            if (prevQuestionId !== changedQuestionId) continue;
             
             // Get the previous question's value
             const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
@@ -2626,11 +2626,21 @@ function checkAlertLogic(changedElement) {
 
 // Add event listeners for alert logic
 document.addEventListener('DOMContentLoaded', function() {
-    const formElements = document.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('change', function() { checkAlertLogic(this); });
-        element.addEventListener('input', function() { checkAlertLogic(this); });
-    });
+    // Only attach alert listeners to elements that have alert logic
+    for (const alertLogic of alertLogics) {
+        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
+        
+        for (const condition of alertLogic.conditions) {
+            const questionId = condition.prevQuestion;
+            const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                                  document.getElementById('answer' + questionId);
+            
+            if (questionElement) {
+                questionElement.addEventListener('change', function() { checkAlertLogic(this); });
+                questionElement.addEventListener('input', function() { checkAlertLogic(this); });
+            }
+        }
+    }
     
     // Initialize checkbox styling for beautiful blue borders
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
