@@ -1150,6 +1150,16 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '    </div>',
+    '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
+    '        <div style="flex: 1;">',
+    '            <label for="user_fullname" style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name</label>',
+    '            <input type="text" form="customForm" id="user_fullname" name="user_fullname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '        <div style="flex: 1;">',
+    '            <label for="user_date" style="display: block; margin-bottom: 5px; font-weight: bold;">Date</label>',
+    '            <input type="text" form="customForm" id="user_date" name="user_date" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '    </div>',
     '    <div style="margin-bottom: 15px;">',
     '        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>',
     '        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
@@ -2413,14 +2423,142 @@ function buildCheckboxName (questionId, rawNameId, labelText){
                   const userDoc = await db.collection('users').doc(user.uid).get();
                   if(userDoc.exists) {
                       const userData = userDoc.data();
-                      document.getElementById('user_firstname').value = userData.firstName || '';
-                      document.getElementById('user_lastname').value = userData.lastName || '';
-                      document.getElementById('user_email').value = userData.email || '';
-                      document.getElementById('user_phone').value = userData.phone || '';
-                      document.getElementById('user_street').value = userData.address?.street || '';
-                      document.getElementById('user_city').value = userData.address?.city || '';
-                      document.getElementById('user_state').value = userData.address?.state || '';
-                      document.getElementById('user_zip').value = userData.address?.zip || '';
+                      
+                      // Wait for DOM to be ready before populating fields
+                      setTimeout(() => {
+                          console.log('=== DEBUGGING USER DATA AUTOFILL ===');
+                          console.log('User data:', userData);
+                          console.log('First name:', userData.firstName);
+                          console.log('Last name:', userData.lastName);
+                          
+                          // Show the user information section first
+                          const userInfoSection = document.querySelector('div[style*="display: none"]');
+                          if (userInfoSection && userInfoSection.innerHTML.includes('Your Information')) {
+                              console.log('Found hidden user info section, making it visible');
+                              userInfoSection.style.display = 'block';
+                          }
+                          
+                          const firstNameField = document.getElementById('user_firstname');
+                          const lastNameField = document.getElementById('user_lastname');
+                          
+                          if (firstNameField) {
+                              firstNameField.value = userData.firstName || '';
+                              console.log('Set user_firstname to:', firstNameField.value);
+                          } else {
+                              console.log('user_firstname field not found');
+                          }
+                          
+                          if (lastNameField) {
+                              lastNameField.value = userData.lastName || '';
+                              console.log('Set user_lastname to:', lastNameField.value);
+                          } else {
+                              console.log('user_lastname field not found');
+                          }
+                          
+                      // Debug and populate user_fullname
+                      const fullNameField = document.getElementById('user_fullname');
+                      if (fullNameField) {
+                          const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
+                          fullNameField.value = fullName.trim();
+                          console.log('Set user_fullname to:', fullName.trim());
+                          alert('DEBUG: First Name: ' + (userData.firstName || 'N/A') + ', Last Name: ' + (userData.lastName || 'N/A') + ', Full Name: ' + fullName.trim());
+                      } else {
+                          console.log('user_fullname field not found');
+                          alert('DEBUG: user_fullname field not found');
+                      }
+                      
+                      // Debug and populate user_date
+                      const dateField = document.getElementById('user_date');
+                      if (dateField) {
+                          const today = new Date().toLocaleDateString();
+                          dateField.value = today;
+                          console.log('Set user_date to:', today);
+                          alert('DEBUG: Date set to: ' + today);
+                      } else {
+                          console.log('user_date field not found');
+                          alert('DEBUG: user_date field not found');
+                      }
+                          document.getElementById('user_email').value = userData.email || '';
+                          
+                          // Update hidden fields
+                          document.getElementById('user_firstname_hidden').value = userData.firstName || '';
+                          document.getElementById('user_lastname_hidden').value = userData.lastName || '';
+                          
+                      // Debug and populate hidden user_fullname
+                      const fullNameHiddenField = document.getElementById('user_fullname_hidden');
+                      if (fullNameHiddenField) {
+                          const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
+                          fullNameHiddenField.value = fullName.trim();
+                          console.log('Set user_fullname_hidden to:', fullName.trim());
+                          alert('DEBUG: Hidden Full Name set to: ' + fullName.trim());
+                      } else {
+                          console.log('user_fullname_hidden field not found');
+                          alert('DEBUG: user_fullname_hidden field not found');
+                      }
+                      
+                      // Debug and populate hidden user_date
+                      const dateHiddenField = document.getElementById('user_date_hidden');
+                      if (dateHiddenField) {
+                          const today = new Date().toLocaleDateString();
+                          dateHiddenField.value = today;
+                          console.log('Set user_date_hidden to:', today);
+                          alert('DEBUG: Hidden Date set to: ' + today);
+                      } else {
+                          console.log('user_date_hidden field not found');
+                          alert('DEBUG: user_date_hidden field not found');
+                      }
+                      
+                      console.log('=== END USER DATA AUTOFILL DEBUG ===');
+                          document.getElementById('user_phone').value = userData.phone || '';
+                          document.getElementById('user_street').value = userData.address?.street || '';
+                          document.getElementById('user_city').value = userData.address?.city || '';
+                          document.getElementById('user_state').value = userData.address?.state || '';
+                          document.getElementById('user_zip').value = userData.address?.zip || '';
+                          
+                          // Add event listeners to update full name when first/last name changes
+                          const firstNameField = document.getElementById('user_firstname');
+                          const lastNameField = document.getElementById('user_lastname');
+                          const fullNameField = document.getElementById('user_fullname');
+                          const fullNameHiddenField = document.getElementById('user_fullname_hidden');
+                          
+                          function updateFullName() {
+                              const firstName = firstNameField.value || '';
+                              const lastName = lastNameField.value || '';
+                              const fullName = (firstName + ' ' + lastName).trim();
+                              fullNameField.value = fullName;
+                              if (fullNameHiddenField) fullNameHiddenField.value = fullName;
+                          }
+                          
+                          if (firstNameField) firstNameField.addEventListener('input', updateFullName);
+                          if (lastNameField) lastNameField.addEventListener('input', updateFullName);
+                          
+                          // Add event listeners to update hidden fields when visible fields change
+                          const fields = [
+                              { visible: 'user_firstname', hidden: 'user_firstname_hidden' },
+                              { visible: 'user_lastname', hidden: 'user_lastname_hidden' },
+                              { visible: 'user_fullname', hidden: 'user_fullname_hidden' },
+                              { visible: 'user_date', hidden: 'user_date_hidden' },
+                              { visible: 'user_email', hidden: 'user_email_hidden' },
+                              { visible: 'user_phone', hidden: 'user_phone_hidden' },
+                              { visible: 'user_street', hidden: 'user_street_hidden' },
+                              { visible: 'user_city', hidden: 'user_city_hidden' },
+                              { visible: 'user_state', hidden: 'user_state_hidden' },
+                              { visible: 'user_zip', hidden: 'user_zip_hidden' }
+                          ];
+                          
+                          fields.forEach(field => {
+                              const visibleField = document.getElementById(field.visible);
+                              const hiddenField = document.getElementById(field.hidden);
+                              if (visibleField && hiddenField) {
+                                  visibleField.addEventListener('input', () => {
+                                      hiddenField.value = visibleField.value;
+                                  });
+                                  visibleField.addEventListener('change', () => {
+                                      hiddenField.value = visibleField.value;
+                                  });
+                              }
+                          });
+                      }, 500); // Wait 500ms for DOM to be ready
                   }
               } catch(error) {
                   console.error("Error fetching user data:", error);
@@ -2540,11 +2678,40 @@ function showValidationPopup() {
   // Add alert logic functions only if alert logics are enabled
   if (alertLogics.length > 0) {
     formHTML += `
+// Initialize autofill flag and alert delay
+window.isAutofilling = false;
+window.alertsDisabled = true;
+
+// Enable alerts after 5 seconds
+setTimeout(() => {
+    window.alertsDisabled = false;
+    console.log('Alerts enabled after 5-second delay');
+}, 5000);
+
 function checkAlertLogic(changedElement) {
-    if (!alertLogics || alertLogics.length === 0) return;
+    console.log('checkAlertLogic called for element:', changedElement ? changedElement.id : 'unknown');
+    if (!alertLogics || alertLogics.length === 0) {
+        console.log('No alert logics found');
+        return;
+    }
+    
+    // Don't show alerts during the first 5 seconds after page load
+    if (window.alertsDisabled) {
+        console.log('Alert blocked - still within 5-second delay period');
+        return;
+    }
     
     // Don't show alerts during autofill process
-    if (window.isAutofilling) return;
+    if (window.isAutofilling) {
+        console.log('Alert blocked during autofill');
+        return;
+    }
+    
+    // Additional safety check - don't show alerts if the element was just programmatically set
+    if (changedElement && changedElement.dataset && changedElement.dataset.autofilled === 'true') {
+        console.log('Alert blocked for autofilled element');
+        return;
+    }
     
     // Get the question ID from the changed element
     let changedQuestionId = null;
@@ -2615,25 +2782,8 @@ function checkAlertLogic(changedElement) {
     }
 }
 
-// Add event listeners for alert logic
+// Initialize checkbox styling for beautiful blue borders on DOM load
 document.addEventListener('DOMContentLoaded', function() {
-    // Only attach alert listeners to elements that have alert logic
-    for (const alertLogic of alertLogics) {
-        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
-        
-        for (const condition of alertLogic.conditions) {
-            const questionId = condition.prevQuestion;
-            const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                                  document.getElementById('answer' + questionId);
-            
-            if (questionElement) {
-                questionElement.addEventListener('change', function() { checkAlertLogic(this); });
-                questionElement.addEventListener('input', function() { checkAlertLogic(this); });
-            }
-        }
-    }
-    
-    // Initialize checkbox styling for beautiful blue borders
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         updateCheckboxStyle(checkbox);
@@ -4482,7 +4632,7 @@ if (typeof handleNext === 'function') {
                     const data = doc.data();
                     const fields = getFormFields();
                     
-                    // Set flag to prevent alerts during autofill
+                    // Set flag to prevent alerts during autofill - set it early
                     window.isAutofilling = true;
                     
                     fields.forEach(el => {
@@ -4490,9 +4640,11 @@ if (typeof handleNext === 'function') {
                             // Check if this answer would trigger a jump to the end
                             if (wouldTriggerJumpToEnd(el, data[el.name])) {
                                 // Don't autofill this answer - keep it as default
-                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
+                            
+                            // Mark element as autofilled
+                            el.dataset.autofilled = 'true';
                             
                             if (el.type === 'checkbox' || el.type === 'radio') {
                                 el.checked = !!data[el.name];
@@ -4502,9 +4654,103 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
+                    // Also populate user data fields from Firebase user document
+                    try {
+                        const userDoc = await db.collection('users').doc(userId).get();
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            
+                            // Wait for DOM to be ready before populating fields
+                            setTimeout(() => {
+                                
+                                const firstNameField = document.getElementById('user_firstname');
+                                const lastNameField = document.getElementById('user_lastname');
+                                
+                                if (firstNameField) {
+                                    firstNameField.value = userData.firstName || '';
+                                }
+                                
+                                if (lastNameField) {
+                                    lastNameField.value = userData.lastName || '';
+                                }
+                                
+                                // Populate user_fullname
+                                const fullNameField = document.getElementById('user_fullname');
+                                if (fullNameField) {
+                                    const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
+                                    fullNameField.value = fullName.trim();
+                                }
+                                
+                                // Populate user_date
+                                const dateField = document.getElementById('user_date');
+                                if (dateField) {
+                                    const today = new Date().toLocaleDateString();
+                                    dateField.value = today;
+                                }
+                                
+                                document.getElementById('user_email').value = userData.email || '';
+                                
+                                // Update hidden fields
+                                document.getElementById('user_firstname_hidden').value = userData.firstName || '';
+                                document.getElementById('user_lastname_hidden').value = userData.lastName || '';
+                                
+                                // Populate hidden user_fullname
+                                const fullNameHiddenField = document.getElementById('user_fullname_hidden');
+                                if (fullNameHiddenField) {
+                                    const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
+                                    fullNameHiddenField.value = fullName.trim();
+                                }
+                                
+                                // Populate hidden user_date
+                                const dateHiddenField = document.getElementById('user_date_hidden');
+                                if (dateHiddenField) {
+                                    const today = new Date().toLocaleDateString();
+                                    dateHiddenField.value = today;
+                                }
+                                
+                                document.getElementById('user_phone').value = userData.phone || '';
+                                document.getElementById('user_street').value = userData.address?.street || '';
+                                document.getElementById('user_city').value = userData.address?.city || '';
+                                document.getElementById('user_state').value = userData.address?.state || '';
+                                document.getElementById('user_zip').value = userData.address?.zip || '';
+                                
+                                // Update hidden fields
+                                document.getElementById('user_email_hidden').value = userData.email || '';
+                                document.getElementById('user_phone_hidden').value = userData.phone || '';
+                                document.getElementById('user_street_hidden').value = userData.address?.street || '';
+                                document.getElementById('user_city_hidden').value = userData.address?.city || '';
+                                document.getElementById('user_state_hidden').value = userData.address?.state || '';
+                                document.getElementById('user_zip_hidden').value = userData.address?.zip || '';
+                                
+                                // Set up event listeners for full name updates
+                                if (firstNameField && lastNameField) {
+                                    const updateFullName = () => {
+                                        const fullName = (firstNameField.value || '') + ' ' + (lastNameField.value || '');
+                                        const fullNameField = document.getElementById('user_fullname');
+                                        const fullNameHiddenField = document.getElementById('user_fullname_hidden');
+                                        if (fullNameField) fullNameField.value = fullName.trim();
+                                        if (fullNameHiddenField) fullNameHiddenField.value = fullName.trim();
+                                    };
+                                    
+                                    firstNameField.addEventListener('input', updateFullName);
+                                    lastNameField.addEventListener('input', updateFullName);
+                                }
+                            }, 500);
+                        }
+                    } catch (error) {
+                        // Error loading user data - silently continue
+                    }
+                    
                     // Clear the autofill flag after a short delay to ensure all events have fired
                     setTimeout(() => {
                         window.isAutofilling = false;
+                        
+                        // Clear the autofilled flag from all elements
+                        fields.forEach(el => {
+                            if (el.dataset) {
+                                delete el.dataset.autofilled;
+                            }
+                        });
                         
                         // After autofilling, trigger visibility updates for dependent questions
                         if (typeof triggerVisibilityUpdates === 'function') {
@@ -4584,6 +4830,27 @@ if (typeof handleNext === 'function') {
                 el.addEventListener('input', saveAnswers);
                 el.addEventListener('change', saveAnswers);
             });
+            
+            // Attach alert listeners after autofill is complete
+            attachAlertListeners();
+        }
+        
+        function attachAlertListeners() {
+            // Only attach alert listeners to elements that have alert logic
+            for (const alertLogic of alertLogics) {
+                if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
+                
+                for (const condition of alertLogic.conditions) {
+                    const questionId = condition.prevQuestion;
+                    const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                                          document.getElementById('answer' + questionId);
+                    
+                    if (questionElement) {
+                        questionElement.addEventListener('change', function() { checkAlertLogic(this); });
+                        questionElement.addEventListener('input', function() { checkAlertLogic(this); });
+                    }
+                }
+            }
         }
         
 
@@ -4618,10 +4885,10 @@ if (typeof handleNext === 'function') {
         firebase.auth().onAuthStateChanged(function(user) {
             isUserLoggedIn = !!user;
             userId = user ? user.uid : null;
+            
             if (isUserLoggedIn) {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('payment') === 'success') {
-                    console.log('Payment successful! Processing PDF...');
                     loadAnswers().then(() => {
                         processAllPdfs().then(() => {
                             wipeAnswers();
@@ -4632,6 +4899,9 @@ if (typeof handleNext === 'function') {
                 } else {
                     loadAnswers().then(attachAutosaveListeners);
                 }
+            } else {
+                // User not logged in, just attach alert listeners
+                attachAlertListeners();
             }
         });
 
@@ -5034,6 +5304,8 @@ function generateHiddenPDFFields() {
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_fullname_hidden"  name="user_fullname_hidden">
+<input type="hidden" id="user_date_hidden"      name="user_date_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
 <input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">
