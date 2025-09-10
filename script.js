@@ -1409,6 +1409,9 @@ window.updatemultipleDropdownTypeTextHandler = function(cellId, text) {
   }
 };
 
+// Expose the option node update function to global scope
+window.updateOptionNodesOnQuestionChange = updateOptionNodesOnQuestionChange;
+
 window.updatemultipleDropdownTypeNumber = function(cellId, which, value) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
@@ -1785,7 +1788,6 @@ function setNodeId(cell, nodeId) {
   const DEBUG_NODE_ID = false;
   
   if (DEBUG_NODE_ID) {
-    console.log("🔧 SET NODE ID DEBUG START");
     console.log("Cell:", cell);
     console.log("Setting nodeId to:", nodeId);
     console.log("Original style:", cell.style);
@@ -1847,7 +1849,6 @@ function setNodeId(cell, nodeId) {
   
   if (DEBUG_NODE_ID) {
     console.log("After setStyle - cell.style:", cell.style);
-    console.log("🔧 SET NODE ID DEBUG END");
   }
 }
 // Local getNodeId function removed - now using global window.getNodeId function
@@ -1858,7 +1859,6 @@ function refreshNodeIdFromLabel(cell) {
   const DEBUG_NODE_ID = false;
   
   if (DEBUG_NODE_ID) {
-    console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG START");
     console.log("Cell:", cell);
     console.log("Cell ID:", cell.id);
     console.log("Cell value:", cell.value);
@@ -1881,7 +1881,6 @@ function refreshNodeIdFromLabel(cell) {
   if (hasCustomNodeId) {
     if (DEBUG_NODE_ID) {
       console.log("Preserving custom Node ID:", existingNodeId);
-      console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END (PRESERVED)");
     }
     return;
   }
@@ -1941,7 +1940,6 @@ function refreshNodeIdFromLabel(cell) {
   const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
   if (DEBUG_NODE_ID) {
     console.log("Verification - getNodeId returns:", verifyId);
-    console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END");
   }
 }
 
@@ -2058,9 +2056,69 @@ function refreshOptionNodeId(cell) {
   }
 }
 
+/**
+ * Update all option nodes connected to a question when the question's node ID changes
+ * @param {mxCell} questionCell - The question cell that changed
+ * @param {string} newQuestionNodeId - The new node ID for the question
+ */
+function updateOptionNodesOnQuestionChange(questionCell, newQuestionNodeId) {
+  if (!graph || !questionCell || !newQuestionNodeId) {
+    console.log("❌ updateOptionNodesOnQuestionChange: Missing required parameters");
+    return;
+  }
+  
+  console.log(`🔄 Updating option nodes for question with new ID: ${newQuestionNodeId}`);
+  
+  // Find all outgoing edges from the question to option nodes
+  const outgoingEdges = graph.getOutgoingEdges(questionCell) || [];
+  const optionNodes = [];
+  
+  for (const edge of outgoingEdges) {
+    const targetCell = edge.target;
+    if (targetCell && typeof window.isOptions === 'function' && window.isOptions(targetCell)) {
+      optionNodes.push(targetCell);
+    }
+  }
+  
+  console.log(`Found ${optionNodes.length} option nodes to update`);
+  
+  // Update each option node's ID
+  optionNodes.forEach(optionNode => {
+    console.log(`Updating option node: ${optionNode.id}`);
+    
+    // Extract option text from the cell value and sanitize it
+    let optionText = "Option";
+    if (optionNode.value) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = optionNode.value;
+      optionText = (tempDiv.textContent || tempDiv.innerText || "").trim();
+    }
+    
+    // Sanitize the option text: lowercase, replace spaces with underscores, remove special chars
+    const sanitizedOptionText = optionText
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    
+    // Create the new node ID in format: new_question_id_option_text
+    const newOptionNodeId = `${newQuestionNodeId}_${sanitizedOptionText}`;
+    
+    console.log(`New option node ID: ${newOptionNodeId}`);
+    
+    // Update the option node's ID
+    if (typeof window.setNodeId === 'function') {
+      window.setNodeId(optionNode, newOptionNodeId);
+    } else {
+      optionNode._nameId = newOptionNodeId;
+    }
+  });
+  
+  console.log("✅ Finished updating option nodes");
+}
+
 // Function to refresh all option node IDs in the graph
 function refreshAllOptionNodeIds() {
-  console.log("🔄 REFRESH ALL OPTION NODE IDS DEBUG START");
   if (!graph) {
     console.log("No graph available");
     return;
@@ -2088,7 +2146,6 @@ function refreshAllOptionNodeIds() {
     console.log("Calling refreshAllCells");
     window.refreshAllCells();
   }
-  console.log("🔄 REFRESH ALL OPTION NODE IDS DEBUG END");
 }
 
 function addSkipReassign(cell) {
@@ -2832,7 +2889,6 @@ function setOptionType(cell, newType) {
   
   // Function to refresh all question node IDs in the graph
   window.refreshAllQuestionNodeIds = function() {
-    console.log("🔄 REFRESH ALL QUESTION NODE IDS DEBUG START");
     if (!graph) {
       console.log("No graph available");
       return;
@@ -2860,7 +2916,6 @@ function setOptionType(cell, newType) {
       console.log("Calling refreshAllCells");
       window.refreshAllCells();
     }
-    console.log("🔄 REFRESH ALL QUESTION NODE IDS DEBUG END");
   };
 
 
@@ -3662,9 +3717,6 @@ window.updateSimpleQuestionTitle = function(cellId, text) {
   
   // Debug logging for big paragraph nodes
   if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Cell ID:', cellId);
-    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Input text:', text);
-    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Cell before update:', cell);
   }
   
   graph.getModel().beginUpdate();
@@ -3673,7 +3725,6 @@ window.updateSimpleQuestionTitle = function(cellId, text) {
     
     // Debug logging after update
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-      console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] cell._questionText after update:', cell._questionText);
     }
   } finally {
     graph.getModel().endUpdate();

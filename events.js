@@ -358,13 +358,38 @@ function setupGraphEventListeners(graph) {
             graph.getModel().setGeometry(descendant, newGeo);
           }
         });
-      } else if ((typeof window.isNotesNode === 'function' && window.isNotesNode(cell)) || 
-                 (typeof window.isChecklistNode === 'function' && window.isChecklistNode(cell)) || 
+        
+        // Also move any notes nodes that point to this question node
+        const parent = graph.getDefaultParent();
+        const allVertices = graph.getChildVertices(parent);
+        const notesNodes = allVertices.filter(vertex => 
+          typeof window.isNotesNode === 'function' && window.isNotesNode(vertex)
+        );
+        
+        notesNodes.forEach(notesNode => {
+          const incomingEdges = graph.getIncomingEdges(notesNode) || [];
+          const pointsToThisQuestion = incomingEdges.some(edge => edge.source === cell);
+          
+          if (pointsToThisQuestion && !movedIds.has(notesNode.id)) {
+            // Move the notes node along with the question
+            const geo = notesNode.geometry;
+            if (geo) {
+              const newGeo = geo.clone();
+              newGeo.x += dx;
+              newGeo.y += dy;
+              graph.getModel().setGeometry(notesNode, newGeo);
+            }
+          }
+        });
+      } else if (typeof window.isNotesNode === 'function' && window.isNotesNode(cell)) {
+        // Notes nodes are independent - they don't drag other nodes with them
+        // No additional logic needed - notes nodes move independently
+      } else if ((typeof window.isChecklistNode === 'function' && window.isChecklistNode(cell)) || 
                  (typeof window.isAlertNode === 'function' && window.isAlertNode(cell)) || 
                  (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) || 
                  (typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(cell)) || 
                  (typeof window.isInfoNode === 'function' && window.isInfoNode(cell))) {
-        // When dragging a notes/checklist/alert/pdf/subtitle/info node, check if it points to a question node
+        // When dragging other special nodes (checklist/alert/pdf/subtitle/info), check if they point to a question node
         const incomingEdges = graph.getIncomingEdges(cell) || [];
         const outgoingEdges = graph.getOutgoingEdges(cell) || [];
         
