@@ -944,7 +944,8 @@ function showPropertiesPopup(cell) {
       const dropdown = document.createElement('select');
       dropdown.id = prop.id;
       dropdown.style.cssText = `
-        flex: 1 1 0%;
+        flex: 0 0 auto;
+        width: 200px;
         padding: 8px 12px;
         border: 1px solid #ddd;
         border-radius: 6px;
@@ -980,6 +981,7 @@ function showPropertiesPopup(cell) {
       // Center the dropdown if no label
       if (!prop.label) {
         fieldDiv.style.justifyContent = 'center';
+        fieldDiv.style.width = '100%';
         fieldDiv.appendChild(dropdown);
       } else {
         fieldDiv.appendChild(label);
@@ -991,7 +993,8 @@ function showPropertiesPopup(cell) {
       button.id = prop.id;
       button.textContent = prop.buttonText || 'Button';
       button.style.cssText = `
-        flex: 1 1 0%;
+        flex: 0 0 auto;
+        width: 200px;
         padding: 8px 12px;
         border: 1px solid #1976d2;
         border-radius: 6px;
@@ -1020,6 +1023,7 @@ function showPropertiesPopup(cell) {
       // Center the button if no label
       if (!prop.label) {
         fieldDiv.style.justifyContent = 'center';
+        fieldDiv.style.width = '100%';
         fieldDiv.appendChild(button);
       } else {
         fieldDiv.appendChild(label);
