@@ -402,6 +402,11 @@ function setupGraphEventListeners(graph) {
         });
       }
     });
+    
+    // Renumber question IDs based on new Y positions
+    if (typeof window.renumberQuestionIds === 'function') {
+      window.renumberQuestionIds();
+    }
   });
 }
 

@@ -1783,6 +1783,24 @@ function updateFormAfterImport() {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateAllChecklistLogicDropdowns, 100);
     }
+    
+    // Update conditional logic dropdowns
+    if (typeof updateAllConditionalLogicDropdowns === 'function') {
+        // Run this with a much longer delay to ensure DOM is ready
+        setTimeout(updateAllConditionalLogicDropdowns, 1000);
+    }
+    
+    // Update alert logic dropdowns
+    if (typeof updateAllAlertLogicDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateAllAlertLogicDropdowns, 100);
+    }
+    
+    // Update PDF logic dropdowns
+    if (typeof updateAllPdfLogicDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateAllPdfLogicDropdowns, 100);
+    }
 }
 
 function updateConditionAnswers(hiddenFieldId, condId) {

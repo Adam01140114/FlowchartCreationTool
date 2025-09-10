@@ -1,0 +1,2 @@
+# Graph Configuration
+# This file contains graph configuration settings for mxGraph

@@ -758,7 +758,44 @@ function showPropertiesPopup(cell) {
         if (selectedValue) {
           // Use the actual node ID from the properties, not the cell ID
           const nodeIdField = document.getElementById('propNodeId');
-          const baseId = nodeIdField ? nodeIdField.textContent.trim() : cell.id;
+          let baseId = cell.id; // fallback to cell.id
+          
+          console.log('🔧 [COPY ID DEBUG] cell.id:', cell.id);
+          console.log('🔧 [COPY ID DEBUG] nodeIdField:', nodeIdField);
+          console.log('🔧 [COPY ID DEBUG] nodeIdField.innerHTML:', nodeIdField ? nodeIdField.innerHTML : 'null');
+          console.log('🔧 [COPY ID DEBUG] nodeIdField.outerHTML:', nodeIdField ? nodeIdField.outerHTML : 'null');
+          
+          if (nodeIdField) {
+            // Check if there's an active input field (user is editing)
+            const activeInput = nodeIdField.parentNode.querySelector('input[type="text"]');
+            console.log('🔧 [COPY ID DEBUG] activeInput:', activeInput);
+            console.log('🔧 [COPY ID DEBUG] nodeIdField.textContent:', nodeIdField.textContent);
+            console.log('🔧 [COPY ID DEBUG] nodeIdField.value:', nodeIdField.value);
+            
+            if (activeInput) {
+              baseId = activeInput.value.trim();
+              console.log('🔧 [COPY ID DEBUG] Using activeInput value:', baseId);
+            } else if (nodeIdField.textContent) {
+              baseId = nodeIdField.textContent.trim();
+              console.log('🔧 [COPY ID DEBUG] Using textContent:', baseId);
+            } else if (nodeIdField.value !== undefined) {
+              baseId = nodeIdField.value.trim();
+              console.log('🔧 [COPY ID DEBUG] Using value property:', baseId);
+            }
+          }
+          
+          // Fallback: if we still don't have a baseId, try to get it from the cell's _nameId or use getNodeId
+          if (!baseId || baseId === cell.id) {
+            if (cell._nameId) {
+              baseId = cell._nameId;
+              console.log('🔧 [COPY ID DEBUG] Using cell._nameId:', baseId);
+            } else if (typeof window.getNodeId === 'function') {
+              baseId = window.getNodeId(cell);
+              console.log('🔧 [COPY ID DEBUG] Using window.getNodeId:', baseId);
+            }
+          }
+          
+          console.log('🔧 [COPY ID DEBUG] Final baseId:', baseId);
           const suffix = selectedValue === 'start' ? '_1' : '_2';
           const fullId = baseId + suffix;
           
@@ -774,8 +811,9 @@ function showPropertiesPopup(cell) {
     });
   }
   
-  // Add PDF properties if this node has PDF properties OR if it's a question node
-  if (pdfProperties || (typeof window.isQuestion === 'function' && window.isQuestion(cell))) {
+  // Add PDF properties if this node has PDF properties OR if it's a question node (but not for date range nodes)
+  if (pdfProperties || (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
+      !(typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'dateRange'))) {
     // Use the actual PDF filename directly from _pdfUrl, or empty string for new question nodes
     const pdfName = pdfProperties ? (pdfProperties.filename || 'PDF Document') : (cell._pdfName || '');
     
@@ -797,7 +835,7 @@ function showPropertiesPopup(cell) {
     `;
     
     const label = document.createElement('label');
-    label.textContent = prop.label + ':';
+    label.textContent = prop.label ? prop.label + ':' : '';
     label.style.cssText = `
       font-weight: 600;
       color: #333;
@@ -882,19 +920,24 @@ function showPropertiesPopup(cell) {
       return; // Skip the normal field creation
     }
     
-    const valueSpan = document.createElement('span');
-    valueSpan.id = prop.id;
-    valueSpan.textContent = prop.value;
-    valueSpan.style.cssText = `
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
-      color: ${prop.editable ? '#333' : '#666'};
-      cursor: ${prop.editable ? 'text' : 'default'};
-      transition: all 0.2s ease;
-    `;
+    // Only create valueSpan for regular input fields, not for dropdowns or buttons
+    let valueSpan = null;
+    if (!prop.isDropdown && !prop.isButton) {
+      valueSpan = document.createElement('span');
+      valueSpan.id = prop.id;
+      valueSpan.textContent = prop.value;
+      valueSpan.style.cssText = `
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
+        color: ${prop.editable ? '#333' : '#666'};
+        cursor: ${prop.editable ? 'text' : 'default'};
+        transition: all 0.2s ease;
+      `;
+      console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
+    }
     
     if (prop.isDropdown) {
       // Handle dropdown fields
@@ -985,6 +1028,8 @@ function showPropertiesPopup(cell) {
     } else if (prop.editable) {
       // Special handling for Node ID field - make it editable with copy functionality
       if (prop.id === 'propNodeId') {
+        console.log(`🔧 [NODE ID DEBUG] Processing propNodeId, valueSpan:`, valueSpan);
+        console.log(`🔧 [NODE ID DEBUG] valueSpan.textContent: "${valueSpan ? valueSpan.textContent : 'null'}"`);
         // Make it contenteditable for editing
         valueSpan.contentEditable = 'true';
         valueSpan.style.cursor = 'text';
@@ -1069,6 +1114,13 @@ function showPropertiesPopup(cell) {
             console.log('🔧 [NODE ID DEBUG] Node ID updated successfully');
           }
         });
+        
+        // Add the valueSpan to the fieldDiv for Node ID field
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(valueSpan);
+        content.appendChild(fieldDiv);
+        console.log(`🔧 [PROPERTIES POPUP DEBUG] Added Node ID field to content, content now has ${content.children.length} children`);
+        return; // Skip the normal field creation
       } else {
         // Regular editable field behavior for other fields
         valueSpan.addEventListener('click', () => {
@@ -1101,15 +1153,22 @@ function showPropertiesPopup(cell) {
                 cell._questionText = newValue;
                 cell.value = newValue;
                 
-                // Auto-update node ID based on text for option nodes
-                if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
+                // Auto-update node ID based on text for all question nodes
+                if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
                   const autoNodeId = newValue.toLowerCase()
                     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
                     .replace(/\s+/g, '_') // Replace spaces with underscores
-                    .substring(0, 20); // Limit length
+                    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+                    .substring(0, 50); // Increase length limit for question nodes
                   
                   if (autoNodeId) {
-                    cell._nameId = autoNodeId;
+                    // Update the node ID using the proper function
+                    if (typeof window.setNodeId === 'function') {
+                      window.setNodeId(cell, autoNodeId);
+                    } else {
+                      cell._nameId = autoNodeId;
+                    }
+                    
                     // Update the node ID field in the popup if it exists
                     const nodeIdField = document.getElementById('propNodeId');
                     if (nodeIdField) {
@@ -1168,6 +1227,15 @@ function showPropertiesPopup(cell) {
                     style += `;nodeId=${encodeURIComponent(newValue)};`;
                   }
                   cell.style = style;
+                }
+                
+                // Update the display in the properties popup
+                const nodeIdField = document.getElementById('propNodeId');
+                if (nodeIdField) {
+                  const nodeIdSpan = nodeIdField.querySelector('span');
+                  if (nodeIdSpan) {
+                    nodeIdSpan.textContent = newValue;
+                  }
                 }
                 break;
               case 'propPdfName':
@@ -1231,7 +1299,9 @@ function showPropertiesPopup(cell) {
     }
     
     fieldDiv.appendChild(label);
-    fieldDiv.appendChild(valueSpan);
+    if (valueSpan) {
+      fieldDiv.appendChild(valueSpan);
+    }
     content.appendChild(fieldDiv);
     console.log(`🔧 [PROPERTIES POPUP DEBUG] Added field ${index} to content, content now has ${content.children.length} children`);
   });

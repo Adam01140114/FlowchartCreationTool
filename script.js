@@ -296,8 +296,8 @@ document.addEventListener("DOMContentLoaded", function() {
           window.cellTextCache.clear();
         }
         
-        // Don't renumber question IDs automatically
-        // renumberQuestionIds();
+        // Renumber question IDs automatically based on Y position
+        renumberQuestionIds();
         
         // Performance monitoring
         const endTime = performance.now();

@@ -1,0 +1,2 @@
+# Editor Configuration
+# This file contains editor configuration settings for mxGraph

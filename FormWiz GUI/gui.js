@@ -283,6 +283,94 @@ function updateAllChecklistLogicDropdowns() {
     });
 }
 
+// Function to update all conditional logic dropdowns
+function updateAllConditionalLogicDropdowns() {
+    // Find all conditional logic containers
+    const logicContainers = document.querySelectorAll('[id^="logicConditions"]');
+    
+    logicContainers.forEach(container => {
+        const questionId = container.id.replace('logicConditions', '');
+        const conditionRows = container.querySelectorAll('.logic-condition-row');
+        
+        conditionRows.forEach((row, index) => {
+            const conditionIndex = index + 1;
+            const prevQuestionInput = row.querySelector(`#prevQuestion${questionId}_${conditionIndex}`);
+            const prevAnswerSelect = row.querySelector(`#prevAnswer${questionId}_${conditionIndex}`);
+            
+            if (prevQuestionInput && prevAnswerSelect) {
+                const savedAnswer = prevAnswerSelect.value;
+                const savedQuestion = prevQuestionInput.value;
+                
+                // Only update if there's a question number entered
+                if (savedQuestion) {
+                    // Check if dropdown already has options (more than just "-- Select an answer --")
+                    const currentOptions = prevAnswerSelect.querySelectorAll('option');
+                    if (currentOptions.length <= 1) {
+                        // Only update if dropdown doesn't have options yet
+                        updateLogicAnswersForRow(questionId, conditionIndex);
+                    }
+                    // Restore the saved answer after updating dropdown options
+                    if (savedAnswer) {
+                        prevAnswerSelect.value = savedAnswer;
+                    }
+                }
+            }
+        });
+    });
+}
+
+// Function to update all alert logic dropdowns
+function updateAllAlertLogicDropdowns() {
+    // Find all alert logic containers
+    const alertLogicContainers = document.querySelectorAll('[id^="alertLogicConditions"]');
+    
+    alertLogicContainers.forEach(container => {
+        const questionId = container.id.replace('alertLogicConditions', '');
+        const conditionRows = container.querySelectorAll('.alert-logic-condition-row');
+        
+        conditionRows.forEach((row, index) => {
+            const conditionIndex = index + 1;
+            const prevQuestionInput = row.querySelector(`#alertPrevQuestion${questionId}_${conditionIndex}`);
+            const prevAnswerSelect = row.querySelector(`#alertPrevAnswer${questionId}_${conditionIndex}`);
+            
+            if (prevQuestionInput && prevAnswerSelect) {
+                const savedAnswer = prevAnswerSelect.value;
+                updateAlertLogicAnswersForRow(questionId, conditionIndex);
+                // Restore the saved answer after updating dropdown options
+                if (savedAnswer) {
+                    prevAnswerSelect.value = savedAnswer;
+                }
+            }
+        });
+    });
+}
+
+// Function to update all PDF logic dropdowns
+function updateAllPdfLogicDropdowns() {
+    // Find all PDF logic containers
+    const pdfLogicContainers = document.querySelectorAll('[id^="pdfLogicConditions"]');
+    
+    pdfLogicContainers.forEach(container => {
+        const questionId = container.id.replace('pdfLogicConditions', '');
+        const conditionRows = container.querySelectorAll('.pdf-logic-condition-row');
+        
+        conditionRows.forEach((row, index) => {
+            const conditionIndex = index + 1;
+            const prevQuestionInput = row.querySelector(`#pdfPrevQuestion${questionId}_${conditionIndex}`);
+            const prevAnswerSelect = row.querySelector(`#pdfPrevAnswer${questionId}_${conditionIndex}`);
+            
+            if (prevQuestionInput && prevAnswerSelect) {
+                const savedAnswer = prevAnswerSelect.value;
+                updatePdfLogicAnswersForRow(questionId, conditionIndex);
+                // Restore the saved answer after updating dropdown options
+                if (savedAnswer) {
+                    prevAnswerSelect.value = savedAnswer;
+                }
+            }
+        });
+    });
+}
+
 function updateSectionName(sectionId) {
     const sectionNameInput = document.getElementById(`sectionName${sectionId}`);
     const sectionLabel = document.getElementById(`sectionLabel${sectionId}`);
