@@ -332,24 +332,7 @@ window.copySelectedNodeAsJson = function() {
   }
 };
 
-/**
- * Paste node from JSON
- */
-window.pasteNodeFromJson = function(x, y) {
-  try {
-    navigator.clipboard.readText().then(text => {
-      const cellData = JSON.parse(text);
-      const cell = deserializeCell(cellData, x, y);
-      if (cell) {
-        graph.addCell(cell);
-        graph.setSelectionCell(cell);
-      }
-    });
-  } catch (error) {
-    console.error('Failed to paste node:', error);
-    alert('Failed to paste node from clipboard');
-  }
-};
+// Paste function is now handled by script.js - no duplicate function needed
 
 /**
  * Serialize a cell to JSON

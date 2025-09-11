@@ -785,7 +785,7 @@ keyHandler.bindControlKey(67, () => {
 keyHandler.bindControlKey(86, () => {
   if (isUserTyping()) return;                  // NEW / CHANGED
   const mousePos = graph.getPointForEvent(graph.lastEvent);
-  pasteNodeFromJson(mousePos ? mousePos.x : undefined,
+  window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
                     mousePos ? mousePos.y : undefined);
 });
 
@@ -799,11 +799,11 @@ keyHandler.bindControlKey(86, () => {
   // Add listener for paste here button
   document.getElementById('pasteHereButton').addEventListener('click', function() {
     if (window.emptySpaceClickX !== undefined && window.emptySpaceClickY !== undefined) {
-      pasteNodeFromJson(window.emptySpaceClickX, window.emptySpaceClickY);
+      window.pasteNodeFromJson(window.emptySpaceClickX, window.emptySpaceClickY);
       window.emptySpaceClickX = undefined;
       window.emptySpaceClickY = undefined;
     } else {
-      pasteNodeFromJson();
+      window.pasteNodeFromJson();
     }
     hideContextMenu();
   });
@@ -4680,7 +4680,7 @@ function copySelectedNodeAsJson() {
   }
 }
 
-function pasteNodeFromJson(x, y) {
+window.pasteNodeFromJson = function(x, y) {
   // Try to get data from localStorage first (for cross-tab functionality)
   let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
   let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
