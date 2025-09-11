@@ -339,22 +339,30 @@ function showPropertiesPopup(cell) {
   
   // Prevent multiple popups
   if (window.__propertiesPopupOpen) {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup already open, returning early");
     return;
   }
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup open flag");
   window.__propertiesPopupOpen = true;
   
   // Clean up any existing popups
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Cleaning up existing popups");
   const existingPopups = document.querySelectorAll('.properties-modal');
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Found existing popups:", existingPopups.length);
   existingPopups.forEach(n => n.remove());
   
   // Hide any old properties menu that might be showing
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Hiding old properties menu");
   const oldPropertiesMenu = document.getElementById('propertiesMenu');
   if (oldPropertiesMenu) {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Old properties menu found, hiding it");
     oldPropertiesMenu.style.display = 'none';
   } else {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] No old properties menu found");
   }
   
   // Create popup container
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating popup container");
   const popup = document.createElement('div');
   popup.className = 'properties-modal';
   popup.style.cssText = `
@@ -374,14 +382,18 @@ function showPropertiesPopup(cell) {
     pointer-events: auto;
     opacity: 1;
   `;
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup CSS styles applied (matching working version)");
   
   // Force the popup to be visible by setting styles directly
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup visibility styles");
   popup.style.pointerEvents = 'auto';
   popup.style.opacity = '1';
   popup.style.display = 'block';
   popup.style.visibility = 'visible';
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup styles set, adding to DOM");
   
   // Create header
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating header element");
   const header = document.createElement('div');
   header.style.cssText = `
     display: flex;
@@ -423,8 +435,10 @@ function showPropertiesPopup(cell) {
   
   header.appendChild(title);
   header.appendChild(closeBtn);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Header created with content");
   
   // Create content area
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating content area");
   const content = document.createElement('div');
   content.style.cssText = `
     max-height: 400px;
@@ -435,6 +449,7 @@ function showPropertiesPopup(cell) {
     border-radius: 8px;
     padding: 15px;
   `;
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Content area created with styles");
   
   // Get cell properties with improved text extraction
   const nodeText = (() => {
@@ -464,6 +479,10 @@ function showPropertiesPopup(cell) {
   
   // Debug logging for big paragraph nodes
   if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+    console.log('🔧 [BIG PARAGRAPH DEBUG] Cell:', cell);
+    console.log('🔧 [BIG PARAGRAPH DEBUG] cell._questionText:', cell._questionText);
+    console.log('🔧 [BIG PARAGRAPH DEBUG] cell.value:', cell.value);
+    console.log('🔧 [BIG PARAGRAPH DEBUG] Extracted nodeText:', nodeText);
   }
   
   // Generate default Node ID based on question text if _nameId is not set
@@ -482,6 +501,7 @@ function showPropertiesPopup(cell) {
   // Always use getNodeId to ensure PDF naming convention is applied
   if (typeof window.getNodeId === 'function') {
     nodeId = window.getNodeId(cell) || 'N/A';
+    console.log('🔧 [NODE ID DEBUG] Using Node ID with PDF naming convention:', nodeId);
   } else {
     // Fallback logic if window.getNodeId is not available
     // PRIORITY 1: Check if we have a saved Node ID in the style
@@ -489,17 +509,20 @@ function showPropertiesPopup(cell) {
       const styleMatch = cell.style.match(/nodeId=([^;]+)/);
       if (styleMatch) {
         nodeId = decodeURIComponent(styleMatch[1]);
+        console.log('🔧 [NODE ID DEBUG] Using saved Node ID from style:', nodeId);
       }
     }
     
     // PRIORITY 2: Check _nameId property
     if (nodeId === 'N/A' && cell._nameId) {
       nodeId = cell._nameId;
+      console.log('🔧 [NODE ID DEBUG] Using saved Node ID from _nameId:', nodeId);
     }
     
     // PRIORITY 3: Generate default Node ID
     if (nodeId === 'N/A') {
       nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      console.log('🔧 [NODE ID DEBUG] Using fallback generated Node ID:', nodeId);
     }
   }
   
@@ -737,17 +760,27 @@ function showPropertiesPopup(cell) {
           const nodeIdField = document.getElementById('propNodeId');
           let baseId = cell.id; // fallback to cell.id
           
+          console.log('🔧 [COPY ID DEBUG] cell.id:', cell.id);
+          console.log('🔧 [COPY ID DEBUG] nodeIdField:', nodeIdField);
+          console.log('🔧 [COPY ID DEBUG] nodeIdField.innerHTML:', nodeIdField ? nodeIdField.innerHTML : 'null');
+          console.log('🔧 [COPY ID DEBUG] nodeIdField.outerHTML:', nodeIdField ? nodeIdField.outerHTML : 'null');
           
           if (nodeIdField) {
             // Check if there's an active input field (user is editing)
             const activeInput = nodeIdField.parentNode.querySelector('input[type="text"]');
+            console.log('🔧 [COPY ID DEBUG] activeInput:', activeInput);
+            console.log('🔧 [COPY ID DEBUG] nodeIdField.textContent:', nodeIdField.textContent);
+            console.log('🔧 [COPY ID DEBUG] nodeIdField.value:', nodeIdField.value);
             
             if (activeInput) {
               baseId = activeInput.value.trim();
+              console.log('🔧 [COPY ID DEBUG] Using activeInput value:', baseId);
             } else if (nodeIdField.textContent) {
               baseId = nodeIdField.textContent.trim();
+              console.log('🔧 [COPY ID DEBUG] Using textContent:', baseId);
             } else if (nodeIdField.value !== undefined) {
               baseId = nodeIdField.value.trim();
+              console.log('🔧 [COPY ID DEBUG] Using value property:', baseId);
             }
           }
           
@@ -755,11 +788,14 @@ function showPropertiesPopup(cell) {
           if (!baseId || baseId === cell.id) {
             if (cell._nameId) {
               baseId = cell._nameId;
+              console.log('🔧 [COPY ID DEBUG] Using cell._nameId:', baseId);
             } else if (typeof window.getNodeId === 'function') {
               baseId = window.getNodeId(cell);
+              console.log('🔧 [COPY ID DEBUG] Using window.getNodeId:', baseId);
             }
           }
           
+          console.log('🔧 [COPY ID DEBUG] Final baseId:', baseId);
           const suffix = selectedValue === 'start' ? '_1' : '_2';
           const fullId = baseId + suffix;
           
@@ -786,8 +822,11 @@ function showPropertiesPopup(cell) {
     );
   }
   
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties array:", properties);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties count:", properties.length);
   
   properties.forEach((prop, index) => {
+    console.log(`🔧 [PROPERTIES POPUP DEBUG] Processing property ${index}:`, prop);
     const fieldDiv = document.createElement('div');
     fieldDiv.style.cssText = `
       margin-bottom: 16px;
@@ -897,6 +936,7 @@ function showPropertiesPopup(cell) {
         cursor: ${prop.editable ? 'text' : 'default'};
         transition: all 0.2s ease;
       `;
+      console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
     }
     
     if (prop.isDropdown) {
@@ -940,13 +980,8 @@ function showPropertiesPopup(cell) {
       
       // Center the dropdown if no label
       if (!prop.label) {
-        fieldDiv.style.cssText = `
-          margin-bottom: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-        `;
+        fieldDiv.style.justifyContent = 'center';
+        fieldDiv.style.width = '100%';
         fieldDiv.appendChild(dropdown);
       } else {
         fieldDiv.appendChild(label);
@@ -987,13 +1022,8 @@ function showPropertiesPopup(cell) {
       
       // Center the button if no label
       if (!prop.label) {
-        fieldDiv.style.cssText = `
-          margin-bottom: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-        `;
+        fieldDiv.style.justifyContent = 'center';
+        fieldDiv.style.width = '100%';
         fieldDiv.appendChild(button);
       } else {
         fieldDiv.appendChild(label);
@@ -1002,6 +1032,8 @@ function showPropertiesPopup(cell) {
     } else if (prop.editable) {
       // Special handling for Node ID field - make it editable with copy functionality
       if (prop.id === 'propNodeId') {
+        console.log(`🔧 [NODE ID DEBUG] Processing propNodeId, valueSpan:`, valueSpan);
+        console.log(`🔧 [NODE ID DEBUG] valueSpan.textContent: "${valueSpan ? valueSpan.textContent : 'null'}"`);
         // Make it contenteditable for editing
         valueSpan.contentEditable = 'true';
         valueSpan.style.cursor = 'text';
@@ -1053,6 +1085,7 @@ function showPropertiesPopup(cell) {
         valueSpan.addEventListener('blur', () => {
           const newValue = valueSpan.textContent.trim();
           if (newValue !== prop.value && newValue !== '') {
+            console.log('🔧 [NODE ID DEBUG] Saving Node ID change from', prop.value, 'to', newValue);
             
             // Update the cell's node ID using the proper method
             if (typeof window.setNodeId === 'function') {
@@ -1082,6 +1115,7 @@ function showPropertiesPopup(cell) {
             graph.getModel().beginUpdate();
             graph.getModel().endUpdate();
             
+            console.log('🔧 [NODE ID DEBUG] Node ID updated successfully');
           }
         });
         
@@ -1089,6 +1123,7 @@ function showPropertiesPopup(cell) {
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(valueSpan);
         content.appendChild(fieldDiv);
+        console.log(`🔧 [PROPERTIES POPUP DEBUG] Added Node ID field to content, content now has ${content.children.length} children`);
         return; // Skip the normal field creation
       } else {
         // Regular editable field behavior for other fields
@@ -1147,11 +1182,6 @@ function showPropertiesPopup(cell) {
                       }
                     }
                     console.log('Auto-updated node ID to:', autoNodeId);
-                    
-                    // Update all connected option nodes' IDs
-                    if (typeof window.updateOptionNodesOnQuestionChange === 'function') {
-                      window.updateOptionNodesOnQuestionChange(cell, autoNodeId);
-                    }
                   }
                 }
                 break;
@@ -1277,11 +1307,15 @@ function showPropertiesPopup(cell) {
       fieldDiv.appendChild(valueSpan);
     }
     content.appendChild(fieldDiv);
+    console.log(`🔧 [PROPERTIES POPUP DEBUG] Added field ${index} to content, content now has ${content.children.length} children`);
   });
   
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Finished processing properties, content has", content.children.length, "children");
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Content innerHTML length:", content.innerHTML.length);
   
   // Ensure content has some content even if properties array was empty
   if (content.children.length === 0) {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] No properties found, adding fallback content");
     const fallbackDiv = document.createElement('div');
     fallbackDiv.innerHTML = `
       <div style="margin-bottom: 15px;">
@@ -1298,6 +1332,7 @@ function showPropertiesPopup(cell) {
       </div>
     `;
     content.appendChild(fallbackDiv);
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Fallback content added");
   }
   
   // Create buttons
@@ -1328,18 +1363,30 @@ function showPropertiesPopup(cell) {
   buttonContainer.appendChild(cancelBtn);
   
   // Assemble popup
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Assembling popup elements");
   popup.appendChild(header);
   popup.appendChild(content);
   popup.appendChild(buttonContainer);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup assembled, adding to document body");
   document.body.appendChild(popup);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup added to DOM successfully");
   
   // Verify popup is actually in the DOM
   const popupInDOM = document.querySelector('.properties-modal');
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup found in DOM:", popupInDOM);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup parent:", popup.parentNode);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup in document.body:", document.body.contains(popup));
   
   // Check popup dimensions immediately after adding to DOM
   const initialRect = popup.getBoundingClientRect();
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Initial popup dimensions:", initialRect);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup children count:", popup.children.length);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Header children:", header.children.length);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Content children:", content.children.length);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Button container children:", buttonContainer.children.length);
   
   // Check for any conflicting CSS rules
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Checking for CSS conflicts...");
   const allStyles = document.styleSheets;
   let conflictingRules = [];
   for (let i = 0; i < allStyles.length; i++) {
@@ -1360,21 +1407,28 @@ function showPropertiesPopup(cell) {
       // Skip stylesheets that can't be accessed (CORS issues)
     }
   }
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Conflicting CSS rules found:", conflictingRules);
   
   
   // Popup should now be visible
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup should now be visible");
   
   // Simple visibility check (matching working version approach)
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup should be visible now");
   const finalRect = popup.getBoundingClientRect();
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Final popup dimensions:", finalRect);
   
   // Popup should now be visible without the DOM re-insertion issue
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup creation completed successfully");
   
   // Temporary alert to confirm popup creation
   setTimeout(() => {
     // Check if popup still exists after 100ms
     const popupStillExists = document.querySelector('.properties-modal');
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup still exists after 100ms:", popupStillExists);
     if (popupStillExists) {
       const rect = popupStillExists.getBoundingClientRect();
+      console.log("🔧 [PROPERTIES POPUP DEBUG] Popup dimensions after 100ms:", rect);
       //alert("Properties popup created successfully! You should see the properties dialog in the center of the screen. Dimensions: " + rect.width + "x" + rect.height);
     } else {
       //alert("ERROR: Properties popup was created but disappeared after 100ms! Something is removing it.");
@@ -1382,14 +1436,19 @@ function showPropertiesPopup(cell) {
   }, 100);
   
   // Auto-copy node ID to clipboard when popup opens
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Checking node ID for clipboard copy");
   if (nodeId && nodeId.trim()) {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Copying node ID to clipboard:", nodeId);
     navigator.clipboard.writeText(nodeId).then(() => {
+      console.log('🔧 [PROPERTIES POPUP DEBUG] Node ID copied to clipboard:', nodeId);
     }).catch(err => {
       console.error('🔧 [PROPERTIES POPUP DEBUG] Failed to copy node ID to clipboard:', err);
     });
   } else {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] No node ID to copy to clipboard");
   }
   
+  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup COMPLETED =====");
   
   // Focus management
   let focusTimeout = null;
@@ -1523,6 +1582,7 @@ function showQuestionTextPopup(cell) {
   // (optional: clean any zombie instances)
   document.querySelectorAll('.question-text-modal').forEach(n => n.remove());
 
+  console.log("=== SHOW QUESTION TEXT POPUP DEBUG ===");
   console.log("showQuestionTextPopup called with cell:", cell);
   console.log("Cell ID:", cell.id);
   console.log("Cell style:", cell.style);
@@ -1692,6 +1752,7 @@ function showQuestionTextPopup(cell) {
   // Now define the function, all elements are available in scope
   function submitQuestionText() {
     if (isClosing) return; // avoid double-submit re-entrancy
+    console.log("=== SUBMIT FUNCTION CALLED ===");
 
     try {
       const newText = textarea.value.trim();
@@ -2184,20 +2245,26 @@ window.showPropertiesPopup = showPropertiesPopup;
 
 // Test function for debugging properties popup
 window.testPropertiesPopup = function() {
+  console.log("🔧 [TEST] Testing properties popup...");
   const graph = window.graph;
   if (!graph) {
+    console.log("🔧 [TEST] No graph available");
     return;
   }
   
   const selectedCells = graph.getSelectionCells();
   if (selectedCells.length === 0) {
+    console.log("🔧 [TEST] No cells selected, selecting first available cell");
     const vertices = graph.getChildVertices(graph.getDefaultParent());
     if (vertices.length > 0) {
       graph.setSelectionCell(vertices[0]);
+      console.log("🔧 [TEST] Selected cell:", vertices[0]);
       showPropertiesPopup(vertices[0]);
     } else {
+      console.log("🔧 [TEST] No vertices available");
     }
   } else {
+    console.log("🔧 [TEST] Using selected cell:", selectedCells[0]);
     showPropertiesPopup(selectedCells[0]);
   }
 };
