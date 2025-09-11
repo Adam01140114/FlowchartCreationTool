@@ -1,7 +1,7 @@
-// AI Legal Assistant Configuration
-// Replace 'YOUR_API_KEY_HERE' with your actual OpenAI API key
+// AI Legal Assistant Configuration Template
+// Copy this file to ai-config.js and add your actual API key
 const AI_CONFIG = {
-    apiKey: '', // Add your OpenAI API key here or use the runtime setup
+    apiKey: 'YOUR_API_KEY_HERE', // Replace with your actual OpenAI API key
     model: 'gpt-3.5-turbo', // or 'gpt-4' for better responses
     maxTokens: 1000,
     temperature: 0.7,
