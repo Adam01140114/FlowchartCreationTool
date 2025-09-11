@@ -1,5 +1,6 @@
-# API Keys and Sensitive Information
+# API Keys and Sensitive Configuration
 AI Assistant/ai-config.js
+ai-config.js
 *.env
 .env
 .env.local
@@ -41,10 +42,31 @@ pids
 # Coverage directory used by tools like istanbul
 coverage/
 
-# Temporary folders
-tmp/
-temp/
+# nyc test coverage
+.nyc_output
 
-# Build outputs
-dist/
-build/
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Firebase config files (if they contain sensitive data)
+firebase-config.js
+firebase.json
+
+# Temporary files
+*.tmp
+*.temp
