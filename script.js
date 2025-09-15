@@ -6379,9 +6379,15 @@ Generate a complete, valid JSON that represents the described flowchart with ALL
 
 // Load AI config - using embedded config to avoid CORS issues
 function loadAIConfig() {
-  // Use the API key from the AI Assistant config file
+  // Try to get API key from environment or use fallback
+  const apiKey = window.OPENAI_API_KEY || 'YOUR_API_KEY_HERE';
+  
+  if (apiKey === 'YOUR_API_KEY_HERE') {
+    throw new Error('OpenAI API key not configured. Please set window.OPENAI_API_KEY or update the config.');
+  }
+  
   return {
-    apiKey: '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',
+    apiKey: apiKey,
     model: 'gpt-3.5-turbo',
     maxTokens: 2000,
     temperature: 0.3

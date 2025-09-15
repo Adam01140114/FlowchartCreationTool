@@ -1,6 +1,7 @@
 # API Keys and Sensitive Configuration
 AI Assistant/ai-config.js
 ai-config.js
+api-config.js
 *.env
 .env
 .env.local
