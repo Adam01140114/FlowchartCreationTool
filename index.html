@@ -199,6 +199,7 @@
   <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
   <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button>
   <button id="downloadSvgBtn" onclick="downloadFlowchartSvg()">Download SVG</button>
+  <button id="uploadFlowchartDetailsBtn" onclick="showFlowchartDetailsModal()">Upload flowchart details</button>
   <br>
   <button id="logoutBtn">Logout</button>
 </div>
@@ -359,6 +360,28 @@
 <input type="color" id="colorPickerTextColor" style="display:none;" />
 <!-- Hidden color picker for section border colors -->
 <input type="color" id="sectionColorPicker" style="display:none;" />
+
+<!-- Flowchart Details Modal -->
+<div id="flowchartDetailsModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Upload Flowchart Details</h3>
+      <button id="closeFlowchartDetailsModal" class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Describe the flowchart you want to create. Be specific about sections, questions, and question types.</p>
+      <textarea id="flowchartDetailsInput" placeholder="Example: I want a flowchart with only one section called 'hunger assessment' and the only question will be a dropdown question called 'Hungry' with yes/no options." rows="6" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"></textarea>
+      <div style="margin-top: 15px;">
+        <button id="generateFlowchartBtn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Generate Flowchart</button>
+        <button id="downloadGeneratedJsonBtn" style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; display: none;">Download Generated JSON</button>
+        <button id="cancelFlowchartDetailsBtn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+      </div>
+      <div id="flowchartGenerationStatus" style="margin-top: 15px; display: none;">
+        <p>Generating flowchart...</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Auth functions - loaded first -->
 <script src="auth.js"></script>

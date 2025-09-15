@@ -6060,3 +6060,376 @@ function sanitizePdfName(pdfName) {
 // Make helper functions globally accessible
 window.findPdfNameForQuestion = findPdfNameForQuestion;
 window.sanitizePdfName = sanitizePdfName;
+
+/**************************************************
+ ************ Flowchart Details Modal *************
+ **************************************************/
+
+// Show the flowchart details modal
+window.showFlowchartDetailsModal = function() {
+  const modal = document.getElementById('flowchartDetailsModal');
+  modal.style.display = 'flex';
+  document.getElementById('flowchartDetailsInput').focus();
+};
+
+// Hide the flowchart details modal
+function hideFlowchartDetailsModal() {
+  const modal = document.getElementById('flowchartDetailsModal');
+  modal.style.display = 'none';
+  document.getElementById('flowchartDetailsInput').value = '';
+  document.getElementById('flowchartGenerationStatus').style.display = 'none';
+  document.getElementById('downloadGeneratedJsonBtn').style.display = 'none';
+}
+
+// Generate flowchart from user description using ChatGPT
+async function generateFlowchartFromDescription() {
+  const description = document.getElementById('flowchartDetailsInput').value.trim();
+  
+  if (!description) {
+    alert('Please enter a description of the flowchart you want to create.');
+    return;
+  }
+
+  const statusDiv = document.getElementById('flowchartGenerationStatus');
+  const generateBtn = document.getElementById('generateFlowchartBtn');
+  
+  // Show loading state
+  statusDiv.style.display = 'block';
+  generateBtn.disabled = true;
+  generateBtn.textContent = 'Generating...';
+
+  try {
+    // Load AI config
+    const aiConfig = await loadAIConfig();
+    
+    // Create the prompt for ChatGPT
+    const systemPrompt = `You are a flowchart generator. Based on the user's description, generate a valid flowchart JSON that can be imported into a flowchart creation tool.
+
+CRITICAL: You must generate EXACTLY the correct JSON structure with ALL required nodes and connections. Here's the precise format:
+
+{
+  "cells": [
+    {
+      "id": "unique_id",
+      "value": "Node text",
+      "geometry": {"x": x_position, "y": y_position, "width": 200, "height": 80},
+      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;questionType=dropdown;nodeId=question_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+      "vertex": true,
+      "edge": false,
+      "source": null,
+      "target": null,
+      "_textboxes": null,
+      "_questionText": "Node text",
+      "_questionId": "1",
+      "_nameId": "question_name"
+    }
+  ],
+  "sectionPrefs": {
+    "1": {
+      "borderColor": "hsl(0, 100%, 80%)",
+      "name": "Section Name"
+    }
+  }
+}
+
+MANDATORY REQUIREMENTS - YOU MUST INCLUDE ALL OF THESE:
+
+1. QUESTION NODES (questions that have options):
+   - Style: "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;questionType=dropdown;nodeId=question_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)"
+   - Geometry: {"x": x, "y": y, "width": 200, "height": 80}
+   - Include: _textboxes: null, _questionText: "question text", _questionId: "1", _nameId: "question_name"
+
+2. OPTION NODES (answers/choices) - CREATE ONE FOR EACH OPTION:
+   - Style: "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;section=1;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)"
+   - Geometry: {"x": x, "y": y, "width": 120, "height": 60}
+   - Include: _nameId: "option_name"
+
+3. END NODES:
+   - Style: "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;"
+   - Geometry: {"x": x, "y": y, "width": 120, "height": 60}
+
+4. EDGES (connections between nodes) - CREATE EDGES FOR ALL CONNECTIONS:
+   - Style: ""
+   - Geometry: {"x": 0, "y": 0, "width": 0, "height": 0}
+   - vertex: false, edge: true
+   - source: "source_node_id", target: "target_node_id"
+
+CONNECTION RULES - YOU MUST CREATE THESE EDGES:
+- Connect each question to ALL its option nodes
+- Connect each option to the next question (if any) or to the end node
+- For dropdown questions: connect the question to each option, then connect each option to the next question
+- For text questions: connect directly to the next question or end node
+
+QUESTION TYPES:
+- dropdown: for multiple choice questions
+- checkbox: for multiple selection questions  
+- text: for text input questions
+- number: for numeric input questions
+- money: for currency input questions
+
+POSITIONING RULES - CRITICAL FOR CLEAN LAYOUTS:
+
+1. QUESTIONS:
+   - Width: 200px, Height: 80px
+   - Start at x=380, y=100
+   - Center horizontally in the layout
+
+2. OPTION NODES - SPREAD HORIZONTALLY IN SINGLE ROW:
+   - Width: 120px, Height: 60px
+   - ALL options on the SAME Y level (same row)
+   - Horizontal spacing: 140px between option centers
+   - Position options below question with 110px vertical spacing
+   - Center the entire row of options under the question
+   - For 4 options: positions should be x=220, x=360, x=500, x=640 (all at same y)
+   - For 3 options: positions should be x=300, x=440, x=580 (all at same y)
+   - For 2 options: positions should be x=380, x=520 (all at same y)
+
+3. NEXT QUESTION:
+   - Width: 200px, Height: 80px
+   - Position 120px below the option row
+   - Center horizontally (x=380)
+
+4. END NODE:
+   - Width: 120px, Height: 60px
+   - Position 140px below the last question
+   - Center horizontally (x=420)
+
+LAYOUT EXAMPLES:
+- 4 options: x=220, x=360, x=500, x=640 (all at y=210)
+- 3 options: x=300, x=440, x=580 (all at y=210)
+- 2 options: x=380, x=520 (all at y=210)
+
+SECTIONS:
+- Each section gets a unique number (1, 2, 3, etc.)
+- Include sectionPrefs with borderColor and name for each section
+- Use different strokeColor for each section: hsl(0, 100%, 80%), hsl(120, 100%, 80%), hsl(240, 100%, 80%), etc.
+
+EXAMPLE STRUCTURE FOR "How satisfied are you?" with options "Very Satisfied", "Satisfied", "Neutral", "Dissatisfied":
+1. Question node: "How satisfied are you with our service?" (id: "1", x=380, y=100)
+2. Option node: "Very Satisfied" (id: "2", x=220, y=210) 
+3. Option node: "Satisfied" (id: "3", x=360, y=210)
+4. Option node: "Neutral" (id: "4", x=500, y=210)
+5. Option node: "Dissatisfied" (id: "5", x=640, y=210)
+6. Question node: "Any additional comments?" (id: "6", x=380, y=330)
+7. End node: "END" (id: "7", x=420, y=470)
+8. Edge: question 1 → option 2
+9. Edge: question 1 → option 3
+10. Edge: question 1 → option 4
+11. Edge: question 1 → option 5
+12. Edge: option 2 → question 6
+13. Edge: option 3 → question 6
+14. Edge: option 4 → question 6
+15. Edge: option 5 → question 6
+16. Edge: question 6 → end 7
+
+NOTE: All 4 options are on the SAME Y level (y=210) with proper horizontal spacing!
+Also set each edge style to edgeStyle=none; rounded=0; orthogonalLoop=0;
+Generate a complete, valid JSON that represents the described flowchart with ALL nodes and ALL connections.`;
+
+    const userPrompt = `Create a flowchart based on this description: ${description}`;
+
+    // Call ChatGPT API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${aiConfig.apiKey}`
+      },
+      body: JSON.stringify({
+        model: aiConfig.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        max_tokens: aiConfig.maxTokens,
+        temperature: aiConfig.temperature
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const generatedContent = data.choices[0].message.content;
+
+    // Extract JSON from the response (it might be wrapped in markdown code blocks)
+    let jsonString = generatedContent;
+    if (jsonString.includes('```json')) {
+      jsonString = jsonString.split('```json')[1].split('```')[0].trim();
+    } else if (jsonString.includes('```')) {
+      jsonString = jsonString.split('```')[1].split('```')[0].trim();
+    }
+
+    // Parse and validate the JSON
+    let flowchartData;
+    try {
+      flowchartData = JSON.parse(jsonString);
+    } catch (parseError) {
+      throw new Error('Failed to parse generated JSON: ' + parseError.message);
+    }
+
+    // Validate the structure
+    if (!flowchartData.cells || !Array.isArray(flowchartData.cells)) {
+      throw new Error('Invalid flowchart structure: missing cells array');
+    }
+
+    // Apply user's edge style preference to all edges in the generated data
+    const userEdgeStyle = window.currentEdgeStyle || 'direct'; // Default to direct if not logged in
+    flowchartData.cells.forEach(cell => {
+      if (cell.edge && cell.vertex === false) {
+        // Apply the user's edge style preference
+        let edgeStyle;
+        if (userEdgeStyle === 'curved') {
+          edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+        } else if (userEdgeStyle === 'straight') {
+          edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+        } else if (userEdgeStyle === 'direct') {
+          edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+        } else {
+          edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+        }
+        cell.style = edgeStyle;
+      }
+    });
+
+    // Clear current flowchart and load the new one
+    if (window.graph) {
+      window.graph.getModel().beginUpdate();
+      try {
+        // Clear all existing cells
+        const parent = window.graph.getDefaultParent();
+        const cells = window.graph.getChildCells(parent, true, true);
+        window.graph.removeCells(cells, true);
+        
+        // Update the graph's default edge style to match user preference
+        if (userEdgeStyle === 'curved') {
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true;
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+        } else if (userEdgeStyle === 'straight') {
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
+        } else if (userEdgeStyle === 'direct') {
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.None;
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
+          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = false;
+        }
+        
+        // Load the new flowchart data
+        loadFlowchartData(flowchartData);
+        
+        // Force update all edge styles after loading to ensure they match user preference
+        setTimeout(() => {
+          // Use the existing updateEdgeStyle function to ensure consistency
+          if (typeof updateEdgeStyle === 'function') {
+            updateEdgeStyle();
+          } else {
+            // Fallback: manually update all edges
+            const allCells = window.graph.getChildCells(window.graph.getDefaultParent(), true, true);
+            allCells.forEach(cell => {
+              if (cell.edge && !cell.vertex) {
+                let edgeStyle;
+                if (userEdgeStyle === 'curved') {
+                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+                } else if (userEdgeStyle === 'straight') {
+                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
+                } else if (userEdgeStyle === 'direct') {
+                  edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
+                } else {
+                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+                }
+                window.graph.getModel().setStyle(cell, edgeStyle);
+              }
+            });
+          }
+          
+          // Force refresh the graph to apply the changes
+          window.graph.refresh();
+        }, 100);
+        
+        // Store the generated JSON for download
+        window.lastGeneratedFlowchartJSON = JSON.stringify(flowchartData, null, 2);
+        
+        // Show the download button
+        document.getElementById('downloadGeneratedJsonBtn').style.display = 'inline-block';
+        
+        // Hide the modal
+        hideFlowchartDetailsModal();
+        
+        alert('Flowchart generated successfully!');
+      } finally {
+        window.graph.getModel().endUpdate();
+      }
+    } else {
+      throw new Error('Graph not initialized');
+    }
+
+  } catch (error) {
+    console.error('Error generating flowchart:', error);
+    alert('Error generating flowchart: ' + error.message);
+  } finally {
+    // Reset button state
+    generateBtn.disabled = false;
+    generateBtn.textContent = 'Generate Flowchart';
+    statusDiv.style.display = 'none';
+  }
+}
+
+// Load AI config - using embedded config to avoid CORS issues
+function loadAIConfig() {
+  // Use the API key from the AI Assistant config file
+  return {
+    apiKey: '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',
+    model: 'gpt-3.5-turbo',
+    maxTokens: 2000,
+    temperature: 0.3
+  };
+}
+
+// Download generated JSON function
+function downloadGeneratedJSON() {
+  if (window.lastGeneratedFlowchartJSON) {
+    const blob = new Blob([window.lastGeneratedFlowchartJSON], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'generated-flowchart.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } else {
+    alert('No generated flowchart JSON available to download.');
+  }
+}
+
+// Event listeners for the modal
+document.addEventListener('DOMContentLoaded', function() {
+  // Close modal when clicking the X button
+  document.getElementById('closeFlowchartDetailsModal').addEventListener('click', hideFlowchartDetailsModal);
+  
+  // Close modal when clicking Cancel button
+  document.getElementById('cancelFlowchartDetailsBtn').addEventListener('click', hideFlowchartDetailsModal);
+  
+  // Generate flowchart when clicking Generate button
+  document.getElementById('generateFlowchartBtn').addEventListener('click', generateFlowchartFromDescription);
+  
+  // Download generated JSON when clicking Download button
+  document.getElementById('downloadGeneratedJsonBtn').addEventListener('click', downloadGeneratedJSON);
+  
+  // Close modal when clicking outside of it
+  document.getElementById('flowchartDetailsModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+      hideFlowchartDetailsModal();
+    }
+  });
+  
+  // Allow Enter key to generate flowchart
+  document.getElementById('flowchartDetailsInput').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && event.ctrlKey) {
+      generateFlowchartFromDescription();
+    }
+  });
+});
