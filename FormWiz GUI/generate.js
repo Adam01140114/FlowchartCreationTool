@@ -1475,12 +1475,16 @@ questionSlugMap[questionId] = slug;
           }
         }
         
+        // Check if this question has a line limit
+        const lineLimitEl = qBlock.querySelector("#lineLimit" + questionId);
+        const lineLimit = lineLimitEl && lineLimitEl.value ? parseInt(lineLimitEl.value) : null;
+        
         if (hasPdfLogic && characterLimits.length > 0) {
           const maxLimit = Math.max(...characterLimits);
           formHTML += `
             <div class="big-paragraph-container">
               <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
-                        maxlength="${maxLimit * 2}" oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
+                        oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
               <div class="character-count" id="charCount_${nameId2}">
                 <span class="current-count">0</span> / <span class="limit-display">${maxLimit}</span> characters
               </div>
@@ -1504,6 +1508,91 @@ questionSlugMap[questionId] = slug;
                     countDisplay.style.color = '#ffa726';
                   } else {
                     countDisplay.style.color = '#666';
+                  }
+                }
+              }
+            </script>
+          `;
+        } else if (lineLimit) {
+          // Generate textarea with line limit functionality
+          formHTML += `
+            <div class="text-input-container">
+              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
+                        oninput="handleLineLimitOverflow('${nameId2}', ${lineLimit})"></textarea>
+            </div>
+            <script>
+              function handleLineLimitOverflow(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                if (!textarea) return;
+                
+                const text = textarea.value;
+                const textLength = text.length;
+                
+                // If text is within limit, clear any overflow fields
+                if (textLength <= lineLimit) {
+                  clearOverflowFields(textareaId);
+                  return;
+                }
+                
+                // Distribute text across main and overflow fields
+                distributeTextAcrossFields(textareaId, text, lineLimit);
+              }
+              
+              function clearOverflowFields(baseId) {
+                let fieldIndex = 2;
+                while (true) {
+                  const overflowField = document.getElementById(baseId + '_' + fieldIndex);
+                  if (overflowField) {
+                    overflowField.value = '';
+                    fieldIndex++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+              
+              function distributeTextAcrossFields(baseId, text, lineLimit) {
+                const mainField = document.getElementById(baseId);
+                if (!mainField) return;
+                
+                // Keep the full text in the main field for user to see and edit
+                // Don't modify mainField.value - let user see their full text
+                
+                // Distribute text across overflow fields for form submission
+                let remainingText = text;
+                let fieldIndex = 2;
+                
+                // Start from the beginning and distribute in chunks
+                while (remainingText.length > 0) {
+                  const overflowFieldId = baseId + '_' + fieldIndex;
+                  let overflowField = document.getElementById(overflowFieldId);
+                  
+                  // Create overflow field if it doesn't exist
+                  if (!overflowField) {
+                    overflowField = document.createElement('input');
+                    overflowField.type = 'hidden';
+                    overflowField.id = overflowFieldId;
+                    overflowField.name = overflowFieldId;
+                    mainField.parentNode.appendChild(overflowField);
+                  }
+                  
+                  // Fill this overflow field with up to lineLimit characters
+                  const fieldText = remainingText.substring(0, lineLimit);
+                  overflowField.value = fieldText;
+                  
+                  // Move to next field
+                  remainingText = remainingText.substring(lineLimit);
+                  fieldIndex++;
+                }
+                
+                // Clear any remaining overflow fields that are no longer needed
+                while (true) {
+                  const overflowField = document.getElementById(baseId + '_' + fieldIndex);
+                  if (overflowField) {
+                    overflowField.value = '';
+                    fieldIndex++;
+                  } else {
+                    break;
                   }
                 }
               }

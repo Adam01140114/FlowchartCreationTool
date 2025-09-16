@@ -505,7 +505,6 @@ function loadFormData(formData) {
                 else if (
                     // Text-like question types
                     question.type === 'text' ||
-                    question.type === 'bigParagraph' ||
                     question.type === 'radio' ||
                     question.type === 'money' ||
                     question.type === 'date' ||
@@ -520,6 +519,20 @@ function loadFormData(formData) {
                     }
                     if (placeholderInput) {
                         placeholderInput.value = question.placeholder || '';
+                    }
+                }
+                else if (question.type === 'bigParagraph') {
+                    const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
+                    const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
+                    const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
+                    if (nameInput) {
+                        nameInput.value = question.nameId || '';
+                    }
+                    if (placeholderInput) {
+                        placeholderInput.value = question.placeholder || '';
+                    }
+                    if (lineLimitInput && question.lineLimit) {
+                        lineLimitInput.value = question.lineLimit;
                     }
                 }
 
@@ -1276,7 +1289,6 @@ function exportForm() {
             }
             else if (
                 questionType === 'text' ||
-                questionType === 'bigParagraph' ||
                 questionType === 'radio' ||
                 questionType === 'money' ||
                 questionType === 'date' ||
@@ -1288,6 +1300,16 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
+            }
+            else if (questionType === 'bigParagraph') {
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
+                const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
+                questionData.nameId = nameId;
+                questionData.placeholder = placeholder;
+                if (lineLimit) {
+                    questionData.lineLimit = parseInt(lineLimit);
+                }
             }
 
             // -- Push questionData once (after we finish building it!) --

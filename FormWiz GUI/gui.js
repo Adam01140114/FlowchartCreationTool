@@ -601,6 +601,12 @@ function addQuestion(sectionId, questionId = null) {
             <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder">
         </div>
 
+        <!-- Line Limit for Big Paragraph -->
+        <div id="lineLimitOptions${currentQuestionId}" class="line-limit-options" style="display: none;">
+            <label>Line Limit: </label>
+            <input type="number" id="lineLimit${currentQuestionId}" placeholder="Enter line limit" min="1" max="100">
+        </div>
+
         <!-- Numbered Dropdown Options -->
         <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
             <label>Number Range: </label>
@@ -911,11 +917,13 @@ function toggleOptions(questionId) {
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
     const multipleTextboxesBlock = document.getElementById(`multipleTextboxesOptionsBlock${questionId}`);
     const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`);
+    const lineLimitOptionsBlock = document.getElementById(`lineLimitOptions${questionId}`);
     const dropdownImageBlock = document.getElementById(`dropdownImageBlock${questionId}`);
     const linkingLogicBlock = document.getElementById(`linkingLogicBlock${questionId}`);
 
     // Reset all blocks
     textboxOptionsBlock.style.display = 'none';
+    lineLimitOptionsBlock.style.display = 'none';
     optionsBlock.style.display = 'none';
     checkboxBlock.style.display = 'none';
     numberedDropdownBlock.style.display = 'none';
@@ -949,10 +957,15 @@ function toggleOptions(questionId) {
 
     switch (questionType) {
         case 'text':
-        case 'bigParagraph':
         case 'date':
         case 'dateRange':
             textboxOptionsBlock.style.display = 'block';
+            // Update existing jump conditions to use simplified format for textbox and date questions
+            updateJumpConditionsForTextbox(questionId);
+            break;
+        case 'bigParagraph':
+            textboxOptionsBlock.style.display = 'block';
+            lineLimitOptionsBlock.style.display = 'block';
             // Update existing jump conditions to use simplified format for textbox and date questions
             updateJumpConditionsForTextbox(questionId);
             break;
