@@ -11,6 +11,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- PDF.js for PDF processing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -200,6 +202,7 @@
   <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button>
   <button id="downloadSvgBtn" onclick="downloadFlowchartSvg()">Download SVG</button>
   <button id="uploadFlowchartDetailsBtn" onclick="showFlowchartDetailsModal()">Upload flowchart details</button>
+  <button id="uploadDocumentPdfBtn" onclick="showDocumentPdfModal()">Upload Document PDF</button>
   <br>
   <button id="logoutBtn">Logout</button>
 </div>
@@ -383,10 +386,41 @@
   </div>
 </div>
 
-<!-- API Configuration - loaded first (gitignored) -->
-<script src="api-config.js"></script>
-<!-- Auth functions - loaded second -->
-<script src="auth.js"></script>
+<!-- Document PDF Modal -->
+<div id="documentPdfModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Upload Document PDF</h3>
+      <button id="closeDocumentPdfModal" class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Upload a PDF document to automatically extract form structure and generate flowchart details.</p>
+      <input type="file" id="pdfFileInput" accept=".pdf" style="width: 100%; padding: 10px; border: 2px dashed #4CAF50; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; background-color: #f9f9f9; cursor: pointer;">
+      <div style="margin-top: 15px;">
+        <button id="processPdfBtn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Process PDF</button>
+        <button id="downloadPdfAnalysisBtn" style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; display: none;">Download Analysis</button>
+        <button id="downloadPdfAnalysisJsonBtn" style="background-color: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; display: none;">Download JSON</button>
+        <button id="cancelDocumentPdfBtn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+      </div>
+      <div id="pdfProcessingStatus" style="margin-top: 15px; display: none;">
+        <p>Processing PDF...</p>
+      </div>
+      <div id="pdfPreview" style="margin-top: 15px; display: none;">
+        <h4>PDF Preview:</h4>
+        <div id="pdfImagesContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #f9f9f9;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- API Configuration - loaded first (gitignored) -->
+    <script src="api-config.js"></script>
+    <!-- AI Features - loaded second -->
+    <script src="ai-features.js"></script>
+    <!-- Export functionality - loaded third -->
+    <script src="export.js"></script>
+    <!-- Auth functions - loaded fourth -->
+    <script src="auth.js"></script>
 <!-- Configuration and setup - loaded third -->
 <script src="config.js"></script>
 <!-- Shared dependencies - loaded third -->

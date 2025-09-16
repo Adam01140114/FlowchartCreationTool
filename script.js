@@ -1,4 +1,4 @@
-/**************************************************
+﻿/**************************************************
  ************ Firebase Config & Basic Auth ********
  **************************************************/
 // Firebase configuration moved to config.js module
@@ -398,7 +398,7 @@ graph.isCellEditable = function (cell) {
   const qt = getQuestionType(cell);
   if (qt === 'multipleTextboxes' ||
       qt === 'multipleDropdownType' ||
-      qt === 'dropdown') {          // new ✱
+      qt === 'dropdown') {          // new âœ±
     return false;
   }
   // Disable direct editing for PDF nodes (they use custom input fields)
@@ -775,13 +775,13 @@ const keyHandler = new mxKeyHandler(graph);
 
 /* DELETE & BACKSPACE you already handled elsewhere ------------------- */
 
-/* Ctrl + C  – copy node (ONLY when not typing) */
+/* Ctrl + C  â€“ copy node (ONLY when not typing) */
 keyHandler.bindControlKey(67, () => {
   if (isUserTyping()) return;                  // NEW / CHANGED
   copySelectedNodeAsJson();
 });
 
-/* Ctrl + V  – paste node (ONLY when not typing) */
+/* Ctrl + V  â€“ paste node (ONLY when not typing) */
 keyHandler.bindControlKey(86, () => {
   if (isUserTyping()) return;                  // NEW / CHANGED
   const mousePos = graph.getPointForEvent(graph.lastEvent);
@@ -940,7 +940,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
                 if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
                 if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
                 
-                console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
+                console.log(`ðŸ” [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
                 
                 // Recursively propagate to further downstream nodes
                 propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
@@ -1021,7 +1021,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
                     if (source._priceId) target._priceId = source._priceId;
                     if (source._characterLimit) target._characterLimit = source._characterLimit;
                     
-                    console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${source.id} to ${target.id}`);
+                    console.log(`ðŸ” [PDF INHERITANCE] Propagated PDF properties from ${source.id} to ${target.id}`);
                     
                     // Also propagate to all downstream nodes from the target
                     propagatePdfPropertiesDownstream(target, source);
@@ -1357,7 +1357,7 @@ function updatemultipleDropdownTypeCell(cell) {
     const checked = tb.isAmountOption ? 'checked' : '';
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
-        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">⋮⋮</div>
+        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
@@ -1785,7 +1785,7 @@ function setNodeId(cell, nodeId) {
   const DEBUG_NODE_ID = false;
   
   if (DEBUG_NODE_ID) {
-    console.log("🔧 SET NODE ID DEBUG START");
+    console.log("ðŸ”§ SET NODE ID DEBUG START");
     console.log("Cell:", cell);
     console.log("Setting nodeId to:", nodeId);
     console.log("Original style:", cell.style);
@@ -1847,7 +1847,7 @@ function setNodeId(cell, nodeId) {
   
   if (DEBUG_NODE_ID) {
     console.log("After setStyle - cell.style:", cell.style);
-    console.log("🔧 SET NODE ID DEBUG END");
+    console.log("ðŸ”§ SET NODE ID DEBUG END");
   }
 }
 // Local getNodeId function removed - now using global window.getNodeId function
@@ -1858,7 +1858,7 @@ function refreshNodeIdFromLabel(cell) {
   const DEBUG_NODE_ID = false;
   
   if (DEBUG_NODE_ID) {
-    console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG START");
+    console.log("ðŸ”„ REFRESH NODE ID FROM LABEL DEBUG START");
     console.log("Cell:", cell);
     console.log("Cell ID:", cell.id);
     console.log("Cell value:", cell.value);
@@ -1881,7 +1881,7 @@ function refreshNodeIdFromLabel(cell) {
   if (hasCustomNodeId) {
     if (DEBUG_NODE_ID) {
       console.log("Preserving custom Node ID:", existingNodeId);
-      console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END (PRESERVED)");
+      console.log("ðŸ”„ REFRESH NODE ID FROM LABEL DEBUG END (PRESERVED)");
     }
     return;
   }
@@ -1941,7 +1941,7 @@ function refreshNodeIdFromLabel(cell) {
   const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
   if (DEBUG_NODE_ID) {
     console.log("Verification - getNodeId returns:", verifyId);
-    console.log("🔄 REFRESH NODE ID FROM LABEL DEBUG END");
+    console.log("ðŸ”„ REFRESH NODE ID FROM LABEL DEBUG END");
   }
 }
 
@@ -2060,7 +2060,7 @@ function refreshOptionNodeId(cell) {
 
 // Function to refresh all option node IDs in the graph
 function refreshAllOptionNodeIds() {
-  console.log("🔄 REFRESH ALL OPTION NODE IDS DEBUG START");
+  console.log("ðŸ”„ REFRESH ALL OPTION NODE IDS DEBUG START");
   if (!graph) {
     console.log("No graph available");
     return;
@@ -2088,7 +2088,7 @@ function refreshAllOptionNodeIds() {
     console.log("Calling refreshAllCells");
     window.refreshAllCells();
   }
-  console.log("🔄 REFRESH ALL OPTION NODE IDS DEBUG END");
+  console.log("ðŸ”„ REFRESH ALL OPTION NODE IDS DEBUG END");
 }
 
 function addSkipReassign(cell) {
@@ -2172,7 +2172,7 @@ window.pickTypeForCell = function(cellId, val) {
 };
 
 /******************************************************************
- * 1) Universal key-down guard – put this in your global helpers  *
+ * 1) Universal key-down guard â€“ put this in your global helpers  *
  ******************************************************************/
 window.handleTitleInputKeydown = function (evt) {
   // Let the browser handle native shortcuts, but don't let mxGraph see them
@@ -2189,7 +2189,7 @@ window.handleTitleInputKeydown = function (evt) {
 };
 
 /******************************************************************
- * 2) renderTextboxes() – used by multiple-textboxes questions     *
+ * 2) renderTextboxes() â€“ used by multiple-textboxes questions     *
  *    (full replacement)                                          *
  ******************************************************************/
 function renderTextboxes(cell) {
@@ -2339,7 +2339,7 @@ window.showReorderModal = function(cellId, questionType) {
   `;
   
   const closeBtn = document.createElement('button');
-  closeBtn.innerHTML = '×';
+  closeBtn.innerHTML = 'Ã—';
   closeBtn.style.cssText = `
     background: none;
     border: none;
@@ -2421,7 +2421,7 @@ window.showReorderModal = function(cellId, questionType) {
     `;
     
     const dragHandle = document.createElement('div');
-    dragHandle.innerHTML = '⋮⋮';
+    dragHandle.innerHTML = 'â‹®â‹®';
     dragHandle.style.cssText = `
       color: #999;
       font-size: 16px;
@@ -2604,7 +2604,7 @@ function saveReorderChanges(cellId, questionType) {
 }
 
 /******************************************************************
- * 3) updatemultipleDropdownTypeCell() – full replacement          *
+ * 3) updatemultipleDropdownTypeCell() â€“ full replacement          *
  ******************************************************************/
 function updatemultipleDropdownTypeCell(cell) {
   const qText   = cell._questionText || "";
@@ -2686,7 +2686,7 @@ function updatemultipleDropdownTypeCell(cell) {
 
 /**************************************************
  *                setQuestionType                 *
- *  – now stores plain text for the simple types  *
+ *  â€“ now stores plain text for the simple types  *
  **************************************************/
 /**************************************************
  *                setQuestionType                 *
@@ -2703,13 +2703,13 @@ function setOptionType(cell, newType) {
     // Extract and preserve the current text content
     const preservedText = extractTextFromCell(cell);
   
-  /* —— 1. update style —— */
+  /* â€”â€” 1. update style â€”â€” */
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
   st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
   
   graph.getModel().setStyle(cell, st);
 
-  /* —— 2. update internals —— */
+  /* â€”â€” 2. update internals â€”â€” */
   graph.getModel().beginUpdate();
   try {
     switch (newType) {
@@ -2832,7 +2832,7 @@ function setOptionType(cell, newType) {
   
   // Function to refresh all question node IDs in the graph
   window.refreshAllQuestionNodeIds = function() {
-    console.log("🔄 REFRESH ALL QUESTION NODE IDS DEBUG START");
+    console.log("ðŸ”„ REFRESH ALL QUESTION NODE IDS DEBUG START");
     if (!graph) {
       console.log("No graph available");
       return;
@@ -2860,7 +2860,7 @@ function setOptionType(cell, newType) {
       console.log("Calling refreshAllCells");
       window.refreshAllCells();
     }
-    console.log("🔄 REFRESH ALL QUESTION NODE IDS DEBUG END");
+    console.log("ðŸ”„ REFRESH ALL QUESTION NODE IDS DEBUG END");
   };
 
 
@@ -2953,7 +2953,7 @@ function isJumpNode(cell) {
 }
 
 /**
- * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple question→question).
+ * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple questionâ†’question).
  */
 function findAllUpstreamOptions(questionCell) {
   const results = [];
@@ -3662,9 +3662,9 @@ window.updateSimpleQuestionTitle = function(cellId, text) {
   
   // Debug logging for big paragraph nodes
   if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Cell ID:', cellId);
-    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Input text:', text);
-    console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] Cell before update:', cell);
+    console.log('ðŸ”§ [BIG PARAGRAPH UPDATE DEBUG] Cell ID:', cellId);
+    console.log('ðŸ”§ [BIG PARAGRAPH UPDATE DEBUG] Input text:', text);
+    console.log('ðŸ”§ [BIG PARAGRAPH UPDATE DEBUG] Cell before update:', cell);
   }
   
   graph.getModel().beginUpdate();
@@ -3673,7 +3673,7 @@ window.updateSimpleQuestionTitle = function(cellId, text) {
     
     // Debug logging after update
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-      console.log('🔧 [BIG PARAGRAPH UPDATE DEBUG] cell._questionText after update:', cell._questionText);
+      console.log('ðŸ”§ [BIG PARAGRAPH UPDATE DEBUG] cell._questionText after update:', cell._questionText);
     }
   } finally {
     graph.getModel().endUpdate();
@@ -3852,7 +3852,7 @@ function updatemultipleDropdownTypeCell(cell) {
     const checked = tb.isAmountOption ? 'checked' : '';
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
-        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">⋮⋮</div>
+        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
@@ -4310,14 +4310,14 @@ function setupAutosaveHooks() {
     
     // Ensure section legend is updated after import
     if (data && data.sectionPrefs) {
-      console.log('🔍 [SCRIPT DEBUG] Autosave hook detected sectionPrefs, scheduling updateSectionLegend...');
+      console.log('ðŸ” [SCRIPT DEBUG] Autosave hook detected sectionPrefs, scheduling updateSectionLegend...');
       setTimeout(() => {
-        console.log('🔍 [SCRIPT DEBUG] Autosave hook calling updateSectionLegend after 100ms delay...');
+        console.log('ðŸ” [SCRIPT DEBUG] Autosave hook calling updateSectionLegend after 100ms delay...');
         if (typeof window.updateSectionLegend === 'function') {
           window.updateSectionLegend();
-          console.log('🔍 [SCRIPT DEBUG] Autosave hook: Section legend updated after import');
+          console.log('ðŸ” [SCRIPT DEBUG] Autosave hook: Section legend updated after import');
         } else {
-          console.error('❌ [SCRIPT DEBUG] Autosave hook: updateSectionLegend function not available!');
+          console.error('âŒ [SCRIPT DEBUG] Autosave hook: updateSectionLegend function not available!');
         }
       }, 100); // Small delay to ensure DOM is ready
     }
@@ -5280,7 +5280,7 @@ function updateAlertNodeCell(cell) {
   const alertText = cell._questionText || cell._alertText;
   
   let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
-  htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ ALERT</div>';
+  htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">âš ï¸ ALERT</div>';
   htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
   htmlContent += '</div>';
   
@@ -5680,271 +5680,6 @@ function selectFirstSearchResult(searchTerm) {
   }
 }
 
-// Download flowchart as SVG with padding
-window.downloadFlowchartSvg = function() {
-  try {
-    // Get all cells in the graph
-    const parent = graph.getDefaultParent();
-    const cells = graph.getChildCells(parent, true, true);
-    
-    if (cells.length === 0) {
-      alert("No flowchart content to export");
-      return;
-    }
-    
-    // Calculate the bounding box of all cells
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    
-    cells.forEach(cell => {
-      if (cell.geometry) {
-        minX = Math.min(minX, cell.geometry.x);
-        minY = Math.min(minY, cell.geometry.y);
-        maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
-        maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
-      }
-    });
-    
-    // Add 100px padding around all sides
-    const padding = 100;
-    const width = maxX - minX + (padding * 2);
-    const height = maxY - minY + (padding * 2);
-    
-    // Create SVG content manually
-    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <rect width="${width}" height="${height}" fill="white"/>
-      <defs>
-        <style>
-          .text { font-family: Arial, sans-serif; font-size: 14px; text-anchor: middle; dominant-baseline: middle; }
-          .edge { stroke: #424242; stroke-width: 2; fill: none; }
-        </style>
-      </defs>`;
-    
-    // Helper function to parse style string and extract properties
-    function parseStyle(styleString) {
-      const style = {};
-      if (!styleString) return style;
-      
-      const parts = styleString.split(';');
-      parts.forEach(part => {
-        const [key, value] = part.split('=');
-        if (key && value) {
-          style[key.trim()] = value.trim();
-        }
-      });
-      return style;
-    }
-    
-    // Helper function to get exact node styling
-    function getNodeStyling(cell) {
-      const style = parseStyle(cell.style);
-      const styling = {
-        fillColor: '#e1f5fe',
-        strokeColor: '#01579b',
-        strokeWidth: 2,
-        fontSize: 14,
-        fontFamily: 'Arial, sans-serif',
-        textAlign: 'center',
-        verticalAlign: 'middle',
-        rounded: 10,
-        dashed: false,
-        strokeDasharray: null
-      };
-      
-      // Get fill color based on node type and preferences
-      if (cell.style && cell.style.includes('nodeType=question')) {
-        const questionType = getQuestionType(cell);
-        if (questionType === 'checkbox') styling.fillColor = colorPreferences.checkbox;
-        else if (questionType === 'dropdown' || questionType === 'text2') styling.fillColor = colorPreferences.dropdown;
-        else if (questionType === 'money' || questionType === 'number') styling.fillColor = colorPreferences.money;
-        else if (questionType === 'date' || questionType === 'dateRange') styling.fillColor = colorPreferences.date;
-        else if (questionType === 'bigParagraph') styling.fillColor = colorPreferences.bigParagraph;
-        else styling.fillColor = colorPreferences.text;
-      } else if (cell.style && cell.style.includes('nodeType=options')) {
-        styling.fillColor = '#ffffff';
-      } else if (cell.style && cell.style.includes('nodeType=end')) {
-        styling.fillColor = '#CCCCCC';
-      } else if (cell.style && cell.style.includes('nodeType=calculation')) {
-        styling.fillColor = '#e1f5fe';
-      }
-      
-      // Get border color from section preferences
-      const section = getSection(cell);
-      const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-      if (section && currentSectionPrefs[section] && currentSectionPrefs[section].borderColor) {
-        styling.strokeColor = currentSectionPrefs[section].borderColor;
-      }
-      
-      // Apply style overrides from cell style
-      if (style.fillColor) styling.fillColor = style.fillColor;
-      if (style.strokeColor) styling.strokeColor = style.strokeColor;
-      if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
-      if (style.fontSize) styling.fontSize = parseInt(style.fontSize);
-      if (style.fontFamily) styling.fontFamily = style.fontFamily;
-      if (style.arcSize) styling.rounded = parseInt(style.arcSize);
-      if (style.dashed === '1') styling.dashed = true;
-      if (style.strokeDasharray) styling.strokeDasharray = style.strokeDasharray;
-      
-      return styling;
-    }
-    
-    // Helper function to get exact edge styling
-    function getEdgeStyling(cell) {
-      const style = parseStyle(cell.style);
-      const styling = {
-        strokeColor: '#424242',
-        strokeWidth: 2,
-        edgeStyle: 'orthogonalEdgeStyle',
-        rounded: 1,
-        orthogonalLoop: 1
-      };
-      
-      // Apply style overrides from cell style
-      if (style.strokeColor) styling.strokeColor = style.strokeColor;
-      if (style.strokeWidth) styling.strokeWidth = parseInt(style.strokeWidth);
-      if (style.edgeStyle) styling.edgeStyle = style.edgeStyle;
-      if (style.rounded !== undefined) styling.rounded = parseInt(style.rounded);
-      if (style.orthogonalLoop !== undefined) styling.orthogonalLoop = parseInt(style.orthogonalLoop);
-      
-      return styling;
-    }
-    
-    // Helper function to create edge path based on style
-    function createEdgePath(source, target, edgeStyle, edgeGeometry) {
-      const x1 = source.geometry.x - minX + padding + source.geometry.width / 2;
-      const y1 = source.geometry.y - minY + padding + source.geometry.height / 2;
-      const x2 = target.geometry.x - minX + padding + target.geometry.width / 2;
-      const y2 = target.geometry.y - minY + padding + target.geometry.height / 2;
-      
-      // If edge has custom geometry points, use them
-      if (edgeGeometry && edgeGeometry.points && edgeGeometry.points.length > 0) {
-        let path = `M ${x1} ${y1}`;
-        edgeGeometry.points.forEach(point => {
-          const px = point.x - minX + padding;
-          const py = point.y - minY + padding;
-          path += ` L ${px} ${py}`;
-        });
-        path += ` L ${x2} ${y2}`;
-        return path;
-      }
-      
-      // Otherwise create path based on edge style
-      if (edgeStyle === 'orthogonalEdgeStyle') {
-        if (edgeStyle.rounded === 1) {
-          // Curved orthogonal
-          const dx = x2 - x1;
-          const dy = y2 - y1;
-          const midX = x1 + dx / 2;
-          const midY = y1 + dy / 2;
-          const controlOffset = Math.min(Math.abs(dx), Math.abs(dy)) * 0.3;
-          return `M ${x1} ${y1} Q ${midX} ${midY - controlOffset} ${x2} ${y2}`;
-        } else {
-          // Straight orthogonal
-          const dx = x2 - x1;
-          const dy = y2 - y1;
-          const midX = x1 + dx / 2;
-          const midY = y1 + dy / 2;
-          return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-        }
-      } else if (edgeStyle === 'none') {
-        // Direct line
-        return `M ${x1} ${y1} L ${x2} ${y2}`;
-      }
-      
-      // Default to orthogonal
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const midX = x1 + dx / 2;
-      const midY = y1 + dy / 2;
-      return `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
-    }
-    
-    // Add edges first (so they appear behind nodes)
-    cells.forEach(cell => {
-      if (cell.edge && cell.source && cell.target) {
-        const source = cell.source;
-        const target = cell.target;
-        
-        if (source.geometry && target.geometry) {
-          const edgeStyling = getEdgeStyling(cell);
-          const pathData = createEdgePath(source, target, edgeStyling.edgeStyle, cell.geometry);
-          
-          // Create arrow marker
-          const markerId = `arrow-${cell.id}`;
-          svgContent += `<defs>
-            <marker id="${markerId}" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-              <polygon points="0,0 0,6 9,3" fill="${edgeStyling.strokeColor}"/>
-            </marker>
-          </defs>`;
-          
-          // Create edge path
-          const strokeDasharray = edgeStyling.strokeDasharray || 'none';
-          svgContent += `<path d="${pathData}" stroke="${edgeStyling.strokeColor}" stroke-width="${edgeStyling.strokeWidth}" fill="none" marker-end="url(#${markerId})" stroke-dasharray="${strokeDasharray}"/>`;
-        }
-      }
-    });
-    
-    // Add nodes (so they appear on top of edges)
-    cells.forEach(cell => {
-      if (cell.vertex) {
-        const x = cell.geometry.x - minX + padding;
-        const y = cell.geometry.y - minY + padding;
-        const w = cell.geometry.width;
-        const h = cell.geometry.height;
-        
-        const styling = getNodeStyling(cell);
-        
-        // Create rectangle for the node
-        const strokeDasharray = styling.dashed ? '5,5' : 'none';
-        svgContent += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${styling.rounded}" ry="${styling.rounded}" fill="${styling.fillColor}" stroke="${styling.strokeColor}" stroke-width="${styling.strokeWidth}" stroke-dasharray="${strokeDasharray}"/>`;
-        
-        // Add text
-        let text = "";
-        if (cell.value) {
-          // Extract text from HTML if present
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = cell.value;
-          text = tempDiv.textContent || tempDiv.innerText || "";
-        }
-        
-        if (text) {
-          const textX = x + w / 2;
-          const textY = y + h / 2;
-          const textAlign = styling.textAlign === 'center' ? 'middle' : styling.textAlign;
-          const dominantBaseline = styling.verticalAlign === 'middle' ? 'middle' : styling.verticalAlign;
-          
-          svgContent += `<text x="${textX}" y="${textY}" font-family="${styling.fontFamily}" font-size="${styling.fontSize}" text-anchor="${textAlign}" dominant-baseline="${dominantBaseline}" fill="black">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text>`;
-        }
-      }
-    });
-    
-    svgContent += '</svg>';
-    
-    // Download the SVG
-    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'flowchart.svg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    // Show success notification
-    const notification = document.createElement('div');
-    notification.textContent = 'SVG downloaded successfully!';
-    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
-    document.body.appendChild(notification);
-    setTimeout(() => {
-      document.body.removeChild(notification);
-    }, 3000);
-    
-  } catch (error) {
-    console.error('Error downloading SVG:', error);
-    alert('Error downloading SVG: ' + error.message);
-  }
-};
 
 // Helper function to find PDF name for a question node
 function findPdfNameForQuestion(cell) {
@@ -6072,370 +5807,3 @@ window.showFlowchartDetailsModal = function() {
   document.getElementById('flowchartDetailsInput').focus();
 };
 
-// Hide the flowchart details modal
-function hideFlowchartDetailsModal() {
-  const modal = document.getElementById('flowchartDetailsModal');
-  modal.style.display = 'none';
-  document.getElementById('flowchartDetailsInput').value = '';
-  document.getElementById('flowchartGenerationStatus').style.display = 'none';
-  document.getElementById('downloadGeneratedJsonBtn').style.display = 'none';
-}
-
-// Generate flowchart from user description using ChatGPT
-async function generateFlowchartFromDescription() {
-  const description = document.getElementById('flowchartDetailsInput').value.trim();
-  
-  if (!description) {
-    alert('Please enter a description of the flowchart you want to create.');
-    return;
-  }
-
-  const statusDiv = document.getElementById('flowchartGenerationStatus');
-  const generateBtn = document.getElementById('generateFlowchartBtn');
-  
-  // Show loading state
-  statusDiv.style.display = 'block';
-  generateBtn.disabled = true;
-  generateBtn.textContent = 'Generating...';
-
-  try {
-    // Load AI config
-    const aiConfig = await loadAIConfig();
-    
-    // Create the prompt for ChatGPT
-    const systemPrompt = `You are a flowchart generator. Based on the user's description, generate a valid flowchart JSON that can be imported into a flowchart creation tool.
-
-CRITICAL: You must generate EXACTLY the correct JSON structure with ALL required nodes and connections. Here's the precise format:
-
-{
-  "cells": [
-    {
-      "id": "unique_id",
-      "value": "Node text",
-      "geometry": {"x": x_position, "y": y_position, "width": 200, "height": 80},
-      "style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;questionType=dropdown;nodeId=question_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
-      "vertex": true,
-      "edge": false,
-      "source": null,
-      "target": null,
-      "_textboxes": null,
-      "_questionText": "Node text",
-      "_questionId": "1",
-      "_nameId": "question_name"
-    }
-  ],
-  "sectionPrefs": {
-    "1": {
-      "borderColor": "hsl(0, 100%, 80%)",
-      "name": "Section Name"
-    }
-  }
-}
-
-MANDATORY REQUIREMENTS - YOU MUST INCLUDE ALL OF THESE:
-
-1. QUESTION NODES (questions that have options):
-   - Style: "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;questionType=dropdown;nodeId=question_name;section=1;fillColor=#80bfff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)"
-   - Geometry: {"x": x, "y": y, "width": 200, "height": 80}
-   - Include: _textboxes: null, _questionText: "question text", _questionId: "1", _nameId: "question_name"
-
-2. OPTION NODES (answers/choices) - CREATE ONE FOR EACH OPTION:
-   - Style: "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;section=1;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)"
-   - Geometry: {"x": x, "y": y, "width": 120, "height": 60}
-   - Include: _nameId: "option_name"
-
-3. END NODES:
-   - Style: "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;"
-   - Geometry: {"x": x, "y": y, "width": 120, "height": 60}
-
-4. EDGES (connections between nodes) - CREATE EDGES FOR ALL CONNECTIONS:
-   - Style: ""
-   - Geometry: {"x": 0, "y": 0, "width": 0, "height": 0}
-   - vertex: false, edge: true
-   - source: "source_node_id", target: "target_node_id"
-
-CONNECTION RULES - YOU MUST CREATE THESE EDGES:
-- Connect each question to ALL its option nodes
-- Connect each option to the next question (if any) or to the end node
-- For dropdown questions: connect the question to each option, then connect each option to the next question
-- For text questions: connect directly to the next question or end node
-
-QUESTION TYPES:
-- dropdown: for multiple choice questions
-- checkbox: for multiple selection questions  
-- text: for text input questions
-- number: for numeric input questions
-- money: for currency input questions
-
-POSITIONING RULES - CRITICAL FOR CLEAN LAYOUTS:
-
-1. QUESTIONS:
-   - Width: 200px, Height: 80px
-   - Start at x=380, y=100
-   - Center horizontally in the layout
-
-2. OPTION NODES - SPREAD HORIZONTALLY IN SINGLE ROW:
-   - Width: 120px, Height: 60px
-   - ALL options on the SAME Y level (same row)
-   - Horizontal spacing: 140px between option centers
-   - Position options below question with 110px vertical spacing
-   - Center the entire row of options under the question
-   - For 4 options: positions should be x=220, x=360, x=500, x=640 (all at same y)
-   - For 3 options: positions should be x=300, x=440, x=580 (all at same y)
-   - For 2 options: positions should be x=380, x=520 (all at same y)
-
-3. NEXT QUESTION:
-   - Width: 200px, Height: 80px
-   - Position 120px below the option row
-   - Center horizontally (x=380)
-
-4. END NODE:
-   - Width: 120px, Height: 60px
-   - Position 140px below the last question
-   - Center horizontally (x=420)
-
-LAYOUT EXAMPLES:
-- 4 options: x=220, x=360, x=500, x=640 (all at y=210)
-- 3 options: x=300, x=440, x=580 (all at y=210)
-- 2 options: x=380, x=520 (all at y=210)
-
-SECTIONS:
-- Each section gets a unique number (1, 2, 3, etc.)
-- Include sectionPrefs with borderColor and name for each section
-- Use different strokeColor for each section: hsl(0, 100%, 80%), hsl(120, 100%, 80%), hsl(240, 100%, 80%), etc.
-
-EXAMPLE STRUCTURE FOR "How satisfied are you?" with options "Very Satisfied", "Satisfied", "Neutral", "Dissatisfied":
-1. Question node: "How satisfied are you with our service?" (id: "1", x=380, y=100)
-2. Option node: "Very Satisfied" (id: "2", x=220, y=210) 
-3. Option node: "Satisfied" (id: "3", x=360, y=210)
-4. Option node: "Neutral" (id: "4", x=500, y=210)
-5. Option node: "Dissatisfied" (id: "5", x=640, y=210)
-6. Question node: "Any additional comments?" (id: "6", x=380, y=330)
-7. End node: "END" (id: "7", x=420, y=470)
-8. Edge: question 1 → option 2
-9. Edge: question 1 → option 3
-10. Edge: question 1 → option 4
-11. Edge: question 1 → option 5
-12. Edge: option 2 → question 6
-13. Edge: option 3 → question 6
-14. Edge: option 4 → question 6
-15. Edge: option 5 → question 6
-16. Edge: question 6 → end 7
-
-NOTE: All 4 options are on the SAME Y level (y=210) with proper horizontal spacing!
-Also set each edge style to edgeStyle=none; rounded=0; orthogonalLoop=0;
-Generate a complete, valid JSON that represents the described flowchart with ALL nodes and ALL connections.`;
-
-    const userPrompt = `Create a flowchart based on this description: ${description}`;
-
-    // Call ChatGPT API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${aiConfig.apiKey}`
-      },
-      body: JSON.stringify({
-        model: aiConfig.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        max_tokens: aiConfig.maxTokens,
-        temperature: aiConfig.temperature
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const generatedContent = data.choices[0].message.content;
-
-    // Extract JSON from the response (it might be wrapped in markdown code blocks)
-    let jsonString = generatedContent;
-    if (jsonString.includes('```json')) {
-      jsonString = jsonString.split('```json')[1].split('```')[0].trim();
-    } else if (jsonString.includes('```')) {
-      jsonString = jsonString.split('```')[1].split('```')[0].trim();
-    }
-
-    // Parse and validate the JSON
-    let flowchartData;
-    try {
-      flowchartData = JSON.parse(jsonString);
-    } catch (parseError) {
-      throw new Error('Failed to parse generated JSON: ' + parseError.message);
-    }
-
-    // Validate the structure
-    if (!flowchartData.cells || !Array.isArray(flowchartData.cells)) {
-      throw new Error('Invalid flowchart structure: missing cells array');
-    }
-
-    // Apply user's edge style preference to all edges in the generated data
-    const userEdgeStyle = window.currentEdgeStyle || 'direct'; // Default to direct if not logged in
-    flowchartData.cells.forEach(cell => {
-      if (cell.edge && cell.vertex === false) {
-        // Apply the user's edge style preference
-        let edgeStyle;
-        if (userEdgeStyle === 'curved') {
-          edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-        } else if (userEdgeStyle === 'straight') {
-          edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
-        } else if (userEdgeStyle === 'direct') {
-          edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
-        } else {
-          edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-        }
-        cell.style = edgeStyle;
-      }
-    });
-
-    // Clear current flowchart and load the new one
-    if (window.graph) {
-      window.graph.getModel().beginUpdate();
-      try {
-        // Clear all existing cells
-        const parent = window.graph.getDefaultParent();
-        const cells = window.graph.getChildCells(parent, true, true);
-        window.graph.removeCells(cells, true);
-        
-        // Update the graph's default edge style to match user preference
-        if (userEdgeStyle === 'curved') {
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = true;
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
-        } else if (userEdgeStyle === 'straight') {
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.OrthConnector;
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = true;
-        } else if (userEdgeStyle === 'direct') {
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_EDGE] = mxEdgeStyle.None;
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
-          window.graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = false;
-        }
-        
-        // Load the new flowchart data
-        loadFlowchartData(flowchartData);
-        
-        // Force update all edge styles after loading to ensure they match user preference
-        setTimeout(() => {
-          // Use the existing updateEdgeStyle function to ensure consistency
-          if (typeof updateEdgeStyle === 'function') {
-            updateEdgeStyle();
-          } else {
-            // Fallback: manually update all edges
-            const allCells = window.graph.getChildCells(window.graph.getDefaultParent(), true, true);
-            allCells.forEach(cell => {
-              if (cell.edge && !cell.vertex) {
-                let edgeStyle;
-                if (userEdgeStyle === 'curved') {
-                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-                } else if (userEdgeStyle === 'straight') {
-                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;";
-                } else if (userEdgeStyle === 'direct') {
-                  edgeStyle = "edgeStyle=none;rounded=0;orthogonalLoop=0;jettySize=auto;html=1;";
-                } else {
-                  edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
-                }
-                window.graph.getModel().setStyle(cell, edgeStyle);
-              }
-            });
-          }
-          
-          // Force refresh the graph to apply the changes
-          window.graph.refresh();
-        }, 100);
-        
-        // Store the generated JSON for download
-        window.lastGeneratedFlowchartJSON = JSON.stringify(flowchartData, null, 2);
-        
-        // Show the download button
-        document.getElementById('downloadGeneratedJsonBtn').style.display = 'inline-block';
-        
-        // Hide the modal
-        hideFlowchartDetailsModal();
-        
-        alert('Flowchart generated successfully!');
-      } finally {
-        window.graph.getModel().endUpdate();
-      }
-    } else {
-      throw new Error('Graph not initialized');
-    }
-
-  } catch (error) {
-    console.error('Error generating flowchart:', error);
-    alert('Error generating flowchart: ' + error.message);
-  } finally {
-    // Reset button state
-    generateBtn.disabled = false;
-    generateBtn.textContent = 'Generate Flowchart';
-    statusDiv.style.display = 'none';
-  }
-}
-
-// Load AI config - using embedded config to avoid CORS issues
-function loadAIConfig() {
-  // Try to get API key from environment or use fallback
-  const apiKey = window.OPENAI_API_KEY || 'YOUR_API_KEY_HERE';
-  
-  if (apiKey === 'YOUR_API_KEY_HERE') {
-    throw new Error('OpenAI API key not configured. Please set window.OPENAI_API_KEY or update the config.');
-  }
-  
-  return {
-    apiKey: apiKey,
-    model: 'gpt-3.5-turbo',
-    maxTokens: 2000,
-    temperature: 0.3
-  };
-}
-
-// Download generated JSON function
-function downloadGeneratedJSON() {
-  if (window.lastGeneratedFlowchartJSON) {
-    const blob = new Blob([window.lastGeneratedFlowchartJSON], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'generated-flowchart.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  } else {
-    alert('No generated flowchart JSON available to download.');
-  }
-}
-
-// Event listeners for the modal
-document.addEventListener('DOMContentLoaded', function() {
-  // Close modal when clicking the X button
-  document.getElementById('closeFlowchartDetailsModal').addEventListener('click', hideFlowchartDetailsModal);
-  
-  // Close modal when clicking Cancel button
-  document.getElementById('cancelFlowchartDetailsBtn').addEventListener('click', hideFlowchartDetailsModal);
-  
-  // Generate flowchart when clicking Generate button
-  document.getElementById('generateFlowchartBtn').addEventListener('click', generateFlowchartFromDescription);
-  
-  // Download generated JSON when clicking Download button
-  document.getElementById('downloadGeneratedJsonBtn').addEventListener('click', downloadGeneratedJSON);
-  
-  // Close modal when clicking outside of it
-  document.getElementById('flowchartDetailsModal').addEventListener('click', function(event) {
-    if (event.target === this) {
-      hideFlowchartDetailsModal();
-    }
-  });
-  
-  // Allow Enter key to generate flowchart
-  document.getElementById('flowchartDetailsInput').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter' && event.ctrlKey) {
-      generateFlowchartFromDescription();
-    }
-  });
-});
