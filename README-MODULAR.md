@@ -15,7 +15,8 @@ This is a **massively consolidated and modular version** of the Flowchart Creati
 | **`graph.js`** | Graph initialization and management | ~200 lines | mxGraph |
 | **`nodes.js`** | Node creation and management | ~250 lines | graph.js |
 | **`ui.js`** | UI interactions and menus | ~300 lines | graph.js, nodes.js |
-| **`export.js`** | Import/export functionality | ~250 lines | graph.js |
+| **`exportsvg.js`** | SVG export functionality | ~250 lines | graph.js |
+| **`form-properties.js`** | Form properties management | ~200 lines | None |
 | **`settings.js`** | Settings and preferences | ~300 lines | None |
 | **`legend.js`** | Colors and sections | ~504 lines | graph.js |
 | **`calc.js`** | Calculation nodes | ~570 lines | graph.js |
@@ -52,7 +53,8 @@ script.js (Main Coordinator)
 ├── graph.js
 ├── nodes.js
 ├── ui.js
-├── export.js
+├── exportsvg.js
+├── form-properties.js
 ├── legend.js
 ├── calc.js
 └── library.js
@@ -61,7 +63,8 @@ Dependencies:
 - graph.js depends on mxGraph library
 - nodes.js depends on graph.js
 - ui.js depends on graph.js and nodes.js
-- export.js depends on graph.js
+- exportsvg.js depends on graph.js
+- form-properties.js has no dependencies
 - legend.js depends on graph.js
 - calc.js depends on graph.js
 - library.js depends on graph.js
@@ -109,12 +112,22 @@ Dependencies:
   - Copy/paste operations
   - Menu management
 
-### `export.js` - Import/Export
+### `exportsvg.js` - SVG Export
 - **Purpose**: Handles flowchart data import/export
 - **Formats**:
   - JSON export/import
   - PNG export
   - SVG export
+
+### `form-properties.js` - Form Properties
+- **Purpose**: Manages PDF form properties for GUI integration
+- **Features**:
+  - PDF form name management
+  - Output file name management
+  - Stripe price ID management
+  - Auto-sync between form name and file name
+  - Integration with GUI autopopulation
+  - Flowchart export/import support
 
 ### `settings.js` - Preferences
 - **Purpose**: Manages user preferences and settings
@@ -155,7 +168,8 @@ Dependencies:
 <script src="graph.js"></script>
 <script src="nodes.js"></script>
 <script src="ui.js"></script>
-<script src="export.js"></script>
+<script src="exportsvg.js"></script>
+<script src="form-properties.js"></script>
 <script src="legend.js"></script>
 <script src="calc.js"></script>
 <script src="library.js"></script>
@@ -190,7 +204,8 @@ Dependencies:
 ### 1. **Identify the Right Module**
 - **New node type?** → Add to `nodes.js`
 - **New UI element?** → Add to `ui.js`
-- **New export format?** → Add to `export.js`
+- **New export format?** → Add to `exportsvg.js`
+- **New form property?** → Add to `form-properties.js`
 - **New setting?** → Add to `settings.js`
 
 ### 2. **Follow Module Patterns**

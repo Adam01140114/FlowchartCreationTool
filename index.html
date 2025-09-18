@@ -11,8 +11,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <!-- PDF.js for PDF processing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -201,8 +199,6 @@
   <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
   <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button>
   <button id="downloadSvgBtn" onclick="downloadFlowchartSvg()">Download SVG</button>
-  <button id="uploadFlowchartDetailsBtn" onclick="showFlowchartDetailsModal()">Upload flowchart details</button>
-  <button id="uploadDocumentPdfBtn" onclick="showDocumentPdfModal()">Upload Document PDF</button>
   <br>
   <button id="logoutBtn">Logout</button>
 </div>
@@ -217,7 +213,6 @@
   <button id="yesNoNode">Yes/No</button>
   <button id="changeType">Change Type &raquo;</button>
   <button id="newSectionNode">New Section</button>
-  <button id="renameNode">Rename</button>
   <button id="propertiesButton">Properties</button>
 </div>
 
@@ -320,12 +315,46 @@
   </div>
   
   <div id="pdfProps" style="display: none;">
-    <p><strong>PDF Node:</strong>
-      <span id="propPdfNode" class="editable-field" tabindex="0"></span>
+    <p><strong>PDF Name (for cart display):</strong>
+      <span id="propPdfDisplayName" class="editable-field" tabindex="0"></span>
     </p>
     <p><strong>PDF Filename:</strong>
       <span id="propPdfFilename" class="editable-field" tabindex="0"></span>
     </p>
+    <p><strong>Price ID:</strong>
+      <span id="propPdfPriceId" class="editable-field" tabindex="0"></span>
+    </p>
+  </div>
+</div>
+
+<!-- PDF Properties Modal -->
+<div id="pdfPropertiesModal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 400px; padding: 20px;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h3 style="margin: 0; color: #333;">PDF Node Properties</h3>
+      <span class="close" onclick="closePdfPropertiesModal()" style="font-size: 24px; cursor: pointer; color: #999;">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 15px;">
+        <label for="pdfDisplayNameInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">PDF Name (for cart display):</label>
+        <input type="text" id="pdfDisplayNameInput" placeholder="Enter display name (e.g., Additional Form)" 
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+      </div>
+      <div style="margin-bottom: 15px;">
+        <label for="pdfFilenameInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">PDF Filename:</label>
+        <input type="text" id="pdfFilenameInput" placeholder="Enter PDF filename (e.g., additional_form.pdf)" 
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+      </div>
+      <div style="margin-bottom: 20px;">
+        <label for="pdfPriceIdInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Price ID:</label>
+        <input type="text" id="pdfPriceIdInput" placeholder="Enter Stripe Price ID (e.g., price_12345)" 
+               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button onclick="closePdfPropertiesModal()" style="padding: 8px 16px; border: 1px solid #ddd; background: #f5f5f5; border-radius: 4px; cursor: pointer;">Cancel</button>
+      <button onclick="savePdfProperties()" style="padding: 8px 16px; border: none; background: #007bff; color: white; border-radius: 4px; cursor: pointer;">Save</button>
+    </div>
   </div>
 </div>
 
@@ -364,89 +393,18 @@
 <!-- Hidden color picker for section border colors -->
 <input type="color" id="sectionColorPicker" style="display:none;" />
 
-<!-- Flowchart Details Modal -->
-<div id="flowchartDetailsModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Upload Flowchart Details</h3>
-      <button id="closeFlowchartDetailsModal" class="close-btn">&times;</button>
-    </div>
-    <div class="modal-body">
-      <p>Describe the flowchart you want to create. Be specific about sections, questions, and question types.</p>
-      <textarea id="flowchartDetailsInput" placeholder="Example: I want a flowchart with only one section called 'hunger assessment' and the only question will be a dropdown question called 'Hungry' with yes/no options." rows="6" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"></textarea>
-      <div style="margin-top: 15px;">
-        <button id="generateFlowchartBtn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Generate Flowchart</button>
-        <button id="downloadGeneratedJsonBtn" style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; display: none;">Download Generated JSON</button>
-        <button id="cancelFlowchartDetailsBtn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
-      </div>
-      <div id="flowchartGenerationStatus" style="margin-top: 15px; display: none;">
-        <p>Generating flowchart...</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Document PDF Modal -->
-<div id="documentPdfModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Upload Document PDF</h3>
-      <button id="closeDocumentPdfModal" class="close-btn">&times;</button>
-    </div>
-    <div class="modal-body">
-      <p>Upload a PDF document to automatically extract form structure and generate flowchart details.</p>
-      <input type="file" id="pdfFileInput" accept=".pdf" style="width: 100%; padding: 10px; border: 2px dashed #4CAF50; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; background-color: #f9f9f9; cursor: pointer;">
-      <div style="margin-top: 15px;">
-        <button id="processPdfBtn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Process PDF</button>
-        <button id="downloadPdfAnalysisBtn" style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; display: none;">Download Analysis</button>
-        <button id="downloadPdfAnalysisJsonBtn" style="background-color: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; display: none;">Download JSON</button>
-        <button id="cancelDocumentPdfBtn" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
-      </div>
-      <div id="pdfProcessingStatus" style="margin-top: 15px; display: none;">
-        <p>Processing PDF...</p>
-      </div>
-      <div id="pdfPreview" style="margin-top: 15px; display: none;">
-        <h4>PDF Preview:</h4>
-        <div id="pdfImagesContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #f9f9f9;"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-    <!-- API Configuration - loaded first (gitignored) -->
-    <script src="api-config.js"></script>
-    <!-- AI Features - loaded second -->
-    <script src="ai-features.js"></script>
-    <!-- Export functionality - loaded third -->
-    <script src="export.js"></script>
-    <!-- Auth functions - loaded fourth -->
-    <script src="auth.js"></script>
-<!-- Configuration and setup - loaded third -->
-<script src="config.js"></script>
-<!-- Shared dependencies - loaded third -->
-<script src="dependencies.js"></script>
-<!-- Node management functions - loaded fourth -->
-<script src="nodes.js"></script>
-<!-- Graph management - loaded fifth -->
-<script src="graph.js"></script>
-<!-- Calculation functions - loaded fifth -->
+<!-- Auth functions - loaded first -->
+<script src="auth.js"></script>
+<!-- Calculation functions - loaded second -->
 <script src="calc.js"></script>
-<!-- Question functions - loaded sixth -->
-<script src="questions.js"></script>
-<!-- Context menus - loaded seventh -->
-<script src="context-menus.js"></script>
-<!-- Properties panel - loaded eighth -->
-<script src="properties.js"></script>
-<!-- Event handlers - loaded ninth -->
-<script src="events.js"></script>
-<!-- Section/Legend functions - loaded tenth -->
+<!-- Section/Legend functions - loaded third -->
 <script src="legend.js"></script>
-<!-- Groups & Organization functions - loaded eleventh -->
-<script src="groups.js"></script>
-<!-- File I/O functions - loaded twelfth -->
+<!-- Form Properties module - loaded fourth -->
+<script src="form-properties.js"></script>
+<!-- File I/O functions - loaded fifth -->
 <script src="library.js"></script>
-<!-- URL sharing functions - loaded thirteenth -->
-<script src="url.js"></script>
+<!-- URL sharing functions - loaded sixth -->
+<script src="export.js"></script>
 <!-- Main script - loaded last -->
 <script src="script.js"></script>
 </body>

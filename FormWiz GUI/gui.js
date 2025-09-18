@@ -283,94 +283,6 @@ function updateAllChecklistLogicDropdowns() {
     });
 }
 
-// Function to update all conditional logic dropdowns
-function updateAllConditionalLogicDropdowns() {
-    // Find all conditional logic containers
-    const logicContainers = document.querySelectorAll('[id^="logicConditions"]');
-    
-    logicContainers.forEach(container => {
-        const questionId = container.id.replace('logicConditions', '');
-        const conditionRows = container.querySelectorAll('.logic-condition-row');
-        
-        conditionRows.forEach((row, index) => {
-            const conditionIndex = index + 1;
-            const prevQuestionInput = row.querySelector(`#prevQuestion${questionId}_${conditionIndex}`);
-            const prevAnswerSelect = row.querySelector(`#prevAnswer${questionId}_${conditionIndex}`);
-            
-            if (prevQuestionInput && prevAnswerSelect) {
-                const savedAnswer = prevAnswerSelect.value;
-                const savedQuestion = prevQuestionInput.value;
-                
-                // Only update if there's a question number entered
-                if (savedQuestion) {
-                    // Check if dropdown already has options (more than just "-- Select an answer --")
-                    const currentOptions = prevAnswerSelect.querySelectorAll('option');
-                    if (currentOptions.length <= 1) {
-                        // Only update if dropdown doesn't have options yet
-                        updateLogicAnswersForRow(questionId, conditionIndex);
-                    }
-                    // Restore the saved answer after updating dropdown options
-                    if (savedAnswer) {
-                        prevAnswerSelect.value = savedAnswer;
-                    }
-                }
-            }
-        });
-    });
-}
-
-// Function to update all alert logic dropdowns
-function updateAllAlertLogicDropdowns() {
-    // Find all alert logic containers
-    const alertLogicContainers = document.querySelectorAll('[id^="alertLogicConditions"]');
-    
-    alertLogicContainers.forEach(container => {
-        const questionId = container.id.replace('alertLogicConditions', '');
-        const conditionRows = container.querySelectorAll('.alert-logic-condition-row');
-        
-        conditionRows.forEach((row, index) => {
-            const conditionIndex = index + 1;
-            const prevQuestionInput = row.querySelector(`#alertPrevQuestion${questionId}_${conditionIndex}`);
-            const prevAnswerSelect = row.querySelector(`#alertPrevAnswer${questionId}_${conditionIndex}`);
-            
-            if (prevQuestionInput && prevAnswerSelect) {
-                const savedAnswer = prevAnswerSelect.value;
-                updateAlertLogicAnswersForRow(questionId, conditionIndex);
-                // Restore the saved answer after updating dropdown options
-                if (savedAnswer) {
-                    prevAnswerSelect.value = savedAnswer;
-                }
-            }
-        });
-    });
-}
-
-// Function to update all PDF logic dropdowns
-function updateAllPdfLogicDropdowns() {
-    // Find all PDF logic containers
-    const pdfLogicContainers = document.querySelectorAll('[id^="pdfLogicConditions"]');
-    
-    pdfLogicContainers.forEach(container => {
-        const questionId = container.id.replace('pdfLogicConditions', '');
-        const conditionRows = container.querySelectorAll('.pdf-logic-condition-row');
-        
-        conditionRows.forEach((row, index) => {
-            const conditionIndex = index + 1;
-            const prevQuestionInput = row.querySelector(`#pdfPrevQuestion${questionId}_${conditionIndex}`);
-            const prevAnswerSelect = row.querySelector(`#pdfPrevAnswer${questionId}_${conditionIndex}`);
-            
-            if (prevQuestionInput && prevAnswerSelect) {
-                const savedAnswer = prevAnswerSelect.value;
-                updatePdfLogicAnswersForRow(questionId, conditionIndex);
-                // Restore the saved answer after updating dropdown options
-                if (savedAnswer) {
-                    prevAnswerSelect.value = savedAnswer;
-                }
-            }
-        });
-    });
-}
-
 function updateSectionName(sectionId) {
     const sectionNameInput = document.getElementById(`sectionName${sectionId}`);
     const sectionLabel = document.getElementById(`sectionLabel${sectionId}`);
@@ -451,54 +363,34 @@ function addJumpCondition(questionId) {
     const existingConditions = jumpConditionsDiv.querySelectorAll('.jump-condition');
     const conditionId = existingConditions.length + 1;
     
-    // Check if this is a textbox or date question type
-    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
-    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
-    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
-    
     const conditionDiv = document.createElement('div');
     conditionDiv.className = 'jump-condition';
     conditionDiv.id = `jumpCondition${questionId}_${conditionId}`;
-    
-    if (isTextboxQuestion) {
-        // For textbox questions, skip the "If selected" dropdown
-        conditionDiv.innerHTML = `
-            <label>Jump to:</label>
-            <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
-            <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
-            <hr>
-        `;
-    } else {
-        // For other question types, keep the original structure
-        conditionDiv.innerHTML = `
-            <label>If selected:</label>
-            <select id="jumpOption${questionId}_${conditionId}">
-                <option value="" disabled selected>Select an option</option>
-            </select>
-            <label>Jump to:</label>
-            <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
-            <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
-            <hr>
-        `;
-    }
-    
+    conditionDiv.innerHTML = `
+        <label>If selected:</label>
+        <select id="jumpOption${questionId}_${conditionId}">
+            <option value="" disabled selected>Select an option</option>
+        </select>
+        <label>Jump to:</label>
+        <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
+        <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
+        <hr>
+    `;
     jumpConditionsDiv.appendChild(conditionDiv);
     
-    // Populate the jump options based on question type (skip for textbox questions)
-    if (!isTextboxQuestion) {
-        const questionTypeSelect = document.getElementById(`questionType${questionId}`);
-        if (questionTypeSelect) {
-            const questionType = questionTypeSelect.value;
-            
-            if (questionType === 'dropdown') {
-                updateJumpOptions(questionId, conditionId);
-            } else if (questionType === 'radio') {
-                updateJumpOptionsForRadio(questionId, conditionId);
-            } else if (questionType === 'checkbox') {
-                updateJumpOptionsForCheckbox(questionId, conditionId);
-            } else if (questionType === 'numberedDropdown') {
-                updateJumpOptionsForNumberedDropdown(questionId, conditionId);
-            }
+    // Populate the jump options based on question type
+    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
+    if (questionTypeSelect) {
+        const questionType = questionTypeSelect.value;
+        
+        if (questionType === 'dropdown') {
+            updateJumpOptions(questionId, conditionId);
+        } else if (questionType === 'radio') {
+            updateJumpOptionsForRadio(questionId, conditionId);
+        } else if (questionType === 'checkbox') {
+            updateJumpOptionsForCheckbox(questionId, conditionId);
+        } else if (questionType === 'numberedDropdown') {
+            updateJumpOptionsForNumberedDropdown(questionId, conditionId);
         }
     }
 }
@@ -506,30 +398,6 @@ function addJumpCondition(questionId) {
 function removeJumpCondition(questionId, conditionId) {
     const conditionDiv = document.getElementById(`jumpCondition${questionId}_${conditionId}`);
     if (conditionDiv) conditionDiv.remove();
-}
-
-// Update existing jump conditions to use simplified format for textbox and date questions
-function updateJumpConditionsForTextbox(questionId) {
-    const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
-    jumpConditions.forEach(condition => {
-        const conditionId = condition.id.split('_')[1];
-        const jumpToInput = document.getElementById(`jumpTo${questionId}_${conditionId}`);
-        
-        // If the condition has a dropdown (old format), convert it to simplified format
-        const selectElement = condition.querySelector('select');
-        if (selectElement) {
-            // Get the current "Jump to" value
-            const currentJumpTo = jumpToInput ? jumpToInput.value : '';
-            
-            // Replace the condition HTML with simplified format
-            condition.innerHTML = `
-                <label>Jump to:</label>
-                <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'" value="${currentJumpTo}">
-                <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
-                <hr>
-            `;
-        }
-    });
 }
 
 // This is the CORRECT version—supports multiple conditions.
@@ -601,12 +469,6 @@ function addQuestion(sectionId, questionId = null) {
             <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder">
         </div>
 
-        <!-- Line Limit for Big Paragraph -->
-        <div id="lineLimitOptions${currentQuestionId}" class="line-limit-options" style="display: none;">
-            <label>Line Limit: </label>
-            <input type="number" id="lineLimit${currentQuestionId}" placeholder="Enter line limit" min="1" max="100">
-        </div>
-
         <!-- Numbered Dropdown Options -->
         <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
             <label>Number Range: </label>
@@ -659,8 +521,6 @@ function addQuestion(sectionId, questionId = null) {
         
         <!-- Multiple Textboxes Options -->
         <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
-            <label>Node ID: </label>
-            <input type="text" id="multipleTextboxesNodeId${currentQuestionId}" placeholder="Enter custom node ID" oninput="updateMultipleTextboxesNodeId(${currentQuestionId})"><br><br>
             <label>Textboxes: </label>
             <div id="multipleTextboxesOptions${currentQuestionId}"></div>
             <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
@@ -711,6 +571,9 @@ function addQuestion(sectionId, questionId = null) {
             <label>Show this question if ANY of these conditions match:</label><br>
             <div id="pdfLogicConditions${currentQuestionId}"></div>
             <button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
+            <br><br>
+            <label>PDF Name (for cart display):</label>
+            <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}" placeholder="Enter display name (e.g., Additional Form)">
             <br><br>
             <label>Additional PDF to download:</label>
             <input type="text" id="pdfLogicPdfName${currentQuestionId}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
@@ -917,13 +780,11 @@ function toggleOptions(questionId) {
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
     const multipleTextboxesBlock = document.getElementById(`multipleTextboxesOptionsBlock${questionId}`);
     const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`);
-    const lineLimitOptionsBlock = document.getElementById(`lineLimitOptions${questionId}`);
     const dropdownImageBlock = document.getElementById(`dropdownImageBlock${questionId}`);
     const linkingLogicBlock = document.getElementById(`linkingLogicBlock${questionId}`);
 
     // Reset all blocks
     textboxOptionsBlock.style.display = 'none';
-    lineLimitOptionsBlock.style.display = 'none';
     optionsBlock.style.display = 'none';
     checkboxBlock.style.display = 'none';
     numberedDropdownBlock.style.display = 'none';
@@ -957,22 +818,12 @@ function toggleOptions(questionId) {
 
     switch (questionType) {
         case 'text':
-        case 'date':
-        case 'dateRange':
-            textboxOptionsBlock.style.display = 'block';
-            // Update existing jump conditions to use simplified format for textbox and date questions
-            updateJumpConditionsForTextbox(questionId);
-            break;
         case 'bigParagraph':
-            textboxOptionsBlock.style.display = 'block';
-            lineLimitOptionsBlock.style.display = 'block';
-            // Update existing jump conditions to use simplified format for textbox and date questions
-            updateJumpConditionsForTextbox(questionId);
-            break;
         case 'radio':
         case 'dropdown':
         case 'email':
         case 'phone':
+        case 'dateRange':
             textboxOptionsBlock.style.display = 'block';
             if (questionType === 'radio' || questionType === 'dropdown') {
                 if (questionType === 'dropdown') {
@@ -1020,8 +871,6 @@ function toggleOptions(questionId) {
 
         case 'money':
             textboxOptionsBlock.style.display = 'block';
-            // Update existing jump conditions to use simplified format for textbox questions
-            updateJumpConditionsForTextbox(questionId);
             break;
     }
 
@@ -1385,15 +1234,7 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
     const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
     if (!questionType) return;
 
-    // Reset the answer select to show it again (in case it was hidden for text questions)
-    answerSelect.style.display = 'block';
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
-    
-    // Remove any existing condition labels and hidden inputs for text questions
-    const existingLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
-    const existingHiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
-    if (existingLabel) existingLabel.remove();
-    if (existingHiddenInput) existingHiddenInput.remove();
 
     if (questionType === 'radio') {
         answerSelect.innerHTML += `
@@ -1446,29 +1287,25 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
                 answerSelect.appendChild(optionEl);
             }
         }
-    } else if (questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange') {
-        // For textbox, money, and date questions, hide the answer dropdown since they don't have predefined options
-        answerSelect.style.display = 'none';
-        
-        // Add a hidden input to store the condition value
-        let hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
-        if (!hiddenInput) {
-            hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.id = `hiddenAnswer${questionId}_${conditionIndex}`;
-            hiddenInput.value = 'Any Text'; // Default value for text questions
-            answerSelect.parentNode.appendChild(hiddenInput);
-        }
-        
-        // Add a label to indicate the condition
-        let conditionLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
-        if (!conditionLabel) {
-            conditionLabel = document.createElement('div');
-            conditionLabel.id = `conditionLabel${questionId}_${conditionIndex}`;
-            conditionLabel.style.cssText = 'margin: 5px 0; padding: 5px; background: #e8f4fd; border-radius: 4px; color: #1976d2; font-size: 14px;';
-            conditionLabel.textContent = 'Will trigger when any text is entered';
-            answerSelect.parentNode.insertBefore(conditionLabel, answerSelect);
-        }
+    } else if (questionType === 'text' || questionType === 'bigParagraph') {
+        // For textbox questions, add an "Any Text" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'Any Text';
+        optionEl.textContent = 'Any Text';
+        answerSelect.appendChild(optionEl);
+    } else if (questionType === 'money') {
+        // For money questions, add an "Any Amount" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'Any Amount';
+        optionEl.textContent = 'Any Amount';
+        answerSelect.appendChild(optionEl);
+        console.log('Money question selected, added "Any Amount" option');
+    } else if (questionType === 'date') {
+        // For date questions, add an "Any Date" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'Any Date';
+        optionEl.textContent = 'Any Date';
+        answerSelect.appendChild(optionEl);
     }
 }
 
@@ -1487,18 +1324,15 @@ function toggleJumpLogic(questionId) {
         if (jumpConditionsDiv && jumpConditionsDiv.children.length === 0) {
             addJumpCondition(questionId); // Add first condition automatically
             
-            // Make sure options are populated based on question type (skip for textbox and date questions)
-            const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
-            if (!isTextboxQuestion) {
-                if (questionType === 'numberedDropdown') {
-                    updateJumpOptionsForNumberedDropdown(questionId);
-                } else if (questionType === 'dropdown') {
-                    updateJumpOptions(questionId);
-                } else if (questionType === 'radio') {
-                    updateJumpOptionsForRadio(questionId);
-                } else if (questionType === 'checkbox') {
-                    updateJumpOptionsForCheckbox(questionId);
-                }
+            // Make sure options are populated based on question type
+            if (questionType === 'numberedDropdown') {
+                updateJumpOptionsForNumberedDropdown(questionId);
+            } else if (questionType === 'dropdown') {
+                updateJumpOptions(questionId);
+            } else if (questionType === 'radio') {
+                updateJumpOptionsForRadio(questionId);
+            } else if (questionType === 'checkbox') {
+                updateJumpOptionsForCheckbox(questionId);
             }
         } else if (questionType === 'numberedDropdown') {
             // If conditions already exist but we're re-enabling jump logic,
@@ -1857,28 +1691,6 @@ function addMultipleTextboxOption(questionId) {
         <hr>
     `;
     multipleTextboxesOptionsDiv.appendChild(optionDiv);
-    
-    // Update the Name/ID field with the custom Node ID if it exists
-    updateMultipleTextboxesNodeId(questionId);
-}
-
-// Function to update all textbox Name/ID fields with the custom Node ID
-function updateMultipleTextboxesNodeId(questionId) {
-    const nodeIdInput = document.getElementById(`multipleTextboxesNodeId${questionId}`);
-    if (!nodeIdInput) return;
-    
-    const customNodeId = nodeIdInput.value.trim();
-    if (!customNodeId) return;
-    
-    // Update all existing textbox Name/ID fields
-    const textboxOptions = document.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
-    textboxOptions.forEach((option, index) => {
-        const nameInput = option.querySelector(`input[id^="multipleTextboxName"]`);
-        if (nameInput && !nameInput.value.trim()) {
-            // Only update if the field is empty
-            nameInput.value = customNodeId;
-        }
-    });
 }
 
 function removeMultipleTextboxOption(questionId, optionNumber) {

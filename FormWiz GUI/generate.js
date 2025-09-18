@@ -72,12 +72,6 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
     // if the designer left the name blank, derive it from the label
     let namePart = (rawNameId || '').trim();
-    
-    // If nameId is provided and already contains the full identifier, use it directly
-    if (namePart && (namePart.startsWith(slugPrefix) || namePart.includes('_'))) {
-        return namePart;
-    }
-    
     if (!namePart){
         namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
@@ -1047,9 +1041,9 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "",
     "<!-- Firebase includes -->",
     '<script src="https://js.stripe.com/v3/"></script>',
-      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
-      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
-      '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
+    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
+    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     '<script src="cart.js"></script>',
     "",
     '<script>',
@@ -1150,16 +1144,6 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '    </div>',
-    '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
-    '        <div style="flex: 1;">',
-    '            <label for="user_fullname" style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name</label>',
-    '            <input type="text" form="customForm" id="user_fullname" name="user_fullname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '        <div style="flex: 1;">',
-    '            <label for="user_date" style="display: block; margin-bottom: 5px; font-weight: bold;">Date</label>',
-    '            <input type="text" form="customForm" id="user_date" name="user_date" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '    </div>',
     '    <div style="margin-bottom: 15px;">',
     '        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>',
     '        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
@@ -1208,6 +1192,9 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
   const pdfOutputNameInputEl = document.getElementById("pdfOutputName");
   const pdfOutputName = pdfOutputNameInputEl && pdfOutputNameInputEl.value.trim() ? pdfOutputNameInputEl.value.trim() : "example.html";
   const escapedPdfOutputName = pdfOutputName.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+  // Set window.formId to use the PDF name (without .pdf extension) for cart and form identification
+  window.formId = pdfFormName.replace(/\.pdf$/i, '');
 
   // Get the Stripe Price ID
   const stripePriceIdInputEl = document.getElementById("stripePriceId");
@@ -1348,30 +1335,14 @@ questionSlugMap[questionId] = slug;
         jumpConditions.forEach((condition) => {
           const jumpOptionEl = condition.querySelector("select");
           const jumpToEl = condition.querySelector('input[type="text"]');
-          
-          // For textbox and date questions, we only need the jumpTo field (no dropdown)
-          const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
-          
-          if (jumpToEl && jumpToEl.value.trim()) {
-            if (isTextboxQuestion) {
-              // For textbox questions, use "Any Text" as the jump option
-              jumpLogics.push({
-                questionId: questionId,
-                questionType: questionType,
-                jumpOption: "Any Text",
-                jumpTo: jumpToEl.value.trim(),
-                section: s,
-              });
-            } else if (jumpOptionEl && jumpOptionEl.value.trim()) {
-              // For other question types, require both dropdown and jumpTo
-              jumpLogics.push({
-                questionId: questionId,
-                questionType: questionType,
-                jumpOption: jumpOptionEl.value.trim(),
-                jumpTo: jumpToEl.value.trim(),
-                section: s,
-              });
-            }
+          if (jumpOptionEl && jumpToEl && jumpToEl.value.trim()) {
+            jumpLogics.push({
+              questionId: questionId,
+              questionType: questionType,
+              jumpOption: jumpOptionEl.value.trim(),
+              jumpTo: jumpToEl.value.trim(),
+              section: s,
+            });
           }
         });
       }
@@ -1475,16 +1446,12 @@ questionSlugMap[questionId] = slug;
           }
         }
         
-        // Check if this question has a line limit
-        const lineLimitEl = qBlock.querySelector("#lineLimit" + questionId);
-        const lineLimit = lineLimitEl && lineLimitEl.value ? parseInt(lineLimitEl.value) : null;
-        
         if (hasPdfLogic && characterLimits.length > 0) {
           const maxLimit = Math.max(...characterLimits);
           formHTML += `
             <div class="big-paragraph-container">
               <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
-                        oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
+                        maxlength="${maxLimit * 2}" oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
               <div class="character-count" id="charCount_${nameId2}">
                 <span class="current-count">0</span> / <span class="limit-display">${maxLimit}</span> characters
               </div>
@@ -1508,91 +1475,6 @@ questionSlugMap[questionId] = slug;
                     countDisplay.style.color = '#ffa726';
                   } else {
                     countDisplay.style.color = '#666';
-                  }
-                }
-              }
-            </script>
-          `;
-        } else if (lineLimit) {
-          // Generate textarea with line limit functionality
-          formHTML += `
-            <div class="text-input-container">
-              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
-                        oninput="handleLineLimitOverflow('${nameId2}', ${lineLimit})"></textarea>
-            </div>
-            <script>
-              function handleLineLimitOverflow(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                if (!textarea) return;
-                
-                const text = textarea.value;
-                const textLength = text.length;
-                
-                // If text is within limit, clear any overflow fields
-                if (textLength <= lineLimit) {
-                  clearOverflowFields(textareaId);
-                  return;
-                }
-                
-                // Distribute text across main and overflow fields
-                distributeTextAcrossFields(textareaId, text, lineLimit);
-              }
-              
-              function clearOverflowFields(baseId) {
-                let fieldIndex = 2;
-                while (true) {
-                  const overflowField = document.getElementById(baseId + '_' + fieldIndex);
-                  if (overflowField) {
-                    overflowField.value = '';
-                    fieldIndex++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-              
-              function distributeTextAcrossFields(baseId, text, lineLimit) {
-                const mainField = document.getElementById(baseId);
-                if (!mainField) return;
-                
-                // Keep the full text in the main field for user to see and edit
-                // Don't modify mainField.value - let user see their full text
-                
-                // Distribute text across overflow fields for form submission
-                let remainingText = text;
-                let fieldIndex = 2;
-                
-                // Start from the beginning and distribute in chunks
-                while (remainingText.length > 0) {
-                  const overflowFieldId = baseId + '_' + fieldIndex;
-                  let overflowField = document.getElementById(overflowFieldId);
-                  
-                  // Create overflow field if it doesn't exist
-                  if (!overflowField) {
-                    overflowField = document.createElement('input');
-                    overflowField.type = 'hidden';
-                    overflowField.id = overflowFieldId;
-                    overflowField.name = overflowFieldId;
-                    mainField.parentNode.appendChild(overflowField);
-                  }
-                  
-                  // Fill this overflow field with up to lineLimit characters
-                  const fieldText = remainingText.substring(0, lineLimit);
-                  overflowField.value = fieldText;
-                  
-                  // Move to next field
-                  remainingText = remainingText.substring(lineLimit);
-                  fieldIndex++;
-                }
-                
-                // Clear any remaining overflow fields that are no longer needed
-                while (true) {
-                  const overflowField = document.getElementById(baseId + '_' + fieldIndex);
-                  if (overflowField) {
-                    overflowField.value = '';
-                    fieldIndex++;
-                  } else {
-                    break;
                   }
                 }
               }
@@ -1886,10 +1768,6 @@ formHTML += `</div><br></div>`;
             textboxInputs.push(dEl);
           }
         }
-        // Get custom Node ID if it exists
-        const nodeIdInput = qBlock.querySelector(`#multipleTextboxesNodeId${questionId}`);
-        const customNodeId = nodeIdInput ? nodeIdInput.value.trim() : "";
-        
         // Render textboxes
         for (let mb = 0; mb < textboxInputs.length; mb++) {
           const dEl = textboxInputs[mb];
@@ -1903,20 +1781,10 @@ formHTML += `</div><br></div>`;
             `#multipleTextboxPlaceholder${questionId}_${mb + 1}`
           );
           const lblVal = lblInput ? lblInput.value.trim() : "";
-          const rawNmVal = nmInput ? nmInput.value.trim() : "";
+          const nmVal = nmInput
+            ? nmInput.value.trim()
+            : "answer" + questionId + "_" + (mb + 1);
           const phVal = phInput ? phInput.value.trim() : "";
-          
-          // Build proper ID using custom Node ID if available, otherwise use question slug + textbox name
-          let nmVal;
-          if (customNodeId && rawNmVal) {
-            nmVal = `${customNodeId}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-          } else if (customNodeId) {
-            nmVal = `${customNodeId}_${mb + 1}`;
-          } else {
-            const questionSlug = questionSlugMap[questionId] || ('answer' + questionId);
-            nmVal = rawNmVal ? `${questionSlug}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : `${questionSlug}_${mb + 1}`;
-          }
-          
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
@@ -1935,13 +1803,10 @@ formHTML += `</div><br></div>`;
             `#multipleAmountPlaceholder${questionId}_${ab + 1}`
           );
           const lblVal = lblInput ? lblInput.value.trim() : "";
-          const rawNmVal = nmInput ? nmInput.value.trim() : "";
+          const nmVal = nmInput
+            ? nmInput.value.trim()
+            : "amount" + questionId + "_" + (ab + 1);
           const phVal = phInput ? phInput.value.trim() : "";
-          
-          // Build proper ID using question slug + amount name
-          const questionSlug = questionSlugMap[questionId] || ('answer' + questionId);
-          const nmVal = rawNmVal ? `${questionSlug}_${rawNmVal.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : `${questionSlug}_amount_${ab + 1}`;
-          
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
@@ -2004,22 +1869,10 @@ formHTML += `</div><br></div>`;
               "#prevAnswer" + questionId + "_" + rowIndex
             );
 
-            if (!pqEl) continue;
+            if (!pqEl || !paEl) continue;
             const pqVal = pqEl.value.trim();
-            if (!pqVal) continue;
-            
-            // Handle text questions with hidden inputs
-            let paVal = "";
-            if (paEl && paEl.style.display === 'none') {
-                // For text questions, get the value from the hidden input
-                const hiddenInput = document.getElementById("hiddenAnswer" + questionId + "_" + rowIndex);
-                paVal = hiddenInput ? hiddenInput.value.trim().toLowerCase() : "any text";
-            } else if (paEl) {
-                // For other question types, get the value from the select dropdown
-                paVal = paEl.value.trim().toLowerCase();
-            }
-            
-            if (!paVal) continue;
+            const paVal = paEl.value.trim().toLowerCase();
+            if (!pqVal || !paVal) continue;
 
             const pType = questionTypesMap[pqVal] || "text";
 
@@ -2035,10 +1888,6 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
             logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
-            logicScriptBuffer += `    } else if(cPrevType==="dateRange"){\n`;
-            logicScriptBuffer += `      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");\n`;
-            logicScriptBuffer += `      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");\n`;
-            logicScriptBuffer += `      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }\n`;
             logicScriptBuffer += `    } else {\n`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
@@ -2082,17 +1931,6 @@ formHTML += `</div><br></div>`;
               logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
-            } else if (pType2 === "dateRange") {
-              // Use "change" event for date range inputs
-              logicScriptBuffer += ` (function(){\n`;
-              // Use explicit question ID reference
-              logicScriptBuffer += `   var dateRangeQuestion = "${pqVal2}";\n`;
-              // Add listeners to both start and end date inputs
-              logicScriptBuffer += `   var startDateEl = document.getElementById(questionNameIds[dateRangeQuestion] + "_1");\n`;
-              logicScriptBuffer += `   var endDateEl = document.getElementById(questionNameIds[dateRangeQuestion] + "_2");\n`;
-              logicScriptBuffer += `   if(startDateEl){ startDateEl.addEventListener("change", function(){ updateVisibility();});}\n`;
-              logicScriptBuffer += `   if(endDateEl){ endDateEl.addEventListener("change", function(){ updateVisibility();});}\n`;
-              logicScriptBuffer += ` })();\n`;
             } else {
               // Use "input" event for text fields
               logicScriptBuffer += ` (function(){\n`;
@@ -2118,6 +1956,8 @@ formHTML += `</div><br></div>`;
         const pdfLogicRows = qBlock.querySelectorAll(".pdf-logic-condition-row");
         const pdfLogicPdfNameEl = qBlock.querySelector("#pdfLogicPdfName" + questionId);
         const pdfLogicPdfName = pdfLogicPdfNameEl ? pdfLogicPdfNameEl.value.trim() : "";
+        const pdfLogicPdfDisplayNameEl = qBlock.querySelector("#pdfLogicPdfDisplayName" + questionId);
+        const pdfLogicPdfDisplayName = pdfLogicPdfDisplayNameEl ? pdfLogicPdfDisplayNameEl.value.trim() : "";
         const pdfLogicStripePriceIdEl = qBlock.querySelector("#pdfLogicStripePriceId" + questionId);
         const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
         
@@ -2126,6 +1966,7 @@ formHTML += `</div><br></div>`;
           pdfLogicPDFs.push({
             questionId: questionId,
             pdfName: pdfLogicPdfName,
+            pdfDisplayName: pdfLogicPdfDisplayName || pdfLogicPdfName.replace(/\.pdf$/i, ''),
             stripePriceId: pdfLogicStripePriceId,
             conditions: [],
             isBigParagraph: questionType === "bigParagraph"
@@ -2389,7 +2230,6 @@ if (s > 1){
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
-    margin-bottom: 20px;
   }
   
   .alert-close-btn:hover {
@@ -2398,7 +2238,6 @@ if (s > 1){
   }
   
   .alert-message {
-    margin-top: 20px;
     margin-bottom: 28px;
     font-size: 1.08rem;
     line-height: 1.5;
@@ -2413,27 +2252,37 @@ if (s > 1){
   
   .alert-buttons {
     display: flex;
+    gap: 18px;
     justify-content: center;
   }
   
   .alert-btn {
-    padding: 12px 32px;
+    padding: 8px 22px;
     border-radius: 6px;
     border: none;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
-    min-width: 120px;
+    min-width: 100px;
   }
   
-  .alert-btn-continue {
+  .alert-btn-back {
     background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
     color: #fff;
   }
   
-  .alert-btn-continue:hover {
+  .alert-btn-back:hover {
     background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
+  }
+  
+  .alert-btn-exit {
+    background: #e74c3c;
+    color: #fff;
+  }
+  
+  .alert-btn-exit:hover {
+    background: #c0392b;
   }
   </style>
   
@@ -2442,7 +2291,8 @@ if (s > 1){
       <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
-        <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
+        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
+        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
       </div>
     </div>
   </div>
@@ -2450,6 +2300,9 @@ if (s > 1){
 
   // Now we place ONE <script> block for everything:
   formHTML += "\n<script>\n";
+  
+  // Set window.formId to the PDF name (without .pdf extension) for cart and form identification
+  formHTML += `window.formId = '${escapedPdfFormName.replace(/\.pdf$/i, '')}';\n`;
   
  formHTML += `
 /*───────────────────────────────*
@@ -2467,12 +2320,6 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
-    
-    // If nameId is provided and already contains the full identifier, use it directly
-    if (namePart && (namePart.startsWith(slugPrefix) || namePart.includes('_'))) {
-        return namePart;
-    }
-    
     if (!namePart){
         namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
@@ -2501,7 +2348,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId");
+      const formId = urlParams.get("formId") || window.formId || 'default';
       let userId = null;
       firebase.auth().onAuthStateChanged(async function(user){
           if(user){ 
@@ -2512,142 +2359,14 @@ function buildCheckboxName (questionId, rawNameId, labelText){
                   const userDoc = await db.collection('users').doc(user.uid).get();
                   if(userDoc.exists) {
                       const userData = userDoc.data();
-                      
-                      // Wait for DOM to be ready before populating fields
-                      setTimeout(() => {
-                          console.log('=== DEBUGGING USER DATA AUTOFILL ===');
-                          console.log('User data:', userData);
-                          console.log('First name:', userData.firstName);
-                          console.log('Last name:', userData.lastName);
-                          
-                          // Show the user information section first
-                          const userInfoSection = document.querySelector('div[style*="display: none"]');
-                          if (userInfoSection && userInfoSection.innerHTML.includes('Your Information')) {
-                              console.log('Found hidden user info section, making it visible');
-                              userInfoSection.style.display = 'block';
-                          }
-                          
-                          const firstNameField = document.getElementById('user_firstname');
-                          const lastNameField = document.getElementById('user_lastname');
-                          
-                          if (firstNameField) {
-                              firstNameField.value = userData.firstName || '';
-                              console.log('Set user_firstname to:', firstNameField.value);
-                          } else {
-                              console.log('user_firstname field not found');
-                          }
-                          
-                          if (lastNameField) {
-                              lastNameField.value = userData.lastName || '';
-                              console.log('Set user_lastname to:', lastNameField.value);
-                          } else {
-                              console.log('user_lastname field not found');
-                          }
-                          
-                      // Debug and populate user_fullname
-                      const fullNameField = document.getElementById('user_fullname');
-                      if (fullNameField) {
-                          const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
-                          fullNameField.value = fullName.trim();
-                          console.log('Set user_fullname to:', fullName.trim());
-                          alert('DEBUG: First Name: ' + (userData.firstName || 'N/A') + ', Last Name: ' + (userData.lastName || 'N/A') + ', Full Name: ' + fullName.trim());
-                      } else {
-                          console.log('user_fullname field not found');
-                          alert('DEBUG: user_fullname field not found');
-                      }
-                      
-                      // Debug and populate user_date
-                      const dateField = document.getElementById('user_date');
-                      if (dateField) {
-                          const today = new Date().toLocaleDateString();
-                          dateField.value = today;
-                          console.log('Set user_date to:', today);
-                          alert('DEBUG: Date set to: ' + today);
-                      } else {
-                          console.log('user_date field not found');
-                          alert('DEBUG: user_date field not found');
-                      }
-                          document.getElementById('user_email').value = userData.email || '';
-                          
-                          // Update hidden fields
-                          document.getElementById('user_firstname_hidden').value = userData.firstName || '';
-                          document.getElementById('user_lastname_hidden').value = userData.lastName || '';
-                          
-                      // Debug and populate hidden user_fullname
-                      const fullNameHiddenField = document.getElementById('user_fullname_hidden');
-                      if (fullNameHiddenField) {
-                          const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
-                          fullNameHiddenField.value = fullName.trim();
-                          console.log('Set user_fullname_hidden to:', fullName.trim());
-                          alert('DEBUG: Hidden Full Name set to: ' + fullName.trim());
-                      } else {
-                          console.log('user_fullname_hidden field not found');
-                          alert('DEBUG: user_fullname_hidden field not found');
-                      }
-                      
-                      // Debug and populate hidden user_date
-                      const dateHiddenField = document.getElementById('user_date_hidden');
-                      if (dateHiddenField) {
-                          const today = new Date().toLocaleDateString();
-                          dateHiddenField.value = today;
-                          console.log('Set user_date_hidden to:', today);
-                          alert('DEBUG: Hidden Date set to: ' + today);
-                      } else {
-                          console.log('user_date_hidden field not found');
-                          alert('DEBUG: user_date_hidden field not found');
-                      }
-                      
-                      console.log('=== END USER DATA AUTOFILL DEBUG ===');
-                          document.getElementById('user_phone').value = userData.phone || '';
-                          document.getElementById('user_street').value = userData.address?.street || '';
-                          document.getElementById('user_city').value = userData.address?.city || '';
-                          document.getElementById('user_state').value = userData.address?.state || '';
-                          document.getElementById('user_zip').value = userData.address?.zip || '';
-                          
-                          // Add event listeners to update full name when first/last name changes
-                          const firstNameField = document.getElementById('user_firstname');
-                          const lastNameField = document.getElementById('user_lastname');
-                          const fullNameField = document.getElementById('user_fullname');
-                          const fullNameHiddenField = document.getElementById('user_fullname_hidden');
-                          
-                          function updateFullName() {
-                              const firstName = firstNameField.value || '';
-                              const lastName = lastNameField.value || '';
-                              const fullName = (firstName + ' ' + lastName).trim();
-                              fullNameField.value = fullName;
-                              if (fullNameHiddenField) fullNameHiddenField.value = fullName;
-                          }
-                          
-                          if (firstNameField) firstNameField.addEventListener('input', updateFullName);
-                          if (lastNameField) lastNameField.addEventListener('input', updateFullName);
-                          
-                          // Add event listeners to update hidden fields when visible fields change
-                          const fields = [
-                              { visible: 'user_firstname', hidden: 'user_firstname_hidden' },
-                              { visible: 'user_lastname', hidden: 'user_lastname_hidden' },
-                              { visible: 'user_fullname', hidden: 'user_fullname_hidden' },
-                              { visible: 'user_date', hidden: 'user_date_hidden' },
-                              { visible: 'user_email', hidden: 'user_email_hidden' },
-                              { visible: 'user_phone', hidden: 'user_phone_hidden' },
-                              { visible: 'user_street', hidden: 'user_street_hidden' },
-                              { visible: 'user_city', hidden: 'user_city_hidden' },
-                              { visible: 'user_state', hidden: 'user_state_hidden' },
-                              { visible: 'user_zip', hidden: 'user_zip_hidden' }
-                          ];
-                          
-                          fields.forEach(field => {
-                              const visibleField = document.getElementById(field.visible);
-                              const hiddenField = document.getElementById(field.hidden);
-                              if (visibleField && hiddenField) {
-                                  visibleField.addEventListener('input', () => {
-                                      hiddenField.value = visibleField.value;
-                                  });
-                                  visibleField.addEventListener('change', () => {
-                                      hiddenField.value = visibleField.value;
-                                  });
-                              }
-                          });
-                      }, 500); // Wait 500ms for DOM to be ready
+                      document.getElementById('user_firstname').value = userData.firstName || '';
+                      document.getElementById('user_lastname').value = userData.lastName || '';
+                      document.getElementById('user_email').value = userData.email || '';
+                      document.getElementById('user_phone').value = userData.phone || '';
+                      document.getElementById('user_street').value = userData.address?.street || '';
+                      document.getElementById('user_city').value = userData.address?.city || '';
+                      document.getElementById('user_state').value = userData.address?.state || '';
+                      document.getElementById('user_zip').value = userData.address?.zip || '';
                   }
               } catch(error) {
                   console.error("Error fetching user data:", error);
@@ -2664,7 +2383,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let isUserLoggedIn = false;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId");
+      const formId = urlParams.get("formId") || window.formId || 'default';
     `;
   }
 
@@ -2712,7 +2431,7 @@ formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditional
   formHTML += logicScriptBuffer + "\n";
 
   // Add alert functions (always available for validation popups)
-    formHTML += `
+  formHTML += `
 // Alert Logic Functions
 function showAlert(message) {
     const alertOverlay = document.getElementById('alertOverlay');
@@ -2725,7 +2444,7 @@ function showAlert(message) {
             alertMessage.innerHTML = message;
         } else {
             // This is a regular text alert
-        alertMessage.textContent = message;
+            alertMessage.textContent = message;
         }
         alertOverlay.style.display = 'flex';
     }
@@ -2748,7 +2467,7 @@ function exitForm() {
         }
     } else {
         // This is a regular alert - reload the page
-    window.location.reload();
+        window.location.reload();
     }
 }
 
@@ -2767,40 +2486,8 @@ function showValidationPopup() {
   // Add alert logic functions only if alert logics are enabled
   if (alertLogics.length > 0) {
     formHTML += `
-// Initialize autofill flag and alert delay
-window.isAutofilling = false;
-window.alertsDisabled = true;
-
-// Enable alerts after 5 seconds
-setTimeout(() => {
-    window.alertsDisabled = false;
-    console.log('Alerts enabled after 5-second delay');
-}, 5000);
-
 function checkAlertLogic(changedElement) {
-    console.log('checkAlertLogic called for element:', changedElement ? changedElement.id : 'unknown');
-    if (!alertLogics || alertLogics.length === 0) {
-        console.log('No alert logics found');
-        return;
-    }
-    
-    // Don't show alerts during the first 5 seconds after page load
-    if (window.alertsDisabled) {
-        console.log('Alert blocked - still within 5-second delay period');
-        return;
-    }
-    
-    // Don't show alerts during autofill process
-    if (window.isAutofilling) {
-        console.log('Alert blocked during autofill');
-        return;
-    }
-    
-    // Additional safety check - don't show alerts if the element was just programmatically set
-    if (changedElement && changedElement.dataset && changedElement.dataset.autofilled === 'true') {
-        console.log('Alert blocked for autofilled element');
-        return;
-    }
+    if (!alertLogics || alertLogics.length === 0) return;
     
     // Get the question ID from the changed element
     let changedQuestionId = null;
@@ -2815,19 +2502,22 @@ function checkAlertLogic(changedElement) {
         }
     }
     
-    // Only check alert logic if we can identify which question changed
-    if (!changedQuestionId) return;
-    
     for (const alertLogic of alertLogics) {
         if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
         
-        // Only check this alert logic if it's specifically for the changed question
+        // Only check this alert logic if it's related to the changed element
         let shouldCheckThisAlert = false;
-        for (const condition of alertLogic.conditions) {
-            if (condition.prevQuestion === changedQuestionId) {
-                shouldCheckThisAlert = true;
-                break;
+        if (changedQuestionId) {
+            // Check if any condition in this alert logic references the changed question
+            for (const condition of alertLogic.conditions) {
+                if (condition.prevQuestion === changedQuestionId) {
+                    shouldCheckThisAlert = true;
+                    break;
+                }
             }
+        } else {
+            // If we can't determine which question changed, check all alerts (fallback)
+            shouldCheckThisAlert = true;
         }
         
         if (!shouldCheckThisAlert) continue;
@@ -2838,9 +2528,6 @@ function checkAlertLogic(changedElement) {
         for (const condition of alertLogic.conditions) {
             const prevQuestionId = condition.prevQuestion;
             const prevAnswer = condition.prevAnswer;
-            
-            // Only check conditions for the question that actually changed
-            if (prevQuestionId !== changedQuestionId) continue;
             
             // Get the previous question's value
             const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
@@ -2871,8 +2558,15 @@ function checkAlertLogic(changedElement) {
     }
 }
 
-// Initialize checkbox styling for beautiful blue borders on DOM load
+// Add event listeners for alert logic
 document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('change', function() { checkAlertLogic(this); });
+        element.addEventListener('input', function() { checkAlertLogic(this); });
+    });
+    
+    // Initialize checkbox styling for beautiful blue borders
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         updateCheckboxStyle(checkbox);
@@ -2922,7 +2616,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -2984,7 +2678,7 @@ window.addFormToCart = function (priceId) {
         if (shouldAddToCart) {
           pdfLogicItems.push({
             formId: (window.formId || 'custom-form') + '_' + pdfLogic.questionId,
-            title: pdfLogic.pdfName.replace(/\\.pdf$/i, ''),
+            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
             formData: formData,
             countyName: countyName,
@@ -3465,9 +3159,6 @@ function addValidationListeners() {
 document.addEventListener('DOMContentLoaded', function() {
     addValidationListeners();
     
-    // Initialize hidden checkboxes for all dropdowns
-    initializeDropdownHiddenCheckboxes();
-    
     // Trigger visibility updates on DOM load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -3490,138 +3181,8 @@ document.addEventListener('DOMContentLoaded', function() {
         attributes: true,
         subtree: true
     });
-    
-    // Add Ctrl+Shift debug feature
-    addDebugKeyboardShortcut();
 });
 
-// Debug feature: Show all question and option IDs when pressing Ctrl+Shift
-function addDebugKeyboardShortcut() {
-    document.addEventListener('keydown', function(e) {
-        // Check for Ctrl+Shift combination
-        if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
-            e.preventDefault();
-            showQuestionIdsDebug();
-        }
-    });
-}
-
-function showQuestionIdsDebug() {
-    const form = document.getElementById('customForm');
-    if (!form) return;
-    
-    const allElements = form.querySelectorAll('input, select, textarea');
-    const questionIds = [];
-    const optionIds = [];
-    const otherIds = [];
-    
-    allElements.forEach(element => {
-        if (element.name && element.id) {
-            const elementInfo = {
-                id: element.id,
-                name: element.name,
-                type: element.type || element.tagName.toLowerCase(),
-                value: element.value || (element.checked ? 'checked' : 'unchecked')
-            };
-            
-            // Categorize based on naming patterns
-            if (element.id.startsWith('answer') || element.name.startsWith('answer')) {
-                questionIds.push(elementInfo);
-            } else if (element.id.includes('_') || element.name.includes('_')) {
-                optionIds.push(elementInfo);
-            } else {
-                otherIds.push(elementInfo);
-            }
-        }
-    });
-    
-    // Create debug modal
-    const modal = document.createElement('div');
-    modal.id = 'debugModal';
-    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: "Courier New", monospace;';
-    
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = 'background: white; border-radius: 8px; padding: 20px; max-width: 80%; max-height: 80%; overflow-y: auto; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);';
-    
-    let html = '<h2 style="margin-top: 0; color: #2c3e50;">🔍 Form Debug: All Question & Option IDs</h2>';
-    html += '<p style="color: #7f8c8d; margin-bottom: 20px;">Press Ctrl+Shift again or click outside to close</p>';
-    
-    // Questions section
-    if (questionIds.length > 0) {
-        html += '<h3 style="color: #2980b9; border-bottom: 2px solid #2980b9; padding-bottom: 5px;">📝 Questions (' + questionIds.length + ')</h3>';
-        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-        questionIds.forEach(item => {
-            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #2980b9;">';
-            html += '<strong>ID:</strong> ' + item.id + '<br>';
-            html += '<strong>Name:</strong> ' + item.name + '<br>';
-            html += '<strong>Type:</strong> ' + item.type + '<br>';
-            html += '<strong>Value:</strong> ' + item.value;
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    // Options section
-    if (optionIds.length > 0) {
-        html += '<h3 style="color: #27ae60; border-bottom: 2px solid #27ae60; padding-bottom: 5px;">☑️ Options (' + optionIds.length + ')</h3>';
-        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-        optionIds.forEach(item => {
-            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #27ae60;">';
-            html += '<strong>ID:</strong> ' + item.id + '<br>';
-            html += '<strong>Name:</strong> ' + item.name + '<br>';
-            html += '<strong>Type:</strong> ' + item.type + '<br>';
-            html += '<strong>Value:</strong> ' + item.value;
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    // Other elements section
-    if (otherIds.length > 0) {
-        html += '<h3 style="color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 5px;">🔧 Other Elements (' + otherIds.length + ')</h3>';
-        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-        otherIds.forEach(item => {
-            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #e74c3c;">';
-            html += '<strong>ID:</strong> ' + item.id + '<br>';
-            html += '<strong>Name:</strong> ' + item.name + '<br>';
-            html += '<strong>Type:</strong> ' + item.type + '<br>';
-            html += '<strong>Value:</strong> ' + item.value;
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    // Summary
-    const totalElements = questionIds.length + optionIds.length + otherIds.length;
-    html += '<div style="background: #2c3e50; color: white; padding: 15px; border-radius: 4px; text-align: center;">';
-    html += '<strong>Total Elements: ' + totalElements + '</strong><br>';
-    html += '<small>Questions: ' + questionIds.length + ' | Options: ' + optionIds.length + ' | Other: ' + otherIds.length + '</small>';
-    html += '</div>';
-    
-    modalContent.innerHTML = html;
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-    
-    // Close modal on click outside or Ctrl+Shift
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeDebugModal();
-        }
-    });
-    
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeDebugModal();
-        }
-    });
-    
-    function closeDebugModal() {
-        if (modal && modal.parentNode) {
-            modal.parentNode.removeChild(modal);
-        }
-    }
-}
 
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
@@ -3710,61 +3271,6 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     }
 }
 
-/*──────────────────────────────────────────────────────────────*
- * Update hidden checkboxes for dropdown options
- *──────────────────────────────────────────────────────────────*/
-function updateHiddenDropdownCheckboxes(baseName, selectedValue) {
-    // Find the dropdown element to get its options
-    const dropdown = document.getElementById(baseName);
-    if (!dropdown || dropdown.tagName !== 'SELECT') return;
-    
-    // Get all options from the dropdown
-    const options = Array.from(dropdown.options).filter(option => option.value.trim() !== '');
-    
-    // For each option, create or update the corresponding hidden checkbox
-    options.forEach(option => {
-        const optionValue = option.value.trim();
-        if (!optionValue) return;
-        
-        // Create checkbox ID based on the option value
-        const checkboxId = baseName + "_" + optionValue.replace(/\W+/g, "_").toLowerCase();
-        
-        // Check if checkbox already exists
-        let checkbox = document.getElementById(checkboxId);
-        
-        if (!checkbox) {
-            // Create the hidden checkbox if it doesn't exist
-            checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = checkboxId;
-            checkbox.name = checkboxId;
-            checkbox.style.display = 'none';
-            
-            // Add it to the form or a hidden container
-            const form = document.getElementById('customForm');
-            if (form) {
-                form.appendChild(checkbox);
-            }
-        }
-        
-        // Set the checkbox state based on whether this option is selected
-        checkbox.checked = (optionValue === selectedValue);
-    });
-}
-
-/*──────────────────────────────────────────────────────────────*
- * Initialize hidden checkboxes for all dropdowns on page load
- *──────────────────────────────────────────────────────────────*/
-function initializeDropdownHiddenCheckboxes() {
-    // Find all dropdown elements in the form
-    const dropdowns = document.querySelectorAll('#customForm select');
-    
-    dropdowns.forEach(dropdown => {
-        // Initialize hidden checkboxes for this dropdown
-        updateHiddenDropdownCheckboxes(dropdown.id, dropdown.value);
-    });
-}
-
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
 function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById("dropdowntext_"+baseName);
@@ -3773,8 +3279,6 @@ function dropdownMirror(selectEl, baseName){
     const val = selectEl.value.trim();
     if(!val) {
         wrap.innerHTML = "";
-        // Uncheck all hidden checkboxes when no option is selected
-        updateHiddenDropdownCheckboxes(baseName, "");
         return;
     }
 
@@ -3798,10 +3302,6 @@ function dropdownMirror(selectEl, baseName){
                      "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
     
     wrap.appendChild(checkboxDiv);
-    
-    // Update hidden checkboxes for dropdown options
-    updateHiddenDropdownCheckboxes(baseName, val);
-    
     handleLinkedDropdowns(baseName, val);
 }
 
@@ -3853,27 +3353,6 @@ function handleNext(currentSection){
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
-            }
-        } else if (['text','bigParagraph','money','date'].includes(jl.questionType)){
-            // For textbox and single date questions, jump logic triggers regardless of input content
-            const el = document.getElementById(nmId);
-            if (el && jl.jumpOption === "Any Text"){
-                // For textbox and date questions, always jump if jump logic is enabled
-                nextSection = jl.jumpTo.toLowerCase();
-                break;
-            }
-        } else if (jl.questionType === 'dateRange'){
-            // For dateRange questions, check if both date inputs have values
-            const startDateEl = document.getElementById(nmId + '_1');
-            const endDateEl = document.getElementById(nmId + '_2');
-            if (startDateEl && endDateEl && jl.jumpOption === "Any Text"){
-                const startVal = startDateEl.value.trim();
-                const endVal = endDateEl.value.trim();
-                // For dateRange questions, jump only if both dates are filled
-                if (startVal !== "" && endVal !== ""){
-                    nextSection = jl.jumpTo.toLowerCase();
-                    break;
-                }
             }
         }
     }
@@ -4630,16 +4109,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Modal logic
 function showLoginRequiredModal() {
-  const modal = document.getElementById('loginRequiredModal');
-  if (modal) {
-    modal.style.display = 'flex';
-  }
+  document.getElementById('loginRequiredModal').style.display = 'flex';
 }
 function hideLoginRequiredModal() {
-  const modal = document.getElementById('loginRequiredModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+  document.getElementById('loginRequiredModal').style.display = 'none';
 }
 document.addEventListener('DOMContentLoaded', function() {
   var backBtn = document.getElementById('modalBackBtn');
@@ -4654,10 +4127,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
-    // Check if we're in preview mode (no login modal exists)
-    const isPreviewMode = !document.getElementById('loginRequiredModal');
-    
-    if (!isUserLoggedIn && !isPreviewMode) {
+    if (!isUserLoggedIn) {
       showLoginRequiredModal();
       return;
     }
@@ -4720,20 +4190,14 @@ if (typeof handleNext === 'function') {
                 if (doc.exists) {
                     const data = doc.data();
                     const fields = getFormFields();
-                    
-                    // Set flag to prevent alerts during autofill - set it early
-                    window.isAutofilling = true;
-                    
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
                             // Check if this answer would trigger a jump to the end
                             if (wouldTriggerJumpToEnd(el, data[el.name])) {
                                 // Don't autofill this answer - keep it as default
+                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
-                            
-                            // Mark element as autofilled
-                            el.dataset.autofilled = 'true';
                             
                             if (el.type === 'checkbox' || el.type === 'radio') {
                                 el.checked = !!data[el.name];
@@ -4743,105 +4207,8 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
-                    // Also populate user data fields from Firebase user document
-                    try {
-                        const userDoc = await db.collection('users').doc(userId).get();
-                        if (userDoc.exists) {
-                            const userData = userDoc.data();
-                            
-                            // Wait for DOM to be ready before populating fields
-                            setTimeout(() => {
-                                
-                                const firstNameField = document.getElementById('user_firstname');
-                                const lastNameField = document.getElementById('user_lastname');
-                                
-                                if (firstNameField) {
-                                    firstNameField.value = userData.firstName || '';
-                                }
-                                
-                                if (lastNameField) {
-                                    lastNameField.value = userData.lastName || '';
-                                }
-                                
-                                // Populate user_fullname
-                                const fullNameField = document.getElementById('user_fullname');
-                                if (fullNameField) {
-                                    const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
-                                    fullNameField.value = fullName.trim();
-                                }
-                                
-                                // Populate user_date
-                                const dateField = document.getElementById('user_date');
-                                if (dateField) {
-                                    const today = new Date().toLocaleDateString();
-                                    dateField.value = today;
-                                }
-                                
-                                document.getElementById('user_email').value = userData.email || '';
-                                
-                                // Update hidden fields
-                                document.getElementById('user_firstname_hidden').value = userData.firstName || '';
-                                document.getElementById('user_lastname_hidden').value = userData.lastName || '';
-                                
-                                // Populate hidden user_fullname
-                                const fullNameHiddenField = document.getElementById('user_fullname_hidden');
-                                if (fullNameHiddenField) {
-                                    const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
-                                    fullNameHiddenField.value = fullName.trim();
-                                }
-                                
-                                // Populate hidden user_date
-                                const dateHiddenField = document.getElementById('user_date_hidden');
-                                if (dateHiddenField) {
-                                    const today = new Date().toLocaleDateString();
-                                    dateHiddenField.value = today;
-                                }
-                                
-                                document.getElementById('user_phone').value = userData.phone || '';
-                                document.getElementById('user_street').value = userData.address?.street || '';
-                                document.getElementById('user_city').value = userData.address?.city || '';
-                                document.getElementById('user_state').value = userData.address?.state || '';
-                                document.getElementById('user_zip').value = userData.address?.zip || '';
-                                
-                                // Update hidden fields
-                                document.getElementById('user_email_hidden').value = userData.email || '';
-                                document.getElementById('user_phone_hidden').value = userData.phone || '';
-                                document.getElementById('user_street_hidden').value = userData.address?.street || '';
-                                document.getElementById('user_city_hidden').value = userData.address?.city || '';
-                                document.getElementById('user_state_hidden').value = userData.address?.state || '';
-                                document.getElementById('user_zip_hidden').value = userData.address?.zip || '';
-                                
-                                // Set up event listeners for full name updates
-                                if (firstNameField && lastNameField) {
-                                    const updateFullName = () => {
-                                        const fullName = (firstNameField.value || '') + ' ' + (lastNameField.value || '');
-                                        const fullNameField = document.getElementById('user_fullname');
-                                        const fullNameHiddenField = document.getElementById('user_fullname_hidden');
-                                        if (fullNameField) fullNameField.value = fullName.trim();
-                                        if (fullNameHiddenField) fullNameHiddenField.value = fullName.trim();
-                                    };
-                                    
-                                    firstNameField.addEventListener('input', updateFullName);
-                                    lastNameField.addEventListener('input', updateFullName);
-                                }
-                            }, 500);
-                        }
-                    } catch (error) {
-                        // Error loading user data - silently continue
-                    }
-                    
-                    // Clear the autofill flag after a short delay to ensure all events have fired
+                    // After autofilling, trigger visibility updates for dependent questions
                     setTimeout(() => {
-                        window.isAutofilling = false;
-                        
-                        // Clear the autofilled flag from all elements
-                        fields.forEach(el => {
-                            if (el.dataset) {
-                                delete el.dataset.autofilled;
-                            }
-                        });
-                        
-                        // After autofilling, trigger visibility updates for dependent questions
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
@@ -4882,23 +4249,6 @@ if (typeof handleNext === 'function') {
                         if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
                             return true;
                         }
-                    } else if (['text','bigParagraph','money','date'].includes(jl.questionType)) {
-                        // For textbox and single date questions, any input (or no input) triggers the jump
-                        if (jl.jumpOption === "Any Text") {
-                            return true;
-                        }
-                    } else if (jl.questionType === 'dateRange') {
-                        // For dateRange questions, check if both dates are filled
-                        if (jl.jumpOption === "Any Text") {
-                            const startDateEl = document.getElementById(questionNameIds[questionId] + '_1');
-                            const endDateEl = document.getElementById(questionNameIds[questionId] + '_2');
-                            if (startDateEl && endDateEl) {
-                                const startVal = startDateEl.value.trim();
-                                const endVal = endDateEl.value.trim();
-                                // Only trigger jump if both dates are filled
-                                return startVal !== "" && endVal !== "";
-                            }
-                        }
                     }
                 }
             }
@@ -4919,27 +4269,6 @@ if (typeof handleNext === 'function') {
                 el.addEventListener('input', saveAnswers);
                 el.addEventListener('change', saveAnswers);
             });
-            
-            // Attach alert listeners after autofill is complete
-            attachAlertListeners();
-        }
-        
-        function attachAlertListeners() {
-            // Only attach alert listeners to elements that have alert logic
-            for (const alertLogic of alertLogics) {
-                if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
-                
-                for (const condition of alertLogic.conditions) {
-                    const questionId = condition.prevQuestion;
-                    const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                                          document.getElementById('answer' + questionId);
-                    
-                    if (questionElement) {
-                        questionElement.addEventListener('change', function() { checkAlertLogic(this); });
-                        questionElement.addEventListener('input', function() { checkAlertLogic(this); });
-                    }
-                }
-            }
         }
         
 
@@ -4974,10 +4303,10 @@ if (typeof handleNext === 'function') {
         firebase.auth().onAuthStateChanged(function(user) {
             isUserLoggedIn = !!user;
             userId = user ? user.uid : null;
-            
             if (isUserLoggedIn) {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('payment') === 'success') {
+                    console.log('Payment successful! Processing PDF...');
                     loadAnswers().then(() => {
                         processAllPdfs().then(() => {
                             wipeAnswers();
@@ -4988,9 +4317,6 @@ if (typeof handleNext === 'function') {
                 } else {
                     loadAnswers().then(attachAutosaveListeners);
                 }
-            } else {
-                // User not logged in, just attach alert listeners
-                attachAlertListeners();
             }
         });
 
@@ -5393,8 +4719,6 @@ function generateHiddenPDFFields() {
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
-<input type="hidden" id="user_fullname_hidden"  name="user_fullname_hidden">
-<input type="hidden" id="user_date_hidden"      name="user_date_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
 <input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">

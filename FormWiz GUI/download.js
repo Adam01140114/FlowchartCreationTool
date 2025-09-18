@@ -77,26 +77,6 @@ function showPreview() {
     }
     
     const formHTML = getFormHTML();
-    
-    // Copy HTML to clipboard automatically when previewing
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(formHTML).then(() => {
-            // Show a brief notification that it was copied
-            const previewButton = document.getElementById('previewButton');
-            if (previewButton) {
-                const originalText = previewButton.textContent;
-                previewButton.textContent = 'Copied to clipboard!';
-                previewButton.style.backgroundColor = '#28a745';
-                setTimeout(() => {
-                    previewButton.textContent = originalText;
-                    previewButton.style.backgroundColor = '';
-                }, 2000);
-            }
-        }).catch(err => {
-            console.error('Failed to copy to clipboard:', err);
-        });
-    }
-    
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
     previewFrame.srcdoc = formHTML;
@@ -148,6 +128,23 @@ function loadFormData(formData) {
         const stripePriceIdInput = document.getElementById('stripePriceId');
         if (stripePriceIdInput) {
             stripePriceIdInput.value = formData.stripePriceId;
+        }
+    }
+    
+    // Set form properties in flowchart if available
+    if (formData.formProperties && typeof setFormProperties === 'function') {
+        setFormProperties(formData.formProperties);
+    }
+    
+    // Also set form properties from individual fields if formProperties not available
+    if (!formData.formProperties && (formData.defaultPDFName || formData.pdfOutputName || formData.stripePriceId)) {
+        const properties = {
+            pdfFormName: formData.defaultPDFName || '',
+            outputFileName: formData.pdfOutputName || '',
+            stripePriceId: formData.stripePriceId || ''
+        };
+        if (typeof setFormProperties === 'function') {
+            setFormProperties(properties);
         }
     }
 
@@ -416,12 +413,6 @@ function loadFormData(formData) {
                     }
                 }
                 else if (question.type === 'multipleTextboxes') {
-                    // Load custom Node ID if it exists
-                    const nodeIdInput = questionBlock.querySelector(`#multipleTextboxesNodeId${question.questionId}`);
-                    if (nodeIdInput && question.nodeId) {
-                        nodeIdInput.value = question.nodeId;
-                    }
-                    
                     // Rebuild multiple textboxes
                     const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
                     if (multipleTextboxesBlock) {
@@ -505,6 +496,7 @@ function loadFormData(formData) {
                 else if (
                     // Text-like question types
                     question.type === 'text' ||
+                    question.type === 'bigParagraph' ||
                     question.type === 'radio' ||
                     question.type === 'money' ||
                     question.type === 'date' ||
@@ -519,20 +511,6 @@ function loadFormData(formData) {
                     }
                     if (placeholderInput) {
                         placeholderInput.value = question.placeholder || '';
-                    }
-                }
-                else if (question.type === 'bigParagraph') {
-                    const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
-                    const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
-                    const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
-                    if (nameInput) {
-                        nameInput.value = question.nameId || '';
-                    }
-                    if (placeholderInput) {
-                        placeholderInput.value = question.placeholder || '';
-                    }
-                    if (lineLimitInput && question.lineLimit) {
-                        lineLimitInput.value = question.lineLimit;
                     }
                 }
 
@@ -551,18 +529,7 @@ function loadFormData(formData) {
                         const pa = questionBlock.querySelector(`#prevAnswer${question.questionId}_${rowId}`);
                         if (pq) pq.value = cond.prevQuestion;
                         updateLogicAnswersForRow(question.questionId, rowId);
-                        
-                        // Handle text questions with hidden inputs
-                        if (pa && pa.style.display === 'none') {
-                            // For text questions, set the hidden input value
-                            const hiddenInput = document.getElementById(`hiddenAnswer${question.questionId}_${rowId}`);
-                            if (hiddenInput) {
-                                hiddenInput.value = cond.prevAnswer || "Any Text";
-                            }
-                        } else if (pa) {
-                            // For other question types, set the select value
-                            pa.value = cond.prevAnswer;
-                        }
+                        if (pa) pa.value = cond.prevAnswer;
                     });
                 }
 
@@ -589,31 +556,23 @@ function loadFormData(formData) {
                         addJumpCondition(question.questionId);
                         const conditionId = index + 1;
                         
-                        // Update options for the dropdown based on question type (skip for textbox and date questions)
-                        const isTextboxQuestion = question.type === 'text' || question.type === 'bigParagraph' || question.type === 'money' || question.type === 'date' || question.type === 'dateRange';
-                        
-                        if (!isTextboxQuestion) {
-                            if (question.type === 'dropdown') {
-                                updateJumpOptions(question.questionId, conditionId);
-                            } else if (question.type === 'radio') {
-                                updateJumpOptionsForRadio(question.questionId, conditionId);
-                            } else if (question.type === 'checkbox') {
-                                updateJumpOptionsForCheckbox(question.questionId, conditionId);
-                            } else if (question.type === 'numberedDropdown') {
-                                updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
-                            }
+                        // Update options for the dropdown based on question type
+                        if (question.type === 'dropdown') {
+                            updateJumpOptions(question.questionId, conditionId);
+                        } else if (question.type === 'radio') {
+                            updateJumpOptionsForRadio(question.questionId, conditionId);
+                        } else if (question.type === 'checkbox') {
+                            updateJumpOptionsForCheckbox(question.questionId, conditionId);
+                        } else if (question.type === 'numberedDropdown') {
+                            updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
                         }
                         
-                        // Set the values based on question type
+                        // After options are populated, set the selected value
                         const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
                         const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
                         
-                        if (!isTextboxQuestion && jumpOptionSelect) {
-                            jumpOptionSelect.value = cond.option;
-                        }
-                        if (jumpToInput) {
-                            jumpToInput.value = cond.to;
-                        }
+                        if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
+                        if (jumpToInput) jumpToInput.value = cond.to;
                     });
                 }
               
@@ -646,6 +605,10 @@ function loadFormData(formData) {
                     const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}`);
                     if (pdfLogicPdfNameInput) {
                         pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
+                    }
+                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}`);
+                    if (pdfLogicPdfDisplayNameInput) {
+                        pdfLogicPdfDisplayNameInput.value = question.pdfLogic.pdfDisplayName || "";
                     }
                     const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
                     if (pdfLogicStripePriceIdInput) {
@@ -846,6 +809,12 @@ function loadFormData(formData) {
 }
 
 function exportForm() {
+    // Get form properties from flowchart if available
+    let formProperties = {};
+    if (typeof getFormProperties === 'function') {
+        formProperties = getFormProperties();
+    }
+    
     const formData = {
         sections: [],
         groups: [],
@@ -856,15 +825,16 @@ function exportForm() {
         groupCounter: groupCounter,
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
-            : '',
+            : formProperties.pdfFormName || '',
         pdfOutputName: document.getElementById('pdfOutputName')
             ? document.getElementById('pdfOutputName').value.trim()
-            : '',
+            : formProperties.outputFileName || '',
         stripePriceId: document.getElementById('stripePriceId')
             ? document.getElementById('stripePriceId').value.trim()
-            : '',
+            : formProperties.stripePriceId || '',
         additionalPDFs: [], // New field for additional PDFs
-        checklistItems: [] // New field for checklist items
+        checklistItems: [], // New field for checklist items
+        formProperties: formProperties // Include form properties in export
     };
 
     // Collect all additional PDF names
@@ -923,20 +893,7 @@ function exportForm() {
                 logicRows.forEach((row, idx) => {
                     const rowIndex = idx + 1;
                     const pqVal = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`)?.value.trim() || "";
-                    
-                    // Check if this is a text question (answer select is hidden)
-                    const answerSelect = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
-                    let paVal = "";
-                    
-                    if (answerSelect && answerSelect.style.display === 'none') {
-                        // For text questions, get the value from the hidden input
-                        const hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${rowIndex}`);
-                        paVal = hiddenInput ? hiddenInput.value.trim() : "Any Text";
-                    } else {
-                        // For other question types, get the value from the select dropdown
-                        paVal = answerSelect?.value.trim() || "";
-                    }
-                    
+                    const paVal = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`)?.value.trim() || "";
                     if (pqVal && paVal) {
                         conditionsArray.push({ prevQuestion: pqVal, prevAnswer: paVal });
                     }
@@ -953,17 +910,7 @@ function exportForm() {
                     const jumpOption = condDiv.querySelector(`#jumpOption${questionId}_${conditionId}`)?.value || '';
                     const jumpTo = condDiv.querySelector(`#jumpTo${questionId}_${conditionId}`)?.value || '';
 
-                    // For textbox and date questions, we only need the jumpTo field (no dropdown)
-                    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
-                    
-                    if (isTextboxQuestion && jumpTo) {
-                        // For textbox and date questions, use "Any Text" as the option
-                        jumpConditions.push({
-                            option: "Any Text",
-                            to: jumpTo
-                        });
-                    } else if (!isTextboxQuestion && jumpOption && jumpTo) {
-                        // For other question types, require both option and jumpTo
+                    if (jumpOption && jumpTo) {
                         jumpConditions.push({
                             option: jumpOption,
                             to: jumpTo
@@ -980,6 +927,7 @@ function exportForm() {
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
             const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
+            const pdfLogicPdfDisplayName = questionBlock.querySelector(`#pdfLogicPdfDisplayName${questionId}`)?.value || "";
             const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
             
             // Collect PDF Logic conditions
@@ -1105,6 +1053,7 @@ function exportForm() {
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
                     pdfName: pdfLogicPdfName,
+                    pdfDisplayName: pdfLogicPdfDisplayName,
                     stripePriceId: pdfLogicStripePriceId,
                     conditions: pdfLogicConditionsArray
                 },
@@ -1249,12 +1198,6 @@ function exportForm() {
                 questionData.amounts = amounts;
             }
             else if (questionType === 'multipleTextboxes') {
-                // Export custom Node ID if it exists
-                const nodeIdInput = questionBlock.querySelector(`#multipleTextboxesNodeId${questionId}`);
-                if (nodeIdInput && nodeIdInput.value.trim()) {
-                    questionData.nodeId = nodeIdInput.value.trim();
-                }
-                
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 questionData.amounts = [];
@@ -1289,6 +1232,7 @@ function exportForm() {
             }
             else if (
                 questionType === 'text' ||
+                questionType === 'bigParagraph' ||
                 questionType === 'radio' ||
                 questionType === 'money' ||
                 questionType === 'date' ||
@@ -1300,16 +1244,6 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
-            }
-            else if (questionType === 'bigParagraph') {
-                const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
-                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
-                const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
-                questionData.nameId = nameId;
-                questionData.placeholder = placeholder;
-                if (lineLimit) {
-                    questionData.lineLimit = parseInt(lineLimit);
-                }
             }
 
             // -- Push questionData once (after we finish building it!) --
@@ -1804,24 +1738,6 @@ function updateFormAfterImport() {
     if (typeof updateAllChecklistLogicDropdowns === 'function') {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateAllChecklistLogicDropdowns, 100);
-    }
-    
-    // Update conditional logic dropdowns
-    if (typeof updateAllConditionalLogicDropdowns === 'function') {
-        // Run this with a much longer delay to ensure DOM is ready
-        setTimeout(updateAllConditionalLogicDropdowns, 1000);
-    }
-    
-    // Update alert logic dropdowns
-    if (typeof updateAllAlertLogicDropdowns === 'function') {
-        // Run this with a slight delay to ensure DOM is ready
-        setTimeout(updateAllAlertLogicDropdowns, 100);
-    }
-    
-    // Update PDF logic dropdowns
-    if (typeof updateAllPdfLogicDropdowns === 'function') {
-        // Run this with a slight delay to ensure DOM is ready
-        setTimeout(updateAllPdfLogicDropdowns, 100);
     }
 }
 
