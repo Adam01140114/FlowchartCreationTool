@@ -984,6 +984,7 @@ window.fixCapitalizationInJumps();
 
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
+  console.log("🔧 [PDF DEBUG] ===== saveFlowchart CALLED =====");
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
@@ -992,9 +993,13 @@ window.saveFlowchart = function() {
     if (!flowchartName || !flowchartName.trim()) return;
     currentFlowchartName = flowchartName;
   }
+  console.log("🔧 [PDF DEBUG] Saving flowchart with name:", flowchartName);
+  
   // Gather data and save
   const data = { cells: [] };
   const cells = graph.getModel().cells;
+  
+  console.log("🔧 [PDF DEBUG] Found", Object.keys(cells).length, "cells in graph");
   for (let id in cells) {
     if (id === "0" || id === "1") continue;
     const cell = cells[id];
@@ -1024,8 +1029,20 @@ window.saveFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, 
+      _pdfUrl: cell._pdfUrl||null, _pdfDisplayName: cell._pdfDisplayName||null, _pdfFilename: cell._pdfFilename||null, _priceId: cell._priceId||null
     };
+    
+    // Log PDF properties being saved
+    if (cell.vertex && cell.style && cell.style.includes("nodeType=pdfNode")) {
+      console.log(`🔧 [PDF DEBUG] Saving PDF node ${cell.id} to library with properties:`, {
+        _pdfUrl: cellData._pdfUrl,
+        _pdfDisplayName: cellData._pdfDisplayName,
+        _pdfFilename: cellData._pdfFilename,
+        _priceId: cellData._priceId
+      });
+    }
+    
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
       cellData._calcAmountLabel = cell._calcAmountLabel;
@@ -1110,11 +1127,32 @@ function displayFlowcharts(flowcharts) {
 }
 
 window.openSavedFlowchart = function(name) {
+  console.log("🔧 [PDF DEBUG] ===== openSavedFlowchart CALLED =====");
+  console.log("🔧 [PDF DEBUG] Loading flowchart:", name);
+  
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
     .get().then(docSnap=>{
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
-      loadFlowchartData(docSnap.data().flowchart);
+      
+      const flowchartData = docSnap.data().flowchart;
+      console.log("🔧 [PDF DEBUG] Loaded flowchart data:", flowchartData);
+      
+      // Log PDF nodes in the loaded data
+      if (flowchartData.cells) {
+        const pdfCells = flowchartData.cells.filter(cell => cell.style && cell.style.includes("nodeType=pdfNode"));
+        console.log("🔧 [PDF DEBUG] Found", pdfCells.length, "PDF nodes in loaded data");
+        pdfCells.forEach((cell, index) => {
+          console.log(`🔧 [PDF DEBUG] PDF Node ${index + 1} (ID: ${cell.id}) in loaded data:`, {
+            _pdfUrl: cell._pdfUrl,
+            _pdfDisplayName: cell._pdfDisplayName,
+            _pdfFilename: cell._pdfFilename,
+            _priceId: cell._priceId
+          });
+        });
+      }
+      
+      loadFlowchartData(flowchartData);
       currentFlowchartName = name;
       
       // Update last used timestamp
@@ -1331,10 +1369,27 @@ function exportGuiJson() {
  * Load a flowchart from JSON data.
  */
 function loadFlowchartData(data) {
+  console.log("🔧 [PDF DEBUG] ===== loadFlowchartData CALLED =====");
+  console.log("🔧 [PDF DEBUG] Data received:", data);
+  
   if (!data.cells) {
     alert("Invalid flowchart data");
     return;
   }
+  
+  console.log("🔧 [PDF DEBUG] Found", data.cells.length, "cells to load");
+  
+  // Log PDF cells in the data
+  const pdfCells = data.cells.filter(cell => cell.style && cell.style.includes("nodeType=pdfNode"));
+  console.log("🔧 [PDF DEBUG] Found", pdfCells.length, "PDF cells in data");
+  pdfCells.forEach((cell, index) => {
+    console.log(`🔧 [PDF DEBUG] PDF Cell ${index + 1} (ID: ${cell.id}) in data:`, {
+      _pdfUrl: cell._pdfUrl,
+      _pdfDisplayName: cell._pdfDisplayName,
+      _pdfFilename: cell._pdfFilename,
+      _priceId: cell._priceId
+    });
+  });
   
   // Check if we have edges without an existing edge style - add default style
   data.cells.forEach(item => {
@@ -1350,9 +1405,26 @@ function loadFlowchartData(data) {
     const createdCells = {};
 
     if (data.sectionPrefs) {
+      console.log('🔍 [SECTION LOAD DEBUG] Loading section preferences:', JSON.stringify(data.sectionPrefs, null, 2));
       sectionPrefs = data.sectionPrefs;
+      console.log('🔍 [SECTION LOAD DEBUG] Set sectionPrefs to:', JSON.stringify(sectionPrefs, null, 2));
+      
+      // Test the getSectionPrefs function immediately after setting
+      if (typeof getSectionPrefs === 'function') {
+        const testResult = getSectionPrefs();
+        console.log('🔍 [SECTION LOAD DEBUG] getSectionPrefs() returns:', JSON.stringify(testResult, null, 2));
+      }
+      
       // updateSectionLegend is defined in legend.js
-      updateSectionLegend();
+      setTimeout(() => {
+        if (typeof updateSectionLegend === 'function') {
+          console.log('🔍 [SECTION LOAD DEBUG] Calling updateSectionLegend()');
+          updateSectionLegend();
+          console.log('🔍 [SECTION LOAD DEBUG] After updateSectionLegend(), sectionPrefs:', JSON.stringify(sectionPrefs, null, 2));
+        } else {
+          console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
+        }
+      }, 50);
     }
 
 
@@ -1369,6 +1441,16 @@ function loadFlowchartData(data) {
         const newCell = new mxCell(item.value, geo, item.style);
         newCell.vertex = true;
         newCell.id = item.id;
+        
+        // Log PDF cell creation
+        if (item.style && item.style.includes("nodeType=pdfNode")) {
+          console.log(`🔧 [PDF DEBUG] Creating PDF cell ${item.id} with properties:`, {
+            _pdfUrl: item._pdfUrl,
+            _pdfDisplayName: item._pdfDisplayName,
+            _pdfFilename: item._pdfFilename,
+            _priceId: item._priceId
+          });
+        }
         
         // Transfer all custom properties
         if (item._textboxes) newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
@@ -1391,6 +1473,17 @@ function loadFlowchartData(data) {
         if (item._pdfDisplayName !== undefined) newCell._pdfDisplayName = item._pdfDisplayName;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
+        
+        // Log PDF properties after transfer
+        if (item.style && item.style.includes("nodeType=pdfNode")) {
+          console.log(`🔧 [PDF DEBUG] After property transfer for PDF cell ${item.id}:`, {
+            _pdfUrl: newCell._pdfUrl,
+            _pdfDisplayName: newCell._pdfDisplayName,
+            _pdfFilename: newCell._pdfFilename,
+            _priceId: newCell._priceId,
+            _characterLimit: newCell._characterLimit
+          });
+        }
         
         
         // Notes node properties
@@ -1449,8 +1542,8 @@ function loadFlowchartData(data) {
     });
 
     // Third pass: Update cell displays based on types
-  graph.getModel().beginUpdate();
-  try {
+    graph.getModel().beginUpdate();
+    try {
       Object.values(createdCells).forEach(cell => {
         if (getQuestionType(cell) === 'multipleTextboxes') {
           updateMultipleTextboxesCell(cell);
@@ -1461,33 +1554,33 @@ function loadFlowchartData(data) {
         } else if (getQuestionType(cell) === 'amountOption') {
           // Amount options are handled in refreshAllCells
         } else if (getQuestionType(cell) === 'imageOption') {
-        updateImageOptionCell(cell);
-              } else if (getQuestionType(cell) === 'notesNode') {
-        updateNotesNodeCell(cell);
+          updateImageOptionCell(cell);
+        } else if (getQuestionType(cell) === 'notesNode') {
+          updateNotesNodeCell(cell);
         } else if (getQuestionType(cell) === 'checklistNode') {
-        updateChecklistNodeCell(cell);
+          updateChecklistNodeCell(cell);
         } else if (getQuestionType(cell) === 'alertNode') {
-        updateAlertNodeCell(cell);
-      } else if (isPdfNode(cell)) {
-        updatePdfNodeCell(cell);
-      } else if (isCalculationNode(cell)) {
-        updateCalculationNodeCell(cell);
-      } else if (isSubtitleNode(cell)) {
+          updateAlertNodeCell(cell);
+        } else if (isPdfNode(cell)) {
+          updatePdfNodeCell(cell);
+        } else if (isCalculationNode(cell)) {
+          updateCalculationNodeCell(cell);
+        } else if (isSubtitleNode(cell)) {
           // Use the _subtitleText property if available, otherwise extract from value
-        if (!cell._subtitleText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._subtitleText = cleanValue || "Subtitle text";
-        }
-        updateSubtitleNodeCell(cell);
-      } else if (isInfoNode(cell)) {
+          if (!cell._subtitleText && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._subtitleText = cleanValue || "Subtitle text";
+          }
+          updateSubtitleNodeCell(cell);
+        } else if (isInfoNode(cell)) {
           // Use the _infoText property if available, otherwise extract from value
-        if (!cell._infoText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._infoText = cleanValue || "Information text";
+          if (!cell._infoText && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._infoText = cleanValue || "Information text";
+          }
+          updateInfoNodeCell(cell);
         }
-        updateInfoNodeCell(cell);
-      }
-    });
+      });
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1515,15 +1608,15 @@ function loadFlowchartData(data) {
 
   refreshAllCells();
   
-      // Load groups data if present (after sections are fully processed)
-    console.log('loadFlowchartData: checking for groups data');
-    console.log('loadFlowchartData: data.groups =', data.groups);
-    if (data.groups) {
-      console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
-      loadGroupsFromData(data.groups);
-    } else {
-      console.log('loadFlowchartData: no groups data found');
-    }
+  // Load groups data if present (after sections are fully processed)
+  console.log('loadFlowchartData: checking for groups data');
+  console.log('loadFlowchartData: data.groups =', data.groups);
+  if (data.groups) {
+    console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
+    loadGroupsFromData(data.groups);
+  } else {
+    console.log('loadFlowchartData: no groups data found');
+  }
   
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {

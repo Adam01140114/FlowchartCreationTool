@@ -1961,6 +1961,14 @@ formHTML += `</div><br></div>`;
         const pdfLogicStripePriceIdEl = qBlock.querySelector("#pdfLogicStripePriceId" + questionId);
         const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
         
+        console.log(`🔍 [PDF LOGIC DEBUG] Question ${questionId}:`, {
+          pdfLogicEnabled,
+          pdfLogicRows: pdfLogicRows.length,
+          pdfLogicPdfName,
+          pdfLogicPdfDisplayName,
+          pdfLogicStripePriceId
+        });
+        
         if (pdfLogicRows.length > 0 && pdfLogicPdfName) {
           // Add to PDF Logic array for later processing
           pdfLogicPDFs.push({
@@ -1973,9 +1981,12 @@ formHTML += `</div><br></div>`;
           });
           
           // Process conditions
+          console.log(`🔍 [PDF LOGIC DEBUG] Processing ${pdfLogicRows.length} conditions for question ${questionId}`);
           for (let lr = 0; lr < pdfLogicRows.length; lr++) {
             const row = pdfLogicRows[lr];
             const rowIndex = lr + 1;
+            
+            console.log(`🔍 [PDF LOGIC DEBUG] Processing condition ${rowIndex} for question ${questionId}, questionType: ${questionType}`);
             
             if (questionType === "bigParagraph") {
               // For Big Paragraph, process character limit
@@ -2009,14 +2020,35 @@ formHTML += `</div><br></div>`;
               "#pdfPrevAnswer" + questionId + "_" + rowIndex
             );
 
-            if (!pqEl || !paEl) continue;
+            console.log(`🔍 [PDF LOGIC DEBUG] Found elements for condition ${rowIndex}:`, {
+              pqEl: !!pqEl,
+              paEl: !!paEl,
+              pqElId: pqEl ? pqEl.id : 'not found',
+              paElId: paEl ? paEl.id : 'not found'
+            });
+
+            if (!pqEl || !paEl) {
+              console.log(`❌ [PDF LOGIC DEBUG] Missing elements for condition ${rowIndex}, skipping`);
+              continue;
+            }
             const pqVal = pqEl.value.trim();
             const paVal = paEl.value.trim();
-            if (!pqVal || !paVal) continue;
+            console.log(`🔍 [PDF LOGIC DEBUG] Values for condition ${rowIndex}:`, {
+              pqVal,
+              paVal
+            });
+            if (!pqVal || !paVal) {
+              console.log(`❌ [PDF LOGIC DEBUG] Empty values for condition ${rowIndex}, skipping`);
+              continue;
+            }
 
             // Add condition to the PDF Logic array
             const pdfLogicIndex = pdfLogicPDFs.length - 1;
             pdfLogicPDFs[pdfLogicIndex].conditions.push({
+              prevQuestion: pqVal,
+              prevAnswer: paVal
+            });
+            console.log(`✅ [PDF LOGIC DEBUG] Added condition to PDF Logic array:`, {
               prevQuestion: pqVal,
               prevAnswer: paVal
             });
@@ -2392,6 +2424,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
   formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs || [])};\n`;
+  console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', JSON.stringify(pdfLogicPDFs, null, 2));
+  formHTML += `console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', ${JSON.stringify(pdfLogicPDFs, null, 2)});\n`;
   formHTML += `var pdfLogicPDFs = ${JSON.stringify(pdfLogicPDFs || [])};\n`;
   formHTML += `var alertLogics = ${JSON.stringify(alertLogics || [])};\n`;
   formHTML += `var checklistLogics = ${JSON.stringify(checklistLogics || [])};\n`;
@@ -2616,7 +2650,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'Pages/cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -2624,8 +2658,28 @@ window.showCartModal = function () {
   });
 };
 
+// --- Cart helpers (new) ---
+function clearCartState() {
+  try { localStorage.removeItem('formwiz_cart'); } catch {}
+  // expire cookie immediately
+  document.cookie = 'formwiz_cart=;path=/;max-age=0';
+}
+
+function writeCartCookie(cart) {
+  try { document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000'; } catch {}
+}
+
+function getUrlParam(name) {
+  const u = new URLSearchParams(window.location.search);
+  return u.get(name) || '';
+}
+
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
+  clearCartState();
+
+  // 2) Collect form data
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
@@ -2637,97 +2691,98 @@ window.addFormToCart = function (priceId) {
     }
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const countyName    = urlParams.get('county') || '';
-  const defendantName = urlParams.get('defendantName') || '';
-  const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
+  // 3) Uniform metadata for every cart line
+  const originalFormId = (window.formId || 'custom-form');
+  const formTitle      = window.pdfOutputFileName || (typeof pdfOutputFileName !== 'undefined' ? pdfOutputFileName : 'Form');
+  const countyName     = getUrlParam('county');
+  const defendantName  = getUrlParam('defendantName');
+  const portfolioId    = getUrlParam('portfolioId');
+  const nowTs          = Date.now();
 
-  // Check for PDF Logic PDFs that should be added to cart
+  // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
-  if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
-    for (const pdfLogic of pdfLogicPDFs) {
-      if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
-        // Check if conditions are met
-        let shouldAddToCart = false;
-        
-        pdfLogic.conditions.forEach(condition => {
-          const prevQuestionId = condition.prevQuestion;
-          const prevAnswer = condition.prevAnswer;
-          
-          // Get the previous question's value
-          const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                    document.getElementById('answer' + prevQuestionId);
-          
-          if (prevQuestionElement) {
-            let prevValue = '';
-            
-            if (prevQuestionElement.type === 'checkbox') {
-              prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-            } else {
-              prevValue = prevQuestionElement.value;
-            }
-            
-            // Check if the condition matches
-            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-              shouldAddToCart = true;
-            }
+  try {
+    if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      for (const pdfLogic of window.pdfLogicPDFs) {
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+
+        let matched = false;
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
+
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) continue;
+
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
+
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
           }
-        });
-        
-        // Add to cart if conditions are met
-        if (shouldAddToCart) {
+        }
+
+        if (matched) {
           pdfLogicItems.push({
-            formId: (window.formId || 'custom-form') + '_' + pdfLogic.questionId,
-            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\\.pdf$/i, ''),
+            formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
+            pdfName: pdfLogic.pdfName,
+            originalFormId: originalFormId,
+            portfolioId: portfolioId,
             formData: formData,
             countyName: countyName,
             defendantName: defendantName,
-            timestamp: Date.now()
+            timestamp: nowTs
           });
         }
       }
     }
+  } catch (e) {
+    console.warn('[PDF LOGIC] error computing matches:', e);
   }
 
-  // Prefer existing cart manager if present
+  // 5) Preferred path: site cart manager
   if (typeof window.addToCart === 'function') {
-    const fid = (window.formId || 'custom-form');
-    window.addToCart(fid, formTitle, priceId, formData, countyName, defendantName);
-    
-    // Add PDF Logic items to cart
-    pdfLogicItems.forEach(item => {
-      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName);
-    });
-    
-    window.location.href = 'cart.html';
+    // main item
+    window.addToCart(
+      originalFormId, formTitle, priceId, { ...formData }, countyName, defendantName,
+      { originalFormId, portfolioId, pdfName: (window.pdfFileName || '') }
+    );
+
+    // every matched PDF logic item
+    for (const item of pdfLogicItems) {
+      window.addToCart(
+        item.formId, item.title, item.priceId, { ...item.formData },
+        item.countyName, item.defendantName,
+        { originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName }
+      );
+    }
+
+    // redirect after everything is queued
+    setTimeout(() => { window.location.href = 'cart.html'; }, 0);
     return;
   }
 
-  // Fallback: localStorage/cookie
-  const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
-  
-  // Add main form
-  const mainItem = {
-    formId: (window.formId || 'custom-form'),
-    title: formTitle,
-    priceId,
-    formData,
-    countyName,
-    defendantName,
-    timestamp: Date.now()
-  };
-  cart.push(mainItem);
-  
-  // Add PDF Logic items
-  pdfLogicItems.forEach(item => {
-    cart.push(item);
+  // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  const cart = [];
+  cart.push({
+    formId: originalFormId, title: formTitle, priceId,
+    pdfName: (window.pdfFileName || ''),
+    originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
   });
-  
-  localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-  document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
-  window.location.href = 'cart.html';
+  for (const item of pdfLogicItems) cart.push(item);
+
+  try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
+  writeCartCookie(cart);
+
+  setTimeout(() => { window.location.href = 'cart.html'; }, 0);
 };
+
 
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {

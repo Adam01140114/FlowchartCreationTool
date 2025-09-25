@@ -369,6 +369,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const jumpNodeButton = document.getElementById("jumpNode");
   const changeTypeButton = document.getElementById("changeType");
   const propertiesButton = document.getElementById("propertiesButton");
+  console.log("🔧 [PROPERTIES MENU DEBUG] propertiesButton element found:", !!propertiesButton);
+  console.log("🔧 [PROPERTIES MENU DEBUG] propertiesButton element:", propertiesButton);
   const yesNoNodeButton = document.getElementById("yesNoNode");
   const newSectionButton = document.getElementById("newSectionNode");
 
@@ -390,11 +392,21 @@ const phoneTypeBtn = document.getElementById("phoneType");
   const multipleDropdownTypeBtn = document.getElementById("multipleDropdownTypeBtn");
 
   const propertiesMenu = document.getElementById("propertiesMenu");
+  console.log("🔧 [PROPERTIES MENU DEBUG] propertiesMenu element found:", !!propertiesMenu);
+  console.log("🔧 [PROPERTIES MENU DEBUG] propertiesMenu element:", propertiesMenu);
+  
   const propNodeText = document.getElementById("propNodeText");
   const propNodeId = document.getElementById("propNodeId");
   const propNodeType = document.getElementById("propNodeType");
   const propNodeSection = document.getElementById("propNodeSection");
   const propSectionName = document.getElementById("propSectionName");
+  
+  console.log("🔧 [PROPERTIES MENU DEBUG] Properties menu elements found:");
+  console.log("🔧 [PROPERTIES MENU DEBUG] - propNodeText:", !!propNodeText);
+  console.log("🔧 [PROPERTIES MENU DEBUG] - propNodeId:", !!propNodeId);
+  console.log("🔧 [PROPERTIES MENU DEBUG] - propNodeType:", !!propNodeType);
+  console.log("🔧 [PROPERTIES MENU DEBUG] - propNodeSection:", !!propNodeSection);
+  console.log("🔧 [PROPERTIES MENU DEBUG] - propSectionName:", !!propSectionName);
 
   const resetBtn = document.getElementById("resetBtn");
 
@@ -493,7 +505,7 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
     evt.consume();
   } else if (isSubtitleNode(cell)) {
     // Update subtitle node
-    graph.getModel().beginUpdate();
+        graph.getModel().beginUpdate();
     try {
       // Save the plain text in the _subtitleText property
       value = value.trim() || "Subtitle text";
@@ -830,17 +842,30 @@ graph.isCellEditable = function (cell) {
   
   // Context menu handling
   graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
+    console.log("🔧 [CONTEXT MENU DEBUG] ===== CONTEXT MENU TRIGGERED =====");
+    console.log("🔧 [CONTEXT MENU DEBUG] menu:", menu);
+    console.log("🔧 [CONTEXT MENU DEBUG] cell:", cell);
+    console.log("🔧 [CONTEXT MENU DEBUG] evt:", evt);
+    console.log("🔧 [CONTEXT MENU DEBUG] isRightMouseButton:", mxEvent.isRightMouseButton(evt));
+    
     // NEW – let native menu appear inside inputs / textareas / contenteditable
     if (evt.target.closest('input, textarea, [contenteditable="true"]')) {
+      console.log("🔧 [CONTEXT MENU DEBUG] Inside input/textarea/contenteditable, returning null");
       return null;            // don't build a graph menu, don't call preventDefault
     }
+    
+    console.log("🔧 [CONTEXT MENU DEBUG] Hiding properties menu and type submenu");
     propertiesMenu.style.display = "none";
     typeSubmenu.style.display = "none";
     selectedCell = cell;
     currentMouseEvent = evt;
     
+    console.log("🔧 [CONTEXT MENU DEBUG] selectedCell set to:", selectedCell);
+    console.log("🔧 [CONTEXT MENU DEBUG] currentMouseEvent set to:", currentMouseEvent);
+    
     // Right-click context menu
     if (mxEvent.isRightMouseButton(evt)) {
+      console.log("🔧 [CONTEXT MENU DEBUG] Right mouse button detected, showing context menu");
       // Store current selection before showing menu
       const currentSelection = graph.getSelectionCells();
       
@@ -891,13 +916,20 @@ graph.isCellEditable = function (cell) {
           boldButton.textContent = isBold ? 'Unbold' : 'Bold';
         } else {
           // Show regular context menu for other cells
+          console.log("🔧 [CONTEXT MENU DEBUG] Showing regular context menu for other cells");
           const x = evt.clientX;
           const y = evt.clientY;
           
+          console.log("🔧 [CONTEXT MENU DEBUG] Context menu position - x:", x, "y:", y);
           const menu = document.getElementById('contextMenu');
+          console.log("🔧 [CONTEXT MENU DEBUG] contextMenu element found:", !!menu);
+          console.log("🔧 [CONTEXT MENU DEBUG] contextMenu element:", menu);
+          
           menu.style.display = 'block';
           menu.style.left = x + 'px';
           menu.style.top = y + 'px';
+          
+          console.log("🔧 [CONTEXT MENU DEBUG] Context menu displayed at position:", menu.style.left, menu.style.top);
           
           // Update menu title to show number of selected items
           if (selectedCells.length > 1) {
@@ -1379,9 +1411,9 @@ graph.isCellEditable = function (cell) {
   // Calc submenu buttons
   calcTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
-      // Extract and preserve the current text content
-      const preservedText = extractTextFromCell(selectedCell);
-      
+        // Extract and preserve the current text content
+        const preservedText = extractTextFromCell(selectedCell);
+        
       // Convert to calculation node
       graph.getModel().beginUpdate();
       try {
@@ -1403,14 +1435,14 @@ graph.isCellEditable = function (cell) {
 
   subtitleTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
-      // Extract and preserve the current text content
-      const preservedText = extractTextFromCell(selectedCell);
-      
+        // Extract and preserve the current text content
+        const preservedText = extractTextFromCell(selectedCell);
+        
       // Convert to subtitle node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=subtitle");
-        selectedCell._subtitleText = preservedText || "Subtitle text";
+          selectedCell._subtitleText = preservedText || "Subtitle text";
         updateSubtitleNodeCell(selectedCell);
       } finally {
         graph.getModel().endUpdate();
@@ -1422,14 +1454,14 @@ graph.isCellEditable = function (cell) {
 
   infoTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
-      // Extract and preserve the current text content
-      const preservedText = extractTextFromCell(selectedCell);
-      
+        // Extract and preserve the current text content
+        const preservedText = extractTextFromCell(selectedCell);
+        
       // Convert to info node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=info");
-        selectedCell._infoText = preservedText || "Information text";
+          selectedCell._infoText = preservedText || "Information text";
         updateInfoNodeCell(selectedCell);
       } finally {
         graph.getModel().endUpdate();
@@ -1604,10 +1636,53 @@ graph.isCellEditable = function (cell) {
 
   // 'Properties' popup
   function showPropertiesMenu(cell, evt) {
-    if (!cell) return;
+    console.log("🔧 [PROPERTIES MENU DEBUG] ===== showPropertiesMenu CALLED =====");
+    console.log("🔧 [PROPERTIES MENU DEBUG] cell:", cell);
+    console.log("🔧 [PROPERTIES MENU DEBUG] evt:", evt);
+    console.log("🔧 [PROPERTIES MENU DEBUG] cell type:", typeof cell);
+    console.log("🔧 [PROPERTIES MENU DEBUG] cell id:", cell?.id);
+    console.log("🔧 [PROPERTIES MENU DEBUG] cell vertex:", cell?.vertex);
+    
+    if (!cell) {
+      console.log("🔧 [PROPERTIES MENU DEBUG] No cell provided, returning early");
+      return;
+    }
+    
+    console.log("🔧 [PROPERTIES MENU DEBUG] propertiesMenu element:", propertiesMenu);
+    console.log("🔧 [PROPERTIES MENU DEBUG] propertiesMenu exists:", !!propertiesMenu);
+    console.log("🔧 [PROPERTIES MENU DEBUG] propertiesMenu current display:", propertiesMenu?.style?.display);
+    
+    if (!propertiesMenu) {
+      console.error("🔧 [PROPERTIES MENU DEBUG] propertiesMenu element not found!");
+      return;
+    }
+    
+    console.log("🔧 [PROPERTIES MENU DEBUG] Setting propertiesMenu display to block");
     propertiesMenu.style.display = "block";
-    propertiesMenu.style.left = evt.clientX + 10 + "px";
-    propertiesMenu.style.top = evt.clientY + 10 + "px";
+    
+    // Force visibility with additional CSS properties
+    propertiesMenu.style.visibility = "visible";
+    propertiesMenu.style.opacity = "1";
+    propertiesMenu.style.zIndex = "9999";
+    propertiesMenu.style.position = "fixed";
+    propertiesMenu.style.backgroundColor = "#ffffff";
+    propertiesMenu.style.border = "2px solid #ff0000"; // Red border for debugging
+    propertiesMenu.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
+    
+    if (evt && evt.clientX !== undefined && evt.clientY !== undefined) {
+      console.log("🔧 [PROPERTIES MENU DEBUG] Setting position - clientX:", evt.clientX, "clientY:", evt.clientY);
+      propertiesMenu.style.left = evt.clientX + 10 + "px";
+      propertiesMenu.style.top = evt.clientY + 10 + "px";
+    } else {
+      console.log("🔧 [PROPERTIES MENU DEBUG] No valid event coordinates, using default position");
+      propertiesMenu.style.left = "100px";
+      propertiesMenu.style.top = "100px";
+    }
+    
+    console.log("🔧 [PROPERTIES MENU DEBUG] Final propertiesMenu position - left:", propertiesMenu.style.left, "top:", propertiesMenu.style.top);
+    console.log("🔧 [PROPERTIES MENU DEBUG] Final propertiesMenu display:", propertiesMenu.style.display);
+    console.log("🔧 [PROPERTIES MENU DEBUG] Final propertiesMenu visibility:", propertiesMenu.style.visibility);
+    console.log("🔧 [PROPERTIES MENU DEBUG] Final propertiesMenu z-index:", propertiesMenu.style.zIndex);
 
     // For multiple-text or multiple-dropdown
     if (isQuestion(cell) && 
@@ -1659,12 +1734,66 @@ graph.isCellEditable = function (cell) {
     } else {
       propNodeType.textContent = "other";
     }
+    
+    console.log("🔧 [PROPERTIES MENU DEBUG] Properties menu setup completed");
+    console.log("🔧 [PROPERTIES MENU DEBUG] Final propertiesMenu visibility check:");
+    console.log("🔧 [PROPERTIES MENU DEBUG] - display:", propertiesMenu.style.display);
+    console.log("🔧 [PROPERTIES MENU DEBUG] - visibility:", propertiesMenu.style.visibility);
+    console.log("🔧 [PROPERTIES MENU DEBUG] - opacity:", propertiesMenu.style.opacity);
+    console.log("🔧 [PROPERTIES MENU DEBUG] - position:", propertiesMenu.style.position);
+    console.log("🔧 [PROPERTIES MENU DEBUG] - z-index:", propertiesMenu.style.zIndex);
+    console.log("🔧 [PROPERTIES MENU DEBUG] - getBoundingClientRect:", propertiesMenu.getBoundingClientRect());
+    
+    // Add a visual alert to confirm the menu should be visible
+    console.log("🔧 [PROPERTIES MENU DEBUG] 🚨 PROPERTIES MENU SHOULD NOW BE VISIBLE WITH RED BORDER! 🚨");
+    
+    // Force a repaint by temporarily hiding and showing
+    setTimeout(() => {
+      console.log("🔧 [PROPERTIES MENU DEBUG] Forcing repaint...");
+      propertiesMenu.style.display = "none";
+      setTimeout(() => {
+        propertiesMenu.style.display = "block";
+        console.log("🔧 [PROPERTIES MENU DEBUG] Repaint complete - menu should be visible now!");
+      }, 10);
+    }, 100);
+    
+    console.log("🔧 [PROPERTIES MENU DEBUG] ===== showPropertiesMenu COMPLETED =====");
   }
 
   propertiesButton.addEventListener("click", () => {
-    if (selectedCell) {
-      showPropertiesMenu(selectedCell, currentMouseEvent);
+    console.log("🔧 [PROPERTIES DEBUG] ===== PROPERTIES BUTTON CLICKED =====");
+    console.log("🔧 [PROPERTIES DEBUG] selectedCell:", selectedCell);
+    console.log("🔧 [PROPERTIES DEBUG] selectedCell type:", typeof selectedCell);
+    console.log("🔧 [PROPERTIES DEBUG] selectedCell vertex:", selectedCell?.vertex);
+    console.log("🔧 [PROPERTIES DEBUG] selectedCell id:", selectedCell?.id);
+    console.log("🔧 [PROPERTIES DEBUG] currentMouseEvent:", currentMouseEvent);
+    console.log("🔧 [PROPERTIES DEBUG] showPropertiesPopup function exists:", typeof showPropertiesPopup);
+    
+    // Hide the context menu first
+    console.log("🔧 [PROPERTIES DEBUG] Hiding context menu before showing properties popup");
+    const contextMenu = document.getElementById('contextMenu');
+    if (contextMenu) {
+      console.log("🔧 [PROPERTIES DEBUG] Context menu found, hiding it");
+      contextMenu.style.display = 'none';
+    } else {
+      console.log("🔧 [PROPERTIES DEBUG] Context menu not found");
     }
+    
+    if (selectedCell) {
+      console.log("🔧 [PROPERTIES DEBUG] Calling showPropertiesPopup with cell:", selectedCell);
+      console.log("🔧 [PROPERTIES DEBUG] Cell question type:", getQuestionType(selectedCell));
+      console.log("🔧 [PROPERTIES DEBUG] Is question node:", isQuestion(selectedCell));
+      
+      try {
+        showPropertiesPopup(selectedCell);
+        console.log("🔧 [PROPERTIES DEBUG] showPropertiesPopup called successfully");
+      } catch (error) {
+        console.error("🔧 [PROPERTIES DEBUG] Error calling showPropertiesPopup:", error);
+      }
+    } else {
+      console.log("🔧 [PROPERTIES DEBUG] No selectedCell, cannot show properties popup");
+    }
+    console.log("🔧 [PROPERTIES DEBUG] ===== PROPERTIES BUTTON CLICK COMPLETED =====");
   });
 
   // Utility: make <span> text editable on double-click
@@ -2135,17 +2264,17 @@ keyHandler.bindControlKey(86, () => {
                 setSection(source, optionSection);
             }
         }
+      }
+  
+      // Update PDF nodes when connections change (to show/hide character limit field)
+      const allCells = graph.getModel().cells;
+      for (const cellId in allCells) {
+        const cell = allCells[cellId];
+        if (cell && isPdfNode(cell)) {
+          updatePdfNodeCell(cell);
+        }
     }
 
-    // Update PDF nodes when connections change (to show/hide character limit field)
-    const allCells = graph.getModel().cells;
-    for (const cellId in allCells) {
-      const cell = allCells[cellId];
-      if (cell && isPdfNode(cell)) {
-        updatePdfNodeCell(cell);
-      }
-    }
-    
     refreshAllCells();
 });
 
@@ -2784,7 +2913,7 @@ function setNodeId(cell, nodeId) {
   style = style.replace(/nodeId=[^;]+/, "");
   style += `;nodeId=${encodeURIComponent(nodeId)};`;
   graph.getModel().setStyle(cell, style);
-}
+  }
 function getNodeId(cell) {
   const style = cell.style || "";
   const m = style.match(/nodeId=([^;]+)/);
@@ -3191,9 +3320,9 @@ function extractTextFromCell(cell) {
 // Function to set option type for option nodes
 function setOptionType(cell, newType) {
   if (!cell || !isOptions(cell)) return;
-  
-  // Extract and preserve the current text content
-  const preservedText = extractTextFromCell(cell);
+    
+    // Extract and preserve the current text content
+    const preservedText = extractTextFromCell(cell);
   
   /* —— 1. update style —— */
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
@@ -3206,31 +3335,31 @@ function setOptionType(cell, newType) {
   try {
     switch (newType) {
       case 'dropdown':
-        // Regular option - preserve text content
-        if (preservedText) {
-          cell.value = `<div style="text-align:center;">${mxUtils.htmlEntities(preservedText)}</div>`;
-        }
+          // Regular option - preserve text content
+          if (preservedText) {
+            cell.value = `<div style="text-align:center;">${mxUtils.htmlEntities(preservedText)}</div>`;
+          }
         updateOptionNodeCell(cell);
         break;
       case 'imageOption':
         // Image option - needs image URL and alt text
         if (!cell._imageUrl) {
           cell._imageUrl = '';
-          cell._imageAltText = preservedText || 'Image description';
+            cell._imageAltText = preservedText || 'Image description';
         }
         updateImageOptionCell(cell);
         break;
       case 'amountOption':
         // Amount option - needs amount name and placeholder
         if (!cell._amountName) {
-          cell._amountName = preservedText || 'Amount';
+            cell._amountName = preservedText || 'Amount';
           cell._amountPlaceholder = 'Enter amount';
         }
         // updateAmountOptionCell is handled in the existing code
         break;
       case 'notesNode':
-        // Notes node - preserve text content
-        cell._notesText = preservedText || 'Notes text';
+          // Notes node - preserve text content
+          cell._notesText = preservedText || 'Notes text';
         // Add bold border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = st.replace(/strokeColor=[^;]+/, '');
@@ -3239,8 +3368,8 @@ function setOptionType(cell, newType) {
         updateNotesNodeCell(cell);
         break;
       case 'checklistNode':
-        // Checklist node - preserve text content
-        cell._checklistText = preservedText || 'Checklist text';
+          // Checklist node - preserve text content
+          cell._checklistText = preservedText || 'Checklist text';
         // Add striped red border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -3250,8 +3379,8 @@ function setOptionType(cell, newType) {
         updateChecklistNodeCell(cell);
         break;
       case 'alertNode':
-        // Alert node - preserve text content
-        cell._alertText = preservedText || 'Alert message';
+          // Alert node - preserve text content
+          cell._alertText = preservedText || 'Alert message';
         // Add bold black and red checkered border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -4071,14 +4200,14 @@ function sanitizeNameId(str) {
  */
 function updateText2Cell(cell) {
   if (!cell) return;
-  // Ensure we have question text - only set default if it's completely undefined or null
-  if (cell._questionText === undefined || cell._questionText === null) {
+    // Ensure we have question text - only set default if it's completely undefined or null
+    if (cell._questionText === undefined || cell._questionText === null) {
     cell._questionText = "Enter dropdown question";
   }
   // Create the HTML content as a single line
   const html = `
     <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText || "")}</div>
+        <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText || "")}</div>
     </div>`;
   graph.getModel().setValue(cell, html);
 }
@@ -4225,7 +4354,7 @@ function updateSimpleQuestionCell(cell) {
   graph.getModel().setValue(cell, html);
 }
 
-
+  
 
 // Patch updateMultipleTextboxesCell to use <input> for title
 function updateMultipleTextboxesCell(cell) {
@@ -4412,23 +4541,23 @@ function previewForm() {
       guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
     }
   }
-  
-  if (guiJsonStr) {
-    // Encode the JSON for URL transmission
-    const encodedJson = encodeURIComponent(guiJsonStr);
-    const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
     
-    // Still copy to clipboard for manual use if needed
+  if (guiJsonStr) {
+      // Encode the JSON for URL transmission
+      const encodedJson = encodeURIComponent(guiJsonStr);
+      const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
+      
+      // Still copy to clipboard for manual use if needed
     navigator.clipboard.writeText(guiJsonStr).then(() => {
       // Optionally, show a message: copied!
     });
-    
-    // Open the GUI preview in a new tab with the JSON in the URL
-    window.open(guiUrl, '_blank');
-  } else {
-    // Fallback to regular GUI if no JSON generated
-    window.open('FormWiz%20GUI/gui.html', '_blank');
-  }
+      
+      // Open the GUI preview in a new tab with the JSON in the URL
+      window.open(guiUrl, '_blank');
+    } else {
+      // Fallback to regular GUI if no JSON generated
+  window.open('FormWiz%20GUI/gui.html', '_blank');
+    }
 }
 
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE
@@ -4441,10 +4570,28 @@ let lastAutosaveData = null;
 let autosaveDataHash = null;
 
 function autosaveFlowchartToLocalStorage() {
+  console.log("🔧 [PDF DEBUG] ===== autosaveFlowchartToLocalStorage CALLED =====");
   try {
-    if (!graph) return;
+    if (!graph) {
+      console.log("🔧 [PDF DEBUG] No graph, returning early");
+      return;
+    }
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
+    
+    console.log("🔧 [PDF DEBUG] Found", cells.length, "cells to save");
+    
+    // Log PDF nodes specifically
+    const pdfNodes = cells.filter(cell => cell.vertex && isPdfNode(cell));
+    console.log("🔧 [PDF DEBUG] Found", pdfNodes.length, "PDF nodes");
+    pdfNodes.forEach((cell, index) => {
+      console.log(`🔧 [PDF DEBUG] PDF Node ${index + 1} (ID: ${cell.id}):`, {
+        _pdfDisplayName: cell._pdfDisplayName,
+        _pdfFilename: cell._pdfFilename,
+        _pdfUrl: cell._pdfUrl,
+        _priceId: cell._priceId
+      });
+    });
     
     // Quick check if data has actually changed
     const currentHash = JSON.stringify({
@@ -4455,6 +4602,7 @@ function autosaveFlowchartToLocalStorage() {
     
     if (currentHash === autosaveDataHash && lastAutosaveData) {
       // Data hasn't changed, skip autosave
+      console.log("🔧 [PDF DEBUG] Data hasn't changed, skipping autosave");
       return;
     }
     
@@ -4518,6 +4666,17 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._pdfDisplayName !== undefined) cellData._pdfDisplayName = cell._pdfDisplayName;
       if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      
+      // Log PDF properties being saved
+      if (isPdfNode(cell)) {
+        console.log(`🔧 [PDF DEBUG] Saving PDF node ${cell.id} with properties:`, {
+          _pdfUrl: cellData._pdfUrl,
+          _pdfFilename: cellData._pdfFilename,
+          _pdfDisplayName: cellData._pdfDisplayName,
+          _priceId: cellData._priceId,
+          _characterLimit: cellData._characterLimit
+        });
+      }
       
       // Debug PDF properties in autosave
       if (cell.style && cell.style.includes("nodeType=pdfNode")) {
@@ -4874,7 +5033,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfUrl', '_priceId'
+      '_checklistText', '_alertText', '_pdfUrl', '_pdfDisplayName', '_pdfFilename', '_priceId'
       ];
       
       safeProperties.forEach(prop => {
@@ -5050,7 +5209,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_pdfDisplayName","_pdfFilename","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -5162,7 +5321,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfUrl","_pdfDisplayName","_pdfFilename","_priceId","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -5416,11 +5575,11 @@ function updatePdfNodeCell(cell) {
   if (cell._priceId === undefined) {
     cell._priceId = "";
   }
-  
-  // Ensure _characterLimit property exists
+
+    // Ensure _characterLimit property exists
   if (cell._characterLimit === undefined) {
-    cell._characterLimit = "";
-  }
+      cell._characterLimit = "";
+    }
   
   console.log('🔄 UPDATE PDF NODE CELL: Properties after ensuring they exist:', {
     _pdfUrl: cell._pdfUrl,
@@ -5428,27 +5587,27 @@ function updatePdfNodeCell(cell) {
     _pdfDisplayName: cell._pdfDisplayName,
     _priceId: cell._priceId
   });
-
-  // Check if this PDF node is connected to a Big Paragraph node
-  const isConnectedToBigParagraph = checkIfPdfConnectedToBigParagraph(cell);
   
-  // Render PDF input field with Price ID field and optional Character Limit field
-  let html = `
+    // Check if this PDF node is connected to a Big Paragraph node
+    const isConnectedToBigParagraph = checkIfPdfConnectedToBigParagraph(cell);
+    
+    // Render PDF input field with Price ID field and optional Character Limit field
+    let html = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
       <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:2px;">
         <label style="font-size:11px;width:100%;text-align:left;">PDF Name:<input type="text" value="${escapeAttr(cell._pdfDisplayName || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfDisplayNameField('${cell.id}',this.value)" /></label>
         <label style="font-size:11px;width:100%;text-align:left;">PDF File:<input type="text" value="${escapeAttr(cell._pdfFilename || cell._pdfUrl || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfFilenameField('${cell.id}',this.value)" /></label>
         <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
-  `;
-  
-  // Add Character Limit field if connected to Big Paragraph
-  if (isConnectedToBigParagraph) {
-    html += `
-        <label style="font-size:11px;width:100%;text-align:left;">Character limit:<input type="number" value="${escapeAttr(cell._characterLimit)}" style="width:120px;margin-left:4px;" min="1" max="10000" onblur="window.updatePdfCharacterLimitField('${cell.id}',this.value)" /></label>
     `;
-  }
-  
-  html += `
+    
+    // Add Character Limit field if connected to Big Paragraph
+    if (isConnectedToBigParagraph) {
+      html += `
+          <label style="font-size:11px;width:100%;text-align:left;">Character limit:<input type="number" value="${escapeAttr(cell._characterLimit)}" style="width:120px;margin-left:4px;" min="1" max="10000" onblur="window.updatePdfCharacterLimitField('${cell.id}',this.value)" /></label>
+      `;
+    }
+    
+    html += `
       </div>
     </div>
   `;
@@ -5474,44 +5633,70 @@ function updatePdfNodeCell(cell) {
 
 // Handler for updating PDF display name field
 window.updatePdfDisplayNameField = function(cellId, value) {
+  console.log("🔧 [PDF DEBUG] ===== updatePdfDisplayNameField CALLED =====");
+  console.log("🔧 [PDF DEBUG] cellId:", cellId);
+  console.log("🔧 [PDF DEBUG] value:", value);
+  
   const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isPdfNode(cell)) return;
-  cell._pdfDisplayName = value;
-  console.log('🔧 PDF FIELD UPDATE: Set _pdfDisplayName to:', value, 'for cell:', cellId);
-  console.log('🔧 PDF FIELD UPDATE: Cell properties after update:', {
+  console.log("🔧 [PDF DEBUG] cell found:", !!cell);
+  console.log("🔧 [PDF DEBUG] isPdfNode:", cell ? isPdfNode(cell) : false);
+  
+  if (!cell || !isPdfNode(cell)) {
+    console.log("🔧 [PDF DEBUG] Early return - cell not found or not PDF node");
+    return;
+  }
+  
+  console.log("🔧 [PDF DEBUG] Before update - cell properties:", {
     _pdfDisplayName: cell._pdfDisplayName,
     _pdfFilename: cell._pdfFilename,
     _priceId: cell._priceId
   });
-  // Update cell value to show display name
-  if (value) {
-    cell.value = value;
-  } else if (cell._pdfFilename) {
-    cell.value = cell._pdfFilename.replace(/\.pdf$/i, '');
-  }
-  // Trigger autosave
+  
+  cell._pdfDisplayName = value;
+  
+  console.log("🔧 [PDF DEBUG] After update - cell properties:", {
+    _pdfDisplayName: cell._pdfDisplayName,
+    _pdfFilename: cell._pdfFilename,
+    _priceId: cell._priceId
+  });
+  
+  console.log("🔧 [PDF DEBUG] Calling requestAutosave...");
   requestAutosave();
-  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+  console.log("🔧 [PDF DEBUG] ===== updatePdfDisplayNameField COMPLETED =====");
 };
 
 // Handler for updating PDF filename field
 window.updatePdfFilenameField = function(cellId, value) {
+  console.log("🔧 [PDF DEBUG] ===== updatePdfFilenameField CALLED =====");
+  console.log("🔧 [PDF DEBUG] cellId:", cellId);
+  console.log("🔧 [PDF DEBUG] value:", value);
+  
   const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isPdfNode(cell)) return;
-  cell._pdfFilename = value;
-  console.log('🔧 PDF FIELD UPDATE: Set _pdfFilename to:', value, 'for cell:', cellId);
-  console.log('🔧 PDF FIELD UPDATE: Cell properties after update:', {
+  console.log("🔧 [PDF DEBUG] cell found:", !!cell);
+  console.log("🔧 [PDF DEBUG] isPdfNode:", cell ? isPdfNode(cell) : false);
+  
+  if (!cell || !isPdfNode(cell)) {
+    console.log("🔧 [PDF DEBUG] Early return - cell not found or not PDF node");
+    return;
+  }
+  
+  console.log("🔧 [PDF DEBUG] Before update - cell properties:", {
     _pdfDisplayName: cell._pdfDisplayName,
     _pdfFilename: cell._pdfFilename,
     _priceId: cell._priceId
   });
-  // Update cell value if no display name is set
-  if (!cell._pdfDisplayName && value) {
-    cell.value = value.replace(/\.pdf$/i, '');
-  }
-  // Trigger autosave
+  
+  cell._pdfFilename = value;
+  
+  console.log("🔧 [PDF DEBUG] After update - cell properties:", {
+    _pdfDisplayName: cell._pdfDisplayName,
+    _pdfFilename: cell._pdfFilename,
+    _priceId: cell._priceId
+  });
+  
+  console.log("🔧 [PDF DEBUG] Calling requestAutosave...");
   requestAutosave();
-  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+  console.log("🔧 [PDF DEBUG] ===== updatePdfFilenameField COMPLETED =====");
 };
 
 // Handler for updating PDF Price ID field
@@ -5529,35 +5714,35 @@ window.updatePdfPriceIdField = function(cellId, value) {
   requestAutosave();
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
-
-// Handler for updating PDF Character Limit field
-window.updatePdfCharacterLimitField = function(cellId, value) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isPdfNode(cell)) return;
-  cell._characterLimit = value;
-  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
-};
-
-// Function to check if a PDF node is connected to a Big Paragraph node
-function checkIfPdfConnectedToBigParagraph(pdfCell) {
-  if (!pdfCell || !isPdfNode(pdfCell)) return false;
   
-  // Get all incoming edges to this PDF node
-  const incomingEdges = graph.getIncomingEdges(pdfCell) || [];
+  // Handler for updating PDF Character Limit field
+  window.updatePdfCharacterLimitField = function(cellId, value) {
+    const cell = graph.getModel().getCell(cellId);
+    if (!cell || !isPdfNode(cell)) return;
+    cell._characterLimit = value;
+    // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+  };
   
-  for (const edge of incomingEdges) {
-    const sourceCell = edge.source;
-    if (sourceCell && isQuestion(sourceCell)) {
-      // Check if the source question is a Big Paragraph
-      const questionType = getQuestionType(sourceCell);
-      if (questionType === "bigParagraph") {
-        return true;
+  // Function to check if a PDF node is connected to a Big Paragraph node
+  function checkIfPdfConnectedToBigParagraph(pdfCell) {
+    if (!pdfCell || !isPdfNode(pdfCell)) return false;
+    
+    // Get all incoming edges to this PDF node
+    const incomingEdges = graph.getIncomingEdges(pdfCell) || [];
+    
+    for (const edge of incomingEdges) {
+      const sourceCell = edge.source;
+      if (sourceCell && isQuestion(sourceCell)) {
+        // Check if the source question is a Big Paragraph
+        const questionType = getQuestionType(sourceCell);
+        if (questionType === "bigParagraph") {
+          return true;
+        }
       }
     }
+    
+    return false;
   }
-  
-  return false;
-}
 
 // Notes Node functions
 function isNotesNode(cell) {
@@ -6649,3 +6834,394 @@ window.downloadFlowchartSvg = function() {
     alert('Error downloading SVG: ' + error.message);
   }
 };
+
+/**
+ * Show the modern, aesthetically pleasing Properties popup for any node
+ */
+function showPropertiesPopup(cell) {
+  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup CALLED =====");
+  console.log("🔧 [PROPERTIES POPUP DEBUG] cell:", cell);
+  
+  // Prevent multiple popups
+  if (window.__propertiesPopupOpen) {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup already open, returning early");
+    return;
+  }
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup open flag");
+  window.__propertiesPopupOpen = true;
+  
+  // Clean up any existing popups
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Cleaning up existing popups");
+  const existingPopups = document.querySelectorAll('.properties-modal');
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Found existing popups:", existingPopups.length);
+  existingPopups.forEach(n => n.remove());
+  
+  // Hide any old properties menu that might be showing
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Hiding old properties menu");
+  const oldPropertiesMenu = document.getElementById('propertiesMenu');
+  if (oldPropertiesMenu) {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Old properties menu found, hiding it");
+    oldPropertiesMenu.style.display = 'none';
+  } else {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] No old properties menu found");
+  }
+  
+  // Create popup container
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating popup container");
+  const popup = document.createElement('div');
+  popup.className = 'properties-modal';
+  popup.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #1976d2;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    min-width: 500px;
+    max-width: 600px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    pointer-events: auto;
+    opacity: 1;
+  `;
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup CSS styles applied");
+  
+  // Create header
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating header element");
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 40px;
+  `;
+  
+  const title = document.createElement('h3');
+  title.textContent = 'Node Properties';
+  title.style.cssText = `
+    margin: 0;
+    color: #1976d2;
+    font-size: 18px;
+    font-weight: 600;
+  `;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.id = 'closePropertiesPopup';
+  closeBtn.style.cssText = `
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  `;
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Header created with content");
+  
+  // Create content area
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating content area");
+  const content = document.createElement('div');
+  content.style.cssText = `
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: 15px;
+  `;
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Content area created with styles");
+  
+  // Get cell properties
+  const properties = [];
+  
+  // Node Text
+  if (cell && cell.value) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cell.value;
+    const textContent = (tempDiv.textContent || tempDiv.innerText || "").trim();
+    if (textContent) {
+      properties.push({
+        label: 'Node Text',
+        value: textContent,
+        editable: true,
+        key: 'value'
+      });
+    }
+  }
+  
+  // Node ID
+  const nodeId = getNodeId(cell) || cell.id || '';
+  if (nodeId) {
+    properties.push({
+      label: 'Node ID',
+      value: nodeId,
+      editable: true,
+      key: 'nodeId'
+    });
+  }
+  
+  // Section - will be handled specially as a dropdown
+  const section = getSection(cell) || '1';
+  properties.push({
+    label: 'Section',
+    value: section,
+    editable: true,
+    key: 'section',
+    isDropdown: true
+  });
+  
+  // Question Number
+  const questionNumber = cell._questionId || '';
+  properties.push({
+    label: 'Question Number',
+    value: questionNumber,
+    editable: true,
+    key: 'questionNumber'
+  });
+  
+  // Node Type
+  let nodeType = 'other';
+  if (isQuestion(cell)) {
+    nodeType = getQuestionType(cell);
+  } else if (isOptions(cell)) {
+    nodeType = 'options';
+  } else if (isCalculationNode(cell)) {
+    nodeType = 'calculation';
+  } else if (isSubtitleNode(cell)) {
+    nodeType = 'subtitle';
+  } else if (isInfoNode(cell)) {
+    nodeType = 'info';
+  }
+  
+  properties.push({
+    label: 'Node Type',
+    value: nodeType,
+    editable: false,
+    key: 'nodeType'
+  });
+  
+  // PDF-specific properties
+  if (cell.style && cell.style.includes("nodeType=pdfNode")) {
+    properties.push({
+      label: 'PDF Display Name',
+      value: cell._pdfDisplayName || '',
+      editable: true,
+      key: 'pdfDisplayName'
+    });
+    
+    properties.push({
+      label: 'PDF Filename',
+      value: cell._pdfFilename || cell._pdfUrl || '',
+      editable: true,
+      key: 'pdfFilename'
+    });
+    
+    properties.push({
+      label: 'Stripe Price ID',
+      value: cell._priceId || '',
+      editable: true,
+      key: 'priceId'
+    });
+  }
+  
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties array:", properties);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties count:", properties.length);
+  
+  // Create property fields
+  properties.forEach((prop, index) => {
+    console.log(`🔧 [PROPERTIES POPUP DEBUG] Processing property ${index}:`, prop);
+    const fieldDiv = document.createElement('div');
+    fieldDiv.style.cssText = `
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    `;
+    
+    const label = document.createElement('label');
+    label.textContent = prop.label;
+    label.style.cssText = `
+      display: block;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 6px;
+      font-size: 14px;
+    `;
+    
+    let valueElement;
+    
+    if (prop.isDropdown && prop.key === 'section') {
+      // Create dropdown for section selection
+      valueElement = document.createElement('select');
+      valueElement.style.cssText = `
+        display: block;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #495057;
+        min-height: 20px;
+        width: 100%;
+        box-sizing: border-box;
+      `;
+      
+      // Get all available sections
+      const availableSections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
+      
+      availableSections.forEach(sectionNum => {
+        const option = document.createElement('option');
+        option.value = sectionNum;
+        const sectionName = sectionPrefs[sectionNum]?.name || `Section ${sectionNum}`;
+        option.textContent = `${sectionNum}: ${sectionName}`;
+        if (sectionNum === prop.value) {
+          option.selected = true;
+        }
+        valueElement.appendChild(option);
+      });
+      
+      // Add change event listener
+      valueElement.addEventListener('change', () => {
+        const newSection = valueElement.value;
+        console.log(`🔧 [PROPERTIES POPUP DEBUG] Section changed to:`, newSection);
+        setSection(cell, newSection);
+        refreshAllCells();
+      });
+      
+    } else {
+      // Create regular text input
+      valueElement = document.createElement('span');
+      valueElement.textContent = prop.value;
+      valueElement.style.cssText = `
+        display: block;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #495057;
+        min-height: 20px;
+        word-wrap: break-word;
+      `;
+      
+      if (prop.editable) {
+        valueElement.style.cursor = 'text';
+        valueElement.contentEditable = 'true';
+        valueElement.addEventListener('blur', () => {
+          const newValue = valueElement.textContent.trim();
+          console.log(`🔧 [PROPERTIES POPUP DEBUG] Property ${prop.key} changed to:`, newValue);
+          
+          // Update the cell property
+          if (prop.key === 'value') {
+            cell.value = newValue;
+          } else if (prop.key === 'nodeId') {
+            // Update node ID logic here
+          } else if (prop.key === 'questionNumber') {
+            cell._questionId = newValue;
+          } else if (prop.key === 'pdfDisplayName') {
+            cell._pdfDisplayName = newValue;
+          } else if (prop.key === 'pdfFilename') {
+            cell._pdfFilename = newValue;
+          } else if (prop.key === 'priceId') {
+            cell._priceId = newValue;
+          }
+          
+          // Refresh the cell display
+          refreshAllCells();
+        });
+      }
+    }
+    
+    fieldDiv.appendChild(label);
+    fieldDiv.appendChild(valueElement);
+    content.appendChild(fieldDiv);
+    console.log(`🔧 [PROPERTIES POPUP DEBUG] Added field ${index} to content, content now has ${content.children.length} children`);
+  });
+  
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Finished processing properties, content has", content.children.length, "children");
+  
+  // Create button container
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.cssText = `
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+  `;
+  
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'Close';
+  closeButton.style.cssText = `
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  `;
+  
+  buttonContainer.appendChild(closeButton);
+  
+  // Assemble popup
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Assembling popup elements");
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(buttonContainer);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup assembled, adding to document body");
+  document.body.appendChild(popup);
+  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup added to DOM successfully");
+  
+  // Event listeners
+  closeBtn.addEventListener('click', () => {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Close button clicked");
+    document.body.removeChild(popup);
+    window.__propertiesPopupOpen = false;
+  });
+  
+  closeButton.addEventListener('click', () => {
+    console.log("🔧 [PROPERTIES POPUP DEBUG] Close button clicked");
+    document.body.removeChild(popup);
+    window.__propertiesPopupOpen = false;
+  });
+  
+  // Close on escape key
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      console.log("🔧 [PROPERTIES POPUP DEBUG] Escape key pressed");
+      document.body.removeChild(popup);
+      window.__propertiesPopupOpen = false;
+      document.removeEventListener('keydown', escapeHandler);
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+  
+  // Close on backdrop click
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) {
+      console.log("🔧 [PROPERTIES POPUP DEBUG] Backdrop clicked");
+      document.body.removeChild(popup);
+      window.__propertiesPopupOpen = false;
+    }
+  });
+  
+  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup COMPLETED =====");
+}

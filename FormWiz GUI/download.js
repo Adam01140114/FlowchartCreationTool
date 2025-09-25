@@ -1023,7 +1023,7 @@ function loadFormData(formData) {
     saveLastImportData(formData);
 }
 
-function exportForm() {
+function exportForm(download = true) {
     // Get form properties from flowchart if available
     let formProperties = {};
     if (typeof getFormProperties === 'function') {
@@ -1696,26 +1696,33 @@ function exportForm() {
     }
 
     const jsonString = JSON.stringify(formData, null, 2);
-    downloadJSON(jsonString, "form_data.json");
     
-    // Also copy to clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(jsonString).then(() => {
-            // Show a brief notification that it was copied
-            const exportButton = document.querySelector('button[onclick="exportForm()"]');
-            if (exportButton) {
-                const originalText = exportButton.textContent;
-                exportButton.textContent = 'Copied to clipboard!';
-                exportButton.style.backgroundColor = '#28a745';
-                setTimeout(() => {
-                    exportButton.textContent = originalText;
-                    exportButton.style.backgroundColor = '';
-                }, 2000);
-            }
-        }).catch(err => {
-            console.error('Failed to copy to clipboard:', err);
-        });
+    // Only download and copy to clipboard if download parameter is true
+    if (download) {
+        downloadJSON(jsonString, "form_data.json");
+        
+        // Also copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(jsonString).then(() => {
+                // Show a brief notification that it was copied
+                const exportButton = document.querySelector('button[onclick="exportForm()"]');
+                if (exportButton) {
+                    const originalText = exportButton.textContent;
+                    exportButton.textContent = 'Copied to clipboard!';
+                    exportButton.style.backgroundColor = '#28a745';
+                    setTimeout(() => {
+                        exportButton.textContent = originalText;
+                        exportButton.style.backgroundColor = '';
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+            });
+        }
     }
+    
+    // Always return the form data (for autosave functionality)
+    return formData;
 }
 
 

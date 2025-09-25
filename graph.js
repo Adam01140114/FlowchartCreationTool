@@ -460,7 +460,7 @@ function showPropertiesPopup(cell) {
     
     // If _questionText is empty, try to extract from cell.value
     if (cell.value) {
-      const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement('div');
       tempDiv.innerHTML = cell.value;
       const extractedText = (tempDiv.textContent || tempDiv.innerText || "").trim();
       
@@ -924,18 +924,18 @@ function showPropertiesPopup(cell) {
     let valueSpan = null;
     if (!prop.isDropdown && !prop.isButton) {
       valueSpan = document.createElement('span');
-      valueSpan.id = prop.id;
-      valueSpan.textContent = prop.value;
-      valueSpan.style.cssText = `
-        flex: 1;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
-        color: ${prop.editable ? '#333' : '#666'};
-        cursor: ${prop.editable ? 'text' : 'default'};
-        transition: all 0.2s ease;
-      `;
+    valueSpan.id = prop.id;
+    valueSpan.textContent = prop.value;
+    valueSpan.style.cssText = `
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
+      color: ${prop.editable ? '#333' : '#666'};
+      cursor: ${prop.editable ? 'text' : 'default'};
+      transition: all 0.2s ease;
+    `;
       console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
     }
     
@@ -1170,7 +1170,7 @@ function showPropertiesPopup(cell) {
                     if (typeof window.setNodeId === 'function') {
                       window.setNodeId(cell, autoNodeId);
                     } else {
-                      cell._nameId = autoNodeId;
+                    cell._nameId = autoNodeId;
                     }
                     
                     // Update the node ID field in the popup if it exists
@@ -1304,7 +1304,7 @@ function showPropertiesPopup(cell) {
     
     fieldDiv.appendChild(label);
     if (valueSpan) {
-      fieldDiv.appendChild(valueSpan);
+    fieldDiv.appendChild(valueSpan);
     }
     content.appendChild(fieldDiv);
     console.log(`🔧 [PROPERTIES POPUP DEBUG] Added field ${index} to content, content now has ${content.children.length} children`);
@@ -1508,7 +1508,7 @@ function showPropertiesPopup(cell) {
   
   // Add event listener to document for outside clicks with a delay to prevent immediate closure
   setTimeout(() => {
-    document.addEventListener('click', handleOutsideClick);
+  document.addEventListener('click', handleOutsideClick);
   }, 200);
   
   // Clean up the outside click listener when popup closes

@@ -12,7 +12,7 @@ function generateShareableUrl() {
     
     if (!flowchartJson) {
       alert('Error: Could not generate flowchart data');
-      return;
+    return;
     }
     
     // Encode the JSON for URL transmission
@@ -192,7 +192,7 @@ function exportFlowchartJson(download = true) {
   const parent = graph.getDefaultParent();
   const cells = graph.getChildCells(parent, true, true);
   console.log('📤 URL EXPORT: Found', cells.length, 'cells to export');
-  
+
   // Use the same serialization logic as the existing export function
   const simplifiedCells = cells.map(cell => {
     const cellData = {
@@ -251,7 +251,7 @@ function exportFlowchartJson(download = true) {
     if (cell._calcThreshold) cellData._calcThreshold = cell._calcThreshold;
     if (cell._calcFinalText) cellData._calcFinalText = cell._calcFinalText;
     if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
-
+    
     return cellData;
   });
 
@@ -264,7 +264,7 @@ function exportFlowchartJson(download = true) {
   const jsonStr = JSON.stringify(output, null, 2);
   
   if (download) {
-    // Download the file
+  // Download the file
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

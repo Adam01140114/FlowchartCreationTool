@@ -205,14 +205,55 @@ function createImageNode(x, y) {
  * Create a PDF node
  */
 function createPdfNode(x, y) {
+  console.log("🔧 [PDF DEBUG] ===== CREATING PDF NODE =====");
+  console.log("🔧 [PDF DEBUG] Position:", x, y);
+  
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=pdfNode;section=1;');
   
+  console.log("🔧 [PDF DEBUG] Created vertex with ID:", vertex.id);
+  console.log("🔧 [PDF DEBUG] Initial vertex properties:", {
+    _pdfUrl: vertex._pdfUrl,
+    _pdfDisplayName: vertex._pdfDisplayName,
+    _pdfFilename: vertex._pdfFilename,
+    _priceId: vertex._priceId,
+    _characterLimit: vertex._characterLimit
+  });
+  
   // Set default properties
   vertex._pdfUrl = "";
+  vertex._pdfDisplayName = "";
+  vertex._pdfFilename = "";
   vertex._priceId = "";
   vertex._characterLimit = 1000;
+  
+  console.log("🔧 [PDF DEBUG] After setting default properties:", {
+    _pdfUrl: vertex._pdfUrl,
+    _pdfDisplayName: vertex._pdfDisplayName,
+    _pdfFilename: vertex._pdfFilename,
+    _priceId: vertex._priceId,
+    _characterLimit: vertex._characterLimit
+  });
+  
+  // Update the cell to render the HTML properly
+  if (typeof updatePdfNodeCell === 'function') {
+    console.log("🔧 [PDF DEBUG] Calling updatePdfNodeCell...");
+    updatePdfNodeCell(vertex);
+    console.log("🔧 [PDF DEBUG] updatePdfNodeCell completed");
+  } else {
+    console.log("🔧 [PDF DEBUG] updatePdfNodeCell function not found!");
+  }
+  
+  console.log("🔧 [PDF DEBUG] Final vertex properties:", {
+    _pdfUrl: vertex._pdfUrl,
+    _pdfDisplayName: vertex._pdfDisplayName,
+    _pdfFilename: vertex._pdfFilename,
+    _priceId: vertex._priceId,
+    _characterLimit: vertex._characterLimit
+  });
+  console.log("🔧 [PDF DEBUG] Final vertex value:", vertex.value);
+  console.log("🔧 [PDF DEBUG] ===== PDF NODE CREATION COMPLETED =====");
   
   return vertex;
 }
