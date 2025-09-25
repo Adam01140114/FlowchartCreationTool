@@ -2578,20 +2578,89 @@ document.addEventListener('DOMContentLoaded', function() {
   formHTML += `
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  const EXAMPLE_FORM_PRICE_ID = window.stripePriceId || stripePriceId || '123';
+  console.log('🛒 [CART DEBUG] showCartModal called');
+  
+  // Calculate all PDFs that will be added to cart
+  const allPdfsToAdd = [];
+  
+  // Add main form
+  const mainFormPriceId = window.stripePriceId || stripePriceId || '123';
+  allPdfsToAdd.push({
+    formId: (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase(),
+    title: window.pdfFileName || 'Form',
+    priceId: mainFormPriceId,
+    pdfName: window.pdfFileName || ''
+  });
+  
+  // Add conditional PDFs based on current form state
+  if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
+    
+    for (const pdfLogic of window.pdfLogicPDFs) {
+      if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+      
+      let matched = false;
+      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+      for (const c of conds) {
+        const prevId = c?.prevQuestion;
+        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+        if (!prevId) continue;
+        
+        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                   document.getElementById('answer' + prevId);
+        if (!el) continue;
+        
+        let val = '';
+        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+        else                        { val = el.value || ''; }
+        
+        if (val.toString().toLowerCase() === expect) {
+          matched = true;
+          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        }
+      }
+      
+      if (matched) {
+        allPdfsToAdd.push({
+          formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          priceId: pdfLogic.stripePriceId,
+          pdfName: pdfLogic.pdfName
+        });
+      }
+    }
+  }
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', allPdfsToAdd.length, allPdfsToAdd);
 
-  // Try to fetch price, but still show a working modal if fetch fails
-  async function fetchExampleFormPrice() {
-    try {
-      const r = await fetch('/stripe-price/' + EXAMPLE_FORM_PRICE_ID);
-      if (!r.ok) return null;
-      const data = await r.json();
-      return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-    } catch { return null; }
+  // Fetch prices for all PDFs
+  async function fetchAllPrices() {
+    const prices = [];
+    for (const pdf of allPdfsToAdd) {
+      try {
+        const r = await fetch('/stripe-price/' + pdf.priceId);
+        if (r.ok) {
+          const data = await r.json();
+          const price = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : '0.00';
+          prices.push(parseFloat(price));
+          console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
+        } else {
+          prices.push(0);
+        }
+      } catch (e) {
+        console.error('🛒 [CART DEBUG] Error fetching price for', pdf.title, ':', e);
+        prices.push(0);
+      }
+    }
+    return prices;
   }
 
-  fetchExampleFormPrice().then((price) => {
-    const priceDisplay = price ? '$' + price : '...';
+  fetchAllPrices().then((prices) => {
+    const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+    const priceDisplay = totalPrice > 0 ? '$' + totalPrice.toFixed(2) : '...';
+    
+    console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
+    
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
@@ -2599,6 +2668,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">\${allPdfsToAdd.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - \${priceDisplay}
         </button>
@@ -2615,9 +2685,10 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
-      window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
+      console.log('🛒 [CART DEBUG] Add to cart button clicked');
+      window.addFormToCart(mainFormPriceId);
       modal.remove();
     };
   });
@@ -2641,6 +2712,8 @@ function getUrlParam(name) {
 
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
+  
   // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
   clearCartState();
 
@@ -2656,9 +2729,11 @@ window.addFormToCart = function (priceId) {
     }
   }
 
+  console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
+
   // 3) Uniform metadata for every cart line
-  const originalFormId = (window.formId || 'custom-form');
-  const formTitle      = window.pdfOutputFileName || (typeof pdfOutputFileName !== 'undefined' ? pdfOutputFileName : 'Form');
+  const originalFormId = (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase();
+  const formTitle      = window.pdfFileName || (typeof pdfFileName !== 'undefined' ? pdfFileName : 'Form');
   const countyName     = getUrlParam('county');
   const defendantName  = getUrlParam('defendantName');
   const portfolioId    = getUrlParam('portfolioId');
@@ -2666,10 +2741,19 @@ window.addFormToCart = function (priceId) {
 
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
+  console.log('🛒 [CART DEBUG] Computing PDF logic items...');
+  
   try {
     if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
+      
       for (const pdfLogic of window.pdfLogicPDFs) {
-        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) {
+          console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
+          continue;
+        }
+        
+        console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
 
         let matched = false;
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -2680,20 +2764,26 @@ window.addFormToCart = function (priceId) {
 
           const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
                      document.getElementById('answer' + prevId);
-          if (!el) continue;
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
 
           let val = '';
           if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
           else                        { val = el.value || ''; }
 
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
           if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
           }
         }
 
         if (matched) {
-          pdfLogicItems.push({
-            formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+          const item = {
+            formId: pdfLogic.pdfName.replace(/\.pdf$/i, '').toLowerCase(),
             title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
             pdfName: pdfLogic.pdfName,
@@ -2703,49 +2793,107 @@ window.addFormToCart = function (priceId) {
             countyName: countyName,
             defendantName: defendantName,
             timestamp: nowTs
-          });
+          };
+          pdfLogicItems.push(item);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId);
+        } else {
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
       }
+    } else {
+      console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
+    
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', pdfLogicItems.length, pdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
   }
 
   // 5) Preferred path: site cart manager
   if (typeof window.addToCart === 'function') {
-    // main item
-    window.addToCart(
-      originalFormId, formTitle, priceId, { ...formData }, countyName, defendantName,
-      { originalFormId, portfolioId, pdfName: (window.pdfFileName || '') }
-    );
-
-    // every matched PDF logic item
+    console.log('🛒 [CART DEBUG] Firebase addToCart function available');
+    
+    // Create a batch of all items to add
+    const allItems = [];
+    
+    // Add main item
+    const mainItem = {
+      formId: originalFormId,
+      title: formTitle,
+      priceId: priceId,
+      formData: { ...formData, originalFormId, portfolioId, pdfName: (window.pdfFileName || '') },
+      countyName: countyName,
+      defendantName: defendantName
+    };
+    allItems.push(mainItem);
+    console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
+    
+    // Add all matched PDF logic items
     for (const item of pdfLogicItems) {
-      window.addToCart(
-        item.formId, item.title, item.priceId, { ...item.formData },
-        item.countyName, item.defendantName,
-        { originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName }
-      );
+      const pdfItem = {
+        formId: item.formId.toLowerCase(),
+        title: item.title,
+        priceId: item.priceId,
+        formData: { ...item.formData, originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName },
+        countyName: item.countyName,
+        defendantName: item.defendantName
+      };
+      allItems.push(pdfItem);
+      console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
     }
+    
+    console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
+    
+    // Add all items to cart with a small delay between each to prevent race conditions
+    let addedCount = 0;
+    allItems.forEach((item, index) => {
+      setTimeout(() => {
+        console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        window.addToCart(
+          item.formId, item.title, item.priceId, item.formData,
+          item.countyName, item.defendantName, item.pdfName
+        );
+        addedCount++;
+        
+        // Check if all items have been added
+        if (addedCount === allItems.length) {
+          console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
+          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\\n');
+          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
+          window.location.href = '../Pages/cart.html';
+        }
+      }, index * 200); // 200ms delay between each item
+    });
 
-    // redirect after everything is queued
-    setTimeout(() => { window.location.href = 'cart.html'; }, 0);
+    // Don't redirect automatically - let the alert handle it
     return;
   }
 
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
+  
   const cart = [];
-  cart.push({
+  const mainCartItem = {
     formId: originalFormId, title: formTitle, priceId,
     pdfName: (window.pdfFileName || ''),
     originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
-  });
-  for (const item of pdfLogicItems) cart.push(item);
+  };
+  cart.push(mainCartItem);
+  console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
+  
+  for (const item of pdfLogicItems) {
+    cart.push(item);
+    console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
+  }
+
+  console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  setTimeout(() => { window.location.href = 'cart.html'; }, 0);
+  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\\n');
+  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
+  window.location.href = '../Pages/cart.html';
 };
 
 
@@ -4622,10 +4770,18 @@ if (typeof handleNext === 'function') {
                             const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
                             countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
                         }
+                        // Use the proper display name instead of the filename
+                        let displayTitle = item.title || 'Form';
+                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
+                            displayTitle = 'SC-120';
+                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
+                            displayTitle = 'SC-500';
+                        }
+                        
                         itemsHtml +=
      '<div class="cart-item">' +
        '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         '<div class="cart-item-title">' + displayTitle + '</div>' +
          defendantHtml +
          countyHtml +
        '</div>' +
@@ -4657,7 +4813,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = 'cart.html';
+                            window.location.href = '../Pages/cart.html';
                         };
                     }
                 } catch (error) {
