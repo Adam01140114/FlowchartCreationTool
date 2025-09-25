@@ -1055,6 +1055,15 @@ window.saveFlowchart = function() {
   }
   data.sectionPrefs = sectionPrefs;
   data.groups = getGroupsData();
+  
+  // Include Form Properties in library save
+  let formPropertiesCopy = null;
+  if (typeof window.getFormProperties === 'function') {
+    formPropertiesCopy = window.getFormProperties();
+    console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in library save:", formPropertiesCopy);
+  }
+  data.formProperties = formPropertiesCopy;
+  
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
     lastUsed: Date.now()
@@ -1154,6 +1163,14 @@ window.openSavedFlowchart = function(name) {
       
       loadFlowchartData(flowchartData);
       currentFlowchartName = name;
+      
+      // Restore Form Properties if they exist
+      if (flowchartData.formProperties && typeof window.setFormProperties === 'function') {
+        console.log('🔧 [FORM PROPERTIES DEBUG] Restoring Form Properties from library:', flowchartData.formProperties);
+        window.setFormProperties(flowchartData.formProperties);
+      } else {
+        console.log('🔧 [FORM PROPERTIES DEBUG] No Form Properties found in library data');
+      }
       
       // Update last used timestamp
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)

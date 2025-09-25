@@ -4729,10 +4729,18 @@ function autosaveFlowchartToLocalStorage() {
       });
     });
     
+    // Include Form Properties in autosave
+    let formPropertiesCopy = null;
+    if (typeof window.getFormProperties === 'function') {
+      formPropertiesCopy = window.getFormProperties();
+      console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in autosave:", formPropertiesCopy);
+    }
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
-      groups: groupsArray
+      groups: groupsArray,
+      formProperties: formPropertiesCopy
     };
     
     // Cache the data and hash for next comparison
@@ -4905,6 +4913,15 @@ function showAutosaveRestorePrompt() {
     if (data) {
       console.log('Restoring autosave with groups:', data.groups);
       window.loadFlowchartData(data);
+      
+      // Restore Form Properties if they exist
+      if (data.formProperties && typeof window.setFormProperties === 'function') {
+        console.log('🔧 [FORM PROPERTIES DEBUG] Restoring Form Properties from autosave:', data.formProperties);
+        window.setFormProperties(data.formProperties);
+      } else {
+        console.log('🔧 [FORM PROPERTIES DEBUG] No Form Properties found in autosave data');
+      }
+      
       // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
       // Wait for groups to be loaded before setting up autosave hooks
       setTimeout(safeSetupAutosaveHooks, 1000);
@@ -4923,6 +4940,21 @@ function showAutosaveRestorePrompt() {
   box.appendChild(noBtn);
   modal.appendChild(box);
   document.body.appendChild(modal);
+  
+  // Close modal when clicking outside the box
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.remove();
+      clearAutosaveLocalStorage();
+      window.location.reload();
+    }
+  });
+  
+  // Prevent clicks inside the box from closing the modal
+  box.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
   // Removed: console.log('[AUTOSAVE][localStorage] Restore prompt shown.');
 }
 
