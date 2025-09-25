@@ -275,6 +275,22 @@ window.exportGuiJson = function(download = true) {
   // Add questions to sections by their section number
   for (const cell of questions) {
     const section = getSection(cell) || "1";
+    // Extract clean text for debugging
+    let debugCleanText = "";
+    if (typeof window.extractTextFromCell === 'function') {
+      debugCleanText = window.extractTextFromCell(cell);
+    } else {
+      debugCleanText = cell._questionText || cell.value || "";
+    }
+    
+    console.log(`🔧 [GUI EXPORT DEBUG] Question cell ${cell.id}:`, {
+      style: cell.style,
+      detectedSection: section,
+      rawQuestionText: cell._questionText,
+      rawValue: cell.value,
+      extractedCleanText: debugCleanText
+    });
+    
     if (!sectionMap[section]) {
       sectionMap[section] = {
         sectionId: parseInt(section),
@@ -288,9 +304,18 @@ window.exportGuiJson = function(download = true) {
     // --- PATCH: treat text2 as dropdown ---
     if (questionType === "text2") exportType = "dropdown";
     
+    // Extract clean text using the proper function
+    let cleanText = "";
+    if (typeof window.extractTextFromCell === 'function') {
+      cleanText = window.extractTextFromCell(cell);
+    } else {
+      // Fallback to simple extraction
+      cleanText = cell._questionText || cell.value || "";
+    }
+    
     const question = {
       questionId: cell._questionId || questionCounter++,
-      text: cell._questionText || cell.value || "",
+      text: cleanText,
       type: exportType,
       logic: {
         enabled: false,
@@ -828,6 +853,13 @@ window.exportGuiJson = function(download = true) {
   }
   sections.sort((a, b) => a.sectionId - b.sectionId);
   
+  console.log(`🔧 [GUI EXPORT DEBUG] Final sections array:`, sections.map(s => ({
+    sectionId: s.sectionId,
+    sectionName: s.sectionName,
+    questionCount: s.questions.length,
+    questions: s.questions.map(q => ({ questionId: q.questionId, text: q.text }))
+  })));
+  
   // Create final output object
   // Get form properties if available
   let formProperties = {};
@@ -940,10 +972,18 @@ window.exportBothJson = function() {
       return cellData;
     });
 
+    // Include Form Properties in export
+    let formProperties = null;
+    if (typeof window.getFormProperties === 'function') {
+      formProperties = window.getFormProperties();
+      console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in exportBothJson:", formProperties);
+    }
+
     const flowchartExportObj = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefs,
-      groups: getGroupsData()
+      groups: getGroupsData(),
+      formProperties: formProperties
     };
 
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
@@ -1291,9 +1331,17 @@ function exportGuiJson() {
     const qId = getNodeId(cell) || sanitizeNameId(cell.value || "unnamed");
     const qSection = getSection(cell);
     
+    // Robust text extraction for options export as well
+    let qText = "";
+    if (typeof window.extractTextFromCell === 'function') {
+      qText = window.extractTextFromCell(cell);
+    } else {
+      qText = cell._questionText || cell.value || "";
+    }
+    
     const questionObj = {
       id: qId,
-      text: cell._questionText || cell.value || "",
+      text: qText,
       type: qType,
       questionNumber: cell._questionId || "",
       options: []

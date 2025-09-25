@@ -3267,8 +3267,20 @@ function setQuestionType (cell, newType) {
 function extractTextFromCell(cell) {
   if (!cell) return '';
   
-  // First, try to get text from _questionText property
-  if (cell._questionText && cell._questionText.trim()) {
+  // Heuristic: detect default dropdown scaffolding text that should be ignored
+  const containsScaffolding = (text) => {
+    if (!text) return false;
+    const t = String(text);
+    return t.includes('-- Choose Question Type --') ||
+           t.includes('Text Dropdown Checkbox Number Date Big Paragraph') ||
+           t.includes('Multiple Textboxes') ||
+           t.includes('Multiple Dropdown Type') ||
+           t.includes('Date Range') ||
+           t.includes('Email') && t.includes('Phone');
+  };
+  
+  // First, try to get text from _questionText property, unless it looks like scaffolding
+  if (cell._questionText && cell._questionText.trim() && !containsScaffolding(cell._questionText)) {
     return cell._questionText.trim();
   }
   
@@ -3276,7 +3288,11 @@ function extractTextFromCell(cell) {
   if (cell.value) {
     const tmp = document.createElement("div");
     tmp.innerHTML = cell.value;
-    const extractedText = (tmp.textContent || tmp.innerText || "").trim();
+    let extractedText = (tmp.textContent || tmp.innerText || "").trim();
+    // If extracted text is still scaffolding, treat as empty
+    if (containsScaffolding(extractedText)) {
+      extractedText = '';
+    }
     if (extractedText) {
       return extractedText;
     }

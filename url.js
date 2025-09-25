@@ -12,7 +12,7 @@ function generateShareableUrl() {
     
     if (!flowchartJson) {
       alert('Error: Could not generate flowchart data');
-    return;
+      return;
     }
     
     // Encode the JSON for URL transmission
@@ -185,14 +185,11 @@ function showFlowchartLoadedNotification() {
  * Exports flowchart JSON without downloading (returns the string)
  */
 function exportFlowchartJson(download = true) {
-  console.log('📤 URL EXPORT: Starting exportFlowchartJson function');
-  alert('URL Export function called!');
   if (!graph) return null;
   
   const parent = graph.getDefaultParent();
   const cells = graph.getChildCells(parent, true, true);
-  console.log('📤 URL EXPORT: Found', cells.length, 'cells to export');
-
+  
   // Use the same serialization logic as the existing export function
   const simplifiedCells = cells.map(cell => {
     const cellData = {
@@ -237,8 +234,6 @@ function exportFlowchartJson(download = true) {
     if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
     if (cell._image) cellData._image = cell._image;
     if (cell._pdfUrl) cellData._pdfUrl = cell._pdfUrl;
-    if (cell._pdfFilename) cellData._pdfFilename = cell._pdfFilename;
-    if (cell._pdfDisplayName) cellData._pdfDisplayName = cell._pdfDisplayName;
     if (cell._priceId) cellData._priceId = cell._priceId;
     if (cell._notesText) cellData._notesText = cell._notesText;
     if (cell._notesBold) cellData._notesBold = cell._notesBold;
@@ -251,28 +246,20 @@ function exportFlowchartJson(download = true) {
     if (cell._calcThreshold) cellData._calcThreshold = cell._calcThreshold;
     if (cell._calcFinalText) cellData._calcFinalText = cell._calcFinalText;
     if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
-    
+
     return cellData;
   });
-
-  // Include Form Properties in export
-  let formProperties = null;
-  if (typeof window.getFormProperties === 'function') {
-    formProperties = window.getFormProperties();
-    console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in export:", formProperties);
-  }
 
   const output = {
     cells: simplifiedCells,
     sectionPrefs: JSON.parse(JSON.stringify(sectionPrefs)),
-    groups: JSON.parse(JSON.stringify(groups)),
-    formProperties: formProperties
+    groups: JSON.parse(JSON.stringify(groups))
   };
 
   const jsonStr = JSON.stringify(output, null, 2);
   
   if (download) {
-  // Download the file
+    // Download the file
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

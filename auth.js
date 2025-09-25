@@ -108,8 +108,8 @@ function checkForSavedLogin() {
         }
       });
   } else {
-    // Don't show login overlay by default - let user access the tool without logging in
-    // showLoginOverlay();
+    // No saved credentials - onAuthStateChanged will handle showing login screen
+    console.log('🔐 [AUTH] No saved credentials found');
   }
 
   setupAuthListeners();
@@ -220,6 +220,21 @@ function setupAuthListeners() {
   
   // Auto-login function - uses hardcoded credentials
   autoLogin();
+  
+  // Set up Firebase auth state listener to show login screen when not authenticated
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in
+      window.currentUser = user;
+      hideLoginOverlay();
+      console.log('🔐 [AUTH] User authenticated:', user.email);
+    } else {
+      // User is signed out or authentication failed
+      window.currentUser = null;
+      showLoginOverlay();
+      console.log('🔐 [AUTH] User not authenticated, showing login screen');
+    }
+  });
 }
 
 /**

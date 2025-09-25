@@ -1044,7 +1044,6 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
-    '<script src="cart.js"></script>',
     "",
     '<script>',
     '// Firebase Configuration',
@@ -2245,29 +2244,6 @@ if (s > 1){
     100% { transform: scale(1); opacity: 1; }
   }
   
-  .alert-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #7f8c8d;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  
-  .alert-close-btn:hover {
-    background: rgba(44, 62, 80, 0.1);
-    color: #2c3e50;
-  }
   
   .alert-message {
     margin-bottom: 28px;
@@ -2299,32 +2275,21 @@ if (s > 1){
     min-width: 100px;
   }
   
-  .alert-btn-back {
+  .alert-btn-continue {
     background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
     color: #fff;
   }
   
-  .alert-btn-back:hover {
+  .alert-btn-continue:hover {
     background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-  }
-  
-  .alert-btn-exit {
-    background: #e74c3c;
-    color: #fff;
-  }
-  
-  .alert-btn-exit:hover {
-    background: #c0392b;
   }
   </style>
   
   <div id="alertOverlay" class="alert-overlay">
     <div class="alert-popup">
-      <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
-        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
-        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
+        <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
       </div>
     </div>
   </div>
@@ -2448,7 +2413,7 @@ formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Main PDF name
 formHTML += `var pdfOutputFileName = "${escapedPdfOutputName}";\n`; // Output file name
 formHTML += `var stripePriceId = "${escapedStripePriceId}";\n`; // Stripe Price ID
 formHTML += `var additionalPdfFileNames = ${JSON.stringify(escapedAdditionalPdfNames)};\n`;  // Additional PDF names
-formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditionalPdfNames.map(name => `"${name}"`).join(", ")}];\n`;  // All PDF names in an array
+formHTML += `var allPdfFileNames = ["${escapedPdfOutputName.replace(/\.pdf$/i, '')}", ${escapedAdditionalPdfNames.map(name => `"${name.replace(/\.pdf$/i, '')}"`).join(", ")}];\n`;  // All PDF names in an array (without .pdf extension)
 
 
 
@@ -2467,7 +2432,21 @@ formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditional
   // Add alert functions (always available for validation popups)
   formHTML += `
 // Alert Logic Functions
+// Track page load time to prevent alerts in first 3 seconds
+const pageLoadTime = Date.now();
+const ALERT_DELAY_MS = 3000; // 3 seconds
+
 function showAlert(message) {
+    // Check if 3 seconds have passed since page load
+    const currentTime = Date.now();
+    const timeSinceLoad = currentTime - pageLoadTime;
+    
+    if (timeSinceLoad < ALERT_DELAY_MS) {
+        // If less than 3 seconds have passed, don't show the alert
+        console.log('Alert blocked: Page loaded less than 3 seconds ago');
+        return;
+    }
+    
     const alertOverlay = document.getElementById('alertOverlay');
     const alertMessage = document.getElementById('alertMessage');
     
@@ -2491,19 +2470,6 @@ function closeAlert() {
     }
 }
 
-function exitForm() {
-    // Check if this is a validation popup or regular alert
-    const alertMessage = document.getElementById('alertMessage');
-    if (alertMessage && alertMessage.innerHTML.includes('Please Complete All Questions')) {
-        // This is a validation popup - go back to forms page
-        if (confirm('Are you sure you want to exit? Your progress will be saved.')) {
-            window.location.href = 'forms.html';
-        }
-    } else {
-        // This is a regular alert - reload the page
-        window.location.reload();
-    }
-}
 
 // Show validation popup when user tries to proceed without answering all questions
 function showValidationPopup() {
@@ -2536,22 +2502,21 @@ function checkAlertLogic(changedElement) {
         }
     }
     
+    // If we can't determine which question changed, don't check any alerts
+    // This prevents alerts from triggering on unrelated form elements
+    if (!changedQuestionId) return;
+    
     for (const alertLogic of alertLogics) {
         if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
         
         // Only check this alert logic if it's related to the changed element
         let shouldCheckThisAlert = false;
-        if (changedQuestionId) {
-            // Check if any condition in this alert logic references the changed question
-            for (const condition of alertLogic.conditions) {
-                if (condition.prevQuestion === changedQuestionId) {
-                    shouldCheckThisAlert = true;
-                    break;
-                }
+        // Check if any condition in this alert logic references the changed question
+        for (const condition of alertLogic.conditions) {
+            if (condition.prevQuestion === changedQuestionId) {
+                shouldCheckThisAlert = true;
+                break;
             }
-        } else {
-            // If we can't determine which question changed, check all alerts (fallback)
-            shouldCheckThisAlert = true;
         }
         
         if (!shouldCheckThisAlert) continue;
@@ -3061,23 +3026,14 @@ function validateCurrentSection(sectionNumber) {
     const questions = section.querySelectorAll('.question-container:not(.hidden)');
     let isValid = true;
     
-    console.log('Validating section', sectionNumber, 'with', questions.length, 'visible questions');
-    
     questions.forEach(question => {
         const questionId = question.id.replace('question-container-', '');
         const questionType = getQuestionTypeFromContainer(question);
         
-        console.log('Validating question', questionId, 'of type', questionType);
-        
         if (!validateQuestion(question, questionType, questionId)) {
-            console.log('Question', questionId, 'failed validation');
             isValid = false;
-        } else {
-            console.log('Question', questionId, 'passed validation');
         }
     });
-    
-    console.log('Section validation result:', isValid);
     
     // Update next button state
     const nextButton = document.getElementById('next-button-' + sectionNumber);
@@ -3154,12 +3110,8 @@ function validateDropdownQuestion(questionContainer) {
     const select = questionContainer.querySelector('select');
     if (!select) return true;
     
-    // Debug logging
-    console.log('Validating dropdown:', select.id, 'Value:', select.value, 'Trimmed:', select.value.trim());
-    
     // Check if the dropdown has a value and it's not the default empty/disabled option
     const isValid = select.value && select.value.trim() !== '' && select.value !== 'Select an option';
-    console.log('Dropdown validation result:', isValid);
     return isValid;
 }
 
@@ -3202,8 +3154,16 @@ function addValidationListeners() {
     const formFields = currentSection.querySelectorAll('input, select, textarea');
     
     formFields.forEach(field => {
-        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
-        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+        // Remove existing listeners to prevent duplicates
+        field.removeEventListener('change', field._validationHandler);
+        field.removeEventListener('input', field._validationHandler);
+        
+        // Create new handler
+        field._validationHandler = () => validateCurrentSection(sectionNumber);
+        
+        // Add listeners
+        field.addEventListener('change', field._validationHandler);
+        field.addEventListener('input', field._validationHandler);
     });
     
     // Initial validation
