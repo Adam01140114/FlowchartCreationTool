@@ -2880,7 +2880,13 @@ window.addFormToCart = function (priceId) {
         // Check if all items have been added
         if (addedCount === allItems.length) {
           console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
-          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A')).join('\\n');
+          const itemList = allItems.map(item => {
+            let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+            if (item.defendantName && item.defendantName.trim() !== '') {
+              itemInfo += ' - Defendant: ' + item.defendantName;
+            }
+            return itemInfo;
+          }).join('\\n');
           console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
           
           // Show debugging alert with cart data
@@ -2919,7 +2925,13 @@ window.addFormToCart = function (priceId) {
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A')).join('\\n');
+  const itemList = cart.map(item => {
+    let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+    if (item.defendantName && item.defendantName.trim() !== '') {
+      itemInfo += ' - Defendant: ' + item.defendantName;
+    }
+    return itemInfo;
+  }).join('\\n');
   console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
   
   // Show debugging alert with cart data
