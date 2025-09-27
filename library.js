@@ -747,6 +747,7 @@ window.exportGuiJson = function(download = true) {
           // This question is directly connected to a PDF node
           question.pdfLogic.enabled = true;
           question.pdfLogic.pdfName = targetCell._pdfFile || targetCell._pdfUrl || "";
+          question.pdfLogic.pdfDisplayName = targetCell._pdfName || "";
           question.pdfLogic.stripePriceId = targetCell._pdfPrice || targetCell._priceId || "";
           
           // If this is a Big Paragraph question and the PDF node has a character limit
@@ -778,6 +779,7 @@ window.exportGuiJson = function(download = true) {
                 // This question's option leads to a PDF node
                 question.pdfLogic.enabled = true;
                 question.pdfLogic.pdfName = pdfCell._pdfFile || pdfCell._pdfUrl || "";
+                question.pdfLogic.pdfDisplayName = pdfCell._pdfName || "";
                 question.pdfLogic.stripePriceId = pdfCell._pdfPrice || pdfCell._priceId || "";
                 
                 // Extract the option text

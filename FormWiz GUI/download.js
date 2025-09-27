@@ -150,6 +150,7 @@ function loadFormData(formData) {
             stripePriceIdInput.value = formData.stripePriceId;
         }
     }
+    
 
     // 3.1) Load additional PDFs if present
     if (formData.additionalPDFs && formData.additionalPDFs.length > 0) {
@@ -647,6 +648,10 @@ function loadFormData(formData) {
                     if (pdfLogicPdfNameInput) {
                         pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
                     }
+                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}`);
+                    if (pdfLogicPdfDisplayNameInput && question.pdfLogic.pdfDisplayName) {
+                        pdfLogicPdfDisplayNameInput.value = question.pdfLogic.pdfDisplayName;
+                    }
                     const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
                     if (pdfLogicStripePriceIdInput) {
                         pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId || "";
@@ -980,6 +985,7 @@ function exportForm() {
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
             const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
+            const pdfLogicPdfDisplayName = questionBlock.querySelector(`#pdfLogicPdfDisplayName${questionId}`)?.value || "";
             const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
             
             // Collect PDF Logic conditions
@@ -1105,6 +1111,7 @@ function exportForm() {
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
                     pdfName: pdfLogicPdfName,
+                    pdfDisplayName: pdfLogicPdfDisplayName,
                     stripePriceId: pdfLogicStripePriceId,
                     conditions: pdfLogicConditionsArray
                 },

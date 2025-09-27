@@ -712,6 +712,9 @@ function addQuestion(sectionId, questionId = null) {
             <div id="pdfLogicConditions${currentQuestionId}"></div>
             <button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
             <br><br>
+            <label>PDF Name (for cart display):</label>
+            <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+            <br><br>
             <label>Additional PDF to download:</label>
             <input type="text" id="pdfLogicPdfName${currentQuestionId}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
             <br><br>
