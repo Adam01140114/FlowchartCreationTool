@@ -389,3 +389,104 @@ window.updateGroupsObject = updateGroupsObject;
 window.loadGroupsFromData = loadGroupsFromData;
 window.getGroupsData = getGroupsData;
 window.updateGroupDropdowns = updateGroupDropdowns;
+
+/**************************************************
+ ************ Default PDF Properties **************
+ **************************************************/
+
+// Default PDF Properties object
+let defaultPdfProperties = {
+  pdfName: "",
+  pdfFile: "",
+  pdfPrice: ""
+};
+
+/**
+ * Initialize Default PDF Properties
+ */
+function initializeDefaultPdfProperties() {
+  // Load from localStorage if available
+  const saved = localStorage.getItem('defaultPdfProperties');
+  if (saved) {
+    try {
+      defaultPdfProperties = JSON.parse(saved);
+    } catch (e) {
+      console.error('Error loading default PDF properties:', e);
+    }
+  }
+  
+  // Update UI with loaded values
+  updateDefaultPdfPropertiesUI();
+}
+
+/**
+ * Update Default PDF Properties UI with current values
+ */
+function updateDefaultPdfPropertiesUI() {
+  const nameInput = document.getElementById('defaultPdfNameInput');
+  const fileInput = document.getElementById('defaultPdfFileInput');
+  const priceInput = document.getElementById('defaultPdfPriceInput');
+  
+  if (nameInput) nameInput.value = defaultPdfProperties.pdfName || "";
+  if (fileInput) fileInput.value = defaultPdfProperties.pdfFile || "";
+  if (priceInput) priceInput.value = defaultPdfProperties.pdfPrice || "";
+}
+
+/**
+ * Update Default PDF Properties from UI inputs
+ */
+function updateDefaultPdfProperties() {
+  const nameInput = document.getElementById('defaultPdfNameInput');
+  const fileInput = document.getElementById('defaultPdfFileInput');
+  const priceInput = document.getElementById('defaultPdfPriceInput');
+  
+  if (nameInput) defaultPdfProperties.pdfName = nameInput.value.trim();
+  if (fileInput) defaultPdfProperties.pdfFile = fileInput.value.trim();
+  if (priceInput) defaultPdfProperties.pdfPrice = priceInput.value.trim();
+  
+  // Save to localStorage
+  localStorage.setItem('defaultPdfProperties', JSON.stringify(defaultPdfProperties));
+  
+  // Trigger autosave
+  const requestAutosave = getRequestAutosave();
+  if (requestAutosave) {
+    requestAutosave();
+  }
+}
+
+/**
+ * Get Default PDF Properties
+ */
+function getDefaultPdfProperties() {
+  return { ...defaultPdfProperties };
+}
+
+/**
+ * Set Default PDF Properties
+ */
+function setDefaultPdfProperties(properties) {
+  defaultPdfProperties = { ...properties };
+  updateDefaultPdfPropertiesUI();
+  
+  // Save to localStorage
+  localStorage.setItem('defaultPdfProperties', JSON.stringify(defaultPdfProperties));
+  
+  // Trigger autosave
+  const requestAutosave = getRequestAutosave();
+  if (requestAutosave) {
+    requestAutosave();
+  }
+}
+
+// Export functions
+window.initializeDefaultPdfProperties = initializeDefaultPdfProperties;
+window.updateDefaultPdfProperties = updateDefaultPdfProperties;
+window.getDefaultPdfProperties = getDefaultPdfProperties;
+window.setDefaultPdfProperties = setDefaultPdfProperties;
+
+// Initialize when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeDefaultPdfProperties);
+} else {
+  initializeDefaultPdfProperties();
+}

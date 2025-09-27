@@ -192,17 +192,9 @@ function autoSaveFlowchart() {
     
     if (cells.length === 0) return; // Don't save empty flowcharts
     
-    // Include Form Properties in autosave
-    let formProperties = null;
-    if (typeof window.getFormProperties === 'function') {
-      formProperties = window.getFormProperties();
-      console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in settings autosave:", formProperties);
-    }
-
     const autoSaveData = {
       timestamp: new Date().toISOString(),
-      cells: cells.map(cell => serializeCellForAutoSave(cell)),
-      formProperties: formProperties
+      cells: cells.map(cell => serializeCellForAutoSave(cell))
     };
     
     localStorage.setItem('flowchart_autosave', JSON.stringify(autoSaveData));

@@ -339,6 +339,42 @@ input[type="file"] {
   border-radius: 5px;
 }
 
+/* Default PDF Properties Styles */
+#defaultPdfPropertiesContainer {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+}
+
+#defaultPdfPropertiesContainer h4 {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 14px;
+}
+
+#defaultPdfPropertiesContainer .form-group {
+  margin-bottom: 10px;
+}
+
+#defaultPdfPropertiesContainer label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #495057;
+  font-size: 12px;
+}
+
+#defaultPdfPropertiesContainer input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 3px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
 #groupsContainer h4 {
   margin: 0 0 10px 0;
   color: #495057;
@@ -851,173 +887,4 @@ body.ctrl-pressed::after {
   color: black;
   text-decoration: none;
   cursor: pointer;
-}
-
-/* PDF Properties Modal specific styles */
-#pdfPropertiesModal .modal-content {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: none;
-  max-width: 400px;
-  width: 90%;
-  margin: 0;
-}
-
-#pdfPropertiesModal .modal-header h3 {
-  color: #333;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-#pdfPropertiesModal .close {
-  color: #aaa;
-  font-size: 28px;
-  font-weight: bold;
-  transition: color 0.2s;
-}
-
-#pdfPropertiesModal .close:hover,
-#pdfPropertiesModal .close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-#pdfPropertiesModal input[type="text"] {
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-#pdfPropertiesModal input[type="text"]:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-#pdfPropertiesModal button {
-  transition: all 0.2s;
-}
-
-#pdfPropertiesModal button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#pdfPropertiesModal button[onclick="savePdfProperties()"]:hover {
-  background-color: #0056b3;
-}
-
-/* Form Properties Module Styles */
-#formPropertiesContainer {
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #f8f9fa;
-}
-
-#formPropertiesContainer .section-header {
-  background: #e9ecef;
-  padding: 10px 15px;
-  border-bottom: 1px solid #ddd;
-  border-radius: 8px 8px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#formPropertiesContainer .section-header h3 {
-  margin: 0;
-  color: #495057;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-#formPropertiesContainer .toggle-btn {
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#formPropertiesContainer .toggle-btn:hover {
-  background: #5a6268;
-}
-
-#formPropertiesContainer .section-content {
-  padding: 15px;
-}
-
-#formPropertiesContainer .form-group {
-  margin-bottom: 15px;
-}
-
-#formPropertiesContainer .form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 600;
-  color: #495057;
-  font-size: 14px;
-}
-
-#formPropertiesContainer .form-group input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  box-sizing: border-box;
-}
-
-#formPropertiesContainer .form-group input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-#formPropertiesContainer .form-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-#formPropertiesContainer .save-btn,
-#formPropertiesContainer .reset-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-#formPropertiesContainer .save-btn {
-  background: #007bff;
-  color: white;
-}
-
-#formPropertiesContainer .save-btn:hover {
-  background: #0056b3;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#formPropertiesContainer .reset-btn {
-  background: #6c757d;
-  color: white;
-}
-
-#formPropertiesContainer .reset-btn:hover {
-  background: #5a6268;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

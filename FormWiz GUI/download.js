@@ -2,219 +2,7 @@
  * download.js - MULTIPLE OR CONDITIONS
  *   WITH multi-term hidden-field calculations
  *   export/import logic (for both checkbox and text)
- *   AND GUI autosave functionality
  ********************************************/
-
-// GUI Autosave functionality
-let guiAutosaveTimeout = null;
-const GUI_AUTOSAVE_DELAY = 2000; // 2 seconds delay
-const GUI_STORAGE_KEY = 'gui_autosave_data';
-const GUI_LAST_IMPORT_KEY = 'gui_last_import';
-
-/**
- * Initialize GUI autosave functionality
- */
-function initializeGuiAutosave() {
-    console.log('🔄 GUI AUTOSAVE: Initializing autosave functionality');
-    
-    // Load last saved data on page load
-    loadLastGuiData();
-    
-    // Set up autosave on form changes
-    setupGuiAutosaveListeners();
-    
-    console.log('🔄 GUI AUTOSAVE: Autosave initialized');
-}
-
-/**
- * Set up event listeners for GUI autosave
- */
-function setupGuiAutosaveListeners() {
-    // Listen for changes in the form builder
-    const formBuilder = document.getElementById('formBuilder');
-    if (formBuilder) {
-        formBuilder.addEventListener('input', debounceGuiAutosave);
-        formBuilder.addEventListener('change', debounceGuiAutosave);
-    }
-    
-    // Listen for section changes
-    document.addEventListener('click', function(e) {
-        if (e.target.matches('button[onclick*="addSection"], button[onclick*="removeSection"], button[onclick*="addQuestion"]')) {
-            debounceGuiAutosave();
-        }
-    });
-    
-    // Listen for PDF input changes
-    const pdfInputs = document.querySelectorAll('#pdfContainer input');
-    pdfInputs.forEach(input => {
-        input.addEventListener('input', debounceGuiAutosave);
-    });
-}
-
-/**
- * Debounced autosave function
- */
-function debounceGuiAutosave() {
-    if (guiAutosaveTimeout) {
-        clearTimeout(guiAutosaveTimeout);
-    }
-    
-    guiAutosaveTimeout = setTimeout(() => {
-        saveGuiData();
-    }, GUI_AUTOSAVE_DELAY);
-}
-
-/**
- * Save current GUI data to localStorage
- */
-function saveGuiData() {
-    try {
-        const formData = exportForm(false); // false = don't download, just return data
-        if (formData) {
-            localStorage.setItem(GUI_STORAGE_KEY, JSON.stringify(formData));
-            console.log('💾 GUI AUTOSAVE: Data saved to localStorage');
-        }
-    } catch (error) {
-        console.error('💾 GUI AUTOSAVE: Error saving data:', error);
-    }
-}
-
-/**
- * Load last saved GUI data from localStorage
- */
-function loadLastGuiData() {
-    try {
-        const savedData = localStorage.getItem(GUI_STORAGE_KEY);
-        if (savedData) {
-            const formData = JSON.parse(savedData);
-            console.log('📥 GUI AUTOSAVE: Found saved data, loading...');
-            
-            // Show a notification to the user
-            showGuiAutosaveNotification('Found saved data. Loading...', 'info');
-            
-            // Load the data
-            loadFormData(formData);
-            
-            // Show success notification
-            setTimeout(() => {
-                showGuiAutosaveNotification('Previous work restored!', 'success');
-            }, 500);
-        }
-    } catch (error) {
-        console.error('📥 GUI AUTOSAVE: Error loading saved data:', error);
-    }
-}
-
-/**
- * Clear saved GUI data
- */
-function clearGuiData() {
-    if (confirm('Are you sure you want to clear all saved GUI data? This cannot be undone.')) {
-        localStorage.removeItem(GUI_STORAGE_KEY);
-        localStorage.removeItem(GUI_LAST_IMPORT_KEY);
-        showGuiAutosaveNotification('Saved data cleared!', 'warning');
-        console.log('🗑️ GUI AUTOSAVE: Data cleared');
-    }
-}
-
-/**
- * Show autosave notification
- */
-function showGuiAutosaveNotification(message, type = 'info') {
-    // Remove existing notification
-    const existingNotification = document.getElementById('guiAutosaveNotification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.id = 'guiAutosaveNotification';
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 6px;
-        color: white;
-        font-weight: 500;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
-        max-width: 300px;
-        word-wrap: break-word;
-    `;
-    
-    // Set color based on type
-    switch (type) {
-        case 'success':
-            notification.style.backgroundColor = '#28a745';
-            break;
-        case 'warning':
-            notification.style.backgroundColor = '#ffc107';
-            notification.style.color = '#000';
-            break;
-        case 'error':
-            notification.style.backgroundColor = '#dc3545';
-            break;
-        default:
-            notification.style.backgroundColor = '#007bff';
-    }
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 300);
-        }
-    }, 3000);
-}
-
-/**
- * Save last imported file data
- */
-function saveLastImportData(formData) {
-    try {
-        localStorage.setItem(GUI_LAST_IMPORT_KEY, JSON.stringify(formData));
-        console.log('💾 GUI AUTOSAVE: Last import data saved');
-    } catch (error) {
-        console.error('💾 GUI AUTOSAVE: Error saving last import data:', error);
-    }
-}
-
-/**
- * Load last imported file data
- */
-function loadLastImportData() {
-    try {
-        const savedData = localStorage.getItem(GUI_LAST_IMPORT_KEY);
-        if (savedData) {
-            const formData = JSON.parse(savedData);
-            console.log('📥 GUI AUTOSAVE: Loading last import data...');
-            loadFormData(formData);
-            showGuiAutosaveNotification('Last imported file restored!', 'success');
-            return true;
-        }
-    } catch (error) {
-        console.error('📥 GUI AUTOSAVE: Error loading last import data:', error);
-    }
-    return false;
-}
-
-// Initialize autosave when DOM is loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeGuiAutosave);
-} else {
-    initializeGuiAutosave();
-}
 
 /**
  * Helper function to find checkbox options for a given question ID
@@ -289,6 +77,26 @@ function showPreview() {
     }
     
     const formHTML = getFormHTML();
+    
+    // Copy HTML to clipboard automatically when previewing
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(formHTML).then(() => {
+            // Show a brief notification that it was copied
+            const previewButton = document.getElementById('previewButton');
+            if (previewButton) {
+                const originalText = previewButton.textContent;
+                previewButton.textContent = 'Copied to clipboard!';
+                previewButton.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    previewButton.textContent = originalText;
+                    previewButton.style.backgroundColor = '';
+                }, 2000);
+            }
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
+    }
+    
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
     previewFrame.srcdoc = formHTML;
@@ -340,23 +148,6 @@ function loadFormData(formData) {
         const stripePriceIdInput = document.getElementById('stripePriceId');
         if (stripePriceIdInput) {
             stripePriceIdInput.value = formData.stripePriceId;
-        }
-    }
-    
-    // Set form properties in flowchart if available
-    if (formData.formProperties && typeof setFormProperties === 'function') {
-        setFormProperties(formData.formProperties);
-    }
-    
-    // Also set form properties from individual fields if formProperties not available
-    if (!formData.formProperties && (formData.defaultPDFName || formData.pdfOutputName || formData.stripePriceId)) {
-        const properties = {
-            pdfFormName: formData.defaultPDFName || '',
-            outputFileName: formData.pdfOutputName || '',
-            stripePriceId: formData.stripePriceId || ''
-        };
-        if (typeof setFormProperties === 'function') {
-            setFormProperties(properties);
         }
     }
 
@@ -625,6 +416,12 @@ function loadFormData(formData) {
                     }
                 }
                 else if (question.type === 'multipleTextboxes') {
+                    // Load custom Node ID if it exists
+                    const nodeIdInput = questionBlock.querySelector(`#multipleTextboxesNodeId${question.questionId}`);
+                    if (nodeIdInput && question.nodeId) {
+                        nodeIdInput.value = question.nodeId;
+                    }
+                    
                     // Rebuild multiple textboxes
                     const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
                     if (multipleTextboxesBlock) {
@@ -708,7 +505,6 @@ function loadFormData(formData) {
                 else if (
                     // Text-like question types
                     question.type === 'text' ||
-                    question.type === 'bigParagraph' ||
                     question.type === 'radio' ||
                     question.type === 'money' ||
                     question.type === 'date' ||
@@ -723,6 +519,20 @@ function loadFormData(formData) {
                     }
                     if (placeholderInput) {
                         placeholderInput.value = question.placeholder || '';
+                    }
+                }
+                else if (question.type === 'bigParagraph') {
+                    const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
+                    const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
+                    const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
+                    if (nameInput) {
+                        nameInput.value = question.nameId || '';
+                    }
+                    if (placeholderInput) {
+                        placeholderInput.value = question.placeholder || '';
+                    }
+                    if (lineLimitInput && question.lineLimit) {
+                        lineLimitInput.value = question.lineLimit;
                     }
                 }
 
@@ -741,7 +551,18 @@ function loadFormData(formData) {
                         const pa = questionBlock.querySelector(`#prevAnswer${question.questionId}_${rowId}`);
                         if (pq) pq.value = cond.prevQuestion;
                         updateLogicAnswersForRow(question.questionId, rowId);
-                        if (pa) pa.value = cond.prevAnswer;
+                        
+                        // Handle text questions with hidden inputs
+                        if (pa && pa.style.display === 'none') {
+                            // For text questions, set the hidden input value
+                            const hiddenInput = document.getElementById(`hiddenAnswer${question.questionId}_${rowId}`);
+                            if (hiddenInput) {
+                                hiddenInput.value = cond.prevAnswer || "Any Text";
+                            }
+                        } else if (pa) {
+                            // For other question types, set the select value
+                            pa.value = cond.prevAnswer;
+                        }
                     });
                 }
 
@@ -768,23 +589,31 @@ function loadFormData(formData) {
                         addJumpCondition(question.questionId);
                         const conditionId = index + 1;
                         
-                        // Update options for the dropdown based on question type
-                        if (question.type === 'dropdown') {
-                            updateJumpOptions(question.questionId, conditionId);
-                        } else if (question.type === 'radio') {
-                            updateJumpOptionsForRadio(question.questionId, conditionId);
-                        } else if (question.type === 'checkbox') {
-                            updateJumpOptionsForCheckbox(question.questionId, conditionId);
-                        } else if (question.type === 'numberedDropdown') {
-                            updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                        // Update options for the dropdown based on question type (skip for textbox and date questions)
+                        const isTextboxQuestion = question.type === 'text' || question.type === 'bigParagraph' || question.type === 'money' || question.type === 'date' || question.type === 'dateRange';
+                        
+                        if (!isTextboxQuestion) {
+                            if (question.type === 'dropdown') {
+                                updateJumpOptions(question.questionId, conditionId);
+                            } else if (question.type === 'radio') {
+                                updateJumpOptionsForRadio(question.questionId, conditionId);
+                            } else if (question.type === 'checkbox') {
+                                updateJumpOptionsForCheckbox(question.questionId, conditionId);
+                            } else if (question.type === 'numberedDropdown') {
+                                updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                            }
                         }
                         
-                        // After options are populated, set the selected value
+                        // Set the values based on question type
                         const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
                         const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
                         
-                        if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
-                        if (jumpToInput) jumpToInput.value = cond.to;
+                        if (!isTextboxQuestion && jumpOptionSelect) {
+                            jumpOptionSelect.value = cond.option;
+                        }
+                        if (jumpToInput) {
+                            jumpToInput.value = cond.to;
+                        }
                     });
                 }
               
@@ -817,10 +646,6 @@ function loadFormData(formData) {
                     const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}`);
                     if (pdfLogicPdfNameInput) {
                         pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
-                    }
-                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}`);
-                    if (pdfLogicPdfDisplayNameInput) {
-                        pdfLogicPdfDisplayNameInput.value = question.pdfLogic.pdfDisplayName || "";
                     }
                     const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
                     if (pdfLogicStripePriceIdInput) {
@@ -1018,18 +843,9 @@ function loadFormData(formData) {
 
     // 9) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
     updateFormAfterImport();
-    
-    // 10) Save the imported data for autosave
-    saveLastImportData(formData);
 }
 
-function exportForm(download = true) {
-    // Get form properties from flowchart if available
-    let formProperties = {};
-    if (typeof getFormProperties === 'function') {
-        formProperties = getFormProperties();
-    }
-    
+function exportForm() {
     const formData = {
         sections: [],
         groups: [],
@@ -1040,16 +856,15 @@ function exportForm(download = true) {
         groupCounter: groupCounter,
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
-            : formProperties.pdfFormName || '',
+            : '',
         pdfOutputName: document.getElementById('pdfOutputName')
             ? document.getElementById('pdfOutputName').value.trim()
-            : formProperties.outputFileName || '',
+            : '',
         stripePriceId: document.getElementById('stripePriceId')
             ? document.getElementById('stripePriceId').value.trim()
-            : formProperties.stripePriceId || '',
+            : '',
         additionalPDFs: [], // New field for additional PDFs
-        checklistItems: [], // New field for checklist items
-        formProperties: formProperties // Include form properties in export
+        checklistItems: [] // New field for checklist items
     };
 
     // Collect all additional PDF names
@@ -1108,7 +923,20 @@ function exportForm(download = true) {
                 logicRows.forEach((row, idx) => {
                     const rowIndex = idx + 1;
                     const pqVal = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`)?.value.trim() || "";
-                    const paVal = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`)?.value.trim() || "";
+                    
+                    // Check if this is a text question (answer select is hidden)
+                    const answerSelect = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
+                    let paVal = "";
+                    
+                    if (answerSelect && answerSelect.style.display === 'none') {
+                        // For text questions, get the value from the hidden input
+                        const hiddenInput = document.getElementById(`hiddenAnswer${questionId}_${rowIndex}`);
+                        paVal = hiddenInput ? hiddenInput.value.trim() : "Any Text";
+                    } else {
+                        // For other question types, get the value from the select dropdown
+                        paVal = answerSelect?.value.trim() || "";
+                    }
+                    
                     if (pqVal && paVal) {
                         conditionsArray.push({ prevQuestion: pqVal, prevAnswer: paVal });
                     }
@@ -1125,7 +953,17 @@ function exportForm(download = true) {
                     const jumpOption = condDiv.querySelector(`#jumpOption${questionId}_${conditionId}`)?.value || '';
                     const jumpTo = condDiv.querySelector(`#jumpTo${questionId}_${conditionId}`)?.value || '';
 
-                    if (jumpOption && jumpTo) {
+                    // For textbox and date questions, we only need the jumpTo field (no dropdown)
+                    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+                    
+                    if (isTextboxQuestion && jumpTo) {
+                        // For textbox and date questions, use "Any Text" as the option
+                        jumpConditions.push({
+                            option: "Any Text",
+                            to: jumpTo
+                        });
+                    } else if (!isTextboxQuestion && jumpOption && jumpTo) {
+                        // For other question types, require both option and jumpTo
                         jumpConditions.push({
                             option: jumpOption,
                             to: jumpTo
@@ -1142,7 +980,6 @@ function exportForm(download = true) {
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
             const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
-            const pdfLogicPdfDisplayName = questionBlock.querySelector(`#pdfLogicPdfDisplayName${questionId}`)?.value || "";
             const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
             
             // Collect PDF Logic conditions
@@ -1268,7 +1105,6 @@ function exportForm(download = true) {
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
                     pdfName: pdfLogicPdfName,
-                    pdfDisplayName: pdfLogicPdfDisplayName,
                     stripePriceId: pdfLogicStripePriceId,
                     conditions: pdfLogicConditionsArray
                 },
@@ -1413,6 +1249,12 @@ function exportForm(download = true) {
                 questionData.amounts = amounts;
             }
             else if (questionType === 'multipleTextboxes') {
+                // Export custom Node ID if it exists
+                const nodeIdInput = questionBlock.querySelector(`#multipleTextboxesNodeId${questionId}`);
+                if (nodeIdInput && nodeIdInput.value.trim()) {
+                    questionData.nodeId = nodeIdInput.value.trim();
+                }
+                
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 questionData.amounts = [];
@@ -1447,7 +1289,6 @@ function exportForm(download = true) {
             }
             else if (
                 questionType === 'text' ||
-                questionType === 'bigParagraph' ||
                 questionType === 'radio' ||
                 questionType === 'money' ||
                 questionType === 'date' ||
@@ -1459,6 +1300,16 @@ function exportForm(download = true) {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
+            }
+            else if (questionType === 'bigParagraph') {
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
+                const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
+                questionData.nameId = nameId;
+                questionData.placeholder = placeholder;
+                if (lineLimit) {
+                    questionData.lineLimit = parseInt(lineLimit);
+                }
             }
 
             // -- Push questionData once (after we finish building it!) --
@@ -1696,33 +1547,26 @@ function exportForm(download = true) {
     }
 
     const jsonString = JSON.stringify(formData, null, 2);
+    downloadJSON(jsonString, "form_data.json");
     
-    // Only download and copy to clipboard if download parameter is true
-    if (download) {
-        downloadJSON(jsonString, "form_data.json");
-        
-        // Also copy to clipboard
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(jsonString).then(() => {
-                // Show a brief notification that it was copied
-                const exportButton = document.querySelector('button[onclick="exportForm()"]');
-                if (exportButton) {
-                    const originalText = exportButton.textContent;
-                    exportButton.textContent = 'Copied to clipboard!';
-                    exportButton.style.backgroundColor = '#28a745';
-                    setTimeout(() => {
-                        exportButton.textContent = originalText;
-                        exportButton.style.backgroundColor = '';
-                    }, 2000);
-                }
-            }).catch(err => {
-                console.error('Failed to copy to clipboard:', err);
-            });
-        }
+    // Also copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(jsonString).then(() => {
+            // Show a brief notification that it was copied
+            const exportButton = document.querySelector('button[onclick="exportForm()"]');
+            if (exportButton) {
+                const originalText = exportButton.textContent;
+                exportButton.textContent = 'Copied to clipboard!';
+                exportButton.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    exportButton.textContent = originalText;
+                    exportButton.style.backgroundColor = '';
+                }, 2000);
+            }
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
     }
-    
-    // Always return the form data (for autosave functionality)
-    return formData;
 }
 
 
@@ -1960,6 +1804,24 @@ function updateFormAfterImport() {
     if (typeof updateAllChecklistLogicDropdowns === 'function') {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateAllChecklistLogicDropdowns, 100);
+    }
+    
+    // Update conditional logic dropdowns
+    if (typeof updateAllConditionalLogicDropdowns === 'function') {
+        // Run this with a much longer delay to ensure DOM is ready
+        setTimeout(updateAllConditionalLogicDropdowns, 1000);
+    }
+    
+    // Update alert logic dropdowns
+    if (typeof updateAllAlertLogicDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateAllAlertLogicDropdowns, 100);
+    }
+    
+    // Update PDF logic dropdowns
+    if (typeof updateAllPdfLogicDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateAllPdfLogicDropdowns, 100);
     }
 }
 

@@ -205,55 +205,14 @@ function createImageNode(x, y) {
  * Create a PDF node
  */
 function createPdfNode(x, y) {
-  console.log("🔧 [PDF DEBUG] ===== CREATING PDF NODE =====");
-  console.log("🔧 [PDF DEBUG] Position:", x, y);
-  
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=pdfNode;section=1;');
   
-  console.log("🔧 [PDF DEBUG] Created vertex with ID:", vertex.id);
-  console.log("🔧 [PDF DEBUG] Initial vertex properties:", {
-    _pdfUrl: vertex._pdfUrl,
-    _pdfDisplayName: vertex._pdfDisplayName,
-    _pdfFilename: vertex._pdfFilename,
-    _priceId: vertex._priceId,
-    _characterLimit: vertex._characterLimit
-  });
-  
-  // Set default properties
-  vertex._pdfUrl = "";
-  vertex._pdfDisplayName = "";
-  vertex._pdfFilename = "";
-  vertex._priceId = "";
-  vertex._characterLimit = 1000;
-  
-  console.log("🔧 [PDF DEBUG] After setting default properties:", {
-    _pdfUrl: vertex._pdfUrl,
-    _pdfDisplayName: vertex._pdfDisplayName,
-    _pdfFilename: vertex._pdfFilename,
-    _priceId: vertex._priceId,
-    _characterLimit: vertex._characterLimit
-  });
-  
-  // Update the cell to render the HTML properly
-  if (typeof updatePdfNodeCell === 'function') {
-    console.log("🔧 [PDF DEBUG] Calling updatePdfNodeCell...");
-    updatePdfNodeCell(vertex);
-    console.log("🔧 [PDF DEBUG] updatePdfNodeCell completed");
-  } else {
-    console.log("🔧 [PDF DEBUG] updatePdfNodeCell function not found!");
-  }
-  
-  console.log("🔧 [PDF DEBUG] Final vertex properties:", {
-    _pdfUrl: vertex._pdfUrl,
-    _pdfDisplayName: vertex._pdfDisplayName,
-    _pdfFilename: vertex._pdfFilename,
-    _priceId: vertex._priceId,
-    _characterLimit: vertex._characterLimit
-  });
-  console.log("🔧 [PDF DEBUG] Final vertex value:", vertex.value);
-  console.log("🔧 [PDF DEBUG] ===== PDF NODE CREATION COMPLETED =====");
+  // Set default properties for the 3 required fields
+  vertex._pdfName = "PDF Document";
+  vertex._pdfFile = "";
+  vertex._pdfPrice = "";
   
   return vertex;
 }
@@ -356,6 +315,7 @@ window.getNodeId = function(cell) {
     // Check for PDF properties in various formats - only if they're not empty
     if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
     if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
+    if (cell._pdfFile && cell._pdfFile.trim()) return cell._pdfFile.trim();
     if (cell._pdfUrl && cell._pdfUrl.trim()) {
       // Extract filename from URL
       const urlParts = cell._pdfUrl.split('/');
@@ -371,6 +331,7 @@ window.getNodeId = function(cell) {
       const extractPdfName = (targetCell) => {
         if (targetCell._pdfName && targetCell._pdfName.trim()) return targetCell._pdfName.trim();
         if (targetCell._pdfFilename && targetCell._pdfFilename.trim()) return targetCell._pdfFilename.trim();
+        if (targetCell._pdfFile && targetCell._pdfFile.trim()) return targetCell._pdfFile.trim();
         if (targetCell._pdfUrl && targetCell._pdfUrl.trim()) {
           const urlParts = targetCell._pdfUrl.split('/');
           const filename = urlParts[urlParts.length - 1];
@@ -563,7 +524,33 @@ window.getNodeId = function(cell) {
     }
   }
   
-  // PRIORITY 3: Fallback to cell.id
+  // PRIORITY 3: Generate base Node ID from node text if we don't have a good one
+  if (!baseNodeId || baseNodeId.match(/^\d+$/)) {
+    // Extract text from the node
+    let nodeText = '';
+    if (cell._questionText) {
+      nodeText = cell._questionText;
+    } else if (cell.value) {
+      // Clean HTML from cell value
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cell.value;
+      nodeText = tempDiv.textContent || tempDiv.innerText || '';
+    }
+    
+    if (nodeText) {
+      baseNodeId = nodeText.toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+        .substring(0, 50); // Limit length
+      
+      if (DEBUG_NODE_ID) {
+        console.log("Generated base nodeId from text:", baseNodeId);
+      }
+    }
+  }
+  
+  // PRIORITY 4: Fallback to cell.id
   if (!baseNodeId) {
     baseNodeId = cell.id || "";
     if (DEBUG_NODE_ID) {
@@ -579,14 +566,18 @@ window.getNodeId = function(cell) {
   
   let finalNodeId = baseNodeId;
   
-  // Only apply PDF naming convention if:
+  // Apply PDF naming convention if:
   // 1. A PDF name was found AND
-  // 2. The cell actually has a PDF name property set (not just inherited from connections)
+  // 2. Either the cell has direct PDF properties OR is connected to a PDF node
   const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
                           (cell._pdfFilename && cell._pdfFilename.trim()) || 
-                          (cell._pdfUrl && cell._pdfUrl.trim());
+                          (cell._pdfUrl && cell._pdfUrl.trim()) ||
+                          (cell._pdfFile && cell._pdfFile.trim());
   
-  if (pdfName && pdfName.trim() && hasDirectPdfName) {
+  // Check if connected to a PDF node (even without direct PDF properties)
+  const isConnectedToPdfNode = pdfName && pdfName.trim() && !hasDirectPdfName;
+  
+  if (pdfName && pdfName.trim() && (hasDirectPdfName || isConnectedToPdfNode)) {
     // Sanitize PDF name (remove .pdf extension and clean up)
     const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
     

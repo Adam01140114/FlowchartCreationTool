@@ -184,7 +184,7 @@ function showFlowchartLoadedNotification() {
 /**
  * Exports flowchart JSON without downloading (returns the string)
  */
-function exportFlowchartJson(download = true) {
+window.exportFlowchartJson = function(download = true) {
   if (!graph) return null;
   
   const parent = graph.getDefaultParent();
@@ -233,6 +233,12 @@ function exportFlowchartJson(download = true) {
     if (cell._amountName) cellData._amountName = cell._amountName;
     if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
     if (cell._image) cellData._image = cell._image;
+    
+    // PDF node properties
+    if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
+    if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
+    if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+    // Legacy PDF properties for backward compatibility
     if (cell._pdfUrl) cellData._pdfUrl = cell._pdfUrl;
     if (cell._priceId) cellData._priceId = cell._priceId;
     if (cell._notesText) cellData._notesText = cell._notesText;
@@ -250,10 +256,20 @@ function exportFlowchartJson(download = true) {
     return cellData;
   });
 
+  // Get current section preferences using the proper function
+  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.sectionPrefs || {});
+  
+  console.log('🔍 [URL.JS EXPORT DEBUG] Current section preferences:', JSON.stringify(currentSectionPrefs, null, 2));
+  
+  // Get default PDF properties
+  const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
+    window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
+  
   const output = {
     cells: simplifiedCells,
-    sectionPrefs: JSON.parse(JSON.stringify(sectionPrefs)),
-    groups: JSON.parse(JSON.stringify(groups))
+    sectionPrefs: JSON.parse(JSON.stringify(currentSectionPrefs)),
+    groups: JSON.parse(JSON.stringify(groups)),
+    defaultPdfProperties: defaultPdfProps
   };
 
   const jsonStr = JSON.stringify(output, null, 2);
@@ -269,6 +285,21 @@ function exportFlowchartJson(download = true) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      console.log('Flowchart JSON copied to clipboard');
+      // Show user feedback
+      const notification = document.createElement('div');
+      notification.textContent = 'Flowchart JSON copied to clipboard!';
+      notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+    }).catch(err => {
+      console.error('Failed to copy to clipboard:', err);
+    });
   }
   
   return jsonStr;

@@ -1,6 +1,9 @@
 /**************************************************
- *            AUTHENTICATION & COOKIES             *
+ *            AUTHENTICATION & USER MANAGEMENT     *
  **************************************************/
+
+// Import configuration from config.js
+// Note: This assumes config.js is loaded before auth.js
 
 /**
  * Sets a cookie with the given name and value.
@@ -35,210 +38,227 @@ function getCookie(name) {
  * Shows the login overlay.
  */
 function showLoginOverlay() {
-  document.getElementById("loginOverlay").style.display = "flex";
+  const loginOverlay = document.getElementById("loginOverlay");
+  if (loginOverlay) {
+    loginOverlay.style.display = "flex";
+  }
 }
 
 /**
  * Hides the login overlay.
  */
 function hideLoginOverlay() {
-  document.getElementById("loginOverlay").style.display = "none";
+  const loginOverlay = document.getElementById("loginOverlay");
+  if (loginOverlay) {
+    loginOverlay.style.display = "none";
+  }
 }
 
 /**
  * Checks for saved login credentials and tries to log in.
  */
 function checkForSavedLogin() {
-  // Firebase configuration - This should be set in the main HTML file
-  // Set up your Firebase config if not already done
-  if (!firebase.apps.length) {
-    try {
-      const firebaseConfig = {
-        apiKey: "AIzaSyC8YKJFyw1a_9-P996NrjXCLCPOGQC8SL8",
-        authDomain: "flow-chart-50c82.firebaseapp.com",
-        projectId: "flow-chart-50c82",
-        storageBucket: "flow-chart-50c82.appspot.com",
-        messagingSenderId: "607845271405",
-        appId: "1:607845271405:web:ab396cde5c056f6cba193b"
-      };
-      firebase.initializeApp(firebaseConfig);
-    } catch (err) {
-      // Remove all console.log, console.error, and console.warn calls from this file
-    }
-  }
-
-  // Check for saved credentials
-  const savedEmail = getCookie("flowchart_email");
-  const savedToken = getCookie("flowchart_token");
-
-  if (savedEmail && savedToken) {
-    firebase.auth().signInWithEmailAndPassword(savedEmail, savedToken)
-      .then((userCredential) => {
-        // User is signed in
-        window.currentUser = userCredential.user;
+  // Check for saved user ID in cookie
+  const savedUid = getCookie("flowchart_uid");
+  
+  if (savedUid) {
+    // Try to restore user session
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user && user.uid === savedUid) {
+        // User is already authenticated
+        window.currentUser = user;
         hideLoginOverlay();
         
-        // Set up logout button
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-          firebase.auth().signOut().then(() => {
-            setCookie("flowchart_email", "", -1);
-            setCookie("flowchart_token", "", -1);
-            window.currentUser = null;
-            showLoginOverlay();
-          });
-        });
-      })
-      .catch((error) => {
-        if (error.code === 'auth/quota-exceeded') {
-          // Sign in as guest
-          window.currentUser = {
-            uid: 'guest',
-            email: 'guest@guest.com',
-            displayName: 'Guest',
-            isGuest: true
-          };
-          setCookie("flowchart_email", "", -1);
-          setCookie("flowchart_token", "", -1);
-          hideLoginOverlay();
-        } else {
-          // Clear invalid cookies
-          setCookie("flowchart_email", "", -1);
-          setCookie("flowchart_token", "", -1);
-          showLoginOverlay();
+        // Load user preferences
+        if (typeof loadUserColorPrefs === 'function') {
+          loadUserColorPrefs();
         }
-      });
+      } else {
+        // Clear invalid cookie
+        setCookie("flowchart_uid", "", -1);
+        showLoginOverlay();
+      }
+    });
   } else {
-    // No saved credentials - onAuthStateChanged will handle showing login screen
-    console.log('🔐 [AUTH] No saved credentials found');
+    // No saved login, show login overlay
+    showLoginOverlay();
   }
-
-  setupAuthListeners();
 }
 
 /**
- * Sets up event listeners for login and signup buttons.
+ * Sets up event listeners for authentication.
  */
 function setupAuthListeners() {
-  // Set up close button for login overlay
-  document.getElementById("closeLoginBtn").addEventListener("click", () => {
-    hideLoginOverlay();
-  });
+  // Get DOM elements
+  const loginButton = document.getElementById("loginButton");
+  const signupButton = document.getElementById("signupButton");
+  const loginEmail = document.getElementById("loginEmail");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginError = document.getElementById("loginError");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  document.getElementById("loginButton").addEventListener("click", () => {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    const errorDiv = document.getElementById("loginError");
+  if (!loginButton || !signupButton || !loginEmail || !loginPassword || !loginError || !logoutBtn) {
+    console.warn("Some authentication elements not found");
+    return;
+  }
+
+  // Login button event listener
+  loginButton.addEventListener("click", () => {
+    const email = loginEmail.value.trim();
+    const pass = loginPassword.value.trim();
     
-    if (!email || !password) {
-      errorDiv.textContent = "Please enter both email and password.";
+    if (!email || !pass) {
+      loginError.textContent = "Please enter both email and password.";
       return;
     }
-    
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        setCookie("flowchart_email", email, 30);
-        setCookie("flowchart_token", password, 30); // Note: storing passwords in cookies is not secure
-        window.currentUser = userCredential.user;
+
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then(cred => {
+        window.currentUser = cred.user;
+        setCookie("flowchart_uid", window.currentUser.uid, 7);
         hideLoginOverlay();
-        errorDiv.textContent = "";
-      })
-      .catch((error) => {
-        if (error.code === 'auth/quota-exceeded') {
-          // Sign in as guest
-          window.currentUser = {
-            uid: 'guest',
-            email: 'guest@guest.com',
-            displayName: 'Guest',
-            isGuest: true
-          };
-          setCookie("flowchart_email", "", -1);
-          setCookie("flowchart_token", "", -1);
-          hideLoginOverlay();
-          errorDiv.textContent = "Signed in as guest due to exceeded quota.";
-        } else {
-          errorDiv.textContent = error.message;
+        
+        // Load user color preferences
+        if (typeof loadUserColorPrefs === 'function') {
+          loadUserColorPrefs();
         }
+        
+        loginError.textContent = "";
+      })
+      .catch(err => {
+        loginError.textContent = err.message;
       });
   });
 
-  document.getElementById("signupButton").addEventListener("click", () => {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    const errorDiv = document.getElementById("loginError");
+  // Signup button event listener
+  signupButton.addEventListener("click", () => {
+    const email = loginEmail.value.trim();
+    const pass = loginPassword.value.trim();
     
-    if (!email || !password) {
-      errorDiv.textContent = "Please enter both email and password.";
+    if (!email || !pass) {
+      loginError.textContent = "Please enter both email and password.";
       return;
     }
-    
-    if (password.length < 6) {
-      errorDiv.textContent = "Password must be at least 6 characters.";
+
+    if (pass.length < 6) {
+      loginError.textContent = "Password must be at least 6 characters.";
       return;
     }
-    
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        setCookie("flowchart_email", email, 30);
-        setCookie("flowchart_token", password, 30);
-        window.currentUser = userCredential.user;
+
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .then(cred => {
+        window.currentUser = cred.user;
+        setCookie("flowchart_uid", window.currentUser.uid, 7);
         hideLoginOverlay();
-        errorDiv.textContent = "";
-      })
-      .catch((error) => {
-        if (error.code === 'auth/quota-exceeded') {
-          // Sign in as guest
-          window.currentUser = {
-            uid: 'guest',
-            email: 'guest@guest.com',
-            displayName: 'Guest',
-            isGuest: true
-          };
-          setCookie("flowchart_email", "", -1);
-          setCookie("flowchart_token", "", -1);
-          hideLoginOverlay();
-          errorDiv.textContent = "Signed in as guest due to exceeded quota.";
-        } else {
-          errorDiv.textContent = error.message;
+        
+        // Save and load user color preferences
+        if (typeof saveUserColorPrefs === 'function' && typeof loadUserColorPrefs === 'function') {
+          saveUserColorPrefs().then(() => loadUserColorPrefs());
         }
+        
+        loginError.textContent = "";
+      })
+      .catch(err => {
+        loginError.textContent = err.message;
       });
   });
 
-  // Set up logout button
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (window.currentUser && window.currentUser.isGuest) {
-      window.currentUser = null;
-      showLoginOverlay();
+  // Logout button event listener
+  logoutBtn.addEventListener("click", () => {
+    if (!window.currentUser) {
+      alert("No user is logged in.");
       return;
     }
-    firebase.auth().signOut().then(() => {
-      setCookie("flowchart_email", "", -1);
-      setCookie("flowchart_token", "", -1);
-      window.currentUser = null;
-      showLoginOverlay();
-    });
+    
+    firebase.auth().signOut()
+      .then(() => {
+        setCookie("flowchart_uid", "", -1);
+        window.currentUser = null;
+        showLoginOverlay();
+      })
+      .catch(err => {
+        // Logout error handled silently
+        alert("Error logging out: " + err);
+      });
   });
-  
-  // Auto-login function - uses hardcoded credentials
-  autoLogin();
-  
-  // Set up Firebase auth state listener to show login screen when not authenticated
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in
-      window.currentUser = user;
+
+  // Close button for login overlay
+  const closeLoginBtn = document.getElementById("closeLoginBtn");
+  if (closeLoginBtn) {
+    closeLoginBtn.addEventListener("click", () => {
       hideLoginOverlay();
-      console.log('🔐 [AUTH] User authenticated:', user.email);
-    } else {
-      // User is signed out or authentication failed
-      window.currentUser = null;
-      showLoginOverlay();
-      console.log('🔐 [AUTH] User not authenticated, showing login screen');
-    }
-  });
+    });
+  }
 }
 
 /**
- * Auto-fills login credentials and logs in automatically.
+ * Load user color preferences from Firebase.
+ */
+function loadUserColorPrefs() {
+  if (!window.currentUser || window.currentUser.isGuest) return;
+  
+  // Access db from config
+  if (typeof window.flowchartConfig !== 'undefined' && window.flowchartConfig.db) {
+    const db = window.flowchartConfig.db;
+    const colorPreferences = window.flowchartConfig.colorPreferences;
+    const defaultColors = window.flowchartConfig.defaultColors;
+    
+    db.collection("users")
+      .doc(window.currentUser.uid)
+      .collection("preferences")
+      .doc("colors")
+      .get()
+      .then(docSnap => {
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          for (let key in defaultColors) {
+            if (data[key] !== undefined) {
+              colorPreferences[key] = data[key];
+            } else {
+              colorPreferences[key] = defaultColors[key];
+            }
+          }
+        }
+        
+        // Update legend colors
+        if (typeof updateLegendColors === 'function') {
+          updateLegendColors();
+        }
+        
+        // Refresh all cells
+        if (typeof refreshAllCells === 'function') {
+          refreshAllCells();
+        }
+      })
+      .catch(err => {
+        // Error loading color preferences handled silently
+      });
+  }
+}
+
+/**
+ * Save user color preferences to Firebase.
+ */
+function saveUserColorPrefs() {
+  if (!window.currentUser || window.currentUser.isGuest) return Promise.resolve();
+  
+  // Access db from config
+  if (typeof window.flowchartConfig !== 'undefined' && window.flowchartConfig.db) {
+    const db = window.flowchartConfig.db;
+    const colorPreferences = window.flowchartConfig.colorPreferences;
+    
+    return db.collection("users")
+      .doc(window.currentUser.uid)
+      .collection("preferences")
+      .doc("colors")
+      .set(colorPreferences, { merge: true });
+  }
+  
+  return Promise.resolve();
+}
+
+/**
+ * Auto-login function for development/testing.
  */
 function autoLogin() {
   const loginEmail = document.getElementById("loginEmail");
@@ -246,6 +266,7 @@ function autoLogin() {
   const loginButton = document.getElementById("loginButton");
   
   if (loginEmail && loginPassword && loginButton) {
+    // Set default credentials (can be customized)
     loginEmail.value = "defaultemail0114@gmail.com";
     loginPassword.value = "adam0114";
     
@@ -256,7 +277,70 @@ function autoLogin() {
   }
 }
 
-// Initialize the authentication when the document is ready
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Initialize authentication system.
+ */
+function initializeAuth() {
+  // Set up authentication state listener
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in
+      window.currentUser = user;
+      hideLoginOverlay();
+      
+      // Load user preferences
+      loadUserColorPrefs();
+    } else {
+      // User is signed out
+      window.currentUser = null;
+      showLoginOverlay();
+    }
+  });
+
+  // Set up event listeners
+  setupAuthListeners();
+  
+  // Check for saved login
   checkForSavedLogin();
+}
+
+/**************************************************
+ ************ Export Authentication ****************
+ **************************************************/
+// Export all authentication functions
+window.auth = {
+  // Functions
+  setCookie,
+  getCookie,
+  showLoginOverlay,
+  hideLoginOverlay,
+  checkForSavedLogin,
+  setupAuthListeners,
+  loadUserColorPrefs,
+  saveUserColorPrefs,
+  autoLogin,
+  initializeAuth,
+  
+  // State
+  currentUser: null
+};
+
+// Also export individual functions for backward compatibility
+window.setCookie = setCookie;
+window.getCookie = getCookie;
+window.showLoginOverlay = showLoginOverlay;
+window.hideLoginOverlay = hideLoginOverlay;
+window.checkForSavedLogin = checkForSavedLogin;
+window.setupAuthListeners = setupAuthListeners;
+window.loadUserColorPrefs = loadUserColorPrefs;
+window.saveUserColorPrefs = saveUserColorPrefs;
+window.autoLogin = autoLogin;
+window.initializeAuth = initializeAuth;
+
+// Initialize authentication when the document is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait a bit for config.js to load
+  setTimeout(() => {
+    initializeAuth();
+  }, 100);
 }); 

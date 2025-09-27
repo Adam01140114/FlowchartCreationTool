@@ -554,7 +554,16 @@ function setupCustomClickHandlers(graph) {
       return;
     }
     
-    // d) Edge double-click = reset geometry
+    // d) PDF node double-click = show properties popup
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // e) Edge double-click = reset geometry
     if (cell && cell.edge) {
       const geo = new mxGeometry();
       graph.getModel().setGeometry(cell, geo);

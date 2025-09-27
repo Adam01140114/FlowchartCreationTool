@@ -1,299 +1,113 @@
-/**************************************************
- ************ URL Sharing Functionality ***********
- **************************************************/
+﻿// Export functionality - SVG download and other export features
+// This file handles all export-related functionality
 
-/**
- * Generates a shareable URL with the current flowchart JSON embedded
- */
-function generateShareableUrl() {
-  try {
-    // Export the flowchart JSON
-    const flowchartJson = exportFlowchartJson(false); // false = don't download, just return the string
-    
-    if (!flowchartJson) {
-      alert('Error: Could not generate flowchart data');
-    return;
+// Helper function to create SVG content from cells
+function createSvgContent(cells) {
+  if (!cells || cells.length === 0) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><text x="200" y="150" text-anchor="middle" font-family="Arial" font-size="16" fill="#666">No flowchart content</text></svg>';
+  }
+  
+  // Calculate bounds
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  cells.forEach(cell => {
+    const geometry = cell.getGeometry();
+    if (geometry) {
+      minX = Math.min(minX, geometry.x);
+      minY = Math.min(minY, geometry.y);
+      maxX = Math.max(maxX, geometry.x + geometry.width);
+      maxY = Math.max(maxY, geometry.y + geometry.height);
     }
+  });
+  
+  const padding = 20;
+  const width = maxX - minX + (padding * 2);
+  const height = maxY - minY + (padding * 2);
+  
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+  
+  // Add background
+  svg += `<rect width="100%" height="100%" fill="white"/>`;
+  
+  // Add cells
+  cells.forEach(cell => {
+    const geometry = cell.getGeometry();
+    if (geometry) {
+      const x = geometry.x - minX + padding;
+      const y = geometry.y - minY + padding;
+      const width = geometry.width;
+      const height = geometry.height;
+      const value = cell.getValue() || '';
+      
+      // Parse style to get colors
+      const style = cell.getStyle() || '';
+      const fillColor = extractStyleValue(style, 'fillColor') || '#e1f5fe';
+      const strokeColor = extractStyleValue(style, 'strokeColor') || '#01579b';
+      const fontColor = extractStyleValue(style, 'fontColor') || '#000000';
+      
+      // Create rectangle
+      svg += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" rx="10"/>`;
+      
+      // Add text
+      const textX = x + width / 2;
+      const textY = y + height / 2;
+      svg += `<text x="${textX}" y="${textY}" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="12" fill="${fontColor}">${escapeXml(value)}</text>`;
+    }
+  });
+  
+  svg += '</svg>';
+  return svg;
+}
+
+// Helper function to extract style values
+function extractStyleValue(style, key) {
+  const regex = new RegExp(`${key}=([^;]+)`);
+  const match = style.match(regex);
+  return match ? match[1] : null;
+}
+
+// Helper function to escape XML
+function escapeXml(text) {
+  return text.replace(/&/g, '&amp;')
+             .replace(/</g, '&lt;')
+             .replace(/>/g, '&gt;')
+             .replace(/"/g, '&quot;')
+             .replace(/'/g, '&#39;');
+}
+
+// Main SVG download function
+window.downloadFlowchartSvg = function() {
+  try {
+    // Get all cells in the graph
+    const cells = graph.getChildCells(graph.getDefaultParent(), true, true);
     
-    // Encode the JSON for URL transmission
-    const encodedJson = encodeURIComponent(flowchartJson);
+    // Filter to only include vertex cells (nodes)
+    const vertexCells = cells.filter(cell => cell.vertex && !cell.edge);
     
-    // Create the shareable URL
-    const currentUrl = window.location.origin + window.location.pathname;
-    const shareableUrl = `${currentUrl}?flowchart=${encodedJson}`;
+    // Create SVG content
+    let svgContent = createSvgContent(vertexCells);
     
-    // Copy to clipboard
-    navigator.clipboard.writeText(shareableUrl).then(() => {
-      // Show success message
-      showShareUrlModal(shareableUrl);
-    }).catch(() => {
-      // Fallback if clipboard API fails
-      showShareUrlModal(shareableUrl);
-    });
+    // Create and download the file
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'flowchart.svg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    // Show success notification
+    const notification = document.createElement('div');
+    notification.textContent = 'SVG downloaded successfully!';
+    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
     
   } catch (error) {
-    console.error('Error generating shareable URL:', error);
-    alert('Error generating shareable URL: ' + error.message);
+    console.error('Error downloading SVG:', error);
+    alert('Error downloading SVG: ' + error.message);
   }
-}
-
-/**
- * Shows a modal with the shareable URL
- */
-function showShareUrlModal(url) {
-  // Create modal if it doesn't exist
-  let modal = document.getElementById('shareUrlModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'shareUrlModal';
-    modal.className = 'modal';
-    modal.innerHTML = `
-      <div class="modal-content" style="max-width: 600px;">
-        <span class="close" onclick="closeShareUrlModal()">&times;</span>
-        <h3>Share Flowchart URL</h3>
-        <p>Your flowchart has been copied to the clipboard! You can also copy the URL below:</p>
-        <textarea id="shareUrlTextarea" readonly style="width: 100%; height: 100px; margin: 10px 0; padding: 8px; font-family: monospace; font-size: 12px; resize: vertical;"></textarea>
-        <div style="text-align: center; margin-top: 15px;">
-          <button onclick="copyShareUrl()" style="margin-right: 10px;">Copy URL</button>
-          <button onclick="closeShareUrlModal()">Close</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-  
-  // Set the URL in the textarea
-  const textarea = document.getElementById('shareUrlTextarea');
-  if (textarea) {
-    textarea.value = url;
-  }
-  
-  // Show the modal
-  modal.style.display = 'flex';
-}
-
-/**
- * Closes the share URL modal
- */
-function closeShareUrlModal() {
-  const modal = document.getElementById('shareUrlModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-}
-
-/**
- * Copies the share URL to clipboard
- */
-function copyShareUrl() {
-  const textarea = document.getElementById('shareUrlTextarea');
-  if (textarea) {
-    textarea.select();
-    textarea.setSelectionRange(0, 99999); // For mobile devices
-    
-    try {
-      document.execCommand('copy');
-      // Show brief success message
-      const copyBtn = document.querySelector('#shareUrlModal button');
-      if (copyBtn) {
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => {
-          copyBtn.textContent = originalText;
-        }, 2000);
-      }
-    } catch (err) {
-      // Fallback: select and show selection
-      textarea.focus();
-      textarea.select();
-    }
-  }
-}
-
-/**
- * Checks for flowchart parameter in URL and loads it if present
- */
-function checkForSharedFlowchart() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const flowchartParam = urlParams.get('flowchart');
-  
-  if (flowchartParam) {
-    try {
-      // Decode the flowchart JSON
-      const decodedJson = decodeURIComponent(flowchartParam);
-      
-      // Parse the JSON
-      const flowchartData = JSON.parse(decodedJson);
-      
-      // Load the flowchart
-      loadFlowchartData(flowchartData);
-      
-      // Clear the URL parameter to prevent reloading on refresh
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-      
-      // Show a notification that the flowchart was loaded
-      showFlowchartLoadedNotification();
-      
-      return true; // Successfully loaded from URL
-    } catch (error) {
-      console.error('Error loading shared flowchart:', error);
-      alert('Error loading shared flowchart: ' + error.message);
-      return false;
-    }
-  }
-  return false; // No flowchart parameter found
-}
-
-/**
- * Shows a notification that the flowchart was loaded from URL
- */
-function showFlowchartLoadedNotification() {
-  // Create notification if it doesn't exist
-  let notification = document.getElementById('flowchartLoadedNotification');
-  if (!notification) {
-    notification = document.createElement('div');
-    notification.id = 'flowchartLoadedNotification';
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #4CAF50;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 5px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      z-index: 10000;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-      max-width: 300px;
-      word-wrap: break-word;
-    `;
-    document.body.appendChild(notification);
-  }
-  
-  notification.textContent = '✅ Shared flowchart loaded successfully!';
-  notification.style.display = 'block';
-  
-  // Auto-hide after 5 seconds
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 5000);
-}
-
-/**
- * Exports flowchart JSON without downloading (returns the string)
- */
-function exportFlowchartJson(download = true) {
-  console.log('📤 URL EXPORT: Starting exportFlowchartJson function');
-  alert('URL Export function called!');
-  if (!graph) return null;
-  
-  const parent = graph.getDefaultParent();
-  const cells = graph.getChildCells(parent, true, true);
-  console.log('📤 URL EXPORT: Found', cells.length, 'cells to export');
-
-  // Use the same serialization logic as the existing export function
-  const simplifiedCells = cells.map(cell => {
-    const cellData = {
-      id: cell.id,
-      vertex: cell.vertex,
-      edge: cell.edge,
-      value: cell.value,
-      style: cell.style,
-    };
-
-    if (cell.geometry) {
-      cellData.geometry = {
-        x: cell.geometry.x,
-        y: cell.geometry.y,
-        width: cell.geometry.width,
-        height: cell.geometry.height,
-      };
-    }
-
-    if (cell.edge && cell.source && cell.target) {
-      cellData.source = cell.source.id;
-      cellData.target = cell.target.id;
-      
-      if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
-        cellData.edgeGeometry = {
-          points: cell.geometry.points.map(point => ({
-            x: point.x,
-            y: point.y
-          }))
-        };
-      }
-    }
-
-    // Custom fields
-    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
-    if (cell._questionText) cellData._questionText = cell._questionText;
-    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
-    if (cell._nameId) cellData._nameId = cell._nameId;
-    if (cell._placeholder) cellData._placeholder = cell._placeholder;
-    if (cell._questionId) cellData._questionId = cell._questionId;
-    if (cell._amountName) cellData._amountName = cell._amountName;
-    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
-    if (cell._image) cellData._image = cell._image;
-    if (cell._pdfUrl) cellData._pdfUrl = cell._pdfUrl;
-    if (cell._pdfFilename) cellData._pdfFilename = cell._pdfFilename;
-    if (cell._pdfDisplayName) cellData._pdfDisplayName = cell._pdfDisplayName;
-    if (cell._priceId) cellData._priceId = cell._priceId;
-    if (cell._notesText) cellData._notesText = cell._notesText;
-    if (cell._notesBold) cellData._notesBold = cell._notesBold;
-    if (cell._notesFontSize) cellData._notesFontSize = cell._notesFontSize;
-    if (cell._checklistText) cellData._checklistText = cell._checklistText;
-    if (cell._alertText) cellData._alertText = cell._alertText;
-    if (cell._calcTitle) cellData._calcTitle = cell._calcTitle;
-    if (cell._calcTerms) cellData._calcTerms = cell._calcTerms;
-    if (cell._calcOperator) cellData._calcOperator = cell._calcOperator;
-    if (cell._calcThreshold) cellData._calcThreshold = cell._calcThreshold;
-    if (cell._calcFinalText) cellData._calcFinalText = cell._calcFinalText;
-    if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
-    
-    return cellData;
-  });
-
-  // Include Form Properties in export
-  let formProperties = null;
-  if (typeof window.getFormProperties === 'function') {
-    formProperties = window.getFormProperties();
-    console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in export:", formProperties);
-  }
-
-  const output = {
-    cells: simplifiedCells,
-    sectionPrefs: JSON.parse(JSON.stringify(sectionPrefs)),
-    groups: JSON.parse(JSON.stringify(groups)),
-    formProperties: formProperties
-  };
-
-  const jsonStr = JSON.stringify(output, null, 2);
-  
-  if (download) {
-  // Download the file
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'flowchart.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-  
-  return jsonStr;
-}
-
-// Initialize URL sharing functionality when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Check for shared flowchart in URL
-  checkForSharedFlowchart();
-});
-
-// Make functions globally available
-window.generateShareableUrl = generateShareableUrl;
-window.closeShareUrlModal = closeShareUrlModal;
-window.copyShareUrl = copyShareUrl;
+};

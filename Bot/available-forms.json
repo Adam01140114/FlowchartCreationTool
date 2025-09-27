@@ -1,0 +1,44 @@
+{
+  "forms": [
+    {
+      "id": "sc500",
+      "url": "sc500.html?formId=sc500",
+      "name": "SC-500",
+      "description": "Small claims form for cases related to COVID-19",
+      "counties": [
+        "Monterey"
+      ],
+      "defendant": "N/A"
+    },
+    {
+      "id": "sc100",
+      "url": "sc100.html?formId=sc100",
+      "name": "SC-100",
+      "description": "Plaintiff's Claim form for suing a defendant",
+      "counties": [
+        "Monterey"
+      ],
+      "defendant": "N/A"
+    },
+    {
+      "id": "sc120",
+      "url": "sc120.html?formId=sc120",
+      "name": "SC-120",
+      "description": "Defendant's Claim form for counter-suing a plaintiff",
+      "counties": [
+        "Monterey"
+      ],
+      "defendant": "Yes"
+    },
+    {
+      "id": "fee-waiver",
+      "url": "fee-waiver.html?formId=fee-waiver",
+      "name": "Fee Waiver",
+      "description": "Application for waiver of court filing fees",
+      "counties": [
+        "Monterey"
+      ],
+      "defendant": "Yes"
+    }
+  ]
+}

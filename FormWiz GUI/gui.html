@@ -144,18 +144,6 @@
             <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
             <button onclick="exportForm()">Export JSON</button>
             <button type="button" id="previewButton" onclick="showPreview()">Preview</button>
-            
-            <!-- Autosave Management Buttons -->
-            <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
-                <h4 style="margin: 0 0 10px 0; color: #495057; font-size: 14px;">Autosave Management</h4>
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <button type="button" onclick="loadLastImportData()" style="margin-right: 8px; background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Load Last Import</button>
-                    <button type="button" onclick="clearGuiData()" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Clear Saved Data</button>
-                </div>
-                <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-                    Your work is automatically saved as you type. Use "Load Last Import" to restore your last imported file.
-                </div>
-            </div>
             <div style="margin-top: 10px;">
                 <label style="display: inline-flex; align-items: center; cursor: pointer;">
                     <input type="checkbox" id="testModeCheckbox" style="margin-right: 8px;" checked>

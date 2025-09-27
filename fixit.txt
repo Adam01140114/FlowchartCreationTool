@@ -1,0 +1,107 @@
+FLOWCHART TOOL - FIXIT DOCUMENTATION
+=====================================
+
+INCIDENT: Dropdown Layout Inconsistency in Properties Popup
+DATE: [Current Date]
+ISSUE ID: DROPDOWN_LAYOUT_001
+
+PROBLEM DESCRIPTION:
+===================
+The Section Name dropdown in the Node Properties popup was not displaying with the same layout as other dropdowns (specifically the Node Type dropdown). The Section Name dropdown was appearing above its label instead of to the right of it, creating visual inconsistency.
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make the Section Name dropdown use the same horizontal layout as the Node Type dropdown
+- Ensure consistent visual appearance across all dropdown fields in the properties popup
+- Have the label appear on the left and the dropdown on the right, side by side
+
+ISSUES ENCOUNTERED:
+==================
+1. INITIAL ATTEMPT - Vertical Layout:
+   - Changed the Section Name dropdown to use `flex-direction: column`
+   - This put the label above the dropdown, but user wanted horizontal layout like Node Type
+
+2. SECOND ATTEMPT - CSS Override:
+   - Tried to override the fieldDiv styling for dropdowns
+   - Still resulted in vertical layout instead of horizontal
+
+3. ROOT CAUSE DISCOVERY:
+   - The Node Type dropdown uses `isQuestionTypeDropdown: true` which gets special handling
+   - The Section Name dropdown was using `isDropdown: true` which goes through different code path
+   - The `isDropdown` code path was designed for vertical layout, not horizontal
+
+TECHNICAL DETAILS:
+==================
+- File: graph.js
+- Node Type dropdown: Uses `isQuestionTypeDropdown: true` → special handling around line 910
+- Section Name dropdown: Was using `isDropdown: true` → different handling around line 1005
+- The `isDropdown` path was creating vertical layout with `flex-direction: column`
+- The `isQuestionTypeDropdown` path uses standard horizontal layout
+
+SOLUTION THAT WORKED:
+====================
+1. Changed Section Name field property from `isDropdown: true` to `isSectionNameDropdown: true`
+2. Added new special handling for `isSectionNameDropdown` that mirrors the `isQuestionTypeDropdown` handling
+3. Used the exact same layout code: `fieldDiv.appendChild(label)` then `fieldDiv.appendChild(dropdown)`
+4. Applied the same CSS styling as the Node Type dropdown
+
+CODE CHANGES:
+=============
+1. In properties array definition (around line 760):
+   - Changed: `isDropdown: true`
+   - To: `isSectionNameDropdown: true`
+
+2. Added new handling section (around line 986):
+   ```javascript
+   // Special handling for section name dropdown
+   if (prop.isSectionNameDropdown) {
+     const dropdown = document.createElement('select');
+     dropdown.id = prop.id;
+     dropdown.style.cssText = `
+       flex: 1;
+       padding: 8px 12px;
+       border: 1px solid #ddd;
+       border-radius: 6px;
+       background: white;
+       color: #333;
+       font-size: 14px;
+       cursor: pointer;
+       transition: all 0.2s ease;
+     `;
+     
+     // Add options, set value, add change listener...
+     
+     fieldDiv.appendChild(label);
+     fieldDiv.appendChild(dropdown);
+     content.appendChild(fieldDiv);
+     return; // Skip the normal field creation
+   }
+   ```
+
+KEY LEARNINGS:
+==============
+1. When trying to make UI elements look the same, check if they're using different code paths
+2. Look for existing working examples (Node Type dropdown) and replicate their approach
+3. Don't try to override CSS when the issue is in the JavaScript logic
+4. Create new property types (`isSectionNameDropdown`) rather than trying to modify existing ones
+5. Always use the same layout pattern: `fieldDiv.appendChild(label)` then `fieldDiv.appendChild(dropdown)`
+
+PREVENTION:
+===========
+- When adding new dropdown fields, use the same pattern as existing working dropdowns
+- If a dropdown needs horizontal layout, use `isQuestionTypeDropdown` or create a similar property
+- If a dropdown needs vertical layout, use `isDropdown`
+- Always test new dropdowns against existing ones to ensure visual consistency
+
+RELATED FILES:
+=============
+- graph.js (main file with properties popup logic)
+- style.css (general styling, but not the issue in this case)
+
+FUTURE REFERENCE:
+================
+If you encounter similar dropdown layout issues:
+1. Check what property type the working dropdown uses (`isQuestionTypeDropdown`)
+2. Check what property type the broken dropdown uses (`isDropdown`)
+3. Either change the property type or create a new one that mirrors the working approach
+4. Use the same layout code pattern: label first, then dropdown, both appended to fieldDiv

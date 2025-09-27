@@ -10,7 +10,7 @@
 // Use shared dependency accessors from dependencies.js module
 
 // Properties Panel DOM Elements
-let propNodeText, propNodeId, propNodeType, propNodeSection, propSectionName, propPdfNode, propPdfFilename, propPdfDisplayName, propPdfPriceId;
+let propNodeText, propNodeId, propNodeType, propNodeSection, propSectionName, propPdfNode, propPdfFilename;
 
 // Initialize Properties Panel DOM Elements
 function initializePropertiesPanelElements() {
@@ -21,8 +21,6 @@ function initializePropertiesPanelElements() {
   propSectionName = document.getElementById("propSectionName");
   propPdfNode = document.getElementById("propPdfNode");
   propPdfFilename = document.getElementById("propPdfFilename");
-  propPdfDisplayName = document.getElementById("propPdfDisplayName");
-  propPdfPriceId = document.getElementById("propPdfPriceId");
 }
 
 // Utility: make <span> text editable on double-click

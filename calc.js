@@ -6,6 +6,214 @@ function isCalculationNode(cell) {
 }
 
 /**
+ * Initialize a new calculation node with default values
+ */
+function initializeCalculationNode(cell) {
+  if (!cell) return;
+  
+  cell._calcTitle = "Calculation Title";
+  cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+  cell._calcOperator = "=";
+  cell._calcThreshold = "0";
+  cell._calcFinalText = "";
+  
+  // For backward compatibility
+  if (cell._calcAmountLabel !== undefined) {
+    cell._calcTerms[0].amountLabel = cell._calcAmountLabel;
+  }
+  
+  updateCalculationNodeCell(cell);
+}
+
+/**
+ * Convert an existing cell to a calculation node
+ */
+function convertToCalculationNode(cell, preservedText = null) {
+  if (!cell) return;
+  
+  cell.style = cell.style.replace(/nodeType=[^;]+/, "nodeType=calculation");
+  cell._calcTitle = preservedText || "Calculation Title";
+  cell._calcAmountLabel = "";
+  cell._calcOperator = "=";
+  cell._calcThreshold = "0";
+  cell._calcFinalText = "";
+  cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+  
+  updateCalculationNodeCell(cell);
+}
+
+/**
+ * Handle calculation node title updates
+ */
+function updateCalculationNodeTitle(cell, newText) {
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  cell._calcTitle = newText.trim();
+  updateCalculationNodeCell(cell);
+}
+
+/**
+ * Get calculation node style and label for node placement
+ */
+function getCalculationNodeStyle() {
+  return {
+    style: "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;",
+    label: "Calculation node"
+  };
+}
+
+/**
+ * Export calculation node data for save/export operations
+ */
+function exportCalculationNodeData(cell, cellData) {
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+  if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
+  if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+  if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+  if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+  if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+}
+
+/**
+ * Get calculation node text for display and search
+ */
+function getCalculationNodeText(cell) {
+  if (!cell || !isCalculationNode(cell)) return '';
+  
+  return cell._calcTitle || cell.value || '';
+}
+
+/**
+ * Handle calculation node copy/paste operations
+ */
+function handleCalculationNodeCopyPaste(newCell) {
+  if (!newCell || !isCalculationNode(newCell)) return;
+  
+  if (typeof updateCalculationNodeCell === "function") {
+    updateCalculationNodeCell(newCell);
+  }
+}
+
+/**
+ * Setup calculation node event listeners
+ */
+function setupCalculationNodeEventListeners() {
+  // Place calculation node button
+  const placeCalcNodeBtn = document.getElementById('placeCalcNode');
+  if (placeCalcNodeBtn) {
+    placeCalcNodeBtn.addEventListener('click', function() {
+      if (typeof window.placeNodeAtClickLocation === 'function') {
+        window.placeNodeAtClickLocation('calculation');
+      }
+    });
+  }
+}
+
+/**
+ * Handle calculation node placement
+ */
+function handleCalculationNodePlacement(cell) {
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  initializeCalculationNode(cell);
+}
+
+/**
+ * Get calculation node properties for display in properties panel
+ */
+function getCalculationNodeProperties(cell) {
+  if (!cell || !isCalculationNode(cell)) return null;
+  
+  return {
+    nodeType: "calculation",
+    title: cell._calcTitle || "Calculation Title",
+    operator: cell._calcOperator || "=",
+    threshold: cell._calcThreshold || "0",
+    finalText: cell._calcFinalText || "",
+    terms: cell._calcTerms || []
+  };
+}
+
+/**
+ * Update calculation nodes when questions change
+ */
+function updateCalculationNodesOnQuestionChange(questionCell, isDeleted = false, oldNodeId = null) {
+  if (isDeleted && !oldNodeId) {
+    return;
+  }
+  
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const questionId = isDeleted ? oldNodeId : ((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "");
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
+  
+  // For direct references to number/money fields, we need to extract the question ID
+  const directQuestionId = isDeleted ? 
+    (oldNodeId.split('_').pop() || "") : 
+    (questionCell._questionId || (questionId.split('_').pop() || ""));
+  
+  // If the question was deleted, find and delete any calc nodes that depend on it
+  if (isDeleted) {
+    // Gather a list of calc nodes to delete
+    const calcNodesToDelete = [];
+    
+    calculationNodes.forEach(calcNode => {
+      if (!calcNode._calcTerms) return;
+      
+      let dependsOnDeletedQuestion = false;
+      calcNode._calcTerms.forEach(term => {
+        if (!term.amountLabel) return;
+        
+        // Check for direct references to the question ID
+        if (term.amountLabel.toLowerCase().includes(oldNodeId.toLowerCase())) {
+          dependsOnDeletedQuestion = true;
+        }
+        
+        // Check for direct answer references (money/number types)
+        const answerPattern = `answer${directQuestionId}`;
+        if (term.amountLabel === answerPattern) {
+          dependsOnDeletedQuestion = true;
+        }
+      });
+      
+      if (dependsOnDeletedQuestion) {
+        calcNodesToDelete.push(calcNode);
+      }
+    });
+    
+    // Delete the dependent calc nodes
+    if (calcNodesToDelete.length > 0) {
+      graph.getModel().beginUpdate();
+      try {
+        graph.removeCells(calcNodesToDelete);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+  }
+  // If the question was modified, update all dependent calculation nodes
+  else {
+    const dependentCalcNodes = findCalcNodesDependentOnQuestion(questionCell);
+    if (dependentCalcNodes.length > 0) {
+      graph.getModel().beginUpdate();
+      try {
+        // Update each calculation node
+        dependentCalcNodes.forEach(calcNode => {
+          updateCalculationNodeCell(calcNode);
+        });
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+  }
+}
+
+/**
  * Build a list of all "amount" labels from numbered dropdown questions.
  * We'll gather them in the format:
  *    "<question_id_text>_<amount_label>"
@@ -56,7 +264,7 @@ function gatherAllAmountLabels() {
       } else if (qType === "money" || qType === "number") {
         // Add number/money type questions directly
         const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
-        const nodeId = getNodeId(cell) || "";
+        const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
         
         // Use answer{questionId} format for consistent JSON export
         const questionId = cell._questionId || nodeId.split('_').pop() || "";
@@ -418,7 +626,7 @@ function findCalcNodesDependentOnQuestion(questionCell) {
   if (!questionCell || !isQuestion(questionCell)) return [];
 
   const dependentCalcNodes = [];
-  const questionId = getNodeId(questionCell) || "";
+  const questionId = (typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "";
   const questionText = questionCell._questionText || questionCell.value || "";
   const cleanQuestionName = sanitizeNameId(questionText);
   
@@ -503,7 +711,7 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
     return;
   }
   
-  const questionId = isDeleted ? oldNodeId : (getNodeId(questionCell) || "");
+  const questionId = isDeleted ? oldNodeId : ((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "");
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
@@ -568,3 +776,45 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
     }
   }
 } 
+
+/**************************************************
+ ************ Module Exports **********************
+ **************************************************/
+
+// Export all functions to window object for global access
+window.calc = {
+  isCalculationNode,
+  initializeCalculationNode,
+  convertToCalculationNode,
+  updateCalculationNodeTitle,
+  setupCalculationNodeEventListeners,
+  getCalculationNodeStyle,
+  handleCalculationNodePlacement,
+  getCalculationNodeProperties,
+  exportCalculationNodeData,
+  getCalculationNodeText,
+  handleCalculationNodeCopyPaste,
+  updateCalculationNodesOnQuestionChange,
+  updateCalculationNodeCell,
+  gatherAllAmountLabels,
+  findCalcNodesDependentOnQuestion,
+  updateAllCalcNodesOnQuestionChange
+};
+
+// Export individual functions for backward compatibility
+window.isCalculationNode = isCalculationNode;
+window.initializeCalculationNode = initializeCalculationNode;
+window.convertToCalculationNode = convertToCalculationNode;
+window.updateCalculationNodeTitle = updateCalculationNodeTitle;
+window.setupCalculationNodeEventListeners = setupCalculationNodeEventListeners;
+window.getCalculationNodeStyle = getCalculationNodeStyle;
+window.handleCalculationNodePlacement = handleCalculationNodePlacement;
+window.getCalculationNodeProperties = getCalculationNodeProperties;
+window.exportCalculationNodeData = exportCalculationNodeData;
+window.getCalculationNodeText = getCalculationNodeText;
+window.handleCalculationNodeCopyPaste = handleCalculationNodeCopyPaste;
+window.updateCalculationNodesOnQuestionChange = updateCalculationNodesOnQuestionChange;
+window.updateCalculationNodeCell = updateCalculationNodeCell;
+window.gatherAllAmountLabels = gatherAllAmountLabels;
+window.findCalcNodesDependentOnQuestion = findCalcNodesDependentOnQuestion;
+window.updateAllCalcNodesOnQuestionChange = updateAllCalcNodesOnQuestionChange; 
