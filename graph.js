@@ -877,7 +877,7 @@ function showPropertiesPopup(cell) {
     // Only add PDF Name field if it has a meaningful value
     if (pdfName && pdfName.trim() !== '' && pdfName !== 'PDF Document') {
       properties.push({
-        label: isInherited ? 'PDF Name (inherited)' : 'PDF Name',
+        label: 'PDF Name',
         value: pdfName,
         id: 'propPdfName',
         editable: !isInherited, // Make inherited fields read-only
