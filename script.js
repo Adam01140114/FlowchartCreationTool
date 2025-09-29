@@ -4170,6 +4170,27 @@ function setupAutosaveHooks() {
       }, 100); // Small delay to ensure DOM is ready
     }
     
+    // Automatically reset Node IDs and PDF inheritance after flowchart loading
+    setTimeout(() => {
+      console.log('🔄 [AUTO RESET] Running automatic Node ID and PDF reset after flowchart load...');
+      
+      // Reset all Node IDs
+      if (typeof resetAllNodeIds === 'function') {
+        resetAllNodeIds();
+        console.log('🔄 [AUTO RESET] Node IDs reset completed');
+      } else {
+        console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
+      }
+      
+      // Reset PDF inheritance for all nodes
+      if (typeof window.resetAllPdfInheritance === 'function') {
+        window.resetAllPdfInheritance();
+        console.log('🔄 [AUTO RESET] PDF inheritance reset completed');
+      } else {
+        console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+      }
+    }, 2000); // Delay to ensure all loading processes are complete
+    
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
       console.log('Autosaving after loadFlowchartData, current groups:', groups);

@@ -956,6 +956,25 @@ window.exportGuiJson = function(download = true) {
 // Export both flowchart and GUI JSON in a combined format
 window.exportBothJson = function() {
   try {
+    // Automatically reset Node IDs and PDF inheritance before export
+    console.log('🔄 [AUTO RESET] Running automatic Node ID and PDF reset before export...');
+    
+    // Reset all Node IDs
+    if (typeof resetAllNodeIds === 'function') {
+      resetAllNodeIds();
+      console.log('🔄 [AUTO RESET] Node IDs reset completed before export');
+    } else {
+      console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
+    }
+    
+    // Reset PDF inheritance for all nodes
+    if (typeof window.resetAllPdfInheritance === 'function') {
+      window.resetAllPdfInheritance();
+      console.log('🔄 [AUTO RESET] PDF inheritance reset completed before export');
+    } else {
+      console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+    }
+    
     // Get flowchart JSON
     const parent = graph.getDefaultParent();
     const encoder = new mxCodec();
@@ -1073,6 +1092,26 @@ window.fixCapitalizationInJumps();
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
+  
+  // Automatically reset Node IDs and PDF inheritance before saving
+  console.log('🔄 [AUTO RESET] Running automatic Node ID and PDF reset before saving...');
+  
+  // Reset all Node IDs
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+    console.log('🔄 [AUTO RESET] Node IDs reset completed before saving');
+  } else {
+    console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
+  }
+  
+  // Reset PDF inheritance for all nodes
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+    console.log('🔄 [AUTO RESET] PDF inheritance reset completed before saving');
+  } else {
+    console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+  }
+  
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
   if (!flowchartName) {
