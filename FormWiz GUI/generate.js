@@ -978,27 +978,27 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "            </a>",
     '            <div class="dropdown-menu" id="forms-dropdown-menu">',
-    '                <a href="forms.html">My Forms</a>',
-    '                <a href="FreeForm.html">Free Form</a>',
-    '                <a href="Family.html">Family</a>',
-    '                <a href="Property.html">Property</a>',
-    '                <a href="Immigration.html">Immigration</a>',
-    '                <a href="smallclaims.html">Small Claims</a>',
-    '                <a href="Other.html">Other</a>',
+    '                <a href="../Pages/forms.html">My Forms</a>',
+    '                <a href="../Pages/FreeForm.html">Free Form</a>',
+    '                <a href="../Pages/Family.html">Family</a>',
+    '                <a href="../Pages/Property.html">Property</a>',
+    '                <a href="../Pages/Immigration.html">Immigration</a>',
+    '                <a href="../Pages/smallclaims.html">Small Claims</a>',
+    '                <a href="../Pages/Other.html">Other</a>',
     "            </div>",
     "        </div>",
-    '        <a href="about.html">About Us',
+    '        <a href="../Pages/about.html">About Us',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
-    '        <a href="contact.html">Contact Us',
+    '        <a href="../Pages/contact.html">Contact Us',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
-    '        <a href="FAQ.html">FAQ',
+    '        <a href="../Pages/FAQ.html">FAQ',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
     "    </nav>",
     '    <div class="header-actions">',
-    '        <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>',
+    '        <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>',
     '        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>',
     '        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">',
     '            <span class="cart-circle">',
@@ -1027,7 +1027,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
                                 "                    To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. ",
             "                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.",
             "                </div>",
-            '                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>',
+            '                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>',
             '                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>',
             '                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>',
             "            </div>",
@@ -2177,7 +2177,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href=\'forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -2194,11 +2194,11 @@ if (s > 1){
     '        </div>',
     '        <div class="pro-footer-col nav-col">',
     '            <div class="pro-footer-title">Navigation</div>',
-    '            <a href="index.html">Home</a>',
-    '            <a href="FreeForm.html">Forms</a>',
-    '            <a href="FAQ.html">FAQ</a>',
-    '            <a href="about.html">About Us</a>',
-    '            <a href="contact.html">Contact Us</a>',
+    '            <a href="../Pages/index.html">Home</a>',
+    '            <a href="../Pages/FreeForm.html">Forms</a>',
+    '            <a href="../Pages/FAQ.html">FAQ</a>',
+    '            <a href="../Pages/about.html">About Us</a>',
+    '            <a href="../Pages/contact.html">Contact Us</a>',
     '        </div>',
     '        <div class="pro-footer-col company-col">',
     '            <div class="pro-footer-title company-title">About FormWiz</div>',
@@ -4328,7 +4328,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var contBtn = document.getElementById('modalContinueBtn');
   if (backBtn) backBtn.onclick = hideLoginRequiredModal;
   if (contBtn) contBtn.onclick = function() {
-    window.location.href = 'account.html';
+    window.location.href = '../Pages/account.html';
   };
 });
 
@@ -4590,7 +4590,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = 'index.html';
+                        window.location.href = '../Pages/index.html';
                     }).catch(function(error) {
                         console.error('Error signing out:', error);
                     });

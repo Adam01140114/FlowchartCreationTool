@@ -1128,6 +1128,11 @@ window.saveFlowchart = function() {
   const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
   data.sectionPrefs = currentSectionPrefs;
   data.groups = getGroupsData();
+  
+  // Get default PDF properties
+  const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
+    window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
+  data.defaultPdfProperties = defaultPdfProps;
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
     lastUsed: Date.now()
@@ -1818,7 +1823,7 @@ window.loadFlowchartData = function(data) {
     console.log('loadFlowchartData: no groups data found');
   }
   
-  // Load default PDF properties if present
+  // Load default PDF properties if present, otherwise clear them
   console.log('loadFlowchartData: checking for default PDF properties');
   console.log('loadFlowchartData: data.defaultPdfProperties =', data.defaultPdfProperties);
   if (data.defaultPdfProperties) {
@@ -1827,7 +1832,11 @@ window.loadFlowchartData = function(data) {
       window.setDefaultPdfProperties(data.defaultPdfProperties);
     }
   } else {
-    console.log('loadFlowchartData: no default PDF properties found');
+    console.log('loadFlowchartData: no default PDF properties found, clearing them');
+    // Clear default PDF properties if the loaded flowchart doesn't have them
+    if (typeof window.setDefaultPdfProperties === 'function') {
+      window.setDefaultPdfProperties({ pdfName: "", pdfFile: "", pdfPrice: "" });
+    }
   }
   
   // Propagate PDF properties through the flowchart after all cells and edges are loaded

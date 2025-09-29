@@ -405,17 +405,14 @@ let defaultPdfProperties = {
  * Initialize Default PDF Properties
  */
 function initializeDefaultPdfProperties() {
-  // Load from localStorage if available
-  const saved = localStorage.getItem('defaultPdfProperties');
-  if (saved) {
-    try {
-      defaultPdfProperties = JSON.parse(saved);
-    } catch (e) {
-      console.error('Error loading default PDF properties:', e);
-    }
-  }
+  // Always start with blank properties
+  defaultPdfProperties = {
+    pdfName: "",
+    pdfFile: "",
+    pdfPrice: ""
+  };
   
-  // Update UI with loaded values
+  // Update UI with blank values
   updateDefaultPdfPropertiesUI();
 }
 
