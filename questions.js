@@ -76,7 +76,8 @@ function setQuestionType(cell, newType) {
         cell._questionText = preservedText || '';
         updateSimpleQuestionCell(cell);
     }
-    refreshNodeIdFromLabel(cell);
+    // DISABLED: Automatic Node ID generation when setting question type
+    // Node IDs will only change when manually edited or reset using the button
   } finally {
     graph.getModel().endUpdate();
   }
@@ -1110,9 +1111,8 @@ window.updateSimpleQuestionTitle = function(cellId, text) {
   }
   // Only re-render on blur, not on every input
   updateSimpleQuestionCell(cell);
-  if (typeof window.refreshNodeIdFromLabel === 'function') {
-    window.refreshNodeIdFromLabel(cell);
-  }
+  // DISABLED: Automatic Node ID generation when updating question text
+  // Node IDs will only change when manually edited or reset using the button
 };
 
 window.updateInputQuestionTitle = function(cellId, text) {
@@ -1130,9 +1130,8 @@ window.updateInputQuestionTitle = function(cellId, text) {
   } else if (getQuestionType(cell) === 'multipleDropdownType') {
     updatemultipleDropdownTypeCell(cell);
   }
-  if (typeof window.refreshNodeIdFromLabel === 'function') {
-    window.refreshNodeIdFromLabel(cell);
-  }
+  // DISABLED: Automatic Node ID generation when updating question text
+  // Node IDs will only change when manually edited or reset using the button
 };
 
 window.handleTitleInputKeydown = function(event, cellId) {

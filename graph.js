@@ -765,6 +765,8 @@ function showPropertiesPopup(cell) {
     });
   }
   
+  // PDF Name field will be added later in the unified section
+  
   // Add Copy ID dropdown and button for date range nodes
   if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'dateRange') {
     properties.push({
@@ -852,16 +854,57 @@ function showPropertiesPopup(cell) {
     });
   }
   
-  // Add PDF properties for non-PDF nodes that have PDF properties (only if actually connected to PDF nodes)
-  if (!(typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) && pdfProperties) {
-    // Add PDF properties for other node types that have PDF properties (only if not blank)
-    const pdfName = pdfProperties.filename || '';
+  // Add unified PDF Name field for non-PDF nodes that have PDF properties
+  if (!(typeof window.isPdfNode === 'function' && window.isPdfNode(cell))) {
+    // Use the same source as the inherited field for consistency
+    let pdfName = '';
+    let isInherited = false;
+    
+    // First try to get PDF name from the unified function
+    if (typeof window.getPdfNameForNode === 'function') {
+      const inheritedPdfName = window.getPdfNameForNode(cell);
+      if (inheritedPdfName && inheritedPdfName.trim()) {
+        pdfName = inheritedPdfName;
+        isInherited = true;
+      }
+    }
+    
+    // Fallback to pdfProperties if no inherited name found
+    if (!pdfName && pdfProperties) {
+      pdfName = pdfProperties.filename || '';
+    }
     
     // Only add PDF Name field if it has a meaningful value
     if (pdfName && pdfName.trim() !== '' && pdfName !== 'PDF Document') {
-      properties.push(
-        { label: 'PDF Name', value: pdfName, id: 'propPdfName', editable: true }
-      );
+      properties.push({
+        label: isInherited ? 'PDF Name (inherited)' : 'PDF Name',
+        value: pdfName,
+        id: 'propPdfName',
+        editable: !isInherited, // Make inherited fields read-only
+        isInherited: isInherited
+      });
+      
+      // Add Reset PDF button for inherited fields
+      if (isInherited) {
+        properties.push({
+          label: '',
+          value: '',
+          id: 'propResetPdf',
+          editable: false,
+          isButton: true,
+          buttonText: 'Reset PDF',
+          buttonAction: () => {
+            const newPdfName = window.resetPdfInheritance(cell);
+            if (newPdfName) {
+              // Update the input field value immediately
+              const pdfNameInput = document.getElementById('propPdfName');
+              if (pdfNameInput) {
+                pdfNameInput.value = newPdfName;
+              }
+            }
+          }
+        });
+      }
     }
   }
   
@@ -875,12 +918,13 @@ function showPropertiesPopup(cell) {
     `;
     
     const label = document.createElement('label');
-    label.textContent = prop.label ? prop.label + ':' : '';
+    label.textContent = prop.label ? prop.label + (prop.isInherited ? ' (inherited):' : ':') : '';
     label.style.cssText = `
       font-weight: 600;
       color: #333;
       min-width: 120px;
       margin-right: 12px;
+      ${prop.isInherited ? 'color: #4caf50;' : ''}
     `;
     
     // Special handling for question type dropdown
@@ -1019,6 +1063,7 @@ function showPropertiesPopup(cell) {
         color: ${prop.editable ? '#333' : '#666'};
         cursor: ${prop.editable ? 'text' : 'default'};
         transition: all 0.2s ease;
+        ${prop.isInherited ? 'border-left: 4px solid #4caf50; font-style: italic;' : ''}
       `;
       console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
     }
@@ -1278,17 +1323,37 @@ function showPropertiesPopup(cell) {
       } else {
         // Regular editable field behavior for other fields
         valueSpan.addEventListener('click', () => {
-          const input = document.createElement('input');
-          input.type = 'text';
+          // For Node Text field, use textarea to maintain size
+          const isNodeText = prop.id === 'propNodeText';
+          const input = document.createElement(isNodeText ? 'textarea' : 'input');
+          if (!isNodeText) {
+            input.type = 'text';
+          }
           input.value = prop.value;
-          input.style.cssText = `
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #1976d2;
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-          `;
+          
+          if (isNodeText) {
+            input.style.cssText = `
+              width: 100%;
+              min-height: 80px;
+              padding: 8px 12px;
+              border: 2px solid #1976d2;
+              border-radius: 6px;
+              font-size: 14px;
+              outline: none;
+              resize: vertical;
+              font-family: inherit;
+              line-height: 1.4;
+            `;
+          } else {
+            input.style.cssText = `
+              width: 100%;
+              padding: 8px 12px;
+              border: 2px solid #1976d2;
+              border-radius: 6px;
+              font-size: 14px;
+              outline: none;
+            `;
+          }
           
           valueSpan.style.display = 'none';
           valueSpan.parentNode.insertBefore(input, valueSpan);
@@ -1307,35 +1372,8 @@ function showPropertiesPopup(cell) {
                 cell._questionText = newValue;
                 cell.value = newValue;
                 
-                // Auto-update node ID based on text for all question nodes
-                if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-                  // Clear the existing Node ID from the style to force regeneration with proper naming scheme
-                  let style = cell.style || '';
-                  style = style.replace(/nodeId=[^;]+/, '');
-                  graph.getModel().setStyle(cell, style);
-                  
-                  // Now get a fresh Node ID using getNodeId (which will apply PDF naming convention)
-                  const freshNodeId = typeof window.getNodeId === 'function' ? window.getNodeId(cell) : (cell._nameId || cell.id);
-                  
-                  if (freshNodeId) {
-                    // Update the node ID using the proper function
-                    if (typeof window.setNodeId === 'function') {
-                      window.setNodeId(cell, freshNodeId);
-                    } else {
-                      cell._nameId = freshNodeId;
-                    }
-                    
-                    // Update the node ID field in the popup if it exists
-                    const nodeIdField = document.getElementById('propNodeId');
-                    if (nodeIdField) {
-                      const nodeIdSpan = nodeIdField.querySelector('span');
-                      if (nodeIdSpan) {
-                        nodeIdSpan.textContent = freshNodeId;
-                      }
-                    }
-                    console.log('Auto-updated node ID to:', freshNodeId);
-                  }
-                }
+                // DO NOT auto-update node ID when editing node text
+                // Node IDs should only change when manually edited or reset using the button
                 break;
               case 'propNodeSection':
                 // Update section using the proper setSection function
@@ -1396,8 +1434,15 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propPdfName':
                 // Update the PDF name property
+                const oldPdfName = cell._pdfName;
                 cell._pdfName = newValue;
-                // Apply PDF naming convention to the Node ID
+                
+                // Update all Node IDs that use this PDF name
+                if (oldPdfName && oldPdfName !== newValue && typeof window.updateAllNodeIdsForPdfChange === 'function') {
+                  window.updateAllNodeIdsForPdfChange(oldPdfName, newValue);
+                }
+                
+                // Apply PDF naming convention to the current Node ID
                 if (typeof window.setNodeId === 'function') {
                   // Get the current Node ID without PDF prefix
                   const currentNodeId = document.getElementById('propNodeId');
@@ -1942,10 +1987,8 @@ function showQuestionTextPopup(cell) {
           console.log("Graph model update failed:", error);
         }
 
-        // Update the _nameId based on the new question text
-        if (typeof window.refreshNodeIdFromLabel === 'function') {
-          window.refreshNodeIdFromLabel(cell);
-        }
+        // DISABLED: Automatic Node ID generation when submitting question text
+        // Node IDs will only change when manually edited or reset using the button
         
         if (typeof window.refreshAllCells === 'function') {
           window.refreshAllCells();

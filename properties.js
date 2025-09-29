@@ -81,9 +81,8 @@ function onNodeTextFieldChange(newText) {
         selectedCell.value = newText.trim();
       }
       
-      if (typeof window.refreshNodeIdFromLabel === 'function') {
-        window.refreshNodeIdFromLabel(selectedCell);
-      }
+      // DISABLED: Automatic Node ID generation when editing node text
+      // Node IDs will only change when manually edited or reset using the button
       
       // Update dependent calculation nodes if the text changed 
       // (which would change the nodeId)

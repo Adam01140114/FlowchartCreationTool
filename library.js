@@ -1427,15 +1427,12 @@ function propagatePdfPropertiesAfterImport() {
  * Naming convention: [pdf name if associated]-[parent node text]-[current node text]
  */
 window.correctNodeIdsAfterImport = function() {
-  console.log('🔧 [NODE ID VALIDATION] correctNodeIdsAfterImport function called');
   
   const graph = window.graph;
   if (!graph) {
-    console.error('🔧 [NODE ID VALIDATION] ERROR: Graph not available');
     return;
   }
   
-  console.log('🔧 [NODE ID VALIDATION] Starting comprehensive Node ID validation and correction');
   
   // Get all cells in the graph
   const allCells = graph.getModel().cells;
@@ -1484,11 +1481,9 @@ window.correctNodeIdsAfterImport = function() {
     }
   });
   
-  console.log(`🔧 [NODE ID VALIDATION] Validated ${validatedCount} nodes, found ${invalidIds.length} invalid Node IDs`);
   
   // Second pass: Correct all invalid Node IDs
   if (invalidIds.length > 0) {
-    console.log('🔧 [NODE ID CORRECTION] Correcting invalid Node IDs...');
     
     invalidIds.forEach(({ cell, currentId, correctId, reason }) => {
       if (typeof window.setNodeId === 'function') {
@@ -1502,23 +1497,18 @@ window.correctNodeIdsAfterImport = function() {
           window.setNodeId(cell, correctId);
           correctedCount++;
           
-          console.log(`🔧 [NODE ID CORRECTION] ${reason}: "${currentId}" → "${correctId}"`);
         } catch (error) {
-          console.error(`🔧 [NODE ID CORRECTION] ERROR correcting node ${cell.id}:`, error);
         }
       } else {
-        console.error('🔧 [NODE ID CORRECTION] ERROR: setNodeId function not available');
       }
     });
     
-    console.log(`🔧 [NODE ID CORRECTION] Successfully corrected ${correctedCount} Node IDs`);
     
     // Refresh the graph to show the corrected Node IDs
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
   } else {
-    console.log('🔧 [NODE ID VALIDATION] All Node IDs are valid and follow the naming convention');
   }
 }
 
@@ -1549,8 +1539,8 @@ function generateCorrectNodeId(cell) {
     nodeId += cleanPdfName + '_';
   }
   
-  // Add parent text if present (for option nodes)
-  if (parentText && parentText.trim()) {
+  // Add parent text if present (only for option nodes, not question nodes)
+  if (parentText && parentText.trim() && isOptions(cell)) {
     const cleanParentText = parentText.trim()
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '') // Remove special characters
@@ -1582,38 +1572,233 @@ function generateCorrectNodeId(cell) {
 }
 
 /**
- * Get PDF name associated with a node
+ * Get current PDF name from a PDF node's HTML input field (dynamic reading)
+ */
+window.getCurrentPdfNameFromHtml = function(pdfNode) {
+  if (!pdfNode || !pdfNode.value) return null;
+  
+  try {
+    // Parse the HTML to find the PDF Name input field
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = pdfNode.value;
+    
+    // Look for the PDF Name input field
+    const pdfNameInput = tempDiv.querySelector('input[type="text"]');
+    if (pdfNameInput) {
+      const currentValue = pdfNameInput.value || pdfNameInput.getAttribute('value') || '';
+      if (currentValue.trim() && currentValue.trim() !== 'PDF Document') {
+        return currentValue.trim();
+      }
+    }
+  } catch (error) {
+    console.error('Error reading PDF name from HTML:', error);
+    }
+    
+    return null;
+};
+
+/**
+ * Reset PDF inheritance by finding the connected PDF node and updating the inherited value
+ */
+window.resetPdfInheritance = function(cell) {
+  const graph = window.graph;
+  if (!graph) {
+    console.error('Graph not available for PDF reset');
+    return;
+  }
+  
+  // Recursive function to find the source PDF node by following the inheritance chain
+  function findSourcePdfNode(currentCell, visited = new Set()) {
+    if (visited.has(currentCell.id)) {
+      return null; // Avoid infinite loops
+    }
+    visited.add(currentCell.id);
+    
+    // Check if this cell is a PDF node
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(currentCell)) {
+      return currentCell;
+    }
+    
+    // Check outgoing edges for direct PDF node connections
+    const outgoingEdges = graph.getOutgoingEdges(currentCell) || [];
+    for (const edge of outgoingEdges) {
+      const target = edge.target;
+      if (target && typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
+        return target;
+      }
+    }
+    
+    // Check incoming edges for PDF nodes or nodes with PDF inheritance
+    const incomingEdges = graph.getIncomingEdges(currentCell) || [];
+    for (const edge of incomingEdges) {
+      const source = edge.source;
+      if (source) {
+        // Check if the source is a PDF node
+        if (typeof window.isPdfNode === 'function' && window.isPdfNode(source)) {
+          return source;
+        }
+        
+        // Check if the source has PDF inheritance (recursive search)
+        const sourcePdfName = window.getPdfNameForNode(source);
+        if (sourcePdfName) {
+          // Recursively search the source node
+          const foundPdfNode = findSourcePdfNode(source, visited);
+          if (foundPdfNode) {
+            return foundPdfNode;
+          }
+        }
+      }
+    }
+    
+    return null;
+  }
+  
+  // Find the connected PDF node using the recursive search
+  const connectedPdfNode = findSourcePdfNode(cell);
+  
+  if (connectedPdfNode) {
+    // Get the current PDF name from the PDF node's HTML input
+    const currentPdfName = window.getCurrentPdfNameFromHtml(connectedPdfNode);
+    if (currentPdfName) {
+      // Update the cell's PDF properties to reflect the current value
+      cell._pdfName = currentPdfName;
+      
+      // Refresh the properties popup to show the updated value
+      if (window.__propertiesPopupOpen) {
+        // Close and reopen the properties popup to refresh the display
+        const closeButton = document.querySelector('#propertiesPopup .close-button');
+        if (closeButton) {
+          closeButton.click();
+        }
+        // Reopen after a short delay
+        setTimeout(() => {
+          window.showPropertiesPopup(cell);
+        }, 100);
+      }
+      
+      console.log(`🔄 [PDF RESET] Updated PDF inheritance for node ${cell.id} to: ${currentPdfName} (found PDF node: ${connectedPdfNode.id})`);
+      return currentPdfName;
+    }
+  }
+  
+  console.log(`🔄 [PDF RESET] No connected PDF node found for reset (searched from node ${cell.id})`);
+  return null;
+};
+
+/**
+ * Reset PDF inheritance for all nodes in the flowchart
+ */
+window.resetAllPdfInheritance = function() {
+  const graph = window.graph;
+  if (!graph) {
+    console.error('Graph not available for PDF reset');
+    return;
+  }
+  
+  // Get all cells in the graph
+  const allCells = graph.getModel().cells;
+  const cells = Object.values(allCells).filter(cell => cell && cell.vertex);
+  
+  let resetCount = 0;
+  let totalCount = 0;
+  
+  console.log('🔄 [RESET ALL PDF] Starting PDF reset for all nodes...');
+  
+  // Process each cell
+  cells.forEach(cell => {
+    // Skip PDF nodes themselves (they don't need inheritance reset)
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+      return;
+    }
+    
+    // Check if this cell has PDF inheritance
+    const currentPdfName = window.getPdfNameForNode(cell);
+    if (currentPdfName) {
+      totalCount++;
+      
+      // Reset the PDF inheritance for this cell
+      const newPdfName = window.resetPdfInheritance(cell);
+      if (newPdfName) {
+        resetCount++;
+        console.log(`🔄 [RESET ALL PDF] Reset node ${cell.id} to: ${newPdfName}`);
+      }
+    }
+  });
+  
+  console.log(`🔄 [RESET ALL PDF] Completed! Reset ${resetCount} out of ${totalCount} nodes with PDF inheritance`);
+  
+  // Show user feedback
+  const message = `PDF inheritance reset completed!\n\nReset ${resetCount} out of ${totalCount} nodes with PDF inheritance.`;
+  alert(message);
+  
+  return { resetCount, totalCount };
+};
+
+/**
+ * Get PDF name associated with a node (now reads dynamically from PDF nodes)
  */
 function getPdfNameForNode(cell) {
-  // Check for direct PDF properties
-  if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
-  if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
-  if (cell._pdfFile && cell._pdfFile.trim()) return cell._pdfFile.trim();
+  // Check for direct PDF properties first (fallback)
+  if (cell._pdfName && cell._pdfName.trim() && cell._pdfName.trim() !== "PDF Document") {
+    return cell._pdfName.trim();
+  }
+  if (cell._pdfFilename && cell._pdfFilename.trim()) {
+    return cell._pdfFilename.trim();
+  }
+  if (cell._pdfFile && cell._pdfFile.trim()) {
+    return cell._pdfFile.trim();
+  }
   if (cell._pdfUrl && cell._pdfUrl.trim()) {
     // Extract filename from URL
     const urlParts = cell._pdfUrl.split('/');
     const filename = urlParts[urlParts.length - 1];
-    return filename.replace(/\.pdf$/i, '').trim();
+    const result = filename.replace(/\.pdf$/i, '').trim();
+    return result;
   }
   
-  // Check if connected to a PDF node
+  // Check if connected to a PDF node or inheriting PDF from connected nodes
   const graph = window.graph;
   if (graph) {
-    // Check outgoing edges to PDF nodes
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    for (const edge of outgoingEdges) {
-      const target = edge.target;
-      if (target && (typeof window.isPdfNode === 'function' && window.isPdfNode(target))) {
-        return getPdfNameForNode(target);
+    // Helper function to extract PDF name from a cell (now reads from HTML inputs)
+    const extractPdfName = (targetCell) => {
+      // If it's a PDF node, read from HTML input field (dynamic)
+      if (typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell)) {
+        const currentPdfName = window.getCurrentPdfNameFromHtml(targetCell);
+        if (currentPdfName) return currentPdfName;
       }
-    }
+      
+      // Fallback to stored properties for non-PDF nodes
+      if (targetCell._pdfName && targetCell._pdfName.trim() && targetCell._pdfName.trim() !== "PDF Document") return targetCell._pdfName.trim();
+      if (targetCell._pdfFilename && targetCell._pdfFilename.trim()) return targetCell._pdfFilename.trim();
+      if (targetCell._pdfFile && targetCell._pdfFile.trim()) return targetCell._pdfFile.trim();
+      if (targetCell._pdfUrl && targetCell._pdfUrl.trim()) {
+        const urlParts = targetCell._pdfUrl.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        return filename.replace(/\.pdf$/i, '').trim();
+      }
+      
+      return null;
+    };
     
-    // Check incoming edges from PDF nodes
+    // Check incoming edges for PDF nodes and PDF inheritance (only downstream flow)
     const incomingEdges = graph.getIncomingEdges(cell) || [];
     for (const edge of incomingEdges) {
       const source = edge.source;
-      if (source && (typeof window.isPdfNode === 'function' && window.isPdfNode(source))) {
-        return getPdfNameForNode(source);
+      if (source) {
+        // Check if it's a PDF node
+        if (typeof window.isPdfNode === 'function' && window.isPdfNode(source)) {
+          const pdfName = extractPdfName(source);
+          if (pdfName) return pdfName;
+        }
+        
+        // Check for PDF inheritance from connected question nodes (downstream only)
+        if ((source._pdfName && source._pdfName.trim() && source._pdfName.trim() !== "PDF Document") || 
+            (source._pdfFilename && source._pdfFilename.trim()) || 
+            (source._pdfFile && source._pdfFile.trim()) ||
+            (source._pdfUrl && source._pdfUrl.trim())) {
+          const pdfName = extractPdfName(source);
+          if (pdfName) return pdfName;
+        }
       }
     }
   }
@@ -2057,9 +2242,7 @@ window.loadFlowchartData = function(data) {
   }, 500); // Increased delay to ensure all edges are fully processed in graph model
   
   // Validate and correct Node IDs after a 1-second delay to ensure everything is loaded
-  console.log('🔧 [NODE ID VALIDATION] Setting up Node ID validation timeout (1 second)');
   setTimeout(() => {
-    console.log('🔧 [NODE ID VALIDATION] Starting Node ID validation after 1-second delay');
     correctNodeIdsAfterImport();
   }, 1000);
   
