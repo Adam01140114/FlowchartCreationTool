@@ -2360,6 +2360,9 @@ function buildCheckboxName (questionId, rawNameId, labelText){
                       document.getElementById('user_lastname').value = userData.lastName || '';
                       document.getElementById('user_email').value = userData.email || '';
                       document.getElementById('user_phone').value = userData.phone || '';
+                      
+                      // Update full name
+                      updateUserFullName();
                       document.getElementById('user_street').value = userData.address?.street || '';
                       document.getElementById('user_city').value = userData.address?.city || '';
                       document.getElementById('user_state').value = userData.address?.state || '';
@@ -4879,6 +4882,340 @@ if (typeof handleNext === 'function') {
     });
 
 </script>
+
+<!-- Debug Menu -->
+<div id="debugMenu" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 99999; font-family: 'Montserrat', sans-serif;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); width: 90%; max-width: 800px; max-height: 80%; overflow: hidden; display: flex; flex-direction: column;">
+    <!-- Header -->
+    <div style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative;">
+      <h2 style="margin: 0; font-size: 1.5em; font-weight: 700;">🔍 Form Debug Menu</h2>
+      <button id="closeDebugMenu" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; padding: 5px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">&times;</button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div style="padding: 20px; border-bottom: 1px solid #eee;">
+      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+    </div>
+    
+    <!-- Content -->
+    <div id="debugContent" style="flex: 1; overflow-y: auto; padding: 20px;">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+// Debug Menu Functionality
+let debugMenuVisible = false;
+
+// Show debug menu on Ctrl+Shift
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+    e.preventDefault();
+    showDebugMenu();
+  }
+});
+
+// Close debug menu
+document.getElementById('closeDebugMenu').addEventListener('click', hideDebugMenu);
+
+// Close on escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && debugMenuVisible) {
+    hideDebugMenu();
+  }
+});
+
+// Removed click-outside-to-close functionality - user must use X button
+
+function showDebugMenu() {
+  debugMenuVisible = true;
+  document.getElementById('debugMenu').style.display = 'block';
+  populateDebugContent();
+  document.getElementById('debugSearch').focus();
+}
+
+function hideDebugMenu() {
+  debugMenuVisible = false;
+  document.getElementById('debugMenu').style.display = 'none';
+}
+
+function populateDebugContent() {
+  const content = document.getElementById('debugContent');
+  const searchTerm = document.getElementById('debugSearch').value.toLowerCase();
+  
+  // Get all form inputs
+  const inputs = document.querySelectorAll('input, select, textarea');
+  const inputData = [];
+  
+  inputs.forEach(input => {
+    if (input.id && input.name) {
+      const value = input.type === 'checkbox' ? input.checked : input.value;
+      const type = input.tagName.toLowerCase();
+      const inputType = input.type || 'text';
+      
+      inputData.push({
+        id: input.id,
+        name: input.name,
+        value: value,
+        type: type,
+        inputType: inputType,
+        placeholder: input.placeholder || '',
+        required: input.required
+      });
+    }
+  });
+  
+  // Filter by search term
+  const filteredData = inputData.filter(item => 
+    item.id.toLowerCase().includes(searchTerm) ||
+    item.name.toLowerCase().includes(searchTerm) ||
+    String(item.value).toLowerCase().includes(searchTerm) ||
+    item.placeholder.toLowerCase().includes(searchTerm)
+  );
+  
+  // Group by type
+  const grouped = {
+    text: [],
+    email: [],
+    tel: [],
+    number: [],
+    date: [],
+    select: [],
+    textarea: [],
+    checkbox: [],
+    radio: [],
+    other: []
+  };
+  
+  filteredData.forEach(item => {
+    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+      grouped[item.inputType].push(item);
+    } else if (item.type === 'select') {
+      grouped.select.push(item);
+    } else if (item.type === 'textarea') {
+      grouped.textarea.push(item);
+    } else if (item.inputType === 'checkbox') {
+      grouped.checkbox.push(item);
+    } else if (item.inputType === 'radio') {
+      grouped.radio.push(item);
+    } else {
+      grouped.other.push(item);
+    }
+  });
+  
+  // Generate HTML
+  let html = '';
+  
+  const typeLabels = {
+    text: '📝 Text Inputs',
+    email: '📧 Email Inputs', 
+    tel: '📞 Phone Inputs',
+    number: '🔢 Number Inputs',
+    date: '📅 Date Inputs',
+    select: '📋 Dropdowns',
+    textarea: '📄 Text Areas',
+    checkbox: '☑️ Checkboxes',
+    radio: '🔘 Radio Buttons',
+    other: '❓ Other Inputs'
+  };
+  
+  Object.keys(grouped).forEach(type => {
+    if (grouped[type].length > 0) {
+      html += '<div style="margin-bottom: 30px;">';
+      html += '<h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.2em; border-bottom: 2px solid #e0e7ef; padding-bottom: 8px;">' + typeLabels[type] + ' (' + grouped[type].length + ')</h3>';
+      
+      grouped[type].forEach(item => {
+        const valueDisplay = item.value === '' ? '<em style="color: #999;">(empty)</em>' : 
+                           item.value === true ? '<span style="color: #38d39f;">✓ checked</span>' :
+                           item.value === false ? '<span style="color: #e74c3c;">✗ unchecked</span>' :
+                           '<span style="color: #2c3e50;">' + String(item.value).substring(0, 100) + (String(item.value).length > 100 ? '...' : '') + '</span>';
+        
+        const requiredBadge = item.required ? '<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">REQUIRED</span>' : '';
+        
+        html += '<div class="debug-entry" data-id="' + item.id + '" style="background: #f8faff; border: 1px solid #e0e7ef; border-radius: 8px; padding: 15px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; position: relative;">' +
+          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">' +
+            '<div>' +
+              '<strong style="color: #2c3e50; font-size: 1.1em;">' + item.id + '</strong>' +
+              requiredBadge +
+            '</div>' +
+            '<span style="background: #e0e7ef; color: #2c3e50; padding: 4px 8px; border-radius: 4px; font-size: 0.9em;">' + item.inputType + '</span>' +
+          '</div>' +
+          '<div style="margin-bottom: 5px;">' +
+            '<span style="color: #666; font-size: 0.9em;">Name: </span>' +
+            '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">' + item.name + '</code>' +
+          '</div>' +
+          (item.placeholder ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">Placeholder: </span><span style="color: #999;">' + item.placeholder + '</span></div>' : '') +
+          '<div>' +
+            '<span style="color: #666; font-size: 0.9em;">Value: </span>' +
+            valueDisplay +
+          '</div>' +
+          '<div class="copy-indicator" style="position: absolute; top: 10px; right: 10px; background: #38d39f; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; opacity: 0; transform: scale(0.8); transition: all 0.3s ease;">COPIED!</div>' +
+        '</div>';
+      });
+      
+      html += '</div>';
+    }
+  });
+  
+  if (html === '') {
+    html = '<div style="text-align: center; color: #666; padding: 40px;"><p>No inputs found matching your search.</p></div>';
+  }
+  
+  content.innerHTML = html;
+  
+  // Add click event listeners to debug entries
+  const debugEntries = content.querySelectorAll('.debug-entry');
+  debugEntries.forEach(entry => {
+    entry.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      copyToClipboard(id, this);
+    });
+    
+    // Add hover effects
+    entry.addEventListener('mouseenter', function() {
+      this.style.background = '#f0f8ff';
+      this.style.borderColor = '#4f8cff';
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 4px 12px rgba(79, 140, 255, 0.15)';
+    });
+    
+    entry.addEventListener('mouseleave', function() {
+      this.style.background = '#f8faff';
+      this.style.borderColor = '#e0e7ef';
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
+    });
+  });
+}
+
+// Copy to clipboard function
+function copyToClipboard(text, element) {
+  // Remove any existing copy highlights
+  const allEntries = document.querySelectorAll('.debug-entry');
+  allEntries.forEach(entry => {
+    entry.style.background = '#f8faff';
+    entry.style.borderColor = '#e0e7ef';
+    entry.style.borderWidth = '1px';
+    const indicator = entry.querySelector('.copy-indicator');
+    if (indicator) {
+      indicator.style.opacity = '0';
+      indicator.style.transform = 'scale(0.8)';
+    }
+  });
+  
+  // Highlight the clicked entry
+  element.style.background = '#e8f5e8';
+  element.style.borderColor = '#38d39f';
+  element.style.borderWidth = '2px';
+  
+  // Show copy indicator
+  const copyIndicator = element.querySelector('.copy-indicator');
+  if (copyIndicator) {
+    copyIndicator.style.opacity = '1';
+    copyIndicator.style.transform = 'scale(1)';
+  }
+  
+  // Copy to clipboard
+  if (navigator.clipboard && window.isSecureContext) {
+    // Use modern clipboard API
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Copied to clipboard:', text);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      fallbackCopyToClipboard(text);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(text);
+  }
+  
+  // Reset highlight after 2 seconds
+  setTimeout(() => {
+    element.style.background = '#f8faff';
+    element.style.borderColor = '#e0e7ef';
+    element.style.borderWidth = '1px';
+    if (copyIndicator) {
+      copyIndicator.style.opacity = '0';
+      copyIndicator.style.transform = 'scale(0.8)';
+    }
+  }, 2000);
+}
+
+// Fallback copy function for older browsers
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    console.log('Copied to clipboard (fallback):', text);
+  } catch (err) {
+    console.error('Fallback copy failed: ', err);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Search functionality
+document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
+
+// Update content when form values change
+document.addEventListener('input', function() {
+  if (debugMenuVisible) {
+    populateDebugContent();
+  }
+});
+
+document.addEventListener('change', function() {
+  if (debugMenuVisible) {
+    populateDebugContent();
+  }
+});
+
+// Function to update user full name
+function updateUserFullName() {
+  const firstName = document.getElementById('user_firstname')?.value || '';
+  const lastName = document.getElementById('user_lastname')?.value || '';
+  const fullNameField = document.getElementById('user_fullname');
+  
+  if (fullNameField) {
+    // Capitalize first letter of each name and combine with space
+    const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    const formattedLastName = lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase();
+    
+    // Combine with space, but only if both names exist
+    const fullName = (formattedFirstName && formattedLastName) ? 
+      formattedFirstName + ' ' + formattedLastName : 
+      formattedFirstName + formattedLastName;
+    
+    fullNameField.value = fullName;
+  }
+}
+
+// Add event listeners for first and last name fields
+document.addEventListener('DOMContentLoaded', function() {
+  const firstNameField = document.getElementById('user_firstname');
+  const lastNameField = document.getElementById('user_lastname');
+  
+  if (firstNameField) {
+    firstNameField.addEventListener('input', updateUserFullName);
+    firstNameField.addEventListener('change', updateUserFullName);
+  }
+  
+  if (lastNameField) {
+    lastNameField.addEventListener('input', updateUserFullName);
+    lastNameField.addEventListener('change', updateUserFullName);
+  }
+});
+</script>
+
 </body>
 </html>
 `;
@@ -4936,6 +5273,7 @@ function generateHiddenPDFFields() {
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_fullname"         name="user_fullname">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
 <input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">

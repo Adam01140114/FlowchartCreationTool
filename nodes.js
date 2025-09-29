@@ -542,7 +542,7 @@ window.getNodeId = function(cell) {
         .replace(/[^a-z0-9\s]/g, '') // Remove special characters
         .replace(/\s+/g, '_') // Replace spaces with underscores
         .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-        .substring(0, 50); // Limit length
+        ; // No length limit
       
       if (DEBUG_NODE_ID) {
         console.log("Generated base nodeId from text:", baseNodeId);

@@ -1206,9 +1206,14 @@ function displayFlowcharts(flowcharts) {
 
 window.openSavedFlowchart = function(name) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
+  
+  console.log('📚 [LIBRARY LOAD] Loading flowchart from library:', name);
+  
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
     .get().then(docSnap=>{
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
+      
+      console.log('📚 [LIBRARY LOAD] Flowchart data retrieved, calling loadFlowchartData');
       loadFlowchartData(docSnap.data().flowchart);
       currentFlowchartName = name;
       
@@ -1218,6 +1223,8 @@ window.openSavedFlowchart = function(name) {
         .catch(err => console.log("Error updating last used timestamp:", err));
       
       document.getElementById("flowchartListOverlay").style.display = "none";
+      
+      console.log('📚 [LIBRARY LOAD] Flowchart loaded, Node ID validation will run in 1 second');
     }).catch(err=>alert("Error loading: " + err));
 };
 
@@ -1416,51 +1423,254 @@ function propagatePdfPropertiesAfterImport() {
 }
 
 /**
- * Correct Node IDs to follow proper naming scheme after import
+ * Validate and correct Node IDs to follow proper naming scheme after import
+ * Naming convention: [pdf name if associated]-[parent node text]-[current node text]
  */
 window.correctNodeIdsAfterImport = function() {
-  const graph = window.graph;
-  if (!graph) return;
+  console.log('🔧 [NODE ID VALIDATION] correctNodeIdsAfterImport function called');
   
-  console.log('🔧 [NODE ID CORRECTION] Starting Node ID correction after import');
+  const graph = window.graph;
+  if (!graph) {
+    console.error('🔧 [NODE ID VALIDATION] ERROR: Graph not available');
+    return;
+  }
+  
+  console.log('🔧 [NODE ID VALIDATION] Starting comprehensive Node ID validation and correction');
   
   // Get all cells in the graph
   const allCells = graph.getModel().cells;
   const cells = Object.values(allCells).filter(cell => cell && cell.vertex);
   
+  let validatedCount = 0;
   let correctedCount = 0;
+  let invalidIds = [];
   
+  // First pass: Validate all existing Node IDs
   cells.forEach(cell => {
-    if (cell && cell.vertex && typeof window.setNodeId === 'function') {
-      // Clear the existing Node ID from the style to force regeneration
-      let style = cell.style || '';
-      const oldNodeId = style.match(/nodeId=([^;]+)/);
-      if (oldNodeId) {
-        const oldId = decodeURIComponent(oldNodeId[1]);
-        style = style.replace(/nodeId=[^;]+/, '');
-        graph.getModel().setStyle(cell, style);
-        
-        // Now get a fresh Node ID using getNodeId (which will apply proper naming scheme)
-        const freshId = typeof window.getNodeId === 'function' ? window.getNodeId(cell) : (cell._nameId || cell.id);
-        
-        // Only update if the ID actually changed
-        if (freshId !== oldId) {
-          window.setNodeId(cell, freshId);
-          correctedCount++;
-          console.log(`🔧 [NODE ID CORRECTION] Corrected Node ID: "${oldId}" → "${freshId}"`);
+    if (cell && cell.vertex) {
+      validatedCount++;
+      
+      // Get current Node ID
+      let currentId = '';
+      if (cell.style) {
+        const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+        if (styleMatch) {
+          currentId = decodeURIComponent(styleMatch[1]);
         }
+      }
+      
+      // If no Node ID exists, mark as invalid
+      if (!currentId) {
+        invalidIds.push({
+          cell: cell,
+          currentId: 'MISSING',
+          reason: 'No Node ID found'
+        });
+        return;
+      }
+      
+      // Generate what the correct Node ID should be
+      const correctId = generateCorrectNodeId(cell);
+      
+      // Check if current ID matches the correct format
+      if (currentId !== correctId) {
+        invalidIds.push({
+          cell: cell,
+          currentId: currentId,
+          correctId: correctId,
+          reason: 'Does not follow naming convention'
+        });
       }
     }
   });
   
-  if (correctedCount > 0) {
-    console.log(`🔧 [NODE ID CORRECTION] Corrected ${correctedCount} Node IDs to follow proper naming scheme`);
+  console.log(`🔧 [NODE ID VALIDATION] Validated ${validatedCount} nodes, found ${invalidIds.length} invalid Node IDs`);
+  
+  // Second pass: Correct all invalid Node IDs
+  if (invalidIds.length > 0) {
+    console.log('🔧 [NODE ID CORRECTION] Correcting invalid Node IDs...');
+    
+    invalidIds.forEach(({ cell, currentId, correctId, reason }) => {
+      if (typeof window.setNodeId === 'function') {
+        try {
+          // Clear the existing Node ID from the style to force regeneration
+          let style = cell.style || '';
+          style = style.replace(/nodeId=[^;]+/, '');
+          graph.getModel().setStyle(cell, style);
+          
+          // Set the correct Node ID
+          window.setNodeId(cell, correctId);
+          correctedCount++;
+          
+          console.log(`🔧 [NODE ID CORRECTION] ${reason}: "${currentId}" → "${correctId}"`);
+        } catch (error) {
+          console.error(`🔧 [NODE ID CORRECTION] ERROR correcting node ${cell.id}:`, error);
+        }
+      } else {
+        console.error('🔧 [NODE ID CORRECTION] ERROR: setNodeId function not available');
+      }
+    });
+    
+    console.log(`🔧 [NODE ID CORRECTION] Successfully corrected ${correctedCount} Node IDs`);
+    
     // Refresh the graph to show the corrected Node IDs
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
   } else {
-    console.log('🔧 [NODE ID CORRECTION] No Node IDs needed correction');
+    console.log('🔧 [NODE ID VALIDATION] All Node IDs are valid and follow the naming convention');
+  }
+}
+
+/**
+ * Generate the correct Node ID for a cell based on the naming convention
+ * Format: [pdf name if associated]-[parent node text]-[current node text]
+ */
+function generateCorrectNodeId(cell) {
+  // Get PDF name if associated with this node
+  const pdfName = getPdfNameForNode(cell);
+  
+  // Get parent node text (for option nodes)
+  const parentText = getParentNodeText(cell);
+  
+  // Get current node text
+  const currentText = getCurrentNodeText(cell);
+  
+  // Build the Node ID according to the convention
+  let nodeId = '';
+  
+  // Add PDF name prefix if present
+  if (pdfName && pdfName.trim()) {
+    const cleanPdfName = pdfName.trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    nodeId += cleanPdfName + '_';
+  }
+  
+  // Add parent text if present (for option nodes)
+  if (parentText && parentText.trim()) {
+    const cleanParentText = parentText.trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    nodeId += cleanParentText + '_';
+  }
+  
+  // Add current node text
+  if (currentText && currentText.trim()) {
+    const cleanCurrentText = currentText.trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    nodeId += cleanCurrentText;
+  }
+  
+  // Clean up the final result
+  nodeId = nodeId.replace(/_+/g, '_') // Replace multiple underscores with single
+                 .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+  
+  // Fallback if no valid text found
+  if (!nodeId) {
+    nodeId = 'unnamed_node';
+  }
+  
+  return nodeId;
+}
+
+/**
+ * Get PDF name associated with a node
+ */
+function getPdfNameForNode(cell) {
+  // Check for direct PDF properties
+  if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
+  if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
+  if (cell._pdfFile && cell._pdfFile.trim()) return cell._pdfFile.trim();
+  if (cell._pdfUrl && cell._pdfUrl.trim()) {
+    // Extract filename from URL
+    const urlParts = cell._pdfUrl.split('/');
+    const filename = urlParts[urlParts.length - 1];
+    return filename.replace(/\.pdf$/i, '').trim();
+  }
+  
+  // Check if connected to a PDF node
+  const graph = window.graph;
+  if (graph) {
+    // Check outgoing edges to PDF nodes
+    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+    for (const edge of outgoingEdges) {
+      const target = edge.target;
+      if (target && (typeof window.isPdfNode === 'function' && window.isPdfNode(target))) {
+        return getPdfNameForNode(target);
+      }
+    }
+    
+    // Check incoming edges from PDF nodes
+    const incomingEdges = graph.getIncomingEdges(cell) || [];
+    for (const edge of incomingEdges) {
+      const source = edge.source;
+      if (source && (typeof window.isPdfNode === 'function' && window.isPdfNode(source))) {
+        return getPdfNameForNode(source);
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Get parent node text (for option nodes)
+ */
+function getParentNodeText(cell) {
+  const graph = window.graph;
+  if (!graph) return null;
+  
+  // Check if this is an option node by looking for incoming edges from question nodes
+  const incomingEdges = graph.getIncomingEdges(cell) || [];
+  for (const edge of incomingEdges) {
+    const source = edge.source;
+    if (source && (typeof window.isQuestion === 'function' && window.isQuestion(source))) {
+      return getCurrentNodeText(source);
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Get current node text
+ */
+function getCurrentNodeText(cell) {
+  // For question nodes, use _questionText if available
+  if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+    if (cell._questionText && cell._questionText.trim()) {
+      return cell._questionText.trim();
+    }
+  }
+  
+  // Extract text from cell value
+  if (cell.value) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cell.value;
+    const text = tempDiv.textContent || tempDiv.innerText || '';
+    return text.trim();
+  }
+  
+  return null;
+}
+
+/**
+ * Manual Node ID validation function - can be called from console for debugging
+ */
+window.validateAllNodeIds = function() {
+  console.log('🔧 [MANUAL VALIDATION] Manual Node ID validation requested');
+  if (typeof window.correctNodeIdsAfterImport === 'function') {
+    window.correctNodeIdsAfterImport();
+  } else {
+    console.error('🔧 [MANUAL VALIDATION] ERROR: correctNodeIdsAfterImport function not available');
   }
 }
 
@@ -1468,6 +1678,8 @@ window.correctNodeIdsAfterImport = function() {
  * Load a flowchart from JSON data.
  */
 window.loadFlowchartData = function(data) {
+  console.log('📥 [LOAD FLOWCHART] Starting to load flowchart data');
+  
   if (!data.cells) {
     alert("Invalid flowchart data");
     return;
@@ -1842,9 +2054,14 @@ window.loadFlowchartData = function(data) {
   // Propagate PDF properties through the flowchart after all cells and edges are loaded
   setTimeout(() => {
     propagatePdfPropertiesAfterImport();
-    // Also correct Node IDs to follow proper naming scheme
-    correctNodeIdsAfterImport();
   }, 500); // Increased delay to ensure all edges are fully processed in graph model
+  
+  // Validate and correct Node IDs after a 1-second delay to ensure everything is loaded
+  console.log('🔧 [NODE ID VALIDATION] Setting up Node ID validation timeout (1 second)');
+  setTimeout(() => {
+    console.log('🔧 [NODE ID VALIDATION] Starting Node ID validation after 1-second delay');
+    correctNodeIdsAfterImport();
+  }, 1000);
   
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {
@@ -1909,6 +2126,9 @@ function resolveDuplicateNodeIds(cells) {
     }
   });
 }
+
+// Export the generateCorrectNodeId function to window for use by other modules
+window.generateCorrectNodeId = generateCorrectNodeId;
 
 
 
