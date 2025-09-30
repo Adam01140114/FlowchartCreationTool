@@ -4211,7 +4211,8 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
-      console.log('Restoring autosave with groups:', data.groups);
+      console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
+      console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
       window.loadFlowchartData(data);
       // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
       // Wait for groups to be loaded before setting up autosave hooks

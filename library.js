@@ -1723,6 +1723,30 @@ window.resetPdfInheritance = function(cell) {
   }
   
   console.log(`🔄 [PDF RESET] No connected PDF node found for reset (searched from node ${cell.id})`);
+  
+  // Clear all PDF properties from the node since no PDF connection exists
+  cell._pdfName = '';
+  cell._pdfFilename = '';
+  cell._pdfFile = '';
+  cell._pdfUrl = '';
+  cell._pdfPrice = '';
+  cell._priceId = '';
+  cell._characterLimit = '';
+  
+  // Refresh the properties popup to remove PDF fields
+  if (window.__propertiesPopupOpen) {
+    // Close and reopen the properties popup to refresh the display
+    const closeButton = document.querySelector('#propertiesPopup .close-button');
+    if (closeButton) {
+      closeButton.click();
+    }
+    // Reopen after a short delay
+    setTimeout(() => {
+      window.showPropertiesPopup(cell);
+    }, 100);
+  }
+  
+  console.log(`🔄 [PDF RESET] Cleared all PDF properties from node ${cell.id} (no PDF connection found)`);
   return null;
 };
 
