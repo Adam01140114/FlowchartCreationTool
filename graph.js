@@ -1212,6 +1212,9 @@ function showPropertiesPopup(cell) {
           const newValue = valueSpan.textContent.trim();
           if (newValue !== prop.value && newValue !== '') {
             
+            // Mark this Node ID as manually edited to prevent automatic regeneration
+            cell._manuallyEditedNodeId = true;
+            
             // Update the cell's node ID using the proper method
             if (typeof window.setNodeId === 'function') {
               window.setNodeId(cell, newValue);
@@ -1276,17 +1279,22 @@ function showPropertiesPopup(cell) {
           e.preventDefault();
           e.stopPropagation();
           
+          // Set flag to prevent automatic Node ID regeneration during this update
+          window._isUpdatingProperties = true;
+          
           // Generate the correct Node ID using the naming convention
           let correctNodeId = '';
           if (typeof window.generateCorrectNodeId === 'function') {
             correctNodeId = window.generateCorrectNodeId(cell);
           } else {
             console.warn("generateCorrectNodeId function not available");
+            window._isUpdatingProperties = false;
             return;
           }
           
           if (!correctNodeId) {
             console.warn("Could not generate correct Node ID");
+            window._isUpdatingProperties = false;
             return;
           }
           
@@ -1298,8 +1306,17 @@ function showPropertiesPopup(cell) {
             window.setNodeId(cell, correctNodeId);
           } else {
             console.warn("setNodeId function not available");
+            window._isUpdatingProperties = false;
             return;
           }
+          
+          // Mark this Node ID as manually edited to prevent future automatic regeneration
+          cell._manuallyEditedNodeId = true;
+          
+          // Clear the updating flag after a short delay
+          setTimeout(() => {
+            window._isUpdatingProperties = false;
+          }, 100);
           
           // Refresh all cells to update the display
           if (typeof window.refreshAllCells === 'function') {

@@ -956,23 +956,24 @@ window.exportGuiJson = function(download = true) {
 // Export both flowchart and GUI JSON in a combined format
 window.exportBothJson = function() {
   try {
-    // Automatically reset Node IDs and PDF inheritance before export
-    console.log('🔄 [AUTO RESET] Running automatic Node ID and PDF reset before export...');
+    // Automatically reset PDF inheritance and Node IDs before export
+    // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+    console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset before export...');
     
-    // Reset all Node IDs
-    if (typeof resetAllNodeIds === 'function') {
-      resetAllNodeIds();
-      console.log('🔄 [AUTO RESET] Node IDs reset completed before export');
-    } else {
-      console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
-    }
-    
-    // Reset PDF inheritance for all nodes
+    // Reset PDF inheritance for all nodes FIRST
     if (typeof window.resetAllPdfInheritance === 'function') {
       window.resetAllPdfInheritance();
       console.log('🔄 [AUTO RESET] PDF inheritance reset completed before export');
     } else {
       console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+    }
+    
+    // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+    if (typeof resetAllNodeIds === 'function') {
+      resetAllNodeIds();
+      console.log('🔄 [AUTO RESET] Node IDs reset completed before export');
+    } else {
+      console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
     }
     
     // Get flowchart JSON
@@ -1093,23 +1094,24 @@ window.fixCapitalizationInJumps();
 window.saveFlowchart = function() {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
   
-  // Automatically reset Node IDs and PDF inheritance before saving
-  console.log('🔄 [AUTO RESET] Running automatic Node ID and PDF reset before saving...');
+  // Automatically reset PDF inheritance and Node IDs before saving
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset before saving...');
   
-  // Reset all Node IDs
-  if (typeof resetAllNodeIds === 'function') {
-    resetAllNodeIds();
-    console.log('🔄 [AUTO RESET] Node IDs reset completed before saving');
-  } else {
-    console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
-  }
-  
-  // Reset PDF inheritance for all nodes
+  // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
     console.log('🔄 [AUTO RESET] PDF inheritance reset completed before saving');
   } else {
     console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+    console.log('🔄 [AUTO RESET] Node IDs reset completed before saving');
+  } else {
+    console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
   }
   
   renumberQuestionIds();

@@ -240,10 +240,8 @@ document.addEventListener("DOMContentLoaded", function() {
               if (window.updateOptionNodeCell) window.updateOptionNodeCell(cell);
             }
             
-            // Refresh option node ID to ensure proper format
-            if (window.refreshOptionNodeId) {
-              window.refreshOptionNodeId(cell);
-            }
+            // DISABLED: Automatic Node ID regeneration during text editing
+            // Node IDs will only change when manually edited or reset using the button
           }
           
           // Handle PDF nodes
@@ -1040,20 +1038,10 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         }
     }
 
-    // Refresh Node IDs to apply PDF naming convention when connections change
-    for (const cellId in allCells) {
-      const cell = allCells[cellId];
-      if (cell && cell.vertex && typeof window.setNodeId === 'function') {
-        // Clear the existing Node ID from the style to force regeneration
-        let style = cell.style || '';
-        style = style.replace(/nodeId=[^;]+/, '');
-        graph.getModel().setStyle(cell, style);
-        
-        // Now get a fresh Node ID using getNodeId (which will apply PDF naming convention)
-        const freshId = typeof window.getNodeId === 'function' ? window.getNodeId(cell) : (cell._nameId || cell.id);
-        window.setNodeId(cell, freshId);
-      }
-    }
+    // DISABLED: Automatic Node ID regeneration has been completely disabled
+    // Node IDs will only change when manually edited or reset using the button
+    // This prevents Node IDs from changing when connections change or structure changes
+    // Users will set all Node IDs at the end when the structure is complete
 
     refreshAllCells();
 });
@@ -1801,54 +1789,10 @@ function setNodeId(cell, nodeId) {
     console.log("Original style:", cell.style);
   }
   
-  // Apply PDF prefix logic if the cell has PDF properties
+  // DISABLED: PDF prefix logic has been completely disabled
+  // Node IDs will only be set when manually edited or reset using the button
+  // Users will set all Node IDs at the end when the structure is complete
   let finalNodeId = nodeId;
-  if (typeof window.getNodeId === 'function') {
-    // Get the PDF name using the same logic as getNodeId
-    const getPdfName = (cell, visited = new Set()) => {
-      // Check for PDF properties in various formats - only if they're not empty
-      if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
-      if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
-      if (cell._pdfFile && cell._pdfFile.trim()) return cell._pdfFile.trim();
-      if (cell._pdfUrl && cell._pdfUrl.trim()) {
-        // Extract filename from URL
-        const urlParts = cell._pdfUrl.split('/');
-        const filename = urlParts[urlParts.length - 1];
-        const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
-        return cleanFilename || null; // Return null if filename is empty after cleaning
-      }
-      return null;
-    };
-    
-    const pdfName = getPdfName(cell);
-    
-    // Only apply PDF naming convention if the cell actually has a PDF name property set
-    const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
-                            (cell._pdfFilename && cell._pdfFilename.trim()) || 
-                            (cell._pdfUrl && cell._pdfUrl.trim()) ||
-                            (cell._pdfFile && cell._pdfFile.trim());
-    
-    // Check if connected to a PDF node (even without direct PDF properties)
-    const isConnectedToPdfNode = pdfName && pdfName.trim() && !hasDirectPdfName;
-    
-    if (pdfName && pdfName.trim() && (hasDirectPdfName || isConnectedToPdfNode)) {
-      // Sanitize PDF name (remove .pdf extension and clean up)
-      const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-      
-      // Check if the nodeId already starts with the PDF name to avoid stacking
-      const pdfPrefix = `${cleanPdfName}_`;
-      if (nodeId && !nodeId.startsWith(pdfPrefix)) {
-        finalNodeId = `${cleanPdfName}_${nodeId}`;
-        if (DEBUG_NODE_ID) {
-          console.log("Applied PDF prefix:", finalNodeId);
-        }
-      }
-    } else {
-      if (DEBUG_NODE_ID) {
-        console.log("No PDF naming convention applied - PDF name found:", pdfName, "Has direct PDF name:", hasDirectPdfName);
-      }
-    }
-  }
   
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
@@ -1932,7 +1876,8 @@ function refreshAllOptionNodeIds() {
     console.log("Is options?", isOptions(cell));
     if (isOptions(cell)) {
       console.log("Refreshing option node ID for:", cell);
-      refreshOptionNodeId(cell);
+      // DISABLED: Automatic Node ID regeneration
+      // refreshOptionNodeId(cell);
       updatedCount++;
     }
   });
@@ -2628,7 +2573,8 @@ function setOptionType(cell, newType) {
       default:
         updateOptionNodeCell(cell);
     }
-    refreshOptionNodeId(cell);
+    // DISABLED: Automatic Node ID regeneration during option type changes
+    // Node IDs will only change when manually edited or reset using the button
   } finally {
     graph.getModel().endUpdate();
   }
@@ -2913,7 +2859,8 @@ function createYesNoOptions(parentCell) {
     const noY = geo.y + geo.height + 50;
     let noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
     const noNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">No</div>", noX, noY, 100, 60, noStyle);
-    refreshOptionNodeId(noNode);
+    // DISABLED: Automatic Node ID regeneration during node creation
+    // Node IDs will only change when manually edited or reset using the button
     if (parentCell !== jumpModeNode) {
       setSection(noNode, parentSection);
     }
@@ -2935,7 +2882,8 @@ function createYesNoOptions(parentCell) {
     const yesY = geo.y + geo.height + 50;
     let yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
     const yesNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">Yes</div>", yesX, yesY, 100, 60, yesStyle);
-    refreshOptionNodeId(yesNode);
+    // DISABLED: Automatic Node ID regeneration during node creation
+    // Node IDs will only change when manually edited or reset using the button
     if (parentCell !== jumpModeNode) {
       setSection(yesNode, parentSection);
     }
@@ -4144,6 +4092,9 @@ function setupAutosaveHooks() {
   // Save after loadFlowchartData (delayed to ensure groups are loaded)
   const origLoadFlowchartData = window.loadFlowchartData;
   window.loadFlowchartData = function(data) {
+    // Set flag to prevent automatic Node ID regeneration during loading
+    window._isLoadingFlowchart = true;
+    
     origLoadFlowchartData.apply(this, arguments);
     
     // Apply groups from imported JSON if present
@@ -4170,32 +4121,42 @@ function setupAutosaveHooks() {
       }, 100); // Small delay to ensure DOM is ready
     }
     
-    // Automatically reset Node IDs and PDF inheritance after flowchart loading
+    // Automatically reset PDF inheritance and Node IDs after flowchart loading
+    // Note: This runs after the internal loadFlowchartData processes:
+    // - 500ms: PDF properties propagation
+    // - 1000ms: Node ID validation and correction
+    // - 3000ms: Our automatic reset (after all internal processes complete)
+    // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
     setTimeout(() => {
-      console.log('🔄 [AUTO RESET] Running automatic Node ID and PDF reset after flowchart load...');
+      console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset after flowchart load...');
       
-      // Reset all Node IDs
-      if (typeof resetAllNodeIds === 'function') {
-        resetAllNodeIds();
-        console.log('🔄 [AUTO RESET] Node IDs reset completed');
-      } else {
-        console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
-      }
-      
-      // Reset PDF inheritance for all nodes
+      // Reset PDF inheritance for all nodes FIRST
       if (typeof window.resetAllPdfInheritance === 'function') {
         window.resetAllPdfInheritance();
         console.log('🔄 [AUTO RESET] PDF inheritance reset completed');
       } else {
         console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
       }
-    }, 2000); // Delay to ensure all loading processes are complete
+      
+      // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+      if (typeof resetAllNodeIds === 'function') {
+        resetAllNodeIds();
+        console.log('🔄 [AUTO RESET] Node IDs reset completed');
+      } else {
+        console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
+      }
+    }, 3000); // Increased delay to ensure all internal loading processes are complete
     
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
       console.log('Autosaving after loadFlowchartData, current groups:', groups);
       autosaveFlowchartToLocalStorage();
     }, 1000); // Increased delay to ensure groups are fully processed
+    
+    // Clear the loading flag after all loading processes are complete
+    setTimeout(() => {
+      window._isLoadingFlowchart = false;
+    }, 4000); // Clear flag after all loading processes (including the 3000ms automatic reset)
   };
   
   // Removed: console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
@@ -4589,7 +4550,8 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else if (isPdfNode(newCell)) {
           updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
-          refreshOptionNodeId(newCell);
+          // DISABLED: Automatic Node ID regeneration during node creation
+          // Node IDs will only change when manually edited or reset using the button
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
         }
@@ -4704,7 +4666,8 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else if (isPdfNode(newCell)) {
           updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
-          refreshOptionNodeId(newCell);
+          // DISABLED: Automatic Node ID regeneration during node creation
+          // Node IDs will only change when manually edited or reset using the button
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           // FIRST OCCURRENCE - Calculation node copy/paste now handled by calc.js
           if (typeof window.handleCalculationNodeCopyPaste === "function") {
@@ -4969,10 +4932,11 @@ window.updatePdfNameField = function(cellId, value) {
   const oldPdfName = cell._pdfName;
   cell._pdfName = value;
   
-  // Update all Node IDs that use this PDF name
-  if (oldPdfName && oldPdfName !== value) {
-    updateAllNodeIdsForPdfChange(oldPdfName, value);
-  }
+  // DISABLED: Automatic Node ID updates when PDF names change
+  // Node IDs will only change when manually edited or reset using the button
+  // if (oldPdfName && oldPdfName !== value) {
+  //   updateAllNodeIdsForPdfChange(oldPdfName, value);
+  // }
   
   // Trigger autosave
   if (typeof window.requestAutosave === 'function') {
@@ -4985,45 +4949,11 @@ window.updatePdfNameField = function(cellId, value) {
  * Update all Node IDs when a PDF name changes
  */
 function updateAllNodeIdsForPdfChange(oldPdfName, newPdfName) {
-  if (!oldPdfName || !newPdfName || oldPdfName === newPdfName) return;
-  
-  console.log(`🔄 Updating Node IDs for PDF name change: "${oldPdfName}" → "${newPdfName}"`);
-  
-  // Clean the PDF names for comparison
-  const oldCleanPdfName = oldPdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-  const newCleanPdfName = newPdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-  
-  // Get all cells in the graph
-  const model = graph.getModel();
-  const cells = Object.values(model.cells);
-  
-  let updatedCount = 0;
-  
-  for (const cell of cells) {
-    if (!cell || cell.edge) continue; // Skip edges
-    
-    // Get current Node ID
-    const currentNodeId = window.getNodeId ? window.getNodeId(cell) : cell._nameId || cell.id;
-    
-    // Check if this Node ID starts with the old PDF prefix
-    const oldPdfPrefix = `${oldCleanPdfName}_`;
-    if (currentNodeId && currentNodeId.startsWith(oldPdfPrefix)) {
-      // Remove the old PDF prefix to get the base Node ID
-      const baseNodeId = currentNodeId.substring(oldPdfPrefix.length);
-      
-      // Create new Node ID with the new PDF prefix
-      const newNodeId = `${newCleanPdfName}_${baseNodeId}`;
-      
-      // Update the Node ID
-      if (typeof window.setNodeId === 'function') {
-        window.setNodeId(cell, newNodeId);
-        updatedCount++;
-        console.log(`🔄 Updated Node ID: "${currentNodeId}" → "${newNodeId}"`);
-      }
-    }
-  }
-  
-  console.log(`🔄 Updated ${updatedCount} Node IDs for PDF name change`);
+  // DISABLED: Automatic Node ID updates have been completely disabled
+  // Node IDs will only change when manually edited or reset using the button
+  // Users will set all Node IDs at the end when the structure is complete
+  console.log("🔄 [DISABLED] updateAllNodeIdsForPdfChange - Automatic Node ID updates disabled");
+  return;
 }
 
 // Export the function to window object
@@ -5298,6 +5228,9 @@ function resetAllNodeIds() {
     if (typeof window.generateCorrectNodeId === 'function') {
       const correctNodeId = window.generateCorrectNodeId(cell);
       if (correctNodeId) {
+        // Clear the manually edited flag since we're resetting to automatic generation
+        cell._manuallyEditedNodeId = false;
+        
         // Update the cell's Node ID
         if (typeof window.setNodeId === 'function') {
           window.setNodeId(cell, correctNodeId);

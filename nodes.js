@@ -307,6 +307,55 @@ window.getNodeId = function(cell) {
     console.log("Cell.id:", cell.id);
   }
   
+  // PRIORITY 1: Return existing Node ID from style if it exists (most reliable)
+  if (cell.style) {
+    const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+    if (styleMatch) {
+      const existingNodeId = decodeURIComponent(styleMatch[1]);
+      // Only return existing Node ID if it's not a temporary/default one
+      if (existingNodeId && 
+          existingNodeId !== 'new_question' && 
+          !existingNodeId.startsWith('Option_') &&
+          existingNodeId !== 'unnamed_node' &&
+          existingNodeId !== 'N/A') {
+        return existingNodeId;
+      }
+    }
+  }
+  
+  // PRIORITY 2: Return _nameId if it exists and is not temporary/default
+  if (cell._nameId && 
+      cell._nameId !== 'new_question' && 
+      !cell._nameId.startsWith('Option_') &&
+      cell._nameId !== 'unnamed_node' &&
+      cell._nameId !== 'N/A') {
+    return cell._nameId;
+  }
+  
+  // PRIORITY 3: Return cell.id if it's not temporary/default
+  if (cell.id && 
+      cell.id !== 'new_question' && 
+      !cell.id.startsWith('Option_') &&
+      cell.id !== 'unnamed_node' &&
+      cell.id !== 'N/A') {
+    return cell.id;
+  }
+  
+  // If this Node ID has been manually edited, return the existing Node ID without modification
+  if (cell._manuallyEditedNodeId) {
+    // Return the existing Node ID from style or _nameId without applying PDF naming convention
+    if (cell.style) {
+      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+      if (styleMatch) {
+        return decodeURIComponent(styleMatch[1]);
+      }
+    }
+    if (cell._nameId) {
+      return cell._nameId;
+    }
+    return cell.id || '';
+  }
+  
   // Use the global function for reading PDF names from HTML inputs
 
   // Helper function to get PDF name from cell (now reads dynamically from PDF nodes)
@@ -512,49 +561,16 @@ window.getNodeId = function(cell) {
     }
   }
   
-  // Check for PDF name and prepend it if found
-  const pdfName = getPdfName(cell, new Set());
-  if (DEBUG_NODE_ID) {
-    console.log("PDF name found:", pdfName);
-  }
+  // DISABLED: PDF naming convention application has been completely disabled
+  // Node IDs will only be set when manually edited or reset using the button
+  // Users will set all Node IDs at the end when the structure is complete
   
   let finalNodeId = baseNodeId;
   
-  // Apply PDF naming convention if:
-  // 1. A PDF name was found AND
-  // 2. Either the cell has direct PDF properties OR is connected to a PDF node
-  const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
-                          (cell._pdfFilename && cell._pdfFilename.trim()) || 
-                          (cell._pdfUrl && cell._pdfUrl.trim()) ||
-                          (cell._pdfFile && cell._pdfFile.trim());
-  
-  // Check if connected to a PDF node (even without direct PDF properties)
-  const isConnectedToPdfNode = pdfName && pdfName.trim() && !hasDirectPdfName;
-  
-  // Apply PDF naming convention with inheritance support
-  if (pdfName && pdfName.trim()) {
-    // Sanitize PDF name (remove .pdf extension and clean up)
-    const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-    
-    // Check if the baseNodeId already starts with the PDF name to avoid stacking
-    const pdfPrefix = `${cleanPdfName}_`;
-    if (!baseNodeId.startsWith(pdfPrefix)) {
-      finalNodeId = `${cleanPdfName}_${baseNodeId}`;
-      if (DEBUG_NODE_ID) {
-        console.log("Final nodeId with PDF prefix (inherited):", finalNodeId);
-      }
-    } else {
-      finalNodeId = baseNodeId;
-      if (DEBUG_NODE_ID) {
-        console.log("Base nodeId already has PDF prefix, using as-is:", finalNodeId);
-      }
-    }
-  } else {
-    finalNodeId = baseNodeId;
-    if (DEBUG_NODE_ID) {
-      console.log("No PDF name found, using base nodeId:", finalNodeId);
-    }
-  }
+  // DISABLED: PDF naming convention application
+  // All PDF naming convention logic has been disabled
+  // Node IDs will only be set when manually edited or reset using the button
+  finalNodeId = baseNodeId;
   
   if (DEBUG_NODE_ID) {
     console.log("Returning final nodeId:", finalNodeId);
