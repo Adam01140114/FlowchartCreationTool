@@ -118,840 +118,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "    <title>Example Form</title>",
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
-    "    <style>",
-    "      /* Checkbox option styling with beautiful blue border */",
-    "      .checkbox-inline {",
-    "        display: block;",
-    "        margin: 8px auto;",
-    "        padding: 12px 16px;",
-    "        border: 1px solid #d1d1d6;",
-    "        border-radius: 8px;",
-    "        background-color: #ffffff;",
-    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
-    "        transition: all 0.3s ease;",
-    "        width: 80%;",
-    "        max-width: 400px;",
-    "        text-align: center;",
-    "      }",
-    "      ",
-    "      .checkbox-inline:hover {",
-    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
-    "        transform: translateY(-1px);",
-    "      }",
-    "      ",
-    "      .checkbox-inline.checked {",
-    "        border-color: #0051a6;",
-    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
-    "        background-color: #f8fbff;",
-    "      }",
-    "      ",
-    "      .checkbox-label {",
-    "        display: flex;",
-    "        align-items: center;",
-    "        justify-content: flex-start;",
-    "        gap: 8px;",
-    "        cursor: pointer;",
-    "        font-size: 16px;",
-    "        color: #333;",
-    "        margin: 0;",
-    "        padding: 0 12px;",
-    "        width: 100%;",
-    "      }",
-    "      ",
-    "      .checkbox-label input[type=\"checkbox\"] {",
-    "        margin: 0;",
-    "        flex-shrink: 0;",
-    "      }",
-    "      ",
-    "      /* Beautiful text input styling to match checkboxes */",
-    "      .text-input-container {",
-    "        display: block;",
-    "        margin: 8px auto;",
-    "        width: 80%;",
-    "        max-width: 400px;",
-    "      }",
-    "      ",
-    "      .text-input-container input[type=\"text\"],",
-    "      .text-input-container input[type=\"email\"],",
-    "      .text-input-container input[type=\"tel\"],",
-    "      .text-input-container input[type=\"number\"],",
-    "      .text-input-container textarea {",
-    "        width: 100%;",
-    "        padding: 12px 16px;",
-    "        border: 1px solid #d1d1d6;",
-    "        border-radius: 8px;",
-    "        background-color: #ffffff;",
-    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
-    "        transition: all 0.3s ease;",
-    "        font-size: 16px;",
-    "        color: #333;",
-    "        font-family: 'Montserrat', sans-serif;",
-    "        box-sizing: border-box;",
-    "      }",
-    "      ",
-    "      .text-input-container input[type=\"text\"]:focus,",
-    "      .text-input-container input[type=\"email\"]:focus,",
-    "      .text-input-container input[type=\"tel\"]:focus,",
-    "      .text-input-container input[type=\"number\"]:focus,",
-    "      .text-input-container textarea:focus {",
-    "        outline: none;",
-    "        border-color: #0051a6;",
-    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
-    "        background-color: #f8fbff;",
-    "        transform: translateY(-1px);",
-    "      }",
-    "      ",
-    "      .text-input-container input[type=\"text\"]:hover,",
-    "      .text-input-container input[type=\"email\"]:hover,",
-    "      .text-input-container input[type=\"tel\"]:hover,",
-    "      .text-input-container input[type=\"number\"]:hover,",
-    "      .text-input-container textarea:hover {",
-    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
-    "        transform: translateY(-1px);",
-    "      }",
-    "      ",
-    "      /* Beautiful date input styling */",
-    "      .date-input-container {",
-    "        display: block;",
-    "        margin: 8px auto;",
-    "        width: 80%;",
-    "        max-width: 400px;",
-    "        position: relative;",
-    "      }",
-    "      ",
-    "      .date-input-container input[type=\"date\"] {",
-    "        width: 100%;",
-    "        padding: 12px 16px;",
-    "        border: 1px solid #d1d1d6;",
-    "        border-radius: 8px;",
-    "        background-color: #ffffff;",
-    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
-    "        transition: all 0.3s ease;",
-    "        font-size: 16px;",
-    "        color: #333;",
-    "        font-family: 'Montserrat', sans-serif;",
-    "        box-sizing: border-box;",
-    "        cursor: pointer;",
-    "      }",
-    "      ",
-    "      .date-input-container input[type=\"date\"]:focus {",
-    "        outline: none;",
-    "        border-color: #0051a6;",
-    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
-    "        background-color: #f8fbff;",
-    "        transform: translateY(-1px);",
-    "      }",
-    "      ",
-    "      .date-input-container input[type=\"date\"]:hover {",
-    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
-    "        transform: translateY(-1px);",
-    "      }",
-    "      ",
-    "      /* Custom date picker icon */",
-    "      .date-input-container::after {",
-    "        content: \"📅\";",
-    "        position: absolute;",
-    "        right: 16px;",
-    "        top: 50%;",
-    "        transform: translateY(-50%);",
-    "        pointer-events: none;",
-    "        font-size: 18px;",
-    "        opacity: 0.6;",
-    "      }",
-    "      ",
-    "      .date-input-container input[type=\"date\"]:focus + ::after {",
-    "        opacity: 1;",
-    "      }",
-    "      ",
-    "      /* Form validation styles */",
-    "      .validation-error {",
-    "        color: #e74c3c;",
-    "        font-size: 14px;",
-    "        margin-top: 5px;",
-    "        display: none;",
-    "      }",
-    "      ",
-    "      .next-button:disabled {",
-    "        background: #bdc3c7 !important;",
-    "        cursor: not-allowed !important;",
-    "        opacity: 0.6;",
-    "      }",
-    "      ",
-    "      /* Header and Navigation Styles */",
-    "      html, body {",
-    "        height: 100%;",
-    "        margin: 0;",
-    "        display: flex;",
-    "        flex-direction: column;",
-    "        font-family: 'Montserrat', sans-serif;",
-    "        color: #333;",
-    "        background-color: #eaf1f8;",
-    "        min-height: 100vh;",
-    "      }",
-    "      body {",
-    "        min-height: 100vh;",
-    "        display: flex;",
-    "        flex-direction: column;",
-    "      }",
-    "      header {",
-    "        background-color: #2c3e50;",
-    "        padding: 20px;",
-    "        display: flex;",
-    "        align-items: center;",
-    "        justify-content: space-between;",
-    "        position: relative;",
-    "      }",
-    "      header img {",
-    "        cursor: pointer;",
-    "      }",
-    "      nav {",
-    "        position: absolute;",
-    "        left: 50%;",
-    "        transform: translateX(-50%);",
-    "        display: flex;",
-    "        gap: 38px;",
-    "        z-index: 2;",
-    "      }",
-    "      nav a {",
-    "        color: #fff;",
-    "        text-decoration: none;",
-    "        font-weight: 700;",
-    "        font-size: 1.18em;",
-    "        letter-spacing: 0.02em;",
-    "        padding: 2px 8px;",
-    "        transition: color 0.2s, background 0.2s, box-shadow 0.2s;",
-    "        border-radius: 6px;",
-    "        display: flex;",
-    "        align-items: center;",
-    "      }",
-    "      nav a:hover {",
-    "        color: #ff7043;",
-    "        background: rgba(255,255,255,0.08);",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
-    "      }",
-    "      .nav-chevron {",
-    "        display: inline-block;",
-    "        margin-left: 6px;",
-    "        width: 14px;",
-    "        height: 14px;",
-    "        vertical-align: middle;",
-    "      }",
-    "      .nav-chevron svg {",
-    "        display: block;",
-    "        width: 100%;",
-    "        height: 100%;",
-    "      }",
-    "      .header-actions {",
-    "        display: flex;",
-    "        align-items: center;",
-    "        gap: 18px;",
-    "        margin-left: auto;",
-    "      }",
-    "      .sign-in-btn {",
-    "        background: #fff;",
-    "        color: #222;",
-    "        font-weight: 700;",
-    "        font-size: 1.08em;",
-    "        border: none;",
-    "        border-radius: 22px;",
-    "        padding: 8px 28px;",
-    "        margin-left: 18px;",
-    "        cursor: pointer;",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
-    "        transition: background 0.2s, color 0.2s, box-shadow 0.2s;",
-    "        text-decoration: none;",
-    "        outline: none;",
-    "      }",
-    "      .sign-in-btn:hover {",
-    "        background: #f4f4f4;",
-    "        color: #2980b9;",
-    "        box-shadow: 0 4px 16px rgba(44,62,80,0.13);",
-    "      }",
-    "      .nav-dropdown-wrapper {",
-    "        position: relative;",
-    "        display: inline-block;",
-    "      }",
-    "      .dropdown-menu {",
-    "        display: none;",
-    "        position: absolute;",
-    "        left: 0;",
-    "        top: 38px;",
-    "        background: #fff;",
-    "        min-width: 210px;",
-    "        box-shadow: 0 4px 24px rgba(44,62,80,0.13);",
-    "        border-radius: 10px;",
-    "        z-index: 10;",
-    "        padding: 12px 0;",
-    "        flex-direction: column;",
-    "        gap: 0;",
-    "      }",
-    "      .dropdown-menu a {",
-    "        color: #222;",
-    "        padding: 12px 28px;",
-    "        text-decoration: none;",
-    "        display: block;",
-    "        font-weight: 600;",
-    "        font-size: 1.08em;",
-    "        border-radius: 0;",
-    "        transition: background 0.18s, color 0.18s;",
-    "      }",
-    "      .dropdown-menu a:hover {",
-    "        background: #eaf1f8;",
-    "        color: #2980b9;",
-    "      }",
-    "      .nav-dropdown-wrapper.open .dropdown-menu {",
-    "        display: flex !important;",
-    "        animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);",
-    "      }",
-    "      @keyframes dropdownFadeIn {",
-    "        from { opacity: 0; transform: translateY(-10px); }",
-    "        to { opacity: 1; transform: translateY(0); }",
-    "      }",
-    "      .forms-chevron {",
-    "        transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);",
-    "      }",
-    "      .nav-dropdown-wrapper.open .forms-chevron {",
-    "        transform: rotate(-90deg);",
-    "      }",
-    "      /* Cart Icon Styles */",
-    "      #cart-icon-link .cart-circle {",
-    "        width: 54px !important;",
-    "        height: 54px !important;",
-    "        background: #2980b9;",
-    "        border-radius: 50%;",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
-    "        display: inline-flex;",
-    "        align-items: center;",
-    "        justify-content: center;",
-    "        position: relative;",
-    "      }",
-    "      #cart-icon {",
-    "        width: 32px !important;",
-    "        height: 32px !important;",
-    "        display: block;",
-    "      }",
-    "      /* Sliding Cart Menu Styles */",
-    "      .cart-overlay {",
-    "        position: fixed;",
-    "        top: 0;",
-    "        left: 0;",
-    "        width: 100%;",
-    "        height: 100%;",
-    "        background: rgba(0, 0, 0, 0.5);",
-    "        z-index: 9999;",
-    "        opacity: 0;",
-    "        visibility: hidden;",
-    "        transition: opacity 0.3s ease, visibility 0.3s ease;",
-    "      }",
-    "      .cart-overlay.active {",
-    "        opacity: 1;",
-    "        visibility: visible;",
-    "      }",
-    "      .cart-side-menu {",
-    "        position: fixed;",
-    "        top: 0;",
-    "        right: -400px;",
-    "        width: 400px;",
-    "        height: 100%;",
-    "        background: #fff;",
-    "        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);",
-    "        z-index: 10000;",
-    "        transition: right 0.3s ease;",
-    "        display: flex;",
-    "        flex-direction: column;",
-    "      }",
-    "      .cart-side-menu.active {",
-    "        right: 0;",
-    "      }",
-    "      .cart-header {",
-    "        background: #2c3e50;",
-    "        color: #fff;",
-    "        padding: 20px;",
-    "        display: flex;",
-    "        justify-content: space-between;",
-    "        align-items: center;",
-    "      }",
-    "      .cart-header h2 {",
-    "        margin: 0;",
-    "        font-size: 1.5em;",
-    "        font-weight: 700;",
-    "      }",
-    "      .cart-close-btn {",
-    "        background: none;",
-    "        border: none;",
-    "        color: #fff;",
-    "        font-size: 1.5em;",
-    "        cursor: pointer;",
-    "        padding: 0;",
-    "        width: 30px;",
-    "        height: 30px;",
-    "        display: flex;",
-    "        align-items: center;",
-    "        justify-content: center;",
-    "        border-radius: 50%;",
-    "        transition: background 0.2s;",
-    "      }",
-    "      .cart-close-btn:hover {",
-    "        background: rgba(255, 255, 255, 0.1);",
-    "      }",
-    "      .cart-content {",
-    "        flex: 1;",
-    "        padding: 30px;",
-    "        display: flex;",
-    "        flex-direction: column;",
-    "        justify-content: center;",
-    "        align-items: center;",
-    "        text-align: center;",
-    "      }",
-    "      .cart-icon-large {",
-    "        font-size: 4em;",
-    "        margin-bottom: 20px;",
-    "        color: #bdc3c7;",
-    "      }",
-    "      .cart-message {",
-    "        font-size: 1.3em;",
-    "        color: #2c3e50;",
-    "        margin-bottom: 15px;",
-    "        font-weight: 600;",
-    "        line-height: 1.4;",
-    "      }",
-    "      .cart-description {",
-    "        font-size: 1em;",
-    "        color: #7f8c8d;",
-    "        margin-bottom: 30px;",
-    "        line-height: 1.5;",
-    "      }",
-    "      .cart-signup-btn {",
-    "        background: #2980b9;",
-    "        color: #fff;",
-    "        border: none;",
-    "        border-radius: 8px;",
-    "        padding: 15px 40px;",
-    "        font-size: 1.1em;",
-    "        font-weight: 700;",
-    "        cursor: pointer;",
-    "        transition: background 0.2s;",
-    "        text-decoration: none;",
-    "        display: inline-block;",
-    "      }",
-    "      .cart-signup-btn:hover {",
-    "        background: #1c598a;",
-    "      }",
-    "      .cart-items-list {",
-    "        width: 100%;",
-    "        max-width: 320px;",
-    "        margin: 0 auto 18px auto;",
-    "        display: flex;",
-    "        flex-direction: column;",
-    "        align-items: center;",
-    "        gap: 18px;",
-    "      }",
-    "      .cart-item {",
-    "        background: #f8faff;",
-    "        border-radius: 18px;",
-    "        box-shadow: 0 2px 12px rgba(44,62,80,0.08);",
-    "        padding: 18px 18px 14px 18px;",
-    "        width: 100%;",
-    "        display: flex;",
-    "        align-items: center;",
-    "        justify-content: space-between;",
-    "        margin-bottom: 0;",
-    "        transition: box-shadow 0.18s, background 0.18s;",
-    "      }",
-    "      .cart-item-info {",
-    "        flex: 1;",
-    "        display: flex;",
-    "        flex-direction: column;",
-    "        gap: 2px;",
-    "        align-items: flex-start;",
-    "      }",
-    "      .cart-item-title {",
-    "        font-weight: 700;",
-    "        color: #22334a;",
-    "        font-size: 1.13em;",
-    "        margin-bottom: 2px;",
-    "      }",
-    "      .cart-item-price {",
-    "        color: #38d39f;",
-    "        font-weight: 700;",
-    "        font-size: 1.08em;",
-    "      }",
-    "      .remove-item {",
-    "        background: #ff5a5f;",
-    "        color: #fff;",
-    "        border: none;",
-    "        padding: 7px 13px 7px 11px;",
-    "        border-radius: 50px;",
-    "        cursor: pointer;",
-    "        font-size: 1em;",
-    "        font-weight: 600;",
-    "        display: flex;",
-    "        align-items: center;",
-    "        gap: 6px;",
-    "        transition: background 0.18s, box-shadow 0.18s;",
-    "        box-shadow: 0 2px 8px rgba(255,90,95,0.10);",
-    "      }",
-    "      .remove-item:hover {",
-    "        background: #d32f2f;",
-    "      }",
-    "      .remove-item svg {",
-    "        margin-right: 4px;",
-    "      }",
-    "      .cart-summary {",
-    "        margin-top: 18px;",
-    "        background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);",
-    "        color: #fff;",
-    "        border-radius: 16px;",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
-    "        padding: 24px 0 16px 0;",
-    "        text-align: center;",
-    "        width: 100%;",
-    "        max-width: 320px;",
-    "      }",
-    "      .summary-label {",
-    "        font-size: 1.18em;",
-    "        font-weight: 600;",
-    "        letter-spacing: 0.01em;",
-    "      }",
-    "      .total-amount {",
-    "        font-size: 2.1em;",
-    "        font-weight: 800;",
-    "        margin: 10px 0 0 0;",
-    "        letter-spacing: 0.01em;",
-    "      }",
-    "      .cart-checkout-btn {",
-    "        background: linear-gradient(90deg, #2980b9 0%, #38d39f 100%);",
-    "        color: #fff;",
-    "        border: none;",
-    "        border-radius: 12px;",
-    "        padding: 16px 0;",
-    "        font-size: 1.18em;",
-    "        font-weight: 700;",
-    "        cursor: pointer;",
-    "        margin: 24px auto 0 auto;",
-    "        width: 100%;",
-    "        max-width: 220px;",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.10);",
-    "        transition: background 0.18s, box-shadow 0.18s, transform 0.18s;",
-    "        display: block;",
-    "      }",
-    "      .cart-checkout-btn:hover {",
-    "        background: linear-gradient(90deg, #38d39f 0%, #2980b9 100%);",
-    "        transform: translateY(-2px) scale(1.03);",
-    "      }",
-    "      @media (max-width: 480px) {",
-    "        .cart-side-menu {",
-    "          width: 100%;",
-    "          right: -100%;",
-    "        }",
-    "        .cart-content {",
-    "          padding: 20px 0 0 0;",
-    "        }",
-    "        .cart-items-list, .cart-summary {",
-    "          max-width: 98vw;",
-    "        }",
-    "        .cart-message {",
-    "          font-size: 1.1em;",
-    "        }",
-    "      }",
-    "      @media (max-width: 768px) {",
-    "        header {",
-    "          flex-direction: column;",
-    "          padding: 10px;",
-    "        }",
-    "        nav {",
-    "          position: static;",
-    "          transform: none;",
-    "          margin-top: 10px;",
-    "        }",
-    "        .dropdown-menu {",
-    "          left: 0;",
-    "          right: 0;",
-    "          min-width: unset;",
-    "          width: 100vw;",
-    "          border-radius: 0 0 10px 10px;",
-    "        }",
-    "      }",
-    "      /* Info icon and tooltip styles */",
-    "      .question-header {",
-    "        display: flex;",
-    "        align-items: center;",
-    "        gap: 10px;",
-    "      }",
-    "      .info-icon {",
-    "        display: inline-block;",
-    "        width: 18px;",
-    "        height: 18px;",
-    "        border: 1px solid #007bff;",
-    "        border-radius: 50%;",
-    "        color: #007bff;",
-    "        font-size: 14px;",
-    "        line-height: 18px;",
-    "        text-align: center;",
-    "        font-weight: bold;",
-    "        cursor: pointer;",
-    "        user-select: none;",
-    "      }",
-    "      .info-icon .info-tooltip {",
-    "        visibility: hidden;",
-    "        top: calc(100% + 5px);",
-    "        left: 50%;",
-    "        transform: translateX(-50%);",
-    "        background-color: #333;",
-    "        color: white;",
-    "        padding: 8px 12px;",
-    "        border-radius: 4px;",
-    "        width: 200px;",
-    "        z-index: 100;",
-    "        font-weight: normal;",
-    "        font-size: 14px;",
-    "        line-height: 1.4;",
-    "        text-align: left;",
-    "        box-shadow: 0 2px 8px rgba(0,0,0,0.2);",
-    "        opacity: 0;",
-    "        transition: opacity 0.3s, visibility 0.3s;",
-    "      }",
-    "      .info-icon:hover .info-tooltip,",
-    "      .info-icon:focus .info-tooltip {",
-    "        visibility: visible;",
-    "        opacity: 1;",
-    "      }",
-    "      .info-icon .info-tooltip::after {",
-    "        content: '';",
-    "        position: absolute;",
-    "        bottom: 100%;",
-    "        left: 50%;",
-    "        margin-left: -5px;",
-    "        border-width: 5px;",
-    "        border-style: solid;",
-    "        border-color: transparent transparent #333 transparent;",
-    "      }",
-    // Progress Bar Styles
-    "      .progress-bar-container {",
-    "        width: 100%;",
-    "        max-width: 800px;",
-    "        margin: 0 auto 20px auto;",
-    "        padding: 0 0 10px 0;",
-    "        background: none;",
-    "      }",
-    "      .progress-bar-bg {",
-    "        width: 100%;",
-    "        height: 18px;",
-    "        background: linear-gradient(90deg, #e0e7ef 0%, #f5f7fa 100%);",
-    "        border-radius: 10px;",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.07);",
-    "        overflow: hidden;",
-    "        position: relative;",
-    "      }",
-    "      .progress-bar-fill {",
-    "        height: 100%;",
-    "        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);",
-    "        border-radius: 10px 0 0 10px;",
-    "        width: 0%;",
-    "        transition: width 0.5s cubic-bezier(.4,1.4,.6,1), background 0.3s;",
-    "        box-shadow: 0 2px 8px rgba(44,62,80,0.13);",
-    "        position: absolute;",
-    "        left: 0;",
-    "        top: 0;",
-    "      }",
-    "      .progress-bar-label {",
-    "        position: absolute;",
-    "        width: 100%;",
-    "        text-align: center;",
-    "        top: 0;",
-    "        left: 0;",
-    "        height: 100%;",
-    "        line-height: 18px;",
-    "        font-size: 13px;",
-    "        color: #2c3e50;",
-    "        font-weight: 600;",
-    "        letter-spacing: 0.5px;",
-    "        pointer-events: none;",
-    "        z-index: 2;",
-    "        text-shadow: 0 1px 2px #fff, 0 0 2px #fff;",
-    "      }",
-    "      .navigation-buttons {",
-    "        display: flex;",
-    "        gap: 15px;",
-    "        justify-content: center;",
-    "        margin-top: 10px;",
-    "      }",
-    "      .navigation-buttons button {",
-    "        width: auto;",
-    "        max-width: none;",
-    "        margin: 0;",
-    "        display: inline-flex;",
-    "      }",
-    "      /* Stepper Progress Bar Styles */",
-    "      .stepper-progress-bar {\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        margin: 12px auto 0 auto;\n        width: 100%;\n        max-width: 700px;\n        background: none;\n        gap: 0;\n      }\n      .stepper-step {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        position: relative;\n        z-index: 2;\n        min-width: 90px;\n      }\n      .stepper-circle {\n        width: 32px;\n        height: 32px;\n        border-radius: 50%;\n        background: #e0e7ef;\n        color: #2c3e50;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        font-weight: bold;\n        font-size: 18px;\n        border: 2px solid #4f8cff;\n        transition: background 0.3s, color 0.3s, border 0.3s;\n      }\n      .stepper-step.active .stepper-circle,\n      .stepper-step.completed .stepper-circle {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n        color: #fff;\n        border: 2px solid #38d39f;\n      }\n      .stepper-label {\n        margin-top: 8px;\n        font-size: 15px;\n        color: #2c3e50;\n        font-weight: 600;\n        text-align: center;\n        min-width: 80px;\n      }\n      .stepper-step.completed .stepper-label {\n        color: #38d39f;\n      }\n      .stepper-step.active .stepper-label {\n        color: #4f8cff;\n      }\n      .stepper-line {\n        flex: 1;\n        height: 4px;\n        background: #e0e7ef;\n        margin: 0 0px;\n        position: relative;\n        z-index: 1;\n        transition: background 0.5s cubic-bezier(.4,1.4,.6,1);\n      }\n      .stepper-line.filled {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n      }\n  ",
-    // Insert modal CSS
-    `      /* Custom Modal Styles */
-      .custom-modal-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(44, 62, 80, 0.45);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: opacity 0.3s;
-      }
-      .custom-modal {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(44,62,80,0.18);
-        padding: 32px 28px 24px 28px;
-        max-width: 370px;
-        width: 90%;
-        text-align: center;
-        position: relative;
-        animation: modalPopIn 0.35s cubic-bezier(.4,1.4,.6,1);
-      }
-      @keyframes modalPopIn {
-        0% { transform: scale(0.85); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-      .custom-modal h2 {
-        margin-top: 0;
-        color: #2c3e50;
-        font-size: 1.35rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-      }
-      .custom-modal p {
-        color: #4f8cff;
-        font-size: 1.08rem;
-        margin-bottom: 28px;
-      }
-      .custom-modal .modal-buttons {
-        display: flex;
-        gap: 18px;
-        justify-content: center;
-      }
-      .custom-modal button {
-        padding: 8px 22px;
-        border-radius: 6px;
-        border: none;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-      }
-      .custom-modal .modal-back {
-        background: #e0e7ef;
-        color: #2c3e50;
-      }
-      .custom-modal .modal-back:hover {
-        background: #cfd8e3;
-      }
-      .custom-modal .modal-continue {
-        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
-        color: #fff;
-        border: none;
-      }
-      .custom-modal .modal-continue:hover {
-        background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-      }
-      /* Pro Footer Styles */
-      .pro-footer {
-        background: #2c3e50;
-        color: #f3f7f8;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 60px;
-        padding: 48px 10vw 32px 10vw;
-        border-top: 2px solid #2c3e50;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 1.18em;
-        margin-top: 0;
-      }
-      .pro-footer-col {
-        flex: 1 1 320px;
-        min-width: 220px;
-        max-width: 420px;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
-      .address-col {
-        border-right: 1.5px solid #2c7a7d;
-        padding-right: 48px;
-        align-items: flex-start;
-      }
-      .nav-col {
-        align-items: flex-start;
-        padding-left: 32px;
-        padding-right: 32px;
-        border-right: 1.5px solid #2c7a7d;
-      }
-      .company-col {
-        align-items: flex-start;
-        padding-left: 48px;
-      }
-      .pro-footer-title {
-        font-weight: 700;
-        font-size: 1.25em;
-        margin-bottom: 6px;
-        color: #fff;
-        letter-spacing: 0.02em;
-      }
-      .company-title {
-        margin-top: 8px;
-        margin-bottom: 0;
-      }
-      .pro-footer-contact a {
-        color: #b6e2e6;
-        text-decoration: underline;
-        font-weight: 500;
-        margin-right: 18px;
-        transition: color 0.2s;
-      }
-      .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
-        color: #ff7043;
-      }
-      .pro-footer-logo {
-        margin-bottom: 8px;
-      }
-      .pro-footer-desc {
-        color: #e0e6ea;
-        font-size: 1em;
-        margin-top: 0;
-        line-height: 1.5;
-      }
-      .pro-footer-col.nav-col a {
-        color: #b6e2e6;
-        text-decoration: none;
-        font-weight: 500;
-        margin-bottom: 6px;
-        transition: color 0.2s;
-        font-size: 1em;
-      }
-      .pro-footer-col.nav-col a:not(:last-child) {
-        margin-bottom: 8px;
-      }
-      @media (max-width: 900px) {
-        .pro-footer {
-          flex-direction: column;
-          gap: 32px;
-          padding: 32px 4vw 18px 4vw;
-        }
-        .address-col, .company-col, .nav-col {
-          border: none;
-          padding: 0;
-          min-width: unset;
-          max-width: unset;
-        }
-        .company-col, .nav-col {
-          align-items: flex-start;
-        }
-      }
-      footer {
-        text-align: center;
-        padding: 20px;
-        background-color: #374656;
-        color: white;
-      }</style>`,
+    '    <link rel="stylesheet" href="generate2.css">',
     "</head>",
     "<body>",
     // Insert modal HTML right after <body> (only if not in test mode)
@@ -2188,7 +1355,7 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
     "</div>",
     "</section>",
     "</div>",
@@ -3212,19 +2379,79 @@ function showValidationPopup() {
 
 // Global function to trigger visibility updates for dependent questions
 function triggerVisibilityUpdates() {
+    console.log('🔧 [VISIBILITY DEBUG] triggerVisibilityUpdates() called');
+    
     // Find all question containers and trigger their visibility logic
     const questionContainers = document.querySelectorAll('[id^="question-container-"]');
+    console.log('🔧 [VISIBILITY DEBUG] Found', questionContainers.length, 'question containers');
+    
     questionContainers.forEach(container => {
         const questionId = container.id.replace('question-container-', '');
+        console.log('🔧 [VISIBILITY DEBUG] Processing question container:', questionId);
         
-        // Find the question element that controls this container's visibility
+        // Try to find and call the updateVisibility function for this question
+        // The conditional logic creates functions in the global scope, so we need to call them
+        try {
+            // Look for the updateVisibility function that was created for this question
+            // The function is created in a closure, so we need to trigger it via the event listeners
         const questionElement = document.getElementById(questionNameIds[questionId]) || 
                               document.getElementById('answer' + questionId);
         
         if (questionElement) {
+                console.log('🔧 [VISIBILITY DEBUG] Found question element for', questionId, ':', questionElement.id);
             // Trigger change event to update visibility
             const event = new Event('change', { bubbles: true });
             questionElement.dispatchEvent(event);
+                console.log('🔧 [VISIBILITY DEBUG] Dispatched change event for', questionId);
+            } else {
+                console.log('🔧 [VISIBILITY DEBUG] No question element found for', questionId);
+            }
+        } catch (error) {
+            console.log('🔧 [VISIBILITY DEBUG] Error processing question', questionId, ':', error);
+        }
+    });
+}
+
+// Fallback function to manually check and update visibility without relying on generated scripts
+function triggerVisibilityUpdatesFallback() {
+    console.log('🔧 [VISIBILITY FALLBACK DEBUG] triggerVisibilityUpdatesFallback() called');
+    
+    // Find all question containers
+    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
+    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found', questionContainers.length, 'question containers');
+    
+    questionContainers.forEach(container => {
+        const questionId = container.id.replace('question-container-', '');
+        console.log('🔧 [VISIBILITY FALLBACK DEBUG] Processing question container:', questionId);
+        
+        // Check if this question has conditional logic by looking for data attributes or other indicators
+        // For now, we'll manually check common conditional logic patterns
+        
+        // Check if this question should be visible based on other question values
+        // This is a simplified version of the conditional logic
+        let shouldBeVisible = true;
+        
+        // Look for any dropdown or input that might control this question's visibility
+        const allInputs = document.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            if (input.id && input.id !== container.id) {
+                // Check if this input's value should affect the visibility of the current question
+                // This is a simplified check - in a real implementation, you'd need to parse the actual conditional logic
+                if (input.value && input.value.trim() !== '') {
+                    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found input with value:', input.id, '=', input.value);
+                    // For now, we'll just log this - the actual conditional logic would be more complex
+                }
+            }
+        });
+        
+        // For debugging, let's just make sure all questions are visible initially
+        // In a real implementation, you'd implement the actual conditional logic here
+        if (shouldBeVisible) {
+            container.classList.remove('hidden');
+            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'visible');
+        } else {
+            container.classList.add('hidden');
+            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'hidden');
         }
     });
 }
@@ -4032,6 +3259,26 @@ async function processAllPdfs() {
     }
 }
 
+// Function to go back to the form from the thank you screen
+function goBackToForm() {
+    console.log('🔧 [BACK BUTTON] Going back to form');
+    
+    // Hide the thank you message
+    const thankYouMessage = document.getElementById('thankYouMessage');
+    if (thankYouMessage) {
+        thankYouMessage.style.display = 'none';
+    }
+    
+    // Show the form again
+    const formContainer = document.querySelector('form');
+    if (formContainer) {
+        formContainer.style.display = 'block';
+    }
+    
+    // Scroll back to the top of the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
     console.log('🔧 [PDF DEBUG] downloadAllPdfs() called');
@@ -4719,10 +3966,24 @@ if (typeof handleNext === 'function') {
                     });
                     
                     // After autofilling, trigger visibility updates for dependent questions
+                    // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
+                        console.log('🔧 [VISIBILITY DEBUG] Starting visibility updates after autofill...');
+                        
+                        // Trigger change events on all autofilled elements to ensure conditional logic runs
+                        fields.forEach(el => {
+                            if (el.value || el.checked) {
+                                console.log('🔧 [VISIBILITY DEBUG] Triggering change event on autofilled element:', el.id || el.name);
+                                const event = new Event('change', { bubbles: true });
+                                el.dispatchEvent(event);
+                            }
+                        });
+                        
+                        // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
+                    }, 2000);
                     
                     // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
                     fields.forEach(el => {
@@ -4797,8 +4058,7 @@ if (typeof handleNext === 'function') {
                         // Reset hidden questions to defaults after autofill and visibility updates
                         if (typeof currentSectionNumber === 'number') {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                        }
-                    }, 100);
+                }
             } catch (e) {
                 console.log('🔧 [AUTOFILL DEBUG] Error in loadAnswers:', e);
             }
@@ -4881,15 +4141,15 @@ if (typeof handleNext === 'function') {
                 });
             });
             
-            // Set up periodic autosave every 2 seconds
+            // Set up periodic autosave every 1 second
             setInterval(() => {
-                console.log('🔄 [PERIODIC AUTOSAVE] Triggering periodic save every 2 seconds');
+                console.log('🔄 [PERIODIC AUTOSAVE] Triggering periodic save every 1 second');
                 if (isUserLoggedIn) {
                     saveAnswers();
                 } else {
                     saveAnswersToLocalStorage();
                 }
-            }, 2000);
+            }, 1000);
         }
         
 
@@ -4967,12 +4227,24 @@ if (typeof handleNext === 'function') {
                     
                     // Trigger visibility updates for dependent questions
                     setTimeout(() => {
+                        console.log('🔧 [LOCALSTORAGE VISIBILITY DEBUG] Starting visibility updates after autofill...');
+                        
+                        // Trigger change events on all autofilled elements to ensure conditional logic runs
+                        const fields = getFormFields();
+                        fields.forEach(el => {
+                            if (el.value || el.checked) {
+                                console.log('🔧 [LOCALSTORAGE VISIBILITY DEBUG] Triggering change event on autofilled element:', el.id || el.name);
+                                const event = new Event('change', { bubbles: true });
+                                el.dispatchEvent(event);
+                            }
+                        });
+                        
+                        // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
                         
                         // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
-                        const fields = getFormFields();
                         fields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
                                 const questionId = el.id.replace('answer', '');
@@ -5041,7 +4313,7 @@ if (typeof handleNext === 'function') {
                                 }
                             });
                         }, 1500);
-                    }, 200);
+                    }, 2000);
                 }
             } catch (e) {
                 console.log('No localStorage data found or error loading:', e);
@@ -5473,6 +4745,58 @@ document.getElementById('closeDebugMenu').addEventListener('click', hideDebugMen
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && debugMenuVisible) {
     hideDebugMenu();
+  }
+});
+
+// Tab key navigation - automatically press next button, submit, or download PDFs
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault(); // Prevent default tab behavior
+    
+    // Check if we're on the thank you screen
+    const thankYouMessage = document.getElementById('thankYouMessage');
+    if (thankYouMessage && thankYouMessage.style.display !== 'none') {
+      // On thank you screen, press download PDFs button
+      const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+      if (downloadButton) {
+        downloadButton.click();
+        return;
+      }
+    }
+    
+    // Look for the next button in the current section
+    const nextButton = document.querySelector('.next-button:not([style*="display: none"])');
+    if (nextButton) {
+      nextButton.click();
+      return;
+    }
+    
+    // Look for submit button
+    const submitButton = document.querySelector('button[type="submit"]:not([style*="display: none"])');
+    if (submitButton) {
+      submitButton.click();
+      return;
+    }
+    
+    // Look for any button with "submit" in its text or onclick
+    const submitButtons = document.querySelectorAll('button');
+    for (let button of submitButtons) {
+      if (button.style.display !== 'none' && 
+          (button.textContent.toLowerCase().includes('submit') || 
+           button.onclick && button.onclick.toString().includes('submit'))) {
+        button.click();
+        return;
+      }
+    }
+    
+    // If no submit button found, look for download PDFs button
+    const downloadPdfButton = document.querySelector('button[onclick*="downloadAllPdfs"]');
+    if (downloadPdfButton) {
+      downloadPdfButton.click();
+      return;
+    }
+    
+    console.log('🔧 [TAB NAVIGATION] No suitable button found to press');
   }
 });
 

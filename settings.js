@@ -323,6 +323,12 @@ function updateSettingsUI() {
     gridSizeInput.value = userSettings.gridSize;
   }
   
+  // Update zoom sensitivity input
+  const zoomSensitivityInput = document.getElementById('zoomSensitivityInput');
+  if (zoomSensitivityInput) {
+    zoomSensitivityInput.value = userSettings.zoomSensitivity;
+  }
+  
   // Update select dropdowns
   const themeSelect = document.getElementById('themeSelect');
   if (themeSelect) {
@@ -472,6 +478,32 @@ function updateZoomSensitivity(value) {
   return window.updateZoomSensitivity(value);
 }
 
+// Make sure the function is available globally immediately
+window.updateZoomSensitivity = window.updateZoomSensitivity || function(value) {
+  console.log('🔧 [ZOOM SENSITIVITY] updateZoomSensitivity called with value:', value);
+  
+  userSettings.zoomSensitivity = parseFloat(value);
+  console.log('🔧 [ZOOM SENSITIVITY] Updated userSettings.zoomSensitivity to:', userSettings.zoomSensitivity);
+  
+  // Update the display value
+  const valueDisplay = document.getElementById('zoomSensitivityValue');
+  if (valueDisplay) {
+    valueDisplay.textContent = value;
+    console.log('🔧 [ZOOM SENSITIVITY] Updated display value to:', value);
+  }
+  
+  // Save the setting immediately
+  console.log('🔧 [ZOOM SENSITIVITY] Calling saveSettings...');
+  window.saveSettings();
+  
+  // Save to Firebase if available
+  saveZoomSensitivityToFirebase(value);
+  
+  // Apply the new zoom sensitivity immediately
+  console.log('🔧 [ZOOM SENSITIVITY] Calling applyZoomSensitivity...');
+  applyZoomSensitivity();
+};
+
 /**
  * Save zoom sensitivity to Firebase
  */
@@ -519,17 +551,11 @@ async function loadZoomSensitivityFromFirebase() {
           userSettings.zoomSensitivity = data.zoomSensitivity;
           
           // Update UI
-          const slider = document.getElementById('zoomSensitivityInput');
-          const display = document.getElementById('zoomSensitivityValue');
+          const input = document.getElementById('zoomSensitivityInput');
           
-          if (slider) {
-            slider.value = data.zoomSensitivity;
-            console.log('🔧 [ZOOM SENSITIVITY] Updated slider value to:', data.zoomSensitivity);
-          }
-          
-          if (display) {
-            display.textContent = data.zoomSensitivity;
-            console.log('🔧 [ZOOM SENSITIVITY] Updated display to:', data.zoomSensitivity);
+          if (input) {
+            input.value = data.zoomSensitivity;
+            console.log('🔧 [ZOOM SENSITIVITY] Updated input value to:', data.zoomSensitivity);
           }
           
           // Apply the setting
