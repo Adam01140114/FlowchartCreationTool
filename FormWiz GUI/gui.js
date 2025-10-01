@@ -609,6 +609,9 @@ function addQuestion(sectionId, questionId = null) {
 
         <!-- Numbered Dropdown Options -->
         <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
+            <label>Node Id: </label>
+            <input type="text" id="nodeId${currentQuestionId}" placeholder="Enter node ID" style="width: 200px;"><br><br>
+            
             <label>Number Range: </label>
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
             <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
@@ -1820,7 +1823,10 @@ function addTextboxLabel(questionId) {
     labelDiv.className = `label${labelCount}`;
     labelDiv.innerHTML = `
         <input type="text" id="label${questionId}_${labelCount}" placeholder="Label ${labelCount}">
-        <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})">Remove</button>
+        <br>
+        <label style="font-size: 0.9em; color: #666;">Node ID: </label>
+        <input type="text" id="labelNodeId${questionId}_${labelCount}" placeholder="Enter node ID for this label" style="width: 200px; margin-top: 5px;">
+        <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>
     `;
     textboxLabelsDiv.appendChild(labelDiv);
 }
@@ -1833,9 +1839,11 @@ function removeTextboxLabel(questionId, labelNumber) {
         labels.forEach((lbl, idx) => {
             const newLabelNumber = idx + 1;
             lbl.className = `label${newLabelNumber}`;
-            const inp = lbl.querySelector('input');
+            const inp = lbl.querySelector('input[type="text"]:first-of-type');
             inp.id = `label${questionId}_${newLabelNumber}`;
             inp.placeholder = `Label ${newLabelNumber}`;
+            const nodeIdInp = lbl.querySelector('input[type="text"]:last-of-type');
+            nodeIdInp.id = `labelNodeId${questionId}_${newLabelNumber}`;
             const btn = lbl.querySelector('button');
             btn.setAttribute('onclick', `removeTextboxLabel(${questionId}, ${newLabelNumber})`);
         });

@@ -471,16 +471,32 @@ function loadFormData(formData) {
                     if (rangeStartEl) rangeStartEl.value = question.min || '';
                     if (rangeEndEl) rangeEndEl.value = question.max || '';
 
-                    // Rebuild custom text labels
+                    // Restore main Node ID if it exists
+                    const nodeIdEl = questionBlock.querySelector(`#nodeId${question.questionId}`);
+                    if (nodeIdEl && question.nodeId) {
+                        nodeIdEl.value = question.nodeId;
+                    }
+
+                    // Rebuild custom text labels with their Node IDs
                     const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${question.questionId}`);
                     if (textboxLabelsDiv) {
                         textboxLabelsDiv.innerHTML = '';
-                        (question.labels || []).forEach((labelValue, ldx) => {
+                        const labels = question.labels || [];
+                        const labelNodeIds = question.labelNodeIds || [];
+                        labels.forEach((labelValue, ldx) => {
                             addTextboxLabel(question.questionId);
                             const labelInput = textboxLabelsDiv.querySelector(
                                 `#label${question.questionId}_${ldx + 1}`
                             );
                             if (labelInput) labelInput.value = labelValue;
+                            
+                            // Restore the Node ID for this label
+                            const labelNodeIdInput = textboxLabelsDiv.querySelector(
+                                `#labelNodeId${question.questionId}_${ldx + 1}`
+                            );
+                            if (labelNodeIdInput && labelNodeIds[ldx]) {
+                                labelNodeIdInput.value = labelNodeIds[ldx];
+                            }
                         });
                     }
 
@@ -1236,11 +1252,21 @@ function exportForm() {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`)?.value || '';
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`)?.value || '';
                 
-                // Collect text labels
-                const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
+                // Export main Node ID if it exists
+                const nodeIdInput = questionBlock.querySelector(`#nodeId${questionId}`);
+                if (nodeIdInput && nodeIdInput.value.trim()) {
+                    questionData.nodeId = nodeIdInput.value.trim();
+                }
+                
+                // Collect text labels and their Node IDs
+                const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input[type='text']:first-of-type`);
+                const labelNodeIdInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input[type='text']:last-of-type`);
                 const labels = [];
-                labelInputs.forEach(lbl => {
+                const labelNodeIds = [];
+                labelInputs.forEach((lbl, index) => {
                     labels.push(lbl.value.trim());
+                    const nodeIdInput = labelNodeIdInputs[index];
+                    labelNodeIds.push(nodeIdInput ? nodeIdInput.value.trim() : '');
                 });
 
                 // Collect amount labels
@@ -1253,6 +1279,7 @@ function exportForm() {
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
                 questionData.labels = labels;
+                questionData.labelNodeIds = labelNodeIds;
                 questionData.amounts = amounts;
             }
             else if (questionType === 'multipleTextboxes') {

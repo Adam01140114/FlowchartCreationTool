@@ -608,12 +608,24 @@ window.exportGuiJson = function(download = true) {
       // Change type to numberedDropdown
       question.type = "numberedDropdown";
       
+      // Get PDF name if available
+      const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+      const sanitizedPdfName = pdfName ? sanitizeNameId(pdfName) : '';
+      
+      // Build base name components
+      const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
+      
+      // Create nodeId with PDF prefix if available
+      const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
+      
       // Extract labels and amounts from textboxes
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
         // Labels should only include non-amount options
         question.labels = [];
         // Amounts should be a simple array of strings for amount options
         question.amounts = [];
+        // LabelNodeIds array for numberedDropdown
+        question.labelNodeIds = [];
         
         cell._textboxes.forEach(tb => {
           if (tb.isAmountOption === true) {
@@ -621,12 +633,17 @@ window.exportGuiJson = function(download = true) {
             question.amounts.push(tb.nameId || tb.placeholder || "");
           } else {
             // Add to labels as a simple string
-            question.labels.push(tb.nameId || tb.placeholder || "");
+            const labelName = tb.nameId || tb.placeholder || "";
+            question.labels.push(labelName);
+            // Create labelNodeId with PDF prefix if available
+            const labelNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+            question.labelNodeIds.push(labelNodeId);
           }
         });
       } else {
         question.labels = [];
         question.amounts = [];
+        question.labelNodeIds = [];
       }
       
       // Extract min and max from _twoNumbers
@@ -638,8 +655,15 @@ window.exportGuiJson = function(download = true) {
         question.max = "1";
       }
       
+      // Add nodeId for numberedDropdown (with PDF prefix if available)
+      question.nodeId = nodeId;
+      
       // Clear options array for numberedDropdown
       question.options = [];
+      
+      // Remove nameId and placeholder fields that shouldn't be in numberedDropdown
+      delete question.nameId;
+      delete question.placeholder;
     }
     
     // --- PATCH: For number type questions, convert to money type ---

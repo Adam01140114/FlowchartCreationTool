@@ -105,6 +105,7 @@
       <button class="renaming-btn" id="exportJsonBtn">Export Field Names JSON</button>
       <input type="file" id="importJsonInput" accept=".json" style="display:none;" />
       <button class="renaming-btn" id="importJsonBtn">Import Name Change JSON</button>
+      <button class="renaming-btn" id="compareIdsBtn">Compare IDs</button>
     </div>
 
     <!-- Field Selection Modal -->
@@ -122,6 +123,31 @@
           <button class="renaming-btn" id="deselectAllBtn">Deselect All</button>
           <button class="renaming-btn" id="exportSelectedBtn">Export Selected</button>
           <button class="renaming-btn" id="cancelExportBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ID Comparison Modal -->
+    <div id="idComparisonModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Compare Field IDs</h2>
+          <span class="close" id="closeComparisonModal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="comparison-input-section">
+            <label for="jsonInputTextarea" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2d3436;">Paste your JSON with field IDs:</label>
+            <textarea id="jsonInputTextarea" placeholder="Paste your JSON here..." style="width: 100%; height: 200px; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.875rem; resize: vertical;"></textarea>
+          </div>
+          <div class="comparison-results" id="comparisonResults" style="display: none; margin-top: 1.5rem;">
+            <h3 style="color: #2d3436; margin-bottom: 1rem;">Comparison Results</h3>
+            <div class="results-summary" id="resultsSummary" style="background: #f8fafc; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;"></div>
+            <div class="unmatched-fields" id="unmatchedFields" style="max-height: 300px; overflow-y: auto;"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="renaming-btn" id="compareFieldsBtn">Compare Fields</button>
+          <button class="renaming-btn" id="cancelComparisonBtn">Cancel</button>
         </div>
       </div>
     </div>
@@ -151,6 +177,15 @@
     const deselectAllBtn = document.getElementById('deselectAllBtn');
     const exportSelectedBtn = document.getElementById('exportSelectedBtn');
     const cancelExportBtn = document.getElementById('cancelExportBtn');
+    const compareIdsBtn = document.getElementById('compareIdsBtn');
+    const idComparisonModal = document.getElementById('idComparisonModal');
+    const closeComparisonModal = document.getElementById('closeComparisonModal');
+    const jsonInputTextarea = document.getElementById('jsonInputTextarea');
+    const compareFieldsBtn = document.getElementById('compareFieldsBtn');
+    const cancelComparisonBtn = document.getElementById('cancelComparisonBtn');
+    const comparisonResults = document.getElementById('comparisonResults');
+    const resultsSummary = document.getElementById('resultsSummary');
+    const unmatchedFields = document.getElementById('unmatchedFields');
 
     let originalFile = null;
     let originalPdfBytes = null;    // Uint8Array (stable copy)
@@ -839,6 +874,165 @@
           }
         }
       });
+    }
+
+    // ID Comparison functionality
+    compareIdsBtn.addEventListener('click', () => {
+      showIdComparisonModal();
+    });
+
+    function showIdComparisonModal() {
+      // Clear previous results
+      comparisonResults.style.display = 'none';
+      jsonInputTextarea.value = '';
+      
+      // Show the modal
+      idComparisonModal.style.display = 'block';
+    }
+
+    // Close comparison modal event listeners
+    closeComparisonModal.addEventListener('click', () => {
+      idComparisonModal.style.display = 'none';
+    });
+
+    cancelComparisonBtn.addEventListener('click', () => {
+      idComparisonModal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (e) => {
+      if (e.target === idComparisonModal) {
+        idComparisonModal.style.display = 'none';
+      }
+    });
+
+    // Compare fields functionality
+    compareFieldsBtn.addEventListener('click', () => {
+      performFieldComparison();
+    });
+
+    function performFieldComparison() {
+      const jsonText = jsonInputTextarea.value.trim();
+      
+      if (!jsonText) {
+        alert('Please paste your JSON with field IDs first.');
+        return;
+      }
+
+      try {
+        const jsonData = JSON.parse(jsonText);
+        
+        if (!jsonData.inputs || !Array.isArray(jsonData.inputs)) {
+          alert('Invalid JSON format. Expected an "inputs" array.');
+          return;
+        }
+
+        // Extract IDs from the JSON
+        const providedIds = new Set(jsonData.inputs.map(input => input.id).filter(id => id));
+        
+        // Get PDF field names
+        const pdfFieldNames = new Set(allFields.map(field => field.name));
+        
+        // Find unmatched fields (PDF fields that don't have corresponding IDs)
+        const unmatchedPdfFields = allFields.filter(field => !providedIds.has(field.name));
+        
+        // Find unmatched IDs (provided IDs that don't have corresponding PDF fields)
+        const unmatchedProvidedIds = Array.from(providedIds).filter(id => !pdfFieldNames.has(id));
+        
+        // Display results
+        displayComparisonResults(unmatchedPdfFields, unmatchedProvidedIds, providedIds.size, pdfFieldNames.size);
+        
+      } catch (error) {
+        alert('Error parsing JSON: ' + error.message);
+      }
+    }
+
+    function displayComparisonResults(unmatchedPdfFields, unmatchedProvidedIds, totalProvidedIds, totalPdfFields) {
+      // Show results section
+      comparisonResults.style.display = 'block';
+      
+      // Update summary
+      const matchedCount = totalPdfFields - unmatchedPdfFields.length;
+      const matchPercentage = totalPdfFields > 0 ? Math.round((matchedCount / totalPdfFields) * 100) : 0;
+      
+      resultsSummary.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div style="text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #48bb78;">${matchedCount}</div>
+            <div style="color: #718096; font-size: 0.875rem;">Matched Fields</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #e53e3e;">${unmatchedPdfFields.length}</div>
+            <div style="color: #718096; font-size: 0.875rem;">Unmatched PDF Fields</div>
+          </div>
+        </div>
+        <div style="text-align: center; color: #2d3436; font-weight: 600;">
+          Match Rate: ${matchPercentage}% (${matchedCount}/${totalPdfFields})
+        </div>
+      `;
+      
+      // Display unmatched PDF fields
+      unmatchedFields.innerHTML = '';
+      
+      if (unmatchedPdfFields.length === 0) {
+        unmatchedFields.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #48bb78; background: #f0fff4; border-radius: 6px; border: 1px solid #9ae6b4;">
+            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;">🎉 Perfect Match!</div>
+            <div>All PDF fields have corresponding IDs in your JSON.</div>
+          </div>
+        `;
+      } else {
+        const unmatchedHeader = document.createElement('h4');
+        unmatchedHeader.textContent = `PDF Fields Without Matches (${unmatchedPdfFields.length})`;
+        unmatchedHeader.style.cssText = 'color: #e53e3e; margin-bottom: 1rem; font-size: 1.1rem;';
+        unmatchedFields.appendChild(unmatchedHeader);
+        
+        unmatchedPdfFields.forEach(field => {
+          const fieldItem = document.createElement('div');
+          fieldItem.className = 'field-item';
+          fieldItem.style.cssText = 'background: #fed7d7; border-color: #feb2b2; margin-bottom: 0.5rem;';
+          
+          const fieldType = field.fieldType === 'Btn' ? 'checkbox' : 'text';
+          const typeClass = field.fieldType === 'Btn' ? 'checkbox' : 'text';
+          
+          fieldItem.innerHTML = `
+            <div class="field-info">
+              <div class="field-name" style="color: #c53030;">${field.name}</div>
+              <div class="field-details">
+                <span class="field-type-badge ${typeClass}">${fieldType}</span>
+                Page ${field.pageNum}
+              </div>
+            </div>
+          `;
+          
+          unmatchedFields.appendChild(fieldItem);
+        });
+      }
+      
+      // If there are unmatched provided IDs, show them too
+      if (unmatchedProvidedIds.length > 0) {
+        const extraIdsHeader = document.createElement('h4');
+        extraIdsHeader.textContent = `Provided IDs Without PDF Fields (${unmatchedProvidedIds.length})`;
+        extraIdsHeader.style.cssText = 'color: #d69e2e; margin: 1.5rem 0 1rem 0; font-size: 1.1rem;';
+        unmatchedFields.appendChild(extraIdsHeader);
+        
+        unmatchedProvidedIds.forEach(id => {
+          const idItem = document.createElement('div');
+          idItem.className = 'field-item';
+          idItem.style.cssText = 'background: #fef5e7; border-color: #f6e05e; margin-bottom: 0.5rem;';
+          
+          idItem.innerHTML = `
+            <div class="field-info">
+              <div class="field-name" style="color: #b7791f;">${id}</div>
+              <div class="field-details" style="color: #744210;">
+                No corresponding PDF field found
+              </div>
+            </div>
+          `;
+          
+          unmatchedFields.appendChild(idItem);
+        });
+      }
     }
   </script>
 </body>
