@@ -3456,40 +3456,30 @@ function showTextboxLabels(questionId, count){
     
     // Attach autosave listeners to newly generated textbox inputs
     const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
-    console.log('🔧 [AUTOSAVE DEBUG] Attaching autosave listeners to', newInputs.length, 'new textbox inputs');
     newInputs.forEach(input => {
-        console.log('🔧 [AUTOSAVE DEBUG] Attaching listeners to input:', input.id, 'name:', input.name);
         input.addEventListener('input', function() {
-            console.log('🔧 [AUTOSAVE DEBUG] Input event on:', this.id, 'value:', this.value);
             // Add a small delay to ensure the value is properly set before saving
             setTimeout(() => {
-                console.log('🔧 [AUTOSAVE DEBUG] Delayed save for:', this.id, 'value:', this.value);
                 if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
                     if (typeof saveAnswers === 'function') {
-                        console.log('🔧 [AUTOSAVE DEBUG] Calling saveAnswers() for Firebase');
                         saveAnswers();
                     }
                 } else {
                     if (typeof saveAnswersToLocalStorage === 'function') {
-                        console.log('🔧 [AUTOSAVE DEBUG] Calling saveAnswersToLocalStorage() for localStorage');
                         saveAnswersToLocalStorage();
                     }
                 }
             }, 100); // 100ms delay to ensure value is set
         });
         input.addEventListener('change', function() {
-            console.log('🔧 [AUTOSAVE DEBUG] Change event on:', this.id, 'value:', this.value);
             // Add a small delay to ensure the value is properly set before saving
             setTimeout(() => {
-                console.log('🔧 [AUTOSAVE DEBUG] Delayed change save for:', this.id, 'value:', this.value);
                 if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
                     if (typeof saveAnswers === 'function') {
-                        console.log('🔧 [AUTOSAVE DEBUG] Calling saveAnswers() for Firebase');
                         saveAnswers();
                     }
                 } else {
                     if (typeof saveAnswersToLocalStorage === 'function') {
-                        console.log('🔧 [AUTOSAVE DEBUG] Calling saveAnswersToLocalStorage() for localStorage');
                         saveAnswersToLocalStorage();
                     }
                 }
@@ -3934,8 +3924,14 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
+    console.log('🔧 [PDF DEBUG] processAllPdfs() called');
+    console.log('🔧 [PDF DEBUG] pdfOutputFileName:', pdfOutputFileName);
+    console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
+    console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
+    
     // Process main PDFs - use the actual PDF filename, not the form name
     if (pdfOutputFileName) {
+        console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
         await editAndDownloadPDF(baseName);
@@ -4038,15 +4034,19 @@ async function processAllPdfs() {
 
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
+    console.log('🔧 [PDF DEBUG] downloadAllPdfs() called');
     try {
         // Show loading state
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+        console.log('🔧 [PDF DEBUG] Download button found:', !!downloadButton);
         if (downloadButton) {
             downloadButton.textContent = 'Processing...';
             downloadButton.disabled = true;
         }
         
+        console.log('🔧 [PDF DEBUG] Calling processAllPdfs()...');
         await processAllPdfs();
+        console.log('🔧 [PDF DEBUG] processAllPdfs() completed successfully');
         
         // Reset button
         if (downloadButton) {
@@ -4054,7 +4054,7 @@ async function downloadAllPdfs() {
             downloadButton.disabled = false;
         }
     } catch (error) {
-        console.error('Error downloading PDFs:', error);
+        console.error('🔧 [PDF DEBUG] Error downloading PDFs:', error);
         // Reset button on error
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
         if (downloadButton) {
@@ -4067,32 +4067,57 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
+        console.log('🔧 [PDF DEBUG] Starting PDF processing for:', pdfName);
+        
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const fd = new FormData(document.getElementById('customForm'));
+        console.log('🔧 [PDF DEBUG] FormData created with', fd.entries().length, 'entries');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
         const baseName = pdfName.replace(/\.pdf$/i, '');
-        const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        console.log('🔧 [PDF DEBUG] Making request to:', endpoint);
+        
+        const res = await fetch(endpoint, { 
             method: 'POST', 
             body: fd 
         });
         
+        console.log('🔧 [PDF DEBUG] Response status:', res.status, 'OK:', res.ok);
+        console.log('🔧 [PDF DEBUG] Response headers:', Object.fromEntries(res.headers.entries()));
+        
         if (!res.ok) {
-            throw new Error("HTTP error! status: " + res.status);
+            const errorText = await res.text();
+            console.error('🔧 [PDF DEBUG] Server error response:', errorText);
+            throw new Error("HTTP error! status: " + res.status + " - " + errorText);
         }
         
         const blob = await res.blob();
+        console.log('🔧 [PDF DEBUG] Blob created, size:', blob.size, 'type:', blob.type);
+        
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
+        
         const url = URL.createObjectURL(blob);
+        console.log('🔧 [PDF DEBUG] Object URL created:', url);
 
         // Trigger download
         const a = document.createElement('a');
         a.href = url;
         a.download = 'Edited_' + pdfName;
+        console.log('🔧 [PDF DEBUG] Triggering download for:', a.download);
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        
+        // Clean up the object URL after a delay
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+            console.log('🔧 [PDF DEBUG] Object URL cleaned up');
+        }, 1000);
 
         // inline preview - only show the last one
         const frame = document.getElementById('pdfFrame');
@@ -4575,7 +4600,6 @@ if (typeof handleNext === 'function') {
         let formId = baseFormId;
         if (county) formId += '_' + county.replace(/\s+/g, '_');
         if (portfolioId) formId += '_' + portfolioId;
-        console.log('🔧 [AUTOSAVE DEBUG] Form ID for autosave:', formId, '(baseFormId:', baseFormId, ', county:', county, ', portfolioId:', portfolioId, ')');
         let userId = null;
         let isUserLoggedIn = false;
 
@@ -4603,24 +4627,20 @@ if (typeof handleNext === 'function') {
             if (!isUserLoggedIn || !userId) return;
             const fields = getFormFields();
             const answers = {};
-            console.log('🔧 [SAVE DEBUG] Saving', fields.length, 'form fields');
             fields.forEach(el => {
                 if (el.type === 'checkbox' || el.type === 'radio') {
                     answers[el.name] = el.checked;
-                    console.log('🔧 [SAVE DEBUG] Saving checkbox/radio:', el.name, '=', el.checked);
                 } else {
                     answers[el.name] = el.value;
-                    console.log('🔧 [SAVE DEBUG] Saving field:', el.name, '=', el.value);
                 }
             });
-            console.log('🔧 [SAVE DEBUG] Final answers object:', answers);
             
    
             
             await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
             
             
-            }
+        }
 
         // Helper: load answers
         async function loadAnswers() {
@@ -4679,30 +4699,30 @@ if (typeof handleNext === 'function') {
                 }
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
-                const fields = getFormFields();
-                fields.forEach(el => {
+                    const fields = getFormFields();
+                    fields.forEach(el => {
                     if (mappedData.hasOwnProperty(el.name)) {
-                        // Check if this answer would trigger a jump to the end
+                            // Check if this answer would trigger a jump to the end
                         if (wouldTriggerJumpToEnd(el, mappedData[el.name])) {
-                            // Don't autofill this answer - keep it as default
-                            console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
-                            return;
-                        }
-                        
+                                // Don't autofill this answer - keep it as default
+                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
+                                return;
+                            }
+                            
                         console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
-                        if (el.type === 'checkbox' || el.type === 'radio') {
+                            if (el.type === 'checkbox' || el.type === 'radio') {
                             el.checked = !!mappedData[el.name];
-                        } else {
+                            } else {
                             el.value = mappedData[el.name];
+                            }
                         }
-                    }
-                });
-                
-                // After autofilling, trigger visibility updates for dependent questions
-                setTimeout(() => {
-                    if (typeof triggerVisibilityUpdates === 'function') {
-                        triggerVisibilityUpdates();
-                    }
+                    });
+                    
+                    // After autofilling, trigger visibility updates for dependent questions
+                    setTimeout(() => {
+                        if (typeof triggerVisibilityUpdates === 'function') {
+                            triggerVisibilityUpdates();
+                        }
                     
                     // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
                     fields.forEach(el => {
@@ -4759,11 +4779,11 @@ if (typeof handleNext === 'function') {
                         });
                     }, 1500);
                     
-                    // Reset hidden questions to defaults after autofill and visibility updates
-                    if (typeof currentSectionNumber === 'number') {
-                        resetHiddenQuestionsToDefaults(currentSectionNumber);
-                    }
-                }, 100);
+                        // Reset hidden questions to defaults after autofill and visibility updates
+                        if (typeof currentSectionNumber === 'number') {
+                            resetHiddenQuestionsToDefaults(currentSectionNumber);
+                        }
+                    }, 100);
             } catch (e) {
                 console.log('🔧 [AUTOFILL DEBUG] Error in loadAnswers:', e);
             }
@@ -4890,17 +4910,13 @@ if (typeof handleNext === 'function') {
             try {
                 const fields = getFormFields();
                 const answers = {};
-                console.log('🔧 [LOCALSTORAGE SAVE DEBUG] Saving', fields.length, 'form fields to localStorage');
                 fields.forEach(el => {
                     if (el.type === 'checkbox' || el.type === 'radio') {
                         answers[el.name] = el.checked;
-                        console.log('🔧 [LOCALSTORAGE SAVE DEBUG] Saving checkbox/radio:', el.name, '=', el.checked);
                     } else {
                         answers[el.name] = el.value;
-                        console.log('🔧 [LOCALSTORAGE SAVE DEBUG] Saving field:', el.name, '=', el.value);
                     }
                 });
-                console.log('🔧 [LOCALSTORAGE SAVE DEBUG] Final answers object:', answers);
                 
                 localStorage.setItem('formData_' + formId, JSON.stringify(answers));
             } catch (e) {
