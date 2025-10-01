@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow authenticated users to read and write their own user settings
+    match /userSettings/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read and write their own flowcharts
+    match /flowcharts/{flowchartId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Allow authenticated users to read and write their own forms
+    match /forms/{formId} {
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Allow public read access to shared flowcharts (if they have a public flag)
+    match /sharedFlowcharts/{flowchartId} {
+      allow read: if resource.data.public == true;
+      allow write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

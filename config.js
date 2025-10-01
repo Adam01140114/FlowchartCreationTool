@@ -34,7 +34,7 @@ const defaultColors = {
 };
 
 // User color preferences (can be overridden by user settings)
-let colorPreferences = { ...defaultColors };
+var colorPreferences = colorPreferences || { ...defaultColors };
 
 /**************************************************
  ************ Global Constants & Settings ********
@@ -261,7 +261,7 @@ function getPerformanceMetrics() {
  **************************************************/
 // Section preferences: mapping section numbers to { borderColor, name }
 // Initialize after getDefaultSectionColor is defined
-let sectionPrefs = {};
+var sectionPrefs = sectionPrefs || {};
 
 // If user has opened a flowchart by name, store it here
 let currentFlowchartName = null;

@@ -3,7 +3,7 @@
  **************************************************/
 
 // Global settings object
-let userSettings = {
+var userSettings = userSettings || {
   autoSave: true,
   autoSaveInterval: 30000, // 30 seconds
   defaultNodeSize: { width: 200, height: 100 },
@@ -16,7 +16,7 @@ let userSettings = {
 };
 
 // Color preferences
-let colorPreferences = {
+var colorPreferences = colorPreferences || {
   text: '#000000',
   checkbox: '#4CAF50',
   dropdown: '#2196F3',
@@ -27,7 +27,7 @@ let colorPreferences = {
 };
 
 // Section preferences
-let sectionPrefs = {};
+var sectionPrefs = sectionPrefs || {};
 
 /**
  * Load settings from localStorage
@@ -339,12 +339,6 @@ function updateSettingsUI() {
   if (languageSelect) {
     languageSelect.value = userSettings.language;
   }
-  
-  // Update zoom sensitivity slider
-  const zoomSensitivityInput = document.getElementById('zoomSensitivityInput');
-  if (zoomSensitivityInput) {
-    zoomSensitivityInput.value = userSettings.zoomSensitivity;
-  }
 }
 
 /**
@@ -478,31 +472,7 @@ function updateZoomSensitivity(value) {
   return window.updateZoomSensitivity(value);
 }
 
-// Make sure the function is available globally immediately
-window.updateZoomSensitivity = window.updateZoomSensitivity || function(value) {
-  console.log('🔧 [ZOOM SENSITIVITY] updateZoomSensitivity called with value:', value);
-  
-  userSettings.zoomSensitivity = parseFloat(value);
-  console.log('🔧 [ZOOM SENSITIVITY] Updated userSettings.zoomSensitivity to:', userSettings.zoomSensitivity);
-  
-  // Update the display value
-  const valueDisplay = document.getElementById('zoomSensitivityValue');
-  if (valueDisplay) {
-    valueDisplay.textContent = value;
-    console.log('🔧 [ZOOM SENSITIVITY] Updated display value to:', value);
-  }
-  
-  // Save the setting immediately
-  console.log('🔧 [ZOOM SENSITIVITY] Calling saveSettings...');
-  window.saveSettings();
-  
-  // Save to Firebase if available
-  saveZoomSensitivityToFirebase(value);
-  
-  // Apply the new zoom sensitivity immediately
-  console.log('🔧 [ZOOM SENSITIVITY] Calling applyZoomSensitivity...');
-  applyZoomSensitivity();
-};
+
 
 /**
  * Save zoom sensitivity to Firebase
@@ -525,7 +495,12 @@ async function saveZoomSensitivityToFirebase(value) {
       console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
     }
   } catch (error) {
-    console.error('🔧 [ZOOM SENSITIVITY] Error saving to Firebase:', error);
+    // Handle Firebase permissions errors gracefully
+    if (error.code === 'permission-denied') {
+      console.log('🔧 [ZOOM SENSITIVITY] Firebase permissions not available - settings saved locally only');
+    } else {
+      console.warn('🔧 [ZOOM SENSITIVITY] Firebase save failed:', error.message);
+    }
   }
 }
 
@@ -597,6 +572,7 @@ function applyZoomSensitivity() {
 window.userSettings = userSettings;
 window.colorPreferences = colorPreferences;
 window.sectionPrefs = sectionPrefs;
+
 
 
 
