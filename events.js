@@ -358,10 +358,9 @@ function setupGraphEventListeners(graph) {
       } else if ((typeof window.isNotesNode === 'function' && window.isNotesNode(cell)) || 
                  (typeof window.isChecklistNode === 'function' && window.isChecklistNode(cell)) || 
                  (typeof window.isAlertNode === 'function' && window.isAlertNode(cell)) || 
-                 (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) || 
                  (typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(cell)) || 
                  (typeof window.isInfoNode === 'function' && window.isInfoNode(cell))) {
-        // When dragging a notes/checklist/alert/pdf/subtitle/info node, check if it points to a question node
+        // When dragging a notes/checklist/alert/subtitle/info node, check if it points to a question node
         const incomingEdges = graph.getIncomingEdges(cell) || [];
         const outgoingEdges = graph.getOutgoingEdges(cell) || [];
         
@@ -397,6 +396,10 @@ function setupGraphEventListeners(graph) {
             });
           }
         });
+      } else if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+        // PDF nodes should NOT drag any connected nodes - they move independently
+        // This prevents PDF nodes from dragging question nodes or other connected elements
+        console.log('PDF node dragged independently - no connected nodes moved');
       }
     });
     

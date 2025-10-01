@@ -701,51 +701,8 @@ graph.isCellEditable = function (cell) {
     hideContextMenu();
   });
 
-  // Notes context menu event handlers
-  document.getElementById('notesBoldButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      const notesCell = selectedCells[0];
-      notesCell._notesBold = !notesCell._notesBold;
-      updateNotesNodeCell(notesCell);
-      refreshSpecificCells([notesCell]);
-      requestAutosave();
-    }
-    hideContextMenu();
-  });
-
-  document.getElementById('notesFontButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      const notesCell = selectedCells[0];
-      const currentFontSize = notesCell._notesFontSize || 14;
-      const newFontSize = prompt('Enter font size (number):', currentFontSize);
-      if (newFontSize && !isNaN(newFontSize) && newFontSize > 0) {
-        notesCell._notesFontSize = parseInt(newFontSize);
-        updateNotesNodeCell(notesCell);
-        refreshSpecificCells([notesCell]);
-        requestAutosave();
-      }
-    }
-    hideContextMenu();
-  });
-
-  document.getElementById('notesCopyButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      copySelectedNodeAsJson();
-    }
-    hideContextMenu();
-  });
-
-  document.getElementById('notesDeleteButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      graph.removeCells(selectedCells);
-      refreshAllCells();
-    }
-    hideContextMenu();
-  });
+  // Notes context menu event handlers are now handled in context-menus.js
+  // Removed duplicate event listeners to prevent conflicts
 
   // Increase the "section number" for a question
   newSectionButton.addEventListener("click", () => {
@@ -785,6 +742,42 @@ keyHandler.bindControlKey(86, () => {
   const mousePos = graph.getPointForEvent(graph.lastEvent);
   window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
                     mousePos ? mousePos.y : undefined);
+});
+
+/* Ctrl + Shift – reset all PDF and node IDs */
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey) {
+    // Only trigger on the initial keydown, not on key repeats
+    if (event.repeat) return;
+    
+    if (isUserTyping()) return; // Don't trigger if user is typing
+    
+    // Confirm with user
+    const confirmed = confirm("This will reset ALL PDF inheritance and node IDs in the flowchart. This action cannot be undone. Continue?");
+    if (!confirmed) {
+      return;
+    }
+    
+    console.log('🔄 [CTRL+SHIFT] Running reset all PDF and node IDs...');
+    
+    // Reset PDF inheritance for all nodes FIRST
+    if (typeof window.resetAllPdfInheritance === 'function') {
+      window.resetAllPdfInheritance();
+      console.log('🔄 [CTRL+SHIFT] PDF inheritance reset completed');
+    } else {
+      console.warn('🔄 [CTRL+SHIFT] resetAllPdfInheritance function not available');
+    }
+    
+    // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+    if (typeof resetAllNodeIds === 'function') {
+      resetAllNodeIds();
+      console.log('🔄 [CTRL+SHIFT] Node IDs reset completed');
+    } else {
+      console.warn('🔄 [CTRL+SHIFT] resetAllNodeIds function not available');
+    }
+    
+    event.preventDefault();
+  }
 });
 
   
@@ -1508,34 +1501,58 @@ window.copyMultipleDropdownId = function(cellId, index) {
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
   
-  // Prompt user for number
-  const number = prompt('Enter a number for this ID:');
-  if (number === null || number.trim() === '') {
-    return; // User cancelled or entered empty
-  }
-  
-  // Create the ID string
+  // Create the ID string with default number "1" first
   const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-  const sanitizedNumber = number.trim();
   
-  // Build the final ID with PDF name if available
-  let textToCopy;
+  // Build the default ID with PDF name if available
+  let defaultTextToCopy;
   if (sanitizedPdfName) {
-    textToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_1_${sanitizedEntryText}`;
   } else {
-    textToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedQuestionText}_1_${sanitizedEntryText}`;
   }
   
-  // Copy to clipboard
+  // Copy the default ID to clipboard immediately
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(textToCopy).catch(() => {
+    navigator.clipboard.writeText(defaultTextToCopy).catch(() => {
       // Fallback for older browsers
-      fallbackCopyToClipboard(textToCopy);
+      fallbackCopyToClipboard(defaultTextToCopy);
     });
   } else {
     // Fallback for older browsers
-    fallbackCopyToClipboard(textToCopy);
+    fallbackCopyToClipboard(defaultTextToCopy);
+  }
+  
+  // Prompt user for number with default value of "1"
+  const number = prompt('Enter a number for this ID:', '1');
+  if (number === null) {
+    return; // User cancelled, but ID was already copied with default value
+  }
+  const finalNumber = number.trim() || '1'; // Use "1" as default if empty
+  
+  // If user entered a different number, copy the updated ID
+  if (finalNumber !== '1') {
+    const sanitizedNumber = finalNumber;
+    
+    // Build the updated ID with PDF name if available
+    let updatedTextToCopy;
+    if (sanitizedPdfName) {
+      updatedTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    } else {
+      updatedTextToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    }
+    
+    // Copy the updated ID to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(updatedTextToCopy).catch(() => {
+        // Fallback for older browsers
+        fallbackCopyToClipboard(updatedTextToCopy);
+      });
+    } else {
+      // Fallback for older browsers
+      fallbackCopyToClipboard(updatedTextToCopy);
+    }
   }
 };
 
@@ -4461,6 +4478,13 @@ function copySelectedNodeAsJson() {
 }
 
 window.pasteNodeFromJson = function(x, y) {
+  // Prevent multiple simultaneous paste operations
+  if (window._isPasting) {
+    console.log('Paste operation already in progress, ignoring duplicate call');
+    return;
+  }
+  window._isPasting = true;
+  
   // Try to get data from localStorage first (for cross-tab functionality)
   let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
   let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
@@ -4478,9 +4502,11 @@ window.pasteNodeFromJson = function(x, y) {
         pasteNodeFromJsonData(text, x, y);
       } catch (e) {
         alert("No valid node data found in clipboard");
+        window._isPasting = false; // Clear flag on error
       }
     }).catch(err => {
       alert("No node data found to paste");
+      window._isPasting = false; // Clear flag on error
     });
     return;
   }
@@ -4494,6 +4520,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
     data = JSON.parse(clipboardData);
   } catch (e) {
     alert("Clipboard data is invalid");
+    window._isPasting = false; // Clear flag on error
     return;
   }
   
@@ -4707,6 +4734,9 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
   } finally {
     graph.getModel().endUpdate();
   }
+  
+  // Clear the paste flag
+  window._isPasting = false;
   
   // Correct Node IDs for pasted nodes to follow proper naming scheme
   setTimeout(() => {
@@ -5212,11 +5242,7 @@ function resetAllNodeIds() {
     return;
   }
   
-  // Confirm with user
-  const confirmed = confirm("This will reset ALL node IDs in the flowchart to match the naming convention. This action cannot be undone. Continue?");
-  if (!confirmed) {
-    return;
-  }
+  // Proceed without confirmation dialog
   
   const graph = window.graph;
   const parent = graph.getDefaultParent();

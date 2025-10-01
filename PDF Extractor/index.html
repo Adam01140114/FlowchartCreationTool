@@ -43,6 +43,32 @@
     .field-overlay { position: absolute; border: 2px solid; border-radius: 3px; opacity: 0.7; pointer-events: auto; }
     .field-overlay.text-field { border-color: #1976d2; background-color: rgba(227,242,253,.3); }
     .field-overlay.checkbox-field { border-color: #d32f2f; background-color: rgba(255,235,238,.3); }
+    .field-overlay.checkbox-field.unchecked { border-color: #d32f2f; background-color: rgba(255,235,238,.1); }
+    .field-overlay.checkbox-field.checked { border-color: #d32f2f; background-color: rgba(255,235,238,.3); }
+    .page-nav-btn { padding: 0.5rem 1rem; margin: 0 0.5rem; background-color: #4299e1; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .page-nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .page-nav-btn:hover:not(:disabled) { background-color: #3182ce; }
+    .json-controls { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    
+    /* Modal Styles */
+    .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background-color: white; margin: 5% auto; padding: 0; border-radius: 8px; width: 80%; max-width: 800px; max-height: 80vh; display: flex; flex-direction: column; }
+    .modal-header { padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { margin: 0; color: #2d3436; }
+    .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close:hover { color: #000; }
+    .modal-body { padding: 1rem 1.5rem; flex: 1; overflow-y: auto; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 1rem; justify-content: flex-end; }
+    .field-list { max-height: 400px; overflow-y: auto; }
+    .field-item { display: flex; align-items: center; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 0.5rem; background: #f8fafc; }
+    .field-item.selected { background: #e6fffa; border-color: #48bb78; }
+    .field-checkbox { margin-right: 0.75rem; }
+    .field-info { flex: 1; }
+    .field-name { font-weight: 600; color: #2d3436; margin-bottom: 0.25rem; }
+    .field-details { font-size: 0.875rem; color: #718096; }
+    .field-type-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
+    .field-type-badge.text { background: #e3f2fd; color: #1976d2; }
+    .field-type-badge.checkbox { background: #ffebee; color: #d32f2f; }
   </style>
 </head>
 <body>
@@ -64,9 +90,39 @@
 
     <div class="pdf-preview-container" id="pdfPreviewContainer" style="display:none;">
       <h2 class="section-header">PDF Preview with Field Highlights</h2>
+      <div class="page-navigation" id="pageNavigation" style="margin-bottom: 1rem; text-align: center;">
+        <button id="prevPage" class="page-nav-btn" disabled>← Previous</button>
+        <span id="pageInfo">Page 1 of 1</span>
+        <button id="nextPage" class="page-nav-btn" disabled>Next →</button>
+      </div>
       <div class="pdf-preview-wrapper">
         <canvas id="pdfCanvas"></canvas>
         <div id="fieldOverlays" class="field-overlays"></div>
+      </div>
+    </div>
+
+    <div class="json-controls" id="jsonControls" style="display:none; margin-top: 2rem;">
+      <button class="renaming-btn" id="exportJsonBtn">Export Field Names JSON</button>
+      <input type="file" id="importJsonInput" accept=".json" style="display:none;" />
+      <button class="renaming-btn" id="importJsonBtn">Import Name Change JSON</button>
+    </div>
+
+    <!-- Field Selection Modal -->
+    <div id="fieldSelectionModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Select Fields to Export</h2>
+          <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="field-list" id="fieldList"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="renaming-btn" id="selectAllBtn">Select All</button>
+          <button class="renaming-btn" id="deselectAllBtn">Deselect All</button>
+          <button class="renaming-btn" id="exportSelectedBtn">Export Selected</button>
+          <button class="renaming-btn" id="cancelExportBtn">Cancel</button>
+        </div>
       </div>
     </div>
 
@@ -81,6 +137,20 @@
     const pdfPreviewContainer = document.getElementById('pdfPreviewContainer');
     const pdfCanvas = document.getElementById('pdfCanvas');
     const fieldOverlays = document.getElementById('fieldOverlays');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('pageInfo');
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    const importJsonBtn = document.getElementById('importJsonBtn');
+    const importJsonInput = document.getElementById('importJsonInput');
+    const jsonControls = document.getElementById('jsonControls');
+    const fieldSelectionModal = document.getElementById('fieldSelectionModal');
+    const closeModal = document.getElementById('closeModal');
+    const fieldList = document.getElementById('fieldList');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const exportSelectedBtn = document.getElementById('exportSelectedBtn');
+    const cancelExportBtn = document.getElementById('cancelExportBtn');
 
     let originalFile = null;
     let originalPdfBytes = null;    // Uint8Array (stable copy)
@@ -88,6 +158,10 @@
     let uploadedFileName = 'updated-fields.pdf';
     let renameMap = {};             // { oldFQN: newName }
     let allFields = [];
+    let currentPdf = null;          // PDF.js document
+    let currentPageNum = 1;         // Current page being displayed
+    let totalPages = 0;             // Total number of pages
+    let selectedFields = new Set(); // Track which fields are selected for export
 
     const lineThreshold = 10;
     const wordSpacingThreshold = 1;
@@ -139,6 +213,7 @@
       formattedOutput.innerHTML = '';
       pdfPreviewContainer.style.display = 'none';
       fieldOverlays.innerHTML = '';
+      jsonControls.style.display = 'none';
       renameMap = {};
       downloadBtn.disabled = true;
 
@@ -158,6 +233,8 @@
 
             // Preview via pdf.js
             const pdf = await pdfjsLib.getDocument({ data: originalPdfBytes }).promise;
+            currentPdf = pdf;
+            totalPages = pdf.numPages;
 
             let allPagesContent = [];
             allFields = [];
@@ -236,7 +313,14 @@
 
             formattedOutput.innerHTML = allPagesContent.join('<div class="page-break"></div>');
             attachRenameListeners();
-            await renderPDFPreview(pdf);
+            
+            // Reset page navigation
+            currentPageNum = 1;
+            updatePageNavigation();
+            await renderPDFPreview(pdf, 1);
+            
+            // Show JSON controls
+            jsonControls.style.display = 'block';
             loadingDiv.style.display = 'none';
 
             downloadBtn.disabled = false;
@@ -469,9 +553,9 @@
       downloadBlob(blob, fileName || 'file.pdf');
     }
 
-    async function renderPDFPreview(pdf) {
+    async function renderPDFPreview(pdf, pageNum = 1) {
       try {
-        const page = await pdf.getPage(1);
+        const page = await pdf.getPage(pageNum);
         const baseViewport = page.getViewport({ scale: 1.0 });
         const scale = 1.5;
         const viewport = page.getViewport({ scale });
@@ -482,14 +566,24 @@
         await page.render({ canvasContext: context, viewport }).promise;
 
         fieldOverlays.innerHTML = '';
-        const firstPageFields = allFields.filter(f => f.pageNum === 1);
+        const currentPageFields = allFields.filter(f => f.pageNum === pageNum);
 
         const toCanvasX = (x) => (x / baseViewport.width) * viewport.width;
         const toCanvasY = (y) => viewport.height - (y / baseViewport.height) * viewport.height;
 
-        firstPageFields.forEach(field => {
+        currentPageFields.forEach(field => {
           const overlay = document.createElement('div');
-          overlay.className = `field-overlay ${field.fieldType === 'Btn' ? 'checkbox-field' : 'text-field'}`;
+          const isCheckbox = field.fieldType === 'Btn';
+          let className = isCheckbox ? 'checkbox-field' : 'text-field';
+          
+          // For checkboxes, we need to determine if they're checked or not
+          // Since we can't easily determine the actual state from PDF.js, 
+          // we'll use a neutral styling for all checkboxes
+          if (isCheckbox) {
+            className += ' unchecked'; // Default to unchecked styling
+          }
+          
+          overlay.className = `field-overlay ${className}`;
 
           const [x0, y0, x1, y1] = field.rect;
           const left = toCanvasX(Math.min(x0, x1));
@@ -501,7 +595,7 @@
           overlay.style.top = `${top}px`;
           overlay.style.width = `${right - left}px`;
           overlay.style.height = `${bottom - top}px`;
-          overlay.title = `${field.fieldType === 'Btn' ? 'Checkbox' : 'Text Field'}: ${field.name}`;
+          overlay.title = `${isCheckbox ? 'Checkbox' : 'Text Field'}: ${field.name}`;
 
           fieldOverlays.appendChild(overlay);
         });
@@ -514,6 +608,237 @@
       } catch (error) {
         console.error('Error rendering PDF preview:', error);
       }
+    }
+
+    function updatePageNavigation() {
+      pageInfo.textContent = `Page ${currentPageNum} of ${totalPages}`;
+      prevPageBtn.disabled = currentPageNum <= 1;
+      nextPageBtn.disabled = currentPageNum >= totalPages;
+    }
+
+    async function goToPage(pageNum) {
+      if (pageNum < 1 || pageNum > totalPages || !currentPdf) return;
+      currentPageNum = pageNum;
+      updatePageNavigation();
+      await renderPDFPreview(currentPdf, pageNum);
+    }
+
+    // Page navigation event listeners
+    prevPageBtn.addEventListener('click', () => goToPage(currentPageNum - 1));
+    nextPageBtn.addEventListener('click', () => goToPage(currentPageNum + 1));
+
+    // Export JSON functionality - Show field selection modal
+    exportJsonBtn.addEventListener('click', () => {
+      showFieldSelectionModal();
+    });
+
+    function showFieldSelectionModal() {
+      // Initialize all fields as selected by default
+      selectedFields.clear();
+      allFields.forEach(field => selectedFields.add(field.name));
+      
+      // Populate the field list
+      populateFieldList();
+      
+      // Show the modal
+      fieldSelectionModal.style.display = 'block';
+    }
+
+    function populateFieldList() {
+      fieldList.innerHTML = '';
+      
+      allFields.forEach(field => {
+        const fieldItem = document.createElement('div');
+        fieldItem.className = 'field-item';
+        if (selectedFields.has(field.name)) {
+          fieldItem.classList.add('selected');
+        }
+        
+        const fieldType = field.fieldType === 'Btn' ? 'checkbox' : 'text';
+        const typeClass = field.fieldType === 'Btn' ? 'checkbox' : 'text';
+        
+        fieldItem.innerHTML = `
+          <input type="checkbox" class="field-checkbox" ${selectedFields.has(field.name) ? 'checked' : ''} data-field-name="${field.name}">
+          <div class="field-info">
+            <div class="field-name">${field.name}</div>
+            <div class="field-details">
+              <span class="field-type-badge ${typeClass}">${fieldType}</span>
+              Page ${field.pageNum}
+            </div>
+          </div>
+        `;
+        
+        // Add click handler for the entire item
+        fieldItem.addEventListener('click', (e) => {
+          if (e.target.type !== 'checkbox') {
+            const checkbox = fieldItem.querySelector('.field-checkbox');
+            checkbox.checked = !checkbox.checked;
+            toggleFieldSelection(field.name, checkbox.checked);
+          }
+        });
+        
+        // Add checkbox change handler
+        const checkbox = fieldItem.querySelector('.field-checkbox');
+        checkbox.addEventListener('change', (e) => {
+          toggleFieldSelection(field.name, e.target.checked);
+        });
+        
+        fieldList.appendChild(fieldItem);
+      });
+    }
+
+    function toggleFieldSelection(fieldName, isSelected) {
+      const fieldItem = document.querySelector(`[data-field-name="${fieldName}"]`).closest('.field-item');
+      
+      if (isSelected) {
+        selectedFields.add(fieldName);
+        fieldItem.classList.add('selected');
+      } else {
+        selectedFields.delete(fieldName);
+        fieldItem.classList.remove('selected');
+      }
+    }
+
+    // Modal control event listeners
+    closeModal.addEventListener('click', () => {
+      fieldSelectionModal.style.display = 'none';
+    });
+
+    cancelExportBtn.addEventListener('click', () => {
+      fieldSelectionModal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (e) => {
+      if (e.target === fieldSelectionModal) {
+        fieldSelectionModal.style.display = 'none';
+      }
+    });
+
+    // Select All / Deselect All functionality
+    selectAllBtn.addEventListener('click', () => {
+      allFields.forEach(field => {
+        selectedFields.add(field.name);
+        const checkbox = document.querySelector(`[data-field-name="${field.name}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+          checkbox.closest('.field-item').classList.add('selected');
+        }
+      });
+    });
+
+    deselectAllBtn.addEventListener('click', () => {
+      selectedFields.clear();
+      allFields.forEach(field => {
+        const checkbox = document.querySelector(`[data-field-name="${field.name}"]`);
+        if (checkbox) {
+          checkbox.checked = false;
+          checkbox.closest('.field-item').classList.remove('selected');
+        }
+      });
+    });
+
+    // Export selected fields
+    exportSelectedBtn.addEventListener('click', () => {
+      const selectedFieldData = allFields
+        .filter(field => selectedFields.has(field.name))
+        .map(field => ({
+          id: field.name,
+          type: field.fieldType === 'Btn' ? 'checkbox' : 'text',
+          page: field.pageNum,
+          currentName: field.name
+        }));
+      
+      const jsonData = {
+        fields: selectedFieldData,
+        exportDate: new Date().toISOString(),
+        totalFields: selectedFieldData.length,
+        selectedFields: selectedFieldData.length,
+        totalAvailableFields: allFields.length
+      };
+      
+      const jsonString = JSON.stringify(jsonData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'selected-field-names.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Close the modal
+      fieldSelectionModal.style.display = 'none';
+    });
+
+    // Import JSON functionality
+    importJsonBtn.addEventListener('click', () => {
+      importJsonInput.click();
+    });
+
+    importJsonInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const jsonData = JSON.parse(event.target.result);
+          
+          if (jsonData.fields && Array.isArray(jsonData.fields)) {
+            // Clear existing rename map
+            renameMap = {};
+            
+            // Apply imported field name changes
+            jsonData.fields.forEach(field => {
+              if (field.id && field.newName && field.id !== field.newName) {
+                renameMap[field.id] = field.newName;
+              }
+            });
+            
+            // Update the display with new names
+            updateFieldDisplay();
+            
+            alert(`Successfully imported ${Object.keys(renameMap).length} field name changes.`);
+          } else {
+            alert('Invalid JSON format. Expected a "fields" array.');
+          }
+        } catch (error) {
+          alert('Error parsing JSON file: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    function updateFieldDisplay() {
+      // Update the formatted text display
+      const fields = document.querySelectorAll('.renameable-field');
+      fields.forEach(fieldEl => {
+        const oldName = fieldEl.getAttribute('data-original-name');
+        if (renameMap[oldName]) {
+          const newName = renameMap[oldName];
+          const fieldType = fieldEl.getAttribute('data-field-type');
+          fieldEl.textContent = fieldType === 'Btn' ? `{{${newName}}}` : `[[${newName}]]`;
+          fieldEl.setAttribute('data-original-name', newName);
+        }
+      });
+      
+      // Update field overlays in PDF preview
+      const overlays = document.querySelectorAll('.field-overlay');
+      overlays.forEach(overlay => {
+        const title = overlay.getAttribute('title');
+        if (title) {
+          const match = title.match(/(Checkbox|Text Field): (.+)/);
+          if (match) {
+            const fieldType = match[1];
+            const fieldName = match[2];
+            if (renameMap[fieldName]) {
+              overlay.setAttribute('title', `${fieldType}: ${renameMap[fieldName]}`);
+            }
+          }
+        }
+      });
     }
   </script>
 </body>

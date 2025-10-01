@@ -281,16 +281,35 @@ window.exportGuiJson = function(download = true) {
     
     // For multiple textboxes, add the textboxes array and nodeId
     if (questionType === "multipleTextboxes" && cell._textboxes) {
+      // Get PDF name if available
+      const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+      const sanitizedPdfName = pdfName ? sanitizeNameId(pdfName) : '';
+      
+      // Build base name components
+      const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
+      
+      // Create nodeId with PDF prefix if available
+      const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
+      
       question.textboxes = cell._textboxes.map(tb => ({
         label: "", // Empty label field as required
-        nameId: tb.nameId || "",
-        placeholder: tb.nameId || "" // Use nameId as placeholder, not the generic "Enter value"
+        nameId: tb.nameId ? `${nodeId}_${sanitizeNameId(tb.nameId)}` : "",
+        placeholder: tb.nameId || "Name" // Use nameId as placeholder, default to "Name"
       }));
       // Add empty amounts array for multipleTextboxes
       question.amounts = [];
       
-      // Add nodeId for multiple textboxes (use the sanitized nameId)
-      question.nodeId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
+      // Add nodeId for multiple textboxes (with PDF prefix if available)
+      question.nodeId = nodeId;
+      
+      // Add missing fields to match expected structure
+      question.pdfLogic = {
+        enabled: false,
+        pdfName: "",
+        pdfDisplayName: "",
+        stripePriceId: "",
+        conditions: []
+      };
     }
     
     // Handle outgoing edges to option nodes
@@ -1792,9 +1811,7 @@ window.resetAllPdfInheritance = function() {
   
   console.log(`🔄 [RESET ALL PDF] Completed! Reset ${resetCount} out of ${totalCount} nodes with PDF inheritance`);
   
-  // Show user feedback
-  const message = `PDF inheritance reset completed!\n\nReset ${resetCount} out of ${totalCount} nodes with PDF inheritance.`;
-  alert(message);
+  // User feedback removed - operation completes silently
   
   return { resetCount, totalCount };
 };
@@ -1845,7 +1862,7 @@ function getPdfNameForNode(cell) {
       return null;
     };
     
-    // Check incoming edges for PDF nodes and PDF inheritance (only downstream flow)
+    // Check incoming edges for PDF nodes and PDF inheritance (downstream flow)
     const incomingEdges = graph.getIncomingEdges(cell) || [];
     for (const edge of incomingEdges) {
       const source = edge.source;
@@ -1862,6 +1879,19 @@ function getPdfNameForNode(cell) {
             (source._pdfFile && source._pdfFile.trim()) ||
             (source._pdfUrl && source._pdfUrl.trim())) {
           const pdfName = extractPdfName(source);
+          if (pdfName) return pdfName;
+        }
+      }
+    }
+    
+    // Check outgoing edges for PDF nodes (upstream flow - when this node points to a PDF node)
+    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+    for (const edge of outgoingEdges) {
+      const target = edge.target;
+      if (target) {
+        // Check if it's a PDF node
+        if (typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
+          const pdfName = extractPdfName(target);
           if (pdfName) return pdfName;
         }
       }

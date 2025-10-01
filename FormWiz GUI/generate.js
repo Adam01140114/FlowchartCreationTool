@@ -1839,7 +1839,7 @@ formHTML += `</div><br></div>`;
 
         // Then build the dropdown
         questionNameIds[questionId] = "answer" + questionId;
-        formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
+        formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         for (let rnum = ddMin; rnum <= ddMax; rnum++) {
           formHTML += `<option value="${rnum}">${rnum}</option>`;
@@ -3410,6 +3410,9 @@ function showTextboxLabels(questionId, count){
         ?.querySelector("h3")?.textContent || ("answer" + questionId);
     const qSafe = sanitizeQuestionText(questionH3);
 
+    // Generate hidden checkboxes for the selected count
+    generateHiddenCheckboxes(questionId, qSafe, count);
+
     for(let j = 1; j <= count; j++){
         /* label inputs */
         for(const lbl of theseLabels){
@@ -3428,6 +3431,87 @@ function showTextboxLabels(questionId, count){
     attachCalculationListeners();   // keep this
 }
 
+// Generate hidden checkboxes for numbered dropdown questions
+function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
+    // Get the dropdown element to find the range
+    const dropdown = document.getElementById("answer" + questionId);
+    if (!dropdown) return;
+    
+    // Find the maximum possible value from the dropdown options
+    let maxRange = 0;
+    for (let i = 0; i < dropdown.options.length; i++) {
+        const optionValue = parseInt(dropdown.options[i].value);
+        if (!isNaN(optionValue) && optionValue > maxRange) {
+            maxRange = optionValue;
+        }
+    }
+    
+    // Remove any existing hidden checkboxes for this question
+    const existingCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="' + questionSafe + '_"]');
+    existingCheckboxes.forEach(checkbox => checkbox.remove());
+    
+    // Generate hidden checkboxes for the full range
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = questionSafe + "_" + i;
+        const checkboxName = questionSafe + "_" + i;
+        
+        // Create hidden checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = checkboxId;
+        checkbox.name = checkboxName;
+        checkbox.style.display = 'none'; // Hidden
+        checkbox.checked = i <= selectedCount; // Check if this number is within the selected range
+        
+        // Add to the form (find the form element or add to body)
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(checkbox);
+    }
+}
+
+// Update hidden checkboxes when dropdown selection changes
+function updateHiddenCheckboxes(questionId, selectedCount) {
+    // Get the question's safe name
+    const questionH3 = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+    
+    // Get the dropdown element to find the range
+    const dropdown = document.getElementById("answer" + questionId);
+    if (!dropdown) return;
+    
+    // Find the maximum possible value from the dropdown options
+    let maxRange = 0;
+    for (let i = 0; i < dropdown.options.length; i++) {
+        const optionValue = parseInt(dropdown.options[i].value);
+        if (!isNaN(optionValue) && optionValue > maxRange) {
+            maxRange = optionValue;
+        }
+    }
+    
+    // Update existing checkboxes or create new ones if they don't exist
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = qSafe + "_" + i;
+        let checkbox = document.getElementById(checkboxId);
+        
+        if (!checkbox) {
+            // Create new checkbox if it doesn't exist
+            checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.name = qSafe + "_" + i;
+            checkbox.style.display = 'none'; // Hidden
+            
+            // Add to the form
+            const form = document.querySelector('form') || document.body;
+            form.appendChild(checkbox);
+        }
+        
+        // Update the checked state based on the selected count
+        checkbox.checked = i <= selectedCount;
+    }
+}
 
 // Handle linked dropdown logic
 function handleLinkedDropdowns(sourceName, selectedValue) {
@@ -3586,6 +3670,61 @@ function handleNext(currentSection){
 
 
 /*------------------------------------------------------------------
+ *  resetHiddenQuestionsToDefaults(sectionNumber)
+ *  – resets hidden questions in the current section to their default values
+ *    This prevents Firebase autosave from keeping values for questions
+ *    that are hidden due to conditional logic
+ *-----------------------------------------------------------------*/
+function resetHiddenQuestionsToDefaults(sectionNumber) {
+    // Get the current section
+    const currentSection = document.getElementById('section' + sectionNumber);
+    if (!currentSection) {
+        console.log('Reset function: Section not found for section', sectionNumber);
+        return;
+    }
+    
+    // Find all hidden question containers in this section
+    const hiddenQuestions = currentSection.querySelectorAll('.question-container.hidden');
+    
+    if (hiddenQuestions.length === 0) {
+        console.log('Reset function: No hidden questions found in section', sectionNumber);
+        return;
+    }
+    
+    console.log('Reset function: Found', hiddenQuestions.length, 'hidden questions in section', sectionNumber);
+    
+    hiddenQuestions.forEach((questionContainer, index) => {
+        // Get all form elements within this hidden question
+        const formElements = questionContainer.querySelectorAll('input, select, textarea');
+        
+        formElements.forEach(element => {
+            const elementName = element.name || element.id || 'unnamed';
+            const oldValue = element.value || element.checked;
+            
+            if (element.tagName === 'SELECT') {
+                // Reset dropdown to default "Select an option"
+                element.value = '';
+                // Find the default option and set it as selected
+                const defaultOption = element.querySelector('option[disabled][selected]');
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                }
+                console.log('Reset function: Reset dropdown', elementName, 'from', oldValue, 'to default');
+            } else if (element.type === 'checkbox' || element.type === 'radio') {
+                // Reset checkboxes and radio buttons to unchecked
+                element.checked = false;
+                console.log('Reset function: Reset', element.type, elementName, 'from', oldValue, 'to false');
+            } else if (element.type === 'text' || element.type === 'email' || element.type === 'tel' || 
+                      element.type === 'number' || element.type === 'date' || element.tagName === 'TEXTAREA') {
+                // Reset text inputs to empty
+                element.value = '';
+                console.log('Reset function: Reset', element.type || 'textarea', elementName, 'from', oldValue, 'to empty');
+            }
+        });
+    });
+}
+
+/*------------------------------------------------------------------
  *  navigateSection(sectionNumber)
  *  – shows exactly one section (or Thank‑you) and records history
  *-----------------------------------------------------------------*/
@@ -3620,6 +3759,10 @@ function navigateSection(sectionNumber){
     (target || sections[maxSection - 1]).classList.add('active');
 
     currentSectionNumber = sectionNumber;
+    
+    // Reset hidden questions to default values after Firebase autosave
+    resetHiddenQuestionsToDefaults(sectionNumber);
+    
     updateProgressBar();
 }
 
@@ -4424,6 +4567,10 @@ if (typeof handleNext === 'function') {
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
+                        // Reset hidden questions to defaults after autofill and visibility updates
+                        if (typeof currentSectionNumber === 'number') {
+                            resetHiddenQuestionsToDefaults(currentSectionNumber);
+                        }
                     }, 100);
                 }
             } catch (e) {
@@ -4895,6 +5042,11 @@ if (typeof handleNext === 'function') {
     <!-- Search Bar -->
     <div style="padding: 20px; border-bottom: 1px solid #eee;">
       <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+      <div style="text-align: center; margin-top: 10px;">
+        <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
+          📋 Export Names/IDs
+        </button>
+      </div>
     </div>
     
     <!-- Content -->
@@ -4940,6 +5092,58 @@ function hideDebugMenu() {
   document.getElementById('debugMenu').style.display = 'none';
 }
 
+// Add virtual checkbox entries for dropdown questions
+function addVirtualDropdownCheckboxes(inputData) {
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+  
+  dropdowns.forEach(dropdown => {
+    // Skip if this dropdown doesn't have an ID or if it's a numbered dropdown
+    if (!dropdown.id || dropdown.id.startsWith('answer') && dropdown.querySelector('option[value="1"]')) {
+      return; // Skip numbered dropdowns
+    }
+    
+    // Get the base name for checkbox generation (similar to dropdownMirror function)
+    const baseName = dropdown.id;
+    
+    // Get all options from the dropdown
+    const options = dropdown.querySelectorAll('option[value]:not([value=""])');
+    
+    options.forEach(option => {
+      const optionValue = option.value.trim();
+      if (!optionValue) return;
+      
+      // Generate checkbox ID using the same pattern as dropdownMirror
+      const idSuffix = optionValue.replace(/\W+/g, "_").toLowerCase();
+      const checkboxId = baseName + "_" + idSuffix;
+      const checkboxName = baseName + "_" + idSuffix;
+      
+      // Check if this virtual checkbox already exists in inputData
+      const exists = inputData.some(item => item.id === checkboxId);
+      
+      if (!exists) {
+        // Check if this checkbox actually exists in the DOM (user selected this option)
+        const actualCheckbox = document.getElementById(checkboxId);
+        const isChecked = actualCheckbox ? actualCheckbox.checked : false;
+        
+        // Add virtual checkbox entry
+        inputData.push({
+          id: checkboxId,
+          name: checkboxName,
+          value: isChecked,
+          type: 'input',
+          inputType: 'checkbox',
+          placeholder: '',
+          required: false,
+          isVirtual: true, // Mark as virtual for display purposes
+          dropdownSource: dropdown.id,
+          optionValue: optionValue
+        });
+      }
+    });
+  });
+}
+
 function populateDebugContent() {
   const content = document.getElementById('debugContent');
   const searchTerm = document.getElementById('debugSearch').value.toLowerCase();
@@ -4949,14 +5153,15 @@ function populateDebugContent() {
   const inputData = [];
   
   inputs.forEach(input => {
-    if (input.id && input.name) {
+    // Include all inputs that have either an ID or a name (or both)
+    if (input.id || input.name) {
       const value = input.type === 'checkbox' ? input.checked : input.value;
       const type = input.tagName.toLowerCase();
       const inputType = input.type || 'text';
       
       inputData.push({
-        id: input.id,
-        name: input.name,
+        id: input.id || '',
+        name: input.name || '',
         value: value,
         type: type,
         inputType: inputType,
@@ -4966,13 +5171,49 @@ function populateDebugContent() {
     }
   });
   
-  // Filter by search term
-  const filteredData = inputData.filter(item => 
-    item.id.toLowerCase().includes(searchTerm) ||
-    item.name.toLowerCase().includes(searchTerm) ||
-    String(item.value).toLowerCase().includes(searchTerm) ||
-    item.placeholder.toLowerCase().includes(searchTerm)
-  );
+  // Add virtual checkbox entries for dropdown questions
+  addVirtualDropdownCheckboxes(inputData);
+  
+  // Filter by search term with bidirectional space/underscore normalization
+  const normalizedSearchTermUnderscore = searchTerm.replace(/[_\s]/g, '_');
+  const normalizedSearchTermSpace = searchTerm.replace(/[_\s]/g, ' ');
+  
+  const filteredData = inputData.filter(item => {
+    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_\s]/g, '_');
+    
+    const normalizedIdSpace = item.id.toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedNameSpace = item.name.toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_\s]/g, ' ');
+    
+    // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
+    return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedNameUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedValueUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedPlaceholderUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedIdSpace.includes(normalizedSearchTermSpace) ||
+           normalizedNameSpace.includes(normalizedSearchTermSpace) ||
+           normalizedValueSpace.includes(normalizedSearchTermSpace) ||
+           normalizedPlaceholderSpace.includes(normalizedSearchTermSpace) ||
+           // Cross-matches: underscore search vs space data
+           normalizedIdSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedNameSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedValueSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedPlaceholderSpace.includes(normalizedSearchTermUnderscore) ||
+           // Cross-matches: space search vs underscore data
+           normalizedIdUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedNameUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedValueUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedPlaceholderUnderscore.includes(normalizedSearchTermSpace) ||
+           // Original exact matches for backward compatibility
+           item.id.toLowerCase().includes(searchTerm) ||
+           item.name.toLowerCase().includes(searchTerm) ||
+           String(item.value).toLowerCase().includes(searchTerm) ||
+           item.placeholder.toLowerCase().includes(searchTerm);
+  });
   
   // Group by type
   const grouped = {
@@ -5032,20 +5273,27 @@ function populateDebugContent() {
                            '<span style="color: #2c3e50;">' + String(item.value).substring(0, 100) + (String(item.value).length > 100 ? '...' : '') + '</span>';
         
         const requiredBadge = item.required ? '<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">REQUIRED</span>' : '';
+        const virtualBadge = item.isVirtual ? '<span style="background: #4f8cff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">VIRTUAL</span>' : '';
         
-        html += '<div class="debug-entry" data-id="' + item.id + '" style="background: #f8faff; border: 1px solid #e0e7ef; border-radius: 8px; padding: 15px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; position: relative;">' +
-          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">' +
-            '<div>' +
-              '<strong style="color: #2c3e50; font-size: 1.1em;">' + item.id + '</strong>' +
-              requiredBadge +
+        // Determine the primary identifier (ID if available, otherwise name)
+        const primaryId = item.id || item.name || 'unnamed';
+        const displayId = item.id || '<em style="color: #999;">(no ID)</em>';
+        const displayName = item.name || '<em style="color: #999;">(no name)</em>';
+        
+        html += '<div class="debug-entry" data-id="' + primaryId + '" style="background: #f8faff; border: 1px solid #e0e7ef; border-radius: 8px; padding: 15px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; position: relative;">' +
+          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">' +
+            '<div style="flex: 1; min-width: 0;">' +
+              '<strong style="color: #2c3e50; font-size: 1.1em; word-break: break-all; line-height: 1.3; display: block;">' + displayId + '</strong>' +
+              requiredBadge + virtualBadge +
             '</div>' +
-            '<span style="background: #e0e7ef; color: #2c3e50; padding: 4px 8px; border-radius: 4px; font-size: 0.9em;">' + item.inputType + '</span>' +
+            '<span style="background: #e0e7ef; color: #2c3e50; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; flex-shrink: 0; white-space: nowrap;">' + item.inputType + '</span>' +
           '</div>' +
           '<div style="margin-bottom: 5px;">' +
             '<span style="color: #666; font-size: 0.9em;">Name: </span>' +
-            '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">' + item.name + '</code>' +
+            '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; word-break: break-all; display: inline-block; max-width: 100%;">' + displayName + '</code>' +
           '</div>' +
           (item.placeholder ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">Placeholder: </span><span style="color: #999;">' + item.placeholder + '</span></div>' : '') +
+          (item.isVirtual && item.dropdownSource ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">From Dropdown: </span><span style="color: #4f8cff; font-weight: bold;">' + item.dropdownSource + '</span> → <span style="color: #2c3e50;">' + item.optionValue + '</span></div>' : '') +
           '<div>' +
             '<span style="color: #666; font-size: 0.9em;">Value: </span>' +
             valueDisplay +
@@ -5163,8 +5411,86 @@ function fallbackCopyToClipboard(text) {
   document.body.removeChild(textArea);
 }
 
+// Export Names/IDs function
+function exportNamesAndIds() {
+  const formData = {
+    exportDate: new Date().toISOString(),
+    formTitle: document.title || 'Form Data',
+    inputs: []
+  };
+  
+  // Get all form inputs
+  const inputs = document.querySelectorAll('input, select, textarea');
+  
+  inputs.forEach((input, index) => {
+    const inputData = {
+      index: index + 1,
+      type: input.type || input.tagName.toLowerCase(),
+      name: input.name || '',
+      id: input.id || '',
+      placeholder: input.placeholder || '',
+      value: input.value || '',
+      required: input.required || false,
+      className: input.className || '',
+      label: ''
+    };
+    
+    // Try to find associated label
+    if (input.id) {
+      const label = document.querySelector('label[for="' + input.id + '"]');
+      if (label) {
+        inputData.label = label.textContent.trim();
+      }
+    }
+    
+    // If no label found by 'for' attribute, look for parent label
+    if (!inputData.label) {
+      const parentLabel = input.closest('label');
+      if (parentLabel) {
+        inputData.label = parentLabel.textContent.trim();
+      }
+    }
+    
+    // If still no label, look for previous sibling text
+    if (!inputData.label) {
+      const prevSibling = input.previousElementSibling;
+      if (prevSibling && prevSibling.textContent) {
+        inputData.label = prevSibling.textContent.trim();
+      }
+    }
+    
+    formData.inputs.push(inputData);
+  });
+  
+  // Create and download JSON file
+  const jsonString = JSON.stringify(formData, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'form-names-ids-' + new Date().toISOString().split('T')[0] + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Show success message
+  const button = document.getElementById('exportNamesIdsBtn');
+  const originalText = button.textContent;
+  button.textContent = '✅ Exported!';
+  button.style.background = 'linear-gradient(90deg, #38d39f 0%, #4f8cff 100%)';
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
+  }, 2000);
+}
+
 // Search functionality
 document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
+
+// Export Names/IDs functionality
+document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
 
 // Update content when form values change
 document.addEventListener('input', function() {

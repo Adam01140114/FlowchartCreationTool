@@ -1,0 +1,160 @@
+{
+  "fields": [
+    {
+      "id": "user_phone",
+      "newName": "user_phone"
+    },
+    {
+      "id": "user_fullname",
+      "newName": "user_fullname"
+    },
+    {
+      "id": "user_state",
+      "newName": "user_state"
+    },
+    {
+      "id": "user_zip",
+      "newName": "user_zip"
+    },
+    {
+      "id": "user_street",
+      "newName": "user_street"
+    },
+    {
+      "id": "user_city",
+      "newName": "user_city"
+    },
+    {
+      "id": "sc100_how_many_people_are_suing_with_you_1_name",
+      "newName": "Name"
+    },
+    {
+      "id": "sc100_how_many_people_are_suing_with_you_1_phone_number",
+      "newName": "Phone Number"
+    },
+    {
+      "id": "sc100_how_many_people_are_suing_with_you_1_mailing_address",
+      "newName": "Mailing Address"
+    },
+    {
+      "id": "sc100_are_you_suing_with_one_more_person_or_multiple_others_multiple_others",
+      "newName": "sc100_are_you_suing_more_than_one_person"
+    },
+    {
+      "id": "sc103_are_you_doing_business_under_a_fictious_business_name_1_yes",
+      "newName": "are_you_doing_business_under_a_fictious_business_name"
+    },
+    {
+      "id": "sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender",
+      "newName": "sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender"
+    },
+    {
+      "id": "sc100_who_are_you_suing_phone_number",
+      "newName": "Phone Number"
+    },
+    {
+      "id": "sc100_who_are_you_suing_name",
+      "newName": "Name"
+    },
+    {
+      "id": "sc100_how_many_people_are_you_suing_1_name",
+      "newName": "Name"
+    },
+    {
+      "id": "sc100_how_many_people_are_you_suing_1_phone_number",
+      "newName": "Phone Number"
+    },
+    {
+      "id": "sc100_who_are_you_suing_mailing_address",
+      "newName": "Mailing Address"
+    },
+    {
+      "id": "sc100_how_many_people_are_you_suing_1_mailing_address",
+      "newName": "Mailing Address"
+    },
+    {
+      "id": "sc100_list_the_person_or_agent_authorized_for_service_name",
+      "newName": "Name"
+    },
+    {
+      "id": "sc100_list_the_person_or_agent_authorized_for_service_job",
+      "newName": "Job"
+    },
+    {
+      "id": "sc100_list_the_person_or_agent_authorized_for_service_address",
+      "newName": "Address"
+    },
+    {
+      "id": "sc100_are_you_suing_more_than_one_person_yes",
+      "newName": "sc100_are_you_suing_more_than_one_person"
+    },
+    {
+      "id": "sc100_what_is_their_name",
+      "newName": "sc100_what_is_their_name"
+    },
+    {
+      "id": "sc100_are_you_suing_anybody_on_active_military_duty_yes",
+      "newName": "sc100_are_you_suing_anybody_on_active_military_duty"
+    },
+    {
+      "id": "sc100_how_much_are_you_suing_for",
+      "newName": "sc100_how_much_are_you_suing_for"
+    },
+    {
+      "id": "sc100_explain_why_they_owe_you_that_money",
+      "newName": "sc100_explain_why_they_owe_you_that_money"
+    },
+    {
+      "id": "sc100_when_did_this_incident_happen",
+      "newName": "sc100_when_did_the_incident_occur"
+    },
+    {
+      "id": "sc100_when_did_this_happen_2",
+      "newName": "sc100_when_did_this_happen_2"
+    },
+    {
+      "id": "sc100_when_did_this_happen_1",
+      "newName": "sc100_when_did_this_happen_1"
+    },
+    {
+      "id": "sc100_how_did_you_calculate_the_money_owed_to_you_1",
+      "newName": "sc100_how_did_you_calculate_the_money_owed_to_you"
+    },
+    {
+      "id": "sc100_have_you_sent_a_demand_letter_to_d_yes",
+      "newName": "sc100_have_you_sent_a_demand_letter_to_d"
+    },
+    {
+      "id": "sc100_have_you_sent_a_demand_letter_to_d_no",
+      "newName": "sc100_have_you_sent_a_demand_letter_to_d"
+    },
+    {
+      "id": "sc100_explain_why_not",
+      "newName": "sc100_explain_why_not"
+    },
+    {
+      "id": "sc103_please_explain_why_you_are_suing_at_this_location_where_the_plaintiffs_property_was_damaged",
+      "newName": "please_explain_why_you_are_suing_at_this_location_where_the_plaintiff's_property_was_damaged."
+    },
+    {
+      "id": "sc103_please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives",
+      "newName": "please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives"
+    },
+    {
+      "id": "sc100_are_you_suing_a_public_entity_yes",
+      "newName": "sc100_are_you_suing_an_individual_a_business_or_a_public_entity"
+    },
+    {
+      "id": "sc100_are_you_suing_a_public_entity_no",
+      "newName": "sc100_are_you_suing_an_individual_a_business_or_a_public_entity"
+    },
+    {
+      "id": "sc100_when_was_the_claim_filed",
+      "newName": "sc100_when_was_the_claim_filed"
+    },
+    {
+      "id": "sc100_have_you_filed_a_written_claim_against_the_entity_yes",
+      "newName": "sc100_have_you_filed_a_written_claim_against_the_entity"
+    }
+  ]
+}

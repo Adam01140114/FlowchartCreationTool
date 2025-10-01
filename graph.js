@@ -204,7 +204,10 @@ function setupCustomDoubleClickBehavior(graph) {
   let lastClickedCell = null;
   const DOUBLE_CLICK_DELAY = 250; // 250ms = quarter of a second
   
-  // Add click listener to detect double-clicks
+  // Track the currently selected cell for click-out detection
+  let currentlySelectedCell = null;
+  
+  // Add click listener to detect double-clicks and click-out
   graph.addListener(mxEvent.CLICK, function(sender, evt) {
     const cell = evt.getProperty('cell');
     const domEvent = evt.getProperty('event'); // Get the original DOM event
@@ -214,6 +217,25 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     
+    // Handle click-out: if we had a selected cell and now clicking on empty space or different cell
+    if (currentlySelectedCell && currentlySelectedCell !== cell) {
+      // Reset PDF and ID for the previously selected cell
+      if (typeof window.resetPdfInheritance === 'function') {
+        window.resetPdfInheritance(currentlySelectedCell);
+      }
+      
+      // Reset node ID by clearing any custom ID properties
+      if (currentlySelectedCell._nameId) {
+        currentlySelectedCell._nameId = '';
+      }
+      if (currentlySelectedCell._customId) {
+        currentlySelectedCell._customId = '';
+      }
+    }
+    
+    // Update currently selected cell
+    currentlySelectedCell = cell;
+    
     if (cell && cell.vertex) {
       const currentTime = Date.now();
       
@@ -221,6 +243,19 @@ function setupCustomDoubleClickBehavior(graph) {
       if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
         //console.log("🎯 DOUBLE CLICK DETECTED manually!");
         //alert("double click detected");
+        
+        // Reset PDF and ID for the node on double-click
+        if (typeof window.resetPdfInheritance === 'function') {
+          window.resetPdfInheritance(cell);
+        }
+        
+        // Reset node ID by clearing any custom ID properties
+        if (cell._nameId) {
+          cell._nameId = '';
+        }
+        if (cell._customId) {
+          cell._customId = '';
+        }
         
         // Show properties popup for question nodes
         if (typeof isQuestion === 'function' && isQuestion(cell)) {

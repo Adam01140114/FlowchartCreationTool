@@ -1288,34 +1288,58 @@ window.copyMultipleDropdownId = function(cellId, index) {
   const pdfName = findPdfNameForQuestion(cell);
   const sanitizedPdfName = pdfName ? sanitizePdfName(pdfName) : '';
   
-  // Prompt user for number
-  const number = prompt('Enter a number for this ID:');
-  if (number === null || number.trim() === '') {
-    return; // User cancelled or entered empty
-  }
-  
-  // Create the ID string
+  // Create the ID string with default number "1" first
   const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-  const sanitizedNumber = number.trim();
   
-  // Build the final ID with PDF name if available
-  let textToCopy;
+  // Build the default ID with PDF name if available
+  let defaultTextToCopy;
   if (sanitizedPdfName) {
-    textToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_1_${sanitizedEntryText}`;
   } else {
-    textToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedQuestionText}_1_${sanitizedEntryText}`;
   }
   
-  // Copy to clipboard
+  // Copy the default ID to clipboard immediately
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(textToCopy).catch(() => {
+    navigator.clipboard.writeText(defaultTextToCopy).catch(() => {
       // Fallback for older browsers
-      fallbackCopyToClipboard(textToCopy);
+      fallbackCopyToClipboard(defaultTextToCopy);
     });
   } else {
     // Fallback for older browsers
-    fallbackCopyToClipboard(textToCopy);
+    fallbackCopyToClipboard(defaultTextToCopy);
+  }
+  
+  // Prompt user for number with default value of "1"
+  const number = prompt('Enter a number for this ID:', '1');
+  if (number === null) {
+    return; // User cancelled, but ID was already copied with default value
+  }
+  const finalNumber = number.trim() || '1'; // Use "1" as default if empty
+  
+  // If user entered a different number, copy the updated ID
+  if (finalNumber !== '1') {
+    const sanitizedNumber = finalNumber;
+    
+    // Build the updated ID with PDF name if available
+    let updatedTextToCopy;
+    if (sanitizedPdfName) {
+      updatedTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    } else {
+      updatedTextToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    }
+    
+    // Copy the updated ID to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(updatedTextToCopy).catch(() => {
+        // Fallback for older browsers
+        fallbackCopyToClipboard(updatedTextToCopy);
+      });
+    } else {
+      // Fallback for older browsers
+      fallbackCopyToClipboard(updatedTextToCopy);
+    }
   }
 };
 

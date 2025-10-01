@@ -412,7 +412,7 @@ window.getNodeId = function(cell) {
         if (pdfName) return pdfName;
       }
       
-      // PDF inheritance only flows downstream (from incoming edges), not upstream (outgoing edges)
+      // PDF inheritance flows both ways: from incoming edges (downstream) and to outgoing edges (upstream)
       
       // Check incoming edges for PDF properties (nodes that point to this node)
       const incomingEdges = graph.getIncomingEdges(cell) || [];
