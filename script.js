@@ -51,6 +51,14 @@ closeFlowchartListBtn.addEventListener("click", function() {
   document.getElementById("flowchartListOverlay").style.display = "none";
 });
 
+// Add click-outside-to-close for library overlay
+document.getElementById("flowchartListOverlay").addEventListener("click", function(event) {
+  if (event.target === this) {
+    // Clicked on the overlay background, not the panel
+    this.style.display = "none";
+  }
+});
+
   // Authentication functions have been moved to auth.js
 
 /**************************************************
@@ -516,8 +524,30 @@ graph.isCellEditable = function (cell) {
   // Zoom with mouse wheel
   mxEvent.addMouseWheelListener(function(evt, up) {
     if (!mxEvent.isConsumed(evt)) {
-      if (up) graph.zoomIn();
-      else graph.zoomOut();
+      // Get zoom sensitivity from settings (default to 0.01 if not set)
+      const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
+      console.log('🔧 [ZOOM DEBUG] Script.js wheel zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
+      
+      // Apply custom zoom based on sensitivity
+      const currentScale = graph.view.scale;
+      const baseZoomFactor = 1.02; // Much smaller base zoom factor
+      const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
+      const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
+      
+      console.log('🔧 [ZOOM DEBUG] Script.js wheel zoom - currentScale:', currentScale, 'baseZoomFactor:', baseZoomFactor, 'sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
+      
+      let newScale;
+      if (up) {
+        newScale = currentScale * zoomFactor;
+      } else {
+        newScale = currentScale / zoomFactor;
+      }
+      
+      // Limit zoom range
+      if (newScale >= 0.1 && newScale <= 3.0) {
+        graph.view.setScale(newScale);
+      }
+      
       mxEvent.consume(evt);
     }
   }, container);
@@ -752,11 +782,7 @@ document.addEventListener('keydown', function(event) {
     
     if (isUserTyping()) return; // Don't trigger if user is typing
     
-    // Confirm with user
-    const confirmed = confirm("This will reset ALL PDF inheritance and node IDs in the flowchart. This action cannot be undone. Continue?");
-    if (!confirmed) {
-      return;
-    }
+    // Proceed without confirmation dialog
     
     console.log('🔄 [CTRL+SHIFT] Running reset all PDF and node IDs...');
     
@@ -3029,7 +3055,7 @@ let animationFrameId = null;
 // Speed and smoothness settings
 const MOVEMENT_SPEED = 2; // pixels per frame (much slower for single tap)
 const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
-  const ZOOM_FACTOR = 1.005; // zoom factor per frame (reduced sensitivity)
+  const BASE_ZOOM_FACTOR = 1.005; // base zoom factor per frame
 
 // Handle key down events - start movement
 document.addEventListener('keydown', function(evt) {
@@ -3227,12 +3253,20 @@ function updateCanvasPosition() {
     // Graph coordinates under mouse before zoom
     const graphX = (mx / oldScale) - oldTx;
     const graphY = (my / oldScale) - oldTy;
+    // Get zoom sensitivity from settings (default to 0.01 if not set)
+    const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
+    console.log('🔧 [ZOOM DEBUG] Keyboard zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
+    const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
+    const zoomFactor = 1 + (BASE_ZOOM_FACTOR - 1) * sensitivityFactor;
+    
+    console.log('🔧 [ZOOM DEBUG] Keyboard zoom - sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
+    
     // New scale
     let newScale;
     if (keysPressed.zoom > 0) {
-      newScale = oldScale * ZOOM_FACTOR;
+      newScale = oldScale * zoomFactor;
     } else {
-      newScale = oldScale / ZOOM_FACTOR;
+      newScale = oldScale / zoomFactor;
     }
     // New translation so that (graphX, graphY) stays under mouse
     const newTx = mx / newScale - graphX;

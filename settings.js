@@ -11,7 +11,8 @@ let userSettings = {
   gridSize: 20,
   showGrid: true,
   theme: 'light',
-  language: 'en'
+  language: 'en',
+  zoomSensitivity: 0.01 // Default zoom sensitivity (0.001 = very sensitive, 0.1 = less sensitive)
 };
 
 // Color preferences
@@ -33,11 +34,23 @@ let sectionPrefs = {};
  */
 window.loadSettingsFromLocalStorage = function() {
   try {
+    console.log('🔧 [ZOOM SENSITIVITY] loadSettingsFromLocalStorage called');
+    
     // Load user settings
     const savedSettings = localStorage.getItem('flowchart_user_settings');
+    console.log('🔧 [ZOOM SENSITIVITY] Saved settings from localStorage:', savedSettings);
+    
     if (savedSettings) {
-      userSettings = { ...userSettings, ...JSON.parse(savedSettings) };
+      const parsedSettings = JSON.parse(savedSettings);
+      console.log('🔧 [ZOOM SENSITIVITY] Parsed settings:', parsedSettings);
+      userSettings = { ...userSettings, ...parsedSettings };
+      console.log('🔧 [ZOOM SENSITIVITY] Final userSettings after merge:', userSettings);
+    } else {
+      console.log('🔧 [ZOOM SENSITIVITY] No saved settings found, using defaults');
     }
+    
+    // Also try to load from Firebase
+    loadZoomSensitivityFromFirebase();
     
     // Load color preferences
     const savedColors = localStorage.getItem('flowchart_color_preferences');
@@ -86,6 +99,9 @@ window.loadSettingsFromLocalStorage = function() {
  */
 window.saveSettings = function() {
   try {
+    console.log('🔧 [ZOOM SENSITIVITY] saveSettings called, userSettings:', userSettings);
+    console.log('🔧 [ZOOM SENSITIVITY] zoomSensitivity being saved:', userSettings.zoomSensitivity);
+    
     // Save user settings
     localStorage.setItem('flowchart_user_settings', JSON.stringify(userSettings));
     
@@ -95,7 +111,7 @@ window.saveSettings = function() {
     // Save section preferences
     localStorage.setItem('flowchart_section_preferences', JSON.stringify(sectionPrefs));
     
-    console.log('Settings saved successfully');
+    console.log('🔧 [ZOOM SENSITIVITY] Settings saved successfully to localStorage');
     
     // Hide settings menu
     if (window.hideSettingsMenu) {
@@ -317,6 +333,12 @@ function updateSettingsUI() {
   if (languageSelect) {
     languageSelect.value = userSettings.language;
   }
+  
+  // Update zoom sensitivity slider
+  const zoomSensitivityInput = document.getElementById('zoomSensitivityInput');
+  if (zoomSensitivityInput) {
+    zoomSensitivityInput.value = userSettings.zoomSensitivity;
+  }
 }
 
 /**
@@ -333,7 +355,8 @@ window.resetSettingsToDefault = function() {
       gridSize: 20,
       showGrid: true,
       theme: 'light',
-      language: 'en'
+      language: 'en',
+      zoomSensitivity: 0.01
     };
     
     colorPreferences = {
@@ -413,6 +436,136 @@ window.loadUserColorPrefs = function() {
     console.error('Error loading color preferences:', error);
   }
 };
+
+/**
+ * Update zoom sensitivity setting
+ */
+window.updateZoomSensitivity = function(value) {
+  console.log('🔧 [ZOOM SENSITIVITY] updateZoomSensitivity called with value:', value);
+  
+  userSettings.zoomSensitivity = parseFloat(value);
+  console.log('🔧 [ZOOM SENSITIVITY] Updated userSettings.zoomSensitivity to:', userSettings.zoomSensitivity);
+  
+  // Update the display value
+  const valueDisplay = document.getElementById('zoomSensitivityValue');
+  if (valueDisplay) {
+    valueDisplay.textContent = value;
+    console.log('🔧 [ZOOM SENSITIVITY] Updated display value to:', value);
+  } else {
+    console.error('🔧 [ZOOM SENSITIVITY] Could not find zoomSensitivityValue element');
+  }
+  
+  // Save the setting immediately
+  console.log('🔧 [ZOOM SENSITIVITY] Calling saveSettings...');
+  window.saveSettings();
+  
+  // Save to Firebase if available
+  saveZoomSensitivityToFirebase(value);
+  
+  // Apply the new zoom sensitivity immediately
+  console.log('🔧 [ZOOM SENSITIVITY] Calling applyZoomSensitivity...');
+  applyZoomSensitivity();
+};
+
+// Also create a global function for direct access
+function updateZoomSensitivity(value) {
+  return window.updateZoomSensitivity(value);
+}
+
+/**
+ * Save zoom sensitivity to Firebase
+ */
+async function saveZoomSensitivityToFirebase(value) {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+      const user = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      
+      console.log('🔧 [ZOOM SENSITIVITY] Saving to Firebase for user:', user.uid);
+      
+      await db.collection('userSettings').doc(user.uid).set({
+        zoomSensitivity: parseFloat(value),
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      
+      console.log('🔧 [ZOOM SENSITIVITY] Successfully saved to Firebase');
+    } else {
+      console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
+    }
+  } catch (error) {
+    console.error('🔧 [ZOOM SENSITIVITY] Error saving to Firebase:', error);
+  }
+}
+
+/**
+ * Load zoom sensitivity from Firebase
+ */
+async function loadZoomSensitivityFromFirebase() {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+      const user = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      
+      console.log('🔧 [ZOOM SENSITIVITY] Loading from Firebase for user:', user.uid);
+      
+      const doc = await db.collection('userSettings').doc(user.uid).get();
+      
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.zoomSensitivity !== undefined) {
+          console.log('🔧 [ZOOM SENSITIVITY] Loaded from Firebase:', data.zoomSensitivity);
+          
+          // Update local settings
+          userSettings.zoomSensitivity = data.zoomSensitivity;
+          
+          // Update UI
+          const slider = document.getElementById('zoomSensitivityInput');
+          const display = document.getElementById('zoomSensitivityValue');
+          
+          if (slider) {
+            slider.value = data.zoomSensitivity;
+            console.log('🔧 [ZOOM SENSITIVITY] Updated slider value to:', data.zoomSensitivity);
+          }
+          
+          if (display) {
+            display.textContent = data.zoomSensitivity;
+            console.log('🔧 [ZOOM SENSITIVITY] Updated display to:', data.zoomSensitivity);
+          }
+          
+          // Apply the setting
+          applyZoomSensitivity();
+        }
+      } else {
+        console.log('🔧 [ZOOM SENSITIVITY] No Firebase settings found, using defaults');
+      }
+    } else {
+      console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
+    }
+  } catch (error) {
+    console.error('🔧 [ZOOM SENSITIVITY] Error loading from Firebase:', error);
+  }
+}
+
+/**
+ * Apply zoom sensitivity to the graph
+ */
+function applyZoomSensitivity() {
+  console.log('🔧 [ZOOM SENSITIVITY] applyZoomSensitivity called');
+  console.log('🔧 [ZOOM SENSITIVITY] window.graph exists:', !!window.graph);
+  console.log('🔧 [ZOOM SENSITIVITY] userSettings.zoomSensitivity:', userSettings.zoomSensitivity);
+  
+  if (!window.graph) {
+    console.warn('🔧 [ZOOM SENSITIVITY] No graph available, cannot apply zoom sensitivity');
+    return;
+  }
+  
+  // The zoom sensitivity will be applied in the mouse wheel event handlers
+  // This function is called when the setting changes
+  console.log('🔧 [ZOOM SENSITIVITY] Zoom sensitivity updated to:', userSettings.zoomSensitivity);
+  console.log('🔧 [ZOOM SENSITIVITY] Setting applied successfully');
+}
+
+// The slider uses oninput attribute in HTML for simplicity
 
 // Export settings for use in other modules
 window.userSettings = userSettings;

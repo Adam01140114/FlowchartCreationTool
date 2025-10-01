@@ -826,6 +826,48 @@ body.ctrl-pressed::after {
   min-width: 120px;
 }
 
+.settings-menu .slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-menu .slider-container input[type="range"] {
+  width: 150px;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.settings-menu .slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.settings-menu .slider-container input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+  border: none;
+}
+
+.settings-menu .slider-container span {
+  font-weight: bold;
+  color: #333;
+  min-width: 30px;
+  text-align: center;
+}
+
 .reset-all-btn {
   background-color: #ff6b6b;
   color: white;

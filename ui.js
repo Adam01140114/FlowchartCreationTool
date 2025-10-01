@@ -144,6 +144,13 @@ window.showSettingsMenu = function() {
   
   // Load current settings
   loadSettingsFromLocalStorage();
+  
+  // The slider should work with the oninput attribute in HTML
+  
+  // Add click-outside-to-close functionality
+  setTimeout(() => {
+    document.addEventListener('click', handleSettingsClickOutside);
+  }, 100);
 };
 
 /**
@@ -155,7 +162,21 @@ window.hideSettingsMenu = function() {
   
   menu.style.display = 'none';
   settingsMenuVisible = false;
+  
+  // Remove click-outside-to-close functionality
+  document.removeEventListener('click', handleSettingsClickOutside);
 };
+
+/**
+ * Handle clicks outside the settings menu
+ */
+function handleSettingsClickOutside(event) {
+  const settingsMenu = document.getElementById('settingsMenu');
+  if (settingsMenu && !settingsMenu.contains(event.target) && settingsMenuVisible) {
+    window.hideSettingsMenu();
+  }
+}
+
 
 /**
  * Update context menu items based on cell type

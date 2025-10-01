@@ -4737,6 +4737,21 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
+                    // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                            console.log('🔧 [AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(el, el.id);
+                            }
+                        }
+                    });
+                    
+                    // Create hidden checkboxes for all autofilled dropdowns
+                    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                        createHiddenCheckboxesForAutofilledDropdowns();
+                    }
+                    
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
@@ -4969,6 +4984,21 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         });
+                        
+                        // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                                console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
+                                if (typeof dropdownMirror === 'function') {
+                                    dropdownMirror(el, el.id);
+                                }
+                            }
+                        });
+                        
+                        // Create hidden checkboxes for all autofilled dropdowns
+                        if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                            createHiddenCheckboxesForAutofilledDropdowns();
+                        }
                         
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
@@ -5481,6 +5511,65 @@ function addVirtualDropdownCheckboxes(inputData) {
   });
 }
 
+// Create a hidden checkbox in the DOM for virtual checkboxes that should be checked
+function createHiddenCheckbox(checkboxId, checkboxName, baseName) {
+  // Find the dropdown wrapper or create a container
+  let wrap = document.getElementById("dropdowntext_" + baseName);
+  if (!wrap) {
+    // If no wrapper exists, create one
+    wrap = document.createElement("div");
+    wrap.id = "dropdowntext_" + baseName;
+    wrap.style.display = "none";
+    
+    // Find the dropdown element and insert the wrapper after it
+    const dropdown = document.getElementById(baseName);
+    if (dropdown && dropdown.parentNode) {
+      dropdown.parentNode.insertBefore(wrap, dropdown.nextSibling);
+    } else {
+      // Fallback: append to body
+      document.body.appendChild(wrap);
+    }
+  }
+  
+  // Create the hidden checkbox
+  const checkboxDiv = document.createElement("div");
+  checkboxDiv.style.display = "none";
+  checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxName + "' checked>" +
+                   "<label for='" + checkboxId + "'> " + checkboxName + "</label>";
+  
+  wrap.appendChild(checkboxDiv);
+  console.log('🔧 [VIRTUAL CHECKBOX DEBUG] Created hidden checkbox:', checkboxId, 'for dropdown:', baseName);
+}
+
+// Create real hidden checkboxes for all autofilled dropdowns
+function createHiddenCheckboxesForAutofilledDropdowns() {
+  console.log('🔧 [AUTOFILL CHECKBOX DEBUG] Creating hidden checkboxes for autofilled dropdowns...');
+  
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+  
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.id || dropdown.id.startsWith('answer')) return; // Skip numbered dropdowns
+    
+    const baseName = dropdown.id;
+    const selectedValue = dropdown.value.trim();
+    
+    if (selectedValue) {
+      // Generate checkbox ID using the same pattern as dropdownMirror
+      const idSuffix = selectedValue.replace(/\W+/g, "_").toLowerCase();
+      const checkboxId = baseName + "_" + idSuffix;
+      const checkboxName = baseName + "_" + idSuffix;
+      
+      // Check if this checkbox already exists
+      const existingCheckbox = document.getElementById(checkboxId);
+      if (!existingCheckbox) {
+        console.log('🔧 [AUTOFILL CHECKBOX DEBUG] Creating hidden checkbox for autofilled dropdown:', baseName, 'value:', selectedValue);
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
+    }
+  });
+}
+
 // Add virtual entries for regular dropdowns (checkbox combinations)
 function addRegularDropdownVirtualEntries(inputData, dropdown) {
   const baseName = dropdown.id;
@@ -5501,7 +5590,13 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
     if (!exists) {
       // Check if this checkbox actually exists in the DOM (user selected this option)
       const actualCheckbox = document.getElementById(checkboxId);
-      const isChecked = actualCheckbox ? actualCheckbox.checked : false;
+      // Also check if the dropdown value matches this option (for autofilled dropdowns)
+      const isChecked = actualCheckbox ? actualCheckbox.checked : (dropdown.value === optionValue);
+      
+      // If the virtual checkbox should be checked, create the actual hidden checkbox in the DOM
+      if (isChecked && !actualCheckbox) {
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
       
       // Add virtual checkbox entry
       inputData.push({
@@ -5512,7 +5607,7 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
         inputType: 'checkbox',
         placeholder: '',
         required: false,
-        isVirtual: true,
+        isVirtual: !actualCheckbox, // Only virtual if it doesn't exist in DOM
         dropdownSource: dropdown.id,
         optionValue: optionValue
       });
@@ -5637,6 +5732,31 @@ function populateDebugContent() {
   
   // Add virtual checkbox entries for dropdown questions
   addVirtualDropdownCheckboxes(inputData);
+  
+  // After potentially creating real checkboxes from virtual ones, re-scan the DOM to include them
+  const updatedInputs = document.querySelectorAll('input, select, textarea');
+  updatedInputs.forEach(input => {
+    // Include all inputs that have either an ID or a name (or both)
+    if (input.id || input.name) {
+      // Check if this input is already in inputData
+      const exists = inputData.some(item => item.id === input.id && item.name === input.name);
+      if (!exists) {
+        const value = input.type === 'checkbox' ? input.checked : input.value;
+        const type = input.tagName.toLowerCase();
+        const inputType = input.type || 'text';
+        
+        inputData.push({
+          id: input.id || '',
+          name: input.name || '',
+          value: value,
+          type: type,
+          inputType: inputType,
+          placeholder: input.placeholder || '',
+          required: input.required
+        });
+      }
+    }
+  });
   
   // Filter by search term with bidirectional space/underscore normalization
   const normalizedSearchTermUnderscore = searchTerm.replace(/[_\s]/g, '_');
