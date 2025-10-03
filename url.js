@@ -271,6 +271,9 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._calcThreshold) cellData._calcThreshold = cell._calcThreshold;
     if (cell._calcFinalText) cellData._calcFinalText = cell._calcFinalText;
     if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
+    
+    // mult dropdown location indicator
+    if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 
     return cellData;
   });

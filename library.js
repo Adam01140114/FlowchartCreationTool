@@ -1120,6 +1120,9 @@ window.exportBothJson = function() {
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      
+      // mult dropdown location indicator
+      if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 
       return cellData;
     });

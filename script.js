@@ -1470,6 +1470,16 @@ function updatemultipleDropdownTypeCell(cell) {
     const val = tb.nameId || '';
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
+    
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
+    
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
         <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
@@ -1482,8 +1492,19 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
+  
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>
     </div>
@@ -1567,7 +1588,20 @@ window.addmultipleDropdownTypeHandler = function(cellId) {
     graph.getModel().beginUpdate();
     try {
       if (!cell._textboxes) cell._textboxes = [];
-      cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+      
+      // If there's a location indicator, add the new option after it
+      if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
+        // Location is at the end, just add normally
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+      } else {
+        // Add the new option
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+        
+        // If there's a location indicator before the end, shift it down
+        if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
+          cell._locationIndex++;
+        }
+      }
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1581,6 +1615,18 @@ window.deletemultipleDropdownTypeHandler = function(cellId, index) {
     graph.getModel().beginUpdate();
     try {
       cell._textboxes.splice(index, 1);
+      
+      // Adjust location index if needed
+      if (cell._locationIndex !== undefined) {
+        if (index < cell._locationIndex) {
+          // Deleted option was before location indicator, shift location index up
+          cell._locationIndex--;
+        } else if (index === cell._locationIndex) {
+          // Deleted option was at the location indicator position, remove location indicator
+          delete cell._locationIndex;
+        }
+        // If index > locationIndex, no adjustment needed
+      }
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1594,6 +1640,34 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
     graph.getModel().beginUpdate();
     try {
       cell._textboxes[index].isAmountOption = checked;
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.addMultipleDropdownLocationHandler = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      // Set the location index to the current number of textboxes (at the end)
+      cell._locationIndex = cell._textboxes ? cell._textboxes.length : 0;
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.removeMultipleDropdownLocationHandler = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      // Remove the location index
+      delete cell._locationIndex;
     } finally {
       graph.getModel().endUpdate();
     }
@@ -2562,10 +2636,22 @@ function updatemultipleDropdownTypeCell(cell) {
 
       <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
 
+  // Check if there's a location indicator position
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  
   cell._textboxes.forEach((tb, index) => {
     const val      = tb.nameId      || "";
     const ph       = tb.placeholder || "Enter value";
     const checked  = tb.isAmountOption ? "checked" : "";
+
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
 
     html += `
       <div class="textbox-entry" style="margin-bottom:4px;text-align:center;">
@@ -2578,10 +2664,20 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
 
   html += `
         <div style="text-align:center;margin-top:8px;">
           <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+          <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
           <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
         </div>
       </div>
@@ -3782,10 +3878,23 @@ function updatemultipleDropdownTypeCell(cell) {
       <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
     </div>
     <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
+  // Check if there's a location indicator position
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || '';
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
+    
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
+    
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
         <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
@@ -3798,8 +3907,19 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
+  
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>
     </div>
@@ -4091,6 +4211,7 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
+      if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       
       // textbox properties
       if (cell._amountName) cellData._amountName = cell._amountName;
