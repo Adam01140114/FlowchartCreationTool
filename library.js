@@ -2165,6 +2165,7 @@ window.loadFlowchartData = function(data) {
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;
         if (item._questionId) newCell._questionId = item._questionId;
+        if (item._locationIndex !== undefined) newCell._locationIndex = item._locationIndex;
         
         // Amount option properties
         if (item._amountName) newCell._amountName = item._amountName;

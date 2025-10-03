@@ -627,16 +627,20 @@ function addQuestion(sectionId, questionId = null) {
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
             <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
 
-            <label>Textbox Labels:</label>
-            <div id="textboxLabels${currentQuestionId}"></div>
-            <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
-            <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin-left: 10px; background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add Location</button>
+            <label>Fields (in creation order):</label>
+            <div id="unifiedFields${currentQuestionId}"></div>
             
             <br><br>
             
-            <label>Amount Labels:</label>
-            <div id="textboxAmounts${currentQuestionId}"></div>
-            <button type="button" onclick="addTextboxAmount(${currentQuestionId})">Add Amount</button>
+            <div style="text-align: center; margin: 15px 0;">
+                <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
+                <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
+                <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
+            </div>
+            
+            <!-- Hidden containers for backward compatibility -->
+            <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
+            <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
         </div><br>
 
 
@@ -683,8 +687,8 @@ function addQuestion(sectionId, questionId = null) {
             <label>Textboxes: </label>
             <div id="multipleTextboxesOptions${currentQuestionId}"></div>
             <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
-            <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin-left: 10px; background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add Location</button>
             <button type="button" onclick="addMultipleAmountOption(${currentQuestionId})">Add Amount</button>
+            <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin-left: 10px; background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add Location</button>
         </div><br>
         
         <!-- Linking Logic for Dropdown -->
@@ -1795,17 +1799,49 @@ function removeCheckboxOption(questionId, optionNumber) {
 
 
 function addTextboxAmount(questionId) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldCount = unifiedDiv.children.length + 1;
+
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'amount');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.innerHTML = `
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #333;">Amount: <span id="labelText${questionId}_${fieldCount}">Amount ${fieldCount}</span></div>
+            <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${questionId}_${fieldCount}">amount_${fieldCount}</span></div>
+            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${questionId}_${fieldCount}">Amount</span> | Order: ${fieldCount}</div>
+            <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+        </div>
+    `;
+    unifiedDiv.appendChild(fieldDiv);
+    
+    // Add double-click event listener as backup
+    const displayDiv = fieldDiv.querySelector('div');
+    if (displayDiv) {
+        // Remove any existing event listeners to prevent duplicates
+        if (displayDiv._dblclickHandler) {
+            displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+        }
+        
+        // Add event listener for double-click editing
+        displayDiv._dblclickHandler = function() {
+            editUnifiedField(questionId, fieldCount);
+        };
+        displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+    
+    // Also add to hidden container for backward compatibility
     const textboxAmountsDiv = document.getElementById(`textboxAmounts${questionId}`);
     const amountCount = textboxAmountsDiv.children.length + 1;
-
-    const amountDiv = document.createElement('div');
-    amountDiv.className = `amount${amountCount}`;
-    amountDiv.innerHTML = `
+    const hiddenAmountDiv = document.createElement('div');
+    hiddenAmountDiv.className = `amount${amountCount}`;
+    hiddenAmountDiv.innerHTML = `
         <input type="text" id="amount${questionId}_${amountCount}" 
                placeholder="Amount ${amountCount} (placeholder text)">
         <button type="button" onclick="removeTextboxAmount(${questionId}, ${amountCount})">Remove</button>
     `;
-    textboxAmountsDiv.appendChild(amountDiv);
+    textboxAmountsDiv.appendChild(hiddenAmountDiv);
 }
 
 
@@ -1828,24 +1864,68 @@ function removeTextboxAmount(questionId, amountNumber) {
             btn.setAttribute('onclick', `removeTextboxAmount(${questionId}, ${newAmountNumber})`);
         });
     }
+    
+    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
 }
 
 
 
 function addTextboxLabel(questionId) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    console.log('🔧 [ADD LABEL DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
+    console.log('🔧 [ADD LABEL DEBUG] Found unified container:', !!unifiedDiv);
+    
+    if (!unifiedDiv) {
+        console.error('🔧 [ADD LABEL DEBUG] Unified container not found!');
+        return;
+    }
+    
+    const fieldCount = unifiedDiv.children.length + 1;
+    console.log('🔧 [ADD LABEL DEBUG] Current field count:', fieldCount);
+
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'label');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.innerHTML = `
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #333;">Label: <span id="labelText${questionId}_${fieldCount}">Label ${fieldCount}</span></div>
+            <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${questionId}_${fieldCount}">label_${fieldCount}</span></div>
+            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${questionId}_${fieldCount}">Label</span> | Order: ${fieldCount}</div>
+            <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+        </div>
+    `;
+    unifiedDiv.appendChild(fieldDiv);
+    console.log('🔧 [ADD LABEL DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
+    
+    // Add double-click event listener as backup
+    const displayDiv = fieldDiv.querySelector('div');
+    if (displayDiv) {
+        // Remove any existing event listeners to prevent duplicates
+        if (displayDiv._dblclickHandler) {
+            displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+        }
+        
+        // Add event listener for double-click editing
+        displayDiv._dblclickHandler = function() {
+            editUnifiedField(questionId, fieldCount);
+        };
+        displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+    
+    // Also add to hidden container for backward compatibility
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
     const labelCount = textboxLabelsDiv.children.length + 1;
-
-    const labelDiv = document.createElement('div');
-    labelDiv.className = `label${labelCount}`;
-    labelDiv.innerHTML = `
+    const hiddenLabelDiv = document.createElement('div');
+    hiddenLabelDiv.className = `label${labelCount}`;
+    hiddenLabelDiv.innerHTML = `
         <input type="text" id="label${questionId}_${labelCount}" placeholder="Label ${labelCount}">
         <br>
         <label style="font-size: 0.9em; color: #666;">Node ID: </label>
         <input type="text" id="labelNodeId${questionId}_${labelCount}" placeholder="Enter node ID for this label" style="width: 200px; margin-top: 5px;">
         <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>
     `;
-    textboxLabelsDiv.appendChild(labelDiv);
+    textboxLabelsDiv.appendChild(hiddenLabelDiv);
 }
 
 function removeTextboxLabel(questionId, labelNumber) {
@@ -1865,6 +1945,8 @@ function removeTextboxLabel(questionId, labelNumber) {
             btn.setAttribute('onclick', `removeTextboxLabel(${questionId}, ${newLabelNumber})`);
         });
     }
+    
+    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
 }
 
 function addMultipleTextboxOption(questionId) {
@@ -2268,25 +2350,30 @@ function addLocationFields(questionId, questionType) {
         // Add labels to numbered dropdown
         locationFields.forEach(field => {
             addTextboxLabel(questionId);
-            // Set the label value
-            const labelsDiv = document.getElementById(`textboxLabels${questionId}`);
-            const lastLabel = labelsDiv.lastElementChild;
-            if (lastLabel) {
-                const labelInput = lastLabel.querySelector('input[type="text"]:first-of-type');
-                const nodeIdInput = lastLabel.querySelector('input[type="text"]:last-of-type');
-                if (labelInput) labelInput.value = field.label;
-                if (nodeIdInput) nodeIdInput.value = field.nodeId;
+            // Set the label value in the unified container
+            const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+            const lastField = unifiedDiv.lastElementChild;
+            if (lastField) {
+                const fieldOrder = lastField.getAttribute('data-order');
+                const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                if (labelTextEl) labelTextEl.textContent = field.label;
+                if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
             }
         });
         
         // Add amount field for Zip
         addTextboxAmount(questionId);
-        const amountsDiv = document.getElementById(`textboxAmounts${questionId}`);
-        const lastAmount = amountsDiv.lastElementChild;
-        if (lastAmount) {
-            const amountInput = lastAmount.querySelector('input[type="text"]');
-            if (amountInput) amountInput.value = 'Zip';
+        const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+        const lastField = unifiedDiv.lastElementChild;
+        if (lastField) {
+            const fieldOrder = lastField.getAttribute('data-order');
+            const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+            if (labelTextEl) labelTextEl.textContent = 'Zip';
         }
+        
+        // Update hidden containers to keep them in sync
+        updateHiddenContainers(questionId);
         
     } else if (questionType === 'multipleTextboxes') {
         // Add textboxes to multiple textboxes
@@ -2314,4 +2401,291 @@ function addLocationFields(questionId, questionType) {
             if (amountNodeIdInput) amountNodeIdInput.value = 'zip';
         }
     }
+    
+    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
+}
+
+// ============================================
+// ===========  UNIFIED FIELD REMOVAL  =======
+// ============================================
+function removeUnifiedField(questionId, fieldOrder) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldToRemove = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    
+    if (fieldToRemove) {
+        const fieldType = fieldToRemove.getAttribute('data-type');
+        fieldToRemove.remove();
+        
+        // Update order numbers for remaining fields
+        const remainingFields = unifiedDiv.querySelectorAll('.unified-field');
+        remainingFields.forEach((field, index) => {
+            const newOrder = index + 1;
+            field.setAttribute('data-order', newOrder);
+            field.className = `unified-field field-${newOrder}`;
+            
+            // Update the order display
+            const orderDisplay = field.querySelector('div:last-of-type');
+            if (orderDisplay && orderDisplay.textContent.includes('Order:')) {
+                orderDisplay.textContent = orderDisplay.textContent.replace(/Order: \d+/, `Order: ${newOrder}`);
+            }
+            
+            // Update button onclick
+            const removeButton = field.querySelector('button');
+            if (removeButton) {
+                removeButton.setAttribute('onclick', `removeUnifiedField(${questionId}, ${newOrder})`);
+            }
+            
+            // Update double-click event
+            const displayDiv = field.querySelector('div');
+            if (displayDiv) {
+            // Remove any existing event listeners to prevent duplicates
+            if (displayDiv._dblclickHandler) {
+                displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+            }
+            
+            // Add event listener for double-click editing
+            displayDiv._dblclickHandler = function() {
+                editUnifiedField(questionId, newOrder);
+            };
+            displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+            }
+        });
+        
+        // Also remove from hidden containers for backward compatibility
+        if (fieldType === 'label') {
+            const hiddenLabelDiv = document.querySelector(`#textboxLabels${questionId} .label${fieldOrder}`);
+            if (hiddenLabelDiv) hiddenLabelDiv.remove();
+        } else if (fieldType === 'amount') {
+            const hiddenAmountDiv = document.querySelector(`#textboxAmounts${questionId} .amount${fieldOrder}`);
+            if (hiddenAmountDiv) hiddenAmountDiv.remove();
+        }
+    }
+}
+
+// ============================================
+// ===========  UNIFIED FIELD EDITING  =======
+// ============================================
+function editUnifiedField(questionId, fieldOrder) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldDiv = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    
+    if (!fieldDiv) {
+        return;
+    }
+    
+    const currentType = fieldDiv.getAttribute('data-type');
+    const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
+    const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
+    
+    if (!labelTextEl || !nodeIdTextEl) {
+        return;
+    }
+    
+    const labelText = labelTextEl.textContent;
+    const nodeIdText = nodeIdTextEl.textContent;
+    
+    // Create edit form
+    const editForm = document.createElement('div');
+    editForm.style.cssText = 'margin: 10px 0; padding: 20px; border: 2px solid #007bff; border-radius: 12px; background: #f0f8ff; box-shadow: 0 2px 8px rgba(0,123,255,0.1);';
+    editForm.innerHTML = `
+        <h4 style="margin-top: 0; color: #007bff;">Edit Field</h4>
+        <div style="margin-bottom: 10px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Field Name:</label>
+            <input type="text" id="editLabel${questionId}_${fieldOrder}" value="${labelText}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Node ID:</label>
+            <input type="text" id="editNodeId${questionId}_${fieldOrder}" value="${nodeIdText}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Type:</label>
+            <select id="editType${questionId}_${fieldOrder}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+                <option value="label" ${currentType === 'label' ? 'selected' : ''}>Label</option>
+                <option value="amount" ${currentType === 'amount' ? 'selected' : ''}>Amount</option>
+            </select>
+        </div>
+        <div style="text-align: center; margin-top: 15px;">
+            <button type="button" onclick="saveUnifiedField(${questionId}, ${fieldOrder})" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 10px; font-size: 14px; font-weight: 500; display: inline-block;">Save</button>
+            <button type="button" onclick="cancelEditUnifiedField(${questionId}, ${fieldOrder})" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 10px; font-size: 14px; font-weight: 500; display: inline-block;">Cancel</button>
+        </div>
+    `;
+    
+    // Replace the field with the edit form
+    fieldDiv.style.display = 'none';
+    fieldDiv.parentNode.insertBefore(editForm, fieldDiv.nextSibling);
+}
+
+function saveUnifiedField(questionId, fieldOrder) {
+    const newLabel = document.getElementById(`editLabel${questionId}_${fieldOrder}`).value.trim();
+    const newNodeId = document.getElementById(`editNodeId${questionId}_${fieldOrder}`).value.trim();
+    const newType = document.getElementById(`editType${questionId}_${fieldOrder}`).value;
+    
+    
+    if (!newLabel) {
+        alert('Field name cannot be empty');
+        return;
+    }
+    
+    // Update the field data
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldDiv = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    const editForm = fieldDiv.nextSibling;
+    
+    // Update field attributes
+    fieldDiv.setAttribute('data-type', newType);
+    
+    // Update display elements
+    const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
+    const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
+    const typeTextEl = document.getElementById('typeText' + questionId + '_' + fieldOrder);
+    
+    labelTextEl.textContent = newLabel;
+    nodeIdTextEl.textContent = newNodeId;
+    typeTextEl.textContent = newType;
+    
+    // Update the display text based on type
+    const displayDiv = fieldDiv.querySelector('div');
+    if (newType === 'label') {
+        displayDiv.querySelector('div:first-child').innerHTML = 'Label: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
+    } else {
+        displayDiv.querySelector('div:first-child').innerHTML = 'Amount: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
+    }
+    
+    // Remove any existing event listeners to prevent duplicates
+    if (displayDiv._dblclickHandler) {
+        displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+    
+    // Add event listener for double-click editing
+    displayDiv._dblclickHandler = function() {
+        editUnifiedField(questionId, fieldOrder);
+    };
+    displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    
+    // Remove edit form and show field
+    editForm.remove();
+    fieldDiv.style.display = 'block';
+    
+    // Update hidden containers for backward compatibility (but don't interfere with the unified structure)
+    setTimeout(() => {
+        updateHiddenContainers(questionId);
+    }, 100);
+}
+
+function cancelEditUnifiedField(questionId, fieldOrder) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldDiv = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    const editForm = fieldDiv.nextSibling;
+    
+    editForm.remove();
+    fieldDiv.style.display = 'block';
+}
+
+function updateHiddenContainers(questionId) {
+    // Clear hidden containers
+    const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
+    const textboxAmountsDiv = document.getElementById(`textboxAmounts${questionId}`);
+    textboxLabelsDiv.innerHTML = '';
+    textboxAmountsDiv.innerHTML = '';
+    
+    // Rebuild hidden containers from unified data
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fields = unifiedDiv.querySelectorAll('.unified-field');
+    
+    let labelCount = 1;
+    let amountCount = 1;
+    
+    fields.forEach(field => {
+        const fieldType = field.getAttribute('data-type');
+        const fieldOrder = field.getAttribute('data-order');
+        const labelText = document.getElementById('labelText' + questionId + '_' + fieldOrder).textContent;
+        const nodeIdText = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder).textContent;
+        
+        if (fieldType === 'label') {
+            const hiddenLabelDiv = document.createElement('div');
+            hiddenLabelDiv.className = `label${labelCount}`;
+            hiddenLabelDiv.innerHTML = `
+                <input type="text" id="label${questionId}_${labelCount}" value="${labelText}">
+                <br>
+                <label style="font-size: 0.9em; color: #666;">Node ID: </label>
+                <input type="text" id="labelNodeId${questionId}_${labelCount}" value="${nodeIdText}" style="width: 200px; margin-top: 5px;">
+                <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>
+            `;
+            textboxLabelsDiv.appendChild(hiddenLabelDiv);
+            labelCount++;
+        } else if (fieldType === 'amount') {
+            const hiddenAmountDiv = document.createElement('div');
+            hiddenAmountDiv.className = `amount${amountCount}`;
+            hiddenAmountDiv.innerHTML = `
+                <input type="text" id="amount${questionId}_${amountCount}" value="${labelText}">
+                <button type="button" onclick="removeTextboxAmount(${questionId}, ${amountCount})">Remove</button>
+            `;
+            textboxAmountsDiv.appendChild(hiddenAmountDiv);
+            amountCount++;
+        }
+    });
+}
+
+// ============================================
+// ===========  UNIFIED FIELDS DISPLAY  =====
+// ============================================
+function updateUnifiedFieldsDisplay(questionId) {
+    const unifiedDiv = document.getElementById('unifiedFields' + questionId);
+    if (!unifiedDiv) return;
+    
+    // Get all elements from both containers
+    const labelElements = Array.from(document.querySelectorAll('#textboxLabels' + questionId + ' > div'));
+    const amountElements = Array.from(document.querySelectorAll('#textboxAmounts' + questionId + ' > div'));
+    
+    // Create a combined array with position information
+    const allElements = [];
+    
+    labelElements.forEach((el) => {
+        const labelInput = el.querySelector('input[type="text"]:first-of-type');
+        const nodeIdInput = el.querySelector('input[type="text"]:last-of-type');
+        allElements.push({
+            type: 'label',
+            label: labelInput ? labelInput.value.trim() : "",
+            nodeId: nodeIdInput ? nodeIdInput.value.trim() : "",
+            element: el,
+            position: el.getBoundingClientRect().top
+        });
+    });
+    
+    amountElements.forEach((el) => {
+        const amountInput = el.querySelector('input[type="text"]');
+        allElements.push({
+            type: 'amount',
+            label: amountInput ? amountInput.value.trim() : "",
+            nodeId: "",
+            element: el,
+            position: el.getBoundingClientRect().top
+        });
+    });
+    
+    // Sort by position in the document (creation order)
+    allElements.sort((a, b) => a.position - b.position);
+    
+    // Clear and rebuild the unified display
+    unifiedDiv.innerHTML = '';
+    
+    allElements.forEach((field, index) => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;';
+        
+        if (field.type === 'label') {
+            fieldDiv.innerHTML = `
+                <div style="font-weight: bold; color: #333;">Label: ${field.label}</div>
+                <div style="font-size: 0.9em; color: #666;">Node ID: ${field.nodeId}</div>
+                <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: Label | Order: ${index + 1}</div>
+            `;
+        } else if (field.type === 'amount') {
+            fieldDiv.innerHTML = `
+                <div style="font-weight: bold; color: #333;">Amount: ${field.label}</div>
+                <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: Amount | Order: ${index + 1}</div>
+            `;
+        }
+        
+        unifiedDiv.appendChild(fieldDiv);
+    });
 }

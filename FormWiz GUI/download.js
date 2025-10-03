@@ -525,40 +525,81 @@ function loadFormData(formData) {
                         nodeIdEl.value = question.nodeId;
                     }
 
-                    // Rebuild custom text labels with their Node IDs
-                    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${question.questionId}`);
-                    if (textboxLabelsDiv) {
-                        textboxLabelsDiv.innerHTML = '';
-                        const labels = question.labels || [];
-                        const labelNodeIds = question.labelNodeIds || [];
-                        labels.forEach((labelValue, ldx) => {
-                            addTextboxLabel(question.questionId);
-                            const labelInput = textboxLabelsDiv.querySelector(
-                                `#label${question.questionId}_${ldx + 1}`
-                            );
-                            if (labelInput) labelInput.value = labelValue;
+                    // Rebuild unified fields from exported data
+                    const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
+                    if (unifiedFieldsDiv) {
+                        unifiedFieldsDiv.innerHTML = '';
+                        
+                        // Use the new allFieldsInOrder format if available, otherwise fallback to old format
+                        let allFields = [];
+                        
+                        if (question.allFieldsInOrder && Array.isArray(question.allFieldsInOrder)) {
+                            // New format: fields are already in correct order
+                            allFields = question.allFieldsInOrder;
+                        } else {
+                            // Fallback to old format for backward compatibility
+                            const labels = question.labels || [];
+                            const labelNodeIds = question.labelNodeIds || [];
+                            const amounts = question.amounts || [];
                             
-                            // Restore the Node ID for this label
-                            const labelNodeIdInput = textboxLabelsDiv.querySelector(
-                                `#labelNodeId${question.questionId}_${ldx + 1}`
-                            );
-                            if (labelNodeIdInput && labelNodeIds[ldx]) {
-                                labelNodeIdInput.value = labelNodeIds[ldx];
+                            // Add labels first (they were exported first)
+                            labels.forEach((labelValue, ldx) => {
+                                allFields.push({
+                                    type: 'label',
+                                    label: labelValue,
+                                    nodeId: labelNodeIds[ldx] || '',
+                                    order: ldx + 1
+                                });
+                            });
+                            
+                            // Add amounts after labels
+                            amounts.forEach((amountValue, index) => {
+                                allFields.push({
+                                    type: 'amount',
+                                    label: amountValue,
+                                    nodeId: '',
+                                    order: labels.length + index + 1
+                                });
+                            });
+                        }
+                        
+                        // Rebuild fields in the unified container
+                        allFields.forEach((field, index) => {
+                            const fieldOrder = field.order || (index + 1);
+                            const fieldDiv = document.createElement('div');
+                            fieldDiv.className = `unified-field field-${fieldOrder}`;
+                            fieldDiv.setAttribute('data-type', field.type);
+                            fieldDiv.setAttribute('data-order', fieldOrder);
+                            
+                            const fieldTypeLabel = field.type === 'label' ? 'Label' : 'Amount';
+                            fieldDiv.innerHTML = `
+                                <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                    <div style="font-weight: bold; color: #333;">${fieldTypeLabel}: <span id="labelText${question.questionId}_${fieldOrder}">${field.label}</span></div>
+                                    <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${question.questionId}_${fieldOrder}">${field.nodeId}</span></div>
+                                    <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${question.questionId}_${fieldOrder}">${fieldTypeLabel}</span> | Order: ${fieldOrder}</div>
+                                    <button type="button" onclick="removeUnifiedField(${question.questionId}, ${fieldOrder})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+                                </div>
+                            `;
+                            unifiedFieldsDiv.appendChild(fieldDiv);
+                            
+                            // Add double-click event listener as backup
+                            const displayDiv = fieldDiv.querySelector('div');
+                            if (displayDiv) {
+                                // Remove any existing event listeners to prevent duplicates
+                                if (displayDiv._dblclickHandler) {
+                                    displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+                                }
+                                
+                                // Add event listener for double-click editing
+                                displayDiv._dblclickHandler = function() {
+                                    editUnifiedField(question.questionId, fieldOrder);
+                                };
+                                displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
                             }
                         });
-                    }
-
-                    // Rebuild amount labels - ADD THIS SECTION
-                    const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${question.questionId}`);
-                    if (textboxAmountsDiv) {
-                        textboxAmountsDiv.innerHTML = '';
-                        (question.amounts || []).forEach((amountValue, adx) => {
-                            addTextboxAmount(question.questionId);
-                            const amountInput = textboxAmountsDiv.querySelector(
-                                `#amount${question.questionId}_${adx + 1}`
-                            );
-                            if (amountInput) amountInput.value = amountValue;
-                        });
+                        
+                        // Also rebuild hidden containers for backward compatibility
+                        updateHiddenContainers(question.questionId);
                     }
                     
                     // After setting min/max values, update any jump logic dropdowns
@@ -1317,29 +1358,107 @@ function exportForm() {
                     questionData.nodeId = nodeIdInput.value.trim();
                 }
                 
-                // Collect text labels and their Node IDs
-                const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input[type='text']:first-of-type`);
-                const labelNodeIdInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input[type='text']:last-of-type`);
-                const labels = [];
-                const labelNodeIds = [];
-                labelInputs.forEach((lbl, index) => {
-                    labels.push(lbl.value.trim());
-                    const nodeIdInput = labelNodeIdInputs[index];
-                    labelNodeIds.push(nodeIdInput ? nodeIdInput.value.trim() : '');
+                // Collect unified field data in true creation order
+                const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] Looking for unified container:', `#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] Found unified container:', !!unifiedContainer);
+                
+                if (unifiedContainer) {
+                    console.log('🔧 [EXPORT DEBUG] Unified container children count:', unifiedContainer.children.length);
+                    console.log('🔧 [EXPORT DEBUG] Unified container innerHTML length:', unifiedContainer.innerHTML.length);
+                    console.log('🔧 [EXPORT DEBUG] Unified container innerHTML preview:', unifiedContainer.innerHTML.substring(0, 200));
+                }
+                
+                const unifiedFields = questionBlock.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
+                console.log('🔧 [EXPORT DEBUG] Found', unifiedFields.length, 'unified fields');
+                
+                // Also try a more direct approach
+                const directUnifiedFields = document.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
+                console.log('🔧 [EXPORT DEBUG] Direct query found', directUnifiedFields.length, 'unified fields');
+                
+                // Use the direct query if the questionBlock query didn't work
+                const fieldsToProcess = unifiedFields.length > 0 ? unifiedFields : directUnifiedFields;
+                console.log('🔧 [EXPORT DEBUG] Using', fieldsToProcess.length, 'fields for processing');
+                
+                const allFieldsInOrder = [];
+                
+                // Process fields in their creation order
+                fieldsToProcess.forEach((field, index) => {
+                    const fieldType = field.getAttribute('data-type');
+                    const fieldOrder = field.getAttribute('data-order');
+                    const labelTextEl = field.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                    const nodeIdTextEl = field.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                    
+                    console.log('🔧 [EXPORT DEBUG] Processing field', index, ':', {
+                        fieldType,
+                        fieldOrder,
+                        hasLabelText: !!labelTextEl,
+                        hasNodeIdText: !!nodeIdTextEl,
+                        labelText: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
+                        nodeIdText: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A'
+                    });
+                    
+                    if (labelTextEl && nodeIdTextEl) {
+                        const labelText = labelTextEl.textContent.trim();
+                        const nodeIdText = nodeIdTextEl.textContent.trim();
+                        
+                        allFieldsInOrder.push({
+                            type: fieldType,
+                            label: labelText,
+                            nodeId: nodeIdText,
+                            order: parseInt(fieldOrder)
+                        });
+                    }
                 });
-
-                // Collect amount labels
-                const amountInputs = questionBlock.querySelectorAll(`#textboxAmounts${questionId} input`);
-                const amounts = [];
-                amountInputs.forEach(amt => {
-                    amounts.push(amt.value.trim());
-                });
+                
+                // Sort by order to ensure correct sequence
+                allFieldsInOrder.sort((a, b) => a.order - b.order);
+                console.log('🔧 [EXPORT DEBUG] Final allFieldsInOrder:', allFieldsInOrder);
 
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
-                questionData.labels = labels;
-                questionData.labelNodeIds = labelNodeIds;
-                questionData.amounts = amounts;
+                questionData.allFieldsInOrder = allFieldsInOrder;
+                
+                // Fallback to old format if no unified fields found
+                if (allFieldsInOrder.length === 0) {
+                    console.log('🔧 [EXPORT DEBUG] No unified fields found, falling back to old format');
+                    
+                    // Try to get data from the old hidden containers
+                    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${questionId}`);
+                    const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${questionId}`);
+                    
+                    const labels = [];
+                    const labelNodeIds = [];
+                    const amounts = [];
+                    
+                    if (textboxLabelsDiv) {
+                        const labelDivs = textboxLabelsDiv.querySelectorAll('.label');
+                        labelDivs.forEach((labelDiv, index) => {
+                            const labelInput = labelDiv.querySelector('input[type="text"]');
+                            const nodeIdInput = labelDiv.querySelector('input[type="text"]:last-of-type');
+                            if (labelInput) {
+                                labels.push(labelInput.value.trim());
+                                labelNodeIds.push(nodeIdInput ? nodeIdInput.value.trim() : '');
+                            }
+                        });
+                    }
+                    
+                    if (textboxAmountsDiv) {
+                        const amountDivs = textboxAmountsDiv.querySelectorAll('.amount');
+                        amountDivs.forEach((amountDiv) => {
+                            const amountInput = amountDiv.querySelector('input[type="text"]');
+                            if (amountInput) {
+                                amounts.push(amountInput.value.trim());
+                            }
+                        });
+                    }
+                    
+                    questionData.labels = labels;
+                    questionData.labelNodeIds = labelNodeIds;
+                    questionData.amounts = amounts;
+                    
+                    console.log('🔧 [EXPORT DEBUG] Fallback data:', { labels, labelNodeIds, amounts });
+                }
             }
             else if (questionType === 'multipleTextboxes') {
                 // Export custom Node ID if it exists

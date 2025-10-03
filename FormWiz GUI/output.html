@@ -1,1624 +1,264 @@
-/*********************************************
- * generate.js - with hidden checkbox & text
- *   multi-term calculations,
- *   plus $$placeholders$$ supporting expressions
- *   and a single <script> block for logic
- *********************************************/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="generate.css">
+    <link rel="stylesheet" href="generate2.css">
+</head>
+<body>
+<header>
+    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+    <nav>
+        <a href="index.html">Home
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+            <a href="#" id="forms-nav-link">Forms
+                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="dropdown-menu" id="forms-dropdown-menu">
+                <a href="../Pages/forms.html">My Forms</a>
+                <a href="../Pages/FreeForm.html">Free Form</a>
+                <a href="../Pages/Family.html">Family</a>
+                <a href="../Pages/Property.html">Property</a>
+                <a href="../Pages/Immigration.html">Immigration</a>
+                <a href="../Pages/smallclaims.html">Small Claims</a>
+                <a href="../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../Pages/about.html">About Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="../Pages/contact.html">Contact Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="../Pages/FAQ.html">FAQ
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+    </nav>
+    <div class="header-actions">
+        <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
+        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+            <span class="cart-circle">
+                <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="10" cy="21" r="1.5"/>
+                    <circle cx="18" cy="21" r="1.5"/>
+                    <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                </svg>
+                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+            </span>
+        </a>
+    </div>
+</header>
 
-/* global map: questionId  →  canonical slug */
-const questionSlugMap = {};
+    <!-- Sliding Cart Menu -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+            </div>
+            <div class="cart-content" id="cart-content">
+                <div class="cart-icon-large">🛒</div>
+                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description" id="cart-description">
+                    To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. 
+                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+                </div>
+                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
+            </div>
+        </div>
+    </div>
 
-/* global maps and arrays for form data */
-const questionNameIds = {};
-const questionTypesMap = {};
-const conditionalPDFs = [];
-const pdfLogicPDFs = [];
-const alertLogics = [];
-let checklistLogics = [];
-const conditionalAlerts = [];
-const jumpLogics = [];
-const labelMap = {};
-const amountMap = {}; // used for numberedDropdown with amounts
-const linkedDropdowns = []; // For storing linked dropdown pairs
+<div id="pdfPreview" style="display:none;">
+    <iframe id="pdfFrame" style="display:none"></iframe>
+</div>
+<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
 
-// Cart functions are now included in the generated HTML
+<!-- Firebase includes -->
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-/*------------------------------------------------------------------
- * HISTORY STACK for accurate "Back" navigation
- *-----------------------------------------------------------------*/
-let sectionStack = [];          // push every section you LEAVE
-let currentSectionNumber = 1;   // updated by navigateSection()
+<script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+    authDomain: "formwiz-3f4fd.firebaseapp.com",
+    projectId: "formwiz-3f4fd",
+    storageBucket: "formwiz-3f4fd.firebasestorage.app",
+    messagingSenderId: "404259212529",
+    appId: "1:404259212529:web:15a33bce82383b21cfed50",
+    measurementId: "G-P07YEN0HPD"
+};
 
-
-
-// We also create a buffer to store our conditional-logic code
-// so we can insert it later in one <script> block.
-let logicScriptBuffer = "";
-
-/*───────────────────────────────*
- * canonical sanitiser – visible
- * to all build-time code
- *───────────────────────────────*/
-
-
-
-
-
-
-
-
-
-/******************************************************************
- * helpers that the generator itself uses ( NOT inside formHTML! )
- ******************************************************************/
-
-/* canonical sanitiser (unchanged) */
-function sanitizeQuestionText (str){
-    return String(str).toLowerCase()
-                      .replace(/\W+/g, "_")
-                      .replace(/^_+|_+$/g, "");
+// Initialize Firebase
+if (typeof firebase !== "undefined" && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
 }
+const auth = firebase.auth();
 
-/* slug‑aware prefix for any checkbox belonging to a question */
-function getCbPrefix (qId){
-    if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';   // e.g. do_you_have_any_of_these_
-    if (questionNameIds[qId]) return questionNameIds[qId] + '_';
-    return 'answer' + qId + '_';
-}
-
-/* build the final <input>.id / name for a checkbox option */
-function buildCheckboxName (questionId, rawNameId, labelText){
-    // if the designer left the name blank, derive it from the label
-    let namePart = (rawNameId || '').trim();
-    if (!namePart){
-        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
-    }
-
-    // Return the name part directly without adding question prefix
-    return namePart;
-}
-
-
-
-
-function getFormHTML() {
-	
-	// RESET all globals before building
-Object.keys(questionSlugMap).forEach(key => delete questionSlugMap[key]);
-Object.keys(questionNameIds).forEach(key => delete questionNameIds[key]);
-Object.keys(questionTypesMap).forEach(key => delete questionTypesMap[key]);
-conditionalPDFs.length = 0;
-pdfLogicPDFs.length = 0;
-alertLogics.length = 0;
-checklistLogics.length = 0;
-conditionalAlerts.length = 0;
-jumpLogics.length = 0;
-linkedDropdowns.length = 0;
-labelMap.length = 0;
-amountMap.length = 0;
-logicScriptBuffer = "";
-
-// Check if test mode is enabled
-const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
-
-// Get form name from the form name input field
-const formNameEl = document.getElementById('formNameInput');
-const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
-
-
-
-  // Top HTML (head, body, header, etc.)
-  let formHTML = [
-    "<!DOCTYPE html>",
-    '<html lang="en">',
-    "<head>",
-    '    <meta charset="UTF-8">',
-    '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
-    `    <title>${formName}</title>`,
-    '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
-    '    <link rel="stylesheet" href="generate.css">',
-    '    <link rel="stylesheet" href="generate2.css">',
-    "</head>",
-    "<body>",
-    // Insert modal HTML right after <body> (only if not in test mode)
-    ...(isTestMode ? [] : [
-      '<div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">\n' +
-      '  <div class="custom-modal">\n' +
-      '    <h2>Account Required</h2>\n' +
-      '    <p>You must create an account to continue filling out the form.</p>\n' +
-      '    <div class="modal-buttons">\n' +
-      '      <button class="modal-back" id="modalBackBtn" type="button">Back</button>\n' +
-      '      <button class="modal-continue" id="modalContinueBtn" type="button">Continue</button>\n' +
-      '    </div>\n' +
-      '  </div>\n' +
-      '</div>'
-    ]),
-    "<header>",
-    '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'index.html\';">',
-    "    <nav>",
-    '        <a href="index.html">Home',
-    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
-    "        </a>",
-    '        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">',
-    '            <a href="#" id="forms-nav-link">Forms',
-    '                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
-    "            </a>",
-    '            <div class="dropdown-menu" id="forms-dropdown-menu">',
-    '                <a href="../Pages/forms.html">My Forms</a>',
-    '                <a href="../Pages/FreeForm.html">Free Form</a>',
-    '                <a href="../Pages/Family.html">Family</a>',
-    '                <a href="../Pages/Property.html">Property</a>',
-    '                <a href="../Pages/Immigration.html">Immigration</a>',
-    '                <a href="../Pages/smallclaims.html">Small Claims</a>',
-    '                <a href="../Pages/Other.html">Other</a>',
-    "            </div>",
-    "        </div>",
-    '        <a href="../Pages/about.html">About Us',
-    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
-    "        </a>",
-    '        <a href="../Pages/contact.html">Contact Us',
-    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
-    "        </a>",
-    '        <a href="../Pages/FAQ.html">FAQ',
-    '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
-    "        </a>",
-    "    </nav>",
-    '    <div class="header-actions">',
-    '        <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>',
-    '        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>',
-    '        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">',
-    '            <span class="cart-circle">',
-    '                <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">',
-    '                    <circle cx="10" cy="21" r="1.5"/>',
-    '                    <circle cx="18" cy="21" r="1.5"/>',
-    '                    <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>',
-    "                </svg>",
-    '                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>',
-    "            </span>",
-    "        </a>",
-    "    </div>",
-    "</header>",
-    "",
-    "    <!-- Sliding Cart Menu -->",
-    '    <div class="cart-overlay" id="cart-overlay">',
-    '        <div class="cart-side-menu" id="cart-side-menu">',
-    "            <div class=\"cart-header\">",
-    "                <h2>🛒 Cart</h2>",
-    '                <button class="cart-close-btn" id="cart-close-btn">&times;</button>',
-    "            </div>",
-                '            <div class="cart-content" id="cart-content">',
-            '                <div class="cart-icon-large">🛒</div>',
-            '                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>',
-            '                <div class="cart-description" id="cart-description">',
-                                "                    To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. ",
-            "                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.",
-            "                </div>",
-            '                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>',
-            '                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>',
-            '                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>',
-            "            </div>",
-    "        </div>",
-    "    </div>",
-    "",
-    '<div id="pdfPreview" style="display:none;">',
-    '    <iframe id="pdfFrame" style="display:none"></iframe>',
-    "</div>",
-    '<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">',
-    "",
-    "<!-- Firebase includes -->",
-    '<script src="https://js.stripe.com/v3/"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
-    '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
-    "",
-    '<script>',
-    '// Firebase Configuration',
-    'const firebaseConfig = {',
-    '    apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",',
-    '    authDomain: "formwiz-3f4fd.firebaseapp.com",',
-    '    projectId: "formwiz-3f4fd",',
-    '    storageBucket: "formwiz-3f4fd.firebasestorage.app",',
-    '    messagingSenderId: "404259212529",',
-    '    appId: "1:404259212529:web:15a33bce82383b21cfed50",',
-    '    measurementId: "G-P07YEN0HPD"',
-    '};',
-    '',
-    '// Initialize Firebase',
-    'if (typeof firebase !== "undefined" && !firebase.apps.length) {',
-    '    firebase.initializeApp(firebaseConfig);',
-    '}',
-    'const auth = firebase.auth();',
-    '',
-    '// Auth state management',
-    'if (typeof firebase !== "undefined" && firebase.apps.length > 0) {',
-    '    auth.onAuthStateChanged(function(user) {',
-    '        isUserLoggedIn = !!user;',
-    '        userId = user ? user.uid : null;',
-    '        updateAuthButtons(user);',
-    '        updateCartCountBadge();',
-    '    });',
-    '} else {',
-    '    // Fallback for when Firebase is not available',
-    '    console.log("Firebase not available, using fallback authentication");',
-    '}',
-    '',
-    '// Function to update button display based on auth state',
-    'function updateAuthButtons(user) {',
-    '    const signInBtn = document.getElementById("sign-in-btn");',
-    '    const logoutBtn = document.getElementById("logout-btn");',
-    '    ',
-    '    if (user) {',
-    '        if (signInBtn) signInBtn.style.display = "none";',
-    '        if (logoutBtn) logoutBtn.style.display = "inline-block";',
-    '    } else {',
-    '        if (signInBtn) signInBtn.style.display = "inline-block";',
-    '        if (logoutBtn) logoutBtn.style.display = "none";',
-    '    }',
-    '}',
-    '',
-    '// Update cart count badge in header',
-    'function updateCartCountBadge() {',
-    '    const cartCountElement = document.getElementById("cart-count-badge");',
-    '    if (cartCountElement) {',
-    '        let count = 0;',
-    '        ',
-    '        // Try to get count from getCartCount function first',
-    '        if (typeof getCartCount === "function") {',
-    '            count = getCartCount();',
-    '        } else {',
-    '            // Fallback to localStorage',
-    '            try {',
-    '                const cartData = localStorage.getItem("formwiz_cart");',
-    '                if (cartData) {',
-    '                    const cart = JSON.parse(cartData);',
-    '                    count = Array.isArray(cart) ? cart.length : 0;',
-    '                }',
-    '            } catch (e) {',
-    '                count = 0;',
-    '            }',
-    '        }',
-    '        ',
-    '        // Always update the text content, even if count is 0',
-    '        cartCountElement.textContent = count;',
-    '        ',
-    '        if (count > 0) {',
-    '            cartCountElement.style.display = "flex";',
-    '        } else {',
-    '            cartCountElement.style.display = "none";',
-    '        }',
-    '    }',
-    '}',
-    '',
-    '// Initialize cart count badge on page load',
-    'document.addEventListener("DOMContentLoaded", function() {',
-    '    updateCartCountBadge();',
-    '    // Update cart count every 5 seconds',
-    '    setInterval(updateCartCountBadge, 5000);',
-    '});',
-    '</script>',
-    "",
-    '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
-    '    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>',
-    '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
-    '        <div style="flex: 1;">',
-    '            <label for="user_firstname" style="display: block; margin-bottom: 5px; font-weight: bold;">First Name</label>',
-    '            <input type="text" form="customForm" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '        <div style="flex: 1;">',
-    '            <label for="user_lastname" style="display: block; margin-bottom: 5px; font-weight: bold;">Last Name</label>',
-    '            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '    </div>',
-    '    <div style="margin-bottom: 15px;">',
-    '        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>',
-    '        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '    </div>',
-    '    <div style="margin-bottom: 15px;">',
-    '        <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>',
-    '        <input type="tel" form="customForm" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '    </div>',
-    '    <div style="margin-bottom: 15px;">',
-    '        <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>',
-    '        <input type="text" form="customForm" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '    </div>',
-    '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
-    '        <div style="flex: 2;">',
-    '            <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>',
-    '            <input type="text" form="customForm" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '        <div style="flex: 1;">',
-    '            <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>',
-    '            <input type="text" form="customForm" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '        <div style="flex: 1;">',
-    '            <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>',
-    '            <input type="text" form="customForm" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
-    '        </div>',
-    '    </div>',
-    '</div>',
-    '<div id="questions">',
-    '    <div id="result"></div>',
-    "    <section>",
-    '    <div id="box">',
-    '        <form id="customForm" onsubmit="return showThankYouMessage(event);">',
-  ].join("\n");
-
-  // Get all PDF names
-  const pdfFormNameInputEl = document.getElementById("formPDFName");
-  const pdfFormName = pdfFormNameInputEl
-    ? pdfFormNameInputEl.value.trim()
-    : "test.pdf";
-  const escapedPdfFormName = pdfFormName
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"');
-    
-  // Get the desired output file name
-  const pdfOutputNameInputEl = document.getElementById("pdfOutputName");
-  const pdfOutputName = pdfOutputNameInputEl && pdfOutputNameInputEl.value.trim() ? pdfOutputNameInputEl.value.trim() : "example.html";
-  const escapedPdfOutputName = pdfOutputName.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
-
-  // Set window.formId to use the PDF name (without .pdf extension) for cart and form identification
-  window.formId = pdfFormName.replace(/\.pdf$/i, '');
-
-  // Get the Stripe Price ID
-  const stripePriceIdInputEl = document.getElementById("stripePriceId");
-  const stripePriceId = stripePriceIdInputEl && stripePriceIdInputEl.value.trim() ? stripePriceIdInputEl.value.trim() : "";
-  const escapedStripePriceId = stripePriceId.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
-
-  // Get additional PDF names
-  const additionalPdfNames = [];
-  const additionalPdfInputs = document.querySelectorAll('[id^="additionalPdfName_"]');
-  additionalPdfInputs.forEach(input => {
-    if (input.value.trim()) {
-      additionalPdfNames.push(input.value.trim());
-    }
-  });
-  
-  // Escape additional PDF names
-  const escapedAdditionalPdfNames = additionalPdfNames.map(name => 
-    name.replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'")
-        .replace(/"/g, '\\"')
-  );
-
-  // Build group-to-section mapping and get group information
-  const groupToSectionMap = {};
-  const groupNames = {};
-  const sectionToGroupMap = {};
-  
-  // Find all groups
-  const groupBlocks = document.querySelectorAll('.group-block');
-  groupBlocks.forEach(groupBlock => {
-    const groupId = groupBlock.id.replace('groupBlock', '');
-    const groupNameEl = document.getElementById(`groupName${groupId}`);
-    const groupName = groupNameEl ? groupNameEl.value.trim() : `Group ${groupId}`;
-    groupNames[groupId] = groupName;
-    
-    // Get sections in this group
-    const groupSectionsDiv = document.getElementById(`groupSections${groupId}`);
-    if (groupSectionsDiv) {
-      const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
-      const sectionsInGroup = [];
-      sectionItems.forEach(sectionItem => {
-        const select = sectionItem.querySelector('select');
-        if (select && select.value.trim()) {
-          sectionsInGroup.push(select.value.trim());
-          sectionToGroupMap[select.value.trim()] = groupId;
-        }
-      });
-      if (sectionsInGroup.length > 0) {
-        groupToSectionMap[groupId] = sectionsInGroup;
-      }
-    }
-  });
-  
-  // If no groups are defined, fall back to section-based progress bar
-  const hasGroups = Object.keys(groupToSectionMap).length > 0;
-  
-  if (hasGroups) {
-    // Insert stepper progress bar based on groups
-    formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
-    const groupIds = Object.keys(groupToSectionMap).sort((a, b) => parseInt(a) - parseInt(b));
-    
-    groupIds.forEach((groupId, index) => {
-      formHTML += `<div class="stepper-step" data-group="${groupId}" data-step="${index + 1}">`;
-      formHTML += `<div class="stepper-circle">${index + 1}</div>`;
-      formHTML += `<div class="stepper-label">${groupNames[groupId]}</div>`;
-      formHTML += `</div>`;
-      if (index < groupIds.length - 1) {
-        formHTML += `<div class="stepper-line"></div>`;
-      }
+// Auth state management
+if (typeof firebase !== "undefined" && firebase.apps.length > 0) {
+    auth.onAuthStateChanged(function(user) {
+        isUserLoggedIn = !!user;
+        userId = user ? user.uid : null;
+        updateAuthButtons(user);
+        updateCartCountBadge();
     });
-    formHTML += `</div>`;
+} else {
+    // Fallback for when Firebase is not available
+    console.log("Firebase not available, using fallback authentication");
+}
+
+// Function to update button display based on auth state
+function updateAuthButtons(user) {
+    const signInBtn = document.getElementById("sign-in-btn");
+    const logoutBtn = document.getElementById("logout-btn");
     
-    // Store group mapping for progress bar logic
-    formHTML += `<script>`;
-    formHTML += `window.groupToSectionMap = ${JSON.stringify(groupToSectionMap)};`;
-    formHTML += `window.sectionToGroupMap = ${JSON.stringify(sectionToGroupMap)};`;
-    formHTML += `window.groupNames = ${JSON.stringify(groupNames)};`;
-    formHTML += `</script>`;
-  } else {
-    // Fallback to section-based progress bar
-    formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
-    for (let step = 1; step < sectionCounter; step++) {
-      formHTML += `<div class="stepper-step" data-step="${step}">`;
-      formHTML += `<div class="stepper-circle">${step}</div>`;
-      const sectionNameEl = document.getElementById("sectionBlock" + step)?.querySelector("#sectionName" + step);
-      const sectionName = sectionNameEl ? sectionNameEl.value : `Section ${step}`;
-      formHTML += `<div class="stepper-label">${sectionName}</div>`;
-      formHTML += `</div>`;
-      if (step < sectionCounter - 1) {
-        formHTML += `<div class="stepper-line"></div>`;
-      }
-    }
-    formHTML += `</div>`;
-  }
-
-  // Build each Section & its questions
-  for (let s = 1; s < sectionCounter; s++) {
-    let sectionBlock = document.getElementById("sectionBlock" + s);
-    if (!sectionBlock) continue;
-    const sectionNameEl = sectionBlock.querySelector("#sectionName" + s);
-    const sectionName = sectionNameEl ? sectionNameEl.value : "Section " + s;
-    // Start the section
-    formHTML += `<div id="section${s}" class="section${s === 1 ? " active" : ""}">`;
-    // Only add the section title, not the stepper
-    formHTML += `<center><h1 class="section-title">${sectionName}</h1>`;
-
-    // Grab all questions in this section
-    const questionsInSection = sectionBlock.querySelectorAll(".question-block");
-    for (let qIdx = 0; qIdx < questionsInSection.length; qIdx++) {
-      const qBlock = questionsInSection[qIdx];
-      const questionId = qBlock.id.replace("questionBlock", "");
-
-      const questionTextEl = qBlock.querySelector("#question" + questionId);
-      const questionText = questionTextEl ? questionTextEl.value : "";
-	  // ----------  ADD THIS  ----------
-const slug = sanitizeQuestionText(questionText);
-questionSlugMap[questionId] = slug;
-// --------------------------------
-
-
-
-
-      const questionTypeEl = qBlock.querySelector("#questionType" + questionId);
-      const questionType = questionTypeEl ? questionTypeEl.value : "text";
-
-      // store the question type
-      questionTypesMap[questionId] = questionType;
-
-      // logic
-      const logicCheckbox = qBlock.querySelector("#logic" + questionId);
-      const logicEnabled = logicCheckbox && logicCheckbox.checked;
-
-      // jump logic (multi-condition version)
-      const jumpEnabledEl = qBlock.querySelector("#enableJump" + questionId);
-      const jumpEnabled = jumpEnabledEl && jumpEnabledEl.checked;
-      if (jumpEnabled) {
-        const jumpConditions = qBlock.querySelectorAll(".jump-condition");
-        jumpConditions.forEach((condition) => {
-          const jumpOptionEl = condition.querySelector("select");
-          const jumpToEl = condition.querySelector('input[type="text"]');
-          if (jumpOptionEl && jumpToEl && jumpToEl.value.trim()) {
-            jumpLogics.push({
-              questionId: questionId,
-              questionType: questionType,
-              jumpOption: jumpOptionEl.value.trim(),
-              jumpTo: jumpToEl.value.trim(),
-              section: s,
-            });
-          }
-        });
-      }
-
-      // conditional PDF
-      const pdfCheckEl = qBlock.querySelector(
-        "#enableConditionalPDF" + questionId
-      );
-      const pdfEnabled = pdfCheckEl && pdfCheckEl.checked;
-
-      const pdfNameEl = qBlock.querySelector("#conditionalPDFName" + questionId);
-      const pdfAnsEl = qBlock.querySelector(
-        "#conditionalPDFAnswer" + questionId
-      );
-      const pdfNameVal = pdfNameEl ? pdfNameEl.value : "";
-      const pdfAnsVal = pdfAnsEl ? pdfAnsEl.value : "";
-
-      // conditional Alert
-      const alertCheckEl = qBlock.querySelector(
-        "#enableConditionalAlert" + questionId
-      );
-      const alertEnabled = alertCheckEl && alertCheckEl.checked;
-      const alertPrevQEl = qBlock.querySelector(
-        "#alertPrevQuestion" + questionId
-      );
-      const alertPrevAEl = qBlock.querySelector("#alertPrevAnswer" + questionId);
-      const alertTextEl = qBlock.querySelector("#alertText" + questionId);
-
-      const alertPrevQ = alertPrevQEl ? alertPrevQEl.value : "";
-      const alertPrevA = alertPrevAEl ? alertPrevAEl.value : "";
-      const alertTxt = alertTextEl ? alertTextEl.value : "";
-      if (alertEnabled && alertPrevQ && alertPrevA && alertTxt) {
-        conditionalAlerts.push({
-          questionId: questionId,
-          prevQuestionId: alertPrevQ,
-          prevAnswer: alertPrevA,
-          alertText: alertTxt,
-        });
-      }
-
-      // Start the question container
-      formHTML += `<div id="question-container-${questionId}" class="question-container${
-        logicEnabled ? ' hidden' : ""
-      }">`;
-      
-      // Check if info box is enabled
-      const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
-      let infoBoxText = "";
-      if (infoBoxEnabled) {
-        infoBoxText = qBlock.querySelector(`#infoBoxText${questionId}`)?.value || "";
-      }
-      
-      // Add question title with info icon if needed
-      if (infoBoxEnabled && infoBoxText) {
-        formHTML += `
-          <div class="question-header">
-            <label><h3>${questionText}</h3></label>
-            <div class="info-icon" tabindex="0">
-              <span>i</span>
-              <div class="info-tooltip">${infoBoxText}</div>
-            </div>
-          </div>
-        `;
-      } else {
-        formHTML += `<label><h3>${questionText}</h3></label>`;
-      }
-
-      // Add subtitle if enabled
-      const subtitleEnabled = qBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false;
-      if (subtitleEnabled) {
-        const subtitleText = qBlock.querySelector(`#subtitleText${questionId}`)?.value || "";
-        if (subtitleText) {
-          formHTML += `<p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">${subtitleText}</p>`;
-        }
-      }
-
-      // Render the question by type
-      if (questionType === "text") {
-        const nmEl = qBlock.querySelector("#textboxName" + questionId);
-        const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
-        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
-        const placeholder = phEl && phEl.value ? phEl.value : "";
-        questionNameIds[questionId] = nameId;
-        formHTML += `<div class="text-input-container"><input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"></div>`;
-      } else if (questionType === "bigParagraph") {
-        const nmEl2 = qBlock.querySelector("#textboxName" + questionId);
-        const phEl2 = qBlock.querySelector("#textboxPlaceholder" + questionId);
-        const maxCharLimitEl = qBlock.querySelector("#maxCharacterLimit" + questionId);
-        const lineLimitEl = qBlock.querySelector("#lineLimit" + questionId);
-        const nameId2 =
-          nmEl2 && nmEl2.value ? nmEl2.value : "answer" + questionId;
-        const ph2 = phEl2 && phEl2.value ? phEl2.value : "";
-        const maxCharLimit = maxCharLimitEl && maxCharLimitEl.value ? parseInt(maxCharLimitEl.value) : null;
-        const lineLimit = lineLimitEl && lineLimitEl.value ? parseInt(lineLimitEl.value) : null;
-        questionNameIds[questionId] = nameId2;
-        
-        // Check if this Big Paragraph has PDF logic with character limits
-        let hasPdfLogic = false;
-        let characterLimits = [];
-        if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
-          const pdfLogic = pdfLogicPDFs.find(pdf => pdf.questionId === questionId && pdf.isBigParagraph);
-          if (pdfLogic && pdfLogic.conditions.length > 0) {
-            hasPdfLogic = true;
-            characterLimits = pdfLogic.conditions.map(condition => condition.characterLimit).filter(limit => limit);
-          }
-        }
-        
-        if (hasPdfLogic && characterLimits.length > 0) {
-          const maxLimit = Math.max(...characterLimits);
-          const effectiveMaxLength = maxCharLimit ? Math.min(maxCharLimit, maxLimit * 2) : maxLimit * 2;
-          const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
-          const onInputHandler = lineLimit ? 
-            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)}); handleLineSplitting('${nameId2}', ${lineLimit});"` :
-            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"`;
-          
-          formHTML += `
-            <div class="big-paragraph-container">
-              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
-                        maxlength="${effectiveMaxLength}"${lineLimitAttr}${onInputHandler}></textarea>
-              <div class="character-count" id="charCount_${nameId2}">
-                <span class="current-count">0</span> / <span class="limit-display">${maxCharLimit || maxLimit}</span> characters
-              </div>
-            </div><br>
-            <script>
-              function updateCharacterCount(textareaId, limits) {
-                const textarea = document.getElementById(textareaId);
-                const countDisplay = document.getElementById('charCount_' + textareaId);
-                const currentCount = textarea.value.length;
-                const maxLimit = Math.max(...limits);
-                
-                if (countDisplay) {
-                  countDisplay.querySelector('.current-count').textContent = currentCount;
-                  countDisplay.querySelector('.limit-display').textContent = maxLimit;
-                  
-                  // Change color based on character count
-                  if (currentCount > maxLimit) {
-                    countDisplay.style.color = '#ff6b6b';
-                    countDisplay.style.fontWeight = 'bold';
-                  } else if (currentCount > maxLimit * 0.8) {
-                    countDisplay.style.color = '#ffa726';
-                  } else {
-                    countDisplay.style.color = '#666';
-                  }
-                }
-              }
-              
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  
-                  hiddenInput.value = lineText;
-                }
-                
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          `;
-        } else {
-          const maxLengthAttr = maxCharLimit ? ` maxlength="${maxCharLimit}"` : '';
-          const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
-          const onInputHandler = lineLimit ? ` oninput="handleLineSplitting('${nameId2}', ${lineLimit})"` : '';
-          
-          formHTML += `
-            <div class="text-input-container">
-              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"${maxLengthAttr}${lineLimitAttr}${onInputHandler}></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  
-                  hiddenInput.value = lineText;
-                }
-                
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          `;
-        }
-      } else if (questionType === "money") {
-        const mnNmEl = qBlock.querySelector("#textboxName" + questionId);
-        const mnPhEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
-        const mnName =
-          mnNmEl && mnNmEl.value ? mnNmEl.value : "answer" + questionId;
-        const mnPh = mnPhEl && mnPhEl.value ? mnPhEl.value : "Enter amount";
-        questionNameIds[questionId] = mnName;
-        formHTML += `<div class="text-input-container"><input type="number" id="${mnName}" name="${mnName}" min="0" step="0.01" placeholder="${mnPh}"></div>`;
-      } else if (questionType === "date") {
-        const nmEl = qBlock.querySelector("#textboxName" + questionId);
-        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
-        questionNameIds[questionId] = nameId;
-        formHTML += `<div class="date-input-container"><input type="date" id="${nameId}" name="${nameId}"></div>`;
-      } else if (questionType === "dateRange") {
-        const nmEl = qBlock.querySelector("#textboxName" + questionId);
-        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
-        questionNameIds[questionId] = nameId;
-        
-        // Create two date inputs with IDs based on the slug (nameId_1 and nameId_2)
-        formHTML += `
-          <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 8px auto; width: 80%; max-width: 400px;">
-            <div class="date-input-container" style="flex: 1;">
-              <label for="${nameId}_1" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Start Date</label>
-              <input type="date" id="${nameId}_1" name="${nameId}_1">
-            </div>
-            <div style="font-weight: 600; color: #666; margin: 0 10px;">to</div>
-            <div class="date-input-container" style="flex: 1;">
-              <label for="${nameId}_2" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">End Date</label>
-              <input type="date" id="${nameId}_2" name="${nameId}_2">
-            </div>
-          </div>
-          <script>
-            // Add validation for date range (end date >= start date)
-            document.addEventListener('DOMContentLoaded', function() {
-              const startDate = document.getElementById('${nameId}_1');
-              const endDate = document.getElementById('${nameId}_2');
-              
-              if (startDate && endDate) {
-                // Update min date for end date when start date changes
-                startDate.addEventListener('change', function() {
-                  if (startDate.value) {
-                    endDate.min = startDate.value;
-                    
-                    // If end date is before start date, reset it
-                    if (endDate.value && endDate.value < startDate.value) {
-                      endDate.value = '';
-                    }
-                  }
-                });
-                
-                // Set initial min value if start date has a value
-                if (startDate.value) {
-                  endDate.min = startDate.value;
-                }
-              }
-            });
-          </script>`;
-      } else if (questionType === "email") {
-        const nmEl = qBlock.querySelector("#textboxName" + questionId);
-        const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
-        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
-        const placeholder = phEl && phEl.value ? phEl.value : "example@domain.com";
-        questionNameIds[questionId] = nameId;
-        formHTML += `<div class="text-input-container"><input type="email" id="${nameId}" name="${nameId}" placeholder="${placeholder}" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"></div>`;
-      } else if (questionType === "phone") {
-        const nmEl = qBlock.querySelector("#textboxName" + questionId);
-        const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
-        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
-        const placeholder = phEl && phEl.value ? phEl.value : "(123) 456-7890";
-        questionNameIds[questionId] = nameId;
-        formHTML += `<div class="text-input-container"><input type="tel" id="${nameId}" name="${nameId}" placeholder="${placeholder}" maxlength="14"></div>`;
-      } else if (questionType === "radio") {
-        const radNameEl = qBlock.querySelector("#textboxName" + questionId);
-        const radName =
-          radNameEl && radNameEl.value
-            ? radNameEl.value
-            : "answer" + questionId;
-        questionNameIds[questionId] = radName;
-        formHTML += `
-          <select id="${radName}" name="${radName}">
-            <option value="" disabled selected>Select an option</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select><br>`;
-        if (pdfEnabled) {
-          conditionalPDFs.push({
-            questionId: questionId,
-            questionNameId: radName,
-            conditionalAnswer: pdfAnsVal,
-            pdfName: pdfNameVal,
-            questionType: questionType,
-          });
-        }
-      } else if (questionType === "dropdown") {
-        const ddNameEl = qBlock.querySelector("#textboxName" + questionId);
-        const ddNm =
-          ddNameEl && ddNameEl.value ? ddNameEl.value : "answer" + questionId;
-        questionNameIds[questionId] = ddNm;
-
-        // Check if linking logic is enabled
-        const linkingEnabledEl = qBlock.querySelector("#enableLinking" + questionId);
-        const linkingEnabled = linkingEnabledEl && linkingEnabledEl.checked;
-        if (linkingEnabled) {
-          const linkingTargetEl = qBlock.querySelector("#linkingTarget" + questionId);
-          const linkingTargetId = linkingTargetEl ? linkingTargetEl.value : "";
-		  
-		  
-		  const targetQuestionBlock = document.getElementById("questionBlock" + linkingTargetId);
-const targetNameInput = targetQuestionBlock?.querySelector("#textboxName" + linkingTargetId);
-const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
-
-
-          if (linkingTargetId) {
-            linkedDropdowns.push({
-  sourceId: questionId,
-  sourceNameId: ddNm,
-  targetId: linkingTargetId,
-  targetNameId: actualTargetNameId
-});
-          }
-        }
-
-        // 1) Possibly grab user-entered image data
-        const imgUrlEl = qBlock.querySelector("#dropdownImageURL" + questionId);
-        const imgWidthEl = qBlock.querySelector(
-          "#dropdownImageWidth" + questionId
-        );
-        const imgHeightEl = qBlock.querySelector(
-          "#dropdownImageHeight" + questionId
-        );
-
-        let imageUrl = imgUrlEl ? imgUrlEl.value.trim() : "";
-        let imageWidth = imgWidthEl ? parseInt(imgWidthEl.value, 10) : 0;
-        let imageHeight = imgHeightEl ? parseInt(imgHeightEl.value, 10) : 0;
-
-        // Insert <img> if user gave a URL
-        if (imageUrl) {
-          if (!imageWidth || imageWidth < 1) imageWidth = 300;
-          if (!imageHeight || imageHeight < 1) imageHeight = 300;
-          formHTML += `<br><img src="${imageUrl}" alt="Dropdown Image" width="${imageWidth}" height="${imageHeight}"><br>`;
-        }
-
-        // 2) The <select> itself
-        formHTML += `<select id="${ddNm}" name="${ddNm}"
-                      onchange="dropdownMirror(this, '${ddNm}')">
-                       <option value="" disabled selected>Select an option</option>`;
-        const ddOps = qBlock.querySelectorAll(
-          `#dropdownOptions${questionId} input`
-        );
-        for (let i = 0; i < ddOps.length; i++) {
-          const val = ddOps[i].value.trim();
-          if (val) {
-            formHTML += `<option value="${val}">${val}</option>`;
-          }
-        }
-        formHTML += `</select><br>
-              <div id="dropdowntext_${ddNm}"></div>
-              <input type="text" id="${ddNm}_dropdown" name="${ddNm}_dropdown"
-                   readonly style="display:none;">`;
-        // handle PDF logic
-        if (pdfEnabled) {
-          conditionalPDFs.push({
-            questionId: questionId,
-            questionNameId: ddNm,
-            conditionalAnswer: pdfAnsVal,
-            pdfName: pdfNameVal,
-            questionType: questionType,
-          });
-        }
-      } else if (questionType === "checkbox") {
-       /* ---------- CHECKBOX QUESTION ---------- */
-const cOptsDivs = qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
-const cboxOptions = [];
-
-/* Use the slug as the base prefix (and store it for helpers) */
-const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
-questionNameIds[questionId] = qSlug;      // so helpers know the base
-
-/* ── check for "Mark only one" option ─────────────────────────── */
-const markOnlyOneEl = qBlock.querySelector(`#markOnlyOne${questionId}`);
-const markOnlyOne = markOnlyOneEl?.checked || false;
-
-formHTML += `<div><center><div id="checkmark" class="checkbox-group-${questionId}">`;
-
-/* ── render each checkbox option ───────────────────────────── */
-for (let co = 0; co < cOptsDivs.length; co++){
-    const optDiv        = cOptsDivs[co];
-    const txtEl         = optDiv.querySelector(`#checkboxOptionText${questionId}_${co+1}`);
-    const nameEl        = optDiv.querySelector(`#checkboxOptionName${questionId}_${co+1}`);
-    const valEl         = optDiv.querySelector(`#checkboxOptionValue${questionId}_${co+1}`);
-    const hasAmountEl   = optDiv.querySelector(`#checkboxOptionHasAmount${questionId}_${co+1}`);
-    const amountNameEl  = optDiv.querySelector(`#checkboxOptionAmountName${questionId}_${co+1}`);
-    const amountPhEl    = optDiv.querySelector(`#checkboxOptionAmountPlaceholder${questionId}_${co+1}`);
-
-    const labelText         = txtEl?.value.trim() || ('Option ' + (co+1));
-    const optionNameIdRaw   = nameEl?.value.trim() || '';
-    const optionNameId      = buildCheckboxName(questionId, optionNameIdRaw, labelText);
-
-    const optionValue       = valEl?.value.trim() || labelText;
-    const hasAmount         = hasAmountEl?.checked;
-    const amountName        = amountNameEl?.value.trim() || '';
-    const amountPlaceholder = amountPhEl?.value.trim() || 'Amount';
-
-    cboxOptions.push({
-        labelText,
-        optionNameId,
-        optionValue,
-        hasAmount,
-        amountName,
-        amountPlaceholder
-    });
-
-    /* actual input */
-    const inputType = markOnlyOne ? 'radio' : 'checkbox';
-    const inputName = markOnlyOne ? qSlug : optionNameId; // Radio buttons share the same name
-    const onChangeHandler = markOnlyOne ? 
-      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); ${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked);` : ''} updateCheckboxStyle(this);"` :
-      `onchange="${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});` : `toggleNoneOption(this, ${questionId});`} updateCheckboxStyle(this);"`;
-    
-    formHTML += `
-      <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
-        <label class="checkbox-label">
-          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" 
-                 ${onChangeHandler}>
-          ${labelText}
-        </label>
-      </span>`;
-
-    /* optional amount field */
-    if (hasAmount){
-        formHTML += `
-          <input type="number" id="${optionNameId}_amount"
-                 name="${amountName || optionNameId + '_amount'}"
-                 placeholder="${amountPlaceholder}"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">`;
-    }
-}
-
-/* ── optional "None of the above" ─────────────────────────── */
-const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
-if (noneEl?.checked){
-    const noneStr      = 'None of the above';
-    // Ensure we use the designated pattern for the "none" option
-    const noneNameId   = `${qSlug}_none`;
-
-    cboxOptions.push({
-        labelText: noneStr,
-        optionNameId: noneNameId,
-        optionValue: noneStr
-    });
-
-    const noneInputType = markOnlyOne ? 'radio' : 'checkbox';
-    const noneInputName = markOnlyOne ? qSlug : noneNameId;
-    const noneOnChangeHandler = markOnlyOne ? 
-      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
-      `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
-
-    formHTML += `
-      <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
-        <label class="checkbox-label">
-          <input type="${noneInputType}" id="${noneNameId}" name="${noneInputName}" value="${noneStr}" 
-                 ${noneOnChangeHandler}>
-          ${noneStr}
-        </label>
-      </span>`;
-}
-
-formHTML += `</div><br></div>`;
-
-
-        // If conditional PDF was enabled
-        if (pdfEnabled) {
-          for (let ck = 0; ck < cboxOptions.length; ck++) {
-            if (cboxOptions[ck].labelText === pdfAnsVal) {
-              conditionalPDFs.push({
-                questionId: questionId,
-                questionNameId: cboxOptions[ck].optionNameId,
-                conditionalAnswer: cboxOptions[ck].optionValue,
-                pdfName: pdfNameVal,
-                questionType: questionType,
-              });
-              break;
-            }
-          }
-        }
-      } else if (questionType === "multipleTextboxes") {
-        const multiBlocks = qBlock.querySelectorAll(
-          `#multipleTextboxesOptions${questionId} > div`
-        );
-        // Separate textboxes and amounts
-        const textboxInputs = [];
-        const amountInputs = [];
-        for (let mb = 0; mb < multiBlocks.length; mb++) {
-          const dEl = multiBlocks[mb];
-          if (dEl.classList.contains('amount-block')) {
-            amountInputs.push(dEl);
-          } else {
-            textboxInputs.push(dEl);
-          }
-        }
-        // Define location field names for visual separation
-        const locationFields = ['Street', 'City', 'State', 'Zip'];
-        
-        // Create a unified array of all fields in true creation order
-        const allFieldsInOrder = [];
-        
-        // Get ALL elements from the multiple textboxes container in their actual DOM order
-        const allElements = Array.from(qBlock.querySelectorAll('#multipleTextboxesOptions' + questionId + ' > div'));
-        
-        // Process each element in DOM order (which is creation order)
-        allElements.forEach((dEl) => {
-          if (dEl.classList.contains('amount-block')) {
-            // This is an amount element
-            const lblInput = dEl.querySelector('input[type="text"]:first-of-type');
-            const nmInput = dEl.querySelector('input[type="text"]:last-of-type');
-            const phInput = dEl.querySelector('input[type="text"]:nth-of-type(2)');
-          const lblVal = lblInput ? lblInput.value.trim() : "";
-            const nmVal = nmInput ? nmInput.value.trim() : "amount" + questionId + "_" + (allFieldsInOrder.filter(f => f.type === 'amount').length + 1);
-          const phVal = phInput ? phInput.value.trim() : "";
-            
-            allFieldsInOrder.push({
-              type: 'amount',
-              label: lblVal,
-              name: nmVal,
-              placeholder: phVal,
-              element: dEl
-            });
-          } else {
-            // This is a textbox element
-            const lblInput = dEl.querySelector('input[type="text"]:first-of-type');
-            const nmInput = dEl.querySelector('input[type="text"]:nth-of-type(2)');
-            const phInput = dEl.querySelector('input[type="text"]:last-of-type');
-          const lblVal = lblInput ? lblInput.value.trim() : "";
-            const nmVal = nmInput ? nmInput.value.trim() : "answer" + questionId + "_" + (allFieldsInOrder.filter(f => f.type === 'textbox').length + 1);
-          const phVal = phInput ? phInput.value.trim() : "";
-            
-            allFieldsInOrder.push({
-              type: 'textbox',
-              label: lblVal,
-              name: nmVal,
-              placeholder: phVal,
-              element: dEl
-            });
-          }
-        });
-        
-        // Render all fields in creation order
-        let lastWasLocation = false;
-        let firstField = true;
-        
-        for (let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++) {
-          const field = allFieldsInOrder[fieldIndex];
-          const isLocationField = locationFields.includes(field.label);
-          
-          // Add visual separation for location fields
-          if (isLocationField && !lastWasLocation && !firstField) {
-            // First location field in a group
-            formHTML += "<br>";
-          } else if (!isLocationField && lastWasLocation) {
-            // First non-location field after location fields
-            formHTML += "<br>";
-          }
-          
-          if (field.label) {
-            formHTML += `<label><h3>${field.label}</h3></label><br>`;
-          }
-          
-          if (field.type === 'textbox') {
-            formHTML += `<div class="text-input-container"><input type="text" id="${field.name}" name="${field.name}" placeholder="${field.placeholder}"></div>`;
-          } else if (field.type === 'amount') {
-            formHTML += `<div class="text-input-container"><input type="number" id="${field.name}" name="${field.name}" placeholder="${field.placeholder}" pattern="[0-9]*" inputmode="numeric"></div>`;
-          }
-          
-          lastWasLocation = isLocationField;
-          firstField = false;
-        }
-      } else if (questionType === "numberedDropdown") {
-        const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
-        const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
-        const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
-        const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
-        const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
-        const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
-
-        // gather unified field data from the new unified container
-        const unifiedFields = qBlock.querySelectorAll("#unifiedFields" + questionId + " .unified-field");
-        const labelVals = [];
-        const labelNodeIds = [];
-        const amountVals = [];
-        let allFieldsInOrder = []; // Declare here so it's available in the entire scope
-        
-        console.log('🔧 [GENERATE DEBUG] qBlock found:', !!qBlock);
-        console.log('🔧 [GENERATE DEBUG] unifiedFields selector:', "#unifiedFields" + questionId + " .unified-field");
-        console.log('🔧 [GENERATE DEBUG] Found', unifiedFields.length, 'unified fields for question', questionId);
-        
-        // If no unified fields found, try fallback to old containers
-        if (unifiedFields.length === 0) {
-          console.log('🔧 [GENERATE DEBUG] No unified fields found, trying fallback to old containers');
-          const lblInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:first-of-type");
-          const labelNodeIdInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:last-of-type");
-          const amtInputs = qBlock.querySelectorAll("#textboxAmounts" + questionId + " input[type='text']");
-          
-          console.log('🔧 [GENERATE DEBUG] Fallback found', lblInputs.length, 'labels and', amtInputs.length, 'amounts');
-          
-        for (let L = 0; L < lblInputs.length; L++) {
-          labelVals.push(lblInputs[L].value.trim());
-            labelNodeIds.push(labelNodeIdInputs[L] ? labelNodeIdInputs[L].value.trim() : "");
-          }
-        for (let A = 0; A < amtInputs.length; A++) {
-          amountVals.push(amtInputs[A].value.trim());
-        }
-        
-        // Create allFieldsInOrder from fallback data
-        allFieldsInOrder = [
-            ...labelVals.map((lbl, index) => ({
-                type: 'label',
-                label: lbl,
-                nodeId: labelNodeIds[index] || "",
-                order: index
-            })),
-            ...amountVals.map((amt, index) => ({
-                type: 'amount',
-                label: amt,
-                nodeId: "",
-                order: labelVals.length + index
-            }))
-        ];
-        } else {
-        
-        // Process fields in their creation order
-        const allElements = [];
-        
-        unifiedFields.forEach(field => {
-          const fieldType = field.getAttribute('data-type');
-          const fieldOrder = field.getAttribute('data-order');
-          const labelTextEl = field.querySelector('#labelText' + questionId + '_' + fieldOrder);
-          const nodeIdTextEl = field.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-          
-          console.log('🔧 [GENERATE DEBUG] Processing field:', { fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl });
-          
-          if (labelTextEl && nodeIdTextEl) {
-            const labelText = labelTextEl.textContent.trim();
-            const nodeIdText = nodeIdTextEl.textContent.trim();
-            
-            console.log('🔧 [GENERATE DEBUG] Field data:', { labelText, nodeIdText, fieldType });
-            
-            // Add to allFieldsInOrder for unified order
-            allElements.push({
-                type: fieldType,
-                label: labelText,
-                nodeId: nodeIdText,
-                order: parseInt(fieldOrder)
-            });
-            
-            if (fieldType === 'label') {
-              labelVals.push(labelText);
-              labelNodeIds.push(nodeIdText);
-            } else if (fieldType === 'amount') {
-              amountVals.push(labelText);
-            }
-          }
-        });
-        
-        // Sort by data-order attribute (creation order)
-        allElements.sort((a, b) => a.order - b.order);
-        allFieldsInOrder = allElements;
-        
-        console.log('🔧 [GENERATE DEBUG] Final arrays:', { labelVals, labelNodeIds, amountVals });
-        }
-        
-        labelMap[questionId] = labelVals;
-        amountMap[questionId] = amountVals;
-        // Store label node IDs for use in showTextboxLabels function
-        window.labelNodeIdsMap = window.labelNodeIdsMap || {};
-        window.labelNodeIdsMap[questionId] = labelNodeIds;
-        
-        // Store unified field data for use in showTextboxLabels function
-        window.unifiedFieldsMap = window.unifiedFieldsMap || {};
-        window.unifiedFieldsMap[questionId] = allFieldsInOrder;
-        
-        console.log('🔧 [UNIFIED FIELDS MAP DEBUG] Stored unifiedFieldsMap for question', questionId, ':', allFieldsInOrder);
-        
-        // Add unifiedFieldsMap to the generated HTML
-        if (!window.unifiedFieldsMapDeclared) {
-            window.unifiedFieldsMapDeclared = true;
-            // This will be added to the HTML output
-        }
-
-        // Then build the dropdown - use nodeId if provided, otherwise fallback to answer + questionId
-        const dropdownId = nodeId || "answer" + questionId;
-        questionNameIds[questionId] = dropdownId;
-        formHTML += `<select id="${dropdownId}" name="${dropdownId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value)">
-                       <option value="" disabled selected>Select an option</option>`;
-        for (let rnum = ddMin; rnum <= ddMax; rnum++) {
-          formHTML += `<option value="${rnum}">${rnum}</option>`;
-        }
-        formHTML += `</select><br><div id="labelContainer${questionId}"></div>`;
-      }
-
-      // end question container
-      formHTML += "</div>";
-
-      // If logic is enabled, gather "multiple-OR" conditions
-      if (logicEnabled) {
-        const logicRows = qBlock.querySelectorAll(".logic-condition-row");
-        if (logicRows.length > 0) {
-          logicScriptBuffer += `\n(function(){\n`;
-          logicScriptBuffer += ` var thisQ=document.getElementById("question-container-${questionId}");\n`;
-          logicScriptBuffer += ` function updateVisibility(){\n  var anyMatch=false;\n`;
-
-          for (let lr = 0; lr < logicRows.length; lr++) {
-            const row = logicRows[lr];
-            const rowIndex = lr + 1;
-            const pqEl = row.querySelector(
-              "#prevQuestion" + questionId + "_" + rowIndex
-            );
-            const paEl = row.querySelector(
-              "#prevAnswer" + questionId + "_" + rowIndex
-            );
-
-            if (!pqEl || !paEl) continue;
-            const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim().toLowerCase();
-            if (!pqVal || !paVal) continue;
-
-            const pType = questionTypesMap[pqVal] || "text";
-
-            logicScriptBuffer += `  (function(){\n`;
-            logicScriptBuffer += `    var cPrevType="${pType}";\n`;
-            logicScriptBuffer += `    var cPrevAns="${paVal}";\n`;
-            logicScriptBuffer += `    var cPrevQNum="${pqVal}";\n`;
-            logicScriptBuffer += `    if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `      var cbPrefix = getCbPrefix(cPrevQNum);\n`;
-			
-
-            logicScriptBuffer += `      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
-            logicScriptBuffer += `      var checkedVals=[];\n`;
-            logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
-            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
-            logicScriptBuffer += `    } else {\n`;
-            logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
-            // Special case for special options that check for presence rather than exact value
-            if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
-              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
-            } else {
-              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
-            }
-            logicScriptBuffer += `    }\n`;
-            logicScriptBuffer += `  })();\n`;
-          }
-
-          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }\n`;
-          logicScriptBuffer += `}\n`;
-
-          // attach event listeners
-          for (let lr2 = 0; lr2 < logicRows.length; lr2++) {
-            const row2 = logicRows[lr2];
-            const rowIndex2 = lr2 + 1;
-            const pqEl2 = row2.querySelector(
-              "#prevQuestion" + questionId + "_" + rowIndex2
-            );
-            if (!pqEl2) continue;
-            const pqVal2 = pqEl2.value.trim();
-            if (!pqVal2) continue;
-
-            const pType2 = questionTypesMap[pqVal2] || "text";
-            if (pType2 === "checkbox") {
-              logicScriptBuffer += ` (function(){\n`;
-              // Use explicit question ID value rather than relying on variable scope
-              logicScriptBuffer += `   var checkQuestion = "${pqVal2}";\n`;
-              logicScriptBuffer += `   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');\n`;
-              logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
-              logicScriptBuffer += ` })();\n`;
-            } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
-              // Use "change" event for select elements (dropdown, radio) instead of "input"
-              logicScriptBuffer += ` (function(){\n`;
-              // Use explicit question ID reference
-              logicScriptBuffer += `   var selectQuestion = "${pqVal2}";\n`;
-              // IMPORTANT: Try questionNameIds first, then fallback to default naming
-              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);\n`;
-              logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
-              logicScriptBuffer += ` })();\n`;
-            } else {
-              // Use "input" event for text fields
-              logicScriptBuffer += ` (function(){\n`;
-              // Use explicit question ID reference
-              logicScriptBuffer += `   var textQuestion = "${pqVal2}";\n`;
-              // IMPORTANT: Try questionNameIds first, then fallback to default naming
-              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);\n`;
-              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}\n`;
-              logicScriptBuffer += ` })();\n`;
-            }
-          }
-
-          logicScriptBuffer += ` updateVisibility();\n`;
-          logicScriptBuffer += `})();\n`;
-        }
-      }
-
-      // If PDF Logic is enabled, gather "multiple-OR" conditions and collect PDF
-      const pdfLogicCheckbox = qBlock.querySelector("#pdfLogic" + questionId);
-      const pdfLogicEnabled = pdfLogicCheckbox && pdfLogicCheckbox.checked;
-      
-      if (pdfLogicEnabled) {
-        const pdfLogicRows = qBlock.querySelectorAll(".pdf-logic-condition-row");
-        const pdfLogicPdfNameEl = qBlock.querySelector("#pdfLogicPdfName" + questionId);
-        const pdfLogicPdfName = pdfLogicPdfNameEl ? pdfLogicPdfNameEl.value.trim() : "";
-        const pdfLogicPdfDisplayNameEl = qBlock.querySelector("#pdfLogicPdfDisplayName" + questionId);
-        const pdfLogicPdfDisplayName = pdfLogicPdfDisplayNameEl ? pdfLogicPdfDisplayNameEl.value.trim() : "";
-        const pdfLogicStripePriceIdEl = qBlock.querySelector("#pdfLogicStripePriceId" + questionId);
-        const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
-        
-        console.log(`🔍 [PDF LOGIC DEBUG] Question ${questionId}:`, {
-          pdfLogicEnabled,
-          pdfLogicRows: pdfLogicRows.length,
-          pdfLogicPdfName,
-          pdfLogicPdfDisplayName,
-          pdfLogicStripePriceId
-        });
-        
-        if (pdfLogicRows.length > 0 && pdfLogicPdfName) {
-          // Add to PDF Logic array for later processing
-          pdfLogicPDFs.push({
-            questionId: questionId,
-            pdfName: pdfLogicPdfName,
-            pdfDisplayName: pdfLogicPdfDisplayName || pdfLogicPdfName.replace(/\.pdf$/i, ''),
-            stripePriceId: pdfLogicStripePriceId,
-            conditions: [],
-            isBigParagraph: questionType === "bigParagraph"
-          });
-          
-          // Process conditions
-          console.log(`🔍 [PDF LOGIC DEBUG] Processing ${pdfLogicRows.length} conditions for question ${questionId}`);
-          for (let lr = 0; lr < pdfLogicRows.length; lr++) {
-            const row = pdfLogicRows[lr];
-            const rowIndex = lr + 1;
-            
-            console.log(`🔍 [PDF LOGIC DEBUG] Processing condition ${rowIndex} for question ${questionId}, questionType: ${questionType}`);
-            
-            if (questionType === "bigParagraph") {
-              // For Big Paragraph, process character limit
-              const charLimitEl = row.querySelector(
-                "#pdfCharacterLimit" + questionId + "_" + rowIndex
-              );
-              const customCharLimitEl = row.querySelector(
-                "#pdfCustomCharacterLimit" + questionId + "_" + rowIndex
-              );
-              
-              if (!charLimitEl) continue;
-              
-              let charLimit = charLimitEl.value.trim();
-              if (charLimit === 'custom') {
-                charLimit = customCharLimitEl ? customCharLimitEl.value.trim() : '';
-              }
-              
-              if (!charLimit) continue;
-              
-              // Add character limit condition to the PDF Logic array
-              const pdfLogicIndex = pdfLogicPDFs.length - 1;
-              pdfLogicPDFs[pdfLogicIndex].conditions.push({
-                characterLimit: parseInt(charLimit)
-              });
-            } else {
-              // For other question types, process previous question logic
-            const pqEl = row.querySelector(
-              "#pdfPrevQuestion" + questionId + "_" + rowIndex
-            );
-            const paEl = row.querySelector(
-              "#pdfPrevAnswer" + questionId + "_" + rowIndex
-            );
-
-            console.log(`🔍 [PDF LOGIC DEBUG] Found elements for condition ${rowIndex}:`, {
-              pqEl: !!pqEl,
-              paEl: !!paEl,
-              pqElId: pqEl ? pqEl.id : 'not found',
-              paElId: paEl ? paEl.id : 'not found'
-            });
-
-            if (!pqEl || !paEl) {
-              console.log(`❌ [PDF LOGIC DEBUG] Missing elements for condition ${rowIndex}, skipping`);
-              continue;
-            }
-            const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim();
-            console.log(`🔍 [PDF LOGIC DEBUG] Values for condition ${rowIndex}:`, {
-              pqVal,
-              paVal
-            });
-            if (!pqVal || !paVal) {
-              console.log(`❌ [PDF LOGIC DEBUG] Empty values for condition ${rowIndex}, skipping`);
-              continue;
-            }
-
-            // Add condition to the PDF Logic array
-            const pdfLogicIndex = pdfLogicPDFs.length - 1;
-            pdfLogicPDFs[pdfLogicIndex].conditions.push({
-              prevQuestion: pqVal,
-              prevAnswer: paVal
-            });
-            console.log(`✅ [PDF LOGIC DEBUG] Added condition to PDF Logic array:`, {
-              prevQuestion: pqVal,
-              prevAnswer: paVal
-            });
-            }
-          }
-        }
-      }
-
-      // If Alert Logic is enabled, gather "multiple-OR" conditions and collect alert
-      const alertLogicCheckbox = qBlock.querySelector("#alertLogic" + questionId);
-      const alertLogicEnabled = alertLogicCheckbox && alertLogicCheckbox.checked;
-      
-      if (alertLogicEnabled) {
-        const alertLogicRows = qBlock.querySelectorAll(".alert-logic-condition-row");
-        const alertLogicMessageEl = qBlock.querySelector("#alertLogicMessage" + questionId);
-        const alertLogicMessage = alertLogicMessageEl ? alertLogicMessageEl.value.trim() : "";
-        
-        if (alertLogicRows.length > 0 && alertLogicMessage) {
-          // Add to Alert Logic array for later processing
-          alertLogics.push({
-            questionId: questionId,
-            message: alertLogicMessage,
-            conditions: []
-          });
-          
-          // Process conditions
-          for (let lr = 0; lr < alertLogicRows.length; lr++) {
-            const row = alertLogicRows[lr];
-            const rowIndex = lr + 1;
-            const pqEl = row.querySelector(
-              "#alertPrevQuestion" + questionId + "_" + rowIndex
-            );
-            const paEl = row.querySelector(
-              "#alertPrevAnswer" + questionId + "_" + rowIndex
-            );
-
-            if (!pqEl || !paEl) continue;
-            const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim();
-            if (!pqVal || !paVal) continue;
-
-            // Add condition to the Alert Logic array
-            const alertLogicIndex = alertLogics.length - 1;
-            alertLogics[alertLogicIndex].conditions.push({
-              prevQuestion: pqVal,
-              prevAnswer: paVal
-            });
-          }
-        }
-      }
-
-      // If Checklist Logic is enabled, gather "multiple-OR" conditions and collect checklist items
-      const checklistLogicCheckbox = qBlock.querySelector("#checklistLogic" + questionId);
-      const checklistLogicEnabled = checklistLogicCheckbox && checklistLogicCheckbox.checked;
-      
-      if (checklistLogicEnabled) {
-        const checklistLogicRows = qBlock.querySelectorAll(".checklist-logic-condition-row");
-        
-        if (checklistLogicRows.length > 0) {
-          // Add to Checklist Logic array for later processing
-          checklistLogics.push({
-            questionId: questionId,
-            conditions: []
-          });
-          
-          // Process conditions
-          for (let lr = 0; lr < checklistLogicRows.length; lr++) {
-            const row = checklistLogicRows[lr];
-            const conditionIndex = lr + 1;
-            const pqEl = row.querySelector(
-              "#checklistPrevQuestion" + questionId + "_" + conditionIndex
-            );
-            const paEl = row.querySelector(
-              "#checklistPrevAnswer" + questionId + "_" + conditionIndex
-            );
-            const checklistItemsEl = row.querySelector(
-              "#checklistItemsToAdd" + questionId + "_" + conditionIndex
-            );
-
-            if (!pqEl || !paEl || !checklistItemsEl) continue;
-            const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim();
-            const checklistItemsText = checklistItemsEl.value.trim();
-            
-            if (!pqVal || !paVal || !checklistItemsText) continue;
-
-            // Split checklist items by newlines and filter out empty lines
-            const checklistItemsArray = checklistItemsText.split('\n')
-              .map(item => item.trim())
-              .filter(item => item.length > 0);
-
-            // Add condition to the Checklist Logic array
-            const checklistLogicIndex = checklistLogics.length - 1;
-            checklistLogics[checklistLogicIndex].conditions.push({
-              prevQuestion: pqVal,
-              prevAnswer: paVal,
-              checklistItems: checklistItemsArray
-            });
-          }
-        }
-      }
-    } // end each question
-
-
-
-    // Section nav
-    formHTML += '<br><br><div class="navigation-buttons">';
-if (s > 1){
-    /* OLD:  <button type="button" onclick="navigateSection('+ (s-1) +')">Back</button> */
-    formHTML += '<button type="button" onclick="goBack()">Back</button>';
-}
-
-    if (s === sectionCounter - 1) {
-      formHTML += `<button type="submit" class="next-button">Submit</button>`;
+    if (user) {
+        if (signInBtn) signInBtn.style.display = "none";
+        if (logoutBtn) logoutBtn.style.display = "inline-block";
     } else {
-      formHTML += `<button type="button" class="next-button" onclick="validateAndProceed(${s})" id="next-button-${s}">Next</button>`;
+        if (signInBtn) signInBtn.style.display = "inline-block";
+        if (logoutBtn) logoutBtn.style.display = "none";
     }
-    formHTML += "</div>";
+}
 
-    formHTML += "</div>"; // end this section
-  }
+// Update cart count badge in header
+function updateCartCountBadge() {
+    const cartCountElement = document.getElementById("cart-count-badge");
+    if (cartCountElement) {
+        let count = 0;
+        
+        // Try to get count from getCartCount function first
+        if (typeof getCartCount === "function") {
+            count = getCartCount();
+        } else {
+            // Fallback to localStorage
+            try {
+                const cartData = localStorage.getItem("formwiz_cart");
+                if (cartData) {
+                    const cart = JSON.parse(cartData);
+                    count = Array.isArray(cart) ? cart.length : 0;
+                }
+            } catch (e) {
+                count = 0;
+            }
+        }
+        
+        // Always update the text content, even if count is 0
+        cartCountElement.textContent = count;
+        
+        if (count > 0) {
+            cartCountElement.style.display = "flex";
+        } else {
+            cartCountElement.style.display = "none";
+        }
+    }
+}
 
-  // Insert hidden fields (including multi-term calculations)
-  const genHidden = generateHiddenPDFFields();
-  formHTML += genHidden.hiddenFieldsHTML;
-  
-  // Add default checkbox based on form name
-  const formNameSafe = formName.replace(/\W+/g, '_').toLowerCase();
-  formHTML += `<input type="checkbox" id="${formNameSafe}_default_checkbox" name="${formNameSafe}_default_checkbox" checked style="display: none;">`;
+// Initialize cart count badge on page load
+document.addEventListener("DOMContentLoaded", function() {
+    updateCartCountBadge();
+    // Update cart count every 5 seconds
+    setInterval(updateCartCountBadge, 5000);
+});
+</script>
 
-  // Close the form & add the thank-you message
-  formHTML += [
-    "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
-    "</div>",
-    "</section>",
-    "</div>",
-    '<div class="pro-footer">',
-    '        <div class="pro-footer-col address-col">',
-    '            <div class="pro-footer-logo">',
-    '                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">',
-    '            </div>',
-    '            <div class="pro-footer-title">FormWiz</div>',
-    '            <div class="pro-footer-contact">',
-    '                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; ',
-    '                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>',
-    '            </div>',
-    '        </div>',
-    '        <div class="pro-footer-col nav-col">',
-    '            <div class="pro-footer-title">Navigation</div>',
-    '            <a href="../Pages/index.html">Home</a>',
-    '            <a href="../Pages/FreeForm.html">Forms</a>',
-    '            <a href="../Pages/FAQ.html">FAQ</a>',
-    '            <a href="../Pages/about.html">About Us</a>',
-    '            <a href="../Pages/contact.html">Contact Us</a>',
-    '        </div>',
-    '        <div class="pro-footer-col company-col">',
-    '            <div class="pro-footer-title company-title">About FormWiz</div>',
-    '            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>',
-    '        </div>',
-    '    </div>',
-    '    <footer>',
-    '        &copy; 2024 FormWiz. All rights reserved.',
-    '    </footer>',
-  ].join("\n");
-
-  // Add alert popup HTML and CSS
-  formHTML += `
+<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">
+    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <div style="flex: 1;">
+            <label for="user_firstname" style="display: block; margin-bottom: 5px; font-weight: bold;">First Name</label>
+            <input type="text" form="customForm" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_lastname" style="display: block; margin-bottom: 5px; font-weight: bold;">Last Name</label>
+            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>
+        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>
+        <input type="tel" form="customForm" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>
+        <input type="text" form="customForm" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <div style="flex: 2;">
+            <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>
+            <input type="text" form="customForm" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>
+            <input type="text" form="customForm" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>
+            <input type="text" form="customForm" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+</div>
+<div id="questions">
+    <div id="result"></div>
+    <section>
+    <div id="box">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>test</h3></label><select id="test" name="test" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
+<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_fullname"         name="user_fullname">
+<input type="hidden" id="user_email_hidden"     name="user_email_hidden">
+<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
+<input type="hidden" id="user_street_hidden"    name="user_street_hidden">
+<input type="hidden" id="user_city_hidden"      name="user_city_hidden">
+<input type="hidden" id="user_state_hidden"     name="user_state_hidden">
+<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
+</div><input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;"></form>
+<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+</div>
+</section>
+</div>
+<div class="pro-footer">
+        <div class="pro-footer-col address-col">
+            <div class="pro-footer-logo">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+            </div>
+            <div class="pro-footer-title">FormWiz</div>
+            <div class="pro-footer-contact">
+                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+            </div>
+        </div>
+        <div class="pro-footer-col nav-col">
+            <div class="pro-footer-title">Navigation</div>
+            <a href="../Pages/index.html">Home</a>
+            <a href="../Pages/FreeForm.html">Forms</a>
+            <a href="../Pages/FAQ.html">FAQ</a>
+            <a href="../Pages/about.html">About Us</a>
+            <a href="../Pages/contact.html">Contact Us</a>
+        </div>
+        <div class="pro-footer-col company-col">
+            <div class="pro-footer-title company-title">About FormWiz</div>
+            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2024 FormWiz. All rights reserved.
+    </footer>
   <style>
   .alert-overlay {
     position: fixed;
@@ -1700,15 +340,10 @@ if (s > 1){
       </div>
     </div>
   </div>
-  `;
+  
+<script>
+window.formId = '';
 
-  // Now we place ONE <script> block for everything:
-  formHTML += "\n<script>\n";
-  
-  // Set window.formId to the PDF name (without .pdf extension) for cart and form identification
-  formHTML += `window.formId = '${escapedPdfFormName.replace(/\.pdf$/i, '')}';\n`;
-  
- formHTML += `
 /*───────────────────────────────*
  * return the true checkbox prefix
  *───────────────────────────────*/
@@ -1724,126 +359,43 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
     // Return the name part directly without adding question prefix
     return namePart;
 }
-`;
 
-
-
-  // 1) Firebase config and check (only if not in test mode)
-  if (!isTestMode) {
-    formHTML += `
-      let isUserLoggedIn = false;
-      const firebaseConfig = {
-          apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-          authDomain: "formwiz-3f4fd.firebaseapp.com",
-          projectId: "formwiz-3f4fd",
-          storageBucket: "formwiz-3f4fd.firebasestorage.app",
-          messagingSenderId: "404259212529",
-          appId: "1:404259212529:web:15a33bce82383b21cfed50",
-          measurementId: "G-P07YEN0HPD"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId") || window.formId || 'default';
-      let userId = null;
-      firebase.auth().onAuthStateChanged(async function(user){
-          if(user){ 
-              isUserLoggedIn = true;
-              userId=user.uid;
-              // Fetch user data and display welcome message
-              try {
-                  const userDoc = await db.collection('users').doc(user.uid).get();
-                  if(userDoc.exists) {
-                      const userData = userDoc.data();
-                      document.getElementById('user_firstname').value = userData.firstName || '';
-                      document.getElementById('user_lastname').value = userData.lastName || '';
-                      document.getElementById('user_email').value = userData.email || '';
-                      document.getElementById('user_phone').value = userData.phone || '';
-                      
-                      // Update full name with 2-second delay to ensure DOM is ready
-                      setTimeout(() => {
-                      updateUserFullName();
-                      }, 2000);
-                      document.getElementById('user_street').value = userData.address?.street || '';
-                      document.getElementById('user_city').value = userData.address?.city || '';
-                      document.getElementById('user_state').value = userData.address?.state || '';
-                      document.getElementById('user_zip').value = userData.address?.zip || '';
-                  }
-              } catch(error) {
-                  console.error("Error fetching user data:", error);
-              }
-          } else {
-              isUserLoggedIn = false;
-              // Do NOT redirect. Just let the user fill the form.
-          }
-      });
-    `;
-  } else {
-    // In test mode, set user as logged in by default
-    formHTML += `
       let isUserLoggedIn = false;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    `;
-  }
-
-  // 2) Our global objects
-  formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap || {})};\n`;
-  formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
-  formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
-  formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs || [])};\n`;
-  console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', JSON.stringify(pdfLogicPDFs, null, 2));
-  formHTML += `console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', ${JSON.stringify(pdfLogicPDFs, null, 2)});\n`;
-  formHTML += `var pdfLogicPDFs = ${JSON.stringify(pdfLogicPDFs || [])};\n`;
-  formHTML += `var alertLogics = ${JSON.stringify(alertLogics || [])};\n`;
-  formHTML += `var checklistLogics = ${JSON.stringify(checklistLogics || [])};\n`;
-  formHTML += `var checklistItems = ${JSON.stringify(checklistItems || [])};\n`;
-  formHTML += `var conditionalAlerts = ${JSON.stringify(conditionalAlerts || [])};\n`;
-  formHTML += `var labelMap = ${JSON.stringify(labelMap || {})};\n`;
-  formHTML += `var amountMap = ${JSON.stringify(amountMap || {})};\n`;
-  formHTML += `var labelNodeIdsMap = ${JSON.stringify(window.labelNodeIdsMap || {})};\n`;
-  formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
-  
-  console.log('🔧 [HTML GENERATION DEBUG] Adding unifiedFieldsMap to HTML:', window.unifiedFieldsMap);
-  formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
-  formHTML += `var isHandlingLink = false;\n`;
-  
-  /*---------------------------------------------------------------
- * HISTORY STACK – must exist in the final HTML before functions
- *--------------------------------------------------------------*/
-/*---------------------------------------------------------------
- * HISTORY STACK – must exist in the final HTML before functions
- *--------------------------------------------------------------*/
-formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
-formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
-formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Main PDF name
-formHTML += `var pdfOutputFileName = "${escapedPdfOutputName}";\n`; // Output file name
-formHTML += `var stripePriceId = "${escapedStripePriceId}";\n`; // Stripe Price ID
-formHTML += `var additionalPdfFileNames = ${JSON.stringify(escapedAdditionalPdfNames)};\n`;  // Additional PDF names
-formHTML += `var allPdfFileNames = ["${escapedPdfOutputName.replace(/\.pdf$/i, '')}", ${escapedAdditionalPdfNames.map(name => `"${name.replace(/\.pdf$/i, '')}"`).join(", ")}];\n`;  // All PDF names in an array (without .pdf extension)
+    var questionSlugMap       = {"1":"test"};
+var questionNameIds = {"1":"test"};
+var jumpLogics = [];
+var conditionalPDFs = [];
+console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', []);
+var pdfLogicPDFs = [];
+var alertLogics = [];
+var checklistLogics = [];
+var checklistItems = [];
+var conditionalAlerts = [];
+var labelMap = {"1":["Street","City","State","bruh"],"length":0};
+var amountMap = {"1":["Zip"],"length":0};
+var labelNodeIdsMap = {"1":["street","city","state","bruh"]};
+var linkedDropdowns = [];
+var isHandlingLink = false;
+var sectionStack = [];
+var currentSectionNumber = 1;
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
+var additionalPdfFileNames = [];
+var allPdfFileNames = ["example.html", ];
+var hiddenCheckboxCalculations = [];
+var hiddenTextCalculations = [];
 
 
 
-
-
-  formHTML += `var hiddenCheckboxCalculations = ${JSON.stringify(
-    genHidden.hiddenCheckboxCalculations || []
-  )};\n`;
-  formHTML += `var hiddenTextCalculations = ${JSON.stringify(
-    genHidden.hiddenTextCalculations || []
-  )};\n\n`;
-
-  // 3) Append the logicScriptBuffer
-  formHTML += logicScriptBuffer + "\n";
-
-  // Add alert functions (always available for validation popups)
-  formHTML += `
 // Alert Logic Functions
 // Track page load time to prevent alerts in first 3 seconds
 const pageLoadTime = Date.now();
@@ -1894,101 +446,7 @@ function showValidationPopup() {
         '</div>';
     showAlert(validationMessage);
 }
-`;
 
-  // Add alert logic functions only if alert logics are enabled
-  if (alertLogics.length > 0) {
-    formHTML += `
-function checkAlertLogic(changedElement) {
-    if (!alertLogics || alertLogics.length === 0) return;
-    
-    // Get the question ID from the changed element
-    let changedQuestionId = null;
-    if (changedElement) {
-        const elementId = changedElement.id;
-        // Try to extract question ID from element ID
-        for (const [qId, nameId] of Object.entries(questionNameIds)) {
-            if (elementId === nameId || elementId === 'answer' + qId) {
-                changedQuestionId = qId;
-                break;
-            }
-        }
-    }
-    
-    // If we can't determine which question changed, don't check any alerts
-    // This prevents alerts from triggering on unrelated form elements
-    if (!changedQuestionId) return;
-    
-    for (const alertLogic of alertLogics) {
-        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
-        
-        // Only check this alert logic if it's related to the changed element
-        let shouldCheckThisAlert = false;
-        // Check if any condition in this alert logic references the changed question
-        for (const condition of alertLogic.conditions) {
-            if (condition.prevQuestion === changedQuestionId) {
-                shouldCheckThisAlert = true;
-                break;
-            }
-        }
-        
-        if (!shouldCheckThisAlert) continue;
-        
-        let shouldShowAlert = false;
-        
-        // Check if ANY of the conditions match (OR logic)
-        for (const condition of alertLogic.conditions) {
-            const prevQuestionId = condition.prevQuestion;
-            const prevAnswer = condition.prevAnswer;
-            
-            // Get the previous question's value
-            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                      document.getElementById('answer' + prevQuestionId);
-            
-            if (prevQuestionElement) {
-                let prevValue = '';
-                
-                if (prevQuestionElement.type === 'checkbox') {
-                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                } else {
-                    prevValue = prevQuestionElement.value;
-                }
-                
-                // Check if the condition matches
-                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                    shouldShowAlert = true;
-                    break; // Found a match, no need to check other conditions
-                }
-            }
-        }
-        
-        // Show alert if conditions are met
-        if (shouldShowAlert && alertLogic.message) {
-            showAlert(alertLogic.message);
-            return; // Show only the first matching alert
-        }
-    }
-}
-
-// Add event listeners for alert logic
-document.addEventListener('DOMContentLoaded', function() {
-    const formElements = document.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('change', function() { checkAlertLogic(this); });
-        element.addEventListener('input', function() { checkAlertLogic(this); });
-    });
-    
-    // Initialize checkbox styling for beautiful blue borders
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        updateCheckboxStyle(checkbox);
-    });
-});
-`;
-  }
-
-  // Always add cart functions (they're needed for the Continue button)
-  formHTML += `
 // Helper function to deduplicate PDFs based on pdfName
 function deduplicatePdfs(pdfArray) {
   const seen = new Set();
@@ -2100,13 +558,13 @@ window.showCartModal = function () {
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
-    modal.innerHTML = \`
+    modal.innerHTML = `
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
-        <p style="font-size:0.9em;color:#666;margin:10px 0;">\${deduplicatedPdfs.length} PDF(s) will be added to cart</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">${deduplicatedPdfs.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
-          Add to Cart - \${priceDisplay}
+          Add to Cart - ${priceDisplay}
         </button>
         <br><br>
         <button id="viewCartBtn" style="background:#e0e7ef;color:#2c3e50;border:none;border-radius:6px;padding:8px 22px;font-size:1em;font-weight:600;cursor:pointer;">
@@ -2117,7 +575,7 @@ window.showCartModal = function () {
           Cancel
         </button>
       </div>
-    \`;
+    `;
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
@@ -2227,12 +685,12 @@ window.addFormToCart = function (priceId) {
           } else {
             // Create a title based on the main form name + PDF name
             const mainFormName = window.pdfFileName || 'Form';
-            const pdfBaseName = pdfLogic.pdfName.replace(/\.pdf$/i, '').toUpperCase();
+            const pdfBaseName = pdfLogic.pdfName.replace(/.pdf$/i, '').toUpperCase();
             displayTitle = mainFormName + ' ' + pdfBaseName;
           }
           
           const item = {
-            formId: pdfLogic.pdfName.replace(/\.pdf$/i, '').toLowerCase(),
+            formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
             title: displayTitle,
             priceId: pdfLogic.stripePriceId,
             pdfName: pdfLogic.pdfName,
@@ -2327,11 +785,11 @@ window.addFormToCart = function (priceId) {
               itemInfo += ' - Defendant: ' + item.defendantName;
             }
             return itemInfo;
-          }).join('\\n');
-          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
+          }).join('\n');
+          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n' + itemList);
           
           // Show debugging alert with cart data
-          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n\\n' + itemList;
+          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n\n' + itemList;
           alert(debugInfo);
           
           // Show cart page requested alert
@@ -2372,11 +830,11 @@ window.addFormToCart = function (priceId) {
       itemInfo += ' - Defendant: ' + item.defendantName;
     }
     return itemInfo;
-  }).join('\\n');
-  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
+  }).join('\n');
+  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\n' + itemList);
   
   // Show debugging alert with cart data
-  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\\n\\n' + itemList;
+  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\n\n' + itemList;
   alert(debugInfo);
   
   // Show cart page requested alert
@@ -2397,114 +855,17 @@ window.getCartCount = function() {
   }
   return 0;
 };
-`;
 
-
-
-  // Always define checklist variables (needed for showThankYouMessage function)
-  formHTML += `
 // Checklist Variables (always defined)
 let userChecklist = [];
 let staticChecklistItems = [];
-`;
 
-  // Add checklist functionality if any checklist logic is enabled
-  if (checklistLogics.length > 0) {
-    formHTML += `
-// Checklist Logic Functions
-function checkChecklistLogic(changedElement) {
-    if (!checklistLogics || checklistLogics.length === 0) return;
-    
-    // Get the question ID from the changed element
-    let changedQuestionId = null;
-    if (changedElement) {
-        const elementId = changedElement.id;
-        // Try to extract question ID from element ID
-        for (const [qId, nameId] of Object.entries(questionNameIds)) {
-            if (elementId === nameId || elementId === 'answer' + qId) {
-                changedQuestionId = qId;
-                break;
-            }
-        }
-    }
-    
-    for (const checklistLogic of checklistLogics) {
-        if (!checklistLogic.conditions || checklistLogic.conditions.length === 0) continue;
-        
-        // Only check this checklist logic if it's related to the changed element
-        let shouldCheckThisLogic = false;
-        if (changedQuestionId) {
-            // Check if any condition in this checklist logic references the changed question
-            for (const condition of checklistLogic.conditions) {
-                if (condition.prevQuestion === changedQuestionId) {
-                    shouldCheckThisLogic = true;
-                    break;
-                }
-            }
-        } else {
-            // If we can't determine which question changed, check all logic (fallback)
-            shouldCheckThisLogic = true;
-        }
-        
-        if (!shouldCheckThisLogic) continue;
-        
-        // Check if ANY of the conditions match (OR logic)
-        for (const condition of checklistLogic.conditions) {
-            const prevQuestionId = condition.prevQuestion;
-            const prevAnswer = condition.prevAnswer;
-            
-            // Get the previous question's value
-            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                      document.getElementById('answer' + prevQuestionId);
-            
-            if (prevQuestionElement) {
-                let prevValue = '';
-                
-                if (prevQuestionElement.type === 'checkbox') {
-                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                } else {
-                    prevValue = prevQuestionElement.value;
-                }
-                
-                // Check if the condition matches
-                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                    // Add checklist items to user's checklist
-                    if (condition.checklistItems && condition.checklistItems.length > 0) {
-                        condition.checklistItems.forEach(item => {
-                            if (!userChecklist.includes(item)) {
-                                userChecklist.push(item);
-                            }
-                        });
-                    }
-                    break; // Found a match, no need to check other conditions
-                }
-            }
-        }
-    }
-}
-
-// Add event listeners for checklist logic
-document.addEventListener('DOMContentLoaded', function() {
-    const formElements = document.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('change', function() { checkChecklistLogic(this); });
-        element.addEventListener('input', function() { checkChecklistLogic(this); });
-    });
-    
-    // Initialize static checklist items
-    staticChecklistItems = ${JSON.stringify(checklistItems || [])};
-});
-`;
-  }
-
-  // 4) The rest of the main JS code
-  formHTML += `
   
   
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
+        .replace(/\W+/g, "_")   // ← double "\" so the HTML gets "\W"
         .replace(/^_+|_+$/g, "");
 }
 
@@ -2512,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function formatPhoneNumber(value) {
   if (!value) return value;
   
-  const phoneNumber = value.replace(/\\D/g, '');
+  const phoneNumber = value.replace(/\D/g, '');
   const phoneNumberLength = phoneNumber.length;
   
   if (phoneNumberLength < 4) {
@@ -2539,7 +900,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event listener for input
     phoneInput.addEventListener('input', function(e) {
       const input = e.target;
-      const value = input.value.replace(/\\D/g, '').substring(0, 10); // Strip non-digits and limit to 10 digits
+      const value = input.value.replace(/\D/g, '').substring(0, 10); // Strip non-digits and limit to 10 digits
       input.value = formatPhoneNumber(value);
     });
   });
@@ -3246,7 +1607,7 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
+    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
     const checkboxId = baseName + "_" + idSuffix;
     
     const checkboxDiv = document.createElement("div");
@@ -3536,7 +1897,7 @@ async function processAllPdfs() {
     if (pdfOutputFileName) {
         console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
-        const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
+        const baseName = pdfOutputFileName.replace(/.pdf$/i, '');
         if (!processedPdfs.has(baseName)) {
             processedPdfs.add(baseName);
         await editAndDownloadPDF(baseName);
@@ -3573,7 +1934,7 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    const baseName = conditionalPDF.pdfName.replace(/\.pdf$/i, '');
+                    const baseName = conditionalPDF.pdfName.replace(/.pdf$/i, '');
                     if (!processedPdfs.has(baseName)) {
                         processedPdfs.add(baseName);
                         await editAndDownloadPDF(baseName);
@@ -3639,7 +2000,7 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    const baseName = pdfLogic.pdfName.replace(/\.pdf$/i, '');
+                    const baseName = pdfLogic.pdfName.replace(/.pdf$/i, '');
                     if (!processedPdfs.has(baseName)) {
                         processedPdfs.add(baseName);
                         await editAndDownloadPDF(baseName);
@@ -3716,7 +2077,7 @@ async function editAndDownloadPDF (pdfName) {
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
-        const baseName = pdfName.replace(/\.pdf$/i, '');
+        const baseName = pdfName.replace(/.pdf$/i, '');
         const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
         console.log('🔧 [PDF DEBUG] Making request to:', endpoint);
         
@@ -3905,15 +2266,15 @@ function runSingleHiddenTextCalculation(calcObj) {
 }
 
 function replacePlaceholderTokens (str){
-    /* note the doubled back-slashes in the delimiters \$\$ */
-    return str.replace(/\\$\\$(.*?)\\$\\$/g, function (_match, innerExpr){
+    /* note the doubled back-slashes in the delimiters $$ */
+    return str.replace(/\$\$(.*?)\$\$/g, function (_match, innerExpr){
         return evaluatePlaceholderExpression(innerExpr);
     });
 }
 
 function evaluatePlaceholderExpression (exprString){
     /* split on +  -  x  /   (all kept as separate tokens) */
-    var tokens = exprString.split(/([+\-x\/])/);          // ← every \ is **doubled**
+    var tokens = exprString.split(/([+-x/])/);          // ← every  is **doubled**
     if (!tokens.length) return '0';
 
     var currentVal = parseTokenValue(tokens[0]);
@@ -3941,7 +2302,7 @@ function parseTokenValue(token){
 /*───────────────────────────────────────────────────────────────*
  * 3.  getMoneyValue(qId)
  *     – tiny regex fix so legacy "amountX_Y_Z" can still resolve
- *       (note the escaped \\d+ instead of stray 'd').
+ *       (note the escaped \d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
     /* direct hit first */
@@ -3956,7 +2317,7 @@ function getMoneyValue(qId) {
     }
 
     /* legacy builder‑shorthand amountX_Y_Z */
-    if (/^amount\d+_\d+_.+/.test(qId)) {
+    if (/^amountd+_d+_.+/.test(qId)) {
         const el2 = document.getElementById(normaliseDesignerFieldRef(qId));
         if (el2) return parseFloat(el2.value) || 0;
     }
@@ -4238,7 +2599,7 @@ if (typeof handleNext === 'function') {
         const portfolioId = urlParams.get('portfolioId') || '';
         // Create a unique form ID that includes county and portfolio information for autosave separation
         let formId = baseFormId;
-        if (county) formId += '_' + county.replace(/\s+/g, '_');
+        if (county) formId += '_' + county.replace(/s+/g, '_');
         if (portfolioId) formId += '_' + portfolioId;
         let userId = null;
         let isUserLoggedIn = false;
@@ -5026,7 +3387,7 @@ if (typeof handleNext === 'function') {
                 } else {
                     // User is not signed in - show signup message
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
-                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
+                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
                     if (cartItemsList) cartItemsList.style.display = 'none';
                     if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
@@ -5094,10 +3455,10 @@ if (typeof handleNext === 'function') {
                         let countyHtml = '';
                         if (item.defendantName) {
                             const capName = String(item.defendantName)
-                              .split(/\s+/)
+                              .split(/s+/)
                               .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
                               .join(' ');
-                            defendantHtml = '<div style=\\"color:#e74c3c;font-weight:600;\\">Defendant: ' + capName + '</div>';
+                            defendantHtml = '<div style=\"color:#e74c3c;font-weight:600;\">Defendant: ' + capName + '</div>';
                         }
                         if (item.countyName) {
                             const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
@@ -5347,7 +3708,7 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
     
     if (selectedValue) {
       // Generate checkbox ID using the same pattern as dropdownMirror
-      const idSuffix = selectedValue.replace(/\W+/g, "_").toLowerCase();
+      const idSuffix = selectedValue.replace(/W+/g, "_").toLowerCase();
       const checkboxId = baseName + "_" + idSuffix;
       const checkboxName = baseName + "_" + idSuffix;
       
@@ -5371,7 +3732,7 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
     if (!optionValue) return;
     
     // Generate checkbox ID using the same pattern as dropdownMirror
-    const idSuffix = optionValue.replace(/\W+/g, "_").toLowerCase();
+    const idSuffix = optionValue.replace(/W+/g, "_").toLowerCase();
     const checkboxId = baseName + "_" + idSuffix;
     const checkboxName = baseName + "_" + idSuffix;
     
@@ -5550,19 +3911,19 @@ function populateDebugContent() {
   });
   
   // Filter by search term with bidirectional space/underscore normalization
-  const normalizedSearchTermUnderscore = searchTerm.replace(/[_\s]/g, '_');
-  const normalizedSearchTermSpace = searchTerm.replace(/[_\s]/g, ' ');
+  const normalizedSearchTermUnderscore = searchTerm.replace(/[_s]/g, '_');
+  const normalizedSearchTermSpace = searchTerm.replace(/[_s]/g, ' ');
   
   const filteredData = inputData.filter(item => {
-    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_\s]/g, '_');
-    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_\s]/g, '_');
-    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_\s]/g, '_');
-    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_s]/g, '_');
+    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_s]/g, '_');
+    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_s]/g, '_');
+    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_s]/g, '_');
     
-    const normalizedIdSpace = item.id.toLowerCase().replace(/[_\s]/g, ' ');
-    const normalizedNameSpace = item.name.toLowerCase().replace(/[_\s]/g, ' ');
-    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_\s]/g, ' ');
-    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedIdSpace = item.id.toLowerCase().replace(/[_s]/g, ' ');
+    const normalizedNameSpace = item.name.toLowerCase().replace(/[_s]/g, ' ');
+    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_s]/g, ' ');
+    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_s]/g, ' ');
     
     // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
     return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
@@ -5944,174 +4305,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-`;
-
-  // Finally, return the assembled HTML
-  return formHTML;
-}
-
-
-
-/*───────────────────────────────────────────────────────────────*
- * 1.  normaliseDesignerFieldRef(raw)
- *     – unchanged except for two tiny regex tweaks (see comments)
- *───────────────────────────────────────────────────────────────*/
-function normaliseDesignerFieldRef(raw) {
-    raw = String(raw || "").trim();
-
-    /* ① already a real element in the live DOM? */
-    if (document.getElementById(raw)) return raw;
-
-    /* ② looks like a finished slug already? */
-    const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
-    if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1]))
-        return raw;
-
-    /* ③ builder shorthand (amountX_Y_field  OR  answerX_Y_field) */
-    const mShort =
-        raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
-        raw.match(/^answer(\d+)_(\d+)_(.+)$/);
-    if (mShort) {
-        const [, qId, idx, field] = mShort;
-        const slug = questionSlugMap[qId] || ("answer" + qId);
-        return `${slug}_${idx}_${sanitizeQuestionText(field)}`;
-    }
-
-    /* ④ catch‑all fallback */
-    const mGeneric = raw.match(/^(.*)_(\d+)_(.+)$/);
-    if (!mGeneric) return sanitizeQuestionText(raw);
-
-    const [, qText, idx, field] = mGeneric;
-    return `${sanitizeQuestionText(qText)}_${idx}_${sanitizeQuestionText(field)}`;
-}
-
-
-
-/*───────────────────────────────────────────────────────────────*
- * 2.  generateHiddenPDFFields()
- *     – now funnels every designer reference through
- *       normaliseDesignerFieldRef() so shorthand is fixed.
- *───────────────────────────────────────────────────────────────*/
-function generateHiddenPDFFields() {
-    let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
-
-    /* profile fields … (unchanged) */
-    hiddenFieldsHTML += `
-<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
-<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
-<input type="hidden" id="user_fullname"         name="user_fullname">
-<input type="hidden" id="user_email_hidden"     name="user_email_hidden">
-<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
-<input type="hidden" id="user_street_hidden"    name="user_street_hidden">
-<input type="hidden" id="user_city_hidden"      name="user_city_hidden">
-<input type="hidden" id="user_state_hidden"     name="user_state_hidden">
-<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">`;
-
-    const hiddenCheckboxCalculations = [];
-    const hiddenTextCalculations     = [];
-
-    const container = document.getElementById("hiddenFieldsContainer");
-    if (!container)
-        return { hiddenFieldsHTML: hiddenFieldsHTML + "</div>",
-                 hiddenCheckboxCalculations,
-                 hiddenTextCalculations };
-
-    /* ── walk every hidden‑field block ────────────────────────── */
-    container.querySelectorAll(".hidden-field-block").forEach(block => {
-        const hid   = block.id.replace("hiddenFieldBlock", "");
-        const fType = block.querySelector("#hiddenFieldType" + hid)?.value || "text";
-        const fName = block.querySelector("#hiddenFieldName" + hid)?.value.trim();
-        if (!fName) return;
-
-        /* TEXT hidden field ......................................*/
-        if (fType === "text") {
-			
-			//hide fields here
-            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:none;">`;
-
-            const rows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
-            if (rows.length) {
-                const calcArr = [];
-
-                rows.forEach(row => {
-                    const oneCalc = { terms: [], compareOperator: "=", threshold: "0", fillValue: "" };
-
-                    /* grab terms */
-                    row.querySelectorAll(".equation-term-text").forEach((termDiv, tIdx) => {
-                        const qSel = termDiv.querySelector('[id^="textTermQuestion"]');
-                        if (!qSel) return;
-
-                        const qId   = qSel.value.trim();
-                        const rawId = questionNameIds[qId] || qId;            // fallback
-                        const isAmt = questionTypesMap[qId] === "checkbox" &&
-                                      termDiv.querySelector('[id^="textTermIsAmount"]')?.checked;
-                        const base  = isAmt ? rawId + "_amount" : rawId;
-
-                        oneCalc.terms.push({
-                            operator: tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
-                            /* HERE is the important line: */
-                            questionNameId: normaliseDesignerFieldRef(base)
-                        });
-                    });
-
-                    if (oneCalc.terms.length) {
-                        oneCalc.compareOperator = row.querySelector('[id^="textCompareOperator"]').value || "=";
-                        oneCalc.threshold       = row.querySelector('[id^="textThreshold"]').value.trim() || "0";
-                        oneCalc.fillValue       = row.querySelector('[id^="textFillValue"]').value.trim() || "";
-                        calcArr.push(oneCalc);
-                    }
-                });
-
-                if (calcArr.length)
-                    hiddenTextCalculations.push({ hiddenFieldName: fName, calculations: calcArr });
-            }
-        }
-
-        /* CHECKBOX hidden field ..................................*/
-        if (fType === "checkbox") {
-            const checked = block.querySelector("#hiddenFieldChecked" + hid)?.checked;
-            hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${fName}" name="${fName}" ${checked ? "checked" : ""}></div>`;
-
-            const rows = block.querySelectorAll(`[id^="calculationRow${hid}_"]`);
-            if (rows.length) {
-                const calcArr = [];
-
-                rows.forEach(row => {
-                    const oneCalc = { terms: [], compareOperator: "=", threshold: "0", result: "checked" };
-
-                    row.querySelectorAll(".equation-term-cb").forEach((termDiv, tIdx) => {
-                        const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
-                        if (!qSel) return;
-
-                        const qId   = qSel.value.trim();
-                        const rawId = questionNameIds[qId] || qId;
-                        const isAmt = questionTypesMap[qId] === "checkbox" &&
-                                      termDiv.querySelector('[id^="calcTermIsAmount"]')?.checked;
-                        const base  = isAmt ? rawId + "_amount" : rawId;
-
-                        oneCalc.terms.push({
-                            operator: tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
-                            questionNameId: normaliseDesignerFieldRef(base)
-                        });
-                    });
-
-                    if (oneCalc.terms.length) {
-                        oneCalc.compareOperator = row.querySelector('[id^="calcCompareOperator"]').value || "=";
-                        oneCalc.threshold       = row.querySelector('[id^="calcThreshold"]').value.trim() || "0";
-                        oneCalc.result          = row.querySelector('[id^="calcResult"]').value || "checked";
-                        calcArr.push(oneCalc);
-                    }
-                });
-
-                if (calcArr.length)
-                    hiddenCheckboxCalculations.push({ hiddenFieldName: fName, calculations: calcArr });
-            }
-        }
-    });
-
-    hiddenFieldsHTML += "\n</div>";
-    return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
-}
-
-
-
