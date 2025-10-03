@@ -1231,8 +1231,6 @@ formHTML += `</div><br></div>`;
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
         window.unifiedFieldsMap[questionId] = allFieldsInOrder;
         
-        console.log('🔧 [UNIFIED FIELDS MAP DEBUG] Stored unifiedFieldsMap for question', questionId, ':', allFieldsInOrder);
-        
         // Add unifiedFieldsMap to the generated HTML
         if (!window.unifiedFieldsMapDeclared) {
             window.unifiedFieldsMapDeclared = true;
@@ -1809,8 +1807,6 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var amountMap = ${JSON.stringify(amountMap || {})};\n`;
   formHTML += `var labelNodeIdsMap = ${JSON.stringify(window.labelNodeIdsMap || {})};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
-  
-  console.log('🔧 [HTML GENERATION DEBUG] Adding unifiedFieldsMap to HTML:', window.unifiedFieldsMap);
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   

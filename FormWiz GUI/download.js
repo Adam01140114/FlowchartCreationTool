@@ -1453,9 +1453,9 @@ function exportForm() {
                         });
                     }
                     
-                    questionData.labels = labels;
+                questionData.labels = labels;
                     questionData.labelNodeIds = labelNodeIds;
-                    questionData.amounts = amounts;
+                questionData.amounts = amounts;
                     
                     console.log('🔧 [EXPORT DEBUG] Fallback data:', { labels, labelNodeIds, amounts });
                 }
