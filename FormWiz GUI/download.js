@@ -568,6 +568,7 @@ function loadFormData(formData) {
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
                     const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
                     const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
+                    const maxCharacterLimitInput = questionBlock.querySelector(`#maxCharacterLimit${question.questionId}`);
                     if (nameInput) {
                         nameInput.value = question.nameId || '';
                     }
@@ -576,6 +577,9 @@ function loadFormData(formData) {
                     }
                     if (lineLimitInput && question.lineLimit) {
                         lineLimitInput.value = question.lineLimit;
+                    }
+                    if (maxCharacterLimitInput && question.maxCharacterLimit) {
+                        maxCharacterLimitInput.value = question.maxCharacterLimit;
                     }
                 }
 
@@ -1369,10 +1373,14 @@ function exportForm() {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
+                const maxCharacterLimit = questionBlock.querySelector(`#maxCharacterLimit${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
                 if (lineLimit) {
                     questionData.lineLimit = parseInt(lineLimit);
+                }
+                if (maxCharacterLimit) {
+                    questionData.maxCharacterLimit = parseInt(maxCharacterLimit);
                 }
             }
 

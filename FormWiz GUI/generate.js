@@ -595,9 +595,13 @@ questionSlugMap[questionId] = slug;
       } else if (questionType === "bigParagraph") {
         const nmEl2 = qBlock.querySelector("#textboxName" + questionId);
         const phEl2 = qBlock.querySelector("#textboxPlaceholder" + questionId);
+        const maxCharLimitEl = qBlock.querySelector("#maxCharacterLimit" + questionId);
+        const lineLimitEl = qBlock.querySelector("#lineLimit" + questionId);
         const nameId2 =
           nmEl2 && nmEl2.value ? nmEl2.value : "answer" + questionId;
         const ph2 = phEl2 && phEl2.value ? phEl2.value : "";
+        const maxCharLimit = maxCharLimitEl && maxCharLimitEl.value ? parseInt(maxCharLimitEl.value) : null;
+        const lineLimit = lineLimitEl && lineLimitEl.value ? parseInt(lineLimitEl.value) : null;
         questionNameIds[questionId] = nameId2;
         
         // Check if this Big Paragraph has PDF logic with character limits
@@ -613,12 +617,18 @@ questionSlugMap[questionId] = slug;
         
         if (hasPdfLogic && characterLimits.length > 0) {
           const maxLimit = Math.max(...characterLimits);
+          const effectiveMaxLength = maxCharLimit ? Math.min(maxCharLimit, maxLimit * 2) : maxLimit * 2;
+          const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
+          const onInputHandler = lineLimit ? 
+            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)}); handleLineSplitting('${nameId2}', ${lineLimit});"` :
+            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"`;
+          
           formHTML += `
             <div class="big-paragraph-container">
               <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
-                        maxlength="${maxLimit * 2}" oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
+                        maxlength="${effectiveMaxLength}"${lineLimitAttr}${onInputHandler}></textarea>
               <div class="character-count" id="charCount_${nameId2}">
-                <span class="current-count">0</span> / <span class="limit-display">${maxLimit}</span> characters
+                <span class="current-count">0</span> / <span class="limit-display">${maxCharLimit || maxLimit}</span> characters
               </div>
             </div><br>
             <script>
@@ -643,10 +653,103 @@ questionSlugMap[questionId] = slug;
                   }
                 }
               }
+              
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  
+                  hiddenInput.value = lineText;
+                }
+                
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
             </script>
           `;
         } else {
-        formHTML += `<div class="text-input-container"><textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea></div>`;
+          const maxLengthAttr = maxCharLimit ? ` maxlength="${maxCharLimit}"` : '';
+          const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
+          const onInputHandler = lineLimit ? ` oninput="handleLineSplitting('${nameId2}', ${lineLimit})"` : '';
+          
+          formHTML += `
+            <div class="text-input-container">
+              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"${maxLengthAttr}${lineLimitAttr}${onInputHandler}></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  
+                  hiddenInput.value = lineText;
+                }
+                
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          `;
         }
       } else if (questionType === "money") {
         const mnNmEl = qBlock.querySelector("#textboxName" + questionId);
@@ -3975,6 +4078,68 @@ if (typeof handleNext === 'function') {
             
         }
 
+        // Helper function to trigger line splitting for autofilled textareas
+        function triggerLineSplittingForAutofilledTextareas() {
+            console.log('🔧 [LINE SPLITTING DEBUG] Checking for textareas that need line splitting...');
+            
+            // Find all textareas that have a line limit data attribute
+            const textareas = document.querySelectorAll('textarea[data-line-limit]');
+            textareas.forEach(textarea => {
+                const lineLimit = parseInt(textarea.getAttribute('data-line-limit'));
+                if (lineLimit && textarea.value && textarea.value.length > 0) {
+                    console.log('🔧 [LINE SPLITTING DEBUG] Triggering line splitting for textarea:', textarea.id, 'with', textarea.value.length, 'characters, line limit:', lineLimit);
+                    
+                    // Call the handleLineSplitting function if it exists
+                    if (typeof handleLineSplitting === 'function') {
+                        handleLineSplitting(textarea.id, lineLimit);
+                    } else {
+                        // Fallback: manually trigger the line splitting logic
+                        const text = textarea.value;
+                        const totalChars = text.length;
+                        const linesNeeded = Math.ceil(totalChars / lineLimit);
+                        
+                        console.log('🔧 [LINE SPLITTING DEBUG] Creating', linesNeeded, 'hidden textboxes for textarea:', textarea.id);
+                        
+                        // Create or update hidden textboxes for each line
+                        for (let i = 1; i <= linesNeeded; i++) {
+                            const startIndex = (i - 1) * lineLimit;
+                            const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                            const lineText = text.substring(startIndex, endIndex);
+                            
+                            const hiddenInputId = textarea.id + '_line' + i;
+                            let hiddenInput = document.getElementById(hiddenInputId);
+                            
+                            if (!hiddenInput) {
+                                // Create new hidden input
+                                hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.id = hiddenInputId;
+                                hiddenInput.name = hiddenInputId;
+                                textarea.parentNode.appendChild(hiddenInput);
+                                console.log('🔧 [LINE SPLITTING DEBUG] Created hidden input:', hiddenInputId);
+                            }
+                            
+                            hiddenInput.value = lineText;
+                            console.log('🔧 [LINE SPLITTING DEBUG] Set value for', hiddenInputId, 'to:', lineText);
+                        }
+                        
+                        // Remove any extra hidden inputs that are no longer needed
+                        let lineNum = linesNeeded + 1;
+                        while (true) {
+                            const extraInput = document.getElementById(textarea.id + '_line' + lineNum);
+                            if (extraInput) {
+                                extraInput.remove();
+                                console.log('🔧 [LINE SPLITTING DEBUG] Removed extra hidden input:', textarea.id + '_line' + lineNum);
+                                lineNum++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // Helper: load answers
         async function loadAnswers() {
             console.log('🔧 [AUTOFILL DEBUG] loadAnswers() called - isUserLoggedIn:', isUserLoggedIn, 'userId:', userId, 'formId:', formId);
@@ -4099,6 +4264,9 @@ if (typeof handleNext === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
                     }
                     
+                    // Trigger line splitting for autofilled textareas
+                    triggerLineSplittingForAutofilledTextareas();
+                    
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
@@ -4139,6 +4307,9 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         });
+                        
+                        // Trigger line splitting again after the second autofill pass
+                        triggerLineSplittingForAutofilledTextareas();
                     }, 1500);
                     
                         // Reset hidden questions to defaults after autofill and visibility updates
@@ -4358,6 +4529,9 @@ if (typeof handleNext === 'function') {
                             createHiddenCheckboxesForAutofilledDropdowns();
                         }
                         
+                        // Trigger line splitting for autofilled textareas
+                        triggerLineSplittingForAutofilledTextareas();
+                        
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
                         setTimeout(() => {
@@ -4398,6 +4572,9 @@ if (typeof handleNext === 'function') {
                                     }
                                 }
                             });
+                            
+                            // Trigger line splitting again after the second autofill pass
+                            triggerLineSplittingForAutofilledTextareas();
                         }, 1500);
                     }, 2000);
                 }
@@ -5234,6 +5411,9 @@ function populateDebugContent() {
       grouped.checkbox.push(item);
     } else if (item.inputType === 'radio') {
       grouped.radio.push(item);
+    } else if (item.inputType === 'hidden' && item.name.includes('_line')) {
+      // Hidden textboxes created by line splitting should be categorized as text inputs
+      grouped.text.push(item);
     } else {
       grouped.other.push(item);
     }

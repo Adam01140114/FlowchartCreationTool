@@ -4041,6 +4041,10 @@ function autosaveFlowchartToLocalStorage() {
       
       // checkbox availability
       if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
+      
+      // big paragraph properties
+      if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
+      if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
 
       return cellData;
     });

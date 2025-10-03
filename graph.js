@@ -821,6 +821,26 @@ function showPropertiesPopup(cell) {
     });
   }
   
+  // Add Max Line Limit and Max Character Limit for big paragraph questions
+  if (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
+      typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+    properties.push({
+      label: 'Max Line Limit',
+      value: cell._lineLimit || '',
+      id: 'propLineLimit',
+      editable: true,
+      inputType: 'number'
+    });
+    
+    properties.push({
+      label: 'Max Character Limit',
+      value: cell._characterLimit || '',
+      id: 'propCharacterLimit',
+      editable: true,
+      inputType: 'number'
+    });
+  }
+  
   // PDF Name field will be added later in the unified section
   
   // Add Copy ID dropdown and button for date range nodes
@@ -1458,7 +1478,7 @@ function showPropertiesPopup(cell) {
           const isNodeText = prop.id === 'propNodeText';
           const input = document.createElement(isNodeText ? 'textarea' : 'input');
           if (!isNodeText) {
-            input.type = 'text';
+            input.type = prop.inputType || 'text';
           }
           input.value = prop.value;
           
@@ -1539,6 +1559,12 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propQuestionNumber':
                 cell._questionId = newValue;
+                break;
+              case 'propLineLimit':
+                cell._lineLimit = newValue;
+                break;
+              case 'propCharacterLimit':
+                cell._characterLimit = newValue;
                 break;
               case 'propNodeId':
                 // Update the _nameId property

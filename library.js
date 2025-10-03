@@ -253,7 +253,17 @@ window.exportGuiJson = function(download = true) {
     if (questionType !== "multipleTextboxes") {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
-    }
+      }
+      
+      // Add line limit and character limit for big paragraph questions
+      if (questionType === "bigParagraph") {
+        if (cell._lineLimit !== undefined && cell._lineLimit !== '') {
+          question.lineLimit = parseInt(cell._lineLimit) || 0;
+        }
+        if (cell._characterLimit !== undefined && cell._characterLimit !== '') {
+          question.characterLimit = parseInt(cell._characterLimit) || 0;
+        }
+      }
     
     // For text2, clean the text from HTML
     if (questionType === "text2" && question.text) {
@@ -1091,6 +1101,10 @@ window.exportBothJson = function() {
       
       // checkbox availability
       if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
+      
+      // big paragraph properties
+      if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
+      if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
 
       return cellData;
     });
@@ -1198,7 +1212,8 @@ window.saveFlowchart = function() {
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
-      _checkboxAvailability: cell._checkboxAvailability||null
+      _checkboxAvailability: cell._checkboxAvailability||null,
+      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
@@ -2222,6 +2237,10 @@ window.loadFlowchartData = function(data) {
         
         // Checkbox availability
         if (item._checkboxAvailability !== undefined) newCell._checkboxAvailability = item._checkboxAvailability;
+        
+        // Big paragraph properties
+        if (item._lineLimit !== undefined) newCell._lineLimit = item._lineLimit;
+        if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
