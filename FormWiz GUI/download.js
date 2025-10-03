@@ -127,7 +127,29 @@ function loadFormData(formData) {
     hiddenFieldCounter = formData.hiddenFieldCounter || 1;
     groupCounter = formData.groupCounter || 1;
 
-    // 3) Set PDF name and other form settings
+    // 3) Set form name and other form settings
+    if (formData.formName) {
+        // Ensure the form name module exists
+        if (!document.getElementById('formNameContainer')) {
+            if (typeof addFormNameModule === 'function') {
+                addFormNameModule();
+            }
+        }
+        
+        const formNameInput = document.getElementById('formNameInput');
+        if (formNameInput) {
+            formNameInput.value = formData.formName;
+        }
+    }
+    
+    // Ensure the PDF configuration module exists
+    if (!document.getElementById('pdfConfigurationModule')) {
+        if (typeof createPdfConfigurationModule === 'function') {
+            createPdfConfigurationModule();
+        }
+    }
+    
+    // Set PDF name
     if (formData.defaultPDFName) {
         const formPDFNameInput = document.getElementById('formPDFName');
         if (formPDFNameInput) {
@@ -905,6 +927,9 @@ function exportForm() {
         questionCounter: questionCounter,
         hiddenFieldCounter: hiddenFieldCounter,
         groupCounter: groupCounter,
+        formName: document.getElementById('formNameInput')
+            ? document.getElementById('formNameInput').value.trim()
+            : '',
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
             : '',

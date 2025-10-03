@@ -284,11 +284,15 @@ window.exportFlowchartJson = function(download = true) {
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  
   const output = {
     cells: simplifiedCells,
     sectionPrefs: JSON.parse(JSON.stringify(currentSectionPrefs)),
     groups: JSON.parse(JSON.stringify(groups)),
-    defaultPdfProperties: defaultPdfProps
+    defaultPdfProperties: defaultPdfProps,
+    formName: formName
   };
 
   const jsonStr = JSON.stringify(output, null, 2);

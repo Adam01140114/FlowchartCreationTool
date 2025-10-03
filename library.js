@@ -254,6 +254,17 @@ window.exportGuiJson = function(download = true) {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
       }
+    
+    // Add linking and image fields
+    question.linking = {
+      enabled: false,
+      targetId: ""
+    };
+    question.image = {
+      url: "",
+      width: 0,
+      height: 0
+    };
       
       // Add line limit and character limit for big paragraph questions
       if (questionType === "bigParagraph") {
@@ -565,10 +576,10 @@ window.exportGuiJson = function(download = true) {
         return "";
       }).filter(opt => opt !== null); // Remove null entries (image options)
       
-      // Add linking field
-      question.linking = { enabled: false, targetId: "" };
-      // Add image field: use imageData if found, else default
-      question.image = imageData || { url: "", width: 0, height: 0 };
+      // Update image field if imageData is found
+      if (imageData) {
+        question.image = imageData;
+      }
     }
     
     // --- PATCH: For checkboxes, convert options to proper checkbox format ---
@@ -980,6 +991,9 @@ window.exportGuiJson = function(download = true) {
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  
   // Create final output object
   const output = {
     sections: sections,
@@ -989,6 +1003,7 @@ window.exportGuiJson = function(download = true) {
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
     groupCounter: 1,
+    formName: formName,
     defaultPDFName: defaultPdfProps.pdfName || "",
     pdfOutputName: defaultPdfProps.pdfFile || "",
     stripePriceId: defaultPdfProps.pdfPrice || "",
@@ -1113,11 +1128,15 @@ window.exportBothJson = function() {
     const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
       window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
     
+    // Get form name
+    const formName = document.getElementById('formNameInput')?.value || '';
+    
     const flowchartExportObj = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefs,
       groups: getGroupsData(),
-      defaultPdfProperties: defaultPdfProps
+      defaultPdfProperties: defaultPdfProps,
+      formName: formName
     };
 
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
@@ -1175,8 +1194,16 @@ window.saveFlowchart = function() {
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
   if (!flowchartName) {
-    flowchartName = prompt("Enter a name for this flowchart:");
-    if (!flowchartName || !flowchartName.trim()) return;
+    // Get form name from input field
+    const formNameInput = document.getElementById('formNameInput');
+    const formName = formNameInput ? formNameInput.value.trim() : '';
+    
+    if (formName) {
+      flowchartName = formName;
+    } else {
+      flowchartName = prompt("Enter a name for this flowchart:");
+      if (!flowchartName || !flowchartName.trim()) return;
+    }
     currentFlowchartName = flowchartName;
   }
   // Gather data and save
@@ -1234,6 +1261,10 @@ window.saveFlowchart = function() {
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   data.defaultPdfProperties = defaultPdfProps;
+  
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  data.formName = formName;
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
     lastUsed: Date.now()
@@ -2362,6 +2393,14 @@ window.loadFlowchartData = function(data) {
     // Clear default PDF properties if the loaded flowchart doesn't have them
     if (typeof window.setDefaultPdfProperties === 'function') {
       window.setDefaultPdfProperties({ pdfName: "", pdfFile: "", pdfPrice: "" });
+    }
+  }
+  
+  // Load form name if present
+  if (data.formName) {
+    const formNameInput = document.getElementById('formNameInput');
+    if (formNameInput) {
+      formNameInput.value = data.formName;
     }
   }
   

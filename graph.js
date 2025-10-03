@@ -1846,17 +1846,23 @@ function showPropertiesPopup(cell) {
   let outsideClickHandler = null;
   
   const handleOutsideClick = (e) => {
+    console.log('🔧 [PROPERTIES] Outside click handler called', e.target);
+    
     // Only handle if popup still exists and is visible
     if (!popup || popup.style.display === 'none' || isClosing) {
+      console.log('🔧 [PROPERTIES] Popup not visible or closing, ignoring click');
       return;
     }
     
     // Check if the click is outside the popup
     if (!popup.contains(e.target)) {
+      console.log('🔧 [PROPERTIES] Click outside detected, closing popup');
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation(); // Prevent other handlers from running
       newClosePopup();
+    } else {
+      console.log('🔧 [PROPERTIES] Click inside popup, ignoring');
     }
   };
   
@@ -1864,6 +1870,7 @@ function showPropertiesPopup(cell) {
   setTimeout(() => {
     outsideClickHandler = handleOutsideClick;
     document.addEventListener('click', outsideClickHandler, true); // Use capture phase
+    console.log('🔧 [PROPERTIES] Outside click handler added');
   }, 200);
   
   // Clean up the outside click listener when popup closes
@@ -2414,7 +2421,30 @@ function setupPanningAndZooming(graph) {
       
       // Limit zoom range
       if (scale >= 0.1 && scale <= 3.0) {
+        // Get mouse position relative to the container
+        const rect = container.getBoundingClientRect();
+        const mouseX = evt.clientX - rect.left;
+        const mouseY = evt.clientY - rect.top;
+        
+        // Get current view state
+        const currentTranslate = graph.view.translate;
+        const currentScale = graph.view.scale;
+        
+        // Calculate the point in graph coordinates that the mouse is over
+        const graphX = (mouseX / currentScale) - currentTranslate.x;
+        const graphY = (mouseY / currentScale) - currentTranslate.y;
+        
+        // Set the new scale
         graph.view.setScale(scale);
+        
+        // Calculate the new translation to keep the mouse point in the same screen position
+        const newTranslateX = (mouseX / scale) - graphX;
+        const newTranslateY = (mouseY / scale) - graphY;
+        
+        // Apply the new translation
+        graph.view.setTranslate(newTranslateX, newTranslateY);
+        
+        console.log('🔧 [ZOOM DEBUG] Ctrl+Wheel zoom - mouse position:', mouseX, mouseY, 'graph point:', graphX, graphY, 'new translate:', newTranslateX, newTranslateY);
       }
     }
   });

@@ -6,6 +6,9 @@
   
   // Colors moved to config.js module
 
+// TEST: Script.js is loading!
+console.log('🚀 SCRIPT.JS IS LOADING!');
+
 
 /**************************************************
  *            GLOBAL  TYPING  HELPER              *
@@ -142,11 +145,21 @@ document.addEventListener("DOMContentLoaded", function() {
     if (typeof initializeGraph === 'function') {
       graph = initializeGraph();
       console.log('Graph initialized:', graph);
+      
+      // Set up zoom sensitivity for the new graph
+      if (typeof window.setupZoomSensitivityForGraph === 'function') {
+        window.setupZoomSensitivityForGraph(graph);
+      }
     } else {
       console.error('initializeGraph function not found');
       // Fallback: create graph directly
   graph = new mxGraph(container);
       console.log('Fallback graph created:', graph);
+      
+      // Set up zoom sensitivity for the fallback graph
+      if (typeof window.setupZoomSensitivityForGraph === 'function') {
+        window.setupZoomSensitivityForGraph(graph);
+      }
     }
     
     // Mouse event listeners moved to events.js module
@@ -545,7 +558,31 @@ graph.isCellEditable = function (cell) {
       
       // Limit zoom range
       if (newScale >= 0.1 && newScale <= 3.0) {
+        // Get mouse position relative to the container
+        const container = graph.container;
+        const rect = container.getBoundingClientRect();
+        const mouseX = evt.clientX - rect.left;
+        const mouseY = evt.clientY - rect.top;
+        
+        // Get current view state
+        const currentTranslate = graph.view.translate;
+        const currentScale = graph.view.scale;
+        
+        // Calculate the point in graph coordinates that the mouse is over
+        const graphX = (mouseX / currentScale) - currentTranslate.x;
+        const graphY = (mouseY / currentScale) - currentTranslate.y;
+        
+        // Set the new scale
         graph.view.setScale(newScale);
+        
+        // Calculate the new translation to keep the mouse point in the same screen position
+        const newTranslateX = (mouseX / newScale) - graphX;
+        const newTranslateY = (mouseY / newScale) - graphY;
+        
+        // Apply the new translation
+        graph.view.setTranslate(newTranslateX, newTranslateY);
+        
+        console.log('🔧 [ZOOM DEBUG] Mouse wheel zoom - mouse position:', mouseX, mouseY, 'graph point:', graphX, graphY, 'new translate:', newTranslateX, newTranslateY);
       }
       
       mxEvent.consume(evt);
@@ -1141,7 +1178,84 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
   document.getElementById('resetAllPdfBtn').addEventListener('click', window.resetAllPdfInheritance);
   
   // Load settings on startup
-  loadSettingsFromLocalStorage();
+  function loadSettingsWhenReady() {
+    if (typeof window.loadSettingsFromLocalStorage === 'function') {
+      try {
+        const result = window.loadSettingsFromLocalStorage();
+        if (result && typeof result.then === 'function') {
+          result.then(() => {
+            console.log('🔧 [ZOOM SENSITIVITY] Settings loaded successfully');
+          }).catch(error => {
+            console.error('🔧 [ZOOM SENSITIVITY] Error loading settings:', error);
+          });
+        } else {
+          console.log('🔧 [ZOOM SENSITIVITY] Settings loaded (non-Promise)');
+        }
+      } catch (error) {
+        console.error('🔧 [ZOOM SENSITIVITY] Error calling loadSettingsFromLocalStorage:', error);
+      }
+    } else {
+      // Try again after a short delay if the function isn't available yet
+      setTimeout(loadSettingsWhenReady, 100);
+    }
+  }
+  
+  loadSettingsWhenReady();
+  
+  // Load zoom sensitivity from Firebase after page loads
+  setTimeout(async () => {
+    console.log('🔧 [ZOOM SENSITIVITY] Loading zoom sensitivity from Firebase...');
+    
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        const db = firebase.firestore();
+        
+        console.log('🔧 [ZOOM SENSITIVITY] Firebase user found:', user.uid);
+        
+        const doc = await db.collection('userSettings').doc(user.uid).get();
+        
+        if (doc.exists) {
+          const data = doc.data();
+          console.log('🔧 [ZOOM SENSITIVITY] Firebase data:', data);
+          
+          if (data.zoomSensitivity !== undefined) {
+            console.log('🔧 [ZOOM SENSITIVITY] Found zoom sensitivity in Firebase:', data.zoomSensitivity);
+            
+            // Update the global settings
+            if (window.userSettings) {
+              window.userSettings.zoomSensitivity = data.zoomSensitivity;
+              console.log('🔧 [ZOOM SENSITIVITY] Updated window.userSettings.zoomSensitivity to:', data.zoomSensitivity);
+            }
+            
+            // Update the UI
+            const input = document.getElementById('zoomSensitivityInput');
+            const displaySpan = document.getElementById('zoomSensitivityValue');
+            
+            if (input) {
+              input.value = data.zoomSensitivity;
+              console.log('🔧 [ZOOM SENSITIVITY] Updated input value to:', data.zoomSensitivity);
+            }
+            
+            if (displaySpan) {
+              displaySpan.textContent = data.zoomSensitivity;
+              console.log('🔧 [ZOOM SENSITIVITY] Updated display span to:', data.zoomSensitivity);
+            }
+            
+            console.log('🔧 [ZOOM SENSITIVITY] Zoom sensitivity loaded successfully from Firebase!');
+          } else {
+            console.log('🔧 [ZOOM SENSITIVITY] No zoom sensitivity found in Firebase data');
+          }
+        } else {
+          console.log('🔧 [ZOOM SENSITIVITY] No Firebase settings document found');
+        }
+      } else {
+        console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
+      }
+    } catch (error) {
+      console.error('🔧 [ZOOM SENSITIVITY] Error loading zoom sensitivity from Firebase:', error);
+    }
+  }, 1000);
   
   // Initialize search functionality
   initializeSearch();
@@ -4064,11 +4178,15 @@ function autosaveFlowchartToLocalStorage() {
     const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
       window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
     
+    // Get form name
+    const formName = document.getElementById('formNameInput')?.value || '';
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
       groups: groupsArray,
-      defaultPdfProperties: defaultPdfProps
+      defaultPdfProperties: defaultPdfProps,
+      formName: formName
     };
     
     // Cache the data and hash for next comparison
@@ -4284,6 +4402,15 @@ function showAutosaveRestorePrompt() {
       console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
       console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
       window.loadFlowchartData(data);
+      
+      // Restore form name if it exists
+      if (data.formName) {
+        const formNameInput = document.getElementById('formNameInput');
+        if (formNameInput) {
+          formNameInput.value = data.formName;
+        }
+      }
+      
       // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
       // Wait for groups to be loaded before setting up autosave hooks
       setTimeout(safeSetupAutosaveHooks, 1000);

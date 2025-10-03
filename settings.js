@@ -12,7 +12,7 @@ var userSettings = userSettings || {
   showGrid: true,
   theme: 'light',
   language: 'en',
-  zoomSensitivity: 0.01 // Default zoom sensitivity (0.001 = very sensitive, 0.1 = less sensitive)
+  zoomSensitivity: 0.67 // Default zoom sensitivity (0.001 = very sensitive, 0.1 = less sensitive)
 };
 
 // Color preferences
@@ -32,25 +32,72 @@ var sectionPrefs = sectionPrefs || {};
 /**
  * Load settings from localStorage
  */
-window.loadSettingsFromLocalStorage = function() {
+window.loadSettingsFromLocalStorage = async function() {
   try {
+    console.log('🔧 [ZOOM SENSITIVITY] ========== LOAD SETTINGS START ==========');
     console.log('🔧 [ZOOM SENSITIVITY] loadSettingsFromLocalStorage called');
+    console.log('🔧 [ZOOM SENSITIVITY] Initial userSettings.zoomSensitivity:', userSettings.zoomSensitivity);
+    console.log('🔧 [ZOOM SENSITIVITY] Function is async:', typeof loadSettingsFromLocalStorage === 'function');
+    console.log('🔧 [ZOOM SENSITIVITY] This function is being called!');
     
     // Load user settings
     const savedSettings = localStorage.getItem('flowchart_user_settings');
-    console.log('🔧 [ZOOM SENSITIVITY] Saved settings from localStorage:', savedSettings);
+    console.log('🔧 [ZOOM SENSITIVITY] Raw localStorage data:', savedSettings);
     
     if (savedSettings) {
       const parsedSettings = JSON.parse(savedSettings);
-      console.log('🔧 [ZOOM SENSITIVITY] Parsed settings:', parsedSettings);
+      console.log('🔧 [ZOOM SENSITIVITY] Parsed localStorage settings:', parsedSettings);
+      console.log('🔧 [ZOOM SENSITIVITY] Parsed zoomSensitivity from localStorage:', parsedSettings.zoomSensitivity);
+      
+      const oldZoomSensitivity = userSettings.zoomSensitivity;
       userSettings = { ...userSettings, ...parsedSettings };
-      console.log('🔧 [ZOOM SENSITIVITY] Final userSettings after merge:', userSettings);
+      console.log('🔧 [ZOOM SENSITIVITY] userSettings.zoomSensitivity before Firebase:', userSettings.zoomSensitivity);
+      console.log('🔧 [ZOOM SENSITIVITY] Changed from localStorage?', oldZoomSensitivity !== userSettings.zoomSensitivity);
     } else {
       console.log('🔧 [ZOOM SENSITIVITY] No saved settings found, using defaults');
     }
     
     // Also try to load from Firebase
-    loadZoomSensitivityFromFirebase();
+    console.log('🔧 [ZOOM SENSITIVITY] About to call loadZoomSensitivityFromFirebase...');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase function exists:', typeof loadZoomSensitivityFromFirebase);
+    console.log('🔧 [ZOOM SENSITIVITY] About to call Firebase function...');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase function exists check:', typeof loadZoomSensitivityFromFirebase === 'function');
+    
+    try {
+      // Add a timeout to Firebase loading
+      const firebasePromise = loadZoomSensitivityFromFirebase();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Firebase load timeout')), 5000)
+      );
+      
+      console.log('🔧 [ZOOM SENSITIVITY] About to await Firebase promise...');
+      await Promise.race([firebasePromise, timeoutPromise]);
+      console.log('🔧 [ZOOM SENSITIVITY] After Firebase load, userSettings.zoomSensitivity:', userSettings.zoomSensitivity);
+    } catch (error) {
+      console.error('🔧 [ZOOM SENSITIVITY] Error in Firebase load:', error);
+      console.log('🔧 [ZOOM SENSITIVITY] Continuing with localStorage value:', userSettings.zoomSensitivity);
+    }
+    
+    // Update the global window.userSettings object that script.js uses
+    if (window.userSettings) {
+      window.userSettings.zoomSensitivity = userSettings.zoomSensitivity;
+      console.log('🔧 [ZOOM SENSITIVITY] Updated window.userSettings.zoomSensitivity to:', window.userSettings.zoomSensitivity);
+    }
+    
+    // Update UI after all settings are loaded
+    console.log('🔧 [ZOOM SENSITIVITY] About to call updateSettingsUI...');
+    updateSettingsUI();
+    console.log('🔧 [ZOOM SENSITIVITY] After updateSettingsUI, checking UI elements...');
+    
+    // Check what the UI actually shows
+    const input = document.getElementById('zoomSensitivityInput');
+    const displaySpan = document.getElementById('zoomSensitivityValue');
+    console.log('🔧 [ZOOM SENSITIVITY] Input element found:', !!input);
+    console.log('🔧 [ZOOM SENSITIVITY] Display span found:', !!displaySpan);
+    if (input) console.log('🔧 [ZOOM SENSITIVITY] Input value after updateSettingsUI:', input.value);
+    if (displaySpan) console.log('🔧 [ZOOM SENSITIVITY] Display span text after updateSettingsUI:', displaySpan.textContent);
+    
+    console.log('🔧 [ZOOM SENSITIVITY] ========== LOAD SETTINGS END ==========');
     
     // Load color preferences
     const savedColors = localStorage.getItem('flowchart_color_preferences');
@@ -325,8 +372,21 @@ function updateSettingsUI() {
   
   // Update zoom sensitivity input
   const zoomSensitivityInput = document.getElementById('zoomSensitivityInput');
+  console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - zoomSensitivityInput found:', !!zoomSensitivityInput);
+  console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - userSettings.zoomSensitivity:', userSettings.zoomSensitivity);
   if (zoomSensitivityInput) {
+    console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - Input value before update:', zoomSensitivityInput.value);
     zoomSensitivityInput.value = userSettings.zoomSensitivity;
+    console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - Input value after update:', zoomSensitivityInput.value);
+  }
+  
+  // Also update the display span
+  const zoomSensitivityValue = document.getElementById('zoomSensitivityValue');
+  console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - zoomSensitivityValue found:', !!zoomSensitivityValue);
+  if (zoomSensitivityValue) {
+    console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - Display span text before update:', zoomSensitivityValue.textContent);
+    zoomSensitivityValue.textContent = userSettings.zoomSensitivity;
+    console.log('🔧 [ZOOM SENSITIVITY] updateSettingsUI - Display span text after update:', zoomSensitivityValue.textContent);
   }
   
   // Update select dropdowns
@@ -356,7 +416,7 @@ window.resetSettingsToDefault = function() {
       showGrid: true,
       theme: 'light',
       language: 'en',
-      zoomSensitivity: 0.01
+      zoomSensitivity: 0.67
     };
     
     colorPreferences = {
@@ -446,6 +506,12 @@ window.updateZoomSensitivity = function(value) {
   userSettings.zoomSensitivity = parseFloat(value);
   console.log('🔧 [ZOOM SENSITIVITY] Updated userSettings.zoomSensitivity to:', userSettings.zoomSensitivity);
   
+  // Update the global window.userSettings object that script.js uses
+  if (window.userSettings) {
+    window.userSettings.zoomSensitivity = parseFloat(value);
+    console.log('🔧 [ZOOM SENSITIVITY] Updated window.userSettings.zoomSensitivity to:', window.userSettings.zoomSensitivity);
+  }
+  
   // Update the display value
   const valueDisplay = document.getElementById('zoomSensitivityValue');
   if (valueDisplay) {
@@ -483,7 +549,14 @@ async function saveZoomSensitivityToFirebase(value) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
       
+      console.log('🔧 [ZOOM SENSITIVITY] ========== FIREBASE SAVE START ==========');
+      console.log('🔧 [ZOOM SENSITIVITY] Saving value to Firebase:', value);
+      console.log('🔧 [ZOOM SENSITIVITY] Parsed value:', parseFloat(value));
       console.log('🔧 [ZOOM SENSITIVITY] Saving to Firebase for user:', user.uid);
+      console.log('🔧 [ZOOM SENSITIVITY] Data being saved:', { 
+        zoomSensitivity: parseFloat(value),
+        lastUpdated: 'serverTimestamp'
+      });
       
       await db.collection('userSettings').doc(user.uid).set({
         zoomSensitivity: parseFloat(value),
@@ -491,6 +564,15 @@ async function saveZoomSensitivityToFirebase(value) {
       }, { merge: true });
       
       console.log('🔧 [ZOOM SENSITIVITY] Successfully saved to Firebase');
+      
+      // Verify the save by reading it back
+      const doc = await db.collection('userSettings').doc(user.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        console.log('🔧 [ZOOM SENSITIVITY] Verification - Firebase doc data after save:', data);
+        console.log('🔧 [ZOOM SENSITIVITY] Verification - Saved zoomSensitivity:', data.zoomSensitivity);
+      }
+      console.log('🔧 [ZOOM SENSITIVITY] ========== FIREBASE SAVE END ==========');
     } else {
       console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
     }
@@ -509,32 +591,63 @@ async function saveZoomSensitivityToFirebase(value) {
  */
 async function loadZoomSensitivityFromFirebase() {
   try {
+    console.log('🔧 [ZOOM SENSITIVITY] ========== FIREBASE LOAD START ==========');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase available:', typeof firebase !== 'undefined');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase auth available:', typeof firebase !== 'undefined' && firebase.auth);
+    console.log('🔧 [ZOOM SENSITIVITY] Current user:', firebase.auth ? firebase.auth().currentUser : 'N/A');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase auth currentUser:', firebase.auth ? firebase.auth().currentUser : 'N/A');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase auth currentUser uid:', firebase.auth && firebase.auth().currentUser ? firebase.auth().currentUser.uid : 'N/A');
+    console.log('🔧 [ZOOM SENSITIVITY] Firebase function called successfully!');
+    
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
       
       console.log('🔧 [ZOOM SENSITIVITY] Loading from Firebase for user:', user.uid);
+      console.log('🔧 [ZOOM SENSITIVITY] userSettings.zoomSensitivity before Firebase:', userSettings.zoomSensitivity);
       
       const doc = await db.collection('userSettings').doc(user.uid).get();
+      console.log('🔧 [ZOOM SENSITIVITY] Firebase doc exists:', doc.exists);
       
       if (doc.exists) {
         const data = doc.data();
+        console.log('🔧 [ZOOM SENSITIVITY] Firebase doc data:', data);
+        console.log('🔧 [ZOOM SENSITIVITY] Firebase zoomSensitivity:', data.zoomSensitivity);
+        console.log('🔧 [ZOOM SENSITIVITY] zoomSensitivity undefined?', data.zoomSensitivity === undefined);
+        
         if (data.zoomSensitivity !== undefined) {
           console.log('🔧 [ZOOM SENSITIVITY] Loaded from Firebase:', data.zoomSensitivity);
+          console.log('🔧 [ZOOM SENSITIVITY] Current userSettings.zoomSensitivity:', userSettings.zoomSensitivity);
           
           // Update local settings
+          const oldValue = userSettings.zoomSensitivity;
           userSettings.zoomSensitivity = data.zoomSensitivity;
+          console.log('🔧 [ZOOM SENSITIVITY] Updated userSettings.zoomSensitivity from', oldValue, 'to', userSettings.zoomSensitivity);
           
           // Update UI
           const input = document.getElementById('zoomSensitivityInput');
+          const displaySpan = document.getElementById('zoomSensitivityValue');
+          
+          console.log('🔧 [ZOOM SENSITIVITY] Input element found:', !!input);
+          console.log('🔧 [ZOOM SENSITIVITY] Display span found:', !!displaySpan);
           
           if (input) {
+            console.log('🔧 [ZOOM SENSITIVITY] Input value before update:', input.value);
             input.value = data.zoomSensitivity;
-            console.log('🔧 [ZOOM SENSITIVITY] Updated input value to:', data.zoomSensitivity);
+            console.log('🔧 [ZOOM SENSITIVITY] Input value after update:', input.value);
+          }
+          
+          if (displaySpan) {
+            console.log('🔧 [ZOOM SENSITIVITY] Display span text before update:', displaySpan.textContent);
+            displaySpan.textContent = data.zoomSensitivity;
+            console.log('🔧 [ZOOM SENSITIVITY] Display span text after update:', displaySpan.textContent);
           }
           
           // Apply the setting
+          console.log('🔧 [ZOOM SENSITIVITY] About to call applyZoomSensitivity...');
           applyZoomSensitivity();
+        } else {
+          console.log('🔧 [ZOOM SENSITIVITY] No zoomSensitivity in Firebase data');
         }
       } else {
         console.log('🔧 [ZOOM SENSITIVITY] No Firebase settings found, using defaults');
@@ -542,6 +655,7 @@ async function loadZoomSensitivityFromFirebase() {
     } else {
       console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
     }
+    console.log('🔧 [ZOOM SENSITIVITY] ========== FIREBASE LOAD END ==========');
   } catch (error) {
     console.error('🔧 [ZOOM SENSITIVITY] Error loading from Firebase:', error);
   }
@@ -565,6 +679,33 @@ function applyZoomSensitivity() {
   console.log('🔧 [ZOOM SENSITIVITY] Zoom sensitivity updated to:', userSettings.zoomSensitivity);
   console.log('🔧 [ZOOM SENSITIVITY] Setting applied successfully');
 }
+
+/**
+ * Set up zoom sensitivity for a new graph instance
+ * This should be called whenever a new graph is created
+ */
+window.setupZoomSensitivityForGraph = function(graph) {
+  console.log('🔧 [ZOOM SENSITIVITY] setupZoomSensitivityForGraph called');
+  console.log('🔧 [ZOOM SENSITIVITY] Graph provided:', !!graph);
+  console.log('🔧 [ZOOM SENSITIVITY] Current userSettings.zoomSensitivity:', userSettings.zoomSensitivity);
+  
+  if (!graph) {
+    console.warn('🔧 [ZOOM SENSITIVITY] No graph provided to setupZoomSensitivityForGraph');
+    return;
+  }
+  
+  // Store the zoom sensitivity in the graph's user data for persistence
+  graph.zoomSensitivity = userSettings.zoomSensitivity;
+  console.log('🔧 [ZOOM SENSITIVITY] Set graph.zoomSensitivity to:', graph.zoomSensitivity);
+  
+  // Apply the zoom sensitivity to the graph's mouse wheel handler
+  if (graph.mouseWheelHandler) {
+    console.log('🔧 [ZOOM SENSITIVITY] Updating existing mouseWheelHandler');
+    graph.mouseWheelHandler.zoomSensitivity = userSettings.zoomSensitivity;
+  }
+  
+  console.log('🔧 [ZOOM SENSITIVITY] Zoom sensitivity setup complete for graph');
+};
 
 // The slider uses oninput attribute in HTML for simplicity
 
