@@ -528,13 +528,6 @@ function showPropertiesPopup(cell) {
     return '';
   })();
   
-  // Debug logging for big paragraph nodes
-  if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-    console.log('🔧 [BIG PARAGRAPH DEBUG] Cell:', cell);
-    console.log('🔧 [BIG PARAGRAPH DEBUG] cell._questionText:', cell._questionText);
-    console.log('🔧 [BIG PARAGRAPH DEBUG] cell.value:', cell.value);
-    console.log('🔧 [BIG PARAGRAPH DEBUG] Extracted nodeText:', nodeText);
-  }
   
   // Generate default Node ID based on question text if _nameId is not set
   const generateDefaultNodeId = (text) => {
@@ -792,7 +785,6 @@ function showPropertiesPopup(cell) {
           // Reassign the node to the selected section
           if (typeof window.setSection === 'function') {
             window.setSection(cell, selectedSection);
-            console.log(`🔧 [SECTION CHANGE] Reassigned node to section ${selectedSection}`);
           }
         }
       }
@@ -879,17 +871,10 @@ function showPropertiesPopup(cell) {
           const nodeIdField = document.getElementById('propNodeId');
           let baseId = cell.id; // fallback to cell.id
           
-          console.log('🔧 [COPY ID DEBUG] cell.id:', cell.id);
-          console.log('🔧 [COPY ID DEBUG] nodeIdField:', nodeIdField);
-          console.log('🔧 [COPY ID DEBUG] nodeIdField.innerHTML:', nodeIdField ? nodeIdField.innerHTML : 'null');
-          console.log('🔧 [COPY ID DEBUG] nodeIdField.outerHTML:', nodeIdField ? nodeIdField.outerHTML : 'null');
           
           if (nodeIdField) {
             // Check if there's an active input field (user is editing)
             const activeInput = nodeIdField.parentNode.querySelector('input[type="text"]');
-            console.log('🔧 [COPY ID DEBUG] activeInput:', activeInput);
-            console.log('🔧 [COPY ID DEBUG] nodeIdField.textContent:', nodeIdField.textContent);
-            console.log('🔧 [COPY ID DEBUG] nodeIdField.value:', nodeIdField.value);
             
             if (activeInput) {
               baseId = activeInput.value.trim();
@@ -2443,8 +2428,6 @@ function setupPanningAndZooming(graph) {
         
         // Apply the new translation
         graph.view.setTranslate(newTranslateX, newTranslateY);
-        
-        console.log('🔧 [ZOOM DEBUG] Ctrl+Wheel zoom - mouse position:', mouseX, mouseY, 'graph point:', graphX, graphY, 'new translate:', newTranslateX, newTranslateY);
       }
     }
   });

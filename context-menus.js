@@ -1374,7 +1374,7 @@ function showPropertiesMenu(cell, evt) {
 function placeNodeAtClickLocation(graph, nodeType) {
   if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
   
-  const parent = graph.getDefaultParent();
+  const parent = graph.getModel().getRoot();
   graph.getModel().beginUpdate();
   let cell;
   try {
@@ -1585,7 +1585,7 @@ window.testContextMenuProperties = function() {
   const selectedCells = graph.getSelectionCells();
   if (selectedCells.length === 0) {
     console.log("🔧 [TEST] No cells selected, selecting first available cell");
-    const vertices = graph.getChildVertices(graph.getDefaultParent());
+    const vertices = graph.getChildVertices(graph.getModel().getRoot());
     if (vertices.length > 0) {
       graph.setSelectionCell(vertices[0]);
       window.selectedCell = vertices[0];

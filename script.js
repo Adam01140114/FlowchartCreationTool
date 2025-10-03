@@ -539,7 +539,6 @@ graph.isCellEditable = function (cell) {
     if (!mxEvent.isConsumed(evt)) {
       // Get zoom sensitivity from settings (default to 0.01 if not set)
       const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      console.log('🔧 [ZOOM DEBUG] Script.js wheel zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
       
       // Apply custom zoom based on sensitivity
       const currentScale = graph.view.scale;
@@ -547,7 +546,6 @@ graph.isCellEditable = function (cell) {
       const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
       const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
       
-      console.log('🔧 [ZOOM DEBUG] Script.js wheel zoom - currentScale:', currentScale, 'baseZoomFactor:', baseZoomFactor, 'sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
       
       let newScale;
       if (up) {
@@ -581,8 +579,6 @@ graph.isCellEditable = function (cell) {
         
         // Apply the new translation
         graph.view.setTranslate(newTranslateX, newTranslateY);
-        
-        console.log('🔧 [ZOOM DEBUG] Mouse wheel zoom - mouse position:', mouseX, mouseY, 'graph point:', graphX, graphY, 'new translate:', newTranslateX, newTranslateY);
       }
       
       mxEvent.consume(evt);
@@ -1184,15 +1180,13 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         const result = window.loadSettingsFromLocalStorage();
         if (result && typeof result.then === 'function') {
           result.then(() => {
-            console.log('🔧 [ZOOM SENSITIVITY] Settings loaded successfully');
           }).catch(error => {
-            console.error('🔧 [ZOOM SENSITIVITY] Error loading settings:', error);
+            console.error('Error loading settings:', error);
           });
         } else {
-          console.log('🔧 [ZOOM SENSITIVITY] Settings loaded (non-Promise)');
         }
       } catch (error) {
-        console.error('🔧 [ZOOM SENSITIVITY] Error calling loadSettingsFromLocalStorage:', error);
+        console.error('Error calling loadSettingsFromLocalStorage:', error);
       }
     } else {
       // Try again after a short delay if the function isn't available yet
@@ -1204,28 +1198,18 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
   
   // Load zoom sensitivity from Firebase after page loads
   setTimeout(async () => {
-    console.log('🔧 [ZOOM SENSITIVITY] Loading zoom sensitivity from Firebase...');
-    
     try {
       if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
         const user = firebase.auth().currentUser;
         const db = firebase.firestore();
-        
-        console.log('🔧 [ZOOM SENSITIVITY] Firebase user found:', user.uid);
-        
         const doc = await db.collection('userSettings').doc(user.uid).get();
         
         if (doc.exists) {
           const data = doc.data();
-          console.log('🔧 [ZOOM SENSITIVITY] Firebase data:', data);
-          
           if (data.zoomSensitivity !== undefined) {
-            console.log('🔧 [ZOOM SENSITIVITY] Found zoom sensitivity in Firebase:', data.zoomSensitivity);
-            
             // Update the global settings
             if (window.userSettings) {
               window.userSettings.zoomSensitivity = data.zoomSensitivity;
-              console.log('🔧 [ZOOM SENSITIVITY] Updated window.userSettings.zoomSensitivity to:', data.zoomSensitivity);
             }
             
             // Update the UI
@@ -1234,26 +1218,16 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
             
             if (input) {
               input.value = data.zoomSensitivity;
-              console.log('🔧 [ZOOM SENSITIVITY] Updated input value to:', data.zoomSensitivity);
             }
             
             if (displaySpan) {
               displaySpan.textContent = data.zoomSensitivity;
-              console.log('🔧 [ZOOM SENSITIVITY] Updated display span to:', data.zoomSensitivity);
             }
-            
-            console.log('🔧 [ZOOM SENSITIVITY] Zoom sensitivity loaded successfully from Firebase!');
-          } else {
-            console.log('🔧 [ZOOM SENSITIVITY] No zoom sensitivity found in Firebase data');
           }
-        } else {
-          console.log('🔧 [ZOOM SENSITIVITY] No Firebase settings document found');
         }
-      } else {
-        console.log('🔧 [ZOOM SENSITIVITY] Firebase not available or user not logged in');
       }
     } catch (error) {
-      console.error('🔧 [ZOOM SENSITIVITY] Error loading zoom sensitivity from Firebase:', error);
+      console.error('Error loading zoom sensitivity from Firebase:', error);
     }
   }, 1000);
   
@@ -3369,11 +3343,9 @@ function updateCanvasPosition() {
     const graphY = (my / oldScale) - oldTy;
     // Get zoom sensitivity from settings (default to 0.01 if not set)
     const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-    console.log('🔧 [ZOOM DEBUG] Keyboard zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
     const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
     const zoomFactor = 1 + (BASE_ZOOM_FACTOR - 1) * sensitivityFactor;
     
-    console.log('🔧 [ZOOM DEBUG] Keyboard zoom - sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
     
     // New scale
     let newScale;

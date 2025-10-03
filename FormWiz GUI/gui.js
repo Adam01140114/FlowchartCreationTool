@@ -630,6 +630,7 @@ function addQuestion(sectionId, questionId = null) {
             <label>Textbox Labels:</label>
             <div id="textboxLabels${currentQuestionId}"></div>
             <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
+            <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin-left: 10px; background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add Location</button>
             
             <br><br>
             
@@ -682,6 +683,7 @@ function addQuestion(sectionId, questionId = null) {
             <label>Textboxes: </label>
             <div id="multipleTextboxesOptions${currentQuestionId}"></div>
             <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
+            <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin-left: 10px; background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add Location</button>
             <button type="button" onclick="addMultipleAmountOption(${currentQuestionId})">Add Amount</button>
         </div><br>
         
@@ -2248,6 +2250,68 @@ function createPdfConfigurationModule() {
         const container = document.querySelector('.container');
         if (container) {
             container.insertBefore(pdfConfigContainer, container.firstChild);
+        }
+    }
+}
+
+// ============================================
+// ===========  ADD LOCATION FIELDS  =========
+// ============================================
+function addLocationFields(questionId, questionType) {
+    const locationFields = [
+        { label: 'Street', nodeId: 'street' },
+        { label: 'City', nodeId: 'city' },
+        { label: 'State', nodeId: 'state' }
+    ];
+    
+    if (questionType === 'numberedDropdown') {
+        // Add labels to numbered dropdown
+        locationFields.forEach(field => {
+            addTextboxLabel(questionId);
+            // Set the label value
+            const labelsDiv = document.getElementById(`textboxLabels${questionId}`);
+            const lastLabel = labelsDiv.lastElementChild;
+            if (lastLabel) {
+                const labelInput = lastLabel.querySelector('input[type="text"]:first-of-type');
+                const nodeIdInput = lastLabel.querySelector('input[type="text"]:last-of-type');
+                if (labelInput) labelInput.value = field.label;
+                if (nodeIdInput) nodeIdInput.value = field.nodeId;
+            }
+        });
+        
+        // Add amount field for Zip
+        addTextboxAmount(questionId);
+        const amountsDiv = document.getElementById(`textboxAmounts${questionId}`);
+        const lastAmount = amountsDiv.lastElementChild;
+        if (lastAmount) {
+            const amountInput = lastAmount.querySelector('input[type="text"]');
+            if (amountInput) amountInput.value = 'Zip';
+        }
+        
+    } else if (questionType === 'multipleTextboxes') {
+        // Add textboxes to multiple textboxes
+        locationFields.forEach(field => {
+            addMultipleTextboxOption(questionId);
+            // Set the label and node ID values
+            const optionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
+            const lastOption = optionsDiv.lastElementChild;
+            if (lastOption) {
+                const labelInput = lastOption.querySelector('#multipleTextboxLabel' + questionId + '_' + (optionsDiv.children.length));
+                const nodeIdInput = lastOption.querySelector('#multipleTextboxNodeId' + questionId + '_' + (optionsDiv.children.length));
+                if (labelInput) labelInput.value = field.label;
+                if (nodeIdInput) nodeIdInput.value = field.nodeId;
+            }
+        });
+        
+        // Add amount field for Zip
+        addMultipleAmountOption(questionId);
+        const optionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
+        const lastAmount = optionsDiv.querySelector('.amount-block:last-child');
+        if (lastAmount) {
+            const amountLabelInput = lastAmount.querySelector('input[type="text"]:first-of-type');
+            const amountNodeIdInput = lastAmount.querySelector('input[type="text"]:last-of-type');
+            if (amountLabelInput) amountLabelInput.value = 'Zip';
+            if (amountNodeIdInput) amountNodeIdInput.value = 'zip';
         }
     }
 }

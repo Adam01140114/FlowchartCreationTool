@@ -1051,6 +1051,9 @@ formHTML += `</div><br></div>`;
             textboxInputs.push(dEl);
           }
         }
+        // Define location field names for visual separation
+        const locationFields = ['Street', 'City', 'State', 'Zip'];
+        
         // Render textboxes
         for (let mb = 0; mb < textboxInputs.length; mb++) {
           const dEl = textboxInputs[mb];
@@ -1068,11 +1071,26 @@ formHTML += `</div><br></div>`;
             ? nmInput.value.trim()
             : "answer" + questionId + "_" + (mb + 1);
           const phVal = phInput ? phInput.value.trim() : "";
+          
+          // Add visual separation for location fields
+          if (locationFields.includes(lblVal)) {
+            if (mb === 0 || !locationFields.includes(textboxInputs[mb - 1]?.querySelector(`#multipleTextboxLabel${questionId}_${mb}`)?.value?.trim())) {
+              // First location field in a group
+              formHTML += "<br>";
+            }
+          } else {
+            if (mb === 0 || locationFields.includes(textboxInputs[mb - 1]?.querySelector(`#multipleTextboxLabel${questionId}_${mb}`)?.value?.trim())) {
+              // First non-location field after location fields
+              formHTML += "<br>";
+            }
+          }
+          
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
           formHTML += `<div class="text-input-container"><input type="text" id="${nmVal}" name="${nmVal}" placeholder="${phVal}"></div>`;
         }
+        
         // Render amounts
         for (let ab = 0; ab < amountInputs.length; ab++) {
           const dEl = amountInputs[ab];
@@ -1090,6 +1108,25 @@ formHTML += `</div><br></div>`;
             ? nmInput.value.trim()
             : "amount" + questionId + "_" + (ab + 1);
           const phVal = phInput ? phInput.value.trim() : "";
+          
+          // Add visual separation for location fields
+          if (locationFields.includes(lblVal)) {
+            // For location amount fields (like Zip), don't add br before if it's the first amount
+            // The br separation should come after the entire location group
+            if (ab === 0 && textboxInputs.length > 0) {
+              const lastTextboxLabel = textboxInputs[textboxInputs.length - 1]?.querySelector(`#multipleTextboxLabel${questionId}_${textboxInputs.length}`)?.value?.trim();
+              if (!locationFields.includes(lastTextboxLabel)) {
+                // First location amount field and last textbox was not a location field
+                formHTML += "<br>";
+              }
+            }
+          } else {
+            if (ab === 0 || locationFields.includes(amountInputs[ab - 1]?.querySelector(`#multipleAmountLabel${questionId}_${ab}`)?.value?.trim())) {
+              // First non-location amount field after location fields
+              formHTML += "<br>";
+            }
+          }
+          
           if (lblVal) {
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
@@ -2823,7 +2860,32 @@ function showTextboxLabels(questionId, count){
     // Generate hidden checkboxes for the selected count
     generateHiddenCheckboxes(questionId, qSafe, count);
 
+    // Define location field names for visual separation
+    const locationFields = ['Street', 'City', 'State', 'Zip'];
+    
     for(let j = 1; j <= count; j++){
+        let hasLocationFields = false;
+        let hasNonLocationFields = false;
+        
+        // Check if we have location fields
+        for(let lblIndex = 0; lblIndex < theseLabels.length; lblIndex++){
+            const lbl = theseLabels[lblIndex];
+            if (locationFields.includes(lbl)) {
+                hasLocationFields = true;
+            } else {
+                hasNonLocationFields = true;
+            }
+        }
+        
+        // Check amounts for location fields
+        for(const amt of theseAmounts){
+            if (locationFields.includes(amt)) {
+                hasLocationFields = true;
+            } else {
+                hasNonLocationFields = true;
+            }
+        }
+        
         /* label inputs */
         for(let lblIndex = 0; lblIndex < theseLabels.length; lblIndex++){
             const lbl = theseLabels[lblIndex];
@@ -2834,14 +2896,45 @@ function showTextboxLabels(questionId, count){
             const id = labelNodeId ? 
               labelNodeId + "_" + j : 
               qSafe + "_" + j + "_" + sanitizeQuestionText(lbl);
+            
+            // Add visual separation for location fields
+            if (locationFields.includes(lbl)) {
+                if (lblIndex === 0 || !locationFields.includes(theseLabels[lblIndex - 1])) {
+                    // First location field in a group
+                    container.innerHTML += "<br>";
+                }
+            } else {
+                if (lblIndex === 0 || locationFields.includes(theseLabels[lblIndex - 1])) {
+                    // First non-location field after location fields
+                    container.innerHTML += "<br>";
+                }
+            }
               
             container.innerHTML +=
               '<input type="text" id="' + id + '" name="' + id + '" placeholder="' + lbl + ' ' + j + '" style="text-align:center;"><br>';
             console.log('🔧 [TEXTBOX GENERATION DEBUG] Created textbox input with ID:', id, 'name:', id);
         }
+        
         /* amount inputs */
-        for(const amt of theseAmounts){
+        for(let amtIndex = 0; amtIndex < theseAmounts.length; amtIndex++){
+            const amt = theseAmounts[amtIndex];
             const id = qSafe + "_" + j + "_" + sanitizeQuestionText(amt);
+            
+            // Add visual separation for location fields
+            if (locationFields.includes(amt)) {
+                // For location amount fields (like Zip), don't add br before if it's the first amount
+                // The br separation should come after the entire location group
+                if (amtIndex === 0 && !locationFields.includes(theseLabels[theseLabels.length - 1])) {
+                    // First location amount field and last label was not a location field
+                    container.innerHTML += "<br>";
+                }
+            } else {
+                if (amtIndex === 0 || locationFields.includes(theseAmounts[amtIndex - 1])) {
+                    // First non-location amount field after location fields
+                    container.innerHTML += "<br>";
+                }
+            }
+            
             container.innerHTML +=
               '<input type="number" id="' + id + '" name="' + id + '" placeholder="' + amt + ' ' + j + '" style="text-align:center;"><br>';
             console.log('🔧 [AMOUNT GENERATION DEBUG] Created amount input with ID:', id, 'name:', id);
