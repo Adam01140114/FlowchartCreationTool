@@ -76,7 +76,6 @@ function setupGraphEventHandlers(graph) {
     const selection = graph.getSelectionCells();
     if (selection.length > 0) {
       // Properties panel update is handled in script.js
-      console.log('Cell selected:', selection[0]);
     }
   });
   
@@ -259,7 +258,6 @@ function setupCustomDoubleClickBehavior(graph) {
         
         // Show properties popup for question nodes
         if (typeof isQuestion === 'function' && isQuestion(cell)) {
-          console.log("🎯 Question node detected, showing properties popup");
           if (typeof window.showPropertiesPopup === 'function') {
             window.showPropertiesPopup(cell);
           }
@@ -389,9 +387,20 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
+  // Automatically reset PDF inheritance and Node IDs before opening properties
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+  }
   
-  // Prevent multiple popups
-  if (window.__propertiesPopupOpen) {
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+  }
+  
+  // Prevent multiple popups or opening while closing
+  if (window.__propertiesPopupOpen || window.__propertiesPopupClosing) {
     return;
   }
   window.__propertiesPopupOpen = true;
@@ -800,6 +809,18 @@ function showPropertiesPopup(cell) {
     });
   }
   
+  // Add Checkbox Availability dropdown for checkbox questions
+  if (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
+      typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'checkbox') {
+    properties.push({
+      label: 'Checkbox Availability',
+      value: cell._checkboxAvailability || 'markAll',
+      id: 'propCheckboxAvailability',
+      editable: false,
+      isCheckboxAvailabilityDropdown: true
+    });
+  }
+  
   // PDF Name field will be added later in the unified section
   
   // Add Copy ID dropdown and button for date range nodes
@@ -1083,6 +1104,65 @@ function showPropertiesPopup(cell) {
       return; // Skip the normal field creation
     }
     
+    // Special handling for checkbox availability dropdown
+    if (prop.isCheckboxAvailabilityDropdown) {
+      const dropdown = document.createElement('select');
+      dropdown.id = prop.id;
+      dropdown.style.cssText = `
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      `;
+      
+      // Checkbox availability options
+      const availabilityOptions = [
+        { value: 'markAll', text: 'Mark all that apply' },
+        { value: 'markOne', text: 'Mark only one' }
+      ];
+      
+      // Add options to dropdown
+      availabilityOptions.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        dropdown.appendChild(optionElement);
+      });
+      
+      // Set current value
+      dropdown.value = prop.value || 'markAll';
+      
+      // Handle change event
+      dropdown.addEventListener('change', () => {
+        const newAvailability = dropdown.value;
+        console.log("Checkbox availability changed to:", newAvailability);
+        
+        // Update the cell's checkbox availability
+        cell._checkboxAvailability = newAvailability;
+        
+        // Refresh the cell display
+        if (typeof window.updateSimpleQuestionCell === 'function') {
+          window.updateSimpleQuestionCell(cell);
+        }
+        if (window.graph) {
+          window.graph.refresh(cell);
+        }
+        if (typeof window.refreshAllCells === 'function') {
+          window.refreshAllCells();
+        }
+      });
+      
+      fieldDiv.appendChild(label);
+      fieldDiv.appendChild(dropdown);
+      content.appendChild(fieldDiv);
+      return; // Skip the normal field creation
+    }
+    
     // Only create valueSpan for regular input fields, not for dropdowns or buttons
     let valueSpan = null;
     if (!prop.isDropdown && !prop.isButton) {
@@ -1100,7 +1180,6 @@ function showPropertiesPopup(cell) {
         transition: all 0.2s ease;
         ${prop.isInherited ? 'border-left: 4px solid #4caf50; font-style: italic;' : ''}
       `;
-      console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
     }
     
     if (prop.isDropdown) {
@@ -1692,6 +1771,9 @@ function showPropertiesPopup(cell) {
     if (isClosing) return;
     isClosing = true;
     
+    // Set a global flag to prevent reopening
+    window.__propertiesPopupClosing = true;
+    
     if (focusTimeout) {
       clearTimeout(focusTimeout);
       focusTimeout = null;
@@ -1706,8 +1788,9 @@ function showPropertiesPopup(cell) {
         popup.parentNode.removeChild(popup);
       }
       window.__propertiesPopupOpen = false;
+      window.__propertiesPopupClosing = false;
       isClosing = false;
-    }, 0);
+    }, 100); // Slightly longer delay to ensure cleanup
   };
   
   const killFocusTimer = () => {
@@ -1734,21 +1817,36 @@ function showPropertiesPopup(cell) {
   });
   
   // Handle clicking outside popup
+  let outsideClickHandler = null;
+  
   const handleOutsideClick = (e) => {
+    // Only handle if popup still exists and is visible
+    if (!popup || popup.style.display === 'none' || isClosing) {
+      return;
+    }
+    
+    // Check if the click is outside the popup
     if (!popup.contains(e.target)) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation(); // Prevent other handlers from running
       newClosePopup();
     }
   };
   
   // Add event listener to document for outside clicks with a delay to prevent immediate closure
   setTimeout(() => {
-    document.addEventListener('click', handleOutsideClick);
+    outsideClickHandler = handleOutsideClick;
+    document.addEventListener('click', outsideClickHandler, true); // Use capture phase
   }, 200);
   
   // Clean up the outside click listener when popup closes
   const originalClosePopup = closePopup;
   const newClosePopup = () => {
-    document.removeEventListener('click', handleOutsideClick);
+    if (outsideClickHandler) {
+      document.removeEventListener('click', outsideClickHandler, true);
+      outsideClickHandler = null;
+    }
     document.removeEventListener('keydown', handleEscape);
     originalClosePopup();
   };
@@ -2250,7 +2348,6 @@ function setupKeyboardNavigation(graph) {
   // Ensure container gets focus when clicked
   container.addEventListener('click', function() {
     container.focus();
-    console.log('Container focused for keyboard input');
   });
   
   // Also focus on mousedown to ensure immediate focus

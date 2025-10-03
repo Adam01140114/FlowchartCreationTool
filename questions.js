@@ -52,9 +52,16 @@ function setQuestionType(cell, newType) {
   try {
     switch (newType) {
       case 'text': case 'date': case 'number': case 'bigParagraph':
-      case 'dateRange': case 'email': case 'phone': case 'checkbox':
+      case 'dateRange': case 'email': case 'phone':
         // Preserve the text content
         cell._questionText = preservedText || '';
+        updateSimpleQuestionCell(cell);
+        break;
+      case 'checkbox':
+        // Preserve the text content
+        cell._questionText = preservedText || '';
+        // Set default checkbox availability
+        cell._checkboxAvailability = cell._checkboxAvailability || 'markAll';
         updateSimpleQuestionCell(cell);
         break;
       case 'text2':

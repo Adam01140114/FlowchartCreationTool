@@ -387,6 +387,8 @@ function setupContextMenuEventListeners(graph) {
         // Clear existing complex structure and convert to checkbox
         window.selectedCell._questionType = "checkbox";
         window.selectedCell._questionText = "Checkbox question node";
+        // Set default checkbox availability
+        window.selectedCell._checkboxAvailability = "markAll";
         // Clear any complex properties
         delete window.selectedCell._textboxes;
         delete window.selectedCell._twoNumbers;
@@ -1194,6 +1196,11 @@ function setupContextMenuEventListeners(graph) {
 
   // Global click listener for hiding menus
   document.addEventListener("click", e => {
+    // Don't hide context menu if clicking on properties popup
+    if (e.target.closest('.properties-modal')) {
+      return;
+    }
+    
     if (
       !(contextMenu && contextMenu.contains(e.target)) &&
       !(notesContextMenu && notesContextMenu.contains(e.target)) &&

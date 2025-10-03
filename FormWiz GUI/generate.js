@@ -68,18 +68,13 @@ function getCbPrefix (qId){
 
 /* build the final <input>.id / name for a checkbox option */
 function buildCheckboxName (questionId, rawNameId, labelText){
-    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
-
     // if the designer left the name blank, derive it from the label
     let namePart = (rawNameId || '').trim();
     if (!namePart){
         namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
 
-    // ensure we have our prefix exactly once
-    if (!namePart.startsWith(slugPrefix)){
-        namePart = slugPrefix + namePart;
-    }
+    // Return the name part directly without adding question prefix
     return namePart;
 }
 
@@ -106,6 +101,10 @@ logicScriptBuffer = "";
 // Check if test mode is enabled
 const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
 
+// Get form name from the form name input field
+const formNameEl = document.getElementById('formNameInput');
+const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
+
 
 
   // Top HTML (head, body, header, etc.)
@@ -115,7 +114,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "<head>",
     '    <meta charset="UTF-8">',
     '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
-    "    <title>Example Form</title>",
+    `    <title>${formName}</title>`,
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     '    <link rel="stylesheet" href="generate2.css">',
@@ -827,6 +826,10 @@ const cboxOptions = [];
 const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
 questionNameIds[questionId] = qSlug;      // so helpers know the base
 
+/* ── check for "Mark only one" option ─────────────────────────── */
+const markOnlyOneEl = qBlock.querySelector(`#markOnlyOne${questionId}`);
+const markOnlyOne = markOnlyOneEl?.checked || false;
+
 formHTML += `<div><center><div id="checkmark" class="checkbox-group-${questionId}">`;
 
 /* ── render each checkbox option ───────────────────────────── */
@@ -858,12 +861,17 @@ for (let co = 0; co < cOptsDivs.length; co++){
     });
 
     /* actual input */
+    const inputType = markOnlyOne ? 'radio' : 'checkbox';
+    const inputName = markOnlyOne ? qSlug : optionNameId; // Radio buttons share the same name
+    const onChangeHandler = markOnlyOne ? 
+      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); ${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked);` : ''} updateCheckboxStyle(this);"` :
+      `onchange="${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});` : `toggleNoneOption(this, ${questionId});`} updateCheckboxStyle(this);"`;
+    
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
         <label class="checkbox-label">
-          <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}" 
-                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"` : 
-                               `onchange="toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"`}>
+          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" 
+                 ${onChangeHandler}>
           ${labelText}
         </label>
       </span>`;
@@ -891,11 +899,17 @@ if (noneEl?.checked){
         optionValue: noneStr
     });
 
+    const noneInputType = markOnlyOne ? 'radio' : 'checkbox';
+    const noneInputName = markOnlyOne ? qSlug : noneNameId;
+    const noneOnChangeHandler = markOnlyOne ? 
+      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
+      `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
+
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
-          <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}" 
-                 onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);">
+          <input type="${noneInputType}" id="${noneNameId}" name="${noneInputName}" value="${noneStr}" 
+                 ${noneOnChangeHandler}>
           ${noneStr}
         </label>
       </span>`;
@@ -1351,6 +1365,10 @@ if (s > 1){
   // Insert hidden fields (including multi-term calculations)
   const genHidden = generateHiddenPDFFields();
   formHTML += genHidden.hiddenFieldsHTML;
+  
+  // Add default checkbox based on form name
+  const formNameSafe = formName.replace(/\W+/g, '_').toLowerCase();
+  formHTML += `<input type="checkbox" id="${formNameSafe}_default_checkbox" name="${formNameSafe}_default_checkbox" checked style="display: none;">`;
 
   // Close the form & add the thank-you message
   formHTML += [
@@ -1493,14 +1511,11 @@ function getCbPrefix (qId){
  * buildCheckboxName(questionId, rawNameId, labelText)
  *───────────────────────────────*/
 function buildCheckboxName (questionId, rawNameId, labelText){
-    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
     if (!namePart){
         namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
-    if (!namePart.startsWith(slugPrefix)){
-        namePart = slugPrefix + namePart;
-    }
+    // Return the name part directly without adding question prefix
     return namePart;
 }
 `;
@@ -1760,6 +1775,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Always add cart functions (they're needed for the Continue button)
   formHTML += `
+// Helper function to deduplicate PDFs based on pdfName
+function deduplicatePdfs(pdfArray) {
+  const seen = new Set();
+  const deduplicated = [];
+  
+  for (const pdf of pdfArray) {
+    const key = pdf.pdfName || pdf.formId || pdf.title;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduplicated.push(pdf);
+    } else {
+      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key);
+    }
+  }
+  
+  return deduplicated;
+}
+
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
   console.log('🛒 [CART DEBUG] showCartModal called');
@@ -1815,12 +1848,17 @@ window.showCartModal = function () {
     }
   }
   
-  console.log('🛒 [CART DEBUG] Total PDFs to add:', allPdfsToAdd.length, allPdfsToAdd);
+  // Deduplicate PDFs to prevent multiple requests for the same PDF
+  const originalCount = allPdfsToAdd.length;
+  const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
+  console.log('🛒 [CART DEBUG] Deduplication: Original count:', originalCount, 'After deduplication:', deduplicatedPdfs.length);
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', deduplicatedPdfs.length, deduplicatedPdfs);
 
   // Fetch prices for all PDFs
   async function fetchAllPrices() {
     const prices = [];
-    for (const pdf of allPdfsToAdd) {
+    for (const pdf of deduplicatedPdfs) {
       try {
         const r = await fetch('/stripe-price/' + pdf.priceId);
         if (r.ok) {
@@ -1852,7 +1890,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
-        <p style="font-size:0.9em;color:#666;margin:10px 0;">\${allPdfsToAdd.length} PDF(s) will be added to cart</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">\${deduplicatedPdfs.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - \${priceDisplay}
         </button>
@@ -2001,7 +2039,12 @@ window.addFormToCart = function (priceId) {
       console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
     
-    console.log('🛒 [CART DEBUG] Final PDF logic items:', pdfLogicItems.length, pdfLogicItems);
+    // Deduplicate PDF logic items to prevent multiple requests for the same PDF
+    const originalPdfLogicCount = pdfLogicItems.length;
+    const deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
+    console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
+    
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
   }
@@ -2026,7 +2069,7 @@ window.addFormToCart = function (priceId) {
     console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
     
     // Add all matched PDF logic items
-    for (const item of pdfLogicItems) {
+    for (const item of deduplicatedPdfLogicItems) {
       const pdfItem = {
         formId: item.formId.toLowerCase(),
         title: item.title,
@@ -2099,7 +2142,7 @@ window.addFormToCart = function (priceId) {
   cart.push(mainCartItem);
   console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
   
-  for (const item of pdfLogicItems) {
+  for (const item of deduplicatedPdfLogicItems) {
     cart.push(item);
     console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
   }
@@ -2295,6 +2338,29 @@ function toggleAmountField(amountFieldId, show) {
         amountField.style.display = show ? 'block' : 'none';
         if (!show) amountField.value = '';
     }
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Handle "Mark only one" selection functionality
+ *──────────────────────────────────────────────────────────────*/
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    if (!selectedInput.checked) return;
+    
+    // Find all radio buttons in this question group
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            // Update styling for unchecked inputs
+            updateCheckboxStyle(input);
+        }
+    });
+    
+    // Update styling for the selected input
+    updateCheckboxStyle(selectedInput);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -3156,12 +3222,20 @@ async function processAllPdfs() {
     console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
     console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
     
+    // Track processed PDFs to prevent duplicates
+    const processedPdfs = new Set();
+    
     // Process main PDFs - use the actual PDF filename, not the form name
     if (pdfOutputFileName) {
         console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
+        if (!processedPdfs.has(baseName)) {
+            processedPdfs.add(baseName);
         await editAndDownloadPDF(baseName);
+        } else {
+            console.log('🔧 [PDF DEBUG] Skipping duplicate main PDF:', baseName);
+        }
     }
     
     // Process Conditional PDFs
@@ -3192,7 +3266,13 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    await editAndDownloadPDF(conditionalPDF.pdfName);
+                    const baseName = conditionalPDF.pdfName.replace(/\.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        await editAndDownloadPDF(baseName);
+                    } else {
+                        console.log('🔧 [PDF DEBUG] Skipping duplicate conditional PDF:', baseName);
+                    }
                 }
             }
         }
@@ -3252,7 +3332,13 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    await editAndDownloadPDF(pdfLogic.pdfName);
+                    const baseName = pdfLogic.pdfName.replace(/\.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        await editAndDownloadPDF(baseName);
+                    } else {
+                        console.log('🔧 [PDF DEBUG] Skipping duplicate PDF logic PDF:', baseName);
+                    }
                 }
             }
         }
@@ -5321,8 +5407,13 @@ function fallbackCopyToClipboard(text) {
 
 // Export Names/IDs function
 function exportNamesAndIds() {
+  // Get form name from the form name input field
+  const formNameEl = document.getElementById('formNameInput');
+  const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
+  
   const formData = {
     exportDate: new Date().toISOString(),
+    formName: formName,
     formTitle: document.title || 'Form Data',
     inputs: []
   };
@@ -5369,6 +5460,55 @@ document.getElementById('debugSearch').addEventListener('input', populateDebugCo
 
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
+
+// Function to create Form Name input field (to be called from the form editor interface)
+function createFormNameInput() {
+  const formNameContainer = document.createElement('div');
+  formNameContainer.id = 'formNameContainer';
+  formNameContainer.style.cssText = 
+    'background: #fff; ' +
+    'border: 2px solid #2980b9; ' +
+    'border-radius: 10px; ' +
+    'padding: 20px; ' +
+    'margin: 20px auto; ' +
+    'max-width: 600px; ' +
+    'box-shadow: 0 4px 12px rgba(0,0,0,0.1);';
+  
+  formNameContainer.innerHTML = 
+    '<h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em;">Form Name</h3>' +
+    '<div style="text-align: center;">' +
+      '<label for="formNameInput" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Form Name:</label>' +
+      '<input type="text" id="formNameInput" name="formNameInput" ' +
+             'placeholder="Enter your form name (e.g., Customer Survey, Job Application)" ' +
+             'style="width: 100%; max-width: 400px; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center;" ' +
+             'value="Example Form">' +
+      '<p style="margin-top: 8px; font-size: 0.9em; color: #666; font-style: italic;">' +
+        'This name will appear in the browser title and be used for the default checkbox.' +
+      '</p>' +
+    '</div>';
+  
+  return formNameContainer;
+}
+
+// Function to insert Form Name input above the first section
+function insertFormNameInput() {
+  // Check if form name input already exists
+  if (document.getElementById('formNameContainer')) {
+    return; // Already exists
+  }
+  
+  // Find the first section or a suitable insertion point
+  const firstSection = document.querySelector('[id^="sectionBlock"]');
+  const formNameInput = createFormNameInput();
+  
+  if (firstSection) {
+    firstSection.parentNode.insertBefore(formNameInput, firstSection);
+  } else {
+    // If no sections found, append to body or a container
+    const container = document.querySelector('#formEditor') || document.body;
+    container.insertBefore(formNameInput, container.firstChild);
+  }
+}
 
 // Update content when form values change
 document.addEventListener('input', function() {

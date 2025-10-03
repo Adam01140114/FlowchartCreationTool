@@ -15,10 +15,19 @@ let checklistItems = [];
 // ============================================
 function addSection(sectionId = null) {
     const formBuilder = document.getElementById('formBuilder');
-    const sectionBlock = document.createElement('div');
-
-    // Use provided sectionId or default to sectionCounter
+    
+    // Check if this is the first section and add modules if needed
     const currentSectionId = sectionId || sectionCounter;
+    if (currentSectionId === 1) {
+        if (!document.getElementById('formNameContainer')) {
+            addFormNameModule();
+        }
+        if (!document.getElementById('pdfConfigurationModule')) {
+            createPdfConfigurationModule();
+        }
+    }
+    
+    const sectionBlock = document.createElement('div');
 
     sectionBlock.className = 'section-block';
     sectionBlock.id = `sectionBlock${currentSectionId}`;
@@ -657,6 +666,10 @@ function addQuestion(sectionId, questionId = null) {
             
             <div id="noneOfTheAboveContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
                 <label><input type="checkbox" id="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
+            </div>
+            
+            <div id="markOnlyOneContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
+                <label><input type="checkbox" id="markOnlyOne${currentQuestionId}">Mark only one</label>
             </div>
         </div><br>
         
@@ -2130,5 +2143,109 @@ function removeMultipleAmountOption(questionId, amountNumber) {
             amt.querySelector(`input[id^="multipleAmountPlaceholder"]`).id = `multipleAmountPlaceholder${questionId}_${newAmountNumber}`;
             amt.querySelector('button').setAttribute('onclick', `removeMultipleAmountOption(${questionId}, ${newAmountNumber})`);
         });
+    }
+}
+
+// ============================================
+// ===========  FORM NAME MODULE  =============
+// ============================================
+function addFormNameModule() {
+    // Check if Form Name module already exists
+    if (document.getElementById('formNameContainer')) {
+        return;
+    }
+    
+    const formNameContainer = document.createElement('div');
+    formNameContainer.id = 'formNameContainer';
+    formNameContainer.className = 'form-name-module';
+    formNameContainer.style.cssText = 
+        'background: #fff; ' +
+        'border: 2px solid #2980b9; ' +
+        'border-radius: 10px; ' +
+        'padding: 20px; ' +
+        'margin: 20px auto; ' +
+        'max-width: 600px; ' +
+        'box-shadow: 0 4px 12px rgba(0,0,0,0.1);';
+    
+    formNameContainer.innerHTML = 
+        '<h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em;">Form Name</h3>' +
+        '<div style="text-align: center;">' +
+          '<label for="formNameInput" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Form Name:</label>' +
+          '<input type="text" id="formNameInput" name="formNameInput" ' +
+                 'placeholder="Enter your form name (e.g., Customer Survey, Job Application)" ' +
+                 'style="width: 100%; max-width: 400px; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center;" ' +
+                 'value="Example Form">' +
+          '<p style="margin-top: 8px; font-size: 0.9em; color: #666; font-style: italic;">' +
+            'This name will appear in the browser title and be used for the default checkbox.' +
+          '</p>' +
+        '</div>';
+    
+    // Insert above the PDF configuration
+    const pdfContainer = document.getElementById('pdfContainer');
+    if (pdfContainer) {
+        pdfContainer.parentNode.insertBefore(formNameContainer, pdfContainer);
+    } else {
+        // Fallback: insert at the beginning of the container
+        const container = document.querySelector('.container');
+        if (container) {
+            container.insertBefore(formNameContainer, container.firstChild);
+        }
+    }
+}
+
+// ============================================
+// ===========  PDF CONFIGURATION MODULE  =====
+// ============================================
+function createPdfConfigurationModule() {
+    // Check if PDF configuration module already exists
+    if (document.getElementById('pdfConfigurationModule')) {
+        return;
+    }
+    
+    const pdfConfigContainer = document.createElement('div');
+    pdfConfigContainer.id = 'pdfConfigurationModule';
+    pdfConfigContainer.className = 'pdf-configuration-module';
+    pdfConfigContainer.style.cssText = 
+        'background: #fff; ' +
+        'border: 2px solid #2980b9; ' +
+        'border-radius: 10px; ' +
+        'padding: 20px; ' +
+        'margin: 20px auto; ' +
+        'max-width: 600px; ' +
+        'box-shadow: 0 4px 12px rgba(0,0,0,0.1);';
+    
+    pdfConfigContainer.innerHTML = 
+        '<h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em;">PDF Configuration</h3>' +
+        '<div style="text-align: center;">' +
+          '<div style="margin-bottom: 15px;">' +
+            '<label for="formPDFName" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Choose Form PDF:</label>' +
+            '<input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)" ' +
+                   'style="width: 100%; max-width: 400px; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; text-align: center;">' +
+          '</div>' +
+          '<div style="margin-bottom: 15px;">' +
+            '<label for="pdfOutputName" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Choose your PDF Name:</label>' +
+            '<input type="text" id="pdfOutputName" placeholder="Enter output file name (e.g., adam.html)" ' +
+                   'style="width: 100%; max-width: 400px; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; text-align: center;">' +
+          '</div>' +
+          '<div style="margin-bottom: 15px;">' +
+            '<label for="stripePriceId" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Choose your Price ID:</label>' +
+            '<input type="text" id="stripePriceId" placeholder="Enter Stripe Price ID (e.g., price_12345)" ' +
+                   'style="width: 100%; max-width: 400px; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; text-align: center;">' +
+          '</div>' +
+          '<p style="margin-top: 8px; font-size: 0.9em; color: #666; font-style: italic;">' +
+            'Configure the PDF form name, output file name, and Stripe price ID for your form.' +
+          '</p>' +
+        '</div>';
+    
+    // Insert after the Form Name module
+    const formNameContainer = document.getElementById('formNameContainer');
+    if (formNameContainer) {
+        formNameContainer.parentNode.insertBefore(pdfConfigContainer, formNameContainer.nextSibling);
+    } else {
+        // Fallback: insert at the beginning of the container
+        const container = document.querySelector('.container');
+        if (container) {
+            container.insertBefore(pdfConfigContainer, container.firstChild);
+        }
     }
 }

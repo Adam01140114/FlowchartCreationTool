@@ -189,22 +189,14 @@ window.exportFlowchartJson = function(download = true) {
   
   // Automatically reset PDF inheritance and Node IDs before export
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset before export...');
-  
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
-    console.log('🔄 [AUTO RESET] PDF inheritance reset completed before export');
-  } else {
-    console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
   }
   
   // Reset all Node IDs SECOND (after PDF inheritance is fixed)
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
-    console.log('🔄 [AUTO RESET] Node IDs reset completed before export');
-  } else {
-    console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
   }
   
   const parent = graph.getDefaultParent();
@@ -264,6 +256,9 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._notesText) cellData._notesText = cell._notesText;
     if (cell._notesBold) cellData._notesBold = cell._notesBold;
     if (cell._notesFontSize) cellData._notesFontSize = cell._notesFontSize;
+    
+    // checkbox availability
+    if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
     if (cell._checklistText) cellData._checklistText = cell._checklistText;
     if (cell._alertText) cellData._alertText = cell._alertText;
     if (cell._calcTitle) cellData._calcTitle = cell._calcTitle;

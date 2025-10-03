@@ -218,6 +218,7 @@ window.exportGuiJson = function(download = true) {
       pdfLogic: {
         enabled: false,
         pdfName: "",
+        pdfDisplayName: "",
         stripePriceId: "",
         conditions: []
       },
@@ -572,6 +573,9 @@ window.exportGuiJson = function(download = true) {
       // Get the proper base nameId from the question's nodeId
       const baseNameId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || question.nameId || "unnamed";
       
+      // Check if this is a "mark only one" checkbox
+      const checkboxAvailability = cell._checkboxAvailability || 'markAll';
+      
       // Convert options to checkbox format with proper amount handling
       question.options = question.options.map(opt => {
         if (typeof opt.text === 'string') {
@@ -580,11 +584,14 @@ window.exportGuiJson = function(download = true) {
           // Check if this option has amount properties
           const hasAmount = opt.amount && typeof opt.amount === 'object';
           
+          // Always use the base nameId prefix for checkbox options
+          const nameId = `${baseNameId}_${optionText.toLowerCase().replace(/\s+/g, '_')}`;
+          
           return {
             label: optionText,
-            nameId: `${baseNameId}_${optionText.toLowerCase().replace(/\s+/g, '_')}`,
+            nameId: nameId,
             value: "",
-            hasAmount: hasAmount,
+            hasAmount: hasAmount || false,
             amountName: hasAmount ? (opt.amount.name || optionText) : "",
             amountPlaceholder: hasAmount ? (opt.amount.placeholder || "") : ""
           };
@@ -599,8 +606,15 @@ window.exportGuiJson = function(download = true) {
         };
       });
       
-      // Set conditionalPDF answer to empty string for checkboxes
-      question.conditionalPDF.answer = "";
+      // Set conditionalPDF answer to "Yes" for checkboxes
+      question.conditionalPDF.answer = "Yes";
+      
+      // For "mark only one" checkboxes, add markOnlyOne field and remove nameId/placeholder
+      if (checkboxAvailability === 'markOne') {
+        question.markOnlyOne = true;
+        delete question.nameId;
+        delete question.placeholder;
+      }
     }
     
     // --- PATCH: For multipleDropdownType, convert to numberedDropdown format ---
@@ -1001,22 +1015,14 @@ window.exportBothJson = function() {
   try {
     // Automatically reset PDF inheritance and Node IDs before export
     // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-    console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset before export...');
-    
     // Reset PDF inheritance for all nodes FIRST
     if (typeof window.resetAllPdfInheritance === 'function') {
       window.resetAllPdfInheritance();
-      console.log('🔄 [AUTO RESET] PDF inheritance reset completed before export');
-    } else {
-      console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
     }
     
     // Reset all Node IDs SECOND (after PDF inheritance is fixed)
     if (typeof resetAllNodeIds === 'function') {
       resetAllNodeIds();
-      console.log('🔄 [AUTO RESET] Node IDs reset completed before export');
-    } else {
-      console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
     }
     
     // Get flowchart JSON
@@ -1082,6 +1088,9 @@ window.exportBothJson = function() {
       // subtitle & info nodes
       if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
       if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+      
+      // checkbox availability
+      if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
 
       return cellData;
     });
@@ -1139,22 +1148,14 @@ window.saveFlowchart = function() {
   
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset before saving...');
-  
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
-    console.log('🔄 [AUTO RESET] PDF inheritance reset completed before saving');
-  } else {
-    console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
   }
   
   // Reset all Node IDs SECOND (after PDF inheritance is fixed)
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
-    console.log('🔄 [AUTO RESET] Node IDs reset completed before saving');
-  } else {
-    console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
   }
   
   renumberQuestionIds();
@@ -1196,7 +1197,8 @@ window.saveFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
+      _checkboxAvailability: cell._checkboxAvailability||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
@@ -1760,12 +1762,9 @@ window.resetPdfInheritance = function(cell) {
         }, 100);
       }
       
-      console.log(`🔄 [PDF RESET] Updated PDF inheritance for node ${cell.id} to: ${currentPdfName} (found PDF node: ${connectedPdfNode.id})`);
       return currentPdfName;
     }
   }
-  
-  console.log(`🔄 [PDF RESET] No connected PDF node found for reset (searched from node ${cell.id})`);
   
   // Clear all PDF properties from the node since no PDF connection exists
   cell._pdfName = '';
@@ -1789,7 +1788,6 @@ window.resetPdfInheritance = function(cell) {
     }, 100);
   }
   
-  console.log(`🔄 [PDF RESET] Cleared all PDF properties from node ${cell.id} (no PDF connection found)`);
   return null;
 };
 
@@ -1810,8 +1808,6 @@ window.resetAllPdfInheritance = function() {
   let resetCount = 0;
   let totalCount = 0;
   
-  console.log('🔄 [RESET ALL PDF] Starting PDF reset for all nodes...');
-  
   // Process each cell
   cells.forEach(cell => {
     // Skip PDF nodes themselves (they don't need inheritance reset)
@@ -1822,18 +1818,10 @@ window.resetAllPdfInheritance = function() {
     // Check if this cell has PDF inheritance
     const currentPdfName = window.getPdfNameForNode(cell);
     if (currentPdfName) {
-      totalCount++;
-      
       // Reset the PDF inheritance for this cell
-      const newPdfName = window.resetPdfInheritance(cell);
-      if (newPdfName) {
-        resetCount++;
-        console.log(`🔄 [RESET ALL PDF] Reset node ${cell.id} to: ${newPdfName}`);
-      }
+      window.resetPdfInheritance(cell);
     }
   });
-  
-  console.log(`🔄 [RESET ALL PDF] Completed! Reset ${resetCount} out of ${totalCount} nodes with PDF inheritance`);
   
   // User feedback removed - operation completes silently
   
@@ -2231,6 +2219,9 @@ window.loadFlowchartData = function(data) {
           }
           newCell._infoText = infoText;
         }
+        
+        // Checkbox availability
+        if (item._checkboxAvailability !== undefined) newCell._checkboxAvailability = item._checkboxAvailability;
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;

@@ -3883,6 +3883,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function previewForm() {
+  // Automatically reset PDF inheritance and Node IDs before previewing
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  console.log('🔄 [PREVIEW RESET] Running automatic PDF and Node ID reset before previewing...');
+  
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+    console.log('🔄 [PREVIEW RESET] PDF inheritance reset completed before previewing');
+  } else {
+    console.warn('🔄 [PREVIEW RESET] resetAllPdfInheritance function not available');
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+    console.log('🔄 [PREVIEW RESET] Node IDs reset completed before previewing');
+  } else {
+    console.warn('🔄 [PREVIEW RESET] resetAllNodeIds function not available');
+  }
+  
   // Generate the GUI JSON string (do not download)
   let guiJsonStr = "";
   if (typeof window.exportGuiJson === "function") {
@@ -4018,6 +4038,9 @@ function autosaveFlowchartToLocalStorage() {
       // subtitle & info nodes
       if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
       if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+      
+      // checkbox availability
+      if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
 
       return cellData;
     });
@@ -4179,22 +4202,14 @@ function setupAutosaveHooks() {
     // - 3000ms: Our automatic reset (after all internal processes complete)
     // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
     setTimeout(() => {
-      console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset after flowchart load...');
-      
       // Reset PDF inheritance for all nodes FIRST
       if (typeof window.resetAllPdfInheritance === 'function') {
         window.resetAllPdfInheritance();
-        console.log('🔄 [AUTO RESET] PDF inheritance reset completed');
-      } else {
-        console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
       }
       
       // Reset all Node IDs SECOND (after PDF inheritance is fixed)
       if (typeof resetAllNodeIds === 'function') {
         resetAllNodeIds();
-        console.log('🔄 [AUTO RESET] Node IDs reset completed');
-      } else {
-        console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
       }
     }, 3000); // Increased delay to ensure all internal loading processes are complete
     
@@ -5310,9 +5325,6 @@ function resetAllNodeIds() {
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
-  
-  // Show success message
-  alert(`Successfully reset ${resetCount} node IDs to match the naming convention.`);
   
   // Close settings menu
   hideSettingsMenu();
