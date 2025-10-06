@@ -492,6 +492,19 @@ graph.isCellEditable = function (cell) {
           updateNotesNodeCell(change.cell);
         }, 10); // Small delay to ensure geometry is updated
       }
+      
+      // Check for geometry changes (resize/move) on calculation nodes
+      if (change instanceof mxGeometryChange && change.cell && typeof window.isCalculationNode === 'function' && window.isCalculationNode(change.cell)) {
+        // Calculation node was resized, show dimensions alert
+        setTimeout(() => {
+          const geo = change.cell.geometry;
+          if (geo) {
+            const width = Math.round(geo.width);
+            const height = Math.round(geo.height);
+            alert(`Calculation Node Dimensions:\nWidth: ${width}px\nHeight: ${height}px`);
+          }
+        }, 10); // Small delay to ensure geometry is updated
+      }
     });
   });
   
@@ -1264,6 +1277,9 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
         label = "Calculation node";
           }
+          // Set fixed dimensions for calculation nodes
+          width = 400;
+          height = 450;
       } else if (nodeType === 'notesNode') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=notesNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;";
         label = "Notes Node";
@@ -4238,8 +4254,10 @@ function autosaveFlowchartToLocalStorage() {
       
       // calculation node properties
         // Calculation node data export now handled by calc.js
-        if (typeof window.exportCalculationNodeData === 'function') {
-          window.exportCalculationNodeData(cell, cellData);
+        if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
+          if (typeof window.exportCalculationNodeData === 'function') {
+            window.exportCalculationNodeData(cell, cellData);
+          }
         }
       
       // subtitle & info nodes

@@ -329,29 +329,9 @@ window.isUserTyping = function() {
 };
 
 /**
- * Copy selected node as JSON
+ * Copy selected node as JSON - handled by script.js
+ * Removed duplicate function to prevent conflicts
  */
-window.copySelectedNodeAsJson = function() {
-  if (!graph) return;
-  
-  const selection = graph.getSelectionCells();
-  if (selection.length === 0) {
-    alert('No node selected');
-    return;
-  }
-  
-  const cell = selection[0];
-  const cellData = serializeCell(cell);
-  
-  try {
-    navigator.clipboard.writeText(JSON.stringify(cellData, null, 2));
-    console.log('Node copied to clipboard');
-  } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
-    // Fallback: show in alert
-    alert('Node data:\n' + JSON.stringify(cellData, null, 2));
-  }
-};
 
 // Paste function is now handled by script.js - no duplicate function needed
 

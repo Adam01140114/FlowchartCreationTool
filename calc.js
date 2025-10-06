@@ -16,6 +16,8 @@ function initializeCalculationNode(cell) {
   cell._calcOperator = "=";
   cell._calcThreshold = "0";
   cell._calcFinalText = "";
+  cell._calcFinalOutputType = "textbox";
+  cell._calcFinalCheckboxChecked = false;
   
   // For backward compatibility
   if (cell._calcAmountLabel !== undefined) {
@@ -38,6 +40,8 @@ function convertToCalculationNode(cell, preservedText = null) {
   cell._calcThreshold = "0";
   cell._calcFinalText = "";
   cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+  cell._calcFinalOutputType = "textbox";
+  cell._calcFinalCheckboxChecked = false;
   
   updateCalculationNodeCell(cell);
 }
@@ -74,6 +78,8 @@ function exportCalculationNodeData(cell, cellData) {
   if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
   if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
   if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+  if (cell._calcFinalOutputType !== undefined) cellData._calcFinalOutputType = cell._calcFinalOutputType;
+  if (cell._calcFinalCheckboxChecked !== undefined) cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
 }
 
 /**
@@ -297,6 +303,8 @@ function updateCalculationNodeCell(cell) {
   if (cell._calcOperator === undefined) cell._calcOperator = "=";
   if (cell._calcThreshold === undefined) cell._calcThreshold = "0";
   if (cell._calcFinalText === undefined) cell._calcFinalText = "";
+  if (cell._calcFinalOutputType === undefined) cell._calcFinalOutputType = "textbox";
+  if (cell._calcFinalCheckboxChecked === undefined) cell._calcFinalCheckboxChecked = false;
 
   // For backward compatibility
   if (cell._calcAmountLabel !== undefined && cell._calcTerms.length === 1 && !cell._calcTerms[0].amountLabel) {
@@ -412,29 +420,35 @@ function updateCalculationNodeCell(cell) {
     operatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
   });
 
+  // Create a simple display for the calculation node
+  const termsText = cell._calcTerms.map((term, index) => {
+    if (index === 0) {
+      return term.amountLabel || 'No amount selected';
+    } else {
+      return `${term.mathOperator || '+'} ${term.amountLabel || 'No amount selected'}`;
+    }
+  }).join(' ');
+  
+  const finalOutputText = cell._calcFinalOutputType === 'textbox' 
+    ? `Text: "${cell._calcFinalText || 'No text set'}"`
+    : `Checkbox: ${cell._calcFinalCheckboxChecked ? 'Checked' : 'Unchecked'} by default`;
+  
   const html = `
-    <div style="padding:10px; width:100%;" class="multiple-textboxes-node">
-      <label>Calculation Title:</label><br/>
-      <div class="textbox-entry">
-        <input type="text" value="${escapeAttr(cell._calcTitle)}" onblur="window.updateCalcNodeTitle('${cell.id}', this.value)" style="width:100%;" />
+    <div style="padding:15px; text-align:center; font-family: Arial, sans-serif;">
+      <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #1976d2;">
+        ${escapeHtml(cell._calcTitle || 'Calculation Title')}
       </div>
-      <br/>
-
-      ${calcTermsHtml}
-
-      <label>Comparison Operator:</label>
-      <select onchange="window.updateCalcNodeOperator('${cell.id}', this.value)">
-        ${operatorOptionsHtml}
-      </select>
-      <br/><br/>
-
-      <label>Number:</label>
-      <input type="number" value="${escapeAttr(cell._calcThreshold)}" onblur="window.updateCalcNodeThreshold('${cell.id}', this.value)"/>
-      <br/><br/>
-
-      <label>Final Text:</label><br/>
-      <div class="textbox-entry">
-        <input type="text" value="${escapeAttr(cell._calcFinalText)}" onblur="window.updateCalcNodeFinalText('${cell.id}', this.value)" style="width:100%;" />
+      <div style="font-size: 14px; margin-bottom: 6px; color: #333;">
+        <strong>Calculation:</strong> ${escapeHtml(termsText)}
+      </div>
+      <div style="font-size: 14px; margin-bottom: 6px; color: #333;">
+        <strong>Condition:</strong> ${escapeHtml(termsText)} ${cell._calcOperator || '='} ${cell._calcThreshold || '0'}
+      </div>
+      <div style="font-size: 14px; color: #333;">
+        <strong>Output:</strong> ${finalOutputText}
+      </div>
+      <div style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">
+        Double-click to configure
       </div>
     </div>
   `;
@@ -458,25 +472,19 @@ function updateCalculationNodeCell(cell) {
     }
     graph.getModel().setStyle(cell, st);
     
-    // Set minimum size for the calculation node
+    // Set fixed size for the calculation node
     const geo = cell.geometry;
     if (geo) {
-      // Set a generous minimum width for the calculation node to fit dropdowns
-      if (geo.width < 400) {
-        geo.width = 400;
-      }
-      // Ensure height is adequate (add 50px per term after the first)
-      const minHeight = 250 + (Math.max(0, cell._calcTerms.length - 1) * 50);
-      if (geo.height < minHeight) {
-        geo.height = minHeight;
-      }
+      // Set fixed dimensions: 400px width, 450px height
+      geo.width = 400;
+      geo.height = 450;
     }
   } finally {
     graph.getModel().endUpdate();
   }
   
-  // Force update cell size to fit content
-  graph.updateCellSize(cell);
+  // Note: Removed graph.updateCellSize(cell) to prevent unwanted cell movement
+  // The cell size should already be appropriate from the initial creation
 }
 
 // Calculation node field updates
@@ -486,6 +494,9 @@ window.updateCalcNodeTitle = (cellId, title) => {
   
   cell._calcTitle = title;
   updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
 };
 
 window.updateCalcNodeAmountLabel = function(cellId, value) {
@@ -508,6 +519,9 @@ window.updateCalcNodeAmountLabel = function(cellId, value) {
     graph.getModel().endUpdate();
   }
   updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
 };
 
 window.updateCalcNodeOperator = function(cellId, value) {
@@ -520,6 +534,9 @@ window.updateCalcNodeOperator = function(cellId, value) {
     graph.getModel().endUpdate();
   }
   updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
 };
 
 window.updateCalcNodeThreshold = function(cellId, value) {
@@ -532,6 +549,9 @@ window.updateCalcNodeThreshold = function(cellId, value) {
     graph.getModel().endUpdate();
   }
   updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
 };
 
 window.updateCalcNodeFinalText = (cellId, text) => {
@@ -540,7 +560,512 @@ window.updateCalcNodeFinalText = (cellId, text) => {
   
   cell._calcFinalText = text;
   updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
 };
+
+window.updateCalcNodeFinalOutputType = (cellId, outputType) => {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  graph.getModel().beginUpdate();
+  try {
+    cell._calcFinalOutputType = outputType;
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
+};
+
+window.updateCalcNodeFinalCheckboxChecked = (cellId, checked) => {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  graph.getModel().beginUpdate();
+  try {
+    cell._calcFinalCheckboxChecked = checked;
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  updateCalculationNodeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
+};
+
+/**
+ * Show calculation node properties popup
+ */
+window.showCalculationNodeProperties = function(cell) {
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  // Prevent multiple popups
+  if (window.__calcPropertiesPopupOpen) {
+    return;
+  }
+  window.__calcPropertiesPopupOpen = true;
+  
+  // Clean up any existing popups
+  const existingPopups = document.querySelectorAll('.calc-properties-modal');
+  existingPopups.forEach(n => n.remove());
+  
+  // Create popup container
+  const popup = document.createElement('div');
+  popup.className = 'calc-properties-modal';
+  popup.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #1976d2;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    min-width: 600px;
+    max-width: 800px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    pointer-events: auto;
+    opacity: 1;
+    max-height: 80vh;
+    overflow-y: auto;
+  `;
+  
+  // Create header
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  `;
+  
+  const title = document.createElement('h3');
+  title.textContent = 'Calculation Node Properties';
+  title.style.cssText = `
+    margin: 0;
+    color: #1976d2;
+    font-size: 18px;
+    font-weight: 600;
+  `;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '×';
+  closeBtn.style.cssText = `
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  
+  closeBtn.onclick = () => {
+    popup.remove();
+    window.__calcPropertiesPopupOpen = false;
+  };
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  
+  // Create content container
+  const content = document.createElement('div');
+  content.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  `;
+  
+  // Calculation Title
+  const titleField = createField('Calculation Title', cell._calcTitle || 'Calculation Title', (value) => {
+    cell._calcTitle = value;
+    updateCalculationNodeCell(cell);
+  });
+  
+  // Calculation Terms
+  const termsContainer = createCalculationTermsContainer(cell);
+  
+  // Comparison Operator
+  const operatorField = createDropdownField('Comparison Operator', cell._calcOperator || '=', ['=', '>', '<'], (value) => {
+    cell._calcOperator = value;
+    updateCalculationNodeCell(cell);
+  });
+  
+  // Threshold Number
+  const thresholdField = createField('Number', cell._calcThreshold || '0', (value) => {
+    cell._calcThreshold = value;
+    updateCalculationNodeCell(cell);
+  });
+  
+  // Final Output Type
+  const outputTypeField = createDropdownField('Final Output Type', cell._calcFinalOutputType || 'textbox', ['textbox', 'checkbox'], (value) => {
+    cell._calcFinalOutputType = value;
+    updateCalculationNodeCell(cell);
+    // Refresh the popup to show/hide the appropriate field
+    setTimeout(() => {
+      popup.remove();
+      window.__calcPropertiesPopupOpen = false;
+      showCalculationNodeProperties(cell);
+    }, 100);
+  });
+  
+  // Conditional Final Output Field
+  const finalOutputContainer = document.createElement('div');
+  finalOutputContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+  
+  if (cell._calcFinalOutputType === 'textbox') {
+    const finalTextField = createField('Final Text', cell._calcFinalText || '', (value) => {
+      cell._calcFinalText = value;
+      updateCalculationNodeCell(cell);
+    });
+    finalOutputContainer.appendChild(finalTextField);
+  } else {
+    const checkboxField = createCheckboxField('Checked by Default', cell._calcFinalCheckboxChecked || false, (checked) => {
+      cell._calcFinalCheckboxChecked = checked;
+      updateCalculationNodeCell(cell);
+    });
+    finalOutputContainer.appendChild(checkboxField);
+  }
+  
+  // Assemble content
+  content.appendChild(titleField);
+  content.appendChild(termsContainer);
+  content.appendChild(operatorField);
+  content.appendChild(thresholdField);
+  content.appendChild(outputTypeField);
+  content.appendChild(finalOutputContainer);
+  
+  // Create footer with buttons
+  const footer = document.createElement('div');
+  footer.style.cssText = `
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+  `;
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save & Close';
+  saveBtn.style.cssText = `
+    background: #1976d2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  `;
+  saveBtn.onclick = () => {
+    popup.remove();
+    window.__calcPropertiesPopupOpen = false;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  footer.appendChild(saveBtn);
+  
+  // Assemble popup
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(footer);
+  
+  // Add to document
+  document.body.appendChild(popup);
+  
+  // Close on escape key
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      popup.remove();
+      window.__calcPropertiesPopupOpen = false;
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+};
+
+// Helper functions for creating form fields
+function createField(label, value, onChange) {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+  
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label + ':';
+  labelEl.style.cssText = 'font-weight: 500; color: #333;';
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = value;
+  input.style.cssText = `
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+  `;
+  input.onblur = () => onChange(input.value);
+  
+  container.appendChild(labelEl);
+  container.appendChild(input);
+  return container;
+}
+
+function createDropdownField(label, value, options, onChange) {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+  
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label + ':';
+  labelEl.style.cssText = 'font-weight: 500; color: #333;';
+  
+  const select = document.createElement('select');
+  select.style.cssText = `
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+  `;
+  
+  options.forEach(option => {
+    const optionEl = document.createElement('option');
+    optionEl.value = option;
+    optionEl.textContent = option;
+    if (option === value) optionEl.selected = true;
+    select.appendChild(optionEl);
+  });
+  
+  select.onchange = () => onChange(select.value);
+  
+  container.appendChild(labelEl);
+  container.appendChild(select);
+  return container;
+}
+
+function createCheckboxField(label, checked, onChange) {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; align-items: center; gap: 8px;';
+  
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = checked;
+  checkbox.onchange = () => onChange(checkbox.checked);
+  
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label;
+  labelEl.style.cssText = 'font-weight: 500; color: #333; margin: 0;';
+  
+  container.appendChild(checkbox);
+  container.appendChild(labelEl);
+  return container;
+}
+
+function createCalculationTermsContainer(cell) {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; flex-direction: column; gap: 12px;';
+  
+  const label = document.createElement('label');
+  label.textContent = 'Calculation Terms:';
+  label.style.cssText = 'font-weight: 500; color: #333;';
+  container.appendChild(label);
+  
+  // Create terms
+  const terms = cell._calcTerms || [{amountLabel: "", mathOperator: ""}];
+  terms.forEach((term, index) => {
+    const termContainer = createCalculationTermField(cell, term, index);
+    container.appendChild(termContainer);
+  });
+  
+  // Add More button
+  const addMoreBtn = document.createElement('button');
+  addMoreBtn.textContent = 'Add More';
+  addMoreBtn.style.cssText = `
+    background: #1976d2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    align-self: flex-start;
+  `;
+  addMoreBtn.onclick = () => {
+    if (!cell._calcTerms) cell._calcTerms = [];
+    cell._calcTerms.push({amountLabel: "", mathOperator: ""});
+    updateCalculationNodeCell(cell);
+    // Refresh the popup
+    setTimeout(() => {
+      const popup = document.querySelector('.calc-properties-modal');
+      if (popup) {
+        popup.remove();
+        window.__calcPropertiesPopupOpen = false;
+        showCalculationNodeProperties(cell);
+      }
+    }, 100);
+  };
+  container.appendChild(addMoreBtn);
+  
+  return container;
+}
+
+function createCalculationTermField(cell, term, index) {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #f9f9f9;
+  `;
+  
+  const termLabel = document.createElement('label');
+  termLabel.textContent = `Calc ${index + 1}:`;
+  termLabel.style.cssText = 'font-weight: 500; color: #333;';
+  container.appendChild(termLabel);
+  
+  // Amount Label dropdown
+  const amountSelect = document.createElement('select');
+  amountSelect.style.cssText = `
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+  `;
+  
+  // Function to populate dropdown options
+  const populateDropdown = () => {
+    // Clear existing options
+    amountSelect.innerHTML = '';
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = '-- pick an amount label --';
+    amountSelect.appendChild(defaultOption);
+    
+    const allAmountLabels = gatherAllAmountLabels();
+    allAmountLabels.forEach(lbl => {
+      const option = document.createElement('option');
+      option.value = lbl;
+      
+      // Extract clean display name
+      let displayName = lbl;
+      if (lbl.startsWith('question_value:')) {
+        // Format: question_value:label:displayName
+        const parts = lbl.split(':');
+        if (parts.length >= 3) {
+          displayName = parts[2]; // Use the display name part
+        }
+      } else {
+        // For regular labels, just use as-is
+        displayName = lbl;
+      }
+      
+      option.textContent = displayName;
+      if (lbl === term.amountLabel) option.selected = true;
+      amountSelect.appendChild(option);
+    });
+  };
+  
+  // Populate dropdown initially
+  populateDropdown();
+  
+  // Refresh dropdown when clicked
+  amountSelect.onmousedown = () => {
+    populateDropdown();
+  };
+  
+  amountSelect.onchange = () => {
+    term.amountLabel = amountSelect.value;
+    updateCalculationNodeCell(cell);
+  };
+  
+  container.appendChild(amountSelect);
+  
+  // Math Operator dropdown (only for terms after the first)
+  if (index > 0) {
+    const operatorSelect = document.createElement('select');
+    operatorSelect.style.cssText = `
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 100px;
+    `;
+    
+    const operators = ['+', '-', '*', '/'];
+    operators.forEach(op => {
+      const option = document.createElement('option');
+      option.value = op;
+      option.textContent = op;
+      if (op === term.mathOperator) option.selected = true;
+      operatorSelect.appendChild(option);
+    });
+    
+    operatorSelect.onchange = () => {
+      term.mathOperator = operatorSelect.value;
+      updateCalculationNodeCell(cell);
+    };
+    
+    const operatorContainer = document.createElement('div');
+    operatorContainer.style.cssText = 'display: flex; align-items: center; gap: 8px;';
+    
+    const operatorLabel = document.createElement('label');
+    operatorLabel.textContent = 'Math Operator:';
+    operatorLabel.style.cssText = 'font-weight: 500; color: #333; white-space: nowrap;';
+    
+    operatorContainer.appendChild(operatorLabel);
+    operatorContainer.appendChild(operatorSelect);
+    container.appendChild(operatorContainer);
+  }
+  
+  // Remove button (only for terms after the first)
+  if (index > 0) {
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'Remove';
+    removeBtn.style.cssText = `
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      align-self: flex-start;
+    `;
+    removeBtn.onclick = () => {
+      cell._calcTerms.splice(index, 1);
+      updateCalculationNodeCell(cell);
+      // Refresh the popup
+      setTimeout(() => {
+        const popup = document.querySelector('.calc-properties-modal');
+        if (popup) {
+          popup.remove();
+          window.__calcPropertiesPopupOpen = false;
+          showCalculationNodeProperties(cell);
+        }
+      }, 100);
+    };
+    container.appendChild(removeBtn);
+  }
+  
+  return container;
+}
 
 // New function to handle updating calculation terms
 window.updateCalcNodeTerm = (cellId, termIndex, property, value) => {

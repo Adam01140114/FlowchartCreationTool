@@ -433,29 +433,8 @@ function setupGraphEventListeners(graph) {
 function setupKeyboardEventListeners(graph) {
   if (!graph) return;
   
-  // Keyboard shortcuts for copy/paste
-  document.addEventListener('keydown', function(evt) {
-    // Only handle shortcuts when not typing in input fields
-    if (typeof window.isUserTyping === 'function' && window.isUserTyping(evt)) return;
-    
-    if (evt.ctrlKey || evt.metaKey) {
-      if (evt.key === 'c') {
-        evt.preventDefault();
-        if (typeof window.copySelectedNodeAsJson === 'function') {
-          window.copySelectedNodeAsJson();
-        }
-      } else if (evt.key === 'v') {
-        evt.preventDefault();
-        // Get the center of the viewport for pasting
-        const viewport = graph.view.getGraphBounds();
-        const centerX = viewport.x + viewport.width / 2;
-        const centerY = viewport.y + viewport.height / 2;
-        if (typeof window.pasteNodeFromJson === 'function') {
-          window.pasteNodeFromJson(centerX, centerY);
-        }
-      }
-    }
-  });
+  // Keyboard shortcuts for copy/paste are handled in script.js using keyHandler.bindControlKey
+  // Removed duplicate event listeners to prevent double copy-paste behavior
   
   // Additional keyboard event listeners
   document.addEventListener('keydown', function(event) {
@@ -566,8 +545,8 @@ function setupCustomClickHandlers(graph) {
     
     // c) Calculation node double-click = show calculation properties
     if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
-      if (typeof window.showCalculationProperties === 'function') {
-        window.showCalculationProperties(cell, evt);
+      if (typeof window.showCalculationNodeProperties === 'function') {
+        window.showCalculationNodeProperties(cell);
       }
       mxEvent.consume(evt);
       return;

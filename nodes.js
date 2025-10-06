@@ -113,7 +113,7 @@ function createOptionsNode(x, y) {
  */
 function createCalculationNode(x, y) {
   const parent = graph.getDefaultParent();
-  const vertex = graph.insertVertex(parent, null, '', x, y, 250, 120, 
+  const vertex = graph.insertVertex(parent, null, '', x, y, 400, 450, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=calculation;section=1;');
   
   // Set default properties

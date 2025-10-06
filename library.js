@@ -254,17 +254,6 @@ window.exportGuiJson = function(download = true) {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
       }
-    
-    // Add linking and image fields
-    question.linking = {
-      enabled: false,
-      targetId: ""
-    };
-    question.image = {
-      url: "",
-      width: 0,
-      height: 0
-    };
       
       // Add line limit and character limit for big paragraph questions
       if (questionType === "bigParagraph") {
@@ -958,6 +947,75 @@ window.exportGuiJson = function(download = true) {
     sectionMap[section].questions.push(question);
   }
   
+  // Process calculation nodes and convert them to hidden fields
+  const calculationNodes = vertices.filter(cell => typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell));
+  for (const cell of calculationNodes) {
+    // Skip if this calculation node doesn't have the required properties
+    if (!cell._calcTitle || !cell._calcTerms || cell._calcTerms.length === 0) {
+      continue;
+    }
+    
+    // Create hidden field for calculation node
+    const hiddenField = {
+      hiddenFieldId: hiddenFieldCounter.toString(),
+      type: cell._calcFinalOutputType === "checkbox" ? "checkbox" : "text",
+      name: cell._calcTitle,
+      checked: cell._calcFinalCheckboxChecked || false,
+      conditions: [],
+      calculations: []
+    };
+    
+    // For checkbox type, don't add calculations - just add the hidden field
+    if (cell._calcFinalOutputType === "checkbox") {
+      hiddenFields.push(hiddenField);
+      hiddenFieldCounter++;
+    } else {
+      // For text type, convert calculation terms to the expected format
+      const calculation = {
+        terms: [],
+        compareOperator: cell._calcOperator || "=",
+        threshold: cell._calcThreshold || "0",
+        fillValue: cell._calcFinalText || ""
+      };
+      
+      // Process each calculation term
+      for (const term of cell._calcTerms) {
+        if (term.amountLabel) {
+          // Extract the question name from the amount label
+          let questionNameId = term.amountLabel;
+          
+          // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
+          if (term.amountLabel.startsWith('question_value:')) {
+            const parts = term.amountLabel.split(':');
+            if (parts.length >= 3) {
+              // Extract the clean question name from the display part
+              // Format: "question_value:answer1:how_much (answer1)"
+              // We want "how_much" from the third part
+              const displayPart = parts[2];
+              // Remove the "(answer1)" part if it exists
+              questionNameId = displayPart.replace(/\s*\([^)]*\)$/, '');
+            }
+          } else {
+            // For regular labels, use as-is
+            questionNameId = term.amountLabel;
+          }
+          
+          calculation.terms.push({
+            operator: term.mathOperator || "",
+            questionNameId: questionNameId
+          });
+        }
+      }
+      
+      // Only add the calculation if it has terms
+      if (calculation.terms.length > 0) {
+        hiddenField.calculations.push(calculation);
+        hiddenFields.push(hiddenField);
+        hiddenFieldCounter++;
+      }
+    }
+  }
+  
   // Sort questions within each section by questionId
   for (const secNum in sectionMap) {
     sectionMap[secNum].questions.sort((a, b) => {
@@ -992,7 +1050,7 @@ window.exportGuiJson = function(download = true) {
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   
   // Get form name
-  const formName = document.getElementById('formNameInput')?.value || '';
+  const formName = document.getElementById('formNameInput')?.value || 'Example Form';
   
   // Create final output object
   const output = {
@@ -1109,6 +1167,8 @@ window.exportBothJson = function() {
       if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
       if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
       if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+      if (cell._calcFinalOutputType !== undefined) cellData._calcFinalOutputType = cell._calcFinalOutputType;
+      if (cell._calcFinalCheckboxChecked !== undefined) cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
       
       // subtitle & info nodes
       if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
@@ -1252,6 +1312,8 @@ window.saveFlowchart = function() {
       cellData._calcThreshold = cell._calcThreshold;
       cellData._calcFinalText = cell._calcFinalText;
       cellData._calcTerms = cell._calcTerms;
+      cellData._calcFinalOutputType = cell._calcFinalOutputType;
+      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
     }
     data.cells.push(cellData);
   }
@@ -2249,6 +2311,8 @@ window.loadFlowchartData = function(data) {
           newCell._calcFinalText = calcFinalText;
         }
         if (item._calcTerms !== undefined) newCell._calcTerms = JSON.parse(JSON.stringify(item._calcTerms));
+        if (item._calcFinalOutputType !== undefined) newCell._calcFinalOutputType = item._calcFinalOutputType;
+        if (item._calcFinalCheckboxChecked !== undefined) newCell._calcFinalCheckboxChecked = item._calcFinalCheckboxChecked;
         
         // Subtitle and info node properties - decode HTML entities
         if (item._subtitleText !== undefined) {

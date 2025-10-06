@@ -105,3 +105,318 @@ If you encounter similar dropdown layout issues:
 2. Check what property type the broken dropdown uses (`isDropdown`)
 3. Either change the property type or create a new one that mirrors the working approach
 4. Use the same layout code pattern: label first, then dropdown, both appended to fieldDiv
+
+=====================================
+
+INCIDENT: Context Menu Node Creation Issues
+DATE: [Current Date]
+ISSUE ID: CONTEXT_MENU_CREATION_001
+
+PROBLEM DESCRIPTION:
+===================
+1. Question nodes created via right-click context menu were not showing the "Choose Question Type" dropdown
+2. Calculation nodes created via right-click context menu were throwing "graph.getModel is not a function" error
+3. Context menu node creation was inconsistent with drag-and-drop node creation
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make right-click context menu create nodes with the same functionality as drag-and-drop
+- Ensure question nodes from context menu show the dropdown for selecting question type
+- Fix JavaScript errors when creating calculation nodes from context menu
+
+ISSUES ENCOUNTERED:
+==================
+1. GRAPH REFERENCE ERROR:
+   - Context menu function `placeNodeAtClickLocation(graph, nodeType)` was trying to use `graph.getModel()`
+   - The `graph` parameter wasn't properly available, causing "graph.getModel is not a function" error
+
+2. INCONSISTENT NODE CREATION:
+   - Drag-and-drop created nodes with label "question node" which triggered dropdown in `refreshAllCells()`
+   - Context menu created nodes with empty label, so `refreshAllCells()` didn't detect them as needing dropdown
+   - Different initialization logic between drag-and-drop and context menu
+
+3. MISSING CALCULATION NODE SUPPORT:
+   - Context menu was missing the calculation node handler
+   - `placeCalcNode` element wasn't properly referenced in context menu setup
+
+TECHNICAL DETAILS:
+==================
+- File: context-menus.js
+- Drag-and-drop logic: Uses `mxUtils.makeDraggable` with callback that gets `graph` parameter
+- Context menu logic: Was trying to use `graph` parameter that wasn't always available
+- `refreshAllCells()` function checks for placeholder text "question node" to show dropdown
+- Context menu was creating nodes with empty labels instead of "question node"
+
+SOLUTION THAT WORKED:
+====================
+1. FIXED GRAPH REFERENCE ERROR:
+   ```javascript
+   // Use the global graph variable if the parameter is not available
+   const graphToUse = graph || window.graph;
+   if (!graphToUse) {
+     console.error('Graph not available for node placement');
+     return;
+   }
+   ```
+
+2. LINKED CONTEXT MENU TO DRAG-AND-DROP LOGIC:
+   - Made context menu use same style as drag-and-drop elements
+   - Made context menu use same initialization logic as drag-and-drop
+   - Made context menu use same finalization logic as drag-and-drop
+
+3. ADDED MISSING CALCULATION NODE SUPPORT:
+   - Added `placeCalcNode` variable declaration
+   - Added `placeCalcNode` element initialization
+   - Added calculation node event handler
+
+CODE CHANGES:
+=============
+1. Fixed graph reference in `placeNodeAtClickLocation` function:
+   ```javascript
+   const graphToUse = graph || window.graph;
+   // Use graphToUse instead of graph throughout the function
+   ```
+
+2. Made context menu use same style as drag-and-drop:
+   ```javascript
+   if (nodeType === 'question') {
+     // Use the same style as the drag-and-drop elements
+     const toolbarShape = document.querySelector('.shape[data-type="question"]');
+     if (toolbarShape) {
+       style = toolbarShape.dataset.style;
+       if (!style.includes("pointerEvents=")) {
+         style += "pointerEvents=1;overflow=fill;";
+       }
+     }
+     label = "question node"; // Set placeholder label to trigger dropdown
+   }
+   ```
+
+3. Added same initialization logic as drag-and-drop:
+   ```javascript
+   if (nodeType === 'question') {
+     if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+       if (typeof window.getQuestionType === 'function') {
+         const qType = window.getQuestionType(cell);
+         if (qType && typeof window.setQuestionType === 'function') {
+           window.setQuestionType(cell, qType);
+         }
+       }
+     }
+   }
+   ```
+
+4. Added calculation node support:
+   ```javascript
+   // Variable declaration
+   let placeCalcNode, placeNotesNode, placeChecklistNode, ...
+   
+   // Element initialization
+   placeCalcNode = document.getElementById('placeCalcNode');
+   
+   // Event handler
+   if (placeCalcNode) {
+     placeCalcNode.addEventListener('click', function() {
+       placeNodeAtClickLocation(graph, 'calculation');
+       hideContextMenu();
+     });
+   }
+   ```
+
+KEY LEARNINGS:
+==============
+1. When context menu and drag-and-drop behave differently, check if they're using different code paths
+2. Always use the global `window.graph` as fallback when graph parameter might not be available
+3. Make context menu use the exact same logic as drag-and-drop for consistency
+4. Check for missing element references and event handlers when adding new functionality
+5. Use placeholder text that `refreshAllCells()` can detect to trigger proper initialization
+
+PREVENTION:
+===========
+- Always link context menu functionality to the same functions as drag-and-drop
+- Use fallback graph reference to prevent "graph.getModel is not a function" errors
+- Ensure all node types have proper event handlers in context menu setup
+- Test context menu creation against drag-and-drop creation to ensure consistency
+
+RELATED FILES:
+=============
+- context-menus.js (main file with context menu logic)
+- events.js (drag-and-drop logic to replicate)
+- script.js (refreshAllCells function that handles dropdown display)
+
+FUTURE REFERENCE:
+================
+If you encounter similar context menu issues:
+1. Check if context menu is using the same logic as drag-and-drop
+2. Use `const graphToUse = graph || window.graph;` to prevent graph reference errors
+3. Make context menu read styles from drag-and-drop elements for consistency
+4. Ensure all node types have proper event handlers in context menu setup
+5. Use placeholder text that triggers proper initialization in `refreshAllCells()`
+
+=====================================
+
+INCIDENT: Calculation Node Properties Menu Migration
+DATE: [Current Date]
+ISSUE ID: CALC_PROPERTIES_MIGRATION_001
+
+PROBLEM DESCRIPTION:
+===================
+The calculation node had complex inline editing functionality that was difficult to maintain and use. The node displayed multiple dropdowns, input fields, and conditional content directly on the canvas, making it cluttered and hard to configure. Users needed a cleaner, more organized way to configure calculation node properties.
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Move all calculation node configuration from inline canvas editing to a dedicated properties popup
+- Create a comprehensive properties menu that appears when double-clicking a calculation node
+- Simplify the on-canvas display to show only essential information
+- Make the configuration process more user-friendly and organized
+
+ISSUES ENCOUNTERED:
+==================
+1. COMPLEX INLINE UI:
+   - Calculation nodes had multiple dropdowns, input fields, and conditional content on the canvas
+   - The UI was cluttered and difficult to use
+   - Conditional display logic was complex and hard to maintain
+
+2. DOUBLE-CLICK HANDLER CONFLICTS:
+   - Multiple double-click handlers were conflicting with each other
+   - One handler was calling the wrong function name (`showCalculationProperties` instead of `showCalculationNodeProperties`)
+   - The correct handler was being overridden by an incorrect one
+
+3. PROPERTIES POPUP COMPLEXITY:
+   - Needed to create a comprehensive popup with multiple field types
+   - Had to handle dynamic content (calculation terms, conditional fields)
+   - Required proper event handling for all field types
+
+TECHNICAL DETAILS:
+==================
+- File: calc.js (main calculation node logic)
+- File: events.js (double-click handlers)
+- File: graph.js (conflicting double-click handler)
+- The inline UI was generated in `updateCalculationNodeCell()` function
+- Properties popup was created in `showCalculationNodeProperties()` function
+
+SOLUTION THAT WORKED:
+====================
+1. SIMPLIFIED ON-CANVAS DISPLAY:
+   ```javascript
+   // Replaced complex inline form with simple display
+   const html = `
+     <div style="padding: 20px; font-family: Arial, sans-serif;">
+       <div style="font-weight: bold; color: #2196F3; margin-bottom: 10px;">${cell._calcTitle}</div>
+       <div style="margin-bottom: 8px;"><strong>Calculation:</strong> ${displayCalculation}</div>
+       <div style="margin-bottom: 8px;"><strong>Condition:</strong> ${displayCondition}</div>
+       <div style="margin-bottom: 8px;"><strong>Output:</strong> ${displayOutput}</div>
+       <div style="font-style: italic; color: #666; font-size: 12px; margin-top: 15px;">Double-click to configure</div>
+     </div>
+   `;
+   ```
+
+2. CREATED COMPREHENSIVE PROPERTIES POPUP:
+   ```javascript
+   window.showCalculationNodeProperties = function(cell) {
+     // Create modal popup with all configuration options
+     const modal = document.createElement('div');
+     modal.className = 'calc-properties-modal';
+     
+     // Add all necessary fields:
+     // - Title input
+     // - Calculation terms (dynamic)
+     // - Comparison operator dropdown
+     // - Threshold number input
+     // - Final output type dropdown
+     // - Conditional fields (text input or checkbox)
+   };
+   ```
+
+3. FIXED DOUBLE-CLICK HANDLER CONFLICTS:
+   ```javascript
+   // In events.js - corrected function name
+   if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
+     if (typeof window.showCalculationNodeProperties === 'function') {
+       window.showCalculationNodeProperties(cell); // Fixed function name
+     }
+     mxEvent.consume(evt);
+     return;
+   }
+   
+   // In graph.js - removed conflicting handler
+   // Removed the duplicate double-click handler that was calling wrong function
+   ```
+
+4. ADDED HELPER FUNCTIONS FOR POPUP:
+   ```javascript
+   // Helper functions for creating different field types
+   function createField(label, input) { ... }
+   function createDropdownField(label, options, value, onChange) { ... }
+   function createCheckboxField(label, checked, onChange) { ... }
+   function createCalculationTermsContainer(cell) { ... }
+   function createCalculationTermField(term, index, cell) { ... }
+   ```
+
+CODE CHANGES:
+=============
+1. Simplified `updateCalculationNodeCell()` function:
+   - Removed complex inline form HTML
+   - Added simple display with essential information
+   - Added "Double-click to configure" instruction
+
+2. Created `showCalculationNodeProperties()` function:
+   - Comprehensive modal popup with all configuration options
+   - Dynamic calculation terms management
+   - Conditional field display based on output type
+   - Proper event handling for all field types
+
+3. Fixed double-click handlers:
+   - Corrected function name in events.js
+   - Removed conflicting handler in graph.js
+
+4. Added helper functions:
+   - `createField()` - basic field creation
+   - `createDropdownField()` - dropdown field creation
+   - `createCheckboxField()` - checkbox field creation
+   - `createCalculationTermsContainer()` - dynamic terms management
+   - `createCalculationTermField()` - individual term field creation
+
+KEY LEARNINGS:
+==============
+1. Complex inline UI should be moved to dedicated properties popups for better UX
+2. Always check for conflicting event handlers when implementing new functionality
+3. Use helper functions to reduce code duplication in complex UI creation
+4. Provide clear visual cues (like "Double-click to configure") for user interaction
+5. Simplify on-canvas display to show only essential information
+
+PREVENTION:
+===========
+- When nodes have complex configuration, consider moving to properties popup
+- Always check for existing event handlers before adding new ones
+- Use consistent function naming to avoid conflicts
+- Create helper functions for repeated UI patterns
+- Test double-click functionality thoroughly when adding new node types
+
+RELATED FILES:
+=============
+- calc.js (main calculation node logic and properties popup)
+- events.js (double-click handlers)
+- graph.js (removed conflicting handler)
+
+FUTURE REFERENCE:
+================
+To replicate this process for other nodes:
+1. Identify complex inline UI that should be moved to properties popup
+2. Create comprehensive properties popup with all configuration options
+3. Simplify on-canvas display to show only essential information
+4. Add "Double-click to configure" instruction
+5. Check for and resolve any conflicting event handlers
+6. Create helper functions for repeated UI patterns
+7. Test thoroughly to ensure all functionality works correctly
+
+MIGRATION PROCESS FOR OTHER NODES:
+==================================
+1. **ANALYZE CURRENT UI**: Identify what configuration options are currently inline
+2. **DESIGN POPUP STRUCTURE**: Plan the layout and organization of the properties popup
+3. **CREATE POPUP FUNCTION**: Build the comprehensive properties popup
+4. **SIMPLIFY CANVAS DISPLAY**: Replace complex inline UI with simple display
+5. **ADD HELPER FUNCTIONS**: Create reusable functions for common UI patterns
+6. **FIX EVENT HANDLERS**: Ensure double-click handlers work correctly
+7. **TEST THOROUGHLY**: Verify all functionality works in the new popup
+8. **ADD USER INSTRUCTIONS**: Include clear instructions for accessing configuration

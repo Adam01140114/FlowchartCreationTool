@@ -17,7 +17,7 @@ let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, su
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
 let newSectionButton, untangleEdge, changeEdgeStyle, deleteEdge, edgeStyleCurved, edgeStyleDirect;
-let placeQuestionNode, placeOptionNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode;
+let placeQuestionNode, placeOptionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode;
 
 
 // Initialize DOM element references
@@ -65,6 +65,7 @@ function initializeContextMenuElements() {
   
   placeQuestionNode = document.getElementById('placeQuestionNode');
   placeOptionNode = document.getElementById('placeOptionNode');
+  placeCalcNode = document.getElementById('placeCalcNode');
   placeNotesNode = document.getElementById('placeNotesNode');
   placeChecklistNode = document.getElementById('placeChecklistNode');
   placeSubtitleNode = document.getElementById('placeSubtitleNode');
@@ -1138,6 +1139,13 @@ function setupContextMenuEventListeners(graph) {
     });
   }
   
+  if (placeCalcNode) {
+    placeCalcNode.addEventListener('click', function() {
+      placeNodeAtClickLocation(graph, 'calculation');
+      hideContextMenu();
+    });
+  }
+  
   if (placeNotesNode) {
     placeNotesNode.addEventListener('click', function() {
       placeNodeAtClickLocation(graph, 'notesNode');
@@ -1374,8 +1382,15 @@ function showPropertiesMenu(cell, evt) {
 function placeNodeAtClickLocation(graph, nodeType) {
   if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
   
-  const parent = graph.getModel().getRoot();
-  graph.getModel().beginUpdate();
+  // Use the global graph variable if the parameter is not available
+  const graphToUse = graph || window.graph;
+  if (!graphToUse) {
+    console.error('Graph not available for node placement');
+    return;
+  }
+  
+  const parent = graphToUse.getDefaultParent();
+  graphToUse.getModel().beginUpdate();
   let cell;
   try {
     let style = "";
@@ -1384,9 +1399,18 @@ function placeNodeAtClickLocation(graph, nodeType) {
     let height = 80;
     
     if (nodeType === 'question') {
-      // Use default style for question, but do not set a static label or questionType
-      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
-      label = ""; // No static label
+      // Use the same style as the drag-and-drop elements
+      const toolbarShape = document.querySelector('.shape[data-type="question"]');
+      if (toolbarShape) {
+        style = toolbarShape.dataset.style;
+        if (!style.includes("pointerEvents=")) {
+          style += "pointerEvents=1;overflow=fill;";
+        }
+      } else {
+        // Fallback style if toolbar element not found
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
+      }
+      label = "question node"; // Set placeholder label to trigger dropdown in refreshAllCells
       width = 280; // Ensure wide enough for dropdown
     } else if (nodeType === 'options') {
       style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
@@ -1401,6 +1425,9 @@ function placeNodeAtClickLocation(graph, nodeType) {
         style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
         label = "Calculation node";
       }
+      // Set fixed dimensions for calculation nodes
+      width = 400;
+      height = 450;
     } else if (nodeType === 'notesNode') {
       style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=notesNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
       label = "Notes text";
@@ -1444,18 +1471,34 @@ function placeNodeAtClickLocation(graph, nodeType) {
     }
     
     // Create the cell
-    cell = graph.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, width, height, style);
+    cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, width, height, style);
     
-    // Initialize specific node types
+    // Initialize specific node types - use same logic as drag-and-drop
     if (nodeType === 'question') {
-      // Initialize as a simple text question
-      cell._questionText = "";
-      cell._questionType = ""; // Explicitly set to empty to trigger dropdown
-      // Don't call updateSimpleQuestionCell here - let refreshAllCells handle it
+      // Use the same initialization logic as drag-and-drop
+      if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+        // Only set type if there is a questionType in the style
+        if (typeof window.getQuestionType === 'function') {
+          const qType = window.getQuestionType(cell);
+          if (qType && typeof window.setQuestionType === 'function') {
+            window.setQuestionType(cell, qType);
+          }
+        }
+        // Otherwise, leave as unassigned so the dropdown appears
+      }
+    } else if (nodeType === 'options') {
+      // Use same logic as drag-and-drop for options
+      if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
+        if (typeof window.refreshOptionNodeId === 'function') {
+          window.refreshOptionNodeId(cell);
+        }
+      }
     } else if (nodeType === 'calculation') {
-      // Initialize calculation node
-      if (typeof window.initializeCalculationNode === 'function') {
-        window.initializeCalculationNode(cell);
+      // Use same logic as drag-and-drop for calculation nodes
+      if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
+        if (typeof window.initializeCalculationNode === 'function') {
+          window.initializeCalculationNode(cell);
+        }
       }
     } else if (nodeType === 'notesNode') {
       cell._notesText = "Notes text";
@@ -1511,18 +1554,19 @@ function placeNodeAtClickLocation(graph, nodeType) {
     window.emptySpaceClickY = undefined;
     
   } finally {
-    graph.getModel().endUpdate();
+    graphToUse.getModel().endUpdate();
   }
   
-  // Select the new cell
+  // Select the new cell and finalize - use same logic as drag-and-drop
   if (cell) {
-    graph.setSelectionCell(cell);
+    graphToUse.setSelectionCell(cell);
     
-    // For question nodes, call refreshAllCells to show the dropdown
-    if (nodeType === 'question' && typeof window.refreshAllCells === 'function') {
+    // Call refreshAllCells for all node types to ensure proper display
+    if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
     
+    // Request autosave
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
