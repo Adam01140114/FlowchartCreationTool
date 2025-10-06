@@ -45,7 +45,7 @@
             width: 100vw; 
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.5); 
-            z-index: 1000; 
+            z-index: 9999; 
             display: flex;
             justify-content: center; 
             align-items: center;
@@ -143,7 +143,7 @@
             <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
             <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
             <button onclick="exportForm()">Export JSON</button>
-            <button type="button" id="previewButton" onclick="showPreview()">Preview</button>
+            <button type="button" id="previewButton" onclick="setTimeout(() => showPreview(), 100);">Preview</button>
             <div style="margin-top: 10px;">
                 <label style="display: inline-flex; align-items: center; cursor: pointer;">
                     <input type="checkbox" id="testModeCheckbox" style="margin-right: 8px;" checked>
@@ -188,6 +188,7 @@
             document.getElementById('previewModal').style.display = 'none';
         }
 
+
         // Close preview modal when clicking outside of it
         document.addEventListener('click', function(event) {
             const previewModal = document.getElementById('previewModal');
@@ -201,16 +202,25 @@
             }
         });
 
-        // Close preview modal when pressing Ctrl+Tab
+        // Close preview modal when pressing Ctrl+CapsLock
         document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'Tab') {
+            if (event.ctrlKey && event.key === 'CapsLock') {
                 const previewModal = document.getElementById('previewModal');
                 if (previewModal && previewModal.style.display === 'flex') {
                     closePreview();
-                    event.preventDefault(); // Prevent default tab behavior
+                    event.preventDefault(); // Prevent default caps lock behavior
                 }
             }
         });
+
+        // Open preview modal when pressing Ctrl+Q
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'q') {
+                showPreview();
+                event.preventDefault(); // Prevent default behavior
+            }
+        });
+
 
         // Paste Json modal logic
         document.addEventListener('DOMContentLoaded', function() {

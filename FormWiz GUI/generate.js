@@ -1803,8 +1803,6 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
   formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs || [])};\n`;
-  console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', JSON.stringify(pdfLogicPDFs, null, 2));
-  formHTML += `console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', ${JSON.stringify(pdfLogicPDFs, null, 2)});\n`;
   formHTML += `var pdfLogicPDFs = ${JSON.stringify(pdfLogicPDFs || [])};\n`;
   formHTML += `var alertLogics = ${JSON.stringify(alertLogics || [])};\n`;
   formHTML += `var checklistLogics = ${JSON.stringify(checklistLogics || [])};\n`;
@@ -1852,12 +1850,6 @@ function populateHiddenFieldsFromUrl() {
         if (formIdField) formIdField.value = formId;
     }
     
-    console.log('🔧 [URL PARAMS] Populated hidden fields:', {
-        zip: zipCode,
-        county: county,
-        defendant: defendant,
-        formId: formId
-    });
 }
 
 // Auto-populate on page load
@@ -1889,7 +1881,6 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
             // Insert after the textarea
             textarea.parentNode.insertBefore(checkbox, textarea.nextSibling);
             
-            console.log('🔧 [PARAGRAPH LIMIT] Created hidden checkbox:', checkboxId);
         } else {
             // Check the existing checkbox
             checkbox.checked = true;
@@ -1898,7 +1889,6 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
         // Remove checkbox if it exists and we're under the limit
         if (checkbox) {
             checkbox.remove();
-            console.log('🔧 [PARAGRAPH LIMIT] Removed hidden checkbox:', checkboxId);
         }
     }
 }
@@ -2749,15 +2739,12 @@ function showValidationPopup() {
 
 // Global function to trigger visibility updates for dependent questions
 function triggerVisibilityUpdates() {
-    console.log('🔧 [VISIBILITY DEBUG] triggerVisibilityUpdates() called');
     
     // Find all question containers and trigger their visibility logic
     const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    console.log('🔧 [VISIBILITY DEBUG] Found', questionContainers.length, 'question containers');
     
     questionContainers.forEach(container => {
         const questionId = container.id.replace('question-container-', '');
-        console.log('🔧 [VISIBILITY DEBUG] Processing question container:', questionId);
         
         // Try to find and call the updateVisibility function for this question
         // The conditional logic creates functions in the global scope, so we need to call them
@@ -4339,7 +4326,6 @@ if (typeof handleNext === 'function') {
         function getFormFields() {
             const form = document.getElementById('customForm');
             if (!form) {
-                console.log('🔧 [GETFORMFIELDS DEBUG] Form not found');
                 return [];
             }
             const fields = Array.from(form.elements).filter(el =>
@@ -4348,7 +4334,6 @@ if (typeof handleNext === 'function') {
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
                 !['hidden', 'button', 'submit', 'reset'].includes(el.type)
             );
-            console.log('🔧 [GETFORMFIELDS DEBUG] Found', fields.length, 'form fields:', fields.map(f => f.name + '=' + f.value));
             return fields;
         }
 
@@ -4374,7 +4359,6 @@ if (typeof handleNext === 'function') {
 
         // Helper function to check paragraph limits for autofilled textareas
         function triggerParagraphLimitCheckForAutofilledTextareas() {
-            console.log('🔧 [PARAGRAPH LIMIT DEBUG] Checking for textareas that need paragraph limit checking...');
             
             // Find all textareas and check if they need paragraph limit checking
             const textareas = document.querySelectorAll('textarea');
@@ -4384,21 +4368,18 @@ if (typeof handleNext === 'function') {
                     // We'll trigger the oninput event which will call checkParagraphLimit if it's set up
                     const event = new Event('input', { bubbles: true });
                     textarea.dispatchEvent(event);
-                    console.log('🔧 [PARAGRAPH LIMIT DEBUG] Triggered paragraph limit check for textarea:', textarea.id);
                 }
             });
         }
 
         // Helper function to trigger line splitting for autofilled textareas
         function triggerLineSplittingForAutofilledTextareas() {
-            console.log('🔧 [LINE SPLITTING DEBUG] Checking for textareas that need line splitting...');
             
             // Find all textareas that have a line limit data attribute
             const textareas = document.querySelectorAll('textarea[data-line-limit]');
             textareas.forEach(textarea => {
                 const lineLimit = parseInt(textarea.getAttribute('data-line-limit'));
                 if (lineLimit && textarea.value && textarea.value.length > 0) {
-                    console.log('🔧 [LINE SPLITTING DEBUG] Triggering line splitting for textarea:', textarea.id, 'with', textarea.value.length, 'characters, line limit:', lineLimit);
                     
                     // Call the handleLineSplitting function if it exists
                     if (typeof handleLineSplitting === 'function') {
@@ -4717,7 +4698,6 @@ if (typeof handleNext === 'function') {
             
             // Set up periodic autosave every 1 second
             setInterval(() => {
-                console.log('🔄 [PERIODIC AUTOSAVE] Triggering periodic save every 1 second');
                 if (isUserLoggedIn) {
                     saveAnswers();
                 } else {
@@ -4779,11 +4759,9 @@ if (typeof handleNext === 'function') {
                 const savedData = localStorage.getItem('formData_' + formId);
                 if (savedData) {
                     const data = JSON.parse(savedData);
-                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] localStorage data loaded:', data);
                     const fields = getFormFields();
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
-                            console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', data[el.name]);
                             if (el.type === 'checkbox' || el.type === 'radio') {
                                 el.checked = !!data[el.name];
                             } else {
@@ -4801,13 +4779,11 @@ if (typeof handleNext === 'function') {
                     
                     // Trigger visibility updates for dependent questions
                     setTimeout(() => {
-                        console.log('🔧 [LOCALSTORAGE VISIBILITY DEBUG] Starting visibility updates after autofill...');
                         
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
                         const fields = getFormFields();
                         fields.forEach(el => {
                             if (el.value || el.checked) {
-                                console.log('🔧 [LOCALSTORAGE VISIBILITY DEBUG] Triggering change event on autofilled element:', el.id || el.name);
                                 const event = new Event('change', { bubbles: true });
                                 el.dispatchEvent(event);
                             }
@@ -4834,7 +4810,6 @@ if (typeof handleNext === 'function') {
                         // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
                         fields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
-                                console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
                                 if (typeof dropdownMirror === 'function') {
                                     dropdownMirror(el, el.id);
                                 }
@@ -4855,9 +4830,7 @@ if (typeof handleNext === 'function') {
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
                         setTimeout(() => {
-                            console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Starting second autofill pass for dynamically generated inputs');
                             const allFields = getFormFields();
-                            console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Found', allFields.length, 'total form fields');
                             
                             // Also try to find fields by ID directly as a fallback
                             const fieldsById = {};
@@ -4869,7 +4842,6 @@ if (typeof handleNext === 'function') {
                             
                             allFields.forEach(el => {
                                 if (data.hasOwnProperty(el.name)) {
-                                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', data[el.name]);
                                     if (el.type === 'checkbox' || el.type === 'radio') {
                                         el.checked = !!data[el.name];
                                     } else {
@@ -4908,11 +4880,9 @@ if (typeof handleNext === 'function') {
 
         // On auth state change
         firebase.auth().onAuthStateChanged(function(user) {
-            console.log('🔧 [AUTH DEBUG] Firebase auth state changed - user:', user ? 'logged in' : 'not logged in', 'userId:', user ? user.uid : 'none');
             isUserLoggedIn = !!user;
             userId = user ? user.uid : null;
             if (isUserLoggedIn) {
-                console.log('🔧 [AUTH DEBUG] User is logged in, checking for payment success...');
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('payment') === 'success') {
                     console.log('Payment successful! Processing PDF...');
@@ -4924,11 +4894,9 @@ if (typeof handleNext === 'function') {
                         });
                     });
                 } else {
-                    console.log('🔧 [AUTH DEBUG] No payment success, calling loadAnswers()...');
                     loadAnswers().then(attachAutosaveListeners);
                 }
             } else {
-                console.log('🔧 [AUTH DEBUG] User not logged in, trying localStorage...');
                 // For non-logged-in users, try to load from localStorage
                 loadAnswersFromLocalStorage();
                 attachAutosaveListeners();
@@ -5448,12 +5416,10 @@ function createHiddenCheckbox(checkboxId, checkboxName, baseName) {
                    "<label for='" + checkboxId + "'> " + checkboxName + "</label>";
   
   wrap.appendChild(checkboxDiv);
-  console.log('🔧 [VIRTUAL CHECKBOX DEBUG] Created hidden checkbox:', checkboxId, 'for dropdown:', baseName);
 }
 
 // Create real hidden checkboxes for all autofilled dropdowns
 function createHiddenCheckboxesForAutofilledDropdowns() {
-  console.log('🔧 [AUTOFILL CHECKBOX DEBUG] Creating hidden checkboxes for autofilled dropdowns...');
   
   // Find all dropdown/select elements
   const dropdowns = document.querySelectorAll('select');
@@ -5473,7 +5439,6 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       // Check if this checkbox already exists
       const existingCheckbox = document.getElementById(checkboxId);
       if (!existingCheckbox) {
-        console.log('🔧 [AUTOFILL CHECKBOX DEBUG] Creating hidden checkbox for autofilled dropdown:', baseName, 'value:', selectedValue);
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
       }
     }

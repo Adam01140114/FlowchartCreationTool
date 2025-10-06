@@ -70,13 +70,40 @@ function generateAndDownloadForm() {
 }
 
 function showPreview() {
+    console.log("🔧 [PREVIEW DEBUG] showPreview() called");
+    
     // Check if the getFormHTML function exists
     if (typeof getFormHTML !== 'function') {
+        console.error("🔧 [PREVIEW DEBUG] getFormHTML function not found");
         alert("Preview function not available in this context. Please try again from the form editor.");
         return;
     }
     
-    const formHTML = getFormHTML();
+    console.log("🔧 [PREVIEW DEBUG] getFormHTML function exists, proceeding...");
+    
+    let formHTML;
+    try {
+        console.log("🔧 [PREVIEW DEBUG] Calling getFormHTML()...");
+        formHTML = getFormHTML();
+        console.log("🔧 [PREVIEW DEBUG] getFormHTML returned HTML length:", formHTML ? formHTML.length : 'null');
+    } catch (error) {
+        console.error("🔧 [PREVIEW DEBUG] Error calling getFormHTML:", error);
+        alert('Error generating form HTML: ' + error.message);
+        return;
+    }
+    
+    if (!formHTML || formHTML.trim() === '') {
+        console.error("🔧 [PREVIEW DEBUG] getFormHTML returned empty HTML");
+        alert('No form content to preview. Please add some questions first.');
+        return;
+    }
+    
+    // Check if the HTML contains actual form content (not just the basic structure)
+    if (!formHTML.includes('customForm') || !formHTML.includes('question')) {
+        console.error("🔧 [PREVIEW DEBUG] HTML does not contain form content");
+        alert('Form appears to be empty. Please add some questions first.');
+        return;
+    }
     
     // Copy HTML to clipboard automatically when previewing
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -97,10 +124,30 @@ function showPreview() {
         });
     }
     
+    console.log("🔧 [PREVIEW DEBUG] Getting modal elements...");
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
+    
+    console.log("🔧 [PREVIEW DEBUG] previewModal found:", !!previewModal);
+    console.log("🔧 [PREVIEW DEBUG] previewFrame found:", !!previewFrame);
+    
+    if (!previewModal || !previewFrame) {
+        console.error("🔧 [PREVIEW DEBUG] Modal elements not found");
+        alert('Preview modal elements not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    console.log("🔧 [PREVIEW DEBUG] Setting iframe content and showing modal...");
     previewFrame.srcdoc = formHTML;
     previewModal.style.display = 'flex';
+    previewModal.style.zIndex = '9999';
+    
+    console.log("🔧 [PREVIEW DEBUG] Modal should now be visible");
+    console.log("🔧 [PREVIEW DEBUG] Modal display style:", previewModal.style.display);
+    console.log("🔧 [PREVIEW DEBUG] Modal computed style:", window.getComputedStyle(previewModal).display);
+    
+    // Force a reflow to ensure the modal is visible
+    previewModal.offsetHeight;
 }
 
 function downloadHTML(content, filename) {
