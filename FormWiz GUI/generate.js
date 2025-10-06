@@ -206,7 +206,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    <link rel="stylesheet" href="generate.css">',
     '    <link rel="stylesheet" href="generate2.css">',
     '    <style>',
-    '        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px 0; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
+    '        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
     '        .address-field { margin: 8px 0; }',
     '        .address-input, .address-select { width: 100%; max-width: 400px; padding: 12px 16px; border: 1px solid #e1e5e9 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; }',
     '        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1); }',
@@ -1243,7 +1243,7 @@ formHTML += `</div><br></div>`;
             // Create entry container div
             const entryContainer = document.createElement('div');
             entryContainer.className = 'entry-container';
-            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
             
             // Process all fields in creation order
             for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
@@ -1275,9 +1275,12 @@ formHTML += `</div><br></div>`;
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 
-                // Add a <br> after the Zip input
-                const brElement = document.createElement('br');
-                entryContainer.appendChild(brElement);
+                // Add a <br> after the Zip input only if there are more fields after it
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
+                if (remainingFields.length > 0) {
+                  const brElement = document.createElement('br');
+                  entryContainer.appendChild(brElement);
+                }
               }
               
               lastWasLocation = isLocationField;
@@ -3149,7 +3152,7 @@ function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
     if(!container) return;
 
-    container.innerHTML = "<br>";
+    container.innerHTML = "";
     
     // Try to get unified fields first, fallback to old arrays
     const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
@@ -3264,9 +3267,12 @@ function showTextboxLabels(questionId, count){
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 
-                // Add a <br> after the Zip input
-                const brElement = document.createElement('br');
-                entryContainer.appendChild(brElement);
+                // Add a <br> after the Zip input only if there are more fields after it
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
+                if (remainingFields.length > 0) {
+                  const brElement = document.createElement('br');
+                  entryContainer.appendChild(brElement);
+                }
             }
             
             lastWasLocation = isLocationField;
@@ -5451,6 +5457,46 @@ if (typeof handleNext === 'function') {
         }
     });
 
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label; // Remove the index number from placeholder
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
+// Helper function to create US states dropdown
+function createStateDropdown(id, index) {
+    const states = [
+        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+        'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+        'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia',
+        'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+    ];
+    
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+        options += '<option value="' + state + '">' + state + '</option>';
+    });
+    
+    return '<div class="address-field">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + id + '\\\', \\\'' + id + '_short\\\')">' +
+           options +
+           '</select>' +
+           '<input type="hidden" id="' + id + '" name="' + id + '" value="">' +
+           '<input type="hidden" id="' + id + '_short" name="' + id + '_short" value="">' +
+           '</div>';
+}
+
 </script>
 
 <!-- Debug Menu -->
@@ -6340,7 +6386,7 @@ function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
     if(!container) return;
 
-    container.innerHTML = "<br>";
+    container.innerHTML = "";
     
     // Try to get unified fields first, fallback to old arrays
     const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
@@ -6455,9 +6501,12 @@ function showTextboxLabels(questionId, count){
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 
-                // Add a <br> after the Zip input
-                const brElement = document.createElement('br');
-                entryContainer.appendChild(brElement);
+                // Add a <br> after the Zip input only if there are more fields after it
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
+                if (remainingFields.length > 0) {
+                  const brElement = document.createElement('br');
+                  entryContainer.appendChild(brElement);
+                }
             }
             
             lastWasLocation = isLocationField;
