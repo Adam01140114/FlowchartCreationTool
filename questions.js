@@ -1192,7 +1192,20 @@ window.addMultipleTextboxHandler = function(cellId) {
     getGraph().getModel().beginUpdate();
     try {
       if (!cell._textboxes) cell._textboxes = [];
-      cell._textboxes.push({ nameId: "", placeholder: "Enter value" });
+      
+      // If there's a location indicator, add the new option after it
+      if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
+        // Location is at the end, just add normally
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value" });
+      } else {
+        // Add the new option
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value" });
+        
+        // If there's a location indicator before the end, shift it down
+        if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
+          cell._locationIndex++;
+        }
+      }
     } finally {
       getGraph().getModel().endUpdate();
     }
@@ -1206,6 +1219,46 @@ window.deleteMultipleTextboxHandler = function(cellId, index) {
     getGraph().getModel().beginUpdate();
     try {
       cell._textboxes.splice(index, 1);
+      
+      // Adjust location index if needed
+      if (cell._locationIndex !== undefined) {
+        if (index < cell._locationIndex) {
+          // Deleted option was before location indicator, shift location index up
+          cell._locationIndex--;
+        } else if (index === cell._locationIndex) {
+          // Deleted option was at the location indicator position, remove location indicator
+          delete cell._locationIndex;
+        }
+        // If index > locationIndex, no adjustment needed
+      }
+    } finally {
+      getGraph().getModel().endUpdate();
+    }
+    updateMultipleTextboxesCell(cell);
+  }
+};
+
+window.addMultipleTextboxLocationHandler = function(cellId) {
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleTextboxes") {
+    getGraph().getModel().beginUpdate();
+    try {
+      // Set the location index to the current number of textboxes (at the end)
+      cell._locationIndex = cell._textboxes ? cell._textboxes.length : 0;
+    } finally {
+      getGraph().getModel().endUpdate();
+    }
+    updateMultipleTextboxesCell(cell);
+  }
+};
+
+window.removeMultipleTextboxLocationHandler = function(cellId) {
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleTextboxes") {
+    getGraph().getModel().beginUpdate();
+    try {
+      // Remove the location index
+      delete cell._locationIndex;
     } finally {
       getGraph().getModel().endUpdate();
     }

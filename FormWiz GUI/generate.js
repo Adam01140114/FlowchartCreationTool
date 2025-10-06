@@ -111,6 +111,63 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
 
 
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label + ' ' + index;
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
+// Helper function to create US states dropdown
+function createStateDropdown(id, index) {
+    const states = [
+        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
+        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+        'Wisconsin', 'Wyoming'
+    ];
+    
+    // State abbreviation mapping
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
+        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
+        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
+        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
+        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
+        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
+    
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+        options += '<option value="' + state + '">' + state + '</option>';
+    });
+    
+    // Create hidden textboxes for full state name and abbreviation
+    const hiddenFullId = id; // Keep the full ID with number
+    const hiddenShortId = id + '_short';
+    
+    return '<div class="address-field">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + hiddenShortId + '\\\')">' +
+           options +
+           '</select>' +
+           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
+           '<input type="hidden" id="' + hiddenShortId + '" name="' + hiddenShortId + '" value="">' +
+           '</div>';
+}
+
 function getFormHTML() {
 	
 	// RESET all globals before building
@@ -1084,95 +1141,155 @@ formHTML += `</div><br></div>`;
           }
         }
       } else if (questionType === "multipleTextboxes") {
-        const multiBlocks = qBlock.querySelectorAll(
-          `#multipleTextboxesOptions${questionId} > div`
-        );
-        // Separate textboxes and amounts
-        const textboxInputs = [];
-        const amountInputs = [];
-        for (let mb = 0; mb < multiBlocks.length; mb++) {
-          const dEl = multiBlocks[mb];
-          if (dEl.classList.contains('amount-block')) {
-            amountInputs.push(dEl);
-          } else {
-            textboxInputs.push(dEl);
+        // Use the same unified fields system as numberedDropdown
+        const unifiedFields = qBlock.querySelectorAll("#unifiedFields" + questionId + " .unified-field");
+        const labelVals = [];
+        const labelNodeIds = [];
+        const amountVals = [];
+        let allFieldsInOrder = []; // Declare here so it's available in the entire scope
+        
+        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes qBlock found:', !!qBlock);
+        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes unifiedFields selector:', "#unifiedFields" + questionId + " .unified-field");
+        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Found', unifiedFields.length, 'unified fields for question', questionId);
+        
+        // If no unified fields found, try fallback to old containers
+        if (unifiedFields.length === 0) {
+          console.log('🔧 [GENERATE DEBUG] MultipleTextboxes No unified fields found, trying fallback to old containers');
+          const lblInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:first-of-type");
+          const labelNodeIdInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:last-of-type");
+          const amtInputs = qBlock.querySelectorAll("#textboxAmounts" + questionId + " input[type='text']");
+          
+          console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Fallback found', lblInputs.length, 'labels and', amtInputs.length, 'amounts');
+          
+        for (let L = 0; L < lblInputs.length; L++) {
+          labelVals.push(lblInputs[L].value.trim());
+            labelNodeIds.push(labelNodeIdInputs[L] ? labelNodeIdInputs[L].value.trim() : "");
           }
+        for (let A = 0; A < amtInputs.length; A++) {
+          amountVals.push(amtInputs[A].value.trim());
         }
-        // Define location field names for visual separation
-        const locationFields = ['Street', 'City', 'State', 'Zip'];
         
-        // Create a unified array of all fields in true creation order
-        const allFieldsInOrder = [];
-        
-        // Get ALL elements from the multiple textboxes container in their actual DOM order
-        const allElements = Array.from(qBlock.querySelectorAll('#multipleTextboxesOptions' + questionId + ' > div'));
-        
-        // Process each element in DOM order (which is creation order)
-        allElements.forEach((dEl) => {
-          if (dEl.classList.contains('amount-block')) {
-            // This is an amount element
-            const lblInput = dEl.querySelector('input[type="text"]:first-of-type');
-            const nmInput = dEl.querySelector('input[type="text"]:last-of-type');
-            const phInput = dEl.querySelector('input[type="text"]:nth-of-type(2)');
-          const lblVal = lblInput ? lblInput.value.trim() : "";
-            const nmVal = nmInput ? nmInput.value.trim() : "amount" + questionId + "_" + (allFieldsInOrder.filter(f => f.type === 'amount').length + 1);
-          const phVal = phInput ? phInput.value.trim() : "";
+        // Create allFieldsInOrder from fallback data
+        allFieldsInOrder = [
+            ...labelVals.map((lbl, index) => ({
+                type: 'label',
+                label: lbl,
+                nodeId: labelNodeIds[index] || "",
+                order: index
+            })),
+            ...amountVals.map((amt, index) => ({
+                type: 'amount',
+                label: amt,
+                nodeId: "",
+                order: index
+            }))
+        ];
+        } else {
+          // Process unified fields
+          unifiedFields.forEach((el) => {
+            const fieldType = el.getAttribute('data-type');
+            const fieldOrder = parseInt(el.getAttribute('data-order'));
+            const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+            const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
             
-            allFieldsInOrder.push({
-              type: 'amount',
-              label: lblVal,
-              name: nmVal,
-              placeholder: phVal,
-              element: dEl
-            });
-          } else {
-            // This is a textbox element
-            const lblInput = dEl.querySelector('input[type="text"]:first-of-type');
-            const nmInput = dEl.querySelector('input[type="text"]:nth-of-type(2)');
-            const phInput = dEl.querySelector('input[type="text"]:last-of-type');
-          const lblVal = lblInput ? lblInput.value.trim() : "";
-            const nmVal = nmInput ? nmInput.value.trim() : "answer" + questionId + "_" + (allFieldsInOrder.filter(f => f.type === 'textbox').length + 1);
-          const phVal = phInput ? phInput.value.trim() : "";
+            console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Processing field:', {fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl});
             
-            allFieldsInOrder.push({
-              type: 'textbox',
-              label: lblVal,
-              name: nmVal,
-              placeholder: phVal,
-              element: dEl
-            });
-          }
-        });
+            if (labelTextEl && nodeIdTextEl) {
+              const fieldData = {
+                type: fieldType,
+                label: labelTextEl.textContent.trim(),
+                nodeId: nodeIdTextEl.textContent.trim(),
+                order: fieldOrder
+              };
+              console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Field data:', fieldData);
+              allFieldsInOrder.push(fieldData);
+            }
+          });
+          
+          // Sort by data-order attribute (creation order)
+          allFieldsInOrder.sort((a, b) => a.order - b.order);
+        }
         
-        // Render all fields in creation order
-        let lastWasLocation = false;
-        let firstField = true;
+        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Final arrays:', {labelVals, labelNodeIds, amountVals});
         
-        for (let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++) {
-          const field = allFieldsInOrder[fieldIndex];
-          const isLocationField = locationFields.includes(field.label);
+        // Store the unified fields data for use in showTextboxLabels
+        window.unifiedFieldsMap = window.unifiedFieldsMap || {};
+        window.unifiedFieldsMap[questionId] = allFieldsInOrder;
+        
+        // For multipleTextboxes, we need to generate the fields directly in the HTML
+        // since there's no dropdown to trigger showTextboxLabels
+        const nodeIdEl = qBlock.querySelector("#multipleTextboxesNodeId" + questionId);
+        const questionNodeId = nodeIdEl ? nodeIdEl.value.trim() : "test";
+        
+        // Get the question text for sanitization
+        const questionH3 = document.getElementById("question-container-" + questionId)?.querySelector("h3")?.textContent || ("answer" + questionId);
+        const qSafe = sanitizeQuestionText(questionH3);
+        
+        // Generate the fields directly in the HTML (similar to numberedDropdown but without dropdown)
+        if (allFieldsInOrder.length > 0) {
+          // Create a container for the multiple textboxes fields
+          formHTML += `<div id="labelContainer${questionId}"></div>`;
           
-          // Add visual separation for location fields
-          if (isLocationField && !lastWasLocation && !firstField) {
-            // First location field in a group
+          // Generate the fields for a default count of 1 (since multipleTextboxes doesn't have a dropdown)
+          const count = 1;
+          
+          // Define location field names for visual separation
+          const locationFields = ['Street', 'City', 'State', 'Zip'];
+
+          for(let j = 1; j <= count; j++){
+            let lastWasLocation = false;
+            let firstField = true;
+            
+            // Create entry container div
+            const entryContainer = document.createElement('div');
+            entryContainer.className = 'entry-container';
+            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+            
+            // Process all fields in creation order
+            for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
+              const field = allFieldsInOrder[fieldIndex];
+              const isLocationField = locationFields.includes(field.label);
+              
+              // Add <br> before first location field in each count
+              if (isLocationField && !lastWasLocation && !firstField) {
+                const br = document.createElement('br');
+                entryContainer.appendChild(br);
+              }
+              
+              if (field.type === 'label') {
+                const fieldId = field.nodeId + "_" + j;
+                if (field.label === 'State') {
+                  // Use dropdown for State field
+                  const dropdownDiv = document.createElement('div');
+                  dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
+                  entryContainer.appendChild(dropdownDiv.firstElementChild);
+                } else {
+                  // Use regular input for other fields
+                  const inputDiv = document.createElement('div');
+                  inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                  entryContainer.appendChild(inputDiv.firstElementChild);
+                }
+              } else if (field.type === 'amount') {
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                entryContainer.appendChild(inputDiv.firstElementChild);
+                
+                // Add a <br> after the Zip input
+                const brElement = document.createElement('br');
+                entryContainer.appendChild(brElement);
+              }
+              
+              lastWasLocation = isLocationField;
+              firstField = false;
+            }
+            
+            // Convert the entry container to HTML string and add to formHTML
+            formHTML += entryContainer.outerHTML;
+            
+            // Add 1 <br> tag after each entry for better visual separation
             formHTML += "<br>";
-          } else if (!isLocationField && lastWasLocation) {
-            // First non-location field after location fields
-            formHTML += "<br>";
           }
-          
-          if (field.label) {
-            formHTML += `<label><h3>${field.label}</h3></label><br>`;
-          }
-          
-          if (field.type === 'textbox') {
-            formHTML += `<div class="text-input-container"><input type="text" id="${field.name}" name="${field.name}" placeholder="${field.placeholder}"></div>`;
-          } else if (field.type === 'amount') {
-            formHTML += `<div class="text-input-container"><input type="number" id="${field.name}" name="${field.name}" placeholder="${field.placeholder}" pattern="[0-9]*" inputmode="numeric"></div>`;
-          }
-          
-          lastWasLocation = isLocationField;
-          firstField = false;
         }
       } else if (questionType === "numberedDropdown") {
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
@@ -3027,64 +3144,6 @@ document.addEventListener('DOMContentLoaded', function() {
         subtree: true
     });
 });
-
-
-// Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text') {
-    const inputType = type === 'number' ? 'number' : 'text';
-    const placeholder = label + ' ' + index;
-    
-    return '<div class="address-field">' +
-           '<input type="' + inputType + '" ' +
-           'id="' + id + '" ' +
-           'name="' + id + '" ' +
-           'placeholder="' + placeholder + '" ' +
-           'class="address-input">' +
-           '</div>';
-}
-
-// Helper function to create US states dropdown
-function createStateDropdown(id, index) {
-    const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
-        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
-        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-        'Wisconsin', 'Wyoming'
-    ];
-    
-    // State abbreviation mapping
-    const stateAbbreviations = {
-        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
-        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
-        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
-        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
-        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
-        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
-        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
-        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
-    };
-    
-    let options = '<option value="">Select State</option>';
-    states.forEach(state => {
-        options += '<option value="' + state + '">' + state + '</option>';
-    });
-    
-    // Create hidden textboxes for full state name and abbreviation
-    const hiddenFullId = id; // Keep the full ID with number
-    const hiddenShortId = id + '_short';
-    
-    return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + hiddenShortId + '\\\')">' +
-           options +
-           '</select>' +
-           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
-           '<input type="hidden" id="' + hiddenShortId + '" name="' + hiddenShortId + '" value="">' +
-           '</div>';
-}
 
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
@@ -5914,7 +5973,7 @@ function populateDebugContent() {
       // Check if this is a state-related hidden field that should be grouped with text inputs
       if (item.id && (item.id.includes('_state') || item.id.includes('_state_short'))) {
         itemType = 'text'; // Classify state-related hidden fields as text inputs
-      } else {
+    } else {
         itemType = 'hidden';
       }
     } else {
@@ -6276,63 +6335,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUserFullName();
   }, 2000);
 });
-
-// Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text') {
-    const inputType = type === 'number' ? 'number' : 'text';
-    const placeholder = label + ' ' + index;
-    
-    return '<div class="address-field">' +
-           '<input type="' + inputType + '" ' +
-           'id="' + id + '" ' +
-           'name="' + id + '" ' +
-           'placeholder="' + placeholder + '" ' +
-           'class="address-input">' +
-           '</div>';
-}
-
-// Helper function to create US states dropdown
-function createStateDropdown(id, index) {
-    const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
-        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
-        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-        'Wisconsin', 'Wyoming'
-    ];
-    
-    // State abbreviation mapping
-    const stateAbbreviations = {
-        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
-        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
-        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
-        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
-        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
-        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
-        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
-        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
-    };
-    
-    let options = '<option value="">Select State</option>';
-    states.forEach(state => {
-        options += '<option value="' + state + '">' + state + '</option>';
-    });
-    
-    // Create hidden textboxes for full state name and abbreviation
-    const hiddenFullId = id; // Keep the full ID with number
-    const hiddenShortId = id + '_short';
-    
-    return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + hiddenShortId + '\\\')">' +
-           options +
-           '</select>' +
-           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
-           '<input type="hidden" id="' + hiddenShortId + '" name="' + hiddenShortId + '" value="">' +
-           '</div>';
-}
 
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);

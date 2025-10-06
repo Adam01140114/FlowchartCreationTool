@@ -293,7 +293,7 @@ window.exportGuiJson = function(download = true) {
       question.text = cleanedText;
     }
     
-    // For multiple textboxes, add the textboxes array and nodeId
+    // For multiple textboxes, add the textboxes array and nodeId with location data support
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
@@ -305,6 +305,52 @@ window.exportGuiJson = function(download = true) {
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
       
+      // Create allFieldsInOrder array to maintain proper field ordering
+      const allFieldsInOrder = [];
+      const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+      
+      // Process each textbox in order
+      cell._textboxes.forEach((tb, index) => {
+        const labelName = tb.nameId || "";
+        const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+        
+        allFieldsInOrder.push({
+          type: "textbox",
+          label: labelName,
+          nodeId: fieldNodeId,
+          order: index + 1
+        });
+      });
+      
+      // Insert location fields at the correct position if locationIndex is set
+      if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+        const locationFields = [
+          { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+          { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+          { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+          { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+        ];
+        
+        // Insert location fields at the specified position
+        locationFields.forEach((field, fieldIndex) => {
+          allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+            type: "textbox",
+            label: field.label,
+            nodeId: field.nodeId,
+            order: locationIndex + fieldIndex + 1
+          });
+        });
+        
+        // Update order numbers for all fields after insertion
+        allFieldsInOrder.forEach((field, index) => {
+          field.order = index + 1;
+        });
+      }
+      
+      // Set the allFieldsInOrder array
+      question.allFieldsInOrder = allFieldsInOrder;
+      
+      // Keep backward compatibility with old format
       question.textboxes = cell._textboxes.map(tb => ({
         label: "", // Empty label field as required
         nameId: tb.nameId ? `${nodeId}_${sanitizeNameId(tb.nameId)}` : "",

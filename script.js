@@ -2211,10 +2211,20 @@ function renderTextboxes(cell) {
   }
 
   let html = "";
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
 
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph  = tb.placeholder || "Enter value";
+
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
 
     html += `
       <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
@@ -2224,9 +2234,19 @@ function renderTextboxes(cell) {
       </div>`;
   });
 
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
+
   html += `
     <div style="text-align:center;margin-top:8px;">
       <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.addMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleTextboxes')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>`;
 

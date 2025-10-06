@@ -628,11 +628,6 @@ function addQuestion(sectionId, questionId = null) {
             <label>Number Range: </label>
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
             <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
-
-            <label>Fields (in creation order):</label>
-            <div id="unifiedFields${currentQuestionId}"></div>
-            
-            <br><br>
             
             <div style="text-align: center; margin: 15px 0;">
                 <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
@@ -645,6 +640,11 @@ function addQuestion(sectionId, questionId = null) {
             <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
         </div><br>
 
+        <!-- Shared Unified Fields Container (for both numberedDropdown and multipleTextboxes) -->
+        <div id="unifiedFieldsContainer${currentQuestionId}" style="display: none;">
+            <label>Fields (in creation order):</label>
+            <div id="unifiedFields${currentQuestionId}"></div>
+        </div><br>
 
         <!-- Dropdown Options -->
         <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
@@ -686,11 +686,16 @@ function addQuestion(sectionId, questionId = null) {
         <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
             <label>Node ID: </label>
             <input type="text" id="multipleTextboxesNodeId${currentQuestionId}" placeholder="Enter custom node ID" oninput="updateMultipleTextboxesNodeId(${currentQuestionId})"><br><br>
-            <label>Textboxes: </label>
-            <div id="multipleTextboxesOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
-            <button type="button" onclick="addMultipleAmountOption(${currentQuestionId})">Add Amount</button>
-            <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin-left: 10px; background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Add Location</button>
+            
+            <div style="text-align: center; margin: 15px 0;">
+                <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
+                <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
+                <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
+            </div>
+            
+            <!-- Hidden containers for backward compatibility -->
+            <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
+            <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
         </div><br>
         
         <!-- Linking Logic for Dropdown -->
@@ -1035,10 +1040,20 @@ function toggleOptions(questionId) {
 
         case 'multipleTextboxes':
             multipleTextboxesBlock.style.display = 'block';
+            // Show the shared unified fields container
+            const unifiedFieldsContainerMultiple = document.getElementById(`unifiedFieldsContainer${questionId}`);
+            if (unifiedFieldsContainerMultiple) {
+                unifiedFieldsContainerMultiple.style.display = 'block';
+            }
             break;
 
         case 'numberedDropdown':
             numberedDropdownBlock.style.display = 'block';
+            // Show the shared unified fields container
+            const unifiedFieldsContainerNumbered = document.getElementById(`unifiedFieldsContainer${questionId}`);
+            if (unifiedFieldsContainerNumbered) {
+                unifiedFieldsContainerNumbered.style.display = 'block';
+            }
             // Update jump options for numbered dropdown
             const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
             jumpConditions.forEach(condition => {
@@ -1801,7 +1816,14 @@ function removeCheckboxOption(questionId, optionNumber) {
 
 
 function addTextboxAmount(questionId) {
-    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const unifiedDiv = getUnifiedContainer(questionId);
+    
+    // Remove placeholder if it exists
+    const placeholder = unifiedDiv.querySelector('div[style*="font-style: italic"]');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    
     const fieldCount = unifiedDiv.children.length + 1;
 
     const fieldDiv = document.createElement('div');
@@ -1817,6 +1839,24 @@ function addTextboxAmount(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
+    console.log('🔧 [ADD AMOUNT DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
+    console.log('🔧 [ADD AMOUNT DEBUG] Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD AMOUNT DEBUG] Unified container display style:', window.getComputedStyle(unifiedDiv).display);
+    console.log('🔧 [ADD AMOUNT DEBUG] Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+    
+    // Force the container to be visible and have dimensions
+    unifiedDiv.style.minHeight = '50px';
+    unifiedDiv.style.border = '1px solid #e0e0e0';
+    unifiedDiv.style.borderRadius = '5px';
+    unifiedDiv.style.padding = '10px';
+    unifiedDiv.style.backgroundColor = '#fafafa';
+    unifiedDiv.style.margin = '10px 0';
+    unifiedDiv.style.width = '100%';
+    unifiedDiv.style.display = 'block';
+    unifiedDiv.style.position = 'relative';
+    
+    console.log('🔧 [ADD AMOUNT DEBUG] After styling - Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD AMOUNT DEBUG] After styling - Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
     
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
@@ -1870,16 +1910,59 @@ function removeTextboxAmount(questionId, amountNumber) {
     // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
 }
 
+function getUnifiedContainer(questionId) {
+  // Get the unified container (should be in the correct position now)
+  let container = document.getElementById(`unifiedFields${questionId}`);
+  
+  // If not found at all (corrupt DOM or old data), create it in the right place
+  if (!container) {
+    // Find the question block to place it at the end
+    const qb = document.getElementById(`questionBlock${questionId}`);
+    if (qb) {
+      container = document.createElement('div');
+      container.id = `unifiedFields${questionId}`;
+      container.style.display = 'block';
+      qb.appendChild(container);
+    }
+  }
 
+  // Always ensure it's visible when we're going to write into it
+  if (container && container.style.display === 'none') {
+    container.style.display = 'block';
+  }
+
+  return container;
+}
 
 function addTextboxLabel(questionId) {
-    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const unifiedDiv = getUnifiedContainer(questionId);
     console.log('🔧 [ADD LABEL DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
     console.log('🔧 [ADD LABEL DEBUG] Found unified container:', !!unifiedDiv);
+    console.log('🔧 [ADD LABEL DEBUG] Unified container display style:', unifiedDiv ? window.getComputedStyle(unifiedDiv).display : 'N/A');
+    console.log('🔧 [ADD LABEL DEBUG] Unified container visibility:', unifiedDiv ? window.getComputedStyle(unifiedDiv).visibility : 'N/A');
+    
+    // Check parent container
+    if (unifiedDiv && unifiedDiv.parentElement) {
+        console.log('🔧 [ADD LABEL DEBUG] Parent container:', unifiedDiv.parentElement.tagName, unifiedDiv.parentElement.id);
+        console.log('🔧 [ADD LABEL DEBUG] Parent display style:', window.getComputedStyle(unifiedDiv.parentElement).display);
+        console.log('🔧 [ADD LABEL DEBUG] Parent dimensions:', unifiedDiv.parentElement.offsetWidth, 'x', unifiedDiv.parentElement.offsetHeight);
+    }
     
     if (!unifiedDiv) {
         console.error('🔧 [ADD LABEL DEBUG] Unified container not found!');
         return;
+    }
+    
+    // Ensure the unified container is visible
+    if (unifiedDiv.style.display === 'none') {
+        console.log('🔧 [ADD LABEL DEBUG] Unified container was hidden, making it visible');
+        unifiedDiv.style.display = 'block';
+    }
+    
+    // Remove placeholder if it exists
+    const placeholder = unifiedDiv.querySelector('div[style*="font-style: italic"]');
+    if (placeholder) {
+        placeholder.remove();
     }
     
     const fieldCount = unifiedDiv.children.length + 1;
@@ -1899,6 +1982,44 @@ function addTextboxLabel(questionId) {
     `;
     unifiedDiv.appendChild(fieldDiv);
     console.log('🔧 [ADD LABEL DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
+    console.log('🔧 [ADD LABEL DEBUG] Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD LABEL DEBUG] Unified container display style:', window.getComputedStyle(unifiedDiv).display);
+    console.log('🔧 [ADD LABEL DEBUG] Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+    
+    // Force a reflow and check if the container has any content
+    unifiedDiv.offsetHeight; // Force reflow
+    console.log('🔧 [ADD LABEL DEBUG] Container has children:', unifiedDiv.children.length);
+    console.log('🔧 [ADD LABEL DEBUG] Container innerHTML length:', unifiedDiv.innerHTML.length);
+    
+    // Try adding a temporary visible element to force dimensions
+    if (unifiedDiv.offsetWidth === 0 && unifiedDiv.offsetHeight === 0) {
+        console.log('🔧 [ADD LABEL DEBUG] Container has zero dimensions, adding temporary content');
+        const tempDiv = document.createElement('div');
+        tempDiv.style.width = '100px';
+        tempDiv.style.height = '20px';
+        tempDiv.style.backgroundColor = 'red';
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.top = '0';
+        tempDiv.style.left = '0';
+        tempDiv.textContent = 'TEMP';
+        unifiedDiv.appendChild(tempDiv);
+        
+        console.log('🔧 [ADD LABEL DEBUG] After temp content - Container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    }
+    
+    // Force the container to be visible and have dimensions
+    unifiedDiv.style.minHeight = '50px';
+    unifiedDiv.style.border = '1px solid #e0e0e0';
+    unifiedDiv.style.borderRadius = '5px';
+    unifiedDiv.style.padding = '10px';
+    unifiedDiv.style.backgroundColor = '#fafafa';
+    unifiedDiv.style.margin = '10px 0';
+    unifiedDiv.style.width = '100%';
+    unifiedDiv.style.display = 'block';
+    unifiedDiv.style.position = 'relative';
+    
+    console.log('🔧 [ADD LABEL DEBUG] After styling - Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD LABEL DEBUG] After styling - Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
     
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
@@ -2353,7 +2474,7 @@ function addLocationFields(questionId, questionType) {
         locationFields.forEach(field => {
             addTextboxLabel(questionId);
             // Set the label value in the unified container
-            const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+            const unifiedDiv = getUnifiedContainer(questionId);
             const lastField = unifiedDiv.lastElementChild;
             if (lastField) {
                 const fieldOrder = lastField.getAttribute('data-order');
@@ -2366,7 +2487,7 @@ function addLocationFields(questionId, questionType) {
         
         // Add amount field for Zip
         addTextboxAmount(questionId);
-        const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+        const unifiedDiv = getUnifiedContainer(questionId);
         const lastField = unifiedDiv.lastElementChild;
         if (lastField) {
             const fieldOrder = lastField.getAttribute('data-order');
@@ -2378,30 +2499,35 @@ function addLocationFields(questionId, questionType) {
         updateHiddenContainers(questionId);
         
     } else if (questionType === 'multipleTextboxes') {
-        // Add textboxes to multiple textboxes
+        // Use unified fields system for multiple textboxes too
         locationFields.forEach(field => {
-            addMultipleTextboxOption(questionId);
-            // Set the label and node ID values
-            const optionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
-            const lastOption = optionsDiv.lastElementChild;
-            if (lastOption) {
-                const labelInput = lastOption.querySelector('#multipleTextboxLabel' + questionId + '_' + (optionsDiv.children.length));
-                const nodeIdInput = lastOption.querySelector('#multipleTextboxNodeId' + questionId + '_' + (optionsDiv.children.length));
-                if (labelInput) labelInput.value = field.label;
-                if (nodeIdInput) nodeIdInput.value = field.nodeId;
+            addTextboxLabel(questionId);
+            // Set the label value in the unified container
+            const unifiedDiv = getUnifiedContainer(questionId);
+            const lastField = unifiedDiv.lastElementChild;
+            if (lastField) {
+                const fieldOrder = lastField.getAttribute('data-order');
+                const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                if (labelTextEl) labelTextEl.textContent = field.label;
+                if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
             }
         });
         
         // Add amount field for Zip
-        addMultipleAmountOption(questionId);
-        const optionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
-        const lastAmount = optionsDiv.querySelector('.amount-block:last-child');
-        if (lastAmount) {
-            const amountLabelInput = lastAmount.querySelector('input[type="text"]:first-of-type');
-            const amountNodeIdInput = lastAmount.querySelector('input[type="text"]:last-of-type');
-            if (amountLabelInput) amountLabelInput.value = 'Zip';
-            if (amountNodeIdInput) amountNodeIdInput.value = 'zip';
+        addTextboxAmount(questionId);
+        const unifiedDiv = getUnifiedContainer(questionId);
+        const lastField = unifiedDiv.lastElementChild;
+        if (lastField) {
+            const fieldOrder = lastField.getAttribute('data-order');
+            const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+            const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+            if (labelTextEl) labelTextEl.textContent = 'Zip';
+            if (nodeIdTextEl) nodeIdTextEl.textContent = 'zip';
         }
+        
+        // Update hidden containers to keep them in sync
+        updateHiddenContainers(questionId);
     }
     
     // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
