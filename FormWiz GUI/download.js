@@ -518,44 +518,89 @@ function loadFormData(formData) {
                         nodeIdInput.value = question.nodeId;
                     }
                     
-                    // Rebuild multiple textboxes
-                    const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
-                    if (multipleTextboxesBlock) {
-                        multipleTextboxesBlock.innerHTML = '';
-                        (question.textboxes || []).forEach((tb, idx) => {
-                            // Add a textbox slot
-                            addMultipleTextboxOption(question.questionId);
+                    // Check if we have unified fields data (new format)
+                    if (question.allFieldsInOrder && question.allFieldsInOrder.length > 0) {
+                        console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Loading unified fields:', question.allFieldsInOrder);
+                        
+                        // Rebuild unified fields from exported data
+                        const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
+                        if (unifiedFieldsDiv) {
+                            unifiedFieldsDiv.innerHTML = '';
+                            
+                            question.allFieldsInOrder.forEach((field, index) => {
+                                if (field.type === 'label') {
+                                    // Add a label field
+                                    addTextboxLabel(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
+                                } else if (field.type === 'amount') {
+                                    // Add an amount field
+                                    addTextboxAmount(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
+                                }
+                            });
+                            
+                            // Update hidden containers to keep them in sync
+                            updateHiddenContainers(question.questionId);
+                        }
+                    } else {
+                        // Fallback to old format
+                        console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Using fallback format');
+                        const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
+                        if (multipleTextboxesBlock) {
+                            multipleTextboxesBlock.innerHTML = '';
+                            (question.textboxes || []).forEach((tb, idx) => {
+                                // Add a textbox slot
+                                addMultipleTextboxOption(question.questionId);
 
-                            // Fill in the values
-                            const labelInput = questionBlock.querySelector(
-                                `#multipleTextboxLabel${question.questionId}_${idx + 1}`
-                            );
-                            const nameIdInput = questionBlock.querySelector(
-                                `#multipleTextboxName${question.questionId}_${idx + 1}`
-                            );
-                            const placeholderInput = questionBlock.querySelector(
-                                `#multipleTextboxPlaceholder${question.questionId}_${idx + 1}`
-                            );
+                                // Fill in the values
+                                const labelInput = questionBlock.querySelector(
+                                    `#multipleTextboxLabel${question.questionId}_${idx + 1}`
+                                );
+                                const nameIdInput = questionBlock.querySelector(
+                                    `#multipleTextboxName${question.questionId}_${idx + 1}`
+                                );
+                                const placeholderInput = questionBlock.querySelector(
+                                    `#multipleTextboxPlaceholder${question.questionId}_${idx + 1}`
+                                );
 
-                            if (labelInput)        labelInput.value = tb.label || '';
-                            if (nameIdInput)       nameIdInput.value = tb.nameId || '';
-                            if (placeholderInput)  placeholderInput.value = tb.placeholder || '';
-                        });
-                        (question.amounts || []).forEach((amt, idx) => {
-                            addMultipleAmountOption(question.questionId);
-                            const labelInput = questionBlock.querySelector(
-                                `#multipleAmountLabel${question.questionId}_${idx + 1}`
-                            );
-                            const nameIdInput = questionBlock.querySelector(
-                                `#multipleAmountName${question.questionId}_${idx + 1}`
-                            );
-                            const placeholderInput = questionBlock.querySelector(
-                                `#multipleAmountPlaceholder${question.questionId}_${idx + 1}`
-                            );
-                            if (labelInput)        labelInput.value = amt.label || '';
-                            if (nameIdInput)       nameIdInput.value = amt.nameId || '';
-                            if (placeholderInput)  placeholderInput.value = amt.placeholder || '';
-                        });
+                                if (labelInput)        labelInput.value = tb.label || '';
+                                if (nameIdInput)       nameIdInput.value = tb.nameId || '';
+                                if (placeholderInput)  placeholderInput.value = tb.placeholder || '';
+                            });
+                            (question.amounts || []).forEach((amt, idx) => {
+                                addMultipleAmountOption(question.questionId);
+                                const labelInput = questionBlock.querySelector(
+                                    `#multipleAmountLabel${question.questionId}_${idx + 1}`
+                                );
+                                const nameIdInput = questionBlock.querySelector(
+                                    `#multipleAmountName${question.questionId}_${idx + 1}`
+                                );
+                                const placeholderInput = questionBlock.querySelector(
+                                    `#multipleAmountPlaceholder${question.questionId}_${idx + 1}`
+                                );
+                                if (labelInput)        labelInput.value = amt.label || '';
+                                if (nameIdInput)       nameIdInput.value = amt.nameId || '';
+                                if (placeholderInput)  placeholderInput.value = amt.placeholder || '';
+                            });
+                        }
                     }
                 }
                // In the numbered dropdown section of loadFormData()
@@ -1518,6 +1563,54 @@ function exportForm() {
                     questionData.nodeId = nodeIdInput.value.trim();
                 }
                 
+                // Use the same unified fields system as numberedDropdown
+                const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Looking for unified container:', `#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Found unified container:', !!unifiedContainer);
+                
+                if (unifiedContainer) {
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container children count:', unifiedContainer.children.length);
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container innerHTML length:', unifiedContainer.innerHTML.length);
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container innerHTML preview:', unifiedContainer.innerHTML.substring(0, 200));
+                }
+                
+                const unifiedFields = questionBlock.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
+                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Found', unifiedFields.length, 'unified fields');
+                
+                if (unifiedFields.length > 0) {
+                    // Use unified fields data
+                    const allFieldsInOrder = [];
+                    
+                    unifiedFields.forEach((el) => {
+                        const fieldType = el.getAttribute('data-type');
+                        const fieldOrder = parseInt(el.getAttribute('data-order'));
+                        const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                        const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                        
+                        console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Processing field:', {fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl});
+                        
+                        if (labelTextEl && nodeIdTextEl) {
+                            const fieldData = {
+                                type: fieldType,
+                                label: labelTextEl.textContent.trim(),
+                                nodeId: nodeIdTextEl.textContent.trim(),
+                                order: fieldOrder
+                            };
+                            console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Field data:', fieldData);
+                            allFieldsInOrder.push(fieldData);
+                        }
+                    });
+                    
+                    // Sort by data-order attribute (creation order)
+                    allFieldsInOrder.sort((a, b) => a.order - b.order);
+                    
+                    // Store in the same format as numberedDropdown
+                    questionData.allFieldsInOrder = allFieldsInOrder;
+                    
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Final allFieldsInOrder:', allFieldsInOrder);
+                } else {
+                    // Fallback to old format if no unified fields found
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes No unified fields found, using fallback');
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 questionData.amounts = [];
@@ -1549,6 +1642,7 @@ function exportForm() {
                         });
                     }
                 });
+                }
             }
             else if (
                 questionType === 'text' ||

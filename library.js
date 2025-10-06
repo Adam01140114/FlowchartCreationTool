@@ -83,6 +83,18 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   // Section jump detection (existing code)
 }
 window.exportGuiJson = function(download = true) {
+  // Automatically reset PDF inheritance and Node IDs before export
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+  }
+  
   // Renumber questions by Y position before export
   renumberQuestionIds();
   
@@ -315,7 +327,7 @@ window.exportGuiJson = function(download = true) {
         const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
         
         allFieldsInOrder.push({
-          type: "textbox",
+          type: "label",
           label: labelName,
           nodeId: fieldNodeId,
           order: index + 1
@@ -334,7 +346,7 @@ window.exportGuiJson = function(download = true) {
         // Insert location fields at the specified position
         locationFields.forEach((field, fieldIndex) => {
           allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
-            type: "textbox",
+            type: field.label === "Zip" ? "amount" : "label",
             label: field.label,
             nodeId: field.nodeId,
             order: locationIndex + fieldIndex + 1

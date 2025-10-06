@@ -114,7 +114,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 // Helper function to create styled address input
 function createAddressInput(id, label, index, type = 'text') {
     const inputType = type === 'number' ? 'number' : 'text';
-    const placeholder = label + ' ' + index;
+    const placeholder = label; // Remove the index number from placeholder
     
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
