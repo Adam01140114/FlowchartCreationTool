@@ -645,32 +645,63 @@ window.exportGuiJson = function(download = true) {
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
       
-      // Extract labels and amounts from textboxes
+      // Extract labels and amounts from textboxes with location data support
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
-        // Labels should only include non-amount options
-        question.labels = [];
-        // Amounts should be a simple array of strings for amount options
-        question.amounts = [];
-        // LabelNodeIds array for numberedDropdown
-        question.labelNodeIds = [];
+        // Create allFieldsInOrder array to maintain proper field ordering
+        const allFieldsInOrder = [];
+        const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
         
-        cell._textboxes.forEach(tb => {
-          if (tb.isAmountOption === true) {
-            // Add to amounts as a simple string
-            question.amounts.push(tb.nameId || tb.placeholder || "");
-          } else {
-            // Add to labels as a simple string
-            const labelName = tb.nameId || tb.placeholder || "";
-            question.labels.push(labelName);
-            // Create labelNodeId with PDF prefix if available
-            const labelNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            question.labelNodeIds.push(labelNodeId);
-          }
+        // Process each textbox in order
+        cell._textboxes.forEach((tb, index) => {
+          const labelName = tb.nameId || tb.placeholder || "";
+          const fieldType = tb.isAmountOption === true ? "amount" : "label";
+          const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+          
+          allFieldsInOrder.push({
+            type: fieldType,
+            label: labelName,
+            nodeId: fieldNodeId,
+            order: index + 1
+          });
         });
+        
+        // Insert location fields at the correct position if locationIndex is set
+        if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+          const locationFields = [
+            { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+            { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+            { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+            { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+          ];
+          
+          // Insert location fields at the specified position
+          locationFields.forEach((field, fieldIndex) => {
+            allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+              type: field.label === "Zip" ? "amount" : "label",
+              label: field.label,
+              nodeId: field.nodeId,
+              order: locationIndex + fieldIndex + 1
+            });
+          });
+          
+          // Update order numbers for all fields after insertion
+          allFieldsInOrder.forEach((field, index) => {
+            field.order = index + 1;
+          });
+        }
+        
+        // Set the allFieldsInOrder array
+        question.allFieldsInOrder = allFieldsInOrder;
+        
+        // Keep empty arrays for backward compatibility
+        question.labels = [];
+        question.amounts = [];
+        question.labelNodeIds = [];
       } else {
         question.labels = [];
         question.amounts = [];
         question.labelNodeIds = [];
+        question.allFieldsInOrder = [];
       }
       
       // Extract min and max from _twoNumbers
@@ -1307,7 +1338,8 @@ window.saveFlowchart = function() {
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
-      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null
+      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
+      _locationIndex: cell._locationIndex||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle || null;

@@ -3204,6 +3204,10 @@ function showTextboxLabels(questionId, count){
                 const inputDiv = document.createElement('div');
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
                 entryContainer.appendChild(inputDiv.firstElementChild);
+                
+                // Add a <br> after the Zip input
+                const brElement = document.createElement('br');
+                entryContainer.appendChild(brElement);
             }
             
             lastWasLocation = isLocationField;
@@ -6448,6 +6452,10 @@ function showTextboxLabels(questionId, count){
                 const inputDiv = document.createElement('div');
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
                 entryContainer.appendChild(inputDiv.firstElementChild);
+                
+                // Add a <br> after the Zip input
+                const brElement = document.createElement('br');
+                entryContainer.appendChild(brElement);
             }
             
             lastWasLocation = isLocationField;
