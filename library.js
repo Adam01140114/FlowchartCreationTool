@@ -1310,14 +1310,14 @@ window.saveFlowchart = function() {
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null
     };
     if (isCalculationNode(cell)) {
-      cellData._calcTitle = cell._calcTitle;
-      cellData._calcAmountLabel = cell._calcAmountLabel;
-      cellData._calcOperator = cell._calcOperator;
-      cellData._calcThreshold = cell._calcThreshold;
-      cellData._calcFinalText = cell._calcFinalText;
-      cellData._calcTerms = cell._calcTerms;
-      cellData._calcFinalOutputType = cell._calcFinalOutputType;
-      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
+      cellData._calcTitle = cell._calcTitle || null;
+      cellData._calcAmountLabel = cell._calcAmountLabel || null;
+      cellData._calcOperator = cell._calcOperator || null;
+      cellData._calcThreshold = cell._calcThreshold || null;
+      cellData._calcFinalText = cell._calcFinalText || null;
+      cellData._calcTerms = cell._calcTerms || null;
+      cellData._calcFinalOutputType = cell._calcFinalOutputType || null;
+      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked || null;
     }
     data.cells.push(cellData);
   }

@@ -3,909 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Form</title>
+    <title>Example Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
+    <link rel="stylesheet" href="generate2.css">
     <style>
-      /* Checkbox option styling with beautiful blue border */
-      .checkbox-inline {
-        display: block;
-        margin: 8px auto;
-        padding: 12px 16px;
-        border: 1px solid #d1d1d6;
-        border-radius: 8px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        width: 80%;
-        max-width: 400px;
-        text-align: center;
-      }
-      
-      .checkbox-inline:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        transform: translateY(-1px);
-      }
-      
-      .checkbox-inline.checked {
-        border-color: #0051a6;
-        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
-        background-color: #f8fbff;
-      }
-      
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        color: #333;
-        margin: 0;
-        padding: 0 12px;
-        width: 100%;
-      }
-      
-      .checkbox-label input[type="checkbox"] {
-        margin: 0;
-        flex-shrink: 0;
-      }
-      
-      /* Beautiful text input styling to match checkboxes */
-      .text-input-container {
-        display: block;
-        margin: 8px auto;
-        width: 80%;
-        max-width: 400px;
-      }
-      
-      .text-input-container input[type="text"],
-      .text-input-container input[type="email"],
-      .text-input-container input[type="tel"],
-      .text-input-container input[type="number"],
-      .text-input-container textarea {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1px solid #d1d1d6;
-        border-radius: 8px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        font-size: 16px;
-        color: #333;
-        font-family: 'Montserrat', sans-serif;
-        box-sizing: border-box;
-      }
-      
-      .text-input-container input[type="text"]:focus,
-      .text-input-container input[type="email"]:focus,
-      .text-input-container input[type="tel"]:focus,
-      .text-input-container input[type="number"]:focus,
-      .text-input-container textarea:focus {
-        outline: none;
-        border-color: #0051a6;
-        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
-        background-color: #f8fbff;
-        transform: translateY(-1px);
-      }
-      
-      .text-input-container input[type="text"]:hover,
-      .text-input-container input[type="email"]:hover,
-      .text-input-container input[type="tel"]:hover,
-      .text-input-container input[type="number"]:hover,
-      .text-input-container textarea:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        transform: translateY(-1px);
-      }
-      
-      /* Beautiful date input styling */
-      .date-input-container {
-        display: block;
-        margin: 8px auto;
-        width: 80%;
-        max-width: 400px;
-        position: relative;
-      }
-      
-      .date-input-container input[type="date"] {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1px solid #d1d1d6;
-        border-radius: 8px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        font-size: 16px;
-        color: #333;
-        font-family: 'Montserrat', sans-serif;
-        box-sizing: border-box;
-        cursor: pointer;
-      }
-      
-      .date-input-container input[type="date"]:focus {
-        outline: none;
-        border-color: #0051a6;
-        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
-        background-color: #f8fbff;
-        transform: translateY(-1px);
-      }
-      
-      .date-input-container input[type="date"]:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        transform: translateY(-1px);
-      }
-      
-      /* Custom date picker icon */
-      .date-input-container::after {
-        content: "📅";
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-        font-size: 18px;
-        opacity: 0.6;
-      }
-      
-      .date-input-container input[type="date"]:focus + ::after {
-        opacity: 1;
-      }
-      
-      /* Form validation styles */
-      .validation-error {
-        color: #e74c3c;
-        font-size: 14px;
-        margin-top: 5px;
-        display: none;
-      }
-      
-      .next-button:disabled {
-        background: #bdc3c7 !important;
-        cursor: not-allowed !important;
-        opacity: 0.6;
-      }
-      
-      /* Header and Navigation Styles */
-      html, body {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        font-family: 'Montserrat', sans-serif;
-        color: #333;
-        background-color: #eaf1f8;
-        min-height: 100vh;
-      }
-      body {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-      header {
-        background-color: #2c3e50;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-      }
-      header img {
-        cursor: pointer;
-      }
-      nav {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 38px;
-        z-index: 2;
-      }
-      nav a {
-        color: #fff;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1.18em;
-        letter-spacing: 0.02em;
-        padding: 2px 8px;
-        transition: color 0.2s, background 0.2s, box-shadow 0.2s;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-      }
-      nav a:hover {
-        color: #ff7043;
-        background: rgba(255,255,255,0.08);
-        box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-      }
-      .nav-chevron {
-        display: inline-block;
-        margin-left: 6px;
-        width: 14px;
-        height: 14px;
-        vertical-align: middle;
-      }
-      .nav-chevron svg {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        margin-left: auto;
-      }
-      .sign-in-btn {
-        background: #fff;
-        color: #222;
-        font-weight: 700;
-        font-size: 1.08em;
-        border: none;
-        border-radius: 22px;
-        padding: 8px 28px;
-        margin-left: 18px;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        text-decoration: none;
-        outline: none;
-      }
-      .sign-in-btn:hover {
-        background: #f4f4f4;
-        color: #2980b9;
-        box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-      }
-      .nav-dropdown-wrapper {
-        position: relative;
-        display: inline-block;
-      }
-      .dropdown-menu {
-        display: none;
-        position: absolute;
-        left: 0;
-        top: 38px;
-        background: #fff;
-        min-width: 210px;
-        box-shadow: 0 4px 24px rgba(44,62,80,0.13);
-        border-radius: 10px;
-        z-index: 10;
-        padding: 12px 0;
-        flex-direction: column;
-        gap: 0;
-      }
-      .dropdown-menu a {
-        color: #222;
-        padding: 12px 28px;
-        text-decoration: none;
-        display: block;
-        font-weight: 600;
-        font-size: 1.08em;
-        border-radius: 0;
-        transition: background 0.18s, color 0.18s;
-      }
-      .dropdown-menu a:hover {
-        background: #eaf1f8;
-        color: #2980b9;
-      }
-      .nav-dropdown-wrapper.open .dropdown-menu {
-        display: flex !important;
-        animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
-      }
-      @keyframes dropdownFadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .forms-chevron {
-        transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-      }
-      .nav-dropdown-wrapper.open .forms-chevron {
-        transform: rotate(-90deg);
-      }
-      /* Cart Icon Styles */
-      #cart-icon-link .cart-circle {
-        width: 54px !important;
-        height: 54px !important;
-        background: #2980b9;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-      }
-      #cart-icon {
-        width: 32px !important;
-        height: 32px !important;
-        display: block;
-      }
-      /* Sliding Cart Menu Styles */
-      .cart-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-      }
-      .cart-overlay.active {
-        opacity: 1;
-        visibility: visible;
-      }
-      .cart-side-menu {
-        position: fixed;
-        top: 0;
-        right: -400px;
-        width: 400px;
-        height: 100%;
-        background: #fff;
-        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-        z-index: 10000;
-        transition: right 0.3s ease;
-        display: flex;
-        flex-direction: column;
-      }
-      .cart-side-menu.active {
-        right: 0;
-      }
-      .cart-header {
-        background: #2c3e50;
-        color: #fff;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .cart-header h2 {
-        margin: 0;
-        font-size: 1.5em;
-        font-weight: 700;
-      }
-      .cart-close-btn {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 1.5em;
-        cursor: pointer;
-        padding: 0;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: background 0.2s;
-      }
-      .cart-close-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-      .cart-content {
-        flex: 1;
-        padding: 30px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-      }
-      .cart-icon-large {
-        font-size: 4em;
-        margin-bottom: 20px;
-        color: #bdc3c7;
-      }
-      .cart-message {
-        font-size: 1.3em;
-        color: #2c3e50;
-        margin-bottom: 15px;
-        font-weight: 600;
-        line-height: 1.4;
-      }
-      .cart-description {
-        font-size: 1em;
-        color: #7f8c8d;
-        margin-bottom: 30px;
-        line-height: 1.5;
-      }
-      .cart-signup-btn {
-        background: #2980b9;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 15px 40px;
-        font-size: 1.1em;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.2s;
-        text-decoration: none;
-        display: inline-block;
-      }
-      .cart-signup-btn:hover {
-        background: #1c598a;
-      }
-      .cart-items-list {
-        width: 100%;
-        max-width: 320px;
-        margin: 0 auto 18px auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 18px;
-      }
-      .cart-item {
-        background: #f8faff;
-        border-radius: 18px;
-        box-shadow: 0 2px 12px rgba(44,62,80,0.08);
-        padding: 18px 18px 14px 18px;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0;
-        transition: box-shadow 0.18s, background 0.18s;
-      }
-      .cart-item-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        align-items: flex-start;
-      }
-      .cart-item-title {
-        font-weight: 700;
-        color: #22334a;
-        font-size: 1.13em;
-        margin-bottom: 2px;
-      }
-      .cart-item-price {
-        color: #38d39f;
-        font-weight: 700;
-        font-size: 1.08em;
-      }
-      .remove-item {
-        background: #ff5a5f;
-        color: #fff;
-        border: none;
-        padding: 7px 13px 7px 11px;
-        border-radius: 50px;
-        cursor: pointer;
-        font-size: 1em;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: background 0.18s, box-shadow 0.18s;
-        box-shadow: 0 2px 8px rgba(255,90,95,0.10);
-      }
-      .remove-item:hover {
-        background: #d32f2f;
-      }
-      .remove-item svg {
-        margin-right: 4px;
-      }
-      .cart-summary {
-        margin-top: 18px;
-        background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-        color: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-        padding: 24px 0 16px 0;
-        text-align: center;
-        width: 100%;
-        max-width: 320px;
-      }
-      .summary-label {
-        font-size: 1.18em;
-        font-weight: 600;
-        letter-spacing: 0.01em;
-      }
-      .total-amount {
-        font-size: 2.1em;
-        font-weight: 800;
-        margin: 10px 0 0 0;
-        letter-spacing: 0.01em;
-      }
-      .cart-checkout-btn {
-        background: linear-gradient(90deg, #2980b9 0%, #38d39f 100%);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: 16px 0;
-        font-size: 1.18em;
-        font-weight: 700;
-        cursor: pointer;
-        margin: 24px auto 0 auto;
-        width: 100%;
-        max-width: 220px;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-        transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
-        display: block;
-      }
-      .cart-checkout-btn:hover {
-        background: linear-gradient(90deg, #38d39f 0%, #2980b9 100%);
-        transform: translateY(-2px) scale(1.03);
-      }
-      @media (max-width: 480px) {
-        .cart-side-menu {
-          width: 100%;
-          right: -100%;
-        }
-        .cart-content {
-          padding: 20px 0 0 0;
-        }
-        .cart-items-list, .cart-summary {
-          max-width: 98vw;
-        }
-        .cart-message {
-          font-size: 1.1em;
-        }
-      }
-      @media (max-width: 768px) {
-        header {
-          flex-direction: column;
-          padding: 10px;
-        }
-        nav {
-          position: static;
-          transform: none;
-          margin-top: 10px;
-        }
-        .dropdown-menu {
-          left: 0;
-          right: 0;
-          min-width: unset;
-          width: 100vw;
-          border-radius: 0 0 10px 10px;
-        }
-      }
-      /* Info icon and tooltip styles */
-      .question-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .info-icon {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        border: 1px solid #007bff;
-        border-radius: 50%;
-        color: #007bff;
-        font-size: 14px;
-        line-height: 18px;
-        text-align: center;
-        font-weight: bold;
-        cursor: pointer;
-        user-select: none;
-      }
-      .info-icon .info-tooltip {
-        visibility: hidden;
-        top: calc(100% + 5px);
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        width: 200px;
-        z-index: 100;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 1.4;
-        text-align: left;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        opacity: 0;
-        transition: opacity 0.3s, visibility 0.3s;
-      }
-      .info-icon:hover .info-tooltip,
-      .info-icon:focus .info-tooltip {
-        visibility: visible;
-        opacity: 1;
-      }
-      .info-icon .info-tooltip::after {
-        content: '';
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: transparent transparent #333 transparent;
-      }
-      .progress-bar-container {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto 20px auto;
-        padding: 0 0 10px 0;
-        background: none;
-      }
-      .progress-bar-bg {
-        width: 100%;
-        height: 18px;
-        background: linear-gradient(90deg, #e0e7ef 0%, #f5f7fa 100%);
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-        overflow: hidden;
-        position: relative;
-      }
-      .progress-bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
-        border-radius: 10px 0 0 10px;
-        width: 0%;
-        transition: width 0.5s cubic-bezier(.4,1.4,.6,1), background 0.3s;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.13);
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
-      .progress-bar-label {
-        position: absolute;
-        width: 100%;
-        text-align: center;
-        top: 0;
-        left: 0;
-        height: 100%;
-        line-height: 18px;
-        font-size: 13px;
-        color: #2c3e50;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        pointer-events: none;
-        z-index: 2;
-        text-shadow: 0 1px 2px #fff, 0 0 2px #fff;
-      }
-      .navigation-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 10px;
-      }
-      .navigation-buttons button {
-        width: auto;
-        max-width: none;
-        margin: 0;
-        display: inline-flex;
-      }
-      /* Stepper Progress Bar Styles */
-      .stepper-progress-bar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 12px auto 0 auto;
-        width: 100%;
-        max-width: 700px;
-        background: none;
-        gap: 0;
-      }
-      .stepper-step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
-        z-index: 2;
-        min-width: 90px;
-      }
-      .stepper-circle {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #e0e7ef;
-        color: #2c3e50;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 18px;
-        border: 2px solid #4f8cff;
-        transition: background 0.3s, color 0.3s, border 0.3s;
-      }
-      .stepper-step.active .stepper-circle,
-      .stepper-step.completed .stepper-circle {
-        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
-        color: #fff;
-        border: 2px solid #38d39f;
-      }
-      .stepper-label {
-        margin-top: 8px;
-        font-size: 15px;
-        color: #2c3e50;
-        font-weight: 600;
-        text-align: center;
-        min-width: 80px;
-      }
-      .stepper-step.completed .stepper-label {
-        color: #38d39f;
-      }
-      .stepper-step.active .stepper-label {
-        color: #4f8cff;
-      }
-      .stepper-line {
-        flex: 1;
-        height: 4px;
-        background: #e0e7ef;
-        margin: 0 0px;
-        position: relative;
-        z-index: 1;
-        transition: background 0.5s cubic-bezier(.4,1.4,.6,1);
-      }
-      .stepper-line.filled {
-        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
-      }
-  
-      /* Custom Modal Styles */
-      .custom-modal-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(44, 62, 80, 0.45);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: opacity 0.3s;
-      }
-      .custom-modal {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(44,62,80,0.18);
-        padding: 32px 28px 24px 28px;
-        max-width: 370px;
-        width: 90%;
-        text-align: center;
-        position: relative;
-        animation: modalPopIn 0.35s cubic-bezier(.4,1.4,.6,1);
-      }
-      @keyframes modalPopIn {
-        0% { transform: scale(0.85); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-      .custom-modal h2 {
-        margin-top: 0;
-        color: #2c3e50;
-        font-size: 1.35rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-      }
-      .custom-modal p {
-        color: #4f8cff;
-        font-size: 1.08rem;
-        margin-bottom: 28px;
-      }
-      .custom-modal .modal-buttons {
-        display: flex;
-        gap: 18px;
-        justify-content: center;
-      }
-      .custom-modal button {
-        padding: 8px 22px;
-        border-radius: 6px;
-        border: none;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-      }
-      .custom-modal .modal-back {
-        background: #e0e7ef;
-        color: #2c3e50;
-      }
-      .custom-modal .modal-back:hover {
-        background: #cfd8e3;
-      }
-      .custom-modal .modal-continue {
-        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
-        color: #fff;
-        border: none;
-      }
-      .custom-modal .modal-continue:hover {
-        background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-      }
-      /* Pro Footer Styles */
-      .pro-footer {
-        background: #2c3e50;
-        color: #f3f7f8;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 60px;
-        padding: 48px 10vw 32px 10vw;
-        border-top: 2px solid #2c3e50;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 1.18em;
-        margin-top: 0;
-      }
-      .pro-footer-col {
-        flex: 1 1 320px;
-        min-width: 220px;
-        max-width: 420px;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
-      .address-col {
-        border-right: 1.5px solid #2c7a7d;
-        padding-right: 48px;
-        align-items: flex-start;
-      }
-      .nav-col {
-        align-items: flex-start;
-        padding-left: 32px;
-        padding-right: 32px;
-        border-right: 1.5px solid #2c7a7d;
-      }
-      .company-col {
-        align-items: flex-start;
-        padding-left: 48px;
-      }
-      .pro-footer-title {
-        font-weight: 700;
-        font-size: 1.25em;
-        margin-bottom: 6px;
-        color: #fff;
-        letter-spacing: 0.02em;
-      }
-      .company-title {
-        margin-top: 8px;
-        margin-bottom: 0;
-      }
-      .pro-footer-contact a {
-        color: #b6e2e6;
-        text-decoration: underline;
-        font-weight: 500;
-        margin-right: 18px;
-        transition: color 0.2s;
-      }
-      .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
-        color: #ff7043;
-      }
-      .pro-footer-logo {
-        margin-bottom: 8px;
-      }
-      .pro-footer-desc {
-        color: #e0e6ea;
-        font-size: 1em;
-        margin-top: 0;
-        line-height: 1.5;
-      }
-      .pro-footer-col.nav-col a {
-        color: #b6e2e6;
-        text-decoration: none;
-        font-weight: 500;
-        margin-bottom: 6px;
-        transition: color 0.2s;
-        font-size: 1em;
-      }
-      .pro-footer-col.nav-col a:not(:last-child) {
-        margin-bottom: 8px;
-      }
-      @media (max-width: 900px) {
-        .pro-footer {
-          flex-direction: column;
-          gap: 32px;
-          padding: 32px 4vw 18px 4vw;
-        }
-        .address-col, .company-col, .nav-col {
-          border: none;
-          padding: 0;
-          min-width: unset;
-          max-width: unset;
-        }
-        .company-col, .nav-col {
-          align-items: flex-start;
-        }
-      }
-      footer {
-        text-align: center;
-        padding: 20px;
-        background-color: #374656;
-        color: white;
-      }</style>
+        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; }
+        .entry-container .address-field { margin: 8px 0; }
+        .entry-container .address-input, .entry-container .address-select { width: 100%; max-width: 400px; padding: 12px 16px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box; }
+        .entry-container .address-select { text-align: center; }
+        .entry-container .address-input:focus, .entry-container .address-select:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); }
+        .entry-container .address-input::placeholder { color: #6c757d; opacity: 1; }
+        .entry-container .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; }
+        .entry-container .address-field:first-child { margin-top: 0; }
+        .entry-container .address-field:last-child { margin-bottom: 0; }
+    </style>
 </head>
 <body>
 <header>
-    <img src="../logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
+    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
     <nav>
         <a href="index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -915,27 +31,27 @@
                 <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <div class="dropdown-menu" id="forms-dropdown-menu">
-                <a href="forms.html">My Forms</a>
-                <a href="FreeForm.html">Free Form</a>
-                <a href="Family.html">Family</a>
-                <a href="Property.html">Property</a>
-                <a href="Immigration.html">Immigration</a>
-                <a href="smallclaims.html">Small Claims</a>
-                <a href="Other.html">Other</a>
+                <a href="../Pages/forms.html">My Forms</a>
+                <a href="../Pages/FreeForm.html">Free Form</a>
+                <a href="../Pages/Family.html">Family</a>
+                <a href="../Pages/Property.html">Property</a>
+                <a href="../Pages/Immigration.html">Immigration</a>
+                <a href="../Pages/smallclaims.html">Small Claims</a>
+                <a href="../Pages/Other.html">Other</a>
             </div>
         </div>
-        <a href="about.html">About Us
+        <a href="../Pages/about.html">About Us
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
-        <a href="contact.html">Contact Us
+        <a href="../Pages/contact.html">Contact Us
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
-        <a href="FAQ.html">FAQ
+        <a href="../Pages/FAQ.html">FAQ
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
     </nav>
     <div class="header-actions">
-        <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
         <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
         <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
             <span class="cart-circle">
@@ -964,7 +80,7 @@
                     To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
-                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
                 <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
                 <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
@@ -981,7 +97,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="../Pages/cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -1112,34 +227,31 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Enter section name</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Enter section name</h1><div id="question-container-2" class="question-container hidden"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
-                      onchange="dropdownMirror(this, 'thirsty')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_thirsty"></div>
-              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);">
+        <!-- Hidden fields for URL parameters -->
+        <input type="hidden" id="form_zip" name="form_zip" value="">
+        <input type="hidden" id="form_county" name="form_county" value="">
+        <input type="hidden" id="form_defendant" name="form_defendant" value="">
+        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_fullname"         name="user_fullname">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
 <input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-</div></form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href='forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+</div><input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;"></form>
+<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
 </div>
 <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="../logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">FormWiz</div>
             <div class="pro-footer-contact">
@@ -1149,11 +261,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
         <div class="pro-footer-col nav-col">
             <div class="pro-footer-title">Navigation</div>
-            <a href="index.html">Home</a>
-            <a href="FreeForm.html">Forms</a>
-            <a href="FAQ.html">FAQ</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
+            <a href="../Pages/index.html">Home</a>
+            <a href="../Pages/FreeForm.html">Forms</a>
+            <a href="../Pages/FAQ.html">FAQ</a>
+            <a href="../Pages/about.html">About Us</a>
+            <a href="../Pages/contact.html">Contact Us</a>
         </div>
         <div class="pro-footer-col company-col">
             <div class="pro-footer-title company-title">About FormWiz</div>
@@ -1195,29 +307,6 @@ document.addEventListener("DOMContentLoaded", function() {
     100% { transform: scale(1); opacity: 1; }
   }
   
-  .alert-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #7f8c8d;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  
-  .alert-close-btn:hover {
-    background: rgba(44, 62, 80, 0.1);
-    color: #2c3e50;
-  }
   
   .alert-message {
     margin-bottom: 28px;
@@ -1249,38 +338,27 @@ document.addEventListener("DOMContentLoaded", function() {
     min-width: 100px;
   }
   
-  .alert-btn-back {
+  .alert-btn-continue {
     background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
     color: #fff;
   }
   
-  .alert-btn-back:hover {
+  .alert-btn-continue:hover {
     background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-  }
-  
-  .alert-btn-exit {
-    background: #e74c3c;
-    color: #fff;
-  }
-  
-  .alert-btn-exit:hover {
-    background: #c0392b;
   }
   </style>
   
   <div id="alertOverlay" class="alert-overlay">
     <div class="alert-popup">
-      <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
-        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
-        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
+        <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
       </div>
     </div>
   </div>
   
 <script>
-window.formId = 'sc100';
+window.formId = '';
 
 /*───────────────────────────────*
  * return the true checkbox prefix
@@ -1295,14 +373,11 @@ function getCbPrefix (qId){
  * buildCheckboxName(questionId, rawNameId, labelText)
  *───────────────────────────────*/
 function buildCheckboxName (questionId, rawNameId, labelText){
-    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
     if (!namePart){
         namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
-    if (!namePart.startsWith(slugPrefix)){
-        namePart = slugPrefix + namePart;
-    }
+    // Return the name part directly without adding question prefix
     return namePart;
 }
 
@@ -1310,82 +385,124 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry","2":"thirsty"};
-var questionNameIds = {"1":"hungry","2":"thirsty"};
+    var questionSlugMap       = {"1":"how_many"};
+var questionNameIds = {"1":"how_many"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500.pdf","pdfDisplayName":"Small Claims 500 Form","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
+var pdfLogicPDFs = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
+var labelMap = {"1":["Name","Street","City","State"],"length":0};
+var amountMap = {"1":["Zip"],"length":0};
+var labelNodeIdsMap = {"1":["how_many_name","street","city","state"]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1},{"type":"label","label":"Street","nodeId":"street","order":2},{"type":"label","label":"City","nodeId":"city","order":3},{"type":"label","label":"State","nodeId":"state","order":4},{"type":"amount","label":"Zip","nodeId":"amount_5","order":5}]};
 var linkedDropdowns = [];
 var isHandlingLink = false;
+// Function to get URL parameters
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Function to populate hidden fields from URL parameters
+function populateHiddenFieldsFromUrl() {
+    const zipCode = getUrlParameter("zipCode");
+    const county = getUrlParameter("county");
+    const defendant = getUrlParameter("defendant");
+    const formId = getUrlParameter("formId");
+    
+    if (zipCode) {
+        const zipField = document.getElementById("form_zip");
+        if (zipField) zipField.value = zipCode;
+    }
+    
+    if (county) {
+        const countyField = document.getElementById("form_county");
+        if (countyField) countyField.value = county;
+    }
+    
+    if (defendant) {
+        const defendantField = document.getElementById("form_defendant");
+        if (defendantField) defendantField.value = defendant;
+    }
+    
+    if (formId) {
+        const formIdField = document.getElementById("form_ID");
+        if (formIdField) formIdField.value = formId;
+    }
+    
+}
+
+// Auto-populate on page load
+document.addEventListener("DOMContentLoaded", function() {
+    populateHiddenFieldsFromUrl();
+});
+
+// Function to check paragraph limit and create hidden checkbox
+function checkParagraphLimit(textareaId, paragraphLimit) {
+    if (!paragraphLimit || paragraphLimit === "null") return;
+    
+    const textarea = document.getElementById(textareaId);
+    if (!textarea) return;
+    
+    const currentLength = textarea.value.length;
+    const checkboxId = textareaId + "_overlimit";
+    let checkbox = document.getElementById(checkboxId);
+    
+    if (currentLength > paragraphLimit) {
+        // Create checkbox if it doesn't exist
+        if (!checkbox) {
+            checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = checkboxId;
+            checkbox.name = checkboxId;
+            checkbox.style.display = "none"; // Hidden checkbox
+            checkbox.checked = true;
+            
+            // Insert after the textarea
+            textarea.parentNode.insertBefore(checkbox, textarea.nextSibling);
+            
+        } else {
+            // Check the existing checkbox
+            checkbox.checked = true;
+        }
+    } else {
+        // Remove checkbox if it exists and we're under the limit
+        if (checkbox) {
+            checkbox.remove();
+        }
+    }
+}
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "sc100.pdf";
-var pdfOutputFileName = "Small Claims 100 Form";
-var stripePriceId = "price_1S8afyFJeSRMFQ8XkAJHVYSv";
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["sc100.pdf", ];
+var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
 
 // Alert Logic Functions
+// Track page load time to prevent alerts in first 3 seconds
+const pageLoadTime = Date.now();
+const ALERT_DELAY_MS = 3000; // 3 seconds
+
 function showAlert(message) {
+    // Check if 3 seconds have passed since page load
+    const currentTime = Date.now();
+    const timeSinceLoad = currentTime - pageLoadTime;
+    
+    if (timeSinceLoad < ALERT_DELAY_MS) {
+        // If less than 3 seconds have passed, don't show the alert
+        console.log('Alert blocked: Page loaded less than 3 seconds ago');
+        return;
+    }
+    
     const alertOverlay = document.getElementById('alertOverlay');
     const alertMessage = document.getElementById('alertMessage');
     
@@ -1409,19 +526,6 @@ function closeAlert() {
     }
 }
 
-function exitForm() {
-    // Check if this is a validation popup or regular alert
-    const alertMessage = document.getElementById('alertMessage');
-    if (alertMessage && alertMessage.innerHTML.includes('Please Complete All Questions')) {
-        // This is a validation popup - go back to forms page
-        if (confirm('Are you sure you want to exit? Your progress will be saved.')) {
-            window.location.href = 'forms.html';
-        }
-    } else {
-        // This is a regular alert - reload the page
-        window.location.reload();
-    }
-}
 
 // Show validation popup when user tries to proceed without answering all questions
 function showValidationPopup() {
@@ -1434,22 +538,114 @@ function showValidationPopup() {
     showAlert(validationMessage);
 }
 
+// Helper function to deduplicate PDFs based on pdfName
+function deduplicatePdfs(pdfArray) {
+  const seen = new Set();
+  const deduplicated = [];
+  
+  for (const pdf of pdfArray) {
+    const key = pdf.pdfName || pdf.formId || pdf.title;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduplicated.push(pdf);
+    } else {
+      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key);
+    }
+  }
+  
+  return deduplicated;
+}
+
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  const EXAMPLE_FORM_PRICE_ID = window.stripePriceId || stripePriceId || '123';
+  console.log('🛒 [CART DEBUG] showCartModal called');
+  
+  // Calculate all PDFs that will be added to cart
+  const allPdfsToAdd = [];
+  
+  // Add main form
+  const mainFormPriceId = window.stripePriceId || stripePriceId || '123';
+  allPdfsToAdd.push({
+    formId: (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase(),
+    title: window.pdfFileName || 'Form',
+    priceId: mainFormPriceId,
+    pdfName: window.pdfFileName || ''
+  });
+  
+  // Add conditional PDFs based on current form state
+  if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
+    
+    for (const pdfLogic of window.pdfLogicPDFs) {
+      if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+      
+      let matched = false;
+      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+      for (const c of conds) {
+        const prevId = c?.prevQuestion;
+        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+        if (!prevId) continue;
+        
+        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                   document.getElementById('answer' + prevId);
+        if (!el) continue;
+        
+        let val = '';
+        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+        else                        { val = el.value || ''; }
+        
+        if (val.toString().toLowerCase() === expect) {
+          matched = true;
+          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        }
+      }
+      
+      if (matched) {
+        allPdfsToAdd.push({
+          formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          priceId: pdfLogic.stripePriceId,
+          pdfName: pdfLogic.pdfName
+        });
+      }
+    }
+  }
+  
+  // Deduplicate PDFs to prevent multiple requests for the same PDF
+  const originalCount = allPdfsToAdd.length;
+  const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
+  console.log('🛒 [CART DEBUG] Deduplication: Original count:', originalCount, 'After deduplication:', deduplicatedPdfs.length);
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', deduplicatedPdfs.length, deduplicatedPdfs);
 
-  // Try to fetch price, but still show a working modal if fetch fails
-  async function fetchExampleFormPrice() {
-    try {
-      const r = await fetch('/stripe-price/' + EXAMPLE_FORM_PRICE_ID);
-      if (!r.ok) return null;
-      const data = await r.json();
-      return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-    } catch { return null; }
+  // Fetch prices for all PDFs
+  async function fetchAllPrices() {
+    const prices = [];
+    for (const pdf of deduplicatedPdfs) {
+      try {
+        const r = await fetch('/stripe-price/' + pdf.priceId);
+        if (r.ok) {
+          const data = await r.json();
+          const price = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : '0.00';
+          prices.push(parseFloat(price));
+          console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
+        } else {
+          prices.push(0);
+        }
+      } catch (e) {
+        console.error('🛒 [CART DEBUG] Error fetching price for', pdf.title, ':', e);
+        prices.push(0);
+      }
+    }
+    return prices;
   }
 
-  fetchExampleFormPrice().then((price) => {
-    const priceDisplay = price ? '$' + price : '...';
+  fetchAllPrices().then((prices) => {
+    const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+    const priceDisplay = totalPrice > 0 ? '$' + totalPrice.toFixed(2) : '...';
+    
+    console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
+    
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
@@ -1457,6 +653,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">${deduplicatedPdfs.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - ${priceDisplay}
         </button>
@@ -1473,16 +670,39 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
-      window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
+      console.log('🛒 [CART DEBUG] Add to cart button clicked');
+      window.addFormToCart(mainFormPriceId);
       modal.remove();
     };
   });
 };
 
+// --- Cart helpers (new) ---
+function clearCartState() {
+  try { localStorage.removeItem('formwiz_cart'); } catch {}
+  // expire cookie immediately
+  document.cookie = 'formwiz_cart=;path=/;max-age=0';
+}
+
+function writeCartCookie(cart) {
+  try { document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000'; } catch {}
+}
+
+function getUrlParam(name) {
+  const u = new URLSearchParams(window.location.search);
+  return u.get(name) || '';
+}
+
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
+  
+  // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
+  clearCartState();
+
+  // 2) Collect form data
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
@@ -1494,171 +714,224 @@ window.addFormToCart = function (priceId) {
     }
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const countyName    = urlParams.get('county') || '';
-  const defendantName = urlParams.get('defendantName') || '';
-  const portfolioId   = urlParams.get('portfolioId') || '';
-  const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
+  console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
 
-  // Check for PDF Logic PDFs that should be added to cart
+  // 3) Uniform metadata for every cart line
+  const originalFormId = (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase();
+  const formTitle      = window.pdfFileName || (typeof pdfFileName !== 'undefined' ? pdfFileName : 'Form');
+  const countyName     = getUrlParam('county');
+  const defendantName  = getUrlParam('defendantName');
+  const portfolioId    = getUrlParam('portfolioId');
+  const nowTs          = Date.now();
+
+  // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
-  console.log('🔍 Checking PDF Logic PDFs:', pdfLogicPDFs);
+  console.log('🛒 [CART DEBUG] Computing PDF logic items...');
   
-  if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
-    for (const pdfLogic of pdfLogicPDFs) {
-      console.log('📋 Processing PDF Logic item:', pdfLogic);
+  try {
+    if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
       
-      if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
-        // Check if conditions are met
-        let shouldAddToCart = false;
+      for (const pdfLogic of window.pdfLogicPDFs) {
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) {
+          console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
+          continue;
+        }
         
-        pdfLogic.conditions.forEach(condition => {
-          const prevQuestionId = condition.prevQuestion;
-          const prevAnswer = condition.prevAnswer;
-          
-          console.log('🔍 Checking condition:', { prevQuestionId, prevAnswer });
-          
-          // Get the previous question's value
-          const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                    document.getElementById('answer' + prevQuestionId);
-          
-          if (prevQuestionElement) {
-            let prevValue = '';
-            
-            if (prevQuestionElement.type === 'checkbox') {
-              prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-            } else {
-              prevValue = prevQuestionElement.value;
-            }
-            
-            console.log('📝 Question value:', { 
-              questionId: prevQuestionId, 
-              value: prevValue, 
-              expected: prevAnswer,
-              matches: prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()
-            });
-            
-            // Check if the condition matches
-            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-              shouldAddToCart = true;
-            }
+        console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+
+        let matched = false;
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
+
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
           }
-        });
-        
-        console.log('✅ Should add to cart:', shouldAddToCart);
-        
-        // Add to cart if conditions are met
-        if (shouldAddToCart) {
-          const pdfLogicItem = {
-            formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''), // Use the PDF name without extension as formId
-            originalFormId: window.formId || 'custom-form', // Track the original form that generated this document
-            portfolioId: portfolioId, // Track the portfolio ID for grouping
-            pdfName: pdfLogic.pdfName, // Store the actual PDF name for generation
-            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
+
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+          }
+        }
+
+        if (matched) {
+          // Create a proper display name for the PDF logic item
+          let displayTitle;
+          
+          // If there's a custom PDF display name from the PDF logic, use it
+          if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
+            displayTitle = pdfLogic.pdfDisplayName.trim();
+          } else {
+            // Create a title based on the main form name + PDF name
+            const mainFormName = window.pdfFileName || 'Form';
+            const pdfBaseName = pdfLogic.pdfName.replace(/.pdf$/i, '').toUpperCase();
+            displayTitle = mainFormName + ' ' + pdfBaseName;
+          }
+          
+          const item = {
+            formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+            title: displayTitle,
             priceId: pdfLogic.stripePriceId,
-            formData: { ...formData, originalFormId: window.formId || 'custom-form', portfolioId: portfolioId }, // Include portfolioId in formData
+            pdfName: pdfLogic.pdfName,
+            originalFormId: originalFormId,
+            portfolioId: portfolioId,
+            formData: formData,
             countyName: countyName,
             defendantName: defendantName,
-            timestamp: Date.now()
+            timestamp: nowTs
           };
-          
-          console.log('📦 Adding PDF Logic item to cart:', pdfLogicItem);
-          pdfLogicItems.push(pdfLogicItem);
+          pdfLogicItems.push(item);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
+        } else {
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
       }
+    } else {
+      console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
-  }
-  
-  console.log('📋 Final PDF Logic items:', pdfLogicItems);
-
-  // Clear old cart items first
-  console.log('🧹 Clearing old cart items...');
-  console.log('🔍 Cart before clearing - localStorage:', localStorage.getItem('formwiz_cart'));
-  console.log('🔍 Cart before clearing - cookies:', document.cookie);
-  localStorage.removeItem('formwiz_cart');
-  document.cookie = 'formwiz_cart=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  console.log('✅ Cart cleared from both localStorage and cookies');
-
-  // Prefer existing cart manager if present
-  // Check if addToCart function exists
-  if (typeof window.addToCart === 'function') {
-    const fid = (window.formId || 'custom-form');
-    console.log('🛒 Adding main form to cart:', { fid, formTitle, priceId });
-    // Add originalFormId and portfolioId to the main form data
-    const mainFormData = { ...formData, originalFormId: fid, portfolioId: portfolioId };
-    console.log('🛒 Main form data with portfolioId:', { mainFormData, portfolioId });
-    window.addToCart(fid, formTitle, priceId, mainFormData, countyName, defendantName);
     
-    // Add PDF Logic items to cart
-    console.log('🛒 Adding PDF Logic items to cart:', pdfLogicItems.length, 'items');
-    pdfLogicItems.forEach((item, index) => {
-      console.log(`🛒 Adding PDF Logic item ${index + 1}:`, {
-        formId: item.formId,
+    // Deduplicate PDF logic items to prevent multiple requests for the same PDF
+    const originalPdfLogicCount = pdfLogicItems.length;
+    const deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
+    console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
+    
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
+  } catch (e) {
+    console.warn('[PDF LOGIC] error computing matches:', e);
+  }
+
+  // 5) Preferred path: site cart manager
+  if (typeof window.addToCart === 'function') {
+    console.log('🛒 [CART DEBUG] Firebase addToCart function available');
+    
+    // Create a batch of all items to add
+    const allItems = [];
+    
+    // Add main item
+    const mainItem = {
+      formId: originalFormId,
+      title: formTitle,
+      priceId: priceId,
+      formData: { ...formData, originalFormId, portfolioId, pdfName: (window.pdfFileName || '') },
+      countyName: countyName,
+      defendantName: defendantName
+    };
+    allItems.push(mainItem);
+    console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
+    
+    // Add all matched PDF logic items
+    for (const item of deduplicatedPdfLogicItems) {
+      const pdfItem = {
+        formId: item.formId.toLowerCase(),
         title: item.title,
         priceId: item.priceId,
-        pdfName: item.pdfName
-      });
-      
-      console.log('🛒 Calling addToCart with parameters:', {
-        formId: item.formId,
-        formTitle: item.title,
-        priceId: item.priceId,
-        formData: item.formData,
+        formData: { ...item.formData, originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName },
         countyName: item.countyName,
-        defendantName: item.defendantName,
-        pdfName: item.pdfName
-      });
-      
-      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName, item.pdfName);
-    });
-    
-    // Debug: Show final cart state after adding items
-    console.log('🔍 Final cart state after adding items:');
-    console.log('📦 localStorage cart:', localStorage.getItem('formwiz_cart'));
-    console.log('🍪 Cookie cart:', document.cookie);
-    
-    // Try to parse and show the cart contents
-    try {
-      const finalCart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
-      console.log('📋 Final parsed cart contents:', finalCart);
-      console.log('📊 Final cart length:', finalCart.length);
-    } catch (e) {
-      console.error('❌ Error parsing final cart:', e);
+        defendantName: item.defendantName
+      };
+      allItems.push(pdfItem);
+      console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
     }
+    
+    console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
+    
+    // Add all items to cart with a small delay between each to prevent race conditions
+    let addedCount = 0;
+    allItems.forEach((item, index) => {
+      setTimeout(() => {
+        console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        
+        // Ensure formData includes portfolio ID for proper grouping
+        const enhancedFormData = {
+          ...item.formData,
+          originalFormId: item.originalFormId,
+          portfolioId: item.portfolioId,
+          pdfName: item.pdfName
+        };
+        
+        window.addToCart(
+          item.formId, item.title, item.priceId, enhancedFormData,
+          item.countyName, item.defendantName, item.pdfName
+        );
+        addedCount++;
+        
+        // Check if all items have been added
+        if (addedCount === allItems.length) {
+          console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
+          const itemList = allItems.map(item => {
+            let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+            if (item.defendantName && item.defendantName.trim() !== '') {
+              itemInfo += ' - Defendant: ' + item.defendantName;
+            }
+            return itemInfo;
+          }).join('\n');
+          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n' + itemList);
+          
+          // Show debugging alert with cart data
+          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n\n' + itemList;
+          alert(debugInfo);
+          
+          // Show cart page requested alert
+          alert('Cart page requested');
+        }
+      }, index * 200); // 200ms delay between each item
+    });
 
+    // Don't redirect automatically - let the alert handle it
     return;
-  } else {
-    // Fallback to localStorage method
   }
 
-  // Fallback: localStorage/cookie
-  console.log('🔄 Using fallback localStorage method');
-  const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+  // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
   
-  // Add main form
-  const mainItem = {
-    formId: (window.formId || 'custom-form'),
-    title: formTitle,
-    priceId,
-    formData,
-    countyName,
-    defendantName,
-    timestamp: Date.now()
+  const cart = [];
+  const mainCartItem = {
+    formId: originalFormId, title: formTitle, priceId,
+    pdfName: (window.pdfFileName || ''),
+    originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
   };
-  cart.push(mainItem);
-  console.log('📦 Added main form to fallback cart:', mainItem);
+  cart.push(mainCartItem);
+  console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
   
-  // Add PDF Logic items
-  pdfLogicItems.forEach(item => {
-    console.log('📦 Adding PDF Logic item to fallback cart:', item);
+  for (const item of deduplicatedPdfLogicItems) {
     cart.push(item);
-  });
-  
-  console.log('💾 Saving fallback cart to localStorage:', cart);
-  localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-  document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+    console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
+  }
 
+  console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
+
+  try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
+  writeCartCookie(cart);
+
+  const itemList = cart.map(item => {
+    let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+    if (item.defendantName && item.defendantName.trim() !== '') {
+      itemInfo += ' - Defendant: ' + item.defendantName;
+    }
+    return itemInfo;
+  }).join('\n');
+  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\n' + itemList);
+  
+  // Show debugging alert with cart data
+  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\n\n' + itemList;
+  alert(debugInfo);
+  
+  // Show cart page requested alert
+  alert('Cart page requested');
 };
+
 
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -1731,6 +1004,29 @@ function toggleAmountField(amountFieldId, show) {
         amountField.style.display = show ? 'block' : 'none';
         if (!show) amountField.value = '';
     }
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Handle "Mark only one" selection functionality
+ *──────────────────────────────────────────────────────────────*/
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    if (!selectedInput.checked) return;
+    
+    // Find all radio buttons in this question group
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            // Update styling for unchecked inputs
+            updateCheckboxStyle(input);
+        }
+    });
+    
+    // Update styling for the selected input
+    updateCheckboxStyle(selectedInput);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -1815,19 +1111,76 @@ function showValidationPopup() {
 
 // Global function to trigger visibility updates for dependent questions
 function triggerVisibilityUpdates() {
+    
     // Find all question containers and trigger their visibility logic
     const questionContainers = document.querySelectorAll('[id^="question-container-"]');
+    
     questionContainers.forEach(container => {
         const questionId = container.id.replace('question-container-', '');
         
-        // Find the question element that controls this container's visibility
+        // Try to find and call the updateVisibility function for this question
+        // The conditional logic creates functions in the global scope, so we need to call them
+        try {
+            // Look for the updateVisibility function that was created for this question
+            // The function is created in a closure, so we need to trigger it via the event listeners
         const questionElement = document.getElementById(questionNameIds[questionId]) || 
                               document.getElementById('answer' + questionId);
         
         if (questionElement) {
+                console.log('🔧 [VISIBILITY DEBUG] Found question element for', questionId, ':', questionElement.id);
             // Trigger change event to update visibility
             const event = new Event('change', { bubbles: true });
             questionElement.dispatchEvent(event);
+                console.log('🔧 [VISIBILITY DEBUG] Dispatched change event for', questionId);
+            } else {
+                console.log('🔧 [VISIBILITY DEBUG] No question element found for', questionId);
+            }
+        } catch (error) {
+            console.log('🔧 [VISIBILITY DEBUG] Error processing question', questionId, ':', error);
+        }
+    });
+}
+
+// Fallback function to manually check and update visibility without relying on generated scripts
+function triggerVisibilityUpdatesFallback() {
+    console.log('🔧 [VISIBILITY FALLBACK DEBUG] triggerVisibilityUpdatesFallback() called');
+    
+    // Find all question containers
+    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
+    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found', questionContainers.length, 'question containers');
+    
+    questionContainers.forEach(container => {
+        const questionId = container.id.replace('question-container-', '');
+        console.log('🔧 [VISIBILITY FALLBACK DEBUG] Processing question container:', questionId);
+        
+        // Check if this question has conditional logic by looking for data attributes or other indicators
+        // For now, we'll manually check common conditional logic patterns
+        
+        // Check if this question should be visible based on other question values
+        // This is a simplified version of the conditional logic
+        let shouldBeVisible = true;
+        
+        // Look for any dropdown or input that might control this question's visibility
+        const allInputs = document.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            if (input.id && input.id !== container.id) {
+                // Check if this input's value should affect the visibility of the current question
+                // This is a simplified check - in a real implementation, you'd need to parse the actual conditional logic
+                if (input.value && input.value.trim() !== '') {
+                    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found input with value:', input.id, '=', input.value);
+                    // For now, we'll just log this - the actual conditional logic would be more complex
+                }
+            }
+        });
+        
+        // For debugging, let's just make sure all questions are visible initially
+        // In a real implementation, you'd implement the actual conditional logic here
+        if (shouldBeVisible) {
+            container.classList.remove('hidden');
+            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'visible');
+        } else {
+            container.classList.add('hidden');
+            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'hidden');
         }
     });
 }
@@ -1840,23 +1193,14 @@ function validateCurrentSection(sectionNumber) {
     const questions = section.querySelectorAll('.question-container:not(.hidden)');
     let isValid = true;
     
-    console.log('Validating section', sectionNumber, 'with', questions.length, 'visible questions');
-    
     questions.forEach(question => {
         const questionId = question.id.replace('question-container-', '');
         const questionType = getQuestionTypeFromContainer(question);
         
-        console.log('Validating question', questionId, 'of type', questionType);
-        
         if (!validateQuestion(question, questionType, questionId)) {
-            console.log('Question', questionId, 'failed validation');
             isValid = false;
-        } else {
-            console.log('Question', questionId, 'passed validation');
         }
     });
-    
-    console.log('Section validation result:', isValid);
     
     // Update next button state
     const nextButton = document.getElementById('next-button-' + sectionNumber);
@@ -1933,12 +1277,8 @@ function validateDropdownQuestion(questionContainer) {
     const select = questionContainer.querySelector('select');
     if (!select) return true;
     
-    // Debug logging
-    console.log('Validating dropdown:', select.id, 'Value:', select.value, 'Trimmed:', select.value.trim());
-    
     // Check if the dropdown has a value and it's not the default empty/disabled option
     const isValid = select.value && select.value.trim() !== '' && select.value !== 'Select an option';
-    console.log('Dropdown validation result:', isValid);
     return isValid;
 }
 
@@ -1981,8 +1321,16 @@ function addValidationListeners() {
     const formFields = currentSection.querySelectorAll('input, select, textarea');
     
     formFields.forEach(field => {
-        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
-        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+        // Remove existing listeners to prevent duplicates
+        field.removeEventListener('change', field._validationHandler);
+        field.removeEventListener('input', field._validationHandler);
+        
+        // Create new handler
+        field._validationHandler = () => validateCurrentSection(sectionNumber);
+        
+        // Add listeners
+        field.addEventListener('change', field._validationHandler);
+        field.addEventListener('input', field._validationHandler);
     });
     
     // Initial validation
@@ -2018,13 +1366,113 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label + ' ' + index;
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
+// Helper function to create US states dropdown
+function createStateDropdown(id, index) {
+    const states = [
+        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
+        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+        'Wisconsin', 'Wyoming'
+    ];
+    
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+        options += '<option value="' + state + '">' + state + '</option>';
+    });
+    
+    return '<div class="address-field">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select">' +
+           options +
+           '</select>' +
+           '</div>';
+}
+
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
     if(!container) return;
 
     container.innerHTML = "<br>";
-    const theseLabels   = labelMap[questionId]   || [];
-    const theseAmounts  = amountMap[questionId]  || [];
+    
+    // Try to get unified fields first, fallback to old arrays
+    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
+                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
+    
+    let allFieldsInOrder = [];
+    
+    if (qBlock) {
+        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
+        
+        if (unifiedFields.length > 0) {
+            // Use unified container data
+            const allElements = [];
+            
+            unifiedFields.forEach((el) => {
+                const fieldType = el.getAttribute('data-type');
+                const fieldOrder = parseInt(el.getAttribute('data-order'));
+                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                
+                if (labelTextEl && nodeIdTextEl) {
+                    allElements.push({
+                        type: fieldType,
+                        label: labelTextEl.textContent.trim(),
+                        nodeId: nodeIdTextEl.textContent.trim(),
+                        order: fieldOrder
+                    });
+                }
+            });
+            
+            // Sort by data-order attribute (creation order)
+            allElements.sort((a, b) => a.order - b.order);
+            allFieldsInOrder = allElements;
+        }
+    }
+    
+    // Fallback to unified fields map or old arrays if no unified fields found
+    if (allFieldsInOrder.length === 0) {
+        // Try unified fields map first
+        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+            allFieldsInOrder = window.unifiedFieldsMap[questionId];
+            console.log('🔧 [UNIFIED FIELDS DEBUG] Using unifiedFieldsMap with', allFieldsInOrder.length, 'fields');
+        } else {
+            // Fallback to old arrays
+            const theseLabels = labelMap[questionId] || [];
+            const theseAmounts = amountMap[questionId] || [];
+            
+            allFieldsInOrder = [
+                ...theseLabels.map((lbl, index) => ({
+                    type: 'label',
+                    label: lbl,
+                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
+                    order: index
+                })),
+                ...theseAmounts.map((amt, index) => ({
+                    type: 'amount',
+                    label: amt,
+                    nodeId: "",
+                    order: index
+                }))
+            ];
+            console.log('🔧 [UNIFIED FIELDS DEBUG] Using fallback arrays with', allFieldsInOrder.length, 'fields');
+        }
+    }
 
     /* get and sanitise the question's visible text exactly once */
     const questionH3   = document
@@ -2032,24 +1480,186 @@ function showTextboxLabels(questionId, count){
         ?.querySelector("h3")?.textContent || ("answer" + questionId);
     const qSafe = sanitizeQuestionText(questionH3);
 
+    // Generate hidden checkboxes for the selected count
+    generateHiddenCheckboxes(questionId, qSafe, count);
+
+    // Define location field names for visual separation
+    const locationFields = ['Street', 'City', 'State', 'Zip'];
+    
+    console.log('🔧 [UNIFIED FIELDS DEBUG] Using allFieldsInOrder with', allFieldsInOrder.length, 'fields');
+
     for(let j = 1; j <= count; j++){
-        /* label inputs */
-        for(const lbl of theseLabels){
-            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(lbl);
-            container.innerHTML +=
-              '<input type="text" id="' + id + '" name="' + id + '" placeholder="' + lbl + ' ' + j + '" style="text-align:center;"><br>';
-        }
-        /* amount inputs */
-        for(const amt of theseAmounts){
-            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(amt);
-            container.innerHTML +=
-              '<input type="number" id="' + id + '" name="' + id + '" placeholder="' + amt + ' ' + j + '" style="text-align:center;"><br>';
+        let lastWasLocation = false;
+        let firstField = true;
+        
+        console.log('🔧 [FIELD PROCESSING DEBUG] Processing count', j, 'with', allFieldsInOrder.length, 'fields');
+        
+        // Process all fields in creation order
+        for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
+            const field = allFieldsInOrder[fieldIndex];
+            const isLocationField = locationFields.includes(field.label);
+            
+            console.log('🔧 [FIELD PROCESSING DEBUG] Processing field', fieldIndex, ':', {
+                type: field.type,
+                label: field.label,
+                nodeId: field.nodeId,
+                isLocationField,
+                order: field.order
+            });
+            
+            // Add visual separation for location fields
+            if (isLocationField && !lastWasLocation && !firstField) {
+                // First location field in a group
+                container.innerHTML += "<br>";
+                console.log('🔧 [FIELD PROCESSING DEBUG] Added <br> before location field group');
+            } else if (!isLocationField && lastWasLocation) {
+                // First non-location field after location fields
+                container.innerHTML += "<br>";
+                console.log('🔧 [FIELD PROCESSING DEBUG] Added <br> after location field group');
+            }
+            
+            if (field.type === 'label') {
+                // Use label node ID if provided, otherwise fallback to the original pattern
+                const id = field.nodeId ? 
+                  field.nodeId + "_" + j : 
+                  qSafe + "_" + j + "_" + sanitizeQuestionText(field.label);
+                
+                // Special handling for State field - create dropdown
+                if (field.label === 'State') {
+                    container.innerHTML += createStateDropdown(id, j);
+                } else {
+                    // Regular text input with enhanced styling
+                    container.innerHTML += createAddressInput(id, field.label, j);
+                }
+                console.log('🔧 [TEXTBOX GENERATION DEBUG] Created textbox input with ID:', id, 'name:', id);
+            } else if (field.type === 'amount') {
+                const id = qSafe + "_" + j + "_" + sanitizeQuestionText(field.label);
+                container.innerHTML += createAddressInput(id, field.label, j, 'number');
+                console.log('🔧 [AMOUNT GENERATION DEBUG] Created amount input with ID:', id, 'name:', id);
+            }
+            
+            lastWasLocation = isLocationField;
+            firstField = false;
         }
         container.innerHTML += "<br>";
     }
     attachCalculationListeners();   // keep this
+    
+    // Attach autosave listeners to newly generated textbox inputs
+    const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
+    newInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Add a small delay to ensure the value is properly set before saving
+            setTimeout(() => {
+                if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof saveAnswers === 'function') {
+                        saveAnswers();
+                    }
+                } else {
+                    if (typeof saveAnswersToLocalStorage === 'function') {
+                        saveAnswersToLocalStorage();
+                    }
+                }
+            }, 100); // 100ms delay to ensure value is set
+        });
+        input.addEventListener('change', function() {
+            // Add a small delay to ensure the value is properly set before saving
+            setTimeout(() => {
+                if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof saveAnswers === 'function') {
+                        saveAnswers();
+                    }
+                } else {
+                    if (typeof saveAnswersToLocalStorage === 'function') {
+                        saveAnswersToLocalStorage();
+                    }
+                }
+            }, 100); // 100ms delay to ensure value is set
+        });
+    });
 }
 
+// Generate hidden checkboxes for numbered dropdown questions
+function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
+    // Get the dropdown element to find the range
+    const dropdown = document.getElementById("answer" + questionId);
+    if (!dropdown) return;
+    
+    // Find the maximum possible value from the dropdown options
+    let maxRange = 0;
+    for (let i = 0; i < dropdown.options.length; i++) {
+        const optionValue = parseInt(dropdown.options[i].value);
+        if (!isNaN(optionValue) && optionValue > maxRange) {
+            maxRange = optionValue;
+        }
+    }
+    
+    // Remove any existing hidden checkboxes for this question
+    const existingCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="' + questionSafe + '_"]');
+    existingCheckboxes.forEach(checkbox => checkbox.remove());
+    
+    // Generate hidden checkboxes for the full range
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = questionSafe + "_" + i;
+        const checkboxName = questionSafe + "_" + i;
+        
+        // Create hidden checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = checkboxId;
+        checkbox.name = checkboxName;
+        checkbox.style.display = 'none'; // Hidden
+        checkbox.checked = i <= selectedCount; // Check if this number is within the selected range
+        
+        // Add to the form (find the form element or add to body)
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(checkbox);
+    }
+}
+
+// Update hidden checkboxes when dropdown selection changes
+function updateHiddenCheckboxes(questionId, selectedCount) {
+    // Get the question's safe name
+    const questionH3 = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+    
+    // Get the dropdown element to find the range
+    const dropdown = document.getElementById("answer" + questionId);
+    if (!dropdown) return;
+    
+    // Find the maximum possible value from the dropdown options
+    let maxRange = 0;
+    for (let i = 0; i < dropdown.options.length; i++) {
+        const optionValue = parseInt(dropdown.options[i].value);
+        if (!isNaN(optionValue) && optionValue > maxRange) {
+            maxRange = optionValue;
+        }
+    }
+    
+    // Update existing checkboxes or create new ones if they don't exist
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = qSafe + "_" + i;
+        let checkbox = document.getElementById(checkboxId);
+        
+        if (!checkbox) {
+            // Create new checkbox if it doesn't exist
+            checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.name = qSafe + "_" + i;
+            checkbox.style.display = 'none'; // Hidden
+            
+            // Add to the form
+            const form = document.querySelector('form') || document.body;
+            form.appendChild(checkbox);
+        }
+        
+        // Update the checked state based on the selected count
+        checkbox.checked = i <= selectedCount;
+    }
+}
 
 // Handle linked dropdown logic
 function handleLinkedDropdowns(sourceName, selectedValue) {
@@ -2208,6 +1818,61 @@ function handleNext(currentSection){
 
 
 /*------------------------------------------------------------------
+ *  resetHiddenQuestionsToDefaults(sectionNumber)
+ *  – resets hidden questions in the current section to their default values
+ *    This prevents Firebase autosave from keeping values for questions
+ *    that are hidden due to conditional logic
+ *-----------------------------------------------------------------*/
+function resetHiddenQuestionsToDefaults(sectionNumber) {
+    // Get the current section
+    const currentSection = document.getElementById('section' + sectionNumber);
+    if (!currentSection) {
+        console.log('Reset function: Section not found for section', sectionNumber);
+        return;
+    }
+    
+    // Find all hidden question containers in this section
+    const hiddenQuestions = currentSection.querySelectorAll('.question-container.hidden');
+    
+    if (hiddenQuestions.length === 0) {
+        console.log('Reset function: No hidden questions found in section', sectionNumber);
+        return;
+    }
+    
+    console.log('Reset function: Found', hiddenQuestions.length, 'hidden questions in section', sectionNumber);
+    
+    hiddenQuestions.forEach((questionContainer, index) => {
+        // Get all form elements within this hidden question
+        const formElements = questionContainer.querySelectorAll('input, select, textarea');
+        
+        formElements.forEach(element => {
+            const elementName = element.name || element.id || 'unnamed';
+            const oldValue = element.value || element.checked;
+            
+            if (element.tagName === 'SELECT') {
+                // Reset dropdown to default "Select an option"
+                element.value = '';
+                // Find the default option and set it as selected
+                const defaultOption = element.querySelector('option[disabled][selected]');
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                }
+                console.log('Reset function: Reset dropdown', elementName, 'from', oldValue, 'to default');
+            } else if (element.type === 'checkbox' || element.type === 'radio') {
+                // Reset checkboxes and radio buttons to unchecked
+                element.checked = false;
+                console.log('Reset function: Reset', element.type, elementName, 'from', oldValue, 'to false');
+            } else if (element.type === 'text' || element.type === 'email' || element.type === 'tel' || 
+                      element.type === 'number' || element.type === 'date' || element.tagName === 'TEXTAREA') {
+                // Reset text inputs to empty
+                element.value = '';
+                console.log('Reset function: Reset', element.type || 'textarea', elementName, 'from', oldValue, 'to empty');
+            }
+        });
+    });
+}
+
+/*------------------------------------------------------------------
  *  navigateSection(sectionNumber)
  *  – shows exactly one section (or Thank‑you) and records history
  *-----------------------------------------------------------------*/
@@ -2242,6 +1907,10 @@ function navigateSection(sectionNumber){
     (target || sections[maxSection - 1]).classList.add('active');
 
     currentSectionNumber = sectionNumber;
+    
+    // Reset hidden questions to default values after Firebase autosave
+    resetHiddenQuestionsToDefaults(sectionNumber);
+    
     updateProgressBar();
 }
 
@@ -2346,10 +2015,24 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
-    // Process main PDFs
-    for (const pdfName of allPdfFileNames) {
-        if (pdfName) {
-            await editAndDownloadPDF(pdfName);
+    console.log('🔧 [PDF DEBUG] processAllPdfs() called');
+    console.log('🔧 [PDF DEBUG] pdfOutputFileName:', pdfOutputFileName);
+    console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
+    console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
+    
+    // Track processed PDFs to prevent duplicates
+    const processedPdfs = new Set();
+    
+    // Process main PDFs - use the actual PDF filename, not the form name
+    if (pdfOutputFileName) {
+        console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
+        // Remove .pdf extension if present since server adds it automatically
+        const baseName = pdfOutputFileName.replace(/.pdf$/i, '');
+        if (!processedPdfs.has(baseName)) {
+            processedPdfs.add(baseName);
+        await editAndDownloadPDF(baseName);
+        } else {
+            console.log('🔧 [PDF DEBUG] Skipping duplicate main PDF:', baseName);
         }
     }
     
@@ -2381,7 +2064,13 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    await editAndDownloadPDF(conditionalPDF.pdfName);
+                    const baseName = conditionalPDF.pdfName.replace(/.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        await editAndDownloadPDF(baseName);
+                    } else {
+                        console.log('🔧 [PDF DEBUG] Skipping duplicate conditional PDF:', baseName);
+                    }
                 }
             }
         }
@@ -2441,24 +2130,54 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    await editAndDownloadPDF(pdfLogic.pdfName);
+                    const baseName = pdfLogic.pdfName.replace(/.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        await editAndDownloadPDF(baseName);
+                    } else {
+                        console.log('🔧 [PDF DEBUG] Skipping duplicate PDF logic PDF:', baseName);
+                    }
                 }
             }
         }
     }
 }
 
+// Function to go back to the form from the thank you screen
+function goBackToForm() {
+    console.log('🔧 [BACK BUTTON] Going back to form');
+    
+    // Hide the thank you message
+    const thankYouMessage = document.getElementById('thankYouMessage');
+    if (thankYouMessage) {
+        thankYouMessage.style.display = 'none';
+    }
+    
+    // Show the form again
+    const formContainer = document.querySelector('form');
+    if (formContainer) {
+        formContainer.style.display = 'block';
+    }
+    
+    // Scroll back to the top of the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
+    console.log('🔧 [PDF DEBUG] downloadAllPdfs() called');
     try {
         // Show loading state
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+        console.log('🔧 [PDF DEBUG] Download button found:', !!downloadButton);
         if (downloadButton) {
             downloadButton.textContent = 'Processing...';
             downloadButton.disabled = true;
         }
         
+        console.log('🔧 [PDF DEBUG] Calling processAllPdfs()...');
         await processAllPdfs();
+        console.log('🔧 [PDF DEBUG] processAllPdfs() completed successfully');
         
         // Reset button
         if (downloadButton) {
@@ -2466,7 +2185,7 @@ async function downloadAllPdfs() {
             downloadButton.disabled = false;
         }
     } catch (error) {
-        console.error('Error downloading PDFs:', error);
+        console.error('🔧 [PDF DEBUG] Error downloading PDFs:', error);
         // Reset button on error
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
         if (downloadButton) {
@@ -2479,32 +2198,57 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
+        console.log('🔧 [PDF DEBUG] Starting PDF processing for:', pdfName);
+        
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const fd = new FormData(document.getElementById('customForm'));
+        console.log('🔧 [PDF DEBUG] FormData created with', fd.entries().length, 'entries');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
         const baseName = pdfName.replace(/.pdf$/i, '');
-        const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        console.log('🔧 [PDF DEBUG] Making request to:', endpoint);
+        
+        const res = await fetch(endpoint, { 
             method: 'POST', 
             body: fd 
         });
         
+        console.log('🔧 [PDF DEBUG] Response status:', res.status, 'OK:', res.ok);
+        console.log('🔧 [PDF DEBUG] Response headers:', Object.fromEntries(res.headers.entries()));
+        
         if (!res.ok) {
-            throw new Error("HTTP error! status: " + res.status);
+            const errorText = await res.text();
+            console.error('🔧 [PDF DEBUG] Server error response:', errorText);
+            throw new Error("HTTP error! status: " + res.status + " - " + errorText);
         }
         
         const blob = await res.blob();
+        console.log('🔧 [PDF DEBUG] Blob created, size:', blob.size, 'type:', blob.type);
+        
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
+        
         const url = URL.createObjectURL(blob);
+        console.log('🔧 [PDF DEBUG] Object URL created:', url);
 
         // Trigger download
         const a = document.createElement('a');
         a.href = url;
         a.download = 'Edited_' + pdfName;
+        console.log('🔧 [PDF DEBUG] Triggering download for:', a.download);
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        
+        // Clean up the object URL after a delay
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+            console.log('🔧 [PDF DEBUG] Object URL cleaned up');
+        }, 1000);
 
         // inline preview - only show the last one
         const frame = document.getElementById('pdfFrame');
@@ -2953,7 +2697,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var contBtn = document.getElementById('modalContinueBtn');
   if (backBtn) backBtn.onclick = hideLoginRequiredModal;
   if (contBtn) contBtn.onclick = function() {
-    window.location.href = 'account.html';
+    window.location.href = '../Pages/account.html';
   };
 });
 
@@ -2982,8 +2726,11 @@ if (typeof handleNext === 'function') {
         const urlParams = new URLSearchParams(window.location.search);
         const baseFormId = urlParams.get('formId') || window.formId || 'default';
         const county = urlParams.get('county') || '';
-        // Create a unique form ID that includes county information for autosave separation
-        const formId = county ? baseFormId + '_' + county.replace(/s+/g, '_') : baseFormId;
+        const portfolioId = urlParams.get('portfolioId') || '';
+        // Create a unique form ID that includes county and portfolio information for autosave separation
+        let formId = baseFormId;
+        if (county) formId += '_' + county.replace(/s+/g, '_');
+        if (portfolioId) formId += '_' + portfolioId;
         let userId = null;
         let isUserLoggedIn = false;
 
@@ -2992,13 +2739,16 @@ if (typeof handleNext === 'function') {
         // Helper: get all form fields to save
         function getFormFields() {
             const form = document.getElementById('customForm');
-            if (!form) return [];
-            return Array.from(form.elements).filter(el =>
+            if (!form) {
+                return [];
+            }
+            const fields = Array.from(form.elements).filter(el =>
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
                 !['hidden', 'button', 'submit', 'reset'].includes(el.type)
             );
+            return fields;
         }
 
         // Helper: save answers
@@ -3013,43 +2763,273 @@ if (typeof handleNext === 'function') {
                     answers[el.name] = el.value;
                 }
             });
+            
+   
+            
             await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+            
+            
+        }
+
+        // Helper function to check paragraph limits for autofilled textareas
+        function triggerParagraphLimitCheckForAutofilledTextareas() {
+            
+            // Find all textareas and check if they need paragraph limit checking
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                if (textarea.value && textarea.value.length > 0) {
+                    // Check if this textarea has a paragraph limit by looking for the checkParagraphLimit function
+                    // We'll trigger the oninput event which will call checkParagraphLimit if it's set up
+                    const event = new Event('input', { bubbles: true });
+                    textarea.dispatchEvent(event);
+                }
+            });
+        }
+
+        // Helper function to trigger line splitting for autofilled textareas
+        function triggerLineSplittingForAutofilledTextareas() {
+            
+            // Find all textareas that have a line limit data attribute
+            const textareas = document.querySelectorAll('textarea[data-line-limit]');
+            textareas.forEach(textarea => {
+                const lineLimit = parseInt(textarea.getAttribute('data-line-limit'));
+                if (lineLimit && textarea.value && textarea.value.length > 0) {
+                    
+                    // Call the handleLineSplitting function if it exists
+                    if (typeof handleLineSplitting === 'function') {
+                        handleLineSplitting(textarea.id, lineLimit);
+                    } else {
+                        // Fallback: manually trigger the line splitting logic
+                        const text = textarea.value;
+                        const totalChars = text.length;
+                        const linesNeeded = Math.ceil(totalChars / lineLimit);
+                        
+                        console.log('🔧 [LINE SPLITTING DEBUG] Creating', linesNeeded, 'hidden textboxes for textarea:', textarea.id);
+                        
+                        // Create or update hidden textboxes for each line
+                        for (let i = 1; i <= linesNeeded; i++) {
+                            const startIndex = (i - 1) * lineLimit;
+                            const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                            const lineText = text.substring(startIndex, endIndex);
+                            
+                            const hiddenInputId = textarea.id + '_line' + i;
+                            let hiddenInput = document.getElementById(hiddenInputId);
+                            
+                            if (!hiddenInput) {
+                                // Create new hidden input
+                                hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.id = hiddenInputId;
+                                hiddenInput.name = hiddenInputId;
+                                textarea.parentNode.appendChild(hiddenInput);
+                                console.log('🔧 [LINE SPLITTING DEBUG] Created hidden input:', hiddenInputId);
+                            }
+                            
+                            hiddenInput.value = lineText;
+                            console.log('🔧 [LINE SPLITTING DEBUG] Set value for', hiddenInputId, 'to:', lineText);
+                        }
+                        
+                        // Remove any extra hidden inputs that are no longer needed
+                        let lineNum = linesNeeded + 1;
+                        while (true) {
+                            const extraInput = document.getElementById(textarea.id + '_line' + lineNum);
+                            if (extraInput) {
+                                extraInput.remove();
+                                console.log('🔧 [LINE SPLITTING DEBUG] Removed extra hidden input:', textarea.id + '_line' + lineNum);
+                                lineNum++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Helper: load answers
         async function loadAnswers() {
-            if (!isUserLoggedIn || !userId) return;
+            console.log('🔧 [AUTOFILL DEBUG] loadAnswers() called - isUserLoggedIn:', isUserLoggedIn, 'userId:', userId, 'formId:', formId);
+            if (!isUserLoggedIn || !userId) {
+                console.log('🔧 [AUTOFILL DEBUG] Skipping loadAnswers - user not logged in or no userId');
+                return;
+            }
             try {
+                // First, try to load user profile data from a user profile document
+                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch user profile data...');
+                const userProfileDoc = await db.collection('users').doc(userId).get();
+                console.log('🔧 [AUTOFILL DEBUG] User profile document exists:', userProfileDoc.exists);
+                
+                let userProfileData = {};
+                if (userProfileDoc.exists) {
+                    userProfileData = userProfileDoc.data();
+                    console.log('🔧 [AUTOFILL DEBUG] User profile data loaded:', userProfileData);
+                }
+                
+                // Then, try to load form-specific data
+                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch Firebase document for formId:', formId);
                 const doc = await db.collection('users').doc(userId).collection('formAnswers').doc(formId).get();
+                console.log('🔧 [AUTOFILL DEBUG] Firebase document exists:', doc.exists);
+                
+                let formData = {};
                 if (doc.exists) {
-                    const data = doc.data();
+                    formData = doc.data();
+                    console.log('🔧 [AUTOFILL DEBUG] Form data loaded:', formData);
+                }
+                
+                // Combine user profile data with form data
+                const data = { ...userProfileData, ...formData };
+                console.log('🔧 [AUTOFILL DEBUG] Combined data (user profile + form):', data);
+                
+                // Helper function to map Firebase data to form field names
+                function mapFirebaseDataToFormFields(firebaseData) {
+                    const mappedData = { ...firebaseData };
+                    
+                    // Map user info fields from Firebase structure to form field names
+                    if (firebaseData.firstName) mappedData.user_firstname = firebaseData.firstName;
+                    if (firebaseData.lastName) mappedData.user_lastname = firebaseData.lastName;
+                    if (firebaseData.email) mappedData.user_email = firebaseData.email;
+                    if (firebaseData.phone) mappedData.user_phone = firebaseData.phone;
+                    
+                    // Map address fields
+                    if (firebaseData.address) {
+                        if (firebaseData.address.street) mappedData.user_street = firebaseData.address.street;
+                        if (firebaseData.address.city) mappedData.user_city = firebaseData.address.city;
+                        if (firebaseData.address.state) mappedData.user_state = firebaseData.address.state;
+                        if (firebaseData.address.zip) mappedData.user_zip = firebaseData.address.zip;
+                    }
+                    
+                    console.log('🔧 [AUTOFILL DEBUG] Mapped data for form fields:', mappedData);
+                    return mappedData;
+                }
+                
+                const mappedData = mapFirebaseDataToFormFields(data);
                     const fields = getFormFields();
                     fields.forEach(el => {
-                        if (data.hasOwnProperty(el.name)) {
+                    if (mappedData.hasOwnProperty(el.name)) {
                             // Check if this answer would trigger a jump to the end
-                            if (wouldTriggerJumpToEnd(el, data[el.name])) {
+                        if (wouldTriggerJumpToEnd(el, mappedData[el.name])) {
                                 // Don't autofill this answer - keep it as default
                                 console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
                             
+                        console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
                             if (el.type === 'checkbox' || el.type === 'radio') {
-                                el.checked = !!data[el.name];
+                            el.checked = !!mappedData[el.name];
                             } else {
-                                el.value = data[el.name];
+                            el.value = mappedData[el.name];
                             }
                         }
                     });
                     
                     // After autofilling, trigger visibility updates for dependent questions
+                    // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
+                        console.log('🔧 [VISIBILITY DEBUG] Starting visibility updates after autofill...');
+                        
+                        // Trigger change events on all autofilled elements to ensure conditional logic runs
+                        fields.forEach(el => {
+                            if (el.value || el.checked) {
+                                console.log('🔧 [VISIBILITY DEBUG] Triggering change event on autofilled element:', el.id || el.name);
+                                const event = new Event('change', { bubbles: true });
+                                el.dispatchEvent(event);
+                            }
+                        });
+                        
+                        // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
-                    }, 100);
+                    }, 2000);
+                    
+                    // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
+                            const questionId = el.id.replace('answer', '');
+                            if (typeof showTextboxLabels === 'function') {
+                                showTextboxLabels(questionId, el.value);
+                            }
+                            if (typeof updateHiddenCheckboxes === 'function') {
+                                updateHiddenCheckboxes(questionId, el.value);
+                            }
+                        }
+                    });
+                    
+                    // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                            console.log('🔧 [AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(el, el.id);
+                            }
+                        }
+                    });
+                    
+                    // Create hidden checkboxes for all autofilled dropdowns
+                    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                        createHiddenCheckboxesForAutofilledDropdowns();
+                    }
+                    
+                    // Trigger line splitting for autofilled textareas
+                    triggerLineSplittingForAutofilledTextareas();
+                    
+                    // Trigger paragraph limit checking for autofilled textareas
+                    triggerParagraphLimitCheckForAutofilledTextareas();
+                    
+                    // Second autofill pass for dynamically generated textbox inputs
+                    // Use a longer delay to ensure textbox inputs are fully generated
+                    setTimeout(() => {
+                        console.log('🔧 [AUTOFILL DEBUG] Starting second autofill pass for dynamically generated inputs');
+                        const allFields = getFormFields();
+                        console.log('🔧 [AUTOFILL DEBUG] Found', allFields.length, 'total form fields');
+                        
+                        // Also try to find fields by ID directly as a fallback
+                        const fieldsById = {};
+                        allFields.forEach(el => {
+                            if (el.id) {
+                                fieldsById[el.id] = el;
+                            }
+                        });
+                        
+                        allFields.forEach(el => {
+                            if (mappedData.hasOwnProperty(el.name)) {
+                                console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
+                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                    el.checked = !!mappedData[el.name];
+                                } else {
+                                    el.value = mappedData[el.name];
+                                    console.log('🔧 [AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
+                                }
+                            }
+                        });
+                        
+                        // Additional pass: try to autofill by ID for any fields that might have been missed
+                        Object.keys(mappedData).forEach(fieldName => {
+                            const fieldById = fieldsById[fieldName];
+                            if (fieldById && !fieldById.value && mappedData[fieldName]) {
+                                console.log('🔧 [AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', mappedData[fieldName]);
+                                if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                    fieldById.checked = !!mappedData[fieldName];
+                                } else {
+                                    fieldById.value = mappedData[fieldName];
+                                    console.log('🔧 [AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
+                                }
+                            }
+                        });
+                        
+                        // Trigger line splitting again after the second autofill pass
+                        triggerLineSplittingForAutofilledTextareas();
+                        
+                        // Trigger paragraph limit checking again after the second autofill pass
+                        triggerParagraphLimitCheckForAutofilledTextareas();
+                    }, 1500);
+                    
+                        // Reset hidden questions to defaults after autofill and visibility updates
+                        if (typeof currentSectionNumber === 'number') {
+                            resetHiddenQuestionsToDefaults(currentSectionNumber);
                 }
             } catch (e) {
-                // ignore
+                console.log('🔧 [AUTOFILL DEBUG] Error in loadAnswers:', e);
             }
         }
         
@@ -3100,9 +3080,44 @@ if (typeof handleNext === 'function') {
         function attachAutosaveListeners() {
             const fields = getFormFields();
             fields.forEach(el => {
-                el.addEventListener('input', saveAnswers);
-                el.addEventListener('change', saveAnswers);
+                el.addEventListener('input', function() {
+                    if (isUserLoggedIn) {
+                        saveAnswers();
+                    } else {
+                        saveAnswersToLocalStorage();
+                    }
+                    
+                    // Update full name if first or last name changed
+                    if (el.id === 'user_firstname' || el.id === 'user_lastname') {
+                        if (typeof updateUserFullName === 'function') {
+                            updateUserFullName();
+                        }
+                    }
+                });
+                el.addEventListener('change', function() {
+                    if (isUserLoggedIn) {
+                        saveAnswers();
+                    } else {
+                        saveAnswersToLocalStorage();
+                    }
+                    
+                    // Update full name if first or last name changed
+                    if (el.id === 'user_firstname' || el.id === 'user_lastname') {
+                        if (typeof updateUserFullName === 'function') {
+                            updateUserFullName();
+                        }
+                    }
+                });
             });
+            
+            // Set up periodic autosave every 1 second
+            setInterval(() => {
+                if (isUserLoggedIn) {
+                    saveAnswers();
+                } else {
+                    saveAnswersToLocalStorage();
+                }
+            }, 1000);
         }
         
 
@@ -3133,6 +3148,150 @@ if (typeof handleNext === 'function') {
         
         // Cart Modal Logic - now handled by global functions outside Firebase IIFE
 
+        // Helper: save answers to localStorage for non-logged-in users
+        function saveAnswersToLocalStorage() {
+            try {
+                const fields = getFormFields();
+                const answers = {};
+                fields.forEach(el => {
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        answers[el.name] = el.checked;
+                    } else {
+                        answers[el.name] = el.value;
+                    }
+                });
+                
+                localStorage.setItem('formData_' + formId, JSON.stringify(answers));
+            } catch (e) {
+                console.log('Error saving to localStorage:', e);
+            }
+        }
+
+        // Helper: load answers from localStorage for non-logged-in users
+        function loadAnswersFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('formData_' + formId);
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    const fields = getFormFields();
+                    fields.forEach(el => {
+                        if (data.hasOwnProperty(el.name)) {
+                            if (el.type === 'checkbox' || el.type === 'radio') {
+                                el.checked = !!data[el.name];
+                            } else {
+                                el.value = data[el.name];
+                            }
+                        }
+                    });
+                    
+                    // Update full name after autofilling with delay to ensure DOM is ready
+                    setTimeout(() => {
+                        if (typeof updateUserFullName === 'function') {
+                            updateUserFullName();
+                        }
+                    }, 2000);
+                    
+                    // Trigger visibility updates for dependent questions
+                    setTimeout(() => {
+                        
+                        // Trigger change events on all autofilled elements to ensure conditional logic runs
+                        const fields = getFormFields();
+                        fields.forEach(el => {
+                            if (el.value || el.checked) {
+                                const event = new Event('change', { bubbles: true });
+                                el.dispatchEvent(event);
+                            }
+                        });
+                        
+                        // Also call the global visibility updates function
+                        if (typeof triggerVisibilityUpdates === 'function') {
+                            triggerVisibilityUpdates();
+                        }
+                        
+                        // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
+                                const questionId = el.id.replace('answer', '');
+                                if (typeof showTextboxLabels === 'function') {
+                                    showTextboxLabels(questionId, el.value);
+                                }
+                                if (typeof updateHiddenCheckboxes === 'function') {
+                                    updateHiddenCheckboxes(questionId, el.value);
+                                }
+                            }
+                        });
+                        
+                        // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                                if (typeof dropdownMirror === 'function') {
+                                    dropdownMirror(el, el.id);
+                                }
+                            }
+                        });
+                        
+                        // Create hidden checkboxes for all autofilled dropdowns
+                        if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                            createHiddenCheckboxesForAutofilledDropdowns();
+                        }
+                        
+                        // Trigger line splitting for autofilled textareas
+                        triggerLineSplittingForAutofilledTextareas();
+                        
+                        // Trigger paragraph limit checking for autofilled textareas
+                        triggerParagraphLimitCheckForAutofilledTextareas();
+                        
+                        // Second autofill pass for dynamically generated textbox inputs
+                        // Use a longer delay to ensure textbox inputs are fully generated
+                        setTimeout(() => {
+                            const allFields = getFormFields();
+                            
+                            // Also try to find fields by ID directly as a fallback
+                            const fieldsById = {};
+                            allFields.forEach(el => {
+                                if (el.id) {
+                                    fieldsById[el.id] = el;
+                                }
+                            });
+                            
+                            allFields.forEach(el => {
+                                if (data.hasOwnProperty(el.name)) {
+                                    if (el.type === 'checkbox' || el.type === 'radio') {
+                                        el.checked = !!data[el.name];
+                                    } else {
+                                        el.value = data[el.name];
+                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
+                                    }
+                                }
+                            });
+                            
+                            // Additional pass: try to autofill by ID for any fields that might have been missed
+                            Object.keys(data).forEach(fieldName => {
+                                const fieldById = fieldsById[fieldName];
+                                if (fieldById && !fieldById.value && data[fieldName]) {
+                                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', data[fieldName]);
+                                    if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                        fieldById.checked = !!data[fieldName];
+                                    } else {
+                                        fieldById.value = data[fieldName];
+                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
+                                    }
+                                }
+                            });
+                            
+                            // Trigger line splitting again after the second autofill pass
+                            triggerLineSplittingForAutofilledTextareas();
+                            
+                            // Trigger paragraph limit checking again after the second autofill pass
+                            triggerParagraphLimitCheckForAutofilledTextareas();
+                        }, 1500);
+                    }, 2000);
+                }
+            } catch (e) {
+                console.log('No localStorage data found or error loading:', e);
+            }
+        }
+
         // On auth state change
         firebase.auth().onAuthStateChanged(function(user) {
             isUserLoggedIn = !!user;
@@ -3151,6 +3310,10 @@ if (typeof handleNext === 'function') {
                 } else {
                     loadAnswers().then(attachAutosaveListeners);
                 }
+            } else {
+                // For non-logged-in users, try to load from localStorage
+                loadAnswersFromLocalStorage();
+                attachAutosaveListeners();
             }
         });
 
@@ -3215,7 +3378,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = 'index.html';
+                        window.location.href = '../Pages/index.html';
                     }).catch(function(error) {
                         console.error('Error signing out:', error);
                     });
@@ -3441,10 +3604,18 @@ if (typeof handleNext === 'function') {
                             const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
                             countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
                         }
+                        // Use the proper display name instead of the filename
+                        let displayTitle = item.title || 'Form';
+                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
+                            displayTitle = 'SC-120';
+                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
+                            displayTitle = 'SC-500';
+                        }
+                        
                         itemsHtml +=
      '<div class="cart-item">' +
        '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         '<div class="cart-item-title">' + displayTitle + '</div>' +
          defendantHtml +
          countyHtml +
        '</div>' +
@@ -3476,7 +3647,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            
+                            window.location.href = '../Pages/cart.html';
                         };
                     }
                 } catch (error) {
@@ -3496,5 +3667,951 @@ if (typeof handleNext === 'function') {
     });
 
 </script>
+
+<!-- Debug Menu -->
+<div id="debugMenu" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 99999; font-family: 'Montserrat', sans-serif;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); width: 90%; max-width: 800px; max-height: 80%; overflow: hidden; display: flex; flex-direction: column;">
+    <!-- Header -->
+    <div style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative;">
+      <h2 style="margin: 0; font-size: 1.5em; font-weight: 700;">🔍 Form Debug Menu</h2>
+      <button id="closeDebugMenu" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; padding: 5px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">&times;</button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div style="padding: 20px; border-bottom: 1px solid #eee;">
+      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+      <div style="text-align: center; margin-top: 10px;">
+        <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
+          📋 Export Names/IDs
+        </button>
+      </div>
+    </div>
+    
+    <!-- Content -->
+    <div id="debugContent" style="flex: 1; overflow-y: auto; padding: 20px;">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+// Debug Menu Functionality
+let debugMenuVisible = false;
+
+// Show debug menu on Ctrl+Shift
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+    e.preventDefault();
+    showDebugMenu();
+  }
+});
+
+// Close debug menu
+document.getElementById('closeDebugMenu').addEventListener('click', hideDebugMenu);
+
+// Close on escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && debugMenuVisible) {
+    hideDebugMenu();
+  }
+});
+
+// Tab key navigation - automatically press next button, submit, or download PDFs
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault(); // Prevent default tab behavior
+    
+    // Check if we're on the thank you screen
+    const thankYouMessage = document.getElementById('thankYouMessage');
+    if (thankYouMessage && thankYouMessage.style.display !== 'none') {
+      // On thank you screen, press download PDFs button
+      const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+      if (downloadButton) {
+        downloadButton.click();
+        return;
+      }
+    }
+    
+    // Look for the next button in the current section
+    const nextButton = document.querySelector('.next-button:not([style*="display: none"])');
+    if (nextButton) {
+      nextButton.click();
+      return;
+    }
+    
+    // Look for submit button
+    const submitButton = document.querySelector('button[type="submit"]:not([style*="display: none"])');
+    if (submitButton) {
+      submitButton.click();
+      return;
+    }
+    
+    // Look for any button with "submit" in its text or onclick
+    const submitButtons = document.querySelectorAll('button');
+    for (let button of submitButtons) {
+      if (button.style.display !== 'none' && 
+          (button.textContent.toLowerCase().includes('submit') || 
+           button.onclick && button.onclick.toString().includes('submit'))) {
+        button.click();
+        return;
+      }
+    }
+    
+    // If no submit button found, look for download PDFs button
+    const downloadPdfButton = document.querySelector('button[onclick*="downloadAllPdfs"]');
+    if (downloadPdfButton) {
+      downloadPdfButton.click();
+      return;
+    }
+    
+    console.log('🔧 [TAB NAVIGATION] No suitable button found to press');
+  }
+});
+
+// Removed click-outside-to-close functionality - user must use X button
+
+function showDebugMenu() {
+  debugMenuVisible = true;
+  document.getElementById('debugMenu').style.display = 'block';
+  populateDebugContent();
+  document.getElementById('debugSearch').focus();
+}
+
+function hideDebugMenu() {
+  debugMenuVisible = false;
+  document.getElementById('debugMenu').style.display = 'none';
+}
+
+// Add virtual checkbox entries for dropdown questions
+function addVirtualDropdownCheckboxes(inputData) {
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+  
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.id) return;
+    
+    // Check if this is a numbered dropdown
+    const isNumberedDropdown = dropdown.id.startsWith('answer') && dropdown.querySelector('option[value="1"]');
+    
+    if (isNumberedDropdown) {
+      // Handle numbered dropdown - generate all possible textbox label combinations
+      addNumberedDropdownVirtualEntries(inputData, dropdown);
+    } else {
+      // Handle regular dropdown - generate checkbox combinations
+      addRegularDropdownVirtualEntries(inputData, dropdown);
+    }
+  });
+}
+
+// Create a hidden checkbox in the DOM for virtual checkboxes that should be checked
+function createHiddenCheckbox(checkboxId, checkboxName, baseName) {
+  // Find the dropdown wrapper or create a container
+  let wrap = document.getElementById("dropdowntext_" + baseName);
+  if (!wrap) {
+    // If no wrapper exists, create one
+    wrap = document.createElement("div");
+    wrap.id = "dropdowntext_" + baseName;
+    wrap.style.display = "none";
+    
+    // Find the dropdown element and insert the wrapper after it
+    const dropdown = document.getElementById(baseName);
+    if (dropdown && dropdown.parentNode) {
+      dropdown.parentNode.insertBefore(wrap, dropdown.nextSibling);
+    } else {
+      // Fallback: append to body
+      document.body.appendChild(wrap);
+    }
+  }
+  
+  // Create the hidden checkbox
+  const checkboxDiv = document.createElement("div");
+  checkboxDiv.style.display = "none";
+  checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxName + "' checked>" +
+                   "<label for='" + checkboxId + "'> " + checkboxName + "</label>";
+  
+  wrap.appendChild(checkboxDiv);
+}
+
+// Create real hidden checkboxes for all autofilled dropdowns
+function createHiddenCheckboxesForAutofilledDropdowns() {
+  
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+  
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.id || dropdown.id.startsWith('answer')) return; // Skip numbered dropdowns
+    
+    const baseName = dropdown.id;
+    const selectedValue = dropdown.value.trim();
+    
+    if (selectedValue) {
+      // Generate checkbox ID using the same pattern as dropdownMirror
+      const idSuffix = selectedValue.replace(/W+/g, "_").toLowerCase();
+      const checkboxId = baseName + "_" + idSuffix;
+      const checkboxName = baseName + "_" + idSuffix;
+      
+      // Check if this checkbox already exists
+      const existingCheckbox = document.getElementById(checkboxId);
+      if (!existingCheckbox) {
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
+    }
+  });
+}
+
+// Add virtual entries for regular dropdowns (checkbox combinations)
+function addRegularDropdownVirtualEntries(inputData, dropdown) {
+  const baseName = dropdown.id;
+  const options = dropdown.querySelectorAll('option[value]:not([value=""])');
+  
+  options.forEach(option => {
+    const optionValue = option.value.trim();
+    if (!optionValue) return;
+    
+    // Generate checkbox ID using the same pattern as dropdownMirror
+    const idSuffix = optionValue.replace(/W+/g, "_").toLowerCase();
+    const checkboxId = baseName + "_" + idSuffix;
+    const checkboxName = baseName + "_" + idSuffix;
+    
+    // Check if this virtual checkbox already exists in inputData
+    const exists = inputData.some(item => item.id === checkboxId);
+    
+    if (!exists) {
+      // Check if this checkbox actually exists in the DOM (user selected this option)
+      const actualCheckbox = document.getElementById(checkboxId);
+      // Also check if the dropdown value matches this option (for autofilled dropdowns)
+      const isChecked = actualCheckbox ? actualCheckbox.checked : (dropdown.value === optionValue);
+      
+      // If the virtual checkbox should be checked, create the actual hidden checkbox in the DOM
+      if (isChecked && !actualCheckbox) {
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
+      
+      // Add virtual checkbox entry
+      inputData.push({
+        id: checkboxId,
+        name: checkboxName,
+        value: isChecked,
+        type: 'input',
+        inputType: 'checkbox',
+        placeholder: '',
+        required: false,
+        isVirtual: !actualCheckbox, // Only virtual if it doesn't exist in DOM
+        dropdownSource: dropdown.id,
+        optionValue: optionValue
+      });
+    }
+  });
+}
+
+// Add virtual entries for numbered dropdowns (textbox label combinations)
+function addNumberedDropdownVirtualEntries(inputData, dropdown) {
+  // Extract question ID from dropdown ID (e.g., "answer123" -> "123")
+  const questionId = dropdown.id.replace('answer', '');
+  
+  // Get the question's Node ID from the question text (this is the base we should use)
+  const questionH3 = document.getElementById("question-container-" + questionId)?.querySelector("h3")?.textContent;
+  const questionNodeId = questionH3 ? sanitizeQuestionText(questionH3) : dropdown.id;
+  
+  // Get the range from the dropdown options
+  const options = dropdown.querySelectorAll('option[value]:not([value=""])');
+  let maxRange = 0;
+  options.forEach(option => {
+    const value = parseInt(option.value);
+    if (!isNaN(value) && value > maxRange) {
+      maxRange = value;
+    }
+  });
+  
+  // Get label information from the global maps
+  const labelVals = labelMap[questionId] || [];
+  const labelNodeIds = window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [];
+  
+  
+  // Generate all possible combinations
+  for (let j = 1; j <= maxRange; j++) {
+    // Add textbox label combinations
+    for (let lblIndex = 0; lblIndex < labelVals.length; lblIndex++) {
+      const lbl = labelVals[lblIndex];
+      const labelNodeId = labelNodeIds[lblIndex] || "";
+      
+      // Use label node ID if provided, otherwise use question Node ID + label + number
+      const id = labelNodeId ? 
+        labelNodeId + "_" + j : 
+        questionNodeId + "_" + j + "_" + sanitizeQuestionText(lbl);
+      
+      // Check if this virtual input already exists in inputData
+      const exists = inputData.some(item => item.id === id);
+      
+      if (!exists) {
+        // Check if this input actually exists in the DOM
+        const actualInput = document.getElementById(id);
+        const value = actualInput ? actualInput.value : '';
+        
+        // Add virtual input entry
+        inputData.push({
+          id: id,
+          name: id,
+          value: value,
+          type: 'input',
+          inputType: 'text',
+          placeholder: lbl + ' ' + j,
+          required: false,
+          isVirtual: true,
+          dropdownSource: dropdown.id,
+          optionValue: j.toString(),
+          labelText: lbl
+        });
+      }
+    }
+    
+    // Add hidden checkbox combinations (for the numbered dropdown hidden checkboxes)
+    const checkboxId = questionNodeId + "_" + j;
+    const checkboxExists = inputData.some(item => item.id === checkboxId);
+    
+    if (!checkboxExists) {
+      // Check if this checkbox actually exists in the DOM
+      const actualCheckbox = document.getElementById(checkboxId);
+      const isChecked = actualCheckbox ? actualCheckbox.checked : false;
+      
+      // Add virtual checkbox entry
+      inputData.push({
+        id: checkboxId,
+        name: checkboxId,
+        value: isChecked,
+        type: 'input',
+        inputType: 'checkbox',
+        placeholder: '',
+        required: false,
+        isVirtual: true,
+        dropdownSource: dropdown.id,
+        optionValue: j.toString(),
+        labelText: 'Hidden checkbox for option ' + j
+      });
+    }
+  }
+}
+
+function populateDebugContent() {
+  const content = document.getElementById('debugContent');
+  const searchTerm = document.getElementById('debugSearch').value.toLowerCase();
+  
+  // Get all form inputs
+  const inputs = document.querySelectorAll('input, select, textarea');
+  const inputData = [];
+  
+  inputs.forEach(input => {
+    // Include all inputs that have either an ID or a name (or both)
+    if (input.id || input.name) {
+      const value = input.type === 'checkbox' ? input.checked : input.value;
+      const type = input.tagName.toLowerCase();
+      const inputType = input.type || 'text';
+      
+      inputData.push({
+        id: input.id || '',
+        name: input.name || '',
+        value: value,
+        type: type,
+        inputType: inputType,
+        placeholder: input.placeholder || '',
+        required: input.required
+      });
+    }
+  });
+  
+  // Add virtual checkbox entries for dropdown questions
+  addVirtualDropdownCheckboxes(inputData);
+  
+  // After potentially creating real checkboxes from virtual ones, re-scan the DOM to include them
+  const updatedInputs = document.querySelectorAll('input, select, textarea');
+  updatedInputs.forEach(input => {
+    // Include all inputs that have either an ID or a name (or both)
+    if (input.id || input.name) {
+      // Check if this input is already in inputData
+      const exists = inputData.some(item => item.id === input.id && item.name === input.name);
+      if (!exists) {
+        const value = input.type === 'checkbox' ? input.checked : input.value;
+        const type = input.tagName.toLowerCase();
+        const inputType = input.type || 'text';
+        
+        inputData.push({
+          id: input.id || '',
+          name: input.name || '',
+          value: value,
+          type: type,
+          inputType: inputType,
+          placeholder: input.placeholder || '',
+          required: input.required
+        });
+      }
+    }
+  });
+  
+  // Filter by search term with bidirectional space/underscore normalization
+  const normalizedSearchTermUnderscore = searchTerm.replace(/[_s]/g, '_');
+  const normalizedSearchTermSpace = searchTerm.replace(/[_s]/g, ' ');
+  
+  const filteredData = inputData.filter(item => {
+    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_s]/g, '_');
+    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_s]/g, '_');
+    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_s]/g, '_');
+    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_s]/g, '_');
+    
+    const normalizedIdSpace = item.id.toLowerCase().replace(/[_s]/g, ' ');
+    const normalizedNameSpace = item.name.toLowerCase().replace(/[_s]/g, ' ');
+    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_s]/g, ' ');
+    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_s]/g, ' ');
+    
+    // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
+    return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedNameUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedValueUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedPlaceholderUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedIdSpace.includes(normalizedSearchTermSpace) ||
+           normalizedNameSpace.includes(normalizedSearchTermSpace) ||
+           normalizedValueSpace.includes(normalizedSearchTermSpace) ||
+           normalizedPlaceholderSpace.includes(normalizedSearchTermSpace) ||
+           // Cross-matches: underscore search vs space data
+           normalizedIdSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedNameSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedValueSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedPlaceholderSpace.includes(normalizedSearchTermUnderscore) ||
+           // Cross-matches: space search vs underscore data
+           normalizedIdUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedNameUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedValueUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedPlaceholderUnderscore.includes(normalizedSearchTermSpace) ||
+           // Original exact matches for backward compatibility
+    item.id.toLowerCase().includes(searchTerm) ||
+    item.name.toLowerCase().includes(searchTerm) ||
+    String(item.value).toLowerCase().includes(searchTerm) ||
+           item.placeholder.toLowerCase().includes(searchTerm);
+  });
+  
+  // Group by type
+  const grouped = {
+    text: [],
+    email: [],
+    tel: [],
+    number: [],
+    date: [],
+    select: [],
+    textarea: [],
+    checkbox: [],
+    radio: [],
+    other: []
+  };
+  
+  filteredData.forEach(item => {
+    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+      grouped[item.inputType].push(item);
+    } else if (item.type === 'select') {
+      grouped.select.push(item);
+    } else if (item.type === 'textarea') {
+      grouped.textarea.push(item);
+    } else if (item.inputType === 'checkbox') {
+      grouped.checkbox.push(item);
+    } else if (item.inputType === 'radio') {
+      grouped.radio.push(item);
+    } else if (item.inputType === 'hidden' && item.name.includes('_line')) {
+      // Hidden textboxes created by line splitting should be categorized as text inputs
+      grouped.text.push(item);
+    } else {
+      grouped.other.push(item);
+    }
+  });
+  
+  // Generate HTML
+  let html = '';
+  
+  const typeLabels = {
+    text: '📝 Text Inputs',
+    email: '📧 Email Inputs', 
+    tel: '📞 Phone Inputs',
+    number: '🔢 Number Inputs',
+    date: '📅 Date Inputs',
+    select: '📋 Dropdowns',
+    textarea: '📄 Text Areas',
+    checkbox: '☑️ Checkboxes',
+    radio: '🔘 Radio Buttons',
+    other: '❓ Other Inputs'
+  };
+  
+  Object.keys(grouped).forEach(type => {
+    if (grouped[type].length > 0) {
+      html += '<div style="margin-bottom: 30px;">';
+      html += '<h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.2em; border-bottom: 2px solid #e0e7ef; padding-bottom: 8px;">' + typeLabels[type] + ' (' + grouped[type].length + ')</h3>';
+      
+      grouped[type].forEach(item => {
+        const valueDisplay = item.value === '' ? '<em style="color: #999;">(empty)</em>' : 
+                           item.value === true ? '<span style="color: #38d39f;">✓ checked</span>' :
+                           item.value === false ? '<span style="color: #e74c3c;">✗ unchecked</span>' :
+                           '<span style="color: #2c3e50;">' + String(item.value).substring(0, 100) + (String(item.value).length > 100 ? '...' : '') + '</span>';
+        
+        const requiredBadge = item.required ? '<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">REQUIRED</span>' : '';
+        const virtualBadge = item.isVirtual ? '<span style="background: #4f8cff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">VIRTUAL</span>' : '';
+        
+        // Determine the primary identifier (ID if available, otherwise name)
+        const primaryId = item.id || item.name || 'unnamed';
+        const displayId = item.id || '<em style="color: #999;">(no ID)</em>';
+        const displayName = item.name || '<em style="color: #999;">(no name)</em>';
+        
+        html += '<div class="debug-entry" data-id="' + primaryId + '" style="background: #f8faff; border: 1px solid #e0e7ef; border-radius: 8px; padding: 15px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; position: relative;">' +
+          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">' +
+            '<div style="flex: 1; min-width: 0;">' +
+              '<strong style="color: #2c3e50; font-size: 1.1em; word-break: break-all; line-height: 1.3; display: block;">' + displayId + '</strong>' +
+              requiredBadge + virtualBadge +
+            '</div>' +
+            '<span style="background: #e0e7ef; color: #2c3e50; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; flex-shrink: 0; white-space: nowrap;">' + item.inputType + '</span>' +
+          '</div>' +
+          '<div style="margin-bottom: 5px;">' +
+            '<span style="color: #666; font-size: 0.9em;">Name: </span>' +
+            '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; word-break: break-all; display: inline-block; max-width: 100%;">' + displayName + '</code>' +
+          '</div>' +
+          (item.placeholder ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">Placeholder: </span><span style="color: #999;">' + item.placeholder + '</span></div>' : '') +
+          (item.isVirtual && item.dropdownSource ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">From Dropdown: </span><span style="color: #4f8cff; font-weight: bold;">' + item.dropdownSource + '</span> → <span style="color: #2c3e50;">' + item.optionValue + '</span></div>' : '') +
+          '<div>' +
+            '<span style="color: #666; font-size: 0.9em;">Value: </span>' +
+            valueDisplay +
+          '</div>' +
+          '<div class="copy-indicator" style="position: absolute; top: 10px; right: 10px; background: #38d39f; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; opacity: 0; transform: scale(0.8); transition: all 0.3s ease;">COPIED!</div>' +
+        '</div>';
+      });
+      
+      html += '</div>';
+    }
+  });
+  
+  if (html === '') {
+    html = '<div style="text-align: center; color: #666; padding: 40px;"><p>No inputs found matching your search.</p></div>';
+  }
+  
+  content.innerHTML = html;
+  
+  // Add click event listeners to debug entries
+  const debugEntries = content.querySelectorAll('.debug-entry');
+  debugEntries.forEach(entry => {
+    entry.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      copyToClipboard(id, this);
+    });
+    
+    // Add hover effects
+    entry.addEventListener('mouseenter', function() {
+      this.style.background = '#f0f8ff';
+      this.style.borderColor = '#4f8cff';
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 4px 12px rgba(79, 140, 255, 0.15)';
+    });
+    
+    entry.addEventListener('mouseleave', function() {
+      this.style.background = '#f8faff';
+      this.style.borderColor = '#e0e7ef';
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
+    });
+  });
+}
+
+// Copy to clipboard function
+function copyToClipboard(text, element) {
+  // Remove any existing copy highlights
+  const allEntries = document.querySelectorAll('.debug-entry');
+  allEntries.forEach(entry => {
+    entry.style.background = '#f8faff';
+    entry.style.borderColor = '#e0e7ef';
+    entry.style.borderWidth = '1px';
+    const indicator = entry.querySelector('.copy-indicator');
+    if (indicator) {
+      indicator.style.opacity = '0';
+      indicator.style.transform = 'scale(0.8)';
+    }
+  });
+  
+  // Highlight the clicked entry
+  element.style.background = '#e8f5e8';
+  element.style.borderColor = '#38d39f';
+  element.style.borderWidth = '2px';
+  
+  // Show copy indicator
+  const copyIndicator = element.querySelector('.copy-indicator');
+  if (copyIndicator) {
+    copyIndicator.style.opacity = '1';
+    copyIndicator.style.transform = 'scale(1)';
+  }
+  
+  // Copy to clipboard
+  if (navigator.clipboard && window.isSecureContext) {
+    // Use modern clipboard API
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Copied to clipboard:', text);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      fallbackCopyToClipboard(text);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(text);
+  }
+  
+  // Reset highlight after 2 seconds
+  setTimeout(() => {
+    element.style.background = '#f8faff';
+    element.style.borderColor = '#e0e7ef';
+    element.style.borderWidth = '1px';
+    if (copyIndicator) {
+      copyIndicator.style.opacity = '0';
+      copyIndicator.style.transform = 'scale(0.8)';
+    }
+  }, 2000);
+}
+
+// Fallback copy function for older browsers
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    console.log('Copied to clipboard (fallback):', text);
+  } catch (err) {
+    console.error('Fallback copy failed: ', err);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Export Names/IDs function
+function exportNamesAndIds() {
+  // Get form name from the form name input field
+  const formNameEl = document.getElementById('formNameInput');
+  const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
+  
+  const formData = {
+    exportDate: new Date().toISOString(),
+    formName: formName,
+    formTitle: document.title || 'Form Data',
+    inputs: []
+  };
+  
+  // Get all form inputs
+  const inputs = document.querySelectorAll('input, select, textarea');
+  
+  inputs.forEach((input, index) => {
+    // Only include inputs that have an ID
+    if (input.id) {
+      const inputData = {
+        id: input.id
+      };
+      formData.inputs.push(inputData);
+    }
+  });
+  
+  // Create and download JSON file
+  const jsonString = JSON.stringify(formData, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'form-names-ids-' + new Date().toISOString().split('T')[0] + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Show success message
+  const button = document.getElementById('exportNamesIdsBtn');
+  const originalText = button.textContent;
+  button.textContent = '✅ Exported!';
+  button.style.background = 'linear-gradient(90deg, #38d39f 0%, #4f8cff 100%)';
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
+  }, 2000);
+}
+
+// Search functionality
+document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
+
+// Export Names/IDs functionality
+document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
+
+// Function to create Form Name input field (to be called from the form editor interface)
+function createFormNameInput() {
+  const formNameContainer = document.createElement('div');
+  formNameContainer.id = 'formNameContainer';
+  formNameContainer.style.cssText = 
+    'background: #fff; ' +
+    'border: 2px solid #2980b9; ' +
+    'border-radius: 10px; ' +
+    'padding: 20px; ' +
+    'margin: 20px auto; ' +
+    'max-width: 600px; ' +
+    'box-shadow: 0 4px 12px rgba(0,0,0,0.1);';
+  
+  formNameContainer.innerHTML = 
+    '<h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em;">Form Name</h3>' +
+    '<div style="text-align: center;">' +
+      '<label for="formNameInput" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Form Name:</label>' +
+      '<input type="text" id="formNameInput" name="formNameInput" ' +
+             'placeholder="Enter your form name (e.g., Customer Survey, Job Application)" ' +
+             'style="width: 100%; max-width: 400px; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center;" ' +
+             'value="Example Form">' +
+      '<p style="margin-top: 8px; font-size: 0.9em; color: #666; font-style: italic;">' +
+        'This name will appear in the browser title and be used for the default checkbox.' +
+      '</p>' +
+    '</div>';
+  
+  return formNameContainer;
+}
+
+// Function to insert Form Name input above the first section
+function insertFormNameInput() {
+  // Check if form name input already exists
+  if (document.getElementById('formNameContainer')) {
+    return; // Already exists
+  }
+  
+  // Find the first section or a suitable insertion point
+  const firstSection = document.querySelector('[id^="sectionBlock"]');
+  const formNameInput = createFormNameInput();
+  
+  if (firstSection) {
+    firstSection.parentNode.insertBefore(formNameInput, firstSection);
+  } else {
+    // If no sections found, append to body or a container
+    const container = document.querySelector('#formEditor') || document.body;
+    container.insertBefore(formNameInput, container.firstChild);
+  }
+}
+
+// Update content when form values change
+document.addEventListener('input', function() {
+  if (debugMenuVisible) {
+    populateDebugContent();
+  }
+});
+
+document.addEventListener('change', function() {
+  if (debugMenuVisible) {
+    populateDebugContent();
+  }
+});
+
+// Function to update user full name
+function updateUserFullName() {
+  const firstName = document.getElementById('user_firstname')?.value || '';
+  const lastName = document.getElementById('user_lastname')?.value || '';
+  const fullNameField = document.getElementById('user_fullname');
+  
+  if (fullNameField) {
+    // Simply combine first and last name with a space
+    const fullName = (firstName + ' ' + lastName).trim();
+    fullNameField.value = fullName;
+  }
+}
+
+// Add event listeners for first and last name fields
+document.addEventListener('DOMContentLoaded', function() {
+  const firstNameField = document.getElementById('user_firstname');
+  const lastNameField = document.getElementById('user_lastname');
+  
+  if (firstNameField) {
+    firstNameField.addEventListener('input', updateUserFullName);
+    firstNameField.addEventListener('change', updateUserFullName);
+  }
+  
+  if (lastNameField) {
+    lastNameField.addEventListener('input', updateUserFullName);
+    lastNameField.addEventListener('change', updateUserFullName);
+  }
+  
+  // Set user_fullname 2 seconds after page loads to ensure all autopopulation is complete
+  setTimeout(() => {
+    updateUserFullName();
+  }, 2000);
+});
+
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label + ' ' + index;
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
+// Helper function to create US states dropdown
+function createStateDropdown(id, index) {
+    const states = [
+        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
+        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+        'Wisconsin', 'Wyoming'
+    ];
+    
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+        options += '<option value="' + state + '">' + state + '</option>';
+    });
+    
+    return '<div class="address-field">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select">' +
+           options +
+           '</select>' +
+           '</div>';
+}
+
+function showTextboxLabels(questionId, count){
+    const container = document.getElementById("labelContainer" + questionId);
+    if(!container) return;
+
+    container.innerHTML = "<br>";
+    
+    // Try to get unified fields first, fallback to old arrays
+    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
+                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
+    
+    let allFieldsInOrder = [];
+    
+    if (qBlock) {
+        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
+        
+        if (unifiedFields.length > 0) {
+            // Use unified container data
+            const allElements = [];
+            
+            unifiedFields.forEach((el) => {
+                const fieldType = el.getAttribute('data-type');
+                const fieldOrder = parseInt(el.getAttribute('data-order'));
+                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                
+                if (labelTextEl && nodeIdTextEl) {
+                    allElements.push({
+                        type: fieldType,
+                        label: labelTextEl.textContent.trim(),
+                        nodeId: nodeIdTextEl.textContent.trim(),
+                        order: fieldOrder
+                    });
+                }
+            });
+            
+            // Sort by data-order attribute (creation order)
+            allElements.sort((a, b) => a.order - b.order);
+            allFieldsInOrder = allElements;
+        }
+    }
+    
+    // Fallback to unified fields map or old arrays if no unified fields found
+    if (allFieldsInOrder.length === 0) {
+        // Try unified fields map first
+        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+            allFieldsInOrder = window.unifiedFieldsMap[questionId];
+        } else {
+            // Fallback to old arrays
+            const theseLabels = labelMap[questionId] || [];
+            const theseAmounts = amountMap[questionId] || [];
+            
+            allFieldsInOrder = [
+                ...theseLabels.map((lbl, index) => ({
+                    type: 'label',
+                    label: lbl,
+                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
+                    order: index
+                })),
+                ...theseAmounts.map((amt, index) => ({
+                    type: 'amount',
+                    label: amt,
+                    nodeId: "",
+                    order: index
+                }))
+            ];
+        }
+    }
+
+    /* get and sanitise the question's visible text exactly once */
+    const questionH3   = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+
+    // Generate hidden checkboxes for the selected count
+    generateHiddenCheckboxes(questionId, qSafe, count);
+
+    // Define location field names for visual separation
+    const locationFields = ['Street', 'City', 'State', 'Zip'];
+
+    for(let j = 1; j <= count; j++){
+        let lastWasLocation = false;
+        let firstField = true;
+        
+        // Create entry container div
+        const entryContainer = document.createElement('div');
+        entryContainer.className = 'entry-container';
+        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+        
+        // Process all fields in creation order
+        for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
+            const field = allFieldsInOrder[fieldIndex];
+            const isLocationField = locationFields.includes(field.label);
+            
+            // Add <br> before first location field in each count
+            if (isLocationField && !lastWasLocation && !firstField) {
+                const br = document.createElement('br');
+                entryContainer.appendChild(br);
+            }
+            
+            if (field.type === 'label') {
+                const fieldId = field.nodeId + j;
+                if (field.label === 'State') {
+                    // Use dropdown for State field
+                    const dropdownDiv = document.createElement('div');
+                    dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
+                    entryContainer.appendChild(dropdownDiv.firstElementChild);
+                } else {
+                    // Use regular input for other fields
+                    const inputDiv = document.createElement('div');
+                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                    entryContainer.appendChild(inputDiv.firstElementChild);
+                }
+            } else if (field.type === 'amount') {
+                const fieldId = field.nodeId + j;
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                entryContainer.appendChild(inputDiv.firstElementChild);
+            }
+            
+            lastWasLocation = isLocationField;
+            firstField = false;
+        }
+        
+        // Append the entry container to the main container
+        container.appendChild(entryContainer);
+        
+        // Add 2 <br> tags after each entry for better visual separation
+        const br1 = document.createElement('br');
+        const br2 = document.createElement('br');
+        container.appendChild(br1);
+        container.appendChild(br2);
+    }
+}
+</script>
+
 </body>
 </html>

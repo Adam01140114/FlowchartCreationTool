@@ -59,6 +59,36 @@ function sanitizeQuestionText (str){
                       .replace(/^_+|_+$/g, "");
 }
 
+// Function to update hidden state fields when dropdown selection changes
+function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    const selectedState = dropdown.value;
+    const fullField = document.getElementById(hiddenFullId);
+    const shortField = document.getElementById(hiddenShortId);
+    
+    // State abbreviation mapping
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
+        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
+        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
+        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
+        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
+        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
+    
+    if (fullField && shortField) {
+        if (selectedState) {
+            fullField.value = selectedState;
+            shortField.value = stateAbbreviations[selectedState] || '';
+        } else {
+            fullField.value = '';
+            shortField.value = '';
+        }
+    }
+}
+
 /* slug‑aware prefix for any checkbox belonging to a question */
 function getCbPrefix (qId){
     if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';   // e.g. do_you_have_any_of_these_
@@ -118,6 +148,16 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     '    <link rel="stylesheet" href="generate2.css">',
+    '    <style>',
+    '        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px 0; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
+    '        .address-field { margin: 8px 0; }',
+    '        .address-input, .address-select { width: 100%; max-width: 400px; padding: 12px 16px; border: 1px solid #e1e5e9 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; }',
+    '        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1); }',
+    '        .address-input::placeholder { color: #6c757d; opacity: 1; }',
+    '        .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; text-align: center; }',
+    '        .address-field:first-child { margin-top: 0; }',
+    '        .address-field:last-child { margin-bottom: 0; }',
+    '    </style>',
     "</head>",
     "<body>",
     // Insert modal HTML right after <body> (only if not in test mode)
@@ -1816,83 +1856,78 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var isHandlingLink = false;\n`;
   
   // URL Parameter parsing and auto-population
-  formHTML += `
-// Function to get URL parameters
-function getUrlParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
-
-// Function to populate hidden fields from URL parameters
-function populateHiddenFieldsFromUrl() {
-    const zipCode = getUrlParameter('zipCode');
-    const county = getUrlParameter('county');
-    const defendant = getUrlParameter('defendant');
-    const formId = getUrlParameter('formId');
-    
-    if (zipCode) {
-        const zipField = document.getElementById('form_zip');
-        if (zipField) zipField.value = zipCode;
-    }
-    
-    if (county) {
-        const countyField = document.getElementById('form_county');
-        if (countyField) countyField.value = county;
-    }
-    
-    if (defendant) {
-        const defendantField = document.getElementById('form_defendant');
-        if (defendantField) defendantField.value = defendant;
-    }
-    
-    if (formId) {
-        const formIdField = document.getElementById('form_ID');
-        if (formIdField) formIdField.value = formId;
-    }
-    
-}
-
-// Auto-populate on page load
-document.addEventListener('DOMContentLoaded', function() {
-    populateHiddenFieldsFromUrl();
-});
-
-// Function to check paragraph limit and create hidden checkbox
-function checkParagraphLimit(textareaId, paragraphLimit) {
-    if (!paragraphLimit || paragraphLimit === 'null') return;
-    
-    const textarea = document.getElementById(textareaId);
-    if (!textarea) return;
-    
-    const currentLength = textarea.value.length;
-    const checkboxId = textareaId + '_overlimit';
-    let checkbox = document.getElementById(checkboxId);
-    
-    if (currentLength > paragraphLimit) {
-        // Create checkbox if it doesn't exist
-        if (!checkbox) {
-            checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = checkboxId;
-            checkbox.name = checkboxId;
-            checkbox.style.display = 'none'; // Hidden checkbox
-            checkbox.checked = true;
-            
-            // Insert after the textarea
-            textarea.parentNode.insertBefore(checkbox, textarea.nextSibling);
-            
-        } else {
-            // Check the existing checkbox
-            checkbox.checked = true;
-        }
-    } else {
-        // Remove checkbox if it exists and we're under the limit
-        if (checkbox) {
-            checkbox.remove();
-        }
-    }
-}
-`;
+  formHTML += '// Function to get URL parameters\n' +
+'function getUrlParameter(name) {\n' +
+'    const urlParams = new URLSearchParams(window.location.search);\n' +
+'    return urlParams.get(name);\n' +
+'}\n\n' +
+'// Function to populate hidden fields from URL parameters\n' +
+'function populateHiddenFieldsFromUrl() {\n' +
+'    const zipCode = getUrlParameter("zipCode");\n' +
+'    const county = getUrlParameter("county");\n' +
+'    const defendant = getUrlParameter("defendant");\n' +
+'    const formId = getUrlParameter("formId");\n' +
+'    \n' +
+'    if (zipCode) {\n' +
+'        const zipField = document.getElementById("form_zip");\n' +
+'        if (zipField) zipField.value = zipCode;\n' +
+'    }\n' +
+'    \n' +
+'    if (county) {\n' +
+'        const countyField = document.getElementById("form_county");\n' +
+'        if (countyField) countyField.value = county;\n' +
+'    }\n' +
+'    \n' +
+'    if (defendant) {\n' +
+'        const defendantField = document.getElementById("form_defendant");\n' +
+'        if (defendantField) defendantField.value = defendant;\n' +
+'    }\n' +
+'    \n' +
+'    if (formId) {\n' +
+'        const formIdField = document.getElementById("form_ID");\n' +
+'        if (formIdField) formIdField.value = formId;\n' +
+'    }\n' +
+'    \n' +
+'}\n\n' +
+'// Auto-populate on page load\n' +
+'document.addEventListener("DOMContentLoaded", function() {\n' +
+'    populateHiddenFieldsFromUrl();\n' +
+'});\n\n' +
+'// Function to check paragraph limit and create hidden checkbox\n' +
+'function checkParagraphLimit(textareaId, paragraphLimit) {\n' +
+'    if (!paragraphLimit || paragraphLimit === "null") return;\n' +
+'    \n' +
+'    const textarea = document.getElementById(textareaId);\n' +
+'    if (!textarea) return;\n' +
+'    \n' +
+'    const currentLength = textarea.value.length;\n' +
+'    const checkboxId = textareaId + "_overlimit";\n' +
+'    let checkbox = document.getElementById(checkboxId);\n' +
+'    \n' +
+'    if (currentLength > paragraphLimit) {\n' +
+'        // Create checkbox if it doesn\'t exist\n' +
+'        if (!checkbox) {\n' +
+'            checkbox = document.createElement("input");\n' +
+'            checkbox.type = "checkbox";\n' +
+'            checkbox.id = checkboxId;\n' +
+'            checkbox.name = checkboxId;\n' +
+'            checkbox.style.display = "none"; // Hidden checkbox\n' +
+'            checkbox.checked = true;\n' +
+'            \n' +
+'            // Insert after the textarea\n' +
+'            textarea.parentNode.insertBefore(checkbox, textarea.nextSibling);\n' +
+'            \n' +
+'        } else {\n' +
+'            // Check the existing checkbox\n' +
+'            checkbox.checked = true;\n' +
+'        }\n' +
+'    } else {\n' +
+'        // Remove checkbox if it exists and we\'re under the limit\n' +
+'        if (checkbox) {\n' +
+'            checkbox.remove();\n' +
+'        }\n' +
+'    }\n' +
+'}\n';
   
   /*---------------------------------------------------------------
  * HISTORY STACK – must exist in the final HTML before functions
@@ -2994,6 +3029,63 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label + ' ' + index;
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
+// Helper function to create US states dropdown
+function createStateDropdown(id, index) {
+    const states = [
+        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
+        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+        'Wisconsin', 'Wyoming'
+    ];
+    
+    // State abbreviation mapping
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
+        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
+        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
+        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
+        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
+        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
+    
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+        options += '<option value="' + state + '">' + state + '</option>';
+    });
+    
+    // Create hidden textboxes for full state name and abbreviation
+    const hiddenFullId = id; // Keep the full ID with number
+    const hiddenShortId = id + '_short';
+    
+    return '<div class="address-field">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + hiddenShortId + '\\\')">' +
+           options +
+           '</select>' +
+           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
+           '<input type="hidden" id="' + hiddenShortId + '" name="' + hiddenShortId + '" value="">' +
+           '</div>';
+}
+
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
     if(!container) return;
@@ -3040,7 +3132,6 @@ function showTextboxLabels(questionId, count){
         // Try unified fields map first
         if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
             allFieldsInOrder = window.unifiedFieldsMap[questionId];
-            console.log('🔧 [UNIFIED FIELDS DEBUG] Using unifiedFieldsMap with', allFieldsInOrder.length, 'fields');
         } else {
             // Fallback to old arrays
             const theseLabels = labelMap[questionId] || [];
@@ -3060,7 +3151,6 @@ function showTextboxLabels(questionId, count){
                     order: index
                 }))
             ];
-            console.log('🔧 [UNIFIED FIELDS DEBUG] Using fallback arrays with', allFieldsInOrder.length, 'fields');
         }
     }
 
@@ -3075,59 +3165,57 @@ function showTextboxLabels(questionId, count){
 
     // Define location field names for visual separation
     const locationFields = ['Street', 'City', 'State', 'Zip'];
-    
-    console.log('🔧 [UNIFIED FIELDS DEBUG] Using allFieldsInOrder with', allFieldsInOrder.length, 'fields');
 
     for(let j = 1; j <= count; j++){
         let lastWasLocation = false;
         let firstField = true;
         
-        console.log('🔧 [FIELD PROCESSING DEBUG] Processing count', j, 'with', allFieldsInOrder.length, 'fields');
+        // Create entry container div
+        const entryContainer = document.createElement('div');
+        entryContainer.className = 'entry-container';
+        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
         
         // Process all fields in creation order
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
             const isLocationField = locationFields.includes(field.label);
             
-            console.log('🔧 [FIELD PROCESSING DEBUG] Processing field', fieldIndex, ':', {
-                type: field.type,
-                label: field.label,
-                nodeId: field.nodeId,
-                isLocationField,
-                order: field.order
-            });
-            
-            // Add visual separation for location fields
+            // Add <br> before first location field in each count
             if (isLocationField && !lastWasLocation && !firstField) {
-                // First location field in a group
-                container.innerHTML += "<br>";
-                console.log('🔧 [FIELD PROCESSING DEBUG] Added <br> before location field group');
-            } else if (!isLocationField && lastWasLocation) {
-                // First non-location field after location fields
-                container.innerHTML += "<br>";
-                console.log('🔧 [FIELD PROCESSING DEBUG] Added <br> after location field group');
+                const br = document.createElement('br');
+                entryContainer.appendChild(br);
             }
             
             if (field.type === 'label') {
-                // Use label node ID if provided, otherwise fallback to the original pattern
-                const id = field.nodeId ? 
-                  field.nodeId + "_" + j : 
-                  qSafe + "_" + j + "_" + sanitizeQuestionText(field.label);
-                  
-            container.innerHTML +=
-                  '<input type="text" id="' + id + '" name="' + id + '" placeholder="' + field.label + ' ' + j + '" style="text-align:center;"><br>';
-                console.log('🔧 [TEXTBOX GENERATION DEBUG] Created textbox input with ID:', id, 'name:', id);
+                const fieldId = field.nodeId + "_" + j;
+                if (field.label === 'State') {
+                    // Use dropdown for State field
+                    const dropdownDiv = document.createElement('div');
+                    dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
+                    entryContainer.appendChild(dropdownDiv.firstElementChild);
+                } else {
+                    // Use regular input for other fields
+                    const inputDiv = document.createElement('div');
+                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                    entryContainer.appendChild(inputDiv.firstElementChild);
+                }
             } else if (field.type === 'amount') {
-                const id = qSafe + "_" + j + "_" + sanitizeQuestionText(field.label);
-                container.innerHTML +=
-                  '<input type="number" id="' + id + '" name="' + id + '" placeholder="' + field.label + ' ' + j + '" style="text-align:center;"><br>';
-                console.log('🔧 [AMOUNT GENERATION DEBUG] Created amount input with ID:', id, 'name:', id);
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                entryContainer.appendChild(inputDiv.firstElementChild);
             }
             
             lastWasLocation = isLocationField;
             firstField = false;
         }
-        container.innerHTML += "<br>";
+        
+        // Append the entry container to the main container
+        container.appendChild(entryContainer);
+        
+        // Add 1 <br> tag after each entry for better visual separation
+        const br = document.createElement('br');
+        container.appendChild(br);
     }
     attachCalculationListeners();   // keep this
     
@@ -4541,6 +4629,18 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
+                    // Trigger state hidden field updates for any state dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                            // This is a state dropdown that was autofilled
+                            const hiddenFullId = el.id; // Keep the full ID with number
+                            const hiddenShortId = hiddenFullId + '_short';
+                            if (typeof updateStateHiddenFields === 'function') {
+                                updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                            }
+                        }
+                    });
+                    
                     // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
                     fields.forEach(el => {
                         if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
@@ -4608,6 +4708,18 @@ if (typeof handleNext === 'function') {
                         
                         // Trigger paragraph limit checking again after the second autofill pass
                         triggerParagraphLimitCheckForAutofilledTextareas();
+                        
+                        // Trigger state hidden field updates for any state dropdowns that were autofilled in second pass
+                        allFields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                                // This is a state dropdown that was autofilled
+                                const hiddenFullId = el.id; // Keep the full ID with number
+                                const hiddenShortId = hiddenFullId + '_short';
+                                if (typeof updateStateHiddenFields === 'function') {
+                                    updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                                }
+                            }
+                        });
                     }, 1500);
                     
                         // Reset hidden questions to defaults after autofill and visibility updates
@@ -4807,6 +4919,18 @@ if (typeof handleNext === 'function') {
                             }
                         });
                         
+                        // Trigger state hidden field updates for any state dropdowns that were autofilled
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                                // This is a state dropdown that was autofilled
+                                const hiddenFullId = el.id; // Keep the full ID with number
+                                const hiddenShortId = hiddenFullId + '_short';
+                                if (typeof updateStateHiddenFields === 'function') {
+                                    updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                                }
+                            }
+                        });
+                        
                         // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
                         fields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
@@ -4870,6 +4994,18 @@ if (typeof handleNext === 'function') {
                             
                             // Trigger paragraph limit checking again after the second autofill pass
                             triggerParagraphLimitCheckForAutofilledTextareas();
+                            
+                            // Trigger state hidden field updates for any state dropdowns that were autofilled in second pass
+                            allFields.forEach(el => {
+                                if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                                    // This is a state dropdown that was autofilled
+                                    const hiddenFullId = el.id; // Keep the full ID with number
+                                    const hiddenShortId = hiddenFullId + '_short';
+                                    if (typeof updateStateHiddenFields === 'function') {
+                                        updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                                    }
+                                }
+                            });
                         }, 1500);
                     }, 2000);
                 }
@@ -5266,10 +5402,29 @@ if (typeof handleNext === 'function') {
     <!-- Search Bar -->
     <div style="padding: 20px; border-bottom: 1px solid #eee;">
       <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
-      <div style="text-align: center; margin-top: 10px;">
-        <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
-          📋 Export Names/IDs
-        </button>
+      
+      <!-- Filter Controls -->
+      <div style="display: flex; gap: 15px; margin-top: 15px; align-items: center; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+          <label for="debugTypeFilter" style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50; font-size: 14px;">Filter by Type:</label>
+          <select id="debugTypeFilter" style="width: 100%; padding: 10px 12px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+            <option value="">All Types</option>
+            <option value="text">📝 Text Inputs</option>
+            <option value="email">📧 Email Inputs</option>
+            <option value="tel">📞 Phone Inputs</option>
+            <option value="number">🔢 Number Inputs</option>
+            <option value="date">📅 Date Inputs</option>
+            <option value="textarea">📄 Text Areas</option>
+            <option value="checkbox">☑️ Checkboxes</option>
+            <option value="radio">🔘 Radio Buttons</option>
+            <option value="hidden">🔒 Hidden Fields</option>
+          </select>
+        </div>
+        <div style="flex-shrink: 0;">
+          <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
+            📋 Export Names/IDs
+          </button>
+        </div>
       </div>
     </div>
     
@@ -5581,6 +5736,7 @@ function addNumberedDropdownVirtualEntries(inputData, dropdown) {
 function populateDebugContent() {
   const content = document.getElementById('debugContent');
   const searchTerm = document.getElementById('debugSearch').value.toLowerCase();
+  const typeFilter = document.getElementById('debugTypeFilter').value;
   
   // Get all form inputs
   const inputs = document.querySelectorAll('input, select, textarea');
@@ -5633,11 +5789,46 @@ function populateDebugContent() {
     }
   });
   
-  // Filter by search term with bidirectional space/underscore normalization
+  // Filter by search term and type
   const normalizedSearchTermUnderscore = searchTerm.replace(/[_\s]/g, '_');
   const normalizedSearchTermSpace = searchTerm.replace(/[_\s]/g, ' ');
   
   const filteredData = inputData.filter(item => {
+    // First check type filter
+    if (typeFilter) {
+      let itemType = '';
+      if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+        itemType = item.inputType;
+      } else if (item.type === 'select') {
+        itemType = 'text'; // Classify dropdowns as text inputs
+      } else if (item.type === 'textarea') {
+        itemType = 'textarea';
+      } else if (item.inputType === 'checkbox') {
+        itemType = 'checkbox';
+      } else if (item.inputType === 'radio') {
+        itemType = 'radio';
+      } else if (item.inputType === 'hidden') {
+        // Check if this is a state-related hidden field that should be grouped with text inputs
+        if (item.id && (item.id.includes('_state') || item.id.includes('_state_short'))) {
+          itemType = 'text'; // Classify state-related hidden fields as text inputs
+        } else {
+          itemType = 'hidden';
+        }
+      } else {
+        itemType = 'text'; // Classify other inputs as text inputs
+      }
+      
+      if (itemType !== typeFilter) {
+        return false;
+      }
+    }
+    
+    // If no search term, return true (type filter already applied)
+    if (!searchTerm) {
+      return true;
+    }
+    
+    // Apply search term filtering with bidirectional space/underscore normalization
     const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_\s]/g, '_');
     const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_\s]/g, '_');
     const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_\s]/g, '_');
@@ -5685,26 +5876,49 @@ function populateDebugContent() {
     textarea: [],
     checkbox: [],
     radio: [],
+    hidden: [],
     other: []
   };
   
+  // First pass: collect all visible field names to identify duplicates
+  const visibleFieldNames = new Set();
   filteredData.forEach(item => {
-    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
-      grouped[item.inputType].push(item);
-    } else if (item.type === 'select') {
-      grouped.select.push(item);
-    } else if (item.type === 'textarea') {
-      grouped.textarea.push(item);
-    } else if (item.inputType === 'checkbox') {
-      grouped.checkbox.push(item);
-    } else if (item.inputType === 'radio') {
-      grouped.radio.push(item);
-    } else if (item.inputType === 'hidden' && item.name.includes('_line')) {
-      // Hidden textboxes created by line splitting should be categorized as text inputs
-      grouped.text.push(item);
-    } else {
-      grouped.other.push(item);
+    if (item.inputType !== 'hidden' && item.type !== 'hidden') {
+      visibleFieldNames.add(item.name);
     }
+  });
+
+  filteredData.forEach(item => {
+    // Skip hidden fields that have a corresponding visible field with the same name
+    if (item.inputType === 'hidden' && visibleFieldNames.has(item.name)) {
+      return; // Skip this hidden field
+    }
+    
+    // Use the same logic as the filtering to determine the final itemType
+    let itemType = '';
+    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+      itemType = item.inputType;
+    } else if (item.type === 'select') {
+      itemType = 'text'; // Classify dropdowns as text inputs
+    } else if (item.type === 'textarea') {
+      itemType = 'textarea';
+    } else if (item.inputType === 'checkbox') {
+      itemType = 'checkbox';
+    } else if (item.inputType === 'radio') {
+      itemType = 'radio';
+    } else if (item.inputType === 'hidden') {
+      // Check if this is a state-related hidden field that should be grouped with text inputs
+      if (item.id && (item.id.includes('_state') || item.id.includes('_state_short'))) {
+        itemType = 'text'; // Classify state-related hidden fields as text inputs
+      } else {
+        itemType = 'hidden';
+      }
+    } else {
+      itemType = 'text'; // Classify other inputs as text inputs
+    }
+    
+    // Group by the final itemType
+    grouped[itemType].push(item);
   });
   
   // Generate HTML
@@ -5716,11 +5930,12 @@ function populateDebugContent() {
     tel: '📞 Phone Inputs',
     number: '🔢 Number Inputs',
     date: '📅 Date Inputs',
-    select: '📋 Dropdowns',
+    select: '📝 Text Inputs',
     textarea: '📄 Text Areas',
     checkbox: '☑️ Checkboxes',
     radio: '🔘 Radio Buttons',
-    other: '❓ Other Inputs'
+    hidden: '🔒 Hidden Fields',
+    other: '📝 Text Inputs'
   };
   
   Object.keys(grouped).forEach(type => {
@@ -5926,6 +6141,9 @@ function exportNamesAndIds() {
 // Search functionality
 document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
 
+// Type filter functionality
+document.getElementById('debugTypeFilter').addEventListener('change', populateDebugContent);
+
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
 
@@ -5991,6 +6209,36 @@ document.addEventListener('change', function() {
   }
 });
 
+// Function to update hidden state fields when dropdown selection changes
+function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    const selectedState = dropdown.value;
+    const fullField = document.getElementById(hiddenFullId);
+    const shortField = document.getElementById(hiddenShortId);
+    
+    // State abbreviation mapping
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
+        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
+        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
+        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
+        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
+        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
+    
+    if (fullField && shortField) {
+        if (selectedState) {
+            fullField.value = selectedState;
+            shortField.value = stateAbbreviations[selectedState] || '';
+        } else {
+            fullField.value = '';
+            shortField.value = '';
+        }
+    }
+}
+
 // Function to update user full name
 function updateUserFullName() {
   const firstName = document.getElementById('user_firstname')?.value || '';
@@ -6024,6 +6272,196 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUserFullName();
   }, 2000);
 });
+
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label + ' ' + index;
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
+// Helper function to create US states dropdown
+function createStateDropdown(id, index) {
+    const states = [
+        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
+        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+        'Wisconsin', 'Wyoming'
+    ];
+    
+    // State abbreviation mapping
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
+        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
+        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
+        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
+        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
+        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
+    
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+        options += '<option value="' + state + '">' + state + '</option>';
+    });
+    
+    // Create hidden textboxes for full state name and abbreviation
+    const hiddenFullId = id; // Keep the full ID with number
+    const hiddenShortId = id + '_short';
+    
+    return '<div class="address-field">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + hiddenShortId + '\\\')">' +
+           options +
+           '</select>' +
+           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
+           '<input type="hidden" id="' + hiddenShortId + '" name="' + hiddenShortId + '" value="">' +
+           '</div>';
+}
+
+function showTextboxLabels(questionId, count){
+    const container = document.getElementById("labelContainer" + questionId);
+    if(!container) return;
+
+    container.innerHTML = "<br>";
+    
+    // Try to get unified fields first, fallback to old arrays
+    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
+                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
+    
+    let allFieldsInOrder = [];
+    
+    if (qBlock) {
+        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
+        
+        if (unifiedFields.length > 0) {
+            // Use unified container data
+            const allElements = [];
+            
+            unifiedFields.forEach((el) => {
+                const fieldType = el.getAttribute('data-type');
+                const fieldOrder = parseInt(el.getAttribute('data-order'));
+                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                
+                if (labelTextEl && nodeIdTextEl) {
+                    allElements.push({
+                        type: fieldType,
+                        label: labelTextEl.textContent.trim(),
+                        nodeId: nodeIdTextEl.textContent.trim(),
+                        order: fieldOrder
+                    });
+                }
+            });
+            
+            // Sort by data-order attribute (creation order)
+            allElements.sort((a, b) => a.order - b.order);
+            allFieldsInOrder = allElements;
+        }
+    }
+    
+    // Fallback to unified fields map or old arrays if no unified fields found
+    if (allFieldsInOrder.length === 0) {
+        // Try unified fields map first
+        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+            allFieldsInOrder = window.unifiedFieldsMap[questionId];
+        } else {
+            // Fallback to old arrays
+            const theseLabels = labelMap[questionId] || [];
+            const theseAmounts = amountMap[questionId] || [];
+            
+            allFieldsInOrder = [
+                ...theseLabels.map((lbl, index) => ({
+                    type: 'label',
+                    label: lbl,
+                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
+                    order: index
+                })),
+                ...theseAmounts.map((amt, index) => ({
+                    type: 'amount',
+                    label: amt,
+                    nodeId: "",
+                    order: index
+                }))
+            ];
+        }
+    }
+
+    /* get and sanitise the question's visible text exactly once */
+    const questionH3   = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+
+    // Generate hidden checkboxes for the selected count
+    generateHiddenCheckboxes(questionId, qSafe, count);
+
+    // Define location field names for visual separation
+    const locationFields = ['Street', 'City', 'State', 'Zip'];
+
+    for(let j = 1; j <= count; j++){
+        let lastWasLocation = false;
+        let firstField = true;
+        
+        // Create entry container div
+        const entryContainer = document.createElement('div');
+        entryContainer.className = 'entry-container';
+        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+        
+        // Process all fields in creation order
+        for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
+            const field = allFieldsInOrder[fieldIndex];
+            const isLocationField = locationFields.includes(field.label);
+            
+            // Add <br> before first location field in each count
+            if (isLocationField && !lastWasLocation && !firstField) {
+                const br = document.createElement('br');
+                entryContainer.appendChild(br);
+            }
+            
+            if (field.type === 'label') {
+                const fieldId = field.nodeId + "_" + j;
+                if (field.label === 'State') {
+                    // Use dropdown for State field
+                    const dropdownDiv = document.createElement('div');
+                    dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
+                    entryContainer.appendChild(dropdownDiv.firstElementChild);
+                } else {
+                    // Use regular input for other fields
+                    const inputDiv = document.createElement('div');
+                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                    entryContainer.appendChild(inputDiv.firstElementChild);
+                }
+            } else if (field.type === 'amount') {
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                entryContainer.appendChild(inputDiv.firstElementChild);
+            }
+            
+            lastWasLocation = isLocationField;
+            firstField = false;
+        }
+        
+        // Append the entry container to the main container
+        container.appendChild(entryContainer);
+        
+        // Add 1 <br> tag after each entry for better visual separation
+        const br = document.createElement('br');
+        container.appendChild(br);
+    }
+}
 </script>
 
 </body>
