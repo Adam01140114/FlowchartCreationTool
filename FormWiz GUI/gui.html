@@ -188,6 +188,30 @@
             document.getElementById('previewModal').style.display = 'none';
         }
 
+        // Close preview modal when clicking outside of it
+        document.addEventListener('click', function(event) {
+            const previewModal = document.getElementById('previewModal');
+            const modalContent = document.querySelector('.modal-content');
+            
+            if (previewModal && previewModal.style.display === 'flex') {
+                // Check if click is outside the modal content
+                if (!modalContent.contains(event.target)) {
+                    closePreview();
+                }
+            }
+        });
+
+        // Close preview modal when pressing Ctrl+Tab
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Tab') {
+                const previewModal = document.getElementById('previewModal');
+                if (previewModal && previewModal.style.display === 'flex') {
+                    closePreview();
+                    event.preventDefault(); // Prevent default tab behavior
+                }
+            }
+        });
+
         // Paste Json modal logic
         document.addEventListener('DOMContentLoaded', function() {
             var pasteBtn = document.getElementById('pasteJsonBtn');

@@ -263,6 +263,9 @@ window.exportGuiJson = function(download = true) {
         if (cell._characterLimit !== undefined && cell._characterLimit !== '') {
           question.characterLimit = parseInt(cell._characterLimit) || 0;
         }
+        if (cell._paragraphLimit !== undefined && cell._paragraphLimit !== '') {
+          question.paragraphLimit = parseInt(cell._paragraphLimit) || 0;
+        }
       }
     
     // For text2, clean the text from HTML
@@ -1180,6 +1183,7 @@ window.exportBothJson = function() {
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
       
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
@@ -1303,7 +1307,7 @@ window.saveFlowchart = function() {
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
-      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null
+      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
@@ -2340,6 +2344,7 @@ window.loadFlowchartData = function(data) {
         // Big paragraph properties
         if (item._lineLimit !== undefined) newCell._lineLimit = item._lineLimit;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
+        if (item._paragraphLimit !== undefined) newCell._paragraphLimit = item._paragraphLimit;
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;

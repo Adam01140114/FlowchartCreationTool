@@ -4270,6 +4270,7 @@ function autosaveFlowchartToLocalStorage() {
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
 
       return cellData;
     });

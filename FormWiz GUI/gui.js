@@ -615,7 +615,9 @@ function addQuestion(sectionId, questionId = null) {
             <label>Line Limit: </label>
             <input type="number" id="lineLimit${currentQuestionId}" placeholder="Enter line limit" min="1" max="100"><br><br>
             <label>Max character limit: </label>
-            <input type="number" id="maxCharacterLimit${currentQuestionId}" placeholder="Enter max character limit" min="1" max="10000">
+            <input type="number" id="maxCharacterLimit${currentQuestionId}" placeholder="Enter max character limit" min="1" max="10000"><br><br>
+            <label>Paragraph limit: </label>
+            <input type="number" id="paragraphLimit${currentQuestionId}" placeholder="Enter paragraph limit" min="1" max="10000">
         </div>
 
         <!-- Numbered Dropdown Options -->

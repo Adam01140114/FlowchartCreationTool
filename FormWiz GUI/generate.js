@@ -602,11 +602,13 @@ questionSlugMap[questionId] = slug;
         const phEl2 = qBlock.querySelector("#textboxPlaceholder" + questionId);
         const maxCharLimitEl = qBlock.querySelector("#maxCharacterLimit" + questionId);
         const lineLimitEl = qBlock.querySelector("#lineLimit" + questionId);
+        const paragraphLimitEl = qBlock.querySelector("#paragraphLimit" + questionId);
         const nameId2 =
           nmEl2 && nmEl2.value ? nmEl2.value : "answer" + questionId;
         const ph2 = phEl2 && phEl2.value ? phEl2.value : "";
         const maxCharLimit = maxCharLimitEl && maxCharLimitEl.value ? parseInt(maxCharLimitEl.value) : null;
         const lineLimit = lineLimitEl && lineLimitEl.value ? parseInt(lineLimitEl.value) : null;
+        const paragraphLimit = paragraphLimitEl && paragraphLimitEl.value ? parseInt(paragraphLimitEl.value) : null;
         questionNameIds[questionId] = nameId2;
         
         // Check if this Big Paragraph has PDF logic with character limits
@@ -625,8 +627,8 @@ questionSlugMap[questionId] = slug;
           const effectiveMaxLength = maxCharLimit ? Math.min(maxCharLimit, maxLimit * 2) : maxLimit * 2;
           const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
           const onInputHandler = lineLimit ? 
-            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)}); handleLineSplitting('${nameId2}', ${lineLimit});"` :
-            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"`;
+            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)}); handleLineSplitting('${nameId2}', ${lineLimit}); checkParagraphLimit('${nameId2}', ${paragraphLimit || 'null'});"` :
+            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)}); checkParagraphLimit('${nameId2}', ${paragraphLimit || 'null'});"`;
           
           formHTML += `
             <div class="big-paragraph-container">
@@ -705,7 +707,7 @@ questionSlugMap[questionId] = slug;
         } else {
           const maxLengthAttr = maxCharLimit ? ` maxlength="${maxCharLimit}"` : '';
           const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
-          const onInputHandler = lineLimit ? ` oninput="handleLineSplitting('${nameId2}', ${lineLimit})"` : '';
+          const onInputHandler = lineLimit ? ` oninput="handleLineSplitting('${nameId2}', ${lineLimit}); checkParagraphLimit('${nameId2}', ${paragraphLimit || 'null'});"` : ` oninput="checkParagraphLimit('${nameId2}', ${paragraphLimit || 'null'});"`;
           
           formHTML += `
             <div class="text-input-container">
@@ -1862,8 +1864,46 @@ function populateHiddenFieldsFromUrl() {
 document.addEventListener('DOMContentLoaded', function() {
     populateHiddenFieldsFromUrl();
 });
-`;
 
+// Function to check paragraph limit and create hidden checkbox
+function checkParagraphLimit(textareaId, paragraphLimit) {
+    if (!paragraphLimit || paragraphLimit === 'null') return;
+    
+    const textarea = document.getElementById(textareaId);
+    if (!textarea) return;
+    
+    const currentLength = textarea.value.length;
+    const checkboxId = textareaId + '_overlimit';
+    let checkbox = document.getElementById(checkboxId);
+    
+    if (currentLength > paragraphLimit) {
+        // Create checkbox if it doesn't exist
+        if (!checkbox) {
+            checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.name = checkboxId;
+            checkbox.style.display = 'none'; // Hidden checkbox
+            checkbox.checked = true;
+            
+            // Insert after the textarea
+            textarea.parentNode.insertBefore(checkbox, textarea.nextSibling);
+            
+            console.log('🔧 [PARAGRAPH LIMIT] Created hidden checkbox:', checkboxId);
+        } else {
+            // Check the existing checkbox
+            checkbox.checked = true;
+        }
+    } else {
+        // Remove checkbox if it exists and we're under the limit
+        if (checkbox) {
+            checkbox.remove();
+            console.log('🔧 [PARAGRAPH LIMIT] Removed hidden checkbox:', checkboxId);
+        }
+    }
+}
+`;
+  
   /*---------------------------------------------------------------
  * HISTORY STACK – must exist in the final HTML before functions
  *--------------------------------------------------------------*/
@@ -4332,6 +4372,23 @@ if (typeof handleNext === 'function') {
             
         }
 
+        // Helper function to check paragraph limits for autofilled textareas
+        function triggerParagraphLimitCheckForAutofilledTextareas() {
+            console.log('🔧 [PARAGRAPH LIMIT DEBUG] Checking for textareas that need paragraph limit checking...');
+            
+            // Find all textareas and check if they need paragraph limit checking
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                if (textarea.value && textarea.value.length > 0) {
+                    // Check if this textarea has a paragraph limit by looking for the checkParagraphLimit function
+                    // We'll trigger the oninput event which will call checkParagraphLimit if it's set up
+                    const event = new Event('input', { bubbles: true });
+                    textarea.dispatchEvent(event);
+                    console.log('🔧 [PARAGRAPH LIMIT DEBUG] Triggered paragraph limit check for textarea:', textarea.id);
+                }
+            });
+        }
+
         // Helper function to trigger line splitting for autofilled textareas
         function triggerLineSplittingForAutofilledTextareas() {
             console.log('🔧 [LINE SPLITTING DEBUG] Checking for textareas that need line splitting...');
@@ -4521,6 +4578,9 @@ if (typeof handleNext === 'function') {
                     // Trigger line splitting for autofilled textareas
                     triggerLineSplittingForAutofilledTextareas();
                     
+                    // Trigger paragraph limit checking for autofilled textareas
+                    triggerParagraphLimitCheckForAutofilledTextareas();
+                    
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
@@ -4564,6 +4624,9 @@ if (typeof handleNext === 'function') {
                         
                         // Trigger line splitting again after the second autofill pass
                         triggerLineSplittingForAutofilledTextareas();
+                        
+                        // Trigger paragraph limit checking again after the second autofill pass
+                        triggerParagraphLimitCheckForAutofilledTextareas();
                     }, 1500);
                     
                         // Reset hidden questions to defaults after autofill and visibility updates
@@ -4786,6 +4849,9 @@ if (typeof handleNext === 'function') {
                         // Trigger line splitting for autofilled textareas
                         triggerLineSplittingForAutofilledTextareas();
                         
+                        // Trigger paragraph limit checking for autofilled textareas
+                        triggerParagraphLimitCheckForAutofilledTextareas();
+                        
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
                         setTimeout(() => {
@@ -4829,6 +4895,9 @@ if (typeof handleNext === 'function') {
                             
                             // Trigger line splitting again after the second autofill pass
                             triggerLineSplittingForAutofilledTextareas();
+                            
+                            // Trigger paragraph limit checking again after the second autofill pass
+                            triggerParagraphLimitCheckForAutofilledTextareas();
                         }, 1500);
                     }, 2000);
                 }

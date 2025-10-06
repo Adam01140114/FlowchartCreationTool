@@ -632,6 +632,7 @@ function loadFormData(formData) {
                     const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
                     const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
                     const maxCharacterLimitInput = questionBlock.querySelector(`#maxCharacterLimit${question.questionId}`);
+                    const paragraphLimitInput = questionBlock.querySelector(`#paragraphLimit${question.questionId}`);
                     if (nameInput) {
                         nameInput.value = question.nameId || '';
                     }
@@ -643,6 +644,9 @@ function loadFormData(formData) {
                     }
                     if (maxCharacterLimitInput && question.maxCharacterLimit) {
                         maxCharacterLimitInput.value = question.maxCharacterLimit;
+                    }
+                    if (paragraphLimitInput && question.paragraphLimit) {
+                        paragraphLimitInput.value = question.paragraphLimit;
                     }
                 }
 
@@ -1518,6 +1522,7 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
                 const maxCharacterLimit = questionBlock.querySelector(`#maxCharacterLimit${questionId}`)?.value.trim() || '';
+                const paragraphLimit = questionBlock.querySelector(`#paragraphLimit${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
                 if (lineLimit) {
@@ -1525,6 +1530,9 @@ function exportForm() {
                 }
                 if (maxCharacterLimit) {
                     questionData.maxCharacterLimit = parseInt(maxCharacterLimit);
+                }
+                if (paragraphLimit) {
+                    questionData.paragraphLimit = parseInt(paragraphLimit);
                 }
             }
 

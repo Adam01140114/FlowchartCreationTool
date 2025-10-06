@@ -736,6 +736,14 @@ function showPropertiesPopup(cell) {
       editable: true,
       inputType: 'number'
     });
+    
+    properties.push({
+      label: 'Paragraph Limit',
+      value: cell._paragraphLimit || '',
+      id: 'propParagraphLimit',
+      editable: true,
+      inputType: 'number'
+    });
   }
   
   // PDF Name field will be added later in the unified section
@@ -1455,6 +1463,9 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propCharacterLimit':
                 cell._characterLimit = newValue;
+                break;
+              case 'propParagraphLimit':
+                cell._paragraphLimit = newValue;
                 break;
               case 'propNodeId':
                 // Update the _nameId property

@@ -263,6 +263,7 @@ window.exportFlowchartJson = function(download = true) {
     // big paragraph properties
     if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
     if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+    if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
     if (cell._checklistText) cellData._checklistText = cell._checklistText;
     if (cell._alertText) cellData._alertText = cell._alertText;
     if (cell._calcTitle) cellData._calcTitle = cell._calcTitle;
@@ -271,6 +272,7 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._calcThreshold) cellData._calcThreshold = cell._calcThreshold;
     if (cell._calcFinalText) cellData._calcFinalText = cell._calcFinalText;
     if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
+    if (cell._paragraphLimit) cellData._paragraphLimit = cell._paragraphLimit;
     
     // mult dropdown location indicator
     if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
