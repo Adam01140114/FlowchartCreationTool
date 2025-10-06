@@ -341,6 +341,11 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     "    <section>",
     '    <div id="box">',
     '        <form id="customForm" onsubmit="return showThankYouMessage(event);">',
+    '        <!-- Hidden fields for URL parameters -->',
+    '        <input type="hidden" id="form_zip" name="form_zip" value="">',
+    '        <input type="hidden" id="form_county" name="form_county" value="">',
+    '        <input type="hidden" id="form_defendant" name="form_defendant" value="">',
+    '        <input type="hidden" id="form_ID" name="form_ID" value="">',
   ].join("\n");
 
   // Get all PDF names
@@ -1810,6 +1815,55 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
+  // URL Parameter parsing and auto-population
+  formHTML += `
+// Function to get URL parameters
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Function to populate hidden fields from URL parameters
+function populateHiddenFieldsFromUrl() {
+    const zipCode = getUrlParameter('zipCode');
+    const county = getUrlParameter('county');
+    const defendant = getUrlParameter('defendant');
+    const formId = getUrlParameter('formId');
+    
+    if (zipCode) {
+        const zipField = document.getElementById('form_zip');
+        if (zipField) zipField.value = zipCode;
+    }
+    
+    if (county) {
+        const countyField = document.getElementById('form_county');
+        if (countyField) countyField.value = county;
+    }
+    
+    if (defendant) {
+        const defendantField = document.getElementById('form_defendant');
+        if (defendantField) defendantField.value = defendant;
+    }
+    
+    if (formId) {
+        const formIdField = document.getElementById('form_ID');
+        if (formIdField) formIdField.value = formId;
+    }
+    
+    console.log('🔧 [URL PARAMS] Populated hidden fields:', {
+        zip: zipCode,
+        county: county,
+        defendant: defendant,
+        formId: formId
+    });
+}
+
+// Auto-populate on page load
+document.addEventListener('DOMContentLoaded', function() {
+    populateHiddenFieldsFromUrl();
+});
+`;
+
   /*---------------------------------------------------------------
  * HISTORY STACK – must exist in the final HTML before functions
  *--------------------------------------------------------------*/
