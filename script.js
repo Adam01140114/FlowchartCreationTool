@@ -4201,8 +4201,14 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
       
       // Linked logic node properties - always save these if they exist on the cell
-      if (cell.hasOwnProperty('_linkedLogicNodeId')) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
-      if (cell.hasOwnProperty('_linkedFields')) cellData._linkedFields = cell._linkedFields;
+      if (cell.hasOwnProperty('_linkedLogicNodeId')) {
+        cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+        console.log('💾 [AUTOSAVE] Saving _linkedLogicNodeId:', cell._linkedLogicNodeId, 'for cell:', cell.id);
+      }
+      if (cell.hasOwnProperty('_linkedFields')) {
+        cellData._linkedFields = cell._linkedFields;
+        console.log('💾 [AUTOSAVE] Saving _linkedFields:', cell._linkedFields, 'for cell:', cell.id);
+      }
       
       // Special handling for hidden textbox nodes - always save _defaultText even if empty
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
@@ -4774,9 +4780,10 @@ function copySelectedNodeAsJson() {
 window.pasteNodeFromJson = function(x, y) {
   // Prevent multiple simultaneous paste operations
   if (window._isPasting) {
-    console.log('Paste operation already in progress, ignoring duplicate call');
+    console.log('🚫 [PASTE] Paste operation already in progress, ignoring duplicate call');
     return;
   }
+  console.log('🔄 [PASTE] Starting paste operation');
   window._isPasting = true;
   
   // Try to get data from localStorage first (for cross-tab functionality)

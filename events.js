@@ -137,33 +137,7 @@ function setupMouseEventListeners(graph) {
     }
   });
   
-  // Zoom with mouse wheel
-  mxEvent.addMouseWheelListener(function(evt, up) {
-    if (!mxEvent.isConsumed(evt)) {
-      // Get zoom sensitivity from settings (default to 0.01 if not set)
-      const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      
-      // Apply custom zoom based on sensitivity
-      const currentScale = graph.view.scale;
-      const baseZoomFactor = 1.02; // Much smaller base zoom factor
-      const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
-      const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
-      
-      let newScale;
-      if (up) {
-        newScale = currentScale * zoomFactor;
-      } else {
-        newScale = currentScale / zoomFactor;
-      }
-      
-      // Limit zoom range
-      if (newScale >= 0.1 && newScale <= 3.0) {
-        graph.view.setScale(newScale);
-      }
-      
-      mxEvent.consume(evt);
-    }
-  }, graph.container);
+  // Mouse wheel zoom is handled in script.js with proper directional zoom logic
   
   // Add global event listeners to prevent graph interference with dropdowns
   document.addEventListener('mousedown', function(e) {

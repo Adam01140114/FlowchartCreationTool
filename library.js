@@ -1204,6 +1204,22 @@ window.exportGuiJson = function(download = true) {
   // Get form name
   const formName = document.getElementById('formNameInput')?.value || 'Example Form';
   
+  // Process Linked Logic nodes for linkedFields
+  const linkedFields = [];
+  const linkedLogicNodes = vertices.filter(cell => 
+    typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)
+  );
+  
+  linkedLogicNodes.forEach((cell, index) => {
+    if (cell._linkedLogicNodeId && cell._linkedFields && cell._linkedFields.length > 0) {
+      linkedFields.push({
+        id: `linkedField${index}`,
+        linkedFieldId: cell._linkedLogicNodeId,
+        fields: cell._linkedFields
+      });
+    }
+  });
+  
   // Create final output object
   const output = {
     sections: sections,
@@ -1218,7 +1234,8 @@ window.exportGuiJson = function(download = true) {
     pdfOutputName: defaultPdfProps.pdfFile || "",
     stripePriceId: defaultPdfProps.pdfPrice || "",
     additionalPDFs: [],
-    checklistItems: []
+    checklistItems: [],
+    linkedFields: linkedFields
   };
   
   // Convert to string and download
@@ -1339,8 +1356,18 @@ window.exportBothJson = function() {
       if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
       
       // Linked logic node properties
-      if (cell._linkedLogicNodeId !== undefined) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
-      if (cell._linkedFields !== undefined) cellData._linkedFields = cell._linkedFields;
+      if (cell._linkedLogicNodeId !== undefined) {
+        cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+        console.log('💾 [LIBRARY SAVE] Saving _linkedLogicNodeId:', cell._linkedLogicNodeId, 'for cell:', cell.id);
+      } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+        console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedLogicNodeId is undefined for cell:', cell.id);
+      }
+      if (cell._linkedFields !== undefined) {
+        cellData._linkedFields = cell._linkedFields;
+        console.log('💾 [LIBRARY SAVE] Saving _linkedFields:', cell._linkedFields, 'for cell:', cell.id);
+      } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+        console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedFields is undefined for cell:', cell.id);
+      }
       
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
@@ -1401,10 +1428,22 @@ window.fixCapitalizationInJumps();
 
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
+  console.log('💾 [LIBRARY SAVE] saveFlowchart function called');
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
   
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  
+  // Check Linked Logic properties BEFORE reset
+  const graph = window.graph;
+  const parent = graph.getDefaultParent();
+  const allCells = graph.getChildVertices(parent);
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [BEFORE RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
+  
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
@@ -1414,6 +1453,13 @@ window.saveFlowchart = function() {
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
   }
+  
+  // Check Linked Logic properties AFTER reset
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [AFTER RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
   
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
@@ -1466,8 +1512,14 @@ window.saveFlowchart = function() {
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
-      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null
+      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
     };
+    
+    // Debug logging for Linked Logic properties
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('💾 [LIBRARY SAVE] Saving Linked Logic properties for cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle || null;
       cellData._calcAmountLabel = cell._calcAmountLabel || null;
@@ -2485,8 +2537,14 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         }
         
         // Linked logic node properties
-        if (item._linkedLogicNodeId !== undefined) newCell._linkedLogicNodeId = item._linkedLogicNodeId;
-        if (item._linkedFields !== undefined) newCell._linkedFields = item._linkedFields;
+        if (item._linkedLogicNodeId !== undefined) {
+          newCell._linkedLogicNodeId = item._linkedLogicNodeId;
+          console.log('📂 [LIBRARY LOAD] Loading _linkedLogicNodeId:', item._linkedLogicNodeId, 'for cell:', item.id);
+        }
+        if (item._linkedFields !== undefined) {
+          newCell._linkedFields = item._linkedFields;
+          console.log('📂 [LIBRARY LOAD] Loading _linkedFields:', item._linkedFields, 'for cell:', item.id);
+        }
         
         // Calculation properties
         if (item._calcTitle !== undefined) {

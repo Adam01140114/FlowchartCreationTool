@@ -762,6 +762,9 @@ function showPropertiesPopup(cell) {
     ];
   } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
     // For linked logic nodes, show special properties with dropdowns
+    console.log('🔍 [PROPERTIES] Loading Linked Logic properties for cell:', cell.id);
+    console.log('🔍 [PROPERTIES] _linkedLogicNodeId:', cell._linkedLogicNodeId);
+    console.log('🔍 [PROPERTIES] _linkedFields:', cell._linkedFields);
     properties = [
       { label: 'Node ID', value: cell._linkedLogicNodeId || 'linked_logic', id: 'propLinkedLogicNodeId', editable: true },
       { label: 'Linked Fields', value: 'linkedFields', id: 'propLinkedFields', editable: false, special: 'linkedFields' }
@@ -1123,7 +1126,9 @@ function showPropertiesPopup(cell) {
       // Helper function to update linked fields
       function updateLinkedFields(cell) {
         const dropdowns = linkedFieldsContainer.querySelectorAll('select');
-        cell._linkedFields = Array.from(dropdowns).map(dropdown => dropdown.value).filter(value => value);
+        const newLinkedFields = Array.from(dropdowns).map(dropdown => dropdown.value).filter(value => value);
+        console.log('💾 [UPDATE LINKED FIELDS] Updating _linkedFields from', cell._linkedFields, 'to', newLinkedFields);
+        cell._linkedFields = newLinkedFields;
         
         // Trigger autosave
         if (typeof window.requestAutosave === 'function') {
@@ -1827,6 +1832,7 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propLinkedLogicNodeId':
                 // Update the linked logic node ID property
+                console.log('💾 [SAVE VALUE] Updating _linkedLogicNodeId from', cell._linkedLogicNodeId, 'to', newValue);
                 cell._linkedLogicNodeId = newValue;
                 
                 // Update the node text to match the Node ID for linked logic nodes
