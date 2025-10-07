@@ -231,8 +231,13 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_zip" name="form_zip" value="">
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
-        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>test</h3></label><select id="test" name="test" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>how many</h3></label><select id="how_many" name="how_many" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><div id="question-container-3" class="question-container hidden"><label><h3>Why</h3></label><div class="text-input-container"><input type="text" id="why" name="why" placeholder=""></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -384,8 +389,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"test"};
-var questionNameIds = {"1":"test"};
+    var questionSlugMap       = {"1":"hungry","2":"how_many","3":"why"};
+var questionNameIds = {"1":"hungry","2":"how_many","3":"why"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -393,11 +398,13 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Street","City","State"],"length":0};
-var amountMap = {"1":["Zip"],"length":0};
-var labelNodeIdsMap = {"1":["street","city","state"]};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Street","nodeId":"street","order":1},{"type":"label","label":"City","nodeId":"city","order":2},{"type":"label","label":"State","nodeId":"state","order":3},{"type":"amount","label":"Zip","nodeId":"amount_4","order":4}]};
+var labelMap = {"2":["Name"],"length":0};
+var amountMap = {"2":[],"length":0};
+var labelNodeIdsMap = {"2":["how_many_name"]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1}]};
 var linkedDropdowns = [];
+var hiddenLogicConfigs = [];
+var linkedFields = [{"linkedFieldId":"test","fields":["how_many_name_1","why"]}];
 var isHandlingLink = false;
 // Function to get URL parameters
 function getUrlParameter(name) {
@@ -437,6 +444,7 @@ function populateHiddenFieldsFromUrl() {
 // Auto-populate on page load
 document.addEventListener("DOMContentLoaded", function() {
     populateHiddenFieldsFromUrl();
+    setupLinkedFields();
 });
 
 // Function to check paragraph limit and create hidden checkbox
@@ -484,6 +492,64 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 // Alert Logic Functions
@@ -1484,7 +1550,7 @@ function showTextboxLabels(questionId, count){
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 
                 // Add a <br> after the Zip input only if there are more fields after it
-                const remainingFields = allFieldsInOrder.slice(i + 1);
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
                 if (remainingFields.length > 0) {
                   const brElement = document.createElement('br');
                   entryContainer.appendChild(brElement);
@@ -1706,6 +1772,165 @@ function dropdownMirror(selectEl, baseName){
     
     wrap.appendChild(checkboxDiv);
     handleLinkedDropdowns(baseName, val);
+}
+
+// Function to handle hidden logic for dropdowns
+function updateHiddenLogic(dropdownName, selectedValue) {
+    // Find the hidden logic configuration for this dropdown
+    const config = hiddenLogicConfigs.find(c => c.questionNameId === dropdownName);
+    if (!config || config.trigger !== selectedValue) {
+        return;
+    }
+    
+    // Check if the hidden element already exists
+    let hiddenElement = document.getElementById(config.nodeId);
+    
+    if (!hiddenElement) {
+        // Create the hidden element based on type
+        if (config.type === 'checkbox') {
+            hiddenElement = document.createElement('input');
+            hiddenElement.type = 'checkbox';
+            hiddenElement.id = config.nodeId;
+            hiddenElement.name = config.nodeId;
+            hiddenElement.checked = true;
+            hiddenElement.style.display = 'none';
+        } else if (config.type === 'textbox') {
+            hiddenElement = document.createElement('input');
+            hiddenElement.type = 'text';
+            hiddenElement.id = config.nodeId;
+            hiddenElement.name = config.nodeId;
+            hiddenElement.value = config.textboxText || '';
+            hiddenElement.style.display = 'none';
+        }
+        
+        // Add the hidden element to the form
+        document.body.appendChild(hiddenElement);
+    } else {
+        // Update existing element
+        if (config.type === 'checkbox') {
+            hiddenElement.checked = true;
+        } else if (config.type === 'textbox') {
+            hiddenElement.value = config.textboxText || '';
+        }
+    }
+}
+
+// Function to handle linked fields synchronization
+function updateLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    linkedFields.forEach(linkedField => {
+        const { linkedFieldId, fields } = linkedField;
+        
+        // Find the hidden textbox for this linked field
+        let hiddenField = document.getElementById(linkedFieldId);
+        if (!hiddenField) {
+            // Create the hidden textbox if it doesn't exist
+            hiddenField = document.createElement('input');
+            hiddenField.type = 'text';
+            hiddenField.id = linkedFieldId;
+            hiddenField.name = linkedFieldId;
+            hiddenField.style.display = 'none';
+            document.body.appendChild(hiddenField);
+        }
+        
+        // Get all the linked textboxes
+        const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+        
+        if (linkedTextboxes.length === 0) return;
+        
+        // Find which textbox has content
+        const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+        
+        if (textboxesWithContent.length === 0) {
+            // No textboxes have content, clear the hidden field
+            hiddenField.value = '';
+        } else if (textboxesWithContent.length === 1) {
+            // Only one textbox has content, use its value
+            hiddenField.value = textboxesWithContent[0].value;
+        } else {
+            // Multiple textboxes have content, use the one with the longest text
+            const longestTextbox = textboxesWithContent.reduce((longest, current) => 
+                current.value.length > longest.value.length ? current : longest
+            );
+            hiddenField.value = longestTextbox.value;
+        }
+    });
+}
+
+// Function to clear inactive linked textboxes (with delay to avoid interfering with typing)
+function clearInactiveLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    // Use setTimeout to avoid interfering with user typing
+    setTimeout(() => {
+        linkedFields.forEach(linkedField => {
+            const { fields } = linkedField;
+            
+            // Get all the linked textboxes
+            const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+            
+            if (linkedTextboxes.length === 0) return;
+            
+            // Find which textboxes are currently visible (not hidden by conditional logic)
+            const visibleTextboxes = linkedTextboxes.filter(tb => {
+                const container = tb.closest('.question-container');
+                return container && !container.classList.contains('hidden');
+            });
+            
+            // Find which textboxes have content
+            const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+            
+            // Clear all hidden textboxes that have content
+            linkedTextboxes.forEach(tb => {
+                const container = tb.closest('.question-container');
+                if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
+                    tb.value = '';
+                }
+            });
+            
+            // If multiple visible textboxes have content, keep only the longest one
+            const visibleTextboxesWithContent = visibleTextboxes.filter(tb => tb.value.trim() !== '');
+            if (visibleTextboxesWithContent.length > 1) {
+                const longestTextbox = visibleTextboxesWithContent.reduce((longest, current) => 
+                    current.value.length > longest.value.length ? current : longest
+                );
+                
+                // Clear all other visible textboxes that aren't the longest
+                visibleTextboxes.forEach(tb => {
+                    if (tb !== longestTextbox && tb.value.trim() !== '') {
+                        tb.value = '';
+                    }
+                });
+            }
+        });
+    }, 100); // 100ms delay to avoid interfering with typing
+}
+
+// Function to set up linked fields event listeners
+function setupLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    linkedFields.forEach(linkedField => {
+        const { fields } = linkedField;
+        
+        // Add event listeners to all linked textboxes
+        fields.forEach(fieldId => {
+            const textbox = document.getElementById(fieldId);
+            if (textbox) {
+                // Remove existing event listener if any
+                textbox.removeEventListener('input', updateLinkedFields);
+                textbox.removeEventListener('change', updateLinkedFields);
+                
+                // Add new event listeners
+                textbox.addEventListener('input', updateLinkedFields);
+                textbox.addEventListener('change', updateLinkedFields);
+            }
+        });
+    });
+    
+    // Initial update
+    updateLinkedFields();
 }
 
 function getQuestionInputs (questionId, type = null) {
@@ -2933,6 +3158,10 @@ if (typeof handleNext === 'function') {
                             if (typeof dropdownMirror === 'function') {
                                 dropdownMirror(el, el.id);
                             }
+                            // Trigger hidden logic for autofilled dropdowns
+                            if (typeof updateHiddenLogic === 'function') {
+                                updateHiddenLogic(el.id, el.value);
+                            }
                         }
                     });
                     
@@ -3221,6 +3450,10 @@ if (typeof handleNext === 'function') {
                             if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
                                 if (typeof dropdownMirror === 'function') {
                                     dropdownMirror(el, el.id);
+                                }
+                                // Trigger hidden logic for autofilled dropdowns
+                                if (typeof updateHiddenLogic === 'function') {
+                                    updateHiddenLogic(el.id, el.value);
                                 }
                             }
                         });
@@ -3921,6 +4154,9 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       if (!existingCheckbox) {
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
       }
+      
+      // Handle custom hidden logic for this dropdown
+      updateHiddenLogic(baseName, selectedValue);
     }
   });
 }
@@ -4718,7 +4954,7 @@ function showTextboxLabels(questionId, count){
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 
                 // Add a <br> after the Zip input only if there are more fields after it
-                const remainingFields = allFieldsInOrder.slice(i + 1);
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
                 if (remainingFields.length > 0) {
                   const brElement = document.createElement('br');
                   entryContainer.appendChild(brElement);

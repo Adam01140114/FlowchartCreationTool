@@ -3016,3 +3016,617 @@ function updateUnifiedFieldsDisplay(questionId) {
         unifiedDiv.appendChild(fieldDiv);
     });
 }
+
+// ============================================
+// ===========  LINKED FIELDS FUNCTIONALITY  =====
+// ============================================
+
+// Global variables for linked fields
+let linkedFieldCounter = 0;
+let currentLinkedFieldConfig = [];
+
+// Open the linked field modal
+function openLinkedFieldModal() {
+    console.log('🔍 [DEBUG] openLinkedFieldModal called');
+    
+    // Create modal if it doesn't exist
+    if (!document.getElementById('linkedFieldModal')) {
+        console.log('🔍 [DEBUG] Creating linked field modal');
+        createLinkedFieldModal();
+    }
+    
+    // Reset current configuration
+    currentLinkedFieldConfig = [];
+    
+    // Show modal
+    document.getElementById('linkedFieldModal').style.display = 'block';
+    console.log('🔍 [DEBUG] Modal displayed');
+    
+    // Initialize with two dropdowns
+    addLinkedFieldDropdown();
+    addLinkedFieldDropdown();
+}
+
+// Create the linked field modal
+function createLinkedFieldModal() {
+    const modal = document.createElement('div');
+    modal.id = 'linkedFieldModal';
+    modal.style.cssText = `
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        ">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Configure Linked Fields</h3>
+            <div id="linkedFieldDropdowns" style="margin-bottom: 20px;">
+                <!-- Dropdowns will be added here -->
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Linked Field ID:</label>
+                <input type="text" id="linkedFieldIdInput" placeholder="Enter linked field ID (e.g., linked_name_address)" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <button type="button" onclick="addLinkedFieldDropdown()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Link Another
+                </button>
+                <button type="button" onclick="finalizeLinkedField()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Done
+                </button>
+                <button type="button" onclick="closeLinkedFieldModal()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Add a dropdown to the linked field configuration
+function addLinkedFieldDropdown() {
+    console.log('🔍 [DEBUG] addLinkedFieldDropdown called');
+    
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    const dropdownIndex = currentLinkedFieldConfig.length;
+    
+    console.log('🔍 [DEBUG] dropdownsContainer:', dropdownsContainer);
+    console.log('🔍 [DEBUG] dropdownIndex:', dropdownIndex);
+    
+    const dropdownDiv = document.createElement('div');
+    dropdownDiv.id = `linkedFieldDropdown${dropdownIndex}`;
+    dropdownDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    `;
+    
+    dropdownDiv.innerHTML = `
+        <div style="flex: 1; margin-right: 10px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Text Question ${dropdownIndex + 1}:</label>
+            <select id="linkedFieldSelect${dropdownIndex}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">Select a text question...</option>
+            </select>
+        </div>
+        <button type="button" onclick="removeLinkedFieldDropdown(${dropdownIndex})" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+            Delete
+        </button>
+    `;
+    
+    dropdownsContainer.appendChild(dropdownDiv);
+    
+    // Populate dropdown with text questions
+    populateLinkedFieldDropdown(dropdownIndex);
+    
+    // Add to current configuration
+    currentLinkedFieldConfig.push({
+        index: dropdownIndex,
+        selectedValue: ''
+    });
+}
+
+// Populate a linked field dropdown with text questions
+function populateLinkedFieldDropdown(dropdownIndex) {
+    console.log('🔍 [DEBUG] populateLinkedFieldDropdown called with dropdownIndex:', dropdownIndex);
+    
+    const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    if (!select) {
+        console.log('❌ [DEBUG] Select element not found for dropdownIndex:', dropdownIndex);
+        return;
+    }
+    
+    console.log('✅ [DEBUG] Found select element:', select);
+    
+    // Clear existing options
+    select.innerHTML = '<option value="">Select a text question...</option>';
+    
+    // Find all text questions and numbered dropdown fields
+    const textQuestions = [];
+    const questionBlocks = document.querySelectorAll('[id^="questionBlock"]');
+    
+    console.log('🔍 [DEBUG] Found question blocks:', questionBlocks.length);
+    
+    questionBlocks.forEach((block, blockIndex) => {
+        const questionId = block.id.replace('questionBlock', '');
+        console.log(`🔍 [DEBUG] Processing block ${blockIndex}: questionId=${questionId}, block.id=${block.id}`);
+        
+        const questionTypeSelect = block.querySelector(`#questionType${questionId}`);
+        const questionNameInput = block.querySelector(`#textboxName${questionId}`);
+        
+        console.log(`🔍 [DEBUG] Block ${blockIndex} - questionTypeSelect:`, questionTypeSelect);
+        console.log(`🔍 [DEBUG] Block ${blockIndex} - questionNameInput:`, questionNameInput);
+        
+        if (questionTypeSelect) {
+            console.log(`🔍 [DEBUG] Block ${blockIndex} - questionType:`, questionTypeSelect.value);
+        }
+        
+        // Handle regular text questions
+        if (questionTypeSelect && (questionTypeSelect.value === 'textbox' || questionTypeSelect.value === 'text') && questionNameInput) {
+            const nodeId = questionNameInput.value.trim() || `answer${questionId}`;
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            
+            console.log(`✅ [DEBUG] Found text question: ${questionText} (${nodeId})`);
+            
+            textQuestions.push({
+                questionId: questionId,
+                nodeId: nodeId,
+                questionText: questionText
+            });
+        }
+        
+        // Handle numbered dropdown questions
+        if (questionTypeSelect && questionTypeSelect.value === 'numberedDropdown') {
+            console.log(`🔍 [DEBUG] Found numberedDropdown question ${questionId}`);
+            
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            const nodeId = block.querySelector(`#nodeId${questionId}`)?.value || `answer${questionId}`;
+            const minValue = parseInt(block.querySelector(`#numberRangeStart${questionId}`)?.value || '1');
+            const maxValue = parseInt(block.querySelector(`#numberRangeEnd${questionId}`)?.value || '1');
+            
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - questionText:`, questionText);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - nodeId:`, nodeId);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - minValue:`, minValue);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - maxValue:`, maxValue);
+            
+            // Get all fields from the numbered dropdown using the unified fields container
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - unifiedFieldsContainer:`, unifiedFieldsContainer);
+            
+            if (unifiedFieldsContainer) {
+                const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field');
+                console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - fieldContainers found:`, fieldContainers.length);
+                
+                fieldContainers.forEach((fieldContainer, fieldIndex) => {
+                    console.log(`🔍 [DEBUG] Processing field container ${fieldIndex} for question ${questionId}`);
+                    
+                    const fieldType = fieldContainer.getAttribute('data-type');
+                    const fieldOrder = fieldContainer.getAttribute('data-order');
+                    
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
+                    
+                    if (fieldType && (fieldType === 'label' || fieldType === 'amount')) {
+                        // Get the field data from the spans
+                        const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
+                        const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
+                        
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabelSpan:`, fieldLabelSpan);
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeIdSpan:`, fieldNodeIdSpan);
+                        
+                        if (fieldLabelSpan && fieldNodeIdSpan) {
+                            const fieldLabel = fieldLabelSpan.textContent.trim();
+                            const fieldNodeId = fieldNodeIdSpan.textContent.trim();
+                            
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabel:`, fieldLabel);
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeId:`, fieldNodeId);
+                            
+                            if (fieldLabel && fieldNodeId) {
+                                console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
+                                
+                                // Generate numbered options for each field
+                                for (let i = minValue; i <= maxValue; i++) {
+                                    const numberedNodeId = `${fieldNodeId}_${i}`;
+                                    const questionTextWithNumber = `${questionText} - ${fieldLabel} ${i}`;
+                                    
+                                    console.log(`✅ [DEBUG] Adding numbered field: ${questionTextWithNumber} (${numberedNodeId})`);
+                                    
+                                    textQuestions.push({
+                                        questionId: questionId,
+                                        nodeId: numberedNodeId,
+                                        questionText: questionTextWithNumber
+                                    });
+                                }
+                            }
+                        } else {
+                            console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
+                        }
+                    } else {
+                        console.log(`❌ [DEBUG] Field ${fieldIndex} doesn't meet criteria - fieldType: ${fieldType}`);
+                    }
+                });
+            } else {
+                console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+            }
+        }
+    });
+    
+    console.log('🔍 [DEBUG] Final textQuestions array:', textQuestions);
+    
+    // Add options to dropdown
+    textQuestions.forEach(question => {
+        const option = document.createElement('option');
+        option.value = question.nodeId;
+        option.textContent = `${question.questionText} (${question.nodeId})`;
+        select.appendChild(option);
+        console.log(`✅ [DEBUG] Added option: ${option.textContent}`);
+    });
+    
+    console.log(`✅ [DEBUG] Total options added: ${textQuestions.length}`);
+    
+    // Add change event listener
+    select.addEventListener('change', function() {
+        currentLinkedFieldConfig[dropdownIndex].selectedValue = this.value;
+    });
+}
+
+// Remove a linked field dropdown
+function removeLinkedFieldDropdown(dropdownIndex) {
+    const dropdownDiv = document.getElementById(`linkedFieldDropdown${dropdownIndex}`);
+    if (dropdownDiv) {
+        dropdownDiv.remove();
+        
+        // Remove from current configuration
+        currentLinkedFieldConfig = currentLinkedFieldConfig.filter(config => config.index !== dropdownIndex);
+        
+        // Renumber remaining dropdowns
+        renumberLinkedFieldDropdowns();
+    }
+}
+
+// Renumber linked field dropdowns after removal
+function renumberLinkedFieldDropdowns() {
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    const dropdowns = dropdownsContainer.querySelectorAll('[id^="linkedFieldDropdown"]');
+    
+    dropdowns.forEach((dropdown, newIndex) => {
+        const oldId = dropdown.id;
+        const newId = `linkedFieldDropdown${newIndex}`;
+        
+        // Update ID
+        dropdown.id = newId;
+        
+        // Update label
+        const label = dropdown.querySelector('label');
+        if (label) {
+            label.textContent = `Text Question ${newIndex + 1}:`;
+        }
+        
+        // Update select ID and event listener
+        const select = dropdown.querySelector('select');
+        if (select) {
+            const oldSelectId = select.id;
+            const newSelectId = `linkedFieldSelect${newIndex}`;
+            select.id = newSelectId;
+            
+            // Remove old event listener and add new one
+            select.removeEventListener('change', select._changeHandler);
+            select._changeHandler = function() {
+                currentLinkedFieldConfig[newIndex].selectedValue = this.value;
+            };
+            select.addEventListener('change', select._changeHandler);
+        }
+        
+        // Update delete button
+        const deleteButton = dropdown.querySelector('button');
+        if (deleteButton) {
+            deleteButton.onclick = new Function(`removeLinkedFieldDropdown(${newIndex})`);
+        }
+        
+        // Update configuration index
+        const configIndex = currentLinkedFieldConfig.findIndex(config => config.index === parseInt(oldId.replace('linkedFieldDropdown', '')));
+        if (configIndex !== -1) {
+            currentLinkedFieldConfig[configIndex].index = newIndex;
+        }
+    });
+}
+
+// Finalize the linked field configuration
+function finalizeLinkedField() {
+    // Validate that at least 2 fields are selected
+    const selectedFields = currentLinkedFieldConfig.filter(config => config.selectedValue);
+    if (selectedFields.length < 2) {
+        alert('Please select at least 2 text questions to link.');
+        return;
+    }
+    
+    // Get the linked field ID
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    const linkedFieldId = linkedFieldIdInput ? linkedFieldIdInput.value.trim() : '';
+    
+    if (!linkedFieldId) {
+        alert('Please enter a Linked Field ID.');
+        return;
+    }
+    
+    // Check if we're editing an existing linked field
+    if (window.editingLinkedFieldId) {
+        console.log('🔍 [DEBUG] Editing existing linked field:', window.editingLinkedFieldId);
+        
+        // Remove the old display
+        removeLinkedFieldDisplay(window.editingLinkedFieldId);
+        
+        // Create the new linked field display
+        createLinkedFieldDisplay(selectedFields, linkedFieldId);
+        
+        // Clear the editing flag
+        window.editingLinkedFieldId = null;
+    } else {
+        console.log('🔍 [DEBUG] Creating new linked field');
+        
+        // Create the linked field display
+        createLinkedFieldDisplay(selectedFields, linkedFieldId);
+    }
+    
+    // Close modal
+    closeLinkedFieldModal();
+}
+
+// Create the linked field display
+function createLinkedFieldDisplay(selectedFields, linkedFieldId) {
+    const displayId = `linkedField${linkedFieldCounter++}`;
+    
+    // Create container for linked fields if it doesn't exist
+    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+    if (!linkedFieldsContainer) {
+        linkedFieldsContainer = document.createElement('div');
+        linkedFieldsContainer.id = 'linkedFieldsContainer';
+        linkedFieldsContainer.style.cssText = `
+            background: #fff;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        `;
+        
+        // Insert before the Form Editor section
+        const formBuilder = document.getElementById('formBuilder');
+        if (formBuilder) {
+            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
+        }
+    }
+    
+    // Create linked field display
+    const linkedFieldDiv = document.createElement('div');
+    linkedFieldDiv.id = displayId;
+    linkedFieldDiv.style.cssText = `
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+        transition: all 0.2s ease;
+    `;
+    
+    // Add hover effect
+    linkedFieldDiv.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderColor = '#27ae60';
+        this.style.transform = 'translateY(-1px)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+    
+    linkedFieldDiv.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#f9f9f9';
+        this.style.borderColor = '#ddd';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+    });
+    
+    const fieldNames = selectedFields.map(config => config.selectedValue).join(' ↔ ');
+    
+    linkedFieldDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Fields (${linkedFieldId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em;">${fieldNames}</p>
+            </div>
+            <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                Remove
+            </button>
+        </div>
+    `;
+    
+    linkedFieldsContainer.appendChild(linkedFieldDiv);
+    
+    // Store the configuration
+    window.linkedFieldsConfig = window.linkedFieldsConfig || [];
+    window.linkedFieldsConfig.push({
+        id: displayId,
+        linkedFieldId: linkedFieldId,
+        fields: selectedFields.map(config => config.selectedValue)
+    });
+}
+
+// Remove a linked field display
+function removeLinkedFieldDisplay(linkedFieldId) {
+    const linkedFieldDiv = document.getElementById(linkedFieldId);
+    if (linkedFieldDiv) {
+        linkedFieldDiv.remove();
+        
+        // Remove from configuration
+        if (window.linkedFieldsConfig) {
+            window.linkedFieldsConfig = window.linkedFieldsConfig.filter(config => config.id !== linkedFieldId);
+        }
+    }
+}
+
+// Edit a linked field display
+function editLinkedFieldDisplay(displayId) {
+    console.log('🔍 [DEBUG] editLinkedFieldDisplay called with displayId:', displayId);
+    
+    // Find the configuration for this display
+    const config = window.linkedFieldsConfig.find(c => c.id === displayId);
+    if (!config) {
+        console.log('❌ [DEBUG] Configuration not found for displayId:', displayId);
+        return;
+    }
+    
+    console.log('✅ [DEBUG] Found configuration:', config);
+    
+    // Store the display ID we're editing
+    window.editingLinkedFieldId = displayId;
+    
+    // Create modal if it doesn't exist
+    if (!document.getElementById('linkedFieldModal')) {
+        console.log('🔍 [DEBUG] Creating linked field modal');
+        createLinkedFieldModal();
+    }
+    
+    // Reset current configuration
+    currentLinkedFieldConfig = [];
+    
+    // Pre-populate the modal with existing data
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    if (linkedFieldIdInput) {
+        linkedFieldIdInput.value = config.linkedFieldId || '';
+    }
+    
+    // Create dropdowns for each field
+    config.fields.forEach(fieldId => {
+        addLinkedFieldDropdown();
+        const dropdownIndex = currentLinkedFieldConfig.length - 1;
+        const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+        if (select) {
+            select.value = fieldId;
+            currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+        }
+    });
+    
+    // Show modal
+    document.getElementById('linkedFieldModal').style.display = 'block';
+    console.log('🔍 [DEBUG] Modal displayed for editing');
+}
+
+// Close the linked field modal
+function closeLinkedFieldModal() {
+    document.getElementById('linkedFieldModal').style.display = 'none';
+    
+    // Clear current configuration
+    currentLinkedFieldConfig = [];
+    
+    // Clear dropdowns
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
+    }
+    
+    // Clear linked field ID input
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    if (linkedFieldIdInput) {
+        linkedFieldIdInput.value = '';
+    }
+    
+    // Clear the editing flag
+    window.editingLinkedFieldId = null;
+}
+
+// Create linked field display from import data
+function createLinkedFieldDisplayFromImport(linkedFieldData) {
+    const displayId = `linkedField${linkedFieldCounter++}`;
+    const linkedFieldId = linkedFieldData.linkedFieldId || 'Unknown';
+    
+    // Create container for linked fields if it doesn't exist
+    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+    if (!linkedFieldsContainer) {
+        linkedFieldsContainer = document.createElement('div');
+        linkedFieldsContainer.id = 'linkedFieldsContainer';
+        linkedFieldsContainer.style.cssText = `
+            background: #fff;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        `;
+        
+        // Insert before the Form Editor section
+        const formBuilder = document.getElementById('formBuilder');
+        if (formBuilder) {
+            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
+        }
+    }
+    
+    // Create linked field display
+    const linkedFieldDiv = document.createElement('div');
+    linkedFieldDiv.id = displayId;
+    linkedFieldDiv.style.cssText = `
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+        transition: all 0.2s ease;
+    `;
+    
+    // Add hover effect
+    linkedFieldDiv.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderColor = '#27ae60';
+        this.style.transform = 'translateY(-1px)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+    
+    linkedFieldDiv.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#f9f9f9';
+        this.style.borderColor = '#ddd';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+    });
+    
+    const fieldNames = linkedFieldData.fields.join(' ↔ ');
+    
+    linkedFieldDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Fields (${linkedFieldId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em;">${fieldNames}</p>
+            </div>
+            <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                Remove
+            </button>
+        </div>
+    `;
+    
+    linkedFieldsContainer.appendChild(linkedFieldDiv);
+    
+    // Store the configuration
+    window.linkedFieldsConfig = window.linkedFieldsConfig || [];
+    window.linkedFieldsConfig.push({
+        id: displayId,
+        linkedFieldId: linkedFieldId,
+        fields: linkedFieldData.fields
+    });
+}

@@ -21,6 +21,7 @@ const labelMap = {};
 const amountMap = {}; // used for numberedDropdown with amounts
 const linkedDropdowns = []; // For storing linked dropdown pairs
 const hiddenLogicConfigs = []; // For storing hidden logic configurations
+const linkedFields = []; // For storing linked field configurations
 
 // Cart functions are now included in the generated HTML
 
@@ -185,6 +186,7 @@ linkedDropdowns.length = 0;
 labelMap.length = 0;
 amountMap.length = 0;
 hiddenLogicConfigs.length = 0;
+linkedFields.length = 0;
 logicScriptBuffer = "";
 
 // Check if test mode is enabled
@@ -1001,7 +1003,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
 
         // 2) The <select> itself
         formHTML += `<select id="${ddNm}" name="${ddNm}"
-                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value)">
+                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -1216,7 +1218,7 @@ formHTML += `</div><br></div>`;
                 order: index
             }))
         ];
-        } else {
+          } else {
           // Process unified fields
           unifiedFields.forEach((el) => {
             const fieldType = el.getAttribute('data-type');
@@ -1990,6 +1992,16 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     `;
   }
 
+  // Collect linked fields data from GUI
+  if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {
+    window.linkedFieldsConfig.forEach(config => {
+      linkedFields.push({
+        linkedFieldId: config.linkedFieldId,
+        fields: config.fields
+      });
+    });
+  }
+
   // 2) Our global objects
   formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap || {})};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
@@ -2006,6 +2018,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var hiddenLogicConfigs = ${JSON.stringify(hiddenLogicConfigs || [])};\n`;
+  formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
   // URL Parameter parsing and auto-population
@@ -2045,6 +2058,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 '// Auto-populate on page load\n' +
 'document.addEventListener("DOMContentLoaded", function() {\n' +
 '    populateHiddenFieldsFromUrl();\n' +
+'    setupLinkedFields();\n' +
 '});\n\n' +
 '// Function to check paragraph limit and create hidden checkbox\n' +
 'function checkParagraphLimit(textareaId, paragraphLimit) {\n' +
@@ -3321,6 +3335,9 @@ function showTextboxLabels(questionId, count){
     }
     attachCalculationListeners();   // keep this
     
+    // Update linked fields after creating new textboxes
+    updateLinkedFields();
+    
     // Attach autosave listeners to newly generated textbox inputs
     const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
     newInputs.forEach(input => {
@@ -3564,6 +3581,135 @@ function updateHiddenLogic(dropdownName, selectedValue) {
             hiddenElement.value = config.textboxText || '';
         }
     }
+}
+
+// Function to handle linked fields synchronization
+function updateLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    linkedFields.forEach(linkedField => {
+        const { linkedFieldId, fields } = linkedField;
+        
+        // Find the hidden textbox for this linked field
+        let hiddenField = document.getElementById(linkedFieldId);
+        if (!hiddenField) {
+            // Create the hidden textbox if it doesn't exist
+            hiddenField = document.createElement('input');
+            hiddenField.type = 'text';
+            hiddenField.id = linkedFieldId;
+            hiddenField.name = linkedFieldId;
+            hiddenField.style.display = 'none';
+            document.body.appendChild(hiddenField);
+        }
+        
+        // Get all the linked textboxes
+        const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+        
+        if (linkedTextboxes.length === 0) return;
+        
+        // Find which textbox has content
+        const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+        
+        if (textboxesWithContent.length === 0) {
+            // No textboxes have content, clear the hidden field
+            hiddenField.value = '';
+        } else if (textboxesWithContent.length === 1) {
+            // Only one textbox has content, use its value
+            hiddenField.value = textboxesWithContent[0].value;
+        } else {
+            // Multiple textboxes have content, use the one with the longest text
+            const longestTextbox = textboxesWithContent.reduce((longest, current) => 
+                current.value.length > longest.value.length ? current : longest
+            );
+            hiddenField.value = longestTextbox.value;
+        }
+    });
+}
+
+// Function to clear inactive linked textboxes (with delay to avoid interfering with typing)
+function clearInactiveLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    // Use setTimeout to avoid interfering with user typing
+    setTimeout(() => {
+        linkedFields.forEach(linkedField => {
+            const { fields } = linkedField;
+            
+            // Get all the linked textboxes
+            const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+            
+            if (linkedTextboxes.length === 0) return;
+            
+            // Find which textboxes are currently visible (not hidden by conditional logic)
+            const visibleTextboxes = linkedTextboxes.filter(tb => {
+                const container = tb.closest('.question-container');
+                return container && !container.classList.contains('hidden');
+            });
+            
+            // Find which textboxes have content
+            const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+            
+            // Clear all hidden textboxes that have content
+            linkedTextboxes.forEach(tb => {
+                const container = tb.closest('.question-container');
+                if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
+                    tb.value = '';
+                }
+            });
+            
+            // If multiple visible textboxes have content, keep only the longest one
+            const visibleTextboxesWithContent = visibleTextboxes.filter(tb => tb.value.trim() !== '');
+            if (visibleTextboxesWithContent.length > 1) {
+                const longestTextbox = visibleTextboxesWithContent.reduce((longest, current) => 
+                    current.value.length > longest.value.length ? current : longest
+                );
+                
+                // Clear all other visible textboxes that aren't the longest
+                visibleTextboxes.forEach(tb => {
+                    if (tb !== longestTextbox && tb.value.trim() !== '') {
+                        tb.value = '';
+                    }
+                });
+            }
+        });
+    }, 100); // 100ms delay to avoid interfering with typing
+}
+
+// Function to set up linked fields event listeners
+function setupLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    // Use event delegation to handle dynamically created textboxes
+    document.addEventListener('input', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+            // Check if this input is part of any linked field
+            const fieldId = event.target.id;
+            const isLinkedField = linkedFields.some(linkedField => 
+                linkedField.fields.includes(fieldId)
+            );
+            
+            if (isLinkedField) {
+                updateLinkedFields();
+            }
+        }
+    });
+    
+    document.addEventListener('change', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+            // Check if this input is part of any linked field
+            const fieldId = event.target.id;
+            const isLinkedField = linkedFields.some(linkedField => 
+                linkedField.fields.includes(fieldId)
+            );
+            
+            if (isLinkedField) {
+                updateLinkedFields();
+            }
+        }
+    });
+    
+    // Initial update
+    updateLinkedFields();
 }
 
 function getQuestionInputs (questionId, type = null) {

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - FormWiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("DAJNuzuAhJZTCn9-D");
+        })();
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #eaf1f8;
+            zoom: 0.90;
+        }
+        header {
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        header img {
+            cursor: pointer;
+        }
+        nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 38px;
+            z-index: 2;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.18em;
+            letter-spacing: 0.02em;
+            padding: 2px 8px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        nav a:hover {
+            color: #ff7043;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        .nav-chevron {
+            display: inline-block;
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        .nav-chevron svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-left: auto;
+        }
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+
+        /* Dropdown specific styles */
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 10;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
+
+        main { flex: 1; }
+        
+        /* Contact Page Specific Styles */
+        .contact-card {
+            background: #fff;
+            max-width: 480px;
+            margin: 64px auto;
+            padding: 48px;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.10);
+            text-align: center;
+        }
+        .contact-card h1 {
+            color: #2980b9;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+        }
+        .contact-card .subtitle {
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 28px;
+        }
+        .contact-card form {
+            width: 100%;
+            text-align: left;
+        }
+        .contact-card label {
+            color: #2980b9;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .contact-card input, .contact-card textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1.5px solid #c9e7ff;
+            border-radius: 7px;
+            font-size: 1em;
+            background: #f8fafc;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .contact-card input:focus, .contact-card textarea:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+        .contact-card button {
+            background: #2980b9;
+            color: #fff;
+            padding: 13px 0;
+            width: 100%;
+            border: none;
+            border-radius: 7px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .contact-card button:hover {
+            background: #1c598a;
+        }
+
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 32px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+        }
+        .pro-footer-col { flex: 1 1 320px; min-width: 220px; max-width: 420px; display: flex; flex-direction: column; gap: 18px; }
+        .address-col { border-right: 1.5px solid #2c7a7d; padding-right: 48px; align-items: flex-start; }
+        .nav-col { align-items: flex-start; padding-left: 32px; padding-right: 32px; border-right: 1.5px solid #2c7a7d; }
+        .company-col { align-items: flex-start; padding-left: 48px; }
+        .pro-footer-title { font-weight: 700; font-size: 1.25em; margin-bottom: 6px; color: #fff; letter-spacing: 0.02em; }
+        .company-title { margin-top: 8px; margin-bottom: 0; }
+        .pro-footer-contact a { color: #b6e2e6; text-decoration: underline; font-weight: 500; margin-right: 18px; transition: color 0.2s; }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover { color: #ff7043; }
+        .pro-footer-logo { margin-bottom: 8px; }
+        .pro-footer-desc { color: #e0e6ea; font-size: 1em; margin-top: 0; line-height: 1.5; }
+        .pro-footer-col.nav-col a { color: #b6e2e6; text-decoration: none; font-weight: 500; margin-bottom: 6px; transition: color 0.2s; font-size: 1em; }
+        .pro-footer-col.nav-col a:not(:last-child) { margin-bottom: 8px; }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .pro-footer { flex-direction: column; gap: 32px; padding: 32px 4vw 18px 4vw; }
+            .address-col, .company-col, .nav-col { border: none; padding: 0; min-width: unset; max-width: unset; align-items: flex-start; }
+        }
+        @media (max-width: 768px) {
+            header { flex-direction: column; padding: 10px; }
+            nav { position: static; transform: none; margin-top: 10px; }
+        }
+        @media (max-width: 600px) { .contact-card { padding: 18px 6vw; } }
+        /* Cart Icon Styles */
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        /* Sliding Cart Menu Styles */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .cart-side-menu {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-side-menu.active {
+            right: 0;
+        }
+        .cart-header {
+            background: #2c3e50;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        .cart-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .cart-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .cart-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .cart-icon-large {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        .cart-message {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .cart-description {
+            font-size: 1em;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .cart-signup-btn {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .cart-signup-btn:hover {
+            background: #1c598a;
+        }
+        @media (max-width: 480px) {
+            .cart-side-menu {
+                width: 100%;
+                right: -100%;
+            }
+            .cart-content {
+                padding: 20px;
+            }
+            .cart-message {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
+        <nav>
+            <a href="../index.html">Home
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+                <a href="#" id="forms-nav-link">Forms
+                    <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </a>
+                <div class="dropdown-menu" id="forms-dropdown-menu">
+                    <a href="forms.html">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Family.html">Family</a>
+                    <a href="Probate.html">Probate</a>
+                    <a href="Property.html">Property</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="contact.html">Contact Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="FAQ.html">FAQ
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+        </nav>
+        <div class="header-actions">
+            <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Sliding Cart Menu -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+            </div>
+            <div class="cart-content">
+                <div class="cart-icon-large">🛒</div>
+                <div class="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description">
+                    To add forms to your cart and make purchases, you'll need to create a FormWiz account. 
+                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+                </div>
+                <a href="account.html" class="cart-signup-btn">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div class="contact-card" id="contact-card">
+            <h1>Contact Us</h1>
+            <div class="subtitle">We'd love to hear from you! Fill out the form below and our team will get back to you soon.</div>
+            <form id="contact-form">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- PROFESSIONAL FOOTER SECTION -->
+    <div class="pro-footer">
+        <div class="pro-footer-col address-col">
+            <div class="pro-footer-logo">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+            </div>
+            <div class="pro-footer-title">FormWiz</div>
+            <div>1043 Garland Ave Unit C #1235<br>San Jose, CA 95126, US</div>
+            <div class="pro-footer-contact">
+                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
+                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+            </div>
+        </div>
+        <div class="pro-footer-col nav-col">
+            <div class="pro-footer-title">Navigation</div>
+            <a href="../index.html">Home</a>
+            <a href="FreeForm.html">Forms</a>
+            <a href="FAQ.html">FAQ</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="pro-footer-col company-col">
+            <div class="pro-footer-title company-title">About FormWiz</div>
+            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined <strong>legal</strong>, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2024 FormWiz. All rights reserved.
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Firebase Configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+                authDomain: "formwiz-3f4fd.firebaseapp.com",
+                projectId: "formwiz-3f4fd",
+                storageBucket: "formwiz-3f4fd.firebasestorage.app",
+                messagingSenderId: "404259212529",
+                appId: "1:404259212529:web:15a33bce82383b21cfed50",
+                measurementId: "G-P07YEN0HPD"
+            };
+
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            const auth = firebase.auth();
+            const signInButton = document.querySelector('.sign-in-btn');
+
+            auth.onAuthStateChanged(function(user) {
+                console.log('Auth state changed on contact.html. User:', user);
+                if (user) {
+                    // User is signed in.
+                    if (signInButton) {
+                        signInButton.textContent = 'Log Out';
+                        signInButton.href = '#';
+                        signInButton.onclick = function(e) {
+                            e.preventDefault();
+                            auth.signOut().then(() => {
+                                window.location.reload();
+                            }).catch((error) => {
+                                console.error('Error signing out:', error);
+                            });
+                        };
+                    }
+                } else {
+                    // No user is signed in.
+                    if (signInButton) {
+                        signInButton.textContent = 'Sign In';
+                        signInButton.href = 'account.html';
+                        signInButton.onclick = null;
+                    }
+                }
+            });
+        
+            // Dropdown for Forms nav
+            const formsWrapper = document.getElementById('forms-dropdown-wrapper');
+            const formsLink = document.getElementById('forms-nav-link');
+            const dropdownMenu = document.getElementById('forms-dropdown-menu');
+            let dropdownOpen = false;
+
+            function openDropdown() {
+                formsWrapper.classList.add('open');
+                dropdownOpen = true;
+            }
+            function closeDropdown() {
+                formsWrapper.classList.remove('open');
+                dropdownOpen = false;
+            }
+            formsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                dropdownOpen ? closeDropdown() : openDropdown();
+            });
+            document.addEventListener('mousedown', function(e) {
+                if (!formsWrapper.contains(e.target)) {
+                    closeDropdown();
+                }
+            });
+            // Keyboard accessibility
+            formsLink.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dropdownOpen ? closeDropdown() : openDropdown();
+                }
+            });
+
+            // Update cart count badge in header
+            function updateCartCountBadge() {
+                const cartCountElement = document.getElementById('cart-count-badge');
+                if (cartCountElement && auth.currentUser && typeof getCartCount === 'function') {
+                    const count = getCartCount();
+                    if (count > 0) {
+                        cartCountElement.textContent = count;
+                        cartCountElement.style.display = 'flex';
+                    } else {
+                        cartCountElement.style.display = 'none';
+                    }
+                } else if (cartCountElement) {
+                    cartCountElement.style.display = 'none';
+                }
+            }
+
+            // Initialize cart count badge
+            updateCartCountBadge();
+            setInterval(updateCartCountBadge, 5000);
+
+            // Sliding Cart Menu
+            const cartIconLink = document.getElementById('cart-icon-link');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartSideMenu = document.getElementById('cart-side-menu');
+            const cartCloseBtn = document.getElementById('cart-close-btn');
+
+            function openCart() {
+                cartOverlay.classList.add('active');
+                cartSideMenu.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            }
+
+            function closeCart() {
+                cartOverlay.classList.remove('active');
+                cartSideMenu.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+
+            cartIconLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (auth.currentUser) {
+                    // User is signed in, redirect to cart.html
+                    window.location.href = 'cart.html';
+                } else {
+                    // User is not signed in, open the cart menu
+                    openCart();
+                }
+            });
+
+            cartCloseBtn.addEventListener('click', closeCart);
+            cartOverlay.addEventListener('click', function(e) {
+                if (e.target === cartOverlay) {
+                    closeCart();
+                }
+            });
+
+            // Keyboard accessibility for cart menu
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeCart();
+                }
+            });
+
+            // EmailJS contact form handler
+            const contactForm = document.getElementById('contact-form');
+            const contactCard = document.getElementById('contact-card');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const message = document.getElementById('message').value;
+                    const submitBtn = contactForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Sending...';
+                    const templateParams = {
+                        to_email: 'info@rdr-gp.com',
+                        from_name: name,
+                        from_email: email,
+                        message: message
+                    };
+                    emailjs.send('service_n2pvmwh', 'template_wa6i8jg', templateParams)
+                        .then(function(response) {
+                            contactCard.innerHTML = `<h1>Thank You!</h1><div class='subtitle'>Your message has been sent. We will get back to you soon.</div>`;
+                        })
+                        .catch(function(error) {
+                            alert('Sorry, there was an issue sending your message. Please try again later.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalBtnText;
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

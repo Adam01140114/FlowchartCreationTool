@@ -29,6 +29,7 @@ function initializeHiddenPDFFieldsModule() {
         <hr>
         <div id="hiddenFieldsContainer"></div>
         <button type="button" onclick="addHiddenField()">Add Hidden Field</button>
+        <button type="button" onclick="openLinkedFieldModal()">Add Linked Field</button>
         <hr>
     `;
     formBuilder.appendChild(hiddenFieldsModule);

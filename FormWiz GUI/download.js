@@ -563,43 +563,43 @@ function loadFormData(formData) {
                     } else {
                         // Fallback to old format
                         console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Using fallback format');
-                        const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
-                        if (multipleTextboxesBlock) {
-                            multipleTextboxesBlock.innerHTML = '';
-                            (question.textboxes || []).forEach((tb, idx) => {
-                                // Add a textbox slot
-                                addMultipleTextboxOption(question.questionId);
+                    const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
+                    if (multipleTextboxesBlock) {
+                        multipleTextboxesBlock.innerHTML = '';
+                        (question.textboxes || []).forEach((tb, idx) => {
+                            // Add a textbox slot
+                            addMultipleTextboxOption(question.questionId);
 
-                                // Fill in the values
-                                const labelInput = questionBlock.querySelector(
-                                    `#multipleTextboxLabel${question.questionId}_${idx + 1}`
-                                );
-                                const nameIdInput = questionBlock.querySelector(
-                                    `#multipleTextboxName${question.questionId}_${idx + 1}`
-                                );
-                                const placeholderInput = questionBlock.querySelector(
-                                    `#multipleTextboxPlaceholder${question.questionId}_${idx + 1}`
-                                );
+                            // Fill in the values
+                            const labelInput = questionBlock.querySelector(
+                                `#multipleTextboxLabel${question.questionId}_${idx + 1}`
+                            );
+                            const nameIdInput = questionBlock.querySelector(
+                                `#multipleTextboxName${question.questionId}_${idx + 1}`
+                            );
+                            const placeholderInput = questionBlock.querySelector(
+                                `#multipleTextboxPlaceholder${question.questionId}_${idx + 1}`
+                            );
 
-                                if (labelInput)        labelInput.value = tb.label || '';
-                                if (nameIdInput)       nameIdInput.value = tb.nameId || '';
-                                if (placeholderInput)  placeholderInput.value = tb.placeholder || '';
-                            });
-                            (question.amounts || []).forEach((amt, idx) => {
-                                addMultipleAmountOption(question.questionId);
-                                const labelInput = questionBlock.querySelector(
-                                    `#multipleAmountLabel${question.questionId}_${idx + 1}`
-                                );
-                                const nameIdInput = questionBlock.querySelector(
-                                    `#multipleAmountName${question.questionId}_${idx + 1}`
-                                );
-                                const placeholderInput = questionBlock.querySelector(
-                                    `#multipleAmountPlaceholder${question.questionId}_${idx + 1}`
-                                );
-                                if (labelInput)        labelInput.value = amt.label || '';
-                                if (nameIdInput)       nameIdInput.value = amt.nameId || '';
-                                if (placeholderInput)  placeholderInput.value = amt.placeholder || '';
-                            });
+                            if (labelInput)        labelInput.value = tb.label || '';
+                            if (nameIdInput)       nameIdInput.value = tb.nameId || '';
+                            if (placeholderInput)  placeholderInput.value = tb.placeholder || '';
+                        });
+                        (question.amounts || []).forEach((amt, idx) => {
+                            addMultipleAmountOption(question.questionId);
+                            const labelInput = questionBlock.querySelector(
+                                `#multipleAmountLabel${question.questionId}_${idx + 1}`
+                            );
+                            const nameIdInput = questionBlock.querySelector(
+                                `#multipleAmountName${question.questionId}_${idx + 1}`
+                            );
+                            const placeholderInput = questionBlock.querySelector(
+                                `#multipleAmountPlaceholder${question.questionId}_${idx + 1}`
+                            );
+                            if (labelInput)        labelInput.value = amt.label || '';
+                            if (nameIdInput)       nameIdInput.value = amt.nameId || '';
+                            if (placeholderInput)  placeholderInput.value = amt.placeholder || '';
+                        });
                         }
                     }
                 }
@@ -1055,6 +1055,18 @@ function loadFormData(formData) {
         });
     }
 
+    // Load linked fields
+    if (formData.linkedFields && formData.linkedFields.length > 0) {
+        // Initialize linked fields configuration
+        window.linkedFieldsConfig = [];
+        linkedFieldCounter = 0;
+        
+        formData.linkedFields.forEach(linkedField => {
+            // Create the linked field display
+            createLinkedFieldDisplayFromImport(linkedField);
+        });
+    }
+
     // 7) Build groups from JSON
     if (formData.groups && formData.groups.length > 0) {
         console.log('Importing groups:', formData.groups); // Debug log
@@ -1122,7 +1134,8 @@ function exportForm() {
             ? document.getElementById('stripePriceId').value.trim()
             : '',
         additionalPDFs: [], // New field for additional PDFs
-        checklistItems: [] // New field for checklist items
+        checklistItems: [], // New field for checklist items
+        linkedFields: [] // New field for linked fields
     };
 
     // Collect all additional PDF names
@@ -1147,6 +1160,15 @@ function exportForm() {
                 formData.checklistItems.push(itemText);
             }
         });
+    }
+
+    // Collect all linked fields
+    if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {
+        formData.linkedFields = window.linkedFieldsConfig.map(config => ({
+            id: config.id,
+            linkedFieldId: config.linkedFieldId,
+            fields: config.fields
+        }));
     }
 
     // Create a map of questionId to question text for easy lookup
