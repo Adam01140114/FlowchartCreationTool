@@ -205,6 +205,7 @@ function setupCustomDoubleClickBehavior(graph) {
   
   // Track the currently selected cell for click-out detection
   let currentlySelectedCell = null;
+  let clickOutTimeout = null;
   
   // Add click listener to detect double-clicks and click-out
   graph.addListener(mxEvent.CLICK, function(sender, evt) {
@@ -216,20 +217,30 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     
+    // Clear any pending click-out reset
+    if (clickOutTimeout) {
+      clearTimeout(clickOutTimeout);
+      clickOutTimeout = null;
+    }
+    
     // Handle click-out: if we had a selected cell and now clicking on empty space or different cell
     if (currentlySelectedCell && currentlySelectedCell !== cell) {
-      // Reset PDF and ID for the previously selected cell
-      if (typeof window.resetPdfInheritance === 'function') {
-        window.resetPdfInheritance(currentlySelectedCell);
-      }
-      
-      // Reset node ID by clearing any custom ID properties
-      if (currentlySelectedCell._nameId) {
-        currentlySelectedCell._nameId = '';
-      }
-      if (currentlySelectedCell._customId) {
-        currentlySelectedCell._customId = '';
-      }
+      // Debounce the reset operations to improve performance on large graphs
+      clickOutTimeout = setTimeout(() => {
+        // Reset PDF and ID for the previously selected cell
+        if (typeof window.resetPdfInheritance === 'function') {
+          window.resetPdfInheritance(currentlySelectedCell);
+        }
+        
+        // Reset node ID by clearing any custom ID properties
+        if (currentlySelectedCell._nameId) {
+          currentlySelectedCell._nameId = '';
+        }
+        if (currentlySelectedCell._customId) {
+          currentlySelectedCell._customId = '';
+        }
+        clickOutTimeout = null;
+      }, 100); // Small delay to batch operations
     }
     
     // Update currently selected cell
@@ -242,6 +253,12 @@ function setupCustomDoubleClickBehavior(graph) {
       if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
         //console.log("🎯 DOUBLE CLICK DETECTED manually!");
         //alert("double click detected");
+        
+        // Clear any pending click-out reset since we're handling a double-click
+        if (clickOutTimeout) {
+          clearTimeout(clickOutTimeout);
+          clickOutTimeout = null;
+        }
         
         // Reset PDF and ID for the node on double-click
         if (typeof window.resetPdfInheritance === 'function') {
@@ -292,18 +309,6 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
-  // Automatically reset PDF inheritance and Node IDs before opening properties
-  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  // Reset PDF inheritance for all nodes FIRST
-  if (typeof window.resetAllPdfInheritance === 'function') {
-    window.resetAllPdfInheritance();
-  }
-  
-  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
-  if (typeof resetAllNodeIds === 'function') {
-    resetAllNodeIds();
-  }
-  
   // Prevent multiple popups or opening while closing
   if (window.__propertiesPopupOpen || window.__propertiesPopupClosing) {
     return;
@@ -1743,38 +1748,30 @@ function showPropertiesPopup(cell) {
     newClosePopup();
   });
   
-  // Handle clicking outside popup
+  // Handle clicking outside popup (optimized version)
   let outsideClickHandler = null;
   
   const handleOutsideClick = (e) => {
-    console.log('🔧 [PROPERTIES] Outside click handler called', e.target);
-    
     // Only handle if popup still exists and is visible
     if (!popup || popup.style.display === 'none' || isClosing) {
-      console.log('🔧 [PROPERTIES] Popup not visible or closing, ignoring click');
       return;
     }
     
     // Check if the click is outside the popup
     if (!popup.contains(e.target)) {
-      console.log('🔧 [PROPERTIES] Click outside detected, closing popup');
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation(); // Prevent other handlers from running
+      // Simple check: if click is not on the popup, close it
+      // No expensive cell detection - just close on any outside click
       newClosePopup();
-    } else {
-      console.log('🔧 [PROPERTIES] Click inside popup, ignoring');
     }
   };
   
-  // Add event listener to document for outside clicks with a delay to prevent immediate closure
+  // Add event listener with a reasonable delay to avoid interfering with double-click
   setTimeout(() => {
     outsideClickHandler = handleOutsideClick;
-    document.addEventListener('click', outsideClickHandler, true); // Use capture phase
-    console.log('🔧 [PROPERTIES] Outside click handler added');
-  }, 200);
+    document.addEventListener('click', outsideClickHandler, true);
+  }, 300); // 300ms delay - longer than double-click detection (250ms)
   
-  // Clean up the outside click listener when popup closes
+  // Clean up event listeners when popup closes
   const originalClosePopup = closePopup;
   const newClosePopup = () => {
     if (outsideClickHandler) {

@@ -20,6 +20,7 @@ const jumpLogics = [];
 const labelMap = {};
 const amountMap = {}; // used for numberedDropdown with amounts
 const linkedDropdowns = []; // For storing linked dropdown pairs
+const hiddenLogicConfigs = []; // For storing hidden logic configurations
 
 // Cart functions are now included in the generated HTML
 
@@ -183,6 +184,7 @@ jumpLogics.length = 0;
 linkedDropdowns.length = 0;
 labelMap.length = 0;
 amountMap.length = 0;
+hiddenLogicConfigs.length = 0;
 logicScriptBuffer = "";
 
 // Check if test mode is enabled
@@ -999,7 +1001,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
 
         // 2) The <select> itself
         formHTML += `<select id="${ddNm}" name="${ddNm}"
-                      onchange="dropdownMirror(this, '${ddNm}')">
+                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -1023,6 +1025,32 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
             pdfName: pdfNameVal,
             questionType: questionType,
           });
+        }
+
+        // handle Hidden Logic
+        const hiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
+        const hiddenLogicEnabled = hiddenLogicEnabledEl && hiddenLogicEnabledEl.checked;
+        if (hiddenLogicEnabled) {
+          const hiddenLogicTriggerEl = qBlock.querySelector(`#hiddenLogicTrigger${questionId}`);
+          const hiddenLogicTypeEl = qBlock.querySelector(`#hiddenLogicType${questionId}`);
+          const hiddenLogicNodeIdEl = qBlock.querySelector(`#hiddenLogicNodeId${questionId}`);
+          const hiddenLogicTextboxTextEl = qBlock.querySelector(`#hiddenLogicTextboxText${questionId}`);
+          
+          const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
+          const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
+          const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
+          const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
+          
+          if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
+            hiddenLogicConfigs.push({
+              questionId: questionId,
+              questionNameId: ddNm,
+              trigger: hiddenLogicTrigger,
+              type: hiddenLogicType,
+              nodeId: hiddenLogicNodeId,
+              textboxText: hiddenLogicTextboxText
+            });
+          }
         }
       } else if (questionType === "checkbox") {
        /* ---------- CHECKBOX QUESTION ---------- */
@@ -1973,6 +2001,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var labelNodeIdsMap = ${JSON.stringify(window.labelNodeIdsMap || {})};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
+  formHTML += `var hiddenLogicConfigs = ${JSON.stringify(hiddenLogicConfigs || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
   // URL Parameter parsing and auto-population
@@ -3492,6 +3521,47 @@ function dropdownMirror(selectEl, baseName){
     handleLinkedDropdowns(baseName, val);
 }
 
+// Function to handle hidden logic for dropdowns
+function updateHiddenLogic(dropdownName, selectedValue) {
+    // Find the hidden logic configuration for this dropdown
+    const config = hiddenLogicConfigs.find(c => c.questionNameId === dropdownName);
+    if (!config || config.trigger !== selectedValue) {
+        return;
+    }
+    
+    // Check if the hidden element already exists
+    let hiddenElement = document.getElementById(config.nodeId);
+    
+    if (!hiddenElement) {
+        // Create the hidden element based on type
+        if (config.type === 'checkbox') {
+            hiddenElement = document.createElement('input');
+            hiddenElement.type = 'checkbox';
+            hiddenElement.id = config.nodeId;
+            hiddenElement.name = config.nodeId;
+            hiddenElement.checked = true;
+            hiddenElement.style.display = 'none';
+        } else if (config.type === 'textbox') {
+            hiddenElement = document.createElement('input');
+            hiddenElement.type = 'text';
+            hiddenElement.id = config.nodeId;
+            hiddenElement.name = config.nodeId;
+            hiddenElement.value = config.textboxText || '';
+            hiddenElement.style.display = 'none';
+        }
+        
+        // Add the hidden element to the form
+        document.body.appendChild(hiddenElement);
+    } else {
+        // Update existing element
+        if (config.type === 'checkbox') {
+            hiddenElement.checked = true;
+        } else if (config.type === 'textbox') {
+            hiddenElement.value = config.textboxText || '';
+        }
+    }
+}
+
 function getQuestionInputs (questionId, type = null) {
   /* 1️⃣ First look inside the question container, if it exists */
   const container = document.getElementById('question-container-' + questionId);
@@ -4717,6 +4787,10 @@ if (typeof handleNext === 'function') {
                             if (typeof dropdownMirror === 'function') {
                                 dropdownMirror(el, el.id);
                             }
+                            // Trigger hidden logic for autofilled dropdowns
+                            if (typeof updateHiddenLogic === 'function') {
+                                updateHiddenLogic(el.id, el.value);
+                            }
                         }
                     });
                     
@@ -5005,6 +5079,10 @@ if (typeof handleNext === 'function') {
                             if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
                                 if (typeof dropdownMirror === 'function') {
                                     dropdownMirror(el, el.id);
+                                }
+                                // Trigger hidden logic for autofilled dropdowns
+                                if (typeof updateHiddenLogic === 'function') {
+                                    updateHiddenLogic(el.id, el.value);
                                 }
                             }
                         });
@@ -5705,6 +5783,9 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       if (!existingCheckbox) {
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
       }
+      
+      // Handle custom hidden logic for this dropdown
+      updateHiddenLogic(baseName, selectedValue);
     }
   });
 }

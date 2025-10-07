@@ -842,6 +842,33 @@ function loadFormData(formData) {
                     }
                 }
 
+                // ============== Hidden Logic ==============
+                if (question.hiddenLogic && question.hiddenLogic.enabled) {
+                    const hiddenLogicCbox = questionBlock.querySelector(`#enableHiddenLogic${question.questionId}`);
+                    if (hiddenLogicCbox) {
+                        hiddenLogicCbox.checked = true;
+                        toggleHiddenLogic(question.questionId);
+                    }
+                    const hiddenLogicTriggerSelect = questionBlock.querySelector(`#hiddenLogicTrigger${question.questionId}`);
+                    const hiddenLogicTypeSelect = questionBlock.querySelector(`#hiddenLogicType${question.questionId}`);
+                    const hiddenLogicNodeIdInput = questionBlock.querySelector(`#hiddenLogicNodeId${question.questionId}`);
+                    const hiddenLogicTextboxTextInput = questionBlock.querySelector(`#hiddenLogicTextboxText${question.questionId}`);
+                    
+                    if (hiddenLogicTriggerSelect) {
+                        hiddenLogicTriggerSelect.value = question.hiddenLogic.trigger;
+                    }
+                    if (hiddenLogicTypeSelect) {
+                        hiddenLogicTypeSelect.value = question.hiddenLogic.type;
+                        toggleHiddenLogicOptions(question.questionId);
+                    }
+                    if (hiddenLogicNodeIdInput) {
+                        hiddenLogicNodeIdInput.value = question.hiddenLogic.nodeId;
+                    }
+                    if (hiddenLogicTextboxTextInput) {
+                        hiddenLogicTextboxTextInput.value = question.hiddenLogic.textboxText;
+                    }
+                }
+
                 // ============== PDF Logic ==============
                 if (question.pdfLogic && question.pdfLogic.enabled) {
                     const pdfLogicCbox = questionBlock.querySelector(`#pdfLogic${question.questionId}`);
@@ -1190,6 +1217,13 @@ function exportForm() {
             const condPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value || "";
             const condPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value || "";
 
+            // ---------- Hidden Logic ----------
+            const hiddenLogicEnabled = questionBlock.querySelector(`#enableHiddenLogic${questionId}`)?.checked || false;
+            const hiddenLogicTrigger = questionBlock.querySelector(`#hiddenLogicTrigger${questionId}`)?.value || "";
+            const hiddenLogicType = questionBlock.querySelector(`#hiddenLogicType${questionId}`)?.value || "";
+            const hiddenLogicNodeId = questionBlock.querySelector(`#hiddenLogicNodeId${questionId}`)?.value || "";
+            const hiddenLogicTextboxText = questionBlock.querySelector(`#hiddenLogicTextboxText${questionId}`)?.value || "";
+
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
             const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
@@ -1315,6 +1349,13 @@ function exportForm() {
                     enabled: condPDFEnabled,
                     pdfName: condPDFName,
                     answer: condPDFAnswer
+                },
+                hiddenLogic: {
+                    enabled: hiddenLogicEnabled,
+                    trigger: hiddenLogicTrigger,
+                    type: hiddenLogicType,
+                    nodeId: hiddenLogicNodeId,
+                    textboxText: hiddenLogicTextboxText
                 },
                 pdfLogic: {
                     enabled: pdfLogicEnabled,

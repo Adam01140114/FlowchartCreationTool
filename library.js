@@ -1898,8 +1898,19 @@ window.resetPdfInheritance = function(cell) {
     return;
   }
   
+  // Check if cell is valid
+  if (!cell) {
+    console.error('Cell is undefined for PDF reset');
+    return;
+  }
+  
   // Recursive function to find the source PDF node by following the inheritance chain
   function findSourcePdfNode(currentCell, visited = new Set()) {
+    // Check if currentCell is valid
+    if (!currentCell || !currentCell.id) {
+      return null;
+    }
+    
     if (visited.has(currentCell.id)) {
       return null; // Avoid infinite loops
     }

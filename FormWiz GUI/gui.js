@@ -802,6 +802,32 @@ function addQuestion(sectionId, questionId = null) {
             </div>
         </div><br>
 
+        <!-- Hidden Logic -->
+        <div id="hiddenLogic${currentQuestionId}" style="display: none;">
+            <label>Enable Hidden Logic: </label>
+            <input type="checkbox" id="enableHiddenLogic${currentQuestionId}" onchange="toggleHiddenLogic(${currentQuestionId})"><br><br>
+            <div id="hiddenLogicBlock${currentQuestionId}" style="display: none;">
+                <label>Trigger Condition:</label>
+                <select id="hiddenLogicTrigger${currentQuestionId}">
+                    <option value="">Select Trigger</option>
+                </select><br><br>
+                <label>Hidden Logic Type:</label>
+                <select id="hiddenLogicType${currentQuestionId}" onchange="toggleHiddenLogicOptions(${currentQuestionId})">
+                    <option value="">Select Type</option>
+                    <option value="checkbox">Checkbox</option>
+                    <option value="textbox">Textbox</option>
+                </select><br><br>
+                <div id="hiddenLogicOptions${currentQuestionId}" style="display: none;">
+                    <label>Node ID:</label>
+                    <input type="text" id="hiddenLogicNodeId${currentQuestionId}" placeholder="Enter node ID"><br><br>
+                    <div id="hiddenLogicTextboxOptions${currentQuestionId}" style="display: none;">
+                        <label>Textbox Text:</label>
+                        <input type="text" id="hiddenLogicTextboxText${currentQuestionId}" placeholder="Enter textbox text"><br><br>
+                    </div>
+                </div>
+            </div>
+        </div><br>
+
         <!-- Conditional Alert Logic -->
         <div id="conditionalAlertLogic${currentQuestionId}" style="display: none;">
             <label>Enable Conditional Alert: </label>
@@ -1080,6 +1106,14 @@ function toggleOptions(questionId) {
         }
     } else {
         pdfBlock.style.display = 'none';
+    }
+
+    // Handle hidden logic visibility - show only for dropdown questions
+    const hiddenLogicBlock = document.getElementById(`hiddenLogic${questionId}`);
+    if (questionType === 'dropdown') {
+        hiddenLogicBlock.style.display = 'block';
+    } else {
+        hiddenLogicBlock.style.display = 'none';
     }
 
     // Handle PDF Logic visibility - show for all question types
@@ -1559,6 +1593,78 @@ function toggleConditionalPDFLogic(questionId) {
     conditionalPDFBlock.style.display = conditionalPDFEnabled ? 'block' : 'none';
 }
 
+// Hidden logic toggling
+function toggleHiddenLogic(questionId) {
+    const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`).checked;
+    const hiddenLogicBlock = document.getElementById(`hiddenLogicBlock${questionId}`);
+    hiddenLogicBlock.style.display = hiddenLogicEnabled ? 'block' : 'none';
+    
+    // Populate trigger options when enabling
+    if (hiddenLogicEnabled) {
+        updateHiddenLogicTriggerOptions(questionId);
+    }
+    
+    // Reset the type selection and options when disabling
+    if (!hiddenLogicEnabled) {
+        const typeSelect = document.getElementById(`hiddenLogicType${questionId}`);
+        const optionsDiv = document.getElementById(`hiddenLogicOptions${questionId}`);
+        const textboxOptionsDiv = document.getElementById(`hiddenLogicTextboxOptions${questionId}`);
+        const triggerSelect = document.getElementById(`hiddenLogicTrigger${questionId}`);
+        
+        if (typeSelect) typeSelect.value = '';
+        if (optionsDiv) optionsDiv.style.display = 'none';
+        if (textboxOptionsDiv) textboxOptionsDiv.style.display = 'none';
+        if (triggerSelect) triggerSelect.value = '';
+    }
+}
+
+// Hidden logic type options toggling
+function toggleHiddenLogicOptions(questionId) {
+    const typeSelect = document.getElementById(`hiddenLogicType${questionId}`);
+    const optionsDiv = document.getElementById(`hiddenLogicOptions${questionId}`);
+    const textboxOptionsDiv = document.getElementById(`hiddenLogicTextboxOptions${questionId}`);
+    
+    if (typeSelect && optionsDiv) {
+        const selectedType = typeSelect.value;
+        
+        if (selectedType) {
+            optionsDiv.style.display = 'block';
+            
+            // Show textbox options only if textbox is selected
+            if (textboxOptionsDiv) {
+                textboxOptionsDiv.style.display = selectedType === 'textbox' ? 'block' : 'none';
+            }
+        } else {
+            optionsDiv.style.display = 'none';
+            if (textboxOptionsDiv) textboxOptionsDiv.style.display = 'none';
+        }
+    }
+}
+
+// Update hidden logic trigger options from dropdown question options
+function updateHiddenLogicTriggerOptions(questionId) {
+    const triggerSelect = document.getElementById(`hiddenLogicTrigger${questionId}`);
+    if (!triggerSelect) return;
+    
+    // Clear existing options except the first one
+    triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
+    
+    // Get dropdown options from the question
+    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+    if (!dropdownOptionsDiv) return;
+    
+    const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+    optionInputs.forEach(optionInput => {
+        const val = optionInput.value.trim();
+        if (val) {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.text = val;
+            triggerSelect.appendChild(opt);
+        }
+    });
+}
+
 // PDF Logic toggling
 function togglePdfLogic(questionId) {
     const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`).checked;
@@ -1683,6 +1789,9 @@ function addDropdownOption(questionId) {
             const conditionId = condition.id.split('_')[1];
             updateJumpOptions(questionId, conditionId);
         });
+        
+        // Update hidden logic trigger options
+        updateHiddenLogicTriggerOptions(questionId);
     });
 
     // Update all existing jump conditions
@@ -1690,6 +1799,9 @@ function addDropdownOption(questionId) {
     
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
+    
+    // Update hidden logic trigger options
+    updateHiddenLogicTriggerOptions(questionId);
 }
 
 function removeDropdownOption(questionId, optionNumber) {
@@ -1710,6 +1822,9 @@ function removeDropdownOption(questionId, optionNumber) {
     
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
+    
+    // Update hidden logic trigger options
+    updateHiddenLogicTriggerOptions(questionId);
 }
 
 function addCheckboxOption(questionId) {
