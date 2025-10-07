@@ -556,6 +556,66 @@ window.exportGuiJson = function(download = true) {
       }
     }
     
+    // Check for hidden logic - look for hidden checkbox/textbox nodes connected to options
+    const hiddenLogicConfigs = [];
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (targetCell && isOptions(targetCell)) {
+          // Get the option text
+          let optionText = targetCell.value || "";
+          if (optionText) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = optionText;
+            let cleanedText = textarea.value;
+            const temp = document.createElement("div");
+            temp.innerHTML = cleanedText;
+            cleanedText = temp.textContent || temp.innerText || cleanedText;
+            cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+            optionText = cleanedText;
+          }
+          
+          // Check if this option connects to hidden nodes
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const hiddenNode = optionEdge.target;
+              if (hiddenNode && typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(hiddenNode)) {
+                // Hidden checkbox node
+                hiddenLogicConfigs.push({
+                  trigger: optionText.trim(),
+                  type: "checkbox",
+                  nodeId: hiddenNode._hiddenNodeId || "hidden_checkbox",
+                  textboxText: ""
+                });
+              } else if (hiddenNode && typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(hiddenNode)) {
+                // Hidden textbox node
+                hiddenLogicConfigs.push({
+                  trigger: optionText.trim(),
+                  type: "textbox",
+                  nodeId: hiddenNode._hiddenNodeId || "hidden_textbox",
+                  textboxText: hiddenNode._defaultText || ""
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Set hidden logic if any hidden nodes are connected to options
+    if (hiddenLogicConfigs.length > 0) {
+      question.hiddenLogic = {
+        enabled: true,
+        configs: hiddenLogicConfigs
+      };
+    } else {
+      question.hiddenLogic = {
+        enabled: false,
+        configs: []
+      };
+    }
+    
     // Set jump logic if any options lead to end nodes or section jumps
     if (jumpConditions.length > 0) {
       question.jump.enabled = true;
@@ -1274,6 +1334,10 @@ window.exportBothJson = function() {
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
       if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
       
+      // Hidden node properties
+      if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
+      if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
+      
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 
@@ -1397,7 +1461,8 @@ window.saveFlowchart = function() {
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
-      _locationIndex: cell._locationIndex||null
+      _locationIndex: cell._locationIndex||null,
+      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null
     };
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle || null;
@@ -2383,6 +2448,21 @@ window.loadFlowchartData = function(data) {
             alertText = tempDiv.textContent || tempDiv.innerText || alertText;
           }
           newCell._alertText = alertText;
+        }
+        
+        // Hidden node properties
+        if (item._hiddenNodeId !== undefined) newCell._hiddenNodeId = item._hiddenNodeId;
+        if (item._defaultText !== undefined) {
+          let defaultText = item._defaultText;
+          if (typeof defaultText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = defaultText;
+            defaultText = tempDiv.textContent || tempDiv.innerText || defaultText;
+          }
+          newCell._defaultText = defaultText;
+          console.log('🔍 [LOAD DEBUG] Loaded _defaultText for cell:', item.id, 'value:', defaultText);
+        } else {
+          console.log('🔍 [LOAD DEBUG] No _defaultText found for cell:', item.id);
         }
         
         // Calculation properties

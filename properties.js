@@ -111,6 +111,20 @@ function onNodeTextFieldChange(newText) {
       if (typeof window.updateInfoNodeCell === 'function') {
         window.updateInfoNodeCell(selectedCell);
       }
+    } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(selectedCell)) {
+      // For hidden checkbox nodes, sync the text with the node ID
+      selectedCell.value = newText.trim();
+      selectedCell._hiddenNodeId = newText.trim() || "hidden_checkbox";
+      if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+        window.updateHiddenCheckboxNodeCell(selectedCell);
+      }
+    } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(selectedCell)) {
+      // For hidden textbox nodes, sync the text with the node ID
+      selectedCell.value = newText.trim();
+      selectedCell._hiddenNodeId = newText.trim() || "hidden_textbox";
+      if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+        window.updateHiddenTextboxNodeCell(selectedCell);
+      }
     }
   } finally {
     graph.getModel().endUpdate();

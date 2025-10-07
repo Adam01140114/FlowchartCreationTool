@@ -49,6 +49,12 @@ window.createNode = function(nodeType, x, y) {
       case 'end':
         vertex = createEndNode(x, y);
         break;
+      case 'hiddenCheckbox':
+        vertex = createHiddenCheckboxNode(x, y);
+        break;
+      case 'hiddenTextbox':
+        vertex = createHiddenTextboxNode(x, y);
+        break;
       default:
         console.error('Unknown node type:', nodeType);
         return null;
@@ -247,6 +253,37 @@ function createEndNode(x, y) {
 }
 
 /**
+ * Create a hidden checkbox node
+ */
+function createHiddenCheckboxNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=hiddenCheckbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;');
+  
+  // Set default properties
+  vertex.value = "Hidden Checkbox";
+  vertex._hiddenNodeId = "hidden_checkbox";
+  
+  return vertex;
+}
+
+/**
+ * Create a hidden textbox node
+ */
+function createHiddenTextboxNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=hiddenTextbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;');
+  
+  // Set default properties
+  vertex.value = "Hidden Textbox";
+  vertex._hiddenNodeId = "hidden_textbox";
+  vertex._defaultText = "";
+  
+  return vertex;
+}
+
+/**
  * Generate a unique question ID
  */
 function generateQuestionId() {
@@ -279,6 +316,52 @@ window.isCalculationNode = function(cell) {
  */
 window.isAmountOption = function(cell) {
   return cell && cell.style && cell.style.includes("nodeType=amountOption");
+};
+
+/**
+ * Check if a cell is a hidden checkbox node
+ */
+window.isHiddenCheckbox = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=hiddenCheckbox");
+};
+
+/**
+ * Check if a cell is a hidden textbox node
+ */
+window.isHiddenTextbox = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=hiddenTextbox");
+};
+
+/**
+ * Update hidden checkbox node cell display
+ */
+window.updateHiddenCheckboxNodeCell = function(cell) {
+  if (!cell) return;
+  
+  const text = cell._hiddenNodeId || "Hidden Checkbox";
+  const html = `<div style="text-align:center;padding:8px;">${text}</div>`;
+  cell.value = html;
+  
+  // Update the graph display
+  if (window.graph) {
+    window.graph.refresh(cell);
+  }
+};
+
+/**
+ * Update hidden textbox node cell display
+ */
+window.updateHiddenTextboxNodeCell = function(cell) {
+  if (!cell) return;
+  
+  const text = cell._hiddenNodeId || "Hidden Textbox";
+  const html = `<div style="text-align:center;padding:8px;">${text}</div>`;
+  cell.value = html;
+  
+  // Update the graph display
+  if (window.graph) {
+    window.graph.refresh(cell);
+  }
 };
 
 /**

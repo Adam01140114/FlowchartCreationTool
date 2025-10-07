@@ -185,6 +185,40 @@ function setupCustomGraphEditing(graph) {
       }
       
       evt.consume();
+    } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      // Update hidden checkbox node - sync text with node ID
+      graph.getModel().beginUpdate();
+      try {
+        // Save the plain text and sync with node ID
+        value = value.trim() || "Hidden Checkbox";
+        cell._hiddenNodeId = value;
+        
+        // Update the display value with the appropriate styling
+        if (window.updateHiddenCheckboxNodeCell) {
+          window.updateHiddenCheckboxNodeCell(cell);
+        }
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      
+      evt.consume();
+    } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      // Update hidden textbox node - sync text with node ID
+      graph.getModel().beginUpdate();
+      try {
+        // Save the plain text and sync with node ID
+        value = value.trim() || "Hidden Textbox";
+        cell._hiddenNodeId = value;
+        
+        // Update the display value with the appropriate styling
+        if (window.updateHiddenTextboxNodeCell) {
+          window.updateHiddenTextboxNodeCell(cell);
+        }
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      
+      evt.consume();
     }
   });
 }
@@ -290,6 +324,24 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // Show properties popup for hidden checkbox nodes
+        if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+          console.log("🎯 Hidden checkbox node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
+        // Show properties popup for hidden textbox nodes
+        if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+          console.log("🎯 Hidden textbox node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
         // Reset the tracking
         lastClickTime = 0;
         lastClickedCell = null;
@@ -365,9 +417,13 @@ function showPropertiesPopup(cell) {
   `;
   
   const title = document.createElement('h3');
-  // Use different title for PDF nodes
+  // Use different title for different node types
   if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
     title.textContent = 'PDF Node Properties';
+  } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+    title.textContent = 'Hidden Checkbox Properties';
+  } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+    title.textContent = 'Hidden Textbox Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -671,6 +727,17 @@ function showPropertiesPopup(cell) {
       { label: 'PDF Name', value: cell._pdfName || 'PDF Document', id: 'propPdfName', editable: true },
       { label: 'PDF File', value: cell._pdfFile || '', id: 'propPdfFile', editable: true },
       { label: 'PDF Price', value: cell._pdfPrice || '', id: 'propPdfPrice', editable: true }
+    ];
+  } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+    // For hidden checkbox nodes, only show Node ID
+    properties = [
+      { label: 'Node ID', value: cell._hiddenNodeId || 'hidden_checkbox', id: 'propHiddenNodeId', editable: true }
+    ];
+  } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+    // For hidden textbox nodes, show Node ID and Default Text
+    properties = [
+      { label: 'Node ID', value: cell._hiddenNodeId || 'hidden_textbox', id: 'propHiddenNodeId', editable: true },
+      { label: 'Default Text', value: cell._defaultText || '', id: 'propDefaultText', editable: true }
     ];
   } else {
     // For all other nodes, show the standard properties
@@ -1542,6 +1609,36 @@ function showPropertiesPopup(cell) {
               case 'propPdfPrice':
                 // Update the PDF price property
                 cell._pdfPrice = newValue;
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propHiddenNodeId':
+                // Update the hidden node ID property
+                cell._hiddenNodeId = newValue;
+                
+                // Update the node text to match the Node ID for hidden nodes
+                if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+                  // Update hidden checkbox node display
+                  if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+                    window.updateHiddenCheckboxNodeCell(cell);
+                  }
+                } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+                  // Update hidden textbox node display
+                  if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+                    window.updateHiddenTextboxNodeCell(cell);
+                  }
+                }
+                
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propDefaultText':
+                // Update the default text property for hidden textbox
+                cell._defaultText = newValue;
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();

@@ -17,7 +17,7 @@ let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, su
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
 let newSectionButton, untangleEdge, changeEdgeStyle, deleteEdge, edgeStyleCurved, edgeStyleDirect;
-let placeQuestionNode, placeOptionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode;
+let placeQuestionNode, placeOptionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode, placeHiddenCheckboxNode, placeHiddenTextboxNode;
 
 
 // Initialize DOM element references
@@ -74,6 +74,8 @@ function initializeContextMenuElements() {
   placePdfNode = document.getElementById('placePdfNode');
   placeAmountNode = document.getElementById('placeAmountNode');
   placeEndNode = document.getElementById('placeEndNode');
+  placeHiddenCheckboxNode = document.getElementById('placeHiddenCheckboxNode');
+  placeHiddenTextboxNode = document.getElementById('placeHiddenTextboxNode');
 }
 
 // Determine the type of a node (question, options, etc.)
@@ -1201,6 +1203,20 @@ function setupContextMenuEventListeners(graph) {
       hideContextMenu();
     });
   }
+  
+  if (placeHiddenCheckboxNode) {
+    placeHiddenCheckboxNode.addEventListener('click', function() {
+      placeNodeAtClickLocation(graph, 'hiddenCheckbox');
+      hideContextMenu();
+    });
+  }
+  
+  if (placeHiddenTextboxNode) {
+    placeHiddenTextboxNode.addEventListener('click', function() {
+      placeNodeAtClickLocation(graph, 'hiddenTextbox');
+      hideContextMenu();
+    });
+  }
 
   // Global click listener for hiding menus
   document.addEventListener("click", e => {
@@ -1546,6 +1562,17 @@ function placeNodeAtClickLocation(graph, nodeType) {
       cell._endText = "End";
       if (typeof window.updateEndNodeCell === 'function') {
         window.updateEndNodeCell(cell);
+      }
+    } else if (nodeType === 'hiddenCheckbox') {
+      cell._hiddenNodeId = "hidden_checkbox";
+      if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+        window.updateHiddenCheckboxNodeCell(cell);
+      }
+    } else if (nodeType === 'hiddenTextbox') {
+      cell._hiddenNodeId = "hidden_textbox";
+      cell._defaultText = "";
+      if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+        window.updateHiddenTextboxNodeCell(cell);
       }
     }
     

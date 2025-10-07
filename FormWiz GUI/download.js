@@ -849,23 +849,41 @@ function loadFormData(formData) {
                         hiddenLogicCbox.checked = true;
                         toggleHiddenLogic(question.questionId);
                     }
-                    const hiddenLogicTriggerSelect = questionBlock.querySelector(`#hiddenLogicTrigger${question.questionId}`);
-                    const hiddenLogicTypeSelect = questionBlock.querySelector(`#hiddenLogicType${question.questionId}`);
-                    const hiddenLogicNodeIdInput = questionBlock.querySelector(`#hiddenLogicNodeId${question.questionId}`);
-                    const hiddenLogicTextboxTextInput = questionBlock.querySelector(`#hiddenLogicTextboxText${question.questionId}`);
                     
-                    if (hiddenLogicTriggerSelect) {
-                        hiddenLogicTriggerSelect.value = question.hiddenLogic.trigger;
+                    // Clear existing configurations
+                    const configsContainer = questionBlock.querySelector(`#hiddenLogicConfigs${question.questionId}`);
+                    if (configsContainer) {
+                        configsContainer.innerHTML = '';
                     }
-                    if (hiddenLogicTypeSelect) {
-                        hiddenLogicTypeSelect.value = question.hiddenLogic.type;
-                        toggleHiddenLogicOptions(question.questionId);
-                    }
-                    if (hiddenLogicNodeIdInput) {
-                        hiddenLogicNodeIdInput.value = question.hiddenLogic.nodeId;
-                    }
-                    if (hiddenLogicTextboxTextInput) {
-                        hiddenLogicTextboxTextInput.value = question.hiddenLogic.textboxText;
+                    
+                    // Restore configurations
+                    if (question.hiddenLogic.configs && question.hiddenLogic.configs.length > 0) {
+                        question.hiddenLogic.configs.forEach((config, index) => {
+                            // Add configuration
+                            addHiddenLogicConfig(question.questionId);
+                            
+                            // Wait a moment for DOM to update, then set values
+                            setTimeout(() => {
+                                const triggerSelect = questionBlock.querySelector(`#hiddenLogicTrigger${question.questionId}_${index}`);
+                                const typeSelect = questionBlock.querySelector(`#hiddenLogicType${question.questionId}_${index}`);
+                                const nodeIdInput = questionBlock.querySelector(`#hiddenLogicNodeId${question.questionId}_${index}`);
+                                const textboxTextInput = questionBlock.querySelector(`#hiddenLogicTextboxText${question.questionId}_${index}`);
+                                
+                                if (triggerSelect) {
+                                    triggerSelect.value = config.trigger;
+                                }
+                                if (typeSelect) {
+                                    typeSelect.value = config.type;
+                                    toggleHiddenLogicOptions(question.questionId, index);
+                                }
+                                if (nodeIdInput) {
+                                    nodeIdInput.value = config.nodeId;
+                                }
+                                if (textboxTextInput) {
+                                    textboxTextInput.value = config.textboxText;
+                                }
+                            }, 10);
+                        });
                     }
                 }
 
@@ -1219,10 +1237,27 @@ function exportForm() {
 
             // ---------- Hidden Logic ----------
             const hiddenLogicEnabled = questionBlock.querySelector(`#enableHiddenLogic${questionId}`)?.checked || false;
-            const hiddenLogicTrigger = questionBlock.querySelector(`#hiddenLogicTrigger${questionId}`)?.value || "";
-            const hiddenLogicType = questionBlock.querySelector(`#hiddenLogicType${questionId}`)?.value || "";
-            const hiddenLogicNodeId = questionBlock.querySelector(`#hiddenLogicNodeId${questionId}`)?.value || "";
-            const hiddenLogicTextboxText = questionBlock.querySelector(`#hiddenLogicTextboxText${questionId}`)?.value || "";
+            const hiddenLogicConfigs = [];
+            
+            if (hiddenLogicEnabled) {
+                // Get all hidden logic configurations
+                const configElements = questionBlock.querySelectorAll('.hidden-logic-config');
+                configElements.forEach((configElement, index) => {
+                    const trigger = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`)?.value || "";
+                    const type = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`)?.value || "";
+                    const nodeId = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`)?.value || "";
+                    const textboxText = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`)?.value || "";
+                    
+                    if (trigger && type && nodeId) {
+                        hiddenLogicConfigs.push({
+                            trigger: trigger,
+                            type: type,
+                            nodeId: nodeId,
+                            textboxText: textboxText
+                        });
+                    }
+                });
+            }
 
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
@@ -1352,10 +1387,7 @@ function exportForm() {
                 },
                 hiddenLogic: {
                     enabled: hiddenLogicEnabled,
-                    trigger: hiddenLogicTrigger,
-                    type: hiddenLogicType,
-                    nodeId: hiddenLogicNodeId,
-                    textboxText: hiddenLogicTextboxText
+                    configs: hiddenLogicConfigs
                 },
                 pdfLogic: {
                     enabled: pdfLogicEnabled,

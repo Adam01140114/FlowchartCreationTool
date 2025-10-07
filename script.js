@@ -4272,6 +4272,17 @@ function autosaveFlowchartToLocalStorage() {
       // Alert node properties
       if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
       
+      // Hidden node properties - always save these if they exist on the cell
+      if (cell.hasOwnProperty('_hiddenNodeId')) cellData._hiddenNodeId = cell._hiddenNodeId;
+      if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
+      
+      // Special handling for hidden textbox nodes - always save _defaultText even if empty
+      if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+        // Always save _defaultText for hidden textbox nodes, even if undefined or empty
+        cellData._defaultText = cell._defaultText !== undefined ? cell._defaultText : "";
+        console.log('🔍 [AUTOSAVE DEBUG] Saving hidden textbox _defaultText:', cellData._defaultText);
+      }
+      
       // calculation node properties
         // Calculation node data export now handled by calc.js
         if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
@@ -5564,6 +5575,14 @@ function resetAllNodeIds() {
   
   // Process each cell
   cells.forEach(cell => {
+    // Skip hidden nodes - they should keep their custom Node IDs
+    if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      return; // Skip hidden checkbox nodes
+    }
+    if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      return; // Skip hidden textbox nodes
+    }
+    
     if (typeof window.generateCorrectNodeId === 'function') {
       const correctNodeId = window.generateCorrectNodeId(cell);
       if (correctNodeId) {

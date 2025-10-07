@@ -807,24 +807,10 @@ function addQuestion(sectionId, questionId = null) {
             <label>Enable Hidden Logic: </label>
             <input type="checkbox" id="enableHiddenLogic${currentQuestionId}" onchange="toggleHiddenLogic(${currentQuestionId})"><br><br>
             <div id="hiddenLogicBlock${currentQuestionId}" style="display: none;">
-                <label>Trigger Condition:</label>
-                <select id="hiddenLogicTrigger${currentQuestionId}">
-                    <option value="">Select Trigger</option>
-                </select><br><br>
-                <label>Hidden Logic Type:</label>
-                <select id="hiddenLogicType${currentQuestionId}" onchange="toggleHiddenLogicOptions(${currentQuestionId})">
-                    <option value="">Select Type</option>
-                    <option value="checkbox">Checkbox</option>
-                    <option value="textbox">Textbox</option>
-                </select><br><br>
-                <div id="hiddenLogicOptions${currentQuestionId}" style="display: none;">
-                    <label>Node ID:</label>
-                    <input type="text" id="hiddenLogicNodeId${currentQuestionId}" placeholder="Enter node ID"><br><br>
-                    <div id="hiddenLogicTextboxOptions${currentQuestionId}" style="display: none;">
-                        <label>Textbox Text:</label>
-                        <input type="text" id="hiddenLogicTextboxText${currentQuestionId}" placeholder="Enter textbox text"><br><br>
-                    </div>
+                <div id="hiddenLogicConfigs${currentQuestionId}">
+                    <!-- First hidden logic configuration will be added here -->
                 </div>
+                <button type="button" onclick="addHiddenLogicConfig(${currentQuestionId})" style="margin-top: 10px;">+ Add Another</button>
             </div>
         </div><br>
 
@@ -1599,30 +1585,28 @@ function toggleHiddenLogic(questionId) {
     const hiddenLogicBlock = document.getElementById(`hiddenLogicBlock${questionId}`);
     hiddenLogicBlock.style.display = hiddenLogicEnabled ? 'block' : 'none';
     
-    // Populate trigger options when enabling
+    // Create first configuration when enabling
     if (hiddenLogicEnabled) {
-        updateHiddenLogicTriggerOptions(questionId);
+        const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+        if (configsContainer && configsContainer.children.length === 0) {
+            addHiddenLogicConfig(questionId);
+        }
     }
     
-    // Reset the type selection and options when disabling
+    // Clear all configurations when disabling
     if (!hiddenLogicEnabled) {
-        const typeSelect = document.getElementById(`hiddenLogicType${questionId}`);
-        const optionsDiv = document.getElementById(`hiddenLogicOptions${questionId}`);
-        const textboxOptionsDiv = document.getElementById(`hiddenLogicTextboxOptions${questionId}`);
-        const triggerSelect = document.getElementById(`hiddenLogicTrigger${questionId}`);
-        
-        if (typeSelect) typeSelect.value = '';
-        if (optionsDiv) optionsDiv.style.display = 'none';
-        if (textboxOptionsDiv) textboxOptionsDiv.style.display = 'none';
-        if (triggerSelect) triggerSelect.value = '';
+        const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+        if (configsContainer) {
+            configsContainer.innerHTML = '';
+        }
     }
 }
 
 // Hidden logic type options toggling
-function toggleHiddenLogicOptions(questionId) {
-    const typeSelect = document.getElementById(`hiddenLogicType${questionId}`);
-    const optionsDiv = document.getElementById(`hiddenLogicOptions${questionId}`);
-    const textboxOptionsDiv = document.getElementById(`hiddenLogicTextboxOptions${questionId}`);
+function toggleHiddenLogicOptions(questionId, configIndex = 0) {
+    const typeSelect = document.getElementById(`hiddenLogicType${questionId}_${configIndex}`);
+    const optionsDiv = document.getElementById(`hiddenLogicOptions${questionId}_${configIndex}`);
+    const textboxOptionsDiv = document.getElementById(`hiddenLogicTextboxOptions${questionId}_${configIndex}`);
     
     if (typeSelect && optionsDiv) {
         const selectedType = typeSelect.value;
@@ -1643,24 +1627,124 @@ function toggleHiddenLogicOptions(questionId) {
 
 // Update hidden logic trigger options from dropdown question options
 function updateHiddenLogicTriggerOptions(questionId) {
-    const triggerSelect = document.getElementById(`hiddenLogicTrigger${questionId}`);
-    if (!triggerSelect) return;
+    // Update all trigger selects for this question
+    const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
+    triggerSelects.forEach(triggerSelect => {
+        // Clear existing options except the first one
+        triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
+        
+        // Get dropdown options from the question
+        const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+        if (!dropdownOptionsDiv) return;
+        
+        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+        optionInputs.forEach(optionInput => {
+            const val = optionInput.value.trim();
+            if (val) {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.text = val;
+                triggerSelect.appendChild(opt);
+            }
+        });
+    });
+}
+
+// Add a new hidden logic configuration
+function addHiddenLogicConfig(questionId) {
+    const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+    if (!configsContainer) return;
     
-    // Clear existing options except the first one
-    triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
+    // Get the next config index
+    const existingConfigs = configsContainer.querySelectorAll('.hidden-logic-config');
+    const configIndex = existingConfigs.length;
     
-    // Get dropdown options from the question
-    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
-    if (!dropdownOptionsDiv) return;
+    // Create the configuration HTML
+    const configHtml = `
+        <div class="hidden-logic-config" id="hiddenLogicConfig${questionId}_${configIndex}" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong>Hidden Logic Configuration ${configIndex + 1}</strong>
+                ${configIndex > 0 ? `<button type="button" onclick="removeHiddenLogicConfig(${questionId}, ${configIndex})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Remove</button>` : ''}
+            </div>
+            <label>Trigger Condition:</label>
+            <select id="hiddenLogicTrigger${questionId}_${configIndex}">
+                <option value="">Select Trigger</option>
+            </select><br><br>
+            <label>Hidden Logic Type:</label>
+            <select id="hiddenLogicType${questionId}_${configIndex}" onchange="toggleHiddenLogicOptions(${questionId}, ${configIndex})">
+                <option value="">Select Type</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="textbox">Textbox</option>
+            </select><br><br>
+            <div id="hiddenLogicOptions${questionId}_${configIndex}" style="display: none;">
+                <label>Node ID:</label>
+                <input type="text" id="hiddenLogicNodeId${questionId}_${configIndex}" placeholder="Enter node ID"><br><br>
+                <div id="hiddenLogicTextboxOptions${questionId}_${configIndex}" style="display: none;">
+                    <label>Textbox Text:</label>
+                    <input type="text" id="hiddenLogicTextboxText${questionId}_${configIndex}" placeholder="Enter textbox text"><br><br>
+                </div>
+            </div>
+        </div>
+    `;
     
-    const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
-    optionInputs.forEach(optionInput => {
-        const val = optionInput.value.trim();
-        if (val) {
-            const opt = document.createElement('option');
-            opt.value = val;
-            opt.text = val;
-            triggerSelect.appendChild(opt);
+    // Add the configuration to the container
+    configsContainer.insertAdjacentHTML('beforeend', configHtml);
+    
+    // Populate trigger options for the new configuration
+    updateHiddenLogicTriggerOptions(questionId);
+}
+
+// Remove a hidden logic configuration
+function removeHiddenLogicConfig(questionId, configIndex) {
+    const configElement = document.getElementById(`hiddenLogicConfig${questionId}_${configIndex}`);
+    if (configElement) {
+        configElement.remove();
+        
+        // Renumber remaining configurations
+        renumberHiddenLogicConfigs(questionId);
+    }
+}
+
+// Renumber hidden logic configurations after removal
+function renumberHiddenLogicConfigs(questionId) {
+    const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+    if (!configsContainer) return;
+    
+    const configs = configsContainer.querySelectorAll('.hidden-logic-config');
+    configs.forEach((config, newIndex) => {
+        const oldId = config.id;
+        const newId = `hiddenLogicConfig${questionId}_${newIndex}`;
+        
+        // Update the container ID
+        config.id = newId;
+        
+        // Update the title
+        const titleElement = config.querySelector('strong');
+        if (titleElement) {
+            titleElement.textContent = `Hidden Logic Configuration ${newIndex + 1}`;
+        }
+        
+        // Update all input IDs and names
+        const inputs = config.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const oldInputId = input.id;
+            if (oldInputId) {
+                const newInputId = oldInputId.replace(/_\d+$/, `_${newIndex}`);
+                input.id = newInputId;
+                
+                // Update onchange handlers
+                if (input.onchange) {
+                    input.onchange = new Function(`toggleHiddenLogicOptions(${questionId}, ${newIndex})`);
+                }
+            }
+        });
+        
+        // Update remove button
+        const removeButton = config.querySelector('button[onclick*="removeHiddenLogicConfig"]');
+        if (removeButton && newIndex > 0) {
+            removeButton.onclick = new Function(`removeHiddenLogicConfig(${questionId}, ${newIndex})`);
+        } else if (removeButton && newIndex === 0) {
+            removeButton.remove();
         }
     });
 }

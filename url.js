@@ -274,6 +274,10 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
     if (cell._paragraphLimit) cellData._paragraphLimit = cell._paragraphLimit;
     
+    // Hidden node properties
+    if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
+    if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
+    
     // mult dropdown location indicator
     if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 

@@ -561,7 +561,25 @@ function setupCustomClickHandlers(graph) {
       return;
     }
     
-    // e) Edge double-click = reset geometry
+    // e) Hidden checkbox node double-click = show properties popup
+    if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // f) Hidden textbox node double-click = show properties popup
+    if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // g) Edge double-click = reset geometry
     if (cell && cell.edge) {
       const geo = new mxGeometry();
       graph.getModel().setGeometry(cell, geo);

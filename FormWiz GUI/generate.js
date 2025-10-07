@@ -1031,26 +1031,30 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         const hiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
         const hiddenLogicEnabled = hiddenLogicEnabledEl && hiddenLogicEnabledEl.checked;
         if (hiddenLogicEnabled) {
-          const hiddenLogicTriggerEl = qBlock.querySelector(`#hiddenLogicTrigger${questionId}`);
-          const hiddenLogicTypeEl = qBlock.querySelector(`#hiddenLogicType${questionId}`);
-          const hiddenLogicNodeIdEl = qBlock.querySelector(`#hiddenLogicNodeId${questionId}`);
-          const hiddenLogicTextboxTextEl = qBlock.querySelector(`#hiddenLogicTextboxText${questionId}`);
-          
-          const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
-          const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
-          const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
-          const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
-          
-          if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
-            hiddenLogicConfigs.push({
-              questionId: questionId,
-              questionNameId: ddNm,
-              trigger: hiddenLogicTrigger,
-              type: hiddenLogicType,
-              nodeId: hiddenLogicNodeId,
-              textboxText: hiddenLogicTextboxText
-            });
-          }
+          // Get all hidden logic configurations
+          const configElements = qBlock.querySelectorAll('.hidden-logic-config');
+          configElements.forEach((configElement, index) => {
+            const hiddenLogicTriggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
+            const hiddenLogicTypeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
+            const hiddenLogicNodeIdEl = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`);
+            const hiddenLogicTextboxTextEl = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`);
+            
+            const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
+            const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
+            const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
+            const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
+            
+            if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
+              hiddenLogicConfigs.push({
+                questionId: questionId,
+                questionNameId: ddNm,
+                trigger: hiddenLogicTrigger,
+                type: hiddenLogicType,
+                nodeId: hiddenLogicNodeId,
+                textboxText: hiddenLogicTextboxText
+              });
+            }
+          });
         }
       } else if (questionType === "checkbox") {
        /* ---------- CHECKBOX QUESTION ---------- */
