@@ -3330,17 +3330,16 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                             if (fieldLabel && fieldNodeId) {
                                 console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
                                 
-                                // For multipleTextboxes, we only need the first numbered field (_1)
-                                // because only one field is actually generated
-                                const numberedNodeId = `${fieldNodeId}_1`;
-                                const questionTextWithNumber = `${questionText} - ${fieldLabel}`;
+                                // For multipleTextboxes, use the base nodeId without numbering
+                                // because the actual generated fields use the base nodeId
+                                const questionTextWithField = `${questionText} - ${fieldLabel}`;
                                 
-                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithNumber} (${numberedNodeId})`);
+                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithField} (${fieldNodeId})`);
                                 
                                 textQuestions.push({
                                     questionId: questionId,
-                                    nodeId: numberedNodeId,
-                                    questionText: questionTextWithNumber
+                                    nodeId: fieldNodeId,
+                                    questionText: questionTextWithField
                                 });
                             }
                         } else {

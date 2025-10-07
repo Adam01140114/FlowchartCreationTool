@@ -1291,7 +1291,8 @@ formHTML += `</div><br></div>`;
               }
               
               if (field.type === 'label') {
-                const fieldId = field.nodeId + "_" + j;
+                // For multipleTextboxes, use the base nodeId without numbering
+                const fieldId = field.nodeId;
                 if (field.label === 'State') {
                   // Use dropdown for State field
                   const dropdownDiv = document.createElement('div');
@@ -1304,7 +1305,8 @@ formHTML += `</div><br></div>`;
                   entryContainer.appendChild(inputDiv.firstElementChild);
                 }
               } else if (field.type === 'amount') {
-                const fieldId = field.nodeId + "_" + j;
+                // For multipleTextboxes, use the base nodeId without numbering
+                const fieldId = field.nodeId;
                 const inputDiv = document.createElement('div');
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
                 entryContainer.appendChild(inputDiv.firstElementChild);

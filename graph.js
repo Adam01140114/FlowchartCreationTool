@@ -2911,11 +2911,31 @@ function populateLinkedLogicDropdown(dropdown, cell) {
   
   // Add options for each textbox question
   textboxNodes.forEach(node => {
-    const option = document.createElement('option');
-    const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
-    option.value = nodeId;
-    option.textContent = nodeId || `Node ${node.id}`;
-    dropdown.appendChild(option);
+    // Check if it's a multiple textbox question
+    if (node.style && node.style.includes('questionType=multipleTextboxes') && 
+        node._textboxes && Array.isArray(node._textboxes)) {
+      // Add individual textbox entries
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const option = document.createElement('option');
+          // Convert nameId to lowercase to match the Copy ID format
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          const labelId = `${baseNodeId}_${lowercaseNameId}`;
+          option.value = labelId;
+          option.textContent = labelId;
+          dropdown.appendChild(option);
+        }
+      });
+    } else {
+      // Regular textbox question - add the base node ID
+      const option = document.createElement('option');
+      const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      option.value = nodeId;
+      option.textContent = nodeId || `Node ${node.id}`;
+      dropdown.appendChild(option);
+    }
   });
   
   // Add options for each multiple dropdown question label
