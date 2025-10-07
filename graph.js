@@ -262,15 +262,15 @@ function setupCustomDoubleClickBehavior(graph) {
       // Debounce the reset operations to improve performance on large graphs
       clickOutTimeout = setTimeout(() => {
         // Reset PDF and ID for the previously selected cell
-        if (typeof window.resetPdfInheritance === 'function') {
+        if (typeof window.resetPdfInheritance === 'function' && currentlySelectedCell) {
           window.resetPdfInheritance(currentlySelectedCell);
         }
         
         // Reset node ID by clearing any custom ID properties
-        if (currentlySelectedCell._nameId) {
+        if (currentlySelectedCell && currentlySelectedCell._nameId) {
           currentlySelectedCell._nameId = '';
         }
-        if (currentlySelectedCell._customId) {
+        if (currentlySelectedCell && currentlySelectedCell._customId) {
           currentlySelectedCell._customId = '';
         }
         clickOutTimeout = null;
@@ -508,27 +508,37 @@ function showPropertiesPopup(cell) {
   // Use the correct window.getNodeId function (same as the old properties menu)
   let nodeId = 'N/A';
   
-  // Always use getNodeId to ensure PDF naming convention is applied
-  if (typeof window.getNodeId === 'function') {
-    nodeId = window.getNodeId(cell) || 'N/A';
+  // Special handling for hidden nodes - use _hiddenNodeId directly to preserve underscores
+  if ((typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) ||
+      (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell))) {
+    if (cell._hiddenNodeId) {
+      nodeId = cell._hiddenNodeId;
+    } else {
+      nodeId = 'N/A';
+    }
   } else {
-    // Fallback logic if window.getNodeId is not available
-    // PRIORITY 1: Check if we have a saved Node ID in the style
-    if (cell.style) {
-      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
-      if (styleMatch) {
-        nodeId = decodeURIComponent(styleMatch[1]);
+    // Regular nodes use getNodeId function
+    if (typeof window.getNodeId === 'function') {
+      nodeId = window.getNodeId(cell) || 'N/A';
+    } else {
+      // Fallback logic if window.getNodeId is not available
+      // PRIORITY 1: Check if we have a saved Node ID in the style
+      if (cell.style) {
+        const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+        if (styleMatch) {
+          nodeId = decodeURIComponent(styleMatch[1]);
+        }
       }
-    }
-    
-    // PRIORITY 2: Check _nameId property
-    if (nodeId === 'N/A' && cell._nameId) {
-      nodeId = cell._nameId;
-    }
-    
-    // PRIORITY 3: Generate default Node ID
-    if (nodeId === 'N/A') {
-      nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      
+      // PRIORITY 2: Check _nameId property
+      if (nodeId === 'N/A' && cell._nameId) {
+        nodeId = cell._nameId;
+      }
+      
+      // PRIORITY 3: Generate default Node ID
+      if (nodeId === 'N/A') {
+        nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      }
     }
   }
   
@@ -1485,7 +1495,11 @@ function showPropertiesPopup(cell) {
             const newValue = input.value.trim();
             valueSpan.textContent = newValue;
             valueSpan.style.display = 'block';
-            input.remove();
+            
+            // Safely remove input element if it still exists
+            if (input && input.parentNode) {
+              input.remove();
+            }
             
             // Update cell property
             switch(prop.id) {
@@ -1662,7 +1676,10 @@ function showPropertiesPopup(cell) {
               saveValue();
             } else if (e.key === 'Escape') {
               valueSpan.style.display = 'block';
-              input.remove();
+              // Safely remove input element if it still exists
+              if (input && input.parentNode) {
+                input.remove();
+              }
             }
           });
         });

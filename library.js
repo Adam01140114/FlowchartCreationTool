@@ -1573,6 +1573,12 @@ window.openSavedFlowchart = function(name) {
       loadFlowchartData(docSnap.data().flowchart);
       currentFlowchartName = name;
       
+      // Trigger autosave to save the library flowchart name
+      if (typeof window.requestAutosave === 'function') {
+        console.log('📚 [LIBRARY LOAD] Triggering autosave to save library flowchart name:', name);
+        window.requestAutosave();
+      }
+      
       // Update last used timestamp
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
         .update({ lastUsed: Date.now() })
@@ -2094,6 +2100,14 @@ window.resetAllPdfInheritance = function() {
     // Skip PDF nodes themselves (they don't need inheritance reset)
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
       return;
+    }
+    
+    // Skip hidden nodes - they should not be affected by PDF reset
+    if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      return; // Skip hidden checkbox nodes
+    }
+    if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      return; // Skip hidden textbox nodes
     }
     
     // Check if this cell has PDF inheritance

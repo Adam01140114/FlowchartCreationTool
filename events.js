@@ -311,7 +311,7 @@ function setupGraphEventListeners(graph) {
     }
   });
   
-  // Move cells event for connected node handling
+  // Move cells event - nodes now move independently without dragging connected nodes
   graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
     const movedCells = evt.getProperty('cells');
     const dx = evt.getProperty('dx');
@@ -319,108 +319,8 @@ function setupGraphEventListeners(graph) {
     
     if (!movedCells || movedCells.length === 0) return;
     
-    const movedIds = new Set(movedCells.map(c => c.id));
-    
-    // Function to get all connected descendants (including notes nodes)
-    const getConnectedDescendants = (cell) => {
-      const descendants = new Set();
-      const queue = [cell];
-      
-      while (queue.length > 0) {
-        const current = queue.shift();
-        const edges = graph.getOutgoingEdges(current) || [];
-        
-        edges.forEach(edge => {
-          const target = edge.target;
-          if (!descendants.has(target) && !movedIds.has(target.id)) {
-            descendants.add(target);
-            queue.push(target);
-          }
-        });
-      }
-      return Array.from(descendants);
-    };
-    
-    // Function to get all connected ancestors (for notes nodes pointing to questions)
-    const getConnectedAncestors = (cell) => {
-      const ancestors = new Set();
-      const queue = [cell];
-      
-      while (queue.length > 0) {
-        const current = queue.shift();
-        const edges = graph.getIncomingEdges(current) || [];
-        
-        edges.forEach(edge => {
-          const source = edge.source;
-          if (!ancestors.has(source) && !movedIds.has(source.id)) {
-            ancestors.add(source);
-            queue.push(source);
-          }
-        });
-      }
-      return Array.from(ancestors);
-    };
-    
-    movedCells.forEach(cell => {
-      if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-        // When dragging a question node, move all connected descendants (including notes nodes)
-        const descendants = getConnectedDescendants(cell);
-        descendants.forEach(descendant => {
-          const geo = descendant.geometry;
-          if (geo) {
-            const newGeo = geo.clone();
-            newGeo.x += dx;
-            newGeo.y += dy;
-            graph.getModel().setGeometry(descendant, newGeo);
-          }
-        });
-      } else if ((typeof window.isNotesNode === 'function' && window.isNotesNode(cell)) || 
-                 (typeof window.isChecklistNode === 'function' && window.isChecklistNode(cell)) || 
-                 (typeof window.isAlertNode === 'function' && window.isAlertNode(cell)) || 
-                 (typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(cell)) || 
-                 (typeof window.isInfoNode === 'function' && window.isInfoNode(cell))) {
-        // When dragging a notes/checklist/alert/subtitle/info node, check if it points to a question node
-        const incomingEdges = graph.getIncomingEdges(cell) || [];
-        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-        
-        // If node has outgoing edges (points to other nodes), move those descendants
-        if (outgoingEdges.length > 0) {
-          const descendants = getConnectedDescendants(cell);
-          descendants.forEach(descendant => {
-            const geo = descendant.geometry;
-            if (geo) {
-              const newGeo = geo.clone();
-              newGeo.x += dx;
-              newGeo.y += dy;
-              graph.getModel().setGeometry(descendant, newGeo);
-            }
-          });
-        }
-        
-        // If node has incoming edges (is pointed to by other nodes), 
-        // check if any of those are question nodes and move them with their descendants
-        incomingEdges.forEach(edge => {
-          const source = edge.source;
-          if (typeof window.isQuestion === 'function' && window.isQuestion(source) && !movedIds.has(source.id)) {
-            // Move the question node and all its descendants
-            const questionAndDescendants = [source, ...getConnectedDescendants(source)];
-            questionAndDescendants.forEach(descendant => {
-              const geo = descendant.geometry;
-              if (geo) {
-                const newGeo = geo.clone();
-                newGeo.x += dx;
-                newGeo.y += dy;
-                graph.getModel().setGeometry(descendant, newGeo);
-              }
-            });
-          }
-        });
-      } else if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
-        // PDF nodes should NOT drag any connected nodes - they move independently
-        // This prevents PDF nodes from dragging question nodes or other connected elements
-        console.log('PDF node dragged independently - no connected nodes moved');
-      }
-    });
+    // All nodes now move independently - no connected node dragging
+    console.log('Nodes moved independently - no connected nodes dragged along');
     
     // Renumber question IDs based on new Y positions
     if (typeof window.renumberQuestionIds === 'function') {

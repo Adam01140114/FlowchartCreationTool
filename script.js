@@ -495,15 +495,8 @@ graph.isCellEditable = function (cell) {
       
       // Check for geometry changes (resize/move) on calculation nodes
       if (change instanceof mxGeometryChange && change.cell && typeof window.isCalculationNode === 'function' && window.isCalculationNode(change.cell)) {
-        // Calculation node was resized, show dimensions alert
-        setTimeout(() => {
-          const geo = change.cell.geometry;
-          if (geo) {
-            const width = Math.round(geo.width);
-            const height = Math.round(geo.height);
-            alert(`Calculation Node Dimensions:\nWidth: ${width}px\nHeight: ${height}px`);
-          }
-        }, 10); // Small delay to ensure geometry is updated
+        // Calculation node was resized - alert disabled
+        // Dimensions are now handled silently without showing alert
       }
     });
   });
@@ -4324,12 +4317,16 @@ function autosaveFlowchartToLocalStorage() {
     // Get form name
     const formName = document.getElementById('formNameInput')?.value || '';
     
+    // Get current library flowchart name (if any)
+    const libraryFlowchartName = window.currentFlowchartName || null;
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
       groups: groupsArray,
       defaultPdfProperties: defaultPdfProps,
-      formName: formName
+      formName: formName,
+      libraryFlowchartName: libraryFlowchartName
     };
     
     // Cache the data and hash for next comparison
@@ -4542,21 +4539,38 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
-      console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
-      console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
-      window.loadFlowchartData(data);
-      
-      // Restore form name if it exists
-      if (data.formName) {
-        const formNameInput = document.getElementById('formNameInput');
-        if (formNameInput) {
-          formNameInput.value = data.formName;
+      // Check if this was a library flowchart and handle it specially
+      if (data.libraryFlowchartName && typeof window.openSavedFlowchart === 'function') {
+        console.log('🔄 [AUTOSAVE RESTORE] Detected library flowchart:', data.libraryFlowchartName);
+        
+        // Show alert to user
+        alert(`Opening ${data.libraryFlowchartName} from library`);
+        
+        // Set the current flowchart name first
+        window.currentFlowchartName = data.libraryFlowchartName;
+        
+        // Open the library flowchart directly (this will load the latest version from the library)
+        window.openSavedFlowchart(data.libraryFlowchartName);
+        
+        // Wait for groups to be loaded before setting up autosave hooks
+        setTimeout(safeSetupAutosaveHooks, 1000);
+      } else {
+        // Handle regular autosave restore (non-library flowchart)
+        console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
+        console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
+        window.loadFlowchartData(data);
+        
+        // Restore form name if it exists
+        if (data.formName) {
+          const formNameInput = document.getElementById('formNameInput');
+          if (formNameInput) {
+            formNameInput.value = data.formName;
+          }
         }
+        
+        // Wait for groups to be loaded before setting up autosave hooks
+        setTimeout(safeSetupAutosaveHooks, 1000);
       }
-      
-      // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
-      // Wait for groups to be loaded before setting up autosave hooks
-      setTimeout(safeSetupAutosaveHooks, 1000);
     } else {
       setTimeout(safeSetupAutosaveHooks, 500);
     }
@@ -4691,7 +4705,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText'
       ];
       
       safeProperties.forEach(prop => {
@@ -4878,7 +4892,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4905,6 +4919,19 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Node IDs will only change when manually edited or reset using the button
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+        }
+        
+        // Handle hidden node copy/paste
+        if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(newCell)) {
+          // Update hidden checkbox node display
+          if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+            window.updateHiddenCheckboxNodeCell(newCell);
+          }
+        } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(newCell)) {
+          // Update hidden textbox node display
+          if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+            window.updateHiddenTextboxNodeCell(newCell);
+          }
         }
       });
       
@@ -4998,7 +5025,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -5023,6 +5050,19 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // FIRST OCCURRENCE - Calculation node copy/paste now handled by calc.js
           if (typeof window.handleCalculationNodeCopyPaste === "function") {
             window.handleCalculationNodeCopyPaste(newCell);
+          }
+        }
+        
+        // Handle hidden node copy/paste
+        if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(newCell)) {
+          // Update hidden checkbox node display
+          if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+            window.updateHiddenCheckboxNodeCell(newCell);
+          }
+        } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(newCell)) {
+          // Update hidden textbox node display
+          if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+            window.updateHiddenTextboxNodeCell(newCell);
           }
         }
       });
