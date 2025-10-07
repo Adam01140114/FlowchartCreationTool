@@ -1570,14 +1570,8 @@ window.openSavedFlowchart = function(name) {
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
       
       console.log('📚 [LIBRARY LOAD] Flowchart data retrieved, calling loadFlowchartData');
-      loadFlowchartData(docSnap.data().flowchart);
       currentFlowchartName = name;
-      
-      // Trigger autosave to save the library flowchart name
-      if (typeof window.requestAutosave === 'function') {
-        console.log('📚 [LIBRARY LOAD] Triggering autosave to save library flowchart name:', name);
-        window.requestAutosave();
-      }
+      loadFlowchartData(docSnap.data().flowchart, name);
       
       // Update last used timestamp
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
@@ -2264,8 +2258,12 @@ window.validateAllNodeIds = function() {
 /**
  * Load a flowchart from JSON data.
  */
-window.loadFlowchartData = function(data) {
+window.loadFlowchartData = function(data, libraryFlowchartName) {
   console.log('📥 [LOAD FLOWCHART] Starting to load flowchart data');
+  console.log('📥 [LOAD FLOWCHART] Library flowchart name:', libraryFlowchartName || 'None (regular import)');
+  
+  // Store library flowchart name in a global variable for autosave to access
+  window._loadingLibraryFlowchartName = libraryFlowchartName || null;
   
   if (!data.cells) {
     alert("Invalid flowchart data");

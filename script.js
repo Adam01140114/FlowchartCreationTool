@@ -4320,6 +4320,13 @@ function autosaveFlowchartToLocalStorage() {
     // Get current library flowchart name (if any)
     const libraryFlowchartName = window.currentFlowchartName || null;
     
+    // Debug logging for library flowchart name
+    if (libraryFlowchartName) {
+      console.log('🔍 [AUTOSAVE DEBUG] Saving library flowchart name:', libraryFlowchartName);
+    } else {
+      console.log('🔍 [AUTOSAVE DEBUG] No library flowchart name to save');
+    }
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
@@ -4478,7 +4485,17 @@ function setupAutosaveHooks() {
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
       console.log('Autosaving after loadFlowchartData, current groups:', groups);
+      // Get library flowchart name from global variable (set by loadFlowchartData)
+      const libraryName = window._loadingLibraryFlowchartName;
+      console.log('🔍 [AUTOSAVE DEBUG] Library name from global variable:', libraryName);
+      // Set currentFlowchartName before autosave if we're loading from library
+      if (libraryName) {
+        window.currentFlowchartName = libraryName;
+        console.log('🔍 [AUTOSAVE DEBUG] Set currentFlowchartName to:', libraryName);
+      }
       autosaveFlowchartToLocalStorage();
+      // Clear the global variable after autosave
+      window._loadingLibraryFlowchartName = null;
     }, 1000); // Increased delay to ensure groups are fully processed
     
     // Clear the loading flag after all loading processes are complete
@@ -4539,6 +4556,11 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
+      // Debug logging for autosave restore
+      console.log('🔍 [AUTOSAVE RESTORE DEBUG] Autosave data:', data);
+      console.log('🔍 [AUTOSAVE RESTORE DEBUG] Library flowchart name:', data.libraryFlowchartName);
+      console.log('🔍 [AUTOSAVE RESTORE DEBUG] openSavedFlowchart function available:', typeof window.openSavedFlowchart === 'function');
+      
       // Check if this was a library flowchart and handle it specially
       if (data.libraryFlowchartName && typeof window.openSavedFlowchart === 'function') {
         console.log('🔄 [AUTOSAVE RESTORE] Detected library flowchart:', data.libraryFlowchartName);
