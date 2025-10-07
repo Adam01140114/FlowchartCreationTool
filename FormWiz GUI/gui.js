@@ -3073,7 +3073,7 @@ function createLinkedFieldModal() {
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        ">
+        " onclick="event.stopPropagation()">
             <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Configure Linked Fields</h3>
             <div id="linkedFieldDropdowns" style="margin-bottom: 20px;">
                 <!-- Dropdowns will be added here -->
@@ -3097,6 +3097,22 @@ function createLinkedFieldModal() {
     `;
     
     document.body.appendChild(modal);
+    
+    // Add event listeners for modal functionality
+    modal.addEventListener('click', function(event) {
+        // Close modal when clicking on the backdrop (outside the modal content)
+        if (event.target === modal) {
+            closeLinkedFieldModal();
+        }
+    });
+    
+    // Add Enter key functionality
+    document.addEventListener('keydown', function(event) {
+        if (modal.style.display === 'block' && event.key === 'Enter') {
+            event.preventDefault();
+            finalizeLinkedField();
+        }
+    });
 }
 
 // Add a dropdown to the linked field configuration
@@ -3256,6 +3272,76 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                         questionText: questionTextWithNumber
                                     });
                                 }
+                            }
+                        } else {
+                            console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
+                        }
+                    } else {
+                        console.log(`❌ [DEBUG] Field ${fieldIndex} doesn't meet criteria - fieldType: ${fieldType}`);
+                    }
+                });
+            } else {
+                console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+            }
+        }
+        
+        // Handle multiple textboxes questions
+        if (questionTypeSelect && questionTypeSelect.value === 'multipleTextboxes') {
+            console.log(`🔍 [DEBUG] Found multipleTextboxes question ${questionId}`);
+            
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            const nodeId = block.querySelector(`#nodeId${questionId}`)?.value || `answer${questionId}`;
+            
+            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - questionText:`, questionText);
+            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - nodeId:`, nodeId);
+            
+            // Get all fields from the multiple textboxes using the unified fields container
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
+            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - unifiedFieldsContainer:`, unifiedFieldsContainer);
+            
+            if (unifiedFieldsContainer) {
+                const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field');
+                console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - fieldContainers found:`, fieldContainers.length);
+                
+                fieldContainers.forEach((fieldContainer, fieldIndex) => {
+                    console.log(`🔍 [DEBUG] Processing field container ${fieldIndex} for question ${questionId}`);
+                    
+                    const fieldType = fieldContainer.getAttribute('data-type');
+                    const fieldOrder = fieldContainer.getAttribute('data-order');
+                    
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
+                    
+                    if (fieldType && (fieldType === 'label' || fieldType === 'amount')) {
+                        // Get the field data from the spans
+                        const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
+                        const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
+                        
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabelSpan:`, fieldLabelSpan);
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeIdSpan:`, fieldNodeIdSpan);
+                        
+                        if (fieldLabelSpan && fieldNodeIdSpan) {
+                            const fieldLabel = fieldLabelSpan.textContent.trim();
+                            const fieldNodeId = fieldNodeIdSpan.textContent.trim();
+                            
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabel:`, fieldLabel);
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeId:`, fieldNodeId);
+                            
+                            if (fieldLabel && fieldNodeId) {
+                                console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
+                                
+                                // For multipleTextboxes, we only need the first numbered field (_1)
+                                // because only one field is actually generated
+                                const numberedNodeId = `${fieldNodeId}_1`;
+                                const questionTextWithNumber = `${questionText} - ${fieldLabel}`;
+                                
+                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithNumber} (${numberedNodeId})`);
+                                
+                                textQuestions.push({
+                                    questionId: questionId,
+                                    nodeId: numberedNodeId,
+                                    questionText: questionTextWithNumber
+                                });
                             }
                         } else {
                             console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
@@ -3478,6 +3564,12 @@ function removeLinkedFieldDisplay(linkedFieldId) {
         // Remove from configuration
         if (window.linkedFieldsConfig) {
             window.linkedFieldsConfig = window.linkedFieldsConfig.filter(config => config.id !== linkedFieldId);
+        }
+        
+        // If no more linked fields, remove the container
+        const linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+        if (linkedFieldsContainer && linkedFieldsContainer.children.length === 0) {
+            linkedFieldsContainer.remove();
         }
     }
 }

@@ -236,8 +236,7 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>how many</h3></label><select id="how_many" name="how_many" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><div id="question-container-3" class="question-container hidden"><label><h3>Why</h3></label><div class="text-input-container"><input type="text" id="why" name="why" placeholder=""></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>Enter info</h3></label><div id="labelContainer2"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="enter_info_name_1" name="enter_info_name_1" placeholder="Name" class="address-input"></div></div><br></div><div id="question-container-3" class="question-container hidden"><label><h3>Why</h3></label><div class="text-input-container"><input type="text" id="why" name="why" placeholder=""></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -389,8 +388,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry","2":"how_many","3":"why"};
-var questionNameIds = {"1":"hungry","2":"how_many","3":"why"};
+    var questionSlugMap       = {"1":"hungry","2":"enter_info","3":"why"};
+var questionNameIds = {"1":"hungry","3":"why"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -398,13 +397,13 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"2":["Name"],"length":0};
-var amountMap = {"2":[],"length":0};
-var labelNodeIdsMap = {"2":["how_many_name"]};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1}]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"enter_info_name","order":1}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
-var linkedFields = [{"linkedFieldId":"test","fields":["how_many_name_1","why"]}];
+var linkedFields = [{"linkedFieldId":"test","fields":["enter_info_name","why"]}];
 var isHandlingLink = false;
 // Function to get URL parameters
 function getUrlParameter(name) {
@@ -1570,6 +1569,9 @@ function showTextboxLabels(questionId, count){
     }
     attachCalculationListeners();   // keep this
     
+    // Update linked fields after creating new textboxes
+    updateLinkedFields();
+    
     // Attach autosave listeners to newly generated textbox inputs
     const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
     newInputs.forEach(input => {
@@ -1911,22 +1913,33 @@ function clearInactiveLinkedFields() {
 function setupLinkedFields() {
     if (!linkedFields || linkedFields.length === 0) return;
     
-    linkedFields.forEach(linkedField => {
-        const { fields } = linkedField;
-        
-        // Add event listeners to all linked textboxes
-        fields.forEach(fieldId => {
-            const textbox = document.getElementById(fieldId);
-            if (textbox) {
-                // Remove existing event listener if any
-                textbox.removeEventListener('input', updateLinkedFields);
-                textbox.removeEventListener('change', updateLinkedFields);
-                
-                // Add new event listeners
-                textbox.addEventListener('input', updateLinkedFields);
-                textbox.addEventListener('change', updateLinkedFields);
+    // Use event delegation to handle dynamically created textboxes
+    document.addEventListener('input', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+            // Check if this input is part of any linked field
+            const fieldId = event.target.id;
+            const isLinkedField = linkedFields.some(linkedField => 
+                linkedField.fields.includes(fieldId)
+            );
+            
+            if (isLinkedField) {
+                updateLinkedFields();
             }
-        });
+        }
+    });
+    
+    document.addEventListener('change', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+            // Check if this input is part of any linked field
+            const fieldId = event.target.id;
+            const isLinkedField = linkedFields.some(linkedField => 
+                linkedField.fields.includes(fieldId)
+            );
+            
+            if (isLinkedField) {
+                updateLinkedFields();
+            }
+        }
     });
     
     // Initial update
