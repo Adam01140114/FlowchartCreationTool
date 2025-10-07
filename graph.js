@@ -342,6 +342,15 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // Show properties popup for linked logic nodes
+        if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+          console.log("🎯 Linked logic node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
         // Reset the tracking
         lastClickTime = 0;
         lastClickedCell = null;
@@ -424,6 +433,8 @@ function showPropertiesPopup(cell) {
     title.textContent = 'Hidden Checkbox Properties';
   } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
     title.textContent = 'Hidden Textbox Properties';
+  } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+    title.textContent = 'Linked Logic Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -749,6 +760,12 @@ function showPropertiesPopup(cell) {
       { label: 'Node ID', value: cell._hiddenNodeId || 'hidden_textbox', id: 'propHiddenNodeId', editable: true },
       { label: 'Default Text', value: cell._defaultText || '', id: 'propDefaultText', editable: true }
     ];
+  } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+    // For linked logic nodes, show special properties with dropdowns
+    properties = [
+      { label: 'Node ID', value: cell._linkedLogicNodeId || 'linked_logic', id: 'propLinkedLogicNodeId', editable: true },
+      { label: 'Linked Fields', value: 'linkedFields', id: 'propLinkedFields', editable: false, special: 'linkedFields' }
+    ];
   } else {
     // For all other nodes, show the standard properties
     properties = [
@@ -966,6 +983,164 @@ function showPropertiesPopup(cell) {
   
   
   properties.forEach((prop, index) => {
+    // Special handling for linked logic fields
+    if (prop.special === 'linkedFields') {
+      const fieldDiv = document.createElement('div');
+      fieldDiv.style.cssText = `
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+      `;
+      
+      const label = document.createElement('label');
+      label.textContent = prop.label ? prop.label + (prop.isInherited ? ' (inherited):' : ':') : '';
+      label.style.cssText = `
+        font-weight: 600;
+        color: #333;
+        min-width: 120px;
+        margin-right: 12px;
+        ${prop.isInherited ? 'color: #4caf50;' : ''}
+      `;
+      
+      const linkedFieldsContainer = document.createElement('div');
+      linkedFieldsContainer.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      `;
+      
+      // Create initial dropdowns (minimum 2)
+      const linkedFields = cell._linkedFields || [];
+      const minDropdowns = Math.max(2, linkedFields.length);
+      
+      for (let i = 0; i < minDropdowns; i++) {
+        const dropdownContainer = document.createElement('div');
+        dropdownContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        `;
+        
+        const dropdown = document.createElement('select');
+        dropdown.style.cssText = `
+          flex: 1;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+        `;
+        
+        // Populate dropdown with textbox question Node IDs
+        populateLinkedLogicDropdown(dropdown, cell);
+        
+        // Set selected value if it exists
+        if (linkedFields[i]) {
+          dropdown.value = linkedFields[i];
+        }
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.cssText = `
+          padding: 4px 8px;
+          background-color: #f44336;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteBtn.onclick = () => {
+          dropdownContainer.remove();
+          updateLinkedFields(cell);
+        };
+        
+        dropdownContainer.appendChild(dropdown);
+        dropdownContainer.appendChild(deleteBtn);
+        linkedFieldsContainer.appendChild(dropdownContainer);
+      }
+      
+      // Add "Link Another" button
+      const linkAnotherBtn = document.createElement('button');
+      linkAnotherBtn.textContent = 'Link Another';
+      linkAnotherBtn.style.cssText = `
+        padding: 8px 16px;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 8px;
+      `;
+      linkAnotherBtn.onclick = () => {
+        const dropdownContainer = document.createElement('div');
+        dropdownContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        `;
+        
+        const dropdown = document.createElement('select');
+        dropdown.style.cssText = `
+          flex: 1;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+        `;
+        
+        populateLinkedLogicDropdown(dropdown, cell);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.cssText = `
+          padding: 4px 8px;
+          background-color: #f44336;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteBtn.onclick = () => {
+          dropdownContainer.remove();
+          updateLinkedFields(cell);
+        };
+        
+        dropdownContainer.appendChild(dropdown);
+        dropdownContainer.appendChild(deleteBtn);
+        linkedFieldsContainer.insertBefore(dropdownContainer, linkAnotherBtn);
+        updateLinkedFields(cell);
+      };
+      
+      linkedFieldsContainer.appendChild(linkAnotherBtn);
+      
+      fieldDiv.appendChild(label);
+      fieldDiv.appendChild(linkedFieldsContainer);
+      content.appendChild(fieldDiv);
+      
+      // Helper function to update linked fields
+      function updateLinkedFields(cell) {
+        const dropdowns = linkedFieldsContainer.querySelectorAll('select');
+        cell._linkedFields = Array.from(dropdowns).map(dropdown => dropdown.value).filter(value => value);
+        
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      }
+      
+      // Add change listeners to all dropdowns
+      linkedFieldsContainer.addEventListener('change', (e) => {
+        if (e.target.tagName === 'SELECT') {
+          updateLinkedFields(cell);
+        }
+      });
+      
+      return; // Skip the normal property creation
+    }
+    
     const fieldDiv = document.createElement('div');
     fieldDiv.style.cssText = `
       margin-bottom: 16px;
@@ -1643,6 +1818,20 @@ function showPropertiesPopup(cell) {
                   if (typeof window.updateHiddenTextboxNodeCell === 'function') {
                     window.updateHiddenTextboxNodeCell(cell);
                   }
+                }
+                
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propLinkedLogicNodeId':
+                // Update the linked logic node ID property
+                cell._linkedLogicNodeId = newValue;
+                
+                // Update the node text to match the Node ID for linked logic nodes
+                if (typeof window.updateLinkedLogicNodeCell === 'function') {
+                  window.updateLinkedLogicNodeCell(cell);
                 }
                 
                 // Trigger autosave
@@ -2675,4 +2864,86 @@ window.testPropertiesPopup = function() {
     showPropertiesPopup(selectedCells[0]);
   }
 };
+
+/**
+ * Populate dropdown with textbox question Node IDs from flowchart
+ */
+function populateLinkedLogicDropdown(dropdown, cell) {
+  // Clear existing options
+  dropdown.innerHTML = '';
+  
+  // Add default option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select a textbox question...';
+  dropdown.appendChild(defaultOption);
+  
+  // Get all cells in the graph
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const allCells = graph.getChildVertices(graph.getDefaultParent());
+  
+  // Find all textbox question nodes and multiple dropdown question labels
+  const textboxNodes = allCells.filter(cell => {
+    // Check if it's a question node with textbox type
+    if (cell.style && cell.style.includes('nodeType=question')) {
+      // Check if it has textbox question type (exclude dropdown types)
+      const isTextbox = cell.style.includes('questionType=text') || 
+                       cell.style.includes('questionType=multipleTextboxes');
+      
+      // Make sure it's NOT a dropdown question
+      const isDropdown = cell.style.includes('questionType=dropdown') ||
+                        cell.style.includes('questionType=yesNo') ||
+                        cell.style.includes('questionType=multipleChoice') ||
+                        cell.style.includes('questionType=multipleDropdownType');
+      
+      return isTextbox && !isDropdown;
+    }
+    return false;
+  });
+  
+  // Find all multiple dropdown question nodes to extract their labels
+  const multipleDropdownNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           cell.style.includes('questionType=multipleDropdownType');
+  });
+  
+  // Add options for each textbox question
+  textboxNodes.forEach(node => {
+    const option = document.createElement('option');
+    const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+    option.value = nodeId;
+    option.textContent = nodeId || `Node ${node.id}`;
+    dropdown.appendChild(option);
+  });
+  
+  // Add options for each multiple dropdown question label
+  multipleDropdownNodes.forEach(node => {
+    if (node._textboxes && Array.isArray(node._textboxes)) {
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const option = document.createElement('option');
+          // Convert nameId to lowercase to match the Copy ID format
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          const labelId = `${baseNodeId}_${lowercaseNameId}_${index + 1}`;
+          option.value = labelId;
+          option.textContent = labelId;
+          dropdown.appendChild(option);
+        }
+      });
+    }
+  });
+  
+  // If no questions found, add a placeholder
+  if (textboxNodes.length === 0 && multipleDropdownNodes.length === 0) {
+    const noOptions = document.createElement('option');
+    noOptions.value = '';
+    noOptions.textContent = 'No textbox questions found';
+    noOptions.disabled = true;
+    dropdown.appendChild(noOptions);
+  }
+}
 

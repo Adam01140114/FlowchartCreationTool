@@ -17,7 +17,7 @@ let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, su
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
 let newSectionButton, untangleEdge, changeEdgeStyle, deleteEdge, edgeStyleCurved, edgeStyleDirect;
-let placeQuestionNode, placeOptionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode, placeHiddenCheckboxNode, placeHiddenTextboxNode;
+let placeQuestionNode, placeOptionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode, placeHiddenCheckboxNode, placeHiddenTextboxNode, placeLinkedLogicNode;
 
 
 // Initialize DOM element references
@@ -76,6 +76,7 @@ function initializeContextMenuElements() {
   placeEndNode = document.getElementById('placeEndNode');
   placeHiddenCheckboxNode = document.getElementById('placeHiddenCheckboxNode');
   placeHiddenTextboxNode = document.getElementById('placeHiddenTextboxNode');
+  placeLinkedLogicNode = document.getElementById('placeLinkedLogicNode');
 }
 
 // Determine the type of a node (question, options, etc.)
@@ -1218,6 +1219,13 @@ function setupContextMenuEventListeners(graph) {
     });
   }
 
+  if (placeLinkedLogicNode) {
+    placeLinkedLogicNode.addEventListener('click', function() {
+      placeNodeAtClickLocation(graph, 'linkedLogic');
+      hideContextMenu();
+    });
+  }
+
   // Global click listener for hiding menus
   document.addEventListener("click", e => {
     // Don't hide context menu if clicking on properties popup
@@ -1484,6 +1492,21 @@ function placeNodeAtClickLocation(graph, nodeType) {
       label = "End";
       width = 120;
       height = 60;
+    } else if (nodeType === 'hiddenCheckbox') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenCheckbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;";
+      label = "Hidden Checkbox";
+      width = 150;
+      height = 80;
+    } else if (nodeType === 'hiddenTextbox') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenTextbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;";
+      label = "Hidden Textbox";
+      width = 150;
+      height = 80;
+    } else if (nodeType === 'linkedLogic') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;section=1;fillColor=#DDA0DD;strokeColor=#9370DB;";
+      label = "Linked Logic";
+      width = 150;
+      height = 80;
     }
     
     // Create the cell
@@ -1573,6 +1596,12 @@ function placeNodeAtClickLocation(graph, nodeType) {
       cell._defaultText = "";
       if (typeof window.updateHiddenTextboxNodeCell === 'function') {
         window.updateHiddenTextboxNodeCell(cell);
+      }
+    } else if (nodeType === 'linkedLogic') {
+      cell._linkedLogicNodeId = "linked_logic";
+      cell._linkedFields = [];
+      if (typeof window.updateLinkedLogicNodeCell === 'function') {
+        window.updateLinkedLogicNodeCell(cell);
       }
     }
     

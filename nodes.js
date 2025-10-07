@@ -55,6 +55,9 @@ window.createNode = function(nodeType, x, y) {
       case 'hiddenTextbox':
         vertex = createHiddenTextboxNode(x, y);
         break;
+      case 'linkedLogic':
+        vertex = createLinkedLogicNode(x, y);
+        break;
       default:
         console.error('Unknown node type:', nodeType);
         return null;
@@ -283,6 +286,19 @@ function createHiddenTextboxNode(x, y) {
   return vertex;
 }
 
+function createLinkedLogicNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=linkedLogic;section=1;fillColor=#DDA0DD;strokeColor=#9370DB;');
+  
+  // Set default properties
+  vertex.value = "Linked Logic";
+  vertex._linkedLogicNodeId = "linked_logic";
+  vertex._linkedFields = []; // Array to store linked field IDs
+  
+  return vertex;
+}
+
 /**
  * Generate a unique question ID
  */
@@ -330,6 +346,29 @@ window.isHiddenCheckbox = function(cell) {
  */
 window.isHiddenTextbox = function(cell) {
   return cell && cell.style && cell.style.includes("nodeType=hiddenTextbox");
+};
+
+/**
+ * Check if a cell is a linked logic node
+ */
+window.isLinkedLogicNode = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=linkedLogic");
+};
+
+/**
+ * Update linked logic node cell display
+ */
+window.updateLinkedLogicNodeCell = function(cell) {
+  if (!cell) return;
+  
+  // Update the display value with the Node ID
+  const nodeId = cell._linkedLogicNodeId || 'linked_logic';
+  cell.value = nodeId;
+  
+  // Update the graph display
+  if (window.graph) {
+    window.graph.refresh(cell);
+  }
 };
 
 /**

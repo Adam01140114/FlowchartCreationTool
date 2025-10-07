@@ -420,3 +420,157 @@ MIGRATION PROCESS FOR OTHER NODES:
 6. **FIX EVENT HANDLERS**: Ensure double-click handlers work correctly
 7. **TEST THOROUGHLY**: Verify all functionality works in the new popup
 8. **ADD USER INSTRUCTIONS**: Include clear instructions for accessing configuration
+
+=====================================
+
+INCIDENT: Right-Click Menu Node Creation Issues for Special Node Types
+DATE: [Current Date]
+ISSUE ID: RIGHT_CLICK_SPECIAL_NODES_001
+
+PROBLEM DESCRIPTION:
+===================
+1. Linked Logic nodes created via right-click context menu appeared as ugly, empty rectangles
+2. Hidden Checkbox and Hidden Textbox nodes created via right-click context menu also appeared as basic rectangles
+3. Double-clicking on these nodes created via right-click menu did nothing (no properties menu opened)
+4. Right-click menu node creation was inconsistent with drag-and-drop node creation for special node types
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make right-click context menu create special node types (Linked Logic, Hidden Checkbox, Hidden Textbox) with the same appearance and functionality as drag-and-drop
+- Ensure these nodes have proper styling, dimensions, and initialization
+- Make double-click functionality work correctly on nodes created via right-click menu
+
+ISSUES ENCOUNTERED:
+==================
+1. MISSING NODE TYPE CASES:
+   - The `placeNodeAtClickLocation` function in context-menus.js was missing cases for `hiddenCheckbox`, `hiddenTextbox`, and `linkedLogic` node types
+   - These node types were falling through to the default case, creating basic cells without proper styling
+
+2. MISSING INITIALIZATION LOGIC:
+   - Even when basic cells were created, they lacked the proper initialization logic
+   - No default properties were being set (like `_hiddenNodeId`, `_linkedLogicNodeId`, etc.)
+   - No update functions were being called to set up the proper display
+
+3. INCONSISTENT STYLING:
+   - Right-click created nodes had different styling than drag-and-drop created nodes
+   - Missing proper colors, dimensions, and visual properties
+
+TECHNICAL DETAILS:
+==================
+- File: context-menus.js
+- Function: `placeNodeAtClickLocation(graph, nodeType)`
+- The function had cases for standard node types but was missing special node types
+- Drag-and-drop uses `createNode()` function in nodes.js which has proper initialization
+- Right-click menu was creating basic `insertVertex()` calls without proper setup
+
+SOLUTION THAT WORKED:
+====================
+1. ADDED MISSING NODE TYPE CASES:
+   ```javascript
+   } else if (nodeType === 'hiddenCheckbox') {
+     style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenCheckbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;";
+     label = "Hidden Checkbox";
+     width = 150;
+     height = 80;
+   } else if (nodeType === 'hiddenTextbox') {
+     style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenTextbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;";
+     label = "Hidden Textbox";
+     width = 150;
+     height = 80;
+   } else if (nodeType === 'linkedLogic') {
+     style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;section=1;fillColor=#DDA0DD;strokeColor=#9370DB;";
+     label = "Linked Logic";
+     width = 150;
+     height = 80;
+   }
+   ```
+
+2. ADDED PROPER INITIALIZATION LOGIC:
+   ```javascript
+   } else if (nodeType === 'hiddenCheckbox') {
+     cell._hiddenNodeId = "hidden_checkbox";
+     if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+       window.updateHiddenCheckboxNodeCell(cell);
+     }
+   } else if (nodeType === 'hiddenTextbox') {
+     cell._hiddenNodeId = "hidden_textbox";
+     cell._defaultText = "";
+     if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+       window.updateHiddenTextboxNodeCell(cell);
+     }
+   } else if (nodeType === 'linkedLogic') {
+     cell._linkedLogicNodeId = "linked_logic";
+     cell._linkedFields = [];
+     if (typeof window.updateLinkedLogicNodeCell === 'function') {
+       window.updateLinkedLogicNodeCell(cell);
+     }
+   }
+   ```
+
+CODE CHANGES:
+=============
+1. Added missing node type cases in `placeNodeAtClickLocation` function:
+   - Added `hiddenCheckbox` case with proper styling and dimensions
+   - Added `hiddenTextbox` case with proper styling and dimensions
+   - Added `linkedLogic` case with proper styling and dimensions
+
+2. Added proper initialization logic for each node type:
+   - Hidden Checkbox: Sets `_hiddenNodeId` and calls `updateHiddenCheckboxNodeCell`
+   - Hidden Textbox: Sets `_hiddenNodeId`, `_defaultText` and calls `updateHiddenTextboxNodeCell`
+   - Linked Logic: Sets `_linkedLogicNodeId`, `_linkedFields` and calls `updateLinkedLogicNodeCell`
+
+3. Applied consistent styling:
+   - Hidden nodes: Blue dashed border (`strokeColor=#0066CC;strokeDasharray=5,5`)
+   - Linked Logic: Light purple fill (`fillColor=#DDA0DD;strokeColor=#9370DB`)
+   - All nodes: Proper dimensions (150x80)
+
+KEY LEARNINGS:
+==============
+1. When adding new node types, ensure both drag-and-drop AND right-click menu support them
+2. Right-click menu node creation must mirror drag-and-drop node creation exactly
+3. Always include proper initialization logic for special node types
+4. Check that all node types have proper styling, dimensions, and default properties
+5. Test both creation methods to ensure consistency
+
+PREVENTION:
+===========
+- When adding new node types, update both `createNode()` in nodes.js AND `placeNodeAtClickLocation()` in context-menus.js
+- Always include proper initialization logic for special node types
+- Use the same styling, dimensions, and properties for both creation methods
+- Test right-click menu creation against drag-and-drop creation for all node types
+
+RELATED FILES:
+=============
+- context-menus.js (main file with right-click menu logic)
+- nodes.js (drag-and-drop node creation logic to replicate)
+- graph.js (double-click handlers for properties menus)
+
+FUTURE REFERENCE:
+================
+When adding new special node types:
+1. Add the node type case to `placeNodeAtClickLocation()` function
+2. Include proper styling, dimensions, and label
+3. Add initialization logic with default properties
+4. Call the appropriate update function
+5. Test both drag-and-drop and right-click menu creation
+6. Ensure double-click functionality works correctly
+
+PATTERN FOR NEW NODE TYPES:
+===========================
+```javascript
+// 1. Add styling case
+} else if (nodeType === 'newNodeType') {
+  style = "proper;styling;string;";
+  label = "Node Label";
+  width = 150;
+  height = 80;
+}
+
+// 2. Add initialization case
+} else if (nodeType === 'newNodeType') {
+  cell._newNodeProperty = "default_value";
+  if (typeof window.updateNewNodeTypeCell === 'function') {
+    window.updateNewNodeTypeCell(cell);
+  }
+}
+```

@@ -1338,6 +1338,10 @@ window.exportBothJson = function() {
       if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
       
+      // Linked logic node properties
+      if (cell._linkedLogicNodeId !== undefined) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+      if (cell._linkedFields !== undefined) cellData._linkedFields = cell._linkedFields;
+      
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 
@@ -2103,6 +2107,9 @@ window.resetAllPdfInheritance = function() {
     if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
       return; // Skip hidden textbox nodes
     }
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      return; // Skip linked logic nodes
+    }
     
     // Check if this cell has PDF inheritance
     const currentPdfName = window.getPdfNameForNode(cell);
@@ -2476,6 +2483,10 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         } else {
           console.log('🔍 [LOAD DEBUG] No _defaultText found for cell:', item.id);
         }
+        
+        // Linked logic node properties
+        if (item._linkedLogicNodeId !== undefined) newCell._linkedLogicNodeId = item._linkedLogicNodeId;
+        if (item._linkedFields !== undefined) newCell._linkedFields = item._linkedFields;
         
         // Calculation properties
         if (item._calcTitle !== undefined) {

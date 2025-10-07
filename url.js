@@ -278,6 +278,10 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
     if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
     
+    // Linked logic node properties
+    if (cell._linkedLogicNodeId !== undefined) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+    if (cell._linkedFields !== undefined) cellData._linkedFields = cell._linkedFields;
+    
     // mult dropdown location indicator
     if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 

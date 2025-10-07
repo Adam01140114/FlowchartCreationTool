@@ -270,8 +270,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (window.updatePdfNodeCell) window.updatePdfNodeCell(cell);
           }
           
-          // If it's a text2 node, make sure we update _questionText from value
-          if (isQuestion(cell) && getQuestionType(cell) === "text2") {
+          // If it's a dropdown node, make sure we update _questionText from value
+          if (isQuestion(cell) && getQuestionType(cell) === "dropdown") {
             // Extract text from HTML value if present
             if (cell.value) {
               const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   onchange="window.pickTypeForCell('${cell.id}', this.value)">
                   <option value="">-- Choose Question Type --</option>
                   <option value="text">Text</option>
-                  <option value="text2">Dropdown</option>
+                  <option value="dropdown">Dropdown</option>
                   <option value="checkbox">Checkbox</option>
                   <option value="number">Number</option>
                   <option value="date">Date</option>
@@ -428,8 +428,8 @@ graph.isCellEditable = function (cell) {
   if (isAlertNode(cell)) {
     return false;
   }
-  // Allow text2 to be edited directly with double-click
-  if (qt === 'text2') {
+  // Allow dropdown to be edited directly with double-click
+  if (qt === 'dropdown') {
     return true;
   }
   // Allow option nodes to be edited directly with double-click
@@ -1705,9 +1705,9 @@ window.copyMultipleDropdownId = function(cellId, index) {
   // Build the default ID with PDF name if available
   let defaultTextToCopy;
   if (sanitizedPdfName) {
-    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_1_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedEntryText}_1`;
   } else {
-    defaultTextToCopy = `${sanitizedQuestionText}_1_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedQuestionText}_${sanitizedEntryText}_1`;
   }
   
   // Copy the default ID to clipboard immediately
@@ -1728,28 +1728,26 @@ window.copyMultipleDropdownId = function(cellId, index) {
   }
   const finalNumber = number.trim() || '1'; // Use "1" as default if empty
   
-  // If user entered a different number, copy the updated ID
-  if (finalNumber !== '1') {
-    const sanitizedNumber = finalNumber;
-    
-    // Build the updated ID with PDF name if available
-    let updatedTextToCopy;
-    if (sanitizedPdfName) {
-      updatedTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
-    } else {
-      updatedTextToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
-    }
-    
-    // Copy the updated ID to clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(updatedTextToCopy).catch(() => {
-        // Fallback for older browsers
-        fallbackCopyToClipboard(updatedTextToCopy);
-      });
-    } else {
+  // Always copy the final ID with the user's number (even if it's "1")
+  const sanitizedNumber = finalNumber;
+  
+  // Build the final ID with PDF name if available
+  let finalTextToCopy;
+  if (sanitizedPdfName) {
+    finalTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedEntryText}_${sanitizedNumber}`;
+  } else {
+    finalTextToCopy = `${sanitizedQuestionText}_${sanitizedEntryText}_${sanitizedNumber}`;
+  }
+  
+  // Copy the final ID to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(finalTextToCopy).catch(() => {
       // Fallback for older browsers
-      fallbackCopyToClipboard(updatedTextToCopy);
-    }
+      fallbackCopyToClipboard(finalTextToCopy);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(finalTextToCopy);
   }
 };
 
@@ -2936,7 +2934,6 @@ function colorCell(cell) {
       case "text":         fillColor = colorPreferences.text; break;
       case "checkbox":     fillColor = colorPreferences.checkbox; break;
       case "dropdown":     fillColor = colorPreferences.dropdown; break;
-      case "text2":        fillColor = colorPreferences.dropdown; break; // Text2 uses dropdown color
       case "number":       fillColor = colorPreferences.money; break;
       case "date":         fillColor = colorPreferences.date; break;
       case "dateRange":    fillColor = colorPreferences.date; break; // Use date color for dateRange
@@ -3600,7 +3597,7 @@ function sanitizeNameId(str) {
  **************************************************/
 
 /**
- * Create a cell for text2 - a textbox that functions like a dropdown but 
+ * Create a cell for dropdown - a textbox that functions like a dropdown but 
  * has better text editing capabilities
  */
 function updateText2Cell(cell) {
@@ -3618,11 +3615,11 @@ function updateText2Cell(cell) {
 }
 
 /**
- * Handler for text2 question text changes
+ * Handler for dropdown question text changes
  */
 window.updateText2Handler = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
-  if (!cell || getQuestionType(cell) !== "text2") return;
+  if (!cell || getQuestionType(cell) !== "dropdown") return;
   
       graph.getModel().beginUpdate();
       try {
@@ -4269,6 +4266,10 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_hiddenNodeId')) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
       
+      // Linked logic node properties - always save these if they exist on the cell
+      if (cell.hasOwnProperty('_linkedLogicNodeId')) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+      if (cell.hasOwnProperty('_linkedFields')) cellData._linkedFields = cell._linkedFields;
+      
       // Special handling for hidden textbox nodes - always save _defaultText even if empty
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
         // Always save _defaultText for hidden textbox nodes, even if undefined or empty
@@ -4727,7 +4728,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields'
       ];
       
       safeProperties.forEach(prop => {
@@ -4914,7 +4915,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4953,6 +4954,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update hidden textbox node display
           if (typeof window.updateHiddenTextboxNodeCell === 'function') {
             window.updateHiddenTextboxNodeCell(newCell);
+          }
+        } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(newCell)) {
+          // Update linked logic node display
+          if (typeof window.updateLinkedLogicNodeCell === 'function') {
+            window.updateLinkedLogicNodeCell(newCell);
           }
         }
       });
@@ -5047,7 +5053,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -5085,6 +5091,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update hidden textbox node display
           if (typeof window.updateHiddenTextboxNodeCell === 'function') {
             window.updateHiddenTextboxNodeCell(newCell);
+          }
+        } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(newCell)) {
+          // Update linked logic node display
+          if (typeof window.updateLinkedLogicNodeCell === 'function') {
+            window.updateLinkedLogicNodeCell(newCell);
           }
         }
       });
@@ -5643,6 +5654,9 @@ function resetAllNodeIds() {
     }
     if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
       return; // Skip hidden textbox nodes
+    }
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      return; // Skip linked logic nodes
     }
     
     if (typeof window.generateCorrectNodeId === 'function') {
