@@ -351,6 +351,10 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // For all other nodes, zoom into the node
+        console.log("🎯 Double-click detected, zooming into node");
+        zoomIntoNode(cell);
+        
         // Reset the tracking
         lastClickTime = 0;
         lastClickedCell = null;
@@ -364,6 +368,52 @@ function setupCustomDoubleClickBehavior(graph) {
   
   // Double-click behavior is now handled in events.js module
   
+}
+
+/**
+ * Zoom into a specific node
+ */
+function zoomIntoNode(cell) {
+  if (!cell || !cell.geometry) {
+    console.warn('Cannot zoom: cell or geometry not available');
+    return;
+  }
+  
+  const graph = window.graph;
+  if (!graph) {
+    console.warn('Cannot zoom: graph not available');
+    return;
+  }
+  
+  // Get the cell's center position
+  const cellX = cell.geometry.x + (cell.geometry.width / 2);
+  const cellY = cell.geometry.y + (cell.geometry.height / 2);
+  
+  // Set a zoom level that makes the node clearly visible
+  const targetScale = 1.5; // Zoom to 150%
+  
+  // Get current view state
+  const currentScale = graph.view.scale;
+  const currentTranslate = graph.view.translate;
+  
+  // Calculate the new translation to center the node
+  const container = graph.container;
+  const containerRect = container.getBoundingClientRect();
+  const containerCenterX = containerRect.width / 2;
+  const containerCenterY = containerRect.height / 2;
+  
+  // Calculate where the cell center should be in screen coordinates
+  const newTranslateX = (containerCenterX / targetScale) - cellX;
+  const newTranslateY = (containerCenterY / targetScale) - cellY;
+  
+  // Apply the zoom and translation
+  graph.view.setScale(targetScale);
+  graph.view.setTranslate(newTranslateX, newTranslateY);
+  
+  // Refresh the graph to show the changes
+  graph.view.refresh();
+  
+  console.log(`🔍 [ZOOM] Zoomed into node at (${cellX}, ${cellY}) with scale ${targetScale}`);
 }
 
 /**
@@ -2844,6 +2894,7 @@ window.setupKeyboardNavigation = setupKeyboardNavigation;
 window.setupPanningAndZooming = setupPanningAndZooming;
 window.showQuestionTextPopup = showQuestionTextPopup;
 window.showPropertiesPopup = showPropertiesPopup;
+window.zoomIntoNode = zoomIntoNode;
 
 // Test function for debugging properties popup
 window.testPropertiesPopup = function() {
@@ -2898,8 +2949,9 @@ function populateLinkedLogicDropdown(dropdown, cell) {
       const isTextbox = cell.style.includes('questionType=text') || 
                        cell.style.includes('questionType=multipleTextboxes');
       
-      // Make sure it's NOT a dropdown question
+      // Make sure it's NOT a dropdown question (including text2 which is dropdown type)
       const isDropdown = cell.style.includes('questionType=dropdown') ||
+                        cell.style.includes('questionType=text2') ||
                         cell.style.includes('questionType=yesNo') ||
                         cell.style.includes('questionType=multipleChoice') ||
                         cell.style.includes('questionType=multipleDropdownType');
@@ -2949,15 +3001,22 @@ function populateLinkedLogicDropdown(dropdown, cell) {
     if (node._textboxes && Array.isArray(node._textboxes)) {
       const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
       
+      // Get the number range from _twoNumbers
+      const firstNumber = parseInt(node._twoNumbers?.first) || 1;
+      const secondNumber = parseInt(node._twoNumbers?.second) || 1;
+      
       node._textboxes.forEach((textbox, index) => {
         if (textbox.nameId) {
-          const option = document.createElement('option');
-          // Convert nameId to lowercase to match the Copy ID format
           const lowercaseNameId = textbox.nameId.toLowerCase();
-          const labelId = `${baseNodeId}_${lowercaseNameId}_${index + 1}`;
-          option.value = labelId;
-          option.textContent = labelId;
-          dropdown.appendChild(option);
+          
+          // Generate options for each number in the range
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('option');
+            const labelId = `${baseNodeId}_${lowercaseNameId}_${num}`;
+            option.value = labelId;
+            option.textContent = labelId;
+            dropdown.appendChild(option);
+          }
         }
       });
     }
