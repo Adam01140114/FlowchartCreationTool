@@ -2586,15 +2586,17 @@ function setupKeyboardNavigation(graph) {
         
       case 'c':
         if (ctrl) {
-          copySelectedCells(graph);
-          evt.preventDefault();
+          // Copy handling moved to script.js to avoid duplicate calls
+          // copySelectedCells(graph);
+          // evt.preventDefault();
         }
         break;
         
       case 'v':
         if (ctrl) {
-          pasteCells(graph);
-          evt.preventDefault();
+          // Paste handling moved to script.js to avoid duplicate calls
+          // pasteCells(graph);
+          // evt.preventDefault();
         }
         break;
         

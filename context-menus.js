@@ -315,6 +315,7 @@ function setupContextMenuEventListeners(graph) {
   });
 
   if (copyNodeButton) copyNodeButton.addEventListener("click", () => {
+    console.log('🔍 [CONTEXT DEBUG] Context menu copy button clicked');
     const selectedCells = graph.getSelectionCells();
     if (selectedCells && selectedCells.length > 0) {
       if (typeof window.copySelectedNodeAsJson === 'function') {

@@ -795,23 +795,35 @@ graph.isCellEditable = function (cell) {
 /**************************************************
  *              KEYBOARD  SHORTCUTS               *
  **************************************************/
-const keyHandler = new mxKeyHandler(graph);
-
-/* DELETE & BACKSPACE you already handled elsewhere ------------------- */
-
-/* Ctrl + C  â€“ copy node (ONLY when not typing) */
-keyHandler.bindControlKey(67, () => {
-  if (isUserTyping()) return;                  // NEW / CHANGED
-  copySelectedNodeAsJson();
-});
-
-/* Ctrl + V  â€“ paste node (ONLY when not typing) */
-keyHandler.bindControlKey(86, () => {
-  if (isUserTyping()) return;                  // NEW / CHANGED
-  const mousePos = graph.getPointForEvent(graph.lastEvent);
-  window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
-                    mousePos ? mousePos.y : undefined);
-});
+// Use document event listener instead of mxKeyHandler to avoid duplicate bindings
+if (!window.flowchartKeyboardInitialized) {
+  console.log('🔍 [KEYHANDLER DEBUG] Setting up keyboard shortcuts');
+  
+  document.addEventListener('keydown', function(event) {
+    // Handle Ctrl+C
+    if ((event.key === 'c' || event.key === 'C') && (event.ctrlKey || event.metaKey)) {
+      console.log('🔍 [KEY DEBUG] Ctrl+C document listener triggered');
+      if (isUserTyping(event)) return;
+      event.preventDefault();
+      copySelectedNodeAsJson();
+    }
+    
+    // Handle Ctrl+V
+    if ((event.key === 'v' || event.key === 'V') && (event.ctrlKey || event.metaKey)) {
+      console.log('🔍 [KEY DEBUG] Ctrl+V document listener triggered');
+      if (isUserTyping(event)) return;
+      event.preventDefault();
+      const mousePos = graph.getPointForEvent(graph.lastEvent);
+      window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
+                        mousePos ? mousePos.y : undefined);
+    }
+  });
+  
+  // Mark that keyboard shortcuts have been initialized
+  window.flowchartKeyboardInitialized = true;
+} else {
+  console.log('🔍 [KEYHANDLER DEBUG] Keyboard shortcuts already initialized, skipping');
+}
 
 /* Ctrl + Shift – reset all PDF and node IDs */
 document.addEventListener('keydown', function(event) {
@@ -848,6 +860,7 @@ document.addEventListener('keydown', function(event) {
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
+    console.log('🔍 [BUTTON DEBUG] Copy button clicked');
     copySelectedNodeAsJson();
     hideContextMenu();
   });
@@ -4582,6 +4595,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // flowchartClipboard, FLOWCHART_CLIPBOARD_KEY, and FLOWCHART_CLIPBOARD_TIMESTAMP_KEY moved to config.js module
 
 function copySelectedNodeAsJson() {
+  // Add debugging to track duplicate calls
+  const stack = new Error().stack;
+  console.log('🔍 [COPY DEBUG] copySelectedNodeAsJson called from:', stack.split('\n')[1]);
+  
   try {
     const cells = graph.getSelectionCells();
     if (!cells || cells.length === 0) {
