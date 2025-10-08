@@ -817,6 +817,18 @@ if (!window.flowchartKeyboardInitialized) {
       window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
                         mousePos ? mousePos.y : undefined);
     }
+    
+    // Handle Ctrl+S
+    if ((event.key === 's' || event.key === 'S') && (event.ctrlKey || event.metaKey)) {
+      console.log('🔍 [KEY DEBUG] Ctrl+S document listener triggered');
+      if (isUserTyping(event)) return;
+      event.preventDefault();
+      // Trigger the save button click
+      const saveButton = document.getElementById('saveFlowchartButton');
+      if (saveButton) {
+        saveButton.click();
+      }
+    }
   });
   
   // Mark that keyboard shortcuts have been initialized

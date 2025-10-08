@@ -3271,6 +3271,20 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                         nodeId: numberedNodeId,
                                         questionText: questionTextWithNumber
                                     });
+                                    
+                                    // For state fields, also add the short version
+                                    if (fieldLabel.toLowerCase() === 'state') {
+                                        const shortNodeId = `${fieldNodeId}_short_${i}`;
+                                        const questionTextWithShort = `${questionText} - ${fieldLabel} Short ${i}`;
+                                        
+                                        console.log(`✅ [DEBUG] Adding short state field: ${questionTextWithShort} (${shortNodeId})`);
+                                        
+                                        textQuestions.push({
+                                            questionId: questionId,
+                                            nodeId: shortNodeId,
+                                            questionText: questionTextWithShort
+                                        });
+                                    }
                                 }
                             }
                         } else {

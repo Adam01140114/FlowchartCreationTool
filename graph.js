@@ -2662,7 +2662,6 @@ function setupPanningAndZooming(graph) {
       
       // Get zoom sensitivity from settings (default to 0.01 if not set)
       const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      console.log('🔧 [ZOOM DEBUG] Ctrl+Wheel zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
       
       // Calculate zoom delta based on sensitivity
       // Much smaller zoom increments for better control
@@ -2671,8 +2670,6 @@ function setupPanningAndZooming(graph) {
       const delta = evt.deltaY > 0 ? 
         (1 - (1 - baseDelta) * sensitivityFactor) : 
         (1 + (baseDelta - 1) * sensitivityFactor);
-      
-      console.log('🔧 [ZOOM DEBUG] Ctrl+Wheel zoom - baseDelta:', baseDelta, 'sensitivityFactor:', sensitivityFactor, 'delta:', delta);
       
       const scale = graph.view.scale * delta;
       
