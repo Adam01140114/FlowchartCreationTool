@@ -285,16 +285,60 @@ function setupGraphEventListeners(graph) {
     }
   });
   
-  // Move cells event - nodes now move independently without dragging connected nodes
+  // Move cells event - implement hierarchical dragging for dropdown nodes
   graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
     const movedCells = evt.getProperty('cells');
     const dx = evt.getProperty('dx');
     const dy = evt.getProperty('dy');
     
     if (!movedCells || movedCells.length === 0) return;
+
+    const movedIds = new Set(movedCells.map(c => c.id));
     
-    // All nodes now move independently - no connected node dragging
-    console.log('Nodes moved independently - no connected nodes dragged along');
+    // Function to get all connected descendants
+    const getConnectedDescendants = (cell) => {
+      const descendants = new Set();
+      const queue = [cell];
+      
+      while (queue.length > 0) {
+        const current = queue.shift();
+        const edges = graph.getOutgoingEdges(current) || [];
+        
+        edges.forEach(edge => {
+          const target = edge.target;
+          if (!descendants.has(target) && !movedIds.has(target.id)) {
+            descendants.add(target);
+            queue.push(target);
+          }
+        });
+      }
+      return Array.from(descendants);
+    };
+
+    movedCells.forEach(cell => {
+      // Check if it's a dropdown or checkbox question node
+      const isDropdownQuestion = cell.style && cell.style.includes('questionType=dropdown') && cell.style.includes('nodeType=question');
+      const isCheckboxQuestion = cell.style && cell.style.includes('questionType=checkbox') && cell.style.includes('nodeType=question');
+      
+      if (isDropdownQuestion || isCheckboxQuestion) {
+        const questionType = isDropdownQuestion ? 'dropdown' : 'checkbox';
+        console.log('🎯 [HIERARCHICAL DRAG]', questionType, 'question node detected');
+        
+        // When dragging a dropdown or checkbox question node, move all connected descendants
+        const descendants = getConnectedDescendants(cell);
+        console.log('🎯 [HIERARCHICAL DRAG] Moving', descendants.length, 'connected descendants');
+        
+        descendants.forEach(descendant => {
+          const geo = descendant.geometry;
+          if (geo) {
+            const newGeo = geo.clone();
+            newGeo.x += dx;
+            newGeo.y += dy;
+            graph.getModel().setGeometry(descendant, newGeo);
+          }
+        });
+      }
+    });
     
     // Renumber question IDs based on new Y positions
     if (typeof window.renumberQuestionIds === 'function') {
@@ -302,6 +346,7 @@ function setupGraphEventListeners(graph) {
     }
   });
 }
+
 
 // Setup Keyboard Event Listeners
 function setupKeyboardEventListeners(graph) {

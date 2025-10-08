@@ -2343,22 +2343,18 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
     const createdCells = {};
 
     if (data.sectionPrefs) {
-      console.log('🔍 [SECTION LOAD DEBUG] Loading section preferences:', JSON.stringify(data.sectionPrefs, null, 2));
       
       // Update section preferences through the proper accessor
       
       if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
         window.flowchartConfig.sectionPrefs = data.sectionPrefs;
-        console.log('🔍 [SECTION LOAD DEBUG] Set window.flowchartConfig.sectionPrefs');
       } else {
         window.sectionPrefs = data.sectionPrefs;
-        console.log('🔍 [SECTION LOAD DEBUG] Set window.sectionPrefs');
       }
       
       // Test the getSectionPrefs function immediately after setting
       if (typeof getSectionPrefs === 'function') {
         const testResult = getSectionPrefs();
-        console.log('🔍 [SECTION LOAD DEBUG] getSectionPrefs() result:', JSON.stringify(testResult, null, 2));
       }
       
       // Add a watcher to detect if section preferences are modified after this point
@@ -2372,7 +2368,6 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
         
         if (typeof updateSectionLegend === 'function') {
-          console.log('🔍 [SECTION LOAD DEBUG] Calling updateSectionLegend()');
           updateSectionLegend();
         } else {
           console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
@@ -2430,6 +2425,21 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         }
       }
     }, 100);
+
+    // Convert text2 nodes to dropdown nodes before processing
+    let text2ConversionCount = 0;
+    data.cells.forEach(item => {
+      if (item.vertex && item.style && item.style.includes('questionType=text2')) {
+        // Replace text2 with dropdown in the style
+        item.style = item.style.replace(/questionType=text2/g, 'questionType=dropdown');
+        text2ConversionCount++;
+      }
+    });
+    
+    // Show conversion alert if any text2 nodes were converted
+    if (text2ConversionCount > 0) {
+      alert(`${text2ConversionCount} text2 nodes converted into dropdowns`);
+    }
 
     // First pass: Create all cells
     data.cells.forEach(item => {
@@ -2531,19 +2541,15 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
             defaultText = tempDiv.textContent || tempDiv.innerText || defaultText;
           }
           newCell._defaultText = defaultText;
-          console.log('🔍 [LOAD DEBUG] Loaded _defaultText for cell:', item.id, 'value:', defaultText);
         } else {
-          console.log('🔍 [LOAD DEBUG] No _defaultText found for cell:', item.id);
         }
         
         // Linked logic node properties
         if (item._linkedLogicNodeId !== undefined) {
           newCell._linkedLogicNodeId = item._linkedLogicNodeId;
-          console.log('📂 [LIBRARY LOAD] Loading _linkedLogicNodeId:', item._linkedLogicNodeId, 'for cell:', item.id);
         }
         if (item._linkedFields !== undefined) {
           newCell._linkedFields = item._linkedFields;
-          console.log('📂 [LIBRARY LOAD] Loading _linkedFields:', item._linkedFields, 'for cell:', item.id);
         }
         
         // Calculation properties

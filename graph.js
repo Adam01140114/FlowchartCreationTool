@@ -351,9 +351,7 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
-        // For all other nodes, zoom into the node
-        console.log("🎯 Double-click detected, zooming into node");
-        zoomIntoNode(cell);
+        // For all other nodes, do nothing on double-click
         
         // Reset the tracking
         lastClickTime = 0;
@@ -2986,6 +2984,19 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           dropdown.appendChild(option);
         }
       });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          const option = document.createElement('option');
+          const labelId = `${baseNodeId}_${locationField}`;
+          option.value = labelId;
+          option.textContent = labelId;
+          dropdown.appendChild(option);
+        });
+      }
     } else {
       // Regular textbox question - add the base node ID
       const option = document.createElement('option');
@@ -3019,6 +3030,22 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           }
         }
       });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          // Generate options for each number in the range for each location field
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('option');
+            const labelId = `${baseNodeId}_${locationField}_${num}`;
+            option.value = labelId;
+            option.textContent = labelId;
+            dropdown.appendChild(option);
+          }
+        });
+      }
     }
   });
   
