@@ -1460,44 +1460,62 @@ document.addEventListener('DOMContentLoaded', function() {
 let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
-    console.log('🔧 [GENERATE DEBUG] showTextboxLabels called with questionId:', questionId, 'count:', count);
+    console.log('🔧 [SHOWTEXTBOX DEBUG] showTextboxLabels called with questionId:', questionId, 'count:', count);
     
     // 🔧 NEW: Check if we're already creating fields
     if (isCreatingFields) {
-        console.log('🔧 [GENERATE DEBUG] ⚠️ Already creating fields, skipping this call');
+        console.log('🔧 [SHOWTEXTBOX DEBUG] ⚠️ Already creating fields, skipping this call');
         return;
     }
     
     const container = document.getElementById("labelContainer" + questionId);
+    console.log('🔧 [SHOWTEXTBOX DEBUG] Container found:', container);
     if(!container) {
-        console.log('🔧 [GENERATE DEBUG] ❌ No container found, returning');
+        console.log('🔧 [SHOWTEXTBOX DEBUG] ❌ No container found, returning');
         return;
     }
 
     // 🔧 NEW: Check if we already have the right number of fields with values
     const existingFields = container.querySelectorAll('input, select, textarea');
     const expectedCount = parseInt(count) || 0;
-    console.log('🔧 [GENERATE DEBUG] Existing fields count:', existingFields.length, 'Expected count:', expectedCount);
+    console.log('🔧 [SHOWTEXTBOX DEBUG] Existing fields count:', existingFields.length, 'Expected count:', expectedCount);
     
     if (existingFields.length === expectedCount && expectedCount > 0) {
-        console.log('🔧 [GENERATE DEBUG] ⚠️ Fields already exist with correct count, checking if they have values...');
+        console.log('🔧 [SHOWTEXTBOX DEBUG] ⚠️ Fields already exist with correct count, checking if they have values...');
         let hasValues = false;
         let fieldValues = {};
         existingFields.forEach(field => {
             if (field.value && field.value.trim() !== '') {
                 hasValues = true;
                 fieldValues[field.id] = field.value;
-                console.log('🔧 [GENERATE DEBUG] Field has value:', field.id, '=', field.value);
+                console.log('🔧 [SHOWTEXTBOX DEBUG] Field has value:', field.id, '=', field.value);
             }
         });
         
         if (hasValues) {
-            console.log('🔧 [GENERATE DEBUG] ✅ Fields already exist with values, skipping recreation to preserve autofill');
-            console.log('🔧 [GENERATE DEBUG] Preserved field values:', fieldValues);
+            console.log('🔧 [SHOWTEXTBOX DEBUG] ✅ Fields already exist with values, skipping recreation to preserve autofill');
+            console.log('🔧 [SHOWTEXTBOX DEBUG] Preserved field values:', fieldValues);
+            return;
+        }
+        
+        // 🔧 NEW: If fields exist but have no values, check if we're in the middle of autofill
+        console.log('🔧 [SHOWTEXTBOX DEBUG] Fields exist but no values yet, checking if autofill is in progress...');
+        
+        // Check if autofill is currently running
+        if (window.isInitialAutofill) {
+            console.log('🔧 [SHOWTEXTBOX DEBUG] Autofill is in progress, skipping recreation to preserve autofill');
+            return;
+        }
+        
+        // Check if there are any pending autofill operations
+        const autofillInProgress = document.querySelector('[data-autofill-pending]');
+        if (autofillInProgress) {
+            console.log('🔧 [SHOWTEXTBOX DEBUG] Autofill is pending, skipping recreation to preserve autofill');
             return;
         }
     }
 
+    console.log('🔧 [SHOWTEXTBOX DEBUG] Clearing container and creating fields...');
     container.innerHTML = "";
     
     // Try to get unified fields first, fallback to old arrays
@@ -1672,7 +1690,7 @@ function showTextboxLabels(questionId, count){
     
     // 🔧 NEW: Clear flag after function completes
     isCreatingFields = false;
-    console.log('🔧 [GENERATE DEBUG] ✅ Field creation completed, flag cleared');
+    console.log('🔧 [SHOWTEXTBOX DEBUG] ✅ Field creation completed, flag cleared');
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -3166,94 +3184,97 @@ if (typeof handleNext === 'function') {
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
                 console.log('🔧 [AUTOFILL DEBUG] Firebase data loaded and mapped:', mappedData);
-                    const fields = getFormFields();
-                    fields.forEach(el => {
+                
+                // 🔧 NEW: Add flag to prevent autosave during initial load
+                window.isInitialAutofill = true;
+                
+                const fields = getFormFields();
+                fields.forEach(el => {
                     if (mappedData.hasOwnProperty(el.name)) {
-                            // Check if this answer would trigger a jump to the end
+                        // Check if this answer would trigger a jump to the end
                         if (wouldTriggerJumpToEnd(el, mappedData[el.name])) {
-                                // Don't autofill this answer - keep it as default
-                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
-                                return;
-                            }
-                            
-                            if (el.type === 'checkbox' || el.type === 'radio') {
+                            // Don't autofill this answer - keep it as default
+                            console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
+                            return;
+                        }
+                        
+                        if (el.type === 'checkbox' || el.type === 'radio') {
                             el.checked = !!mappedData[el.name];
-                            } else {
+                        } else {
                             el.value = mappedData[el.name];
-                            }
                         }
-                    });
-                    
-                    // After autofilling, trigger visibility updates for dependent questions
-                    // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
-                    setTimeout(() => {
-                        
-                        // Trigger change events on all autofilled elements to ensure conditional logic runs
-                        fields.forEach(el => {
-                            if (el.value || el.checked) {
-                                const event = new Event('change', { bubbles: true });
-                                el.dispatchEvent(event);
-                            }
-                        });
-                        
-                        // Also call the global visibility updates function
-                        if (typeof triggerVisibilityUpdates === 'function') {
-                            triggerVisibilityUpdates();
-                        }
-                    }, 2000);
-                    
-                    // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
-                    fields.forEach(el => {
-                        if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
-                            const questionId = el.id.replace('answer', '');
-                            if (typeof showTextboxLabels === 'function') {
-                                showTextboxLabels(questionId, el.value);
-                            }
-                            if (typeof updateHiddenCheckboxes === 'function') {
-                                updateHiddenCheckboxes(questionId, el.value);
-                            }
-                        }
-                    });
-                    
-                    // Trigger state hidden field updates for any state dropdowns that were autofilled
-                    fields.forEach(el => {
-                        if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
-                            // This is a state dropdown that was autofilled
-                            const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-                            const hiddenShortId = window.toShortIdFromBase(el.id);
-                            if (typeof updateStateHiddenFields === 'function') {
-                                updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
-                            }
-                        }
-                    });
-                    
-                    // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
-                    fields.forEach(el => {
-                        if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
-                            if (typeof dropdownMirror === 'function') {
-                                dropdownMirror(el, el.id);
-                            }
-                            // Trigger hidden logic for autofilled dropdowns
-                            if (typeof updateHiddenLogic === 'function') {
-                                updateHiddenLogic(el.id, el.value);
-                            }
-                        }
-                    });
-                    
-                    // Create hidden checkboxes for all autofilled dropdowns
-                    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
-                        createHiddenCheckboxesForAutofilledDropdowns();
                     }
+                });
+                
+                // After autofilling, trigger visibility updates for dependent questions
+                // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
+                setTimeout(() => {
+                    // Trigger change events on all autofilled elements to ensure conditional logic runs
+                    fields.forEach(el => {
+                        if (el.value || el.checked) {
+                            const event = new Event('change', { bubbles: true });
+                            el.dispatchEvent(event);
+                        }
+                    });
                     
-                    // Trigger line splitting for autofilled textareas
-                    triggerLineSplittingForAutofilledTextareas();
-                    
-                    // Trigger paragraph limit checking for autofilled textareas
-                    triggerParagraphLimitCheckForAutofilledTextareas();
-                    
-                    // Second autofill pass for dynamically generated textbox inputs
-                    // Use a longer delay to ensure textbox inputs are fully generated
-                    setTimeout(() => {
+                    // Also call the global visibility updates function
+                    if (typeof triggerVisibilityUpdates === 'function') {
+                        triggerVisibilityUpdates();
+                    }
+                }, 2000);
+                
+                // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                fields.forEach(el => {
+                    if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id === 'how_many') && el.value) {
+                        const questionId = el.id.startsWith('answer') ? el.id.replace('answer', '') : '1';
+                        if (typeof showTextboxLabels === 'function') {
+                            showTextboxLabels(questionId, el.value);
+                        }
+                        if (typeof updateHiddenCheckboxes === 'function') {
+                            updateHiddenCheckboxes(questionId, el.value);
+                        }
+                    }
+                });
+                
+                // Trigger state hidden field updates for any state dropdowns that were autofilled
+                fields.forEach(el => {
+                    if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                        // This is a state dropdown that was autofilled
+                        const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+                        const hiddenShortId = window.toShortIdFromBase(el.id);
+                        if (typeof updateStateHiddenFields === 'function') {
+                            updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                        }
+                    }
+                });
+                
+                // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                fields.forEach(el => {
+                    if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                        if (typeof dropdownMirror === 'function') {
+                            dropdownMirror(el, el.id);
+                        }
+                        // Trigger hidden logic for autofilled dropdowns
+                        if (typeof updateHiddenLogic === 'function') {
+                            updateHiddenLogic(el.id, el.value);
+                        }
+                    }
+                });
+                
+                // Create hidden checkboxes for all autofilled dropdowns
+                if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                    createHiddenCheckboxesForAutofilledDropdowns();
+                }
+                
+                // Trigger line splitting for autofilled textareas
+                triggerLineSplittingForAutofilledTextareas();
+                
+                // Trigger paragraph limit checking for autofilled textareas
+                triggerParagraphLimitCheckForAutofilledTextareas();
+                
+                // Second autofill pass for dynamically generated textbox inputs
+                // Use a longer delay to ensure textbox inputs are fully generated
+                setTimeout(() => {
                         const allFields = getFormFields();
                         
                         // Also try to find fields by ID directly as a fallback
@@ -3292,6 +3313,19 @@ if (typeof handleNext === 'function') {
                         // Trigger paragraph limit checking again after the second autofill pass
                         triggerParagraphLimitCheckForAutofilledTextareas();
                         
+                        // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled in second pass
+                        allFields.forEach(el => {
+                            if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id === 'how_many') && el.value) {
+                                const questionId = el.id.startsWith('answer') ? el.id.replace('answer', '') : '1';
+                                if (typeof showTextboxLabels === 'function') {
+                                    showTextboxLabels(questionId, el.value);
+                                }
+                                if (typeof updateHiddenCheckboxes === 'function') {
+                                    updateHiddenCheckboxes(questionId, el.value);
+                                }
+                            }
+                        });
+                        
                         // Trigger state hidden field updates for any state dropdowns that were autofilled in second pass
                         allFields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
@@ -3304,12 +3338,17 @@ if (typeof handleNext === 'function') {
                             }
                         });
                     }, 1500);
-                    
-                        // Reset hidden questions to defaults after autofill and visibility updates
-                        if (typeof currentSectionNumber === 'number') {
-                            resetHiddenQuestionsToDefaults(currentSectionNumber);
+                
+                // Reset hidden questions to defaults after autofill and visibility updates
+                if (typeof currentSectionNumber === 'number') {
+                    resetHiddenQuestionsToDefaults(currentSectionNumber);
                 }
+                
+                // 🔧 NEW: Clear autofill flag after autofill is complete
+                window.isInitialAutofill = false;
+                console.log('🔧 [AUTOFILL DEBUG] ✅ Autosave re-enabled after autofill');
             } catch (e) {
+                console.log('Error loading answers:', e);
             }
         }
         
@@ -4879,164 +4918,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUserFullName();
   }, 2000);
 });
-    const container = document.getElementById("labelContainer" + questionId);
-    if(!container) return;
-
-    // 🔧 NEW: Check if we already have the right number of fields with values
-    const existingFields = container.querySelectorAll('input, select, textarea');
-    const expectedCount = parseInt(count) || 0;
-    
-    if (existingFields.length === expectedCount && expectedCount > 0) {
-        let hasValues = false;
-        let fieldValues = {};
-        existingFields.forEach(field => {
-            if (field.value && field.value.trim() !== '') {
-                hasValues = true;
-                fieldValues[field.id] = field.value;
-            }
-        });
-        
-        if (hasValues) {
-            // Fields already exist with values, skip recreation to preserve autofill
-            return;
-        }
-    }
-
-    container.innerHTML = "";
-    
-    // Try to get unified fields first, fallback to old arrays
-    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
-                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
-    
-    let allFieldsInOrder = [];
-    
-    if (qBlock) {
-        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
-        
-        if (unifiedFields.length > 0) {
-            // Use unified container data
-            const allElements = [];
-            
-            unifiedFields.forEach((el) => {
-                const fieldType = el.getAttribute('data-type');
-                const fieldOrder = parseInt(el.getAttribute('data-order'));
-                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
-                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                
-                if (labelTextEl && nodeIdTextEl) {
-                    allElements.push({
-                        type: fieldType,
-                        label: labelTextEl.textContent.trim(),
-                        nodeId: nodeIdTextEl.textContent.trim(),
-                        order: fieldOrder
-                    });
-                }
-            });
-            
-            // Sort by data-order attribute (creation order)
-            allElements.sort((a, b) => a.order - b.order);
-            allFieldsInOrder = allElements;
-        }
-    }
-    
-    // Fallback to unified fields map or old arrays if no unified fields found
-    if (allFieldsInOrder.length === 0) {
-        // Try unified fields map first
-        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-            allFieldsInOrder = window.unifiedFieldsMap[questionId];
-        } else {
-            // Fallback to old arrays
-            const theseLabels = labelMap[questionId] || [];
-            const theseAmounts = amountMap[questionId] || [];
-            
-            allFieldsInOrder = [
-                ...theseLabels.map((lbl, index) => ({
-                    type: 'label',
-                    label: lbl,
-                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
-                    order: index
-                })),
-                ...theseAmounts.map((amt, index) => ({
-                    type: 'amount',
-                    label: amt,
-                    nodeId: "",
-                    order: index
-                }))
-            ];
-        }
-    }
-
-    /* get and sanitise the question's visible text exactly once */
-    const questionH3   = document
-        .getElementById("question-container-" + questionId)
-        ?.querySelector("h3")?.textContent || ("answer" + questionId);
-    const qSafe = sanitizeQuestionText(questionH3);
-
-    // Generate hidden checkboxes for the selected count
-    generateHiddenCheckboxes(questionId, qSafe, count);
-
-    // Define location field names for visual separation
-    const locationFields = ['Street', 'City', 'State', 'Zip'];
-
-    for(let j = 1; j <= count; j++){
-        let lastWasLocation = false;
-        let firstField = true;
-        
-        // Create entry container div
-        const entryContainer = document.createElement('div');
-        entryContainer.className = 'entry-container';
-        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
-        
-        // Process all fields in creation order
-        for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
-            const field = allFieldsInOrder[fieldIndex];
-            const isLocationField = locationFields.includes(field.label);
-            
-            // Add <br> before first location field in each count
-            if (isLocationField && !lastWasLocation && !firstField) {
-                const br = document.createElement('br');
-                entryContainer.appendChild(br);
-            }
-            
-            if (field.type === 'label') {
-                const fieldId = field.nodeId + "_" + j;
-                if (field.label === 'State') {
-                    // Use dropdown for State field
-                    const dropdownDiv = document.createElement('div');
-                    dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
-                    entryContainer.appendChild(dropdownDiv.firstElementChild);
-                } else {
-                    // Use regular input for other fields
-                    const inputDiv = document.createElement('div');
-                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
-                    entryContainer.appendChild(inputDiv.firstElementChild);
-                }
-            } else if (field.type === 'amount') {
-                const fieldId = field.nodeId + "_" + j;
-                const inputDiv = document.createElement('div');
-                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
-                entryContainer.appendChild(inputDiv.firstElementChild);
-                
-                // Add a <br> after the Zip input only if there are more fields after it
-                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
-                if (remainingFields.length > 0) {
-                  const brElement = document.createElement('br');
-                  entryContainer.appendChild(brElement);
-                }
-            }
-            
-            lastWasLocation = isLocationField;
-            firstField = false;
-        }
-        
-        // Append the entry container to the main container
-        container.appendChild(entryContainer);
-        
-        // Add 1 <br> tag after each entry for better visual separation
-        const br = document.createElement('br');
-        container.appendChild(br);
-    }
-}
+           
 </script>
 
 </body>
