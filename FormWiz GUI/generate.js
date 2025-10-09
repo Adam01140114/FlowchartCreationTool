@@ -197,7 +197,7 @@ function createStateDropdown(id, index) {
     }
     
     return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + hiddenShortId + '\\\'); updateLinkedFields();">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, ' + hiddenFullId + ', ' + hiddenShortId + '); updateLinkedFields();">' +
            options +
            '</select>' +
            '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
@@ -5830,7 +5830,7 @@ function createStateDropdown(id, index) {
     }
     
     return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + shortId + '\\\'); updateLinkedFields();">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, ' + hiddenFullId + ', ' + shortId + '); updateLinkedFields();">' +
            options +
            '</select>' +
            '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
