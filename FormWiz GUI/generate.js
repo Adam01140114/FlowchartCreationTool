@@ -63,9 +63,20 @@ function sanitizeQuestionText (str){
 
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    console.log('🔧 [STATE DEBUG] updateStateHiddenFields called with:', { hiddenFullId, hiddenShortId });
+    
     const selectedState = dropdown.value;
+    console.log('🔧 [STATE DEBUG] selectedState:', selectedState);
+    
     const fullField = document.getElementById(hiddenFullId);
     const shortField = document.getElementById(hiddenShortId);
+    
+    console.log('🔧 [STATE DEBUG] fullField found:', !!fullField, fullField);
+    console.log('🔧 [STATE DEBUG] shortField found:', !!shortField, shortField);
+    console.log('🔧 [STATE DEBUG] fullField type:', fullField ? fullField.type : 'undefined');
+    console.log('🔧 [STATE DEBUG] shortField type:', shortField ? shortField.type : 'undefined');
+    console.log('🔧 [STATE DEBUG] fullField tagName:', fullField ? fullField.tagName : 'undefined');
+    console.log('🔧 [STATE DEBUG] shortField tagName:', shortField ? shortField.tagName : 'undefined');
     
     // State abbreviation mapping
     const stateAbbreviations = {
@@ -82,12 +93,20 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
     
     if (fullField && shortField) {
         if (selectedState) {
+            const abbreviation = stateAbbreviations[selectedState] || '';
+            console.log('🔧 [STATE DEBUG] Setting fullField.value to:', selectedState);
+            console.log('🔧 [STATE DEBUG] Setting shortField.value to:', abbreviation);
             fullField.value = selectedState;
-            shortField.value = stateAbbreviations[selectedState] || '';
+            shortField.value = abbreviation;
+            console.log('🔧 [STATE DEBUG] After setting - fullField.value:', fullField.value);
+            console.log('🔧 [STATE DEBUG] After setting - shortField.value:', shortField.value);
         } else {
+            console.log('🔧 [STATE DEBUG] Clearing fields');
             fullField.value = '';
             shortField.value = '';
         }
+    } else {
+        console.log('🔧 [STATE DEBUG] Fields not found! fullField:', !!fullField, 'shortField:', !!shortField);
     }
 }
 
@@ -158,7 +177,7 @@ function createStateDropdown(id, index) {
     });
     
     // Create hidden textboxes for full state name and abbreviation
-    const hiddenFullId = id; // Keep the full ID with number
+    const hiddenFullId = id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
     
     // For numbered dropdown questions, transform the ID pattern
     // from "how_many_state_1" to "how_many_state_short_1"
@@ -4940,7 +4959,7 @@ if (typeof handleNext === 'function') {
                     fields.forEach(el => {
                         if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                             // This is a state dropdown that was autofilled
-                            const hiddenFullId = el.id; // Keep the full ID with number
+                            const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
                             // For numbered dropdown questions, transform the ID pattern
                             // from "how_many_state_1" to "how_many_state_short_1"
                             let hiddenShortId;
@@ -5038,7 +5057,7 @@ if (typeof handleNext === 'function') {
                         allFields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                                 // This is a state dropdown that was autofilled
-                                const hiddenFullId = el.id; // Keep the full ID with number
+                                const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
                                 // For numbered dropdown questions, transform the ID pattern
                             // from "how_many_state_1" to "how_many_state_short_1"
                             let hiddenShortId;
@@ -5262,7 +5281,7 @@ if (typeof handleNext === 'function') {
                         fields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                                 // This is a state dropdown that was autofilled
-                                const hiddenFullId = el.id; // Keep the full ID with number
+                                const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
                                 // For numbered dropdown questions, transform the ID pattern
                             // from "how_many_state_1" to "how_many_state_short_1"
                             let hiddenShortId;
@@ -5356,7 +5375,7 @@ if (typeof handleNext === 'function') {
                             allFields.forEach(el => {
                                 if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                                     // This is a state dropdown that was autofilled
-                                    const hiddenFullId = el.id; // Keep the full ID with number
+                                    const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
                                     // For numbered dropdown questions, transform the ID pattern
                             // from "how_many_state_1" to "how_many_state_short_1"
                             let hiddenShortId;
@@ -5790,6 +5809,9 @@ function createStateDropdown(id, index) {
         options += '<option value="' + state + '">' + state + '</option>';
     });
     
+    // Create hidden textboxes for full state name and abbreviation
+    const hiddenFullId = id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+    
     // For numbered dropdown questions, transform the ID pattern
     // from "how_many_state_1" to "how_many_state_short_1"
     let shortId;
@@ -5808,10 +5830,10 @@ function createStateDropdown(id, index) {
     }
     
     return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + id + '\\\', \\\'' + shortId + '\\\'); updateLinkedFields();">' +
+           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, \\\'' + hiddenFullId + '\\\', \\\'' + shortId + '\\\'); updateLinkedFields();">' +
            options +
            '</select>' +
-           '<input type="hidden" id="' + id + '" name="' + id + '" value="">' +
+           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
            '<input type="hidden" id="' + shortId + '" name="' + shortId + '" value="">' +
            '</div>';
 }
@@ -6642,9 +6664,20 @@ document.addEventListener('change', function() {
 
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    console.log('🔧 [STATE DEBUG] updateStateHiddenFields called with:', { hiddenFullId, hiddenShortId });
+    
     const selectedState = dropdown.value;
+    console.log('🔧 [STATE DEBUG] selectedState:', selectedState);
+    
     const fullField = document.getElementById(hiddenFullId);
     const shortField = document.getElementById(hiddenShortId);
+    
+    console.log('🔧 [STATE DEBUG] fullField found:', !!fullField, fullField);
+    console.log('🔧 [STATE DEBUG] shortField found:', !!shortField, shortField);
+    console.log('🔧 [STATE DEBUG] fullField type:', fullField ? fullField.type : 'undefined');
+    console.log('🔧 [STATE DEBUG] shortField type:', shortField ? shortField.type : 'undefined');
+    console.log('🔧 [STATE DEBUG] fullField tagName:', fullField ? fullField.tagName : 'undefined');
+    console.log('🔧 [STATE DEBUG] shortField tagName:', shortField ? shortField.tagName : 'undefined');
     
     // State abbreviation mapping
     const stateAbbreviations = {
@@ -6661,12 +6694,20 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
     
     if (fullField && shortField) {
         if (selectedState) {
+            const abbreviation = stateAbbreviations[selectedState] || '';
+            console.log('🔧 [STATE DEBUG] Setting fullField.value to:', selectedState);
+            console.log('🔧 [STATE DEBUG] Setting shortField.value to:', abbreviation);
             fullField.value = selectedState;
-            shortField.value = stateAbbreviations[selectedState] || '';
+            shortField.value = abbreviation;
+            console.log('🔧 [STATE DEBUG] After setting - fullField.value:', fullField.value);
+            console.log('🔧 [STATE DEBUG] After setting - shortField.value:', shortField.value);
         } else {
+            console.log('🔧 [STATE DEBUG] Clearing fields');
             fullField.value = '';
             shortField.value = '';
         }
+    } else {
+        console.log('🔧 [STATE DEBUG] Fields not found! fullField:', !!fullField, 'shortField:', !!shortField);
     }
 }
 

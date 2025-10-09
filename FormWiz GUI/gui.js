@@ -3355,6 +3355,20 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                     nodeId: fieldNodeId,
                                     questionText: questionTextWithField
                                 });
+                                
+                                // For state fields, also add the short version
+                                if (fieldLabel.toLowerCase() === 'state') {
+                                    const shortNodeId = `${fieldNodeId}_short`;
+                                    const questionTextWithShort = `${questionText} - ${fieldLabel} Short`;
+                                    
+                                    console.log(`✅ [DEBUG] Adding short state field: ${questionTextWithShort} (${shortNodeId})`);
+                                    
+                                    textQuestions.push({
+                                        questionId: questionId,
+                                        nodeId: shortNodeId,
+                                        questionText: questionTextWithShort
+                                    });
+                                }
                             }
                         } else {
                             console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);

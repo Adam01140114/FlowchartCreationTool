@@ -2994,6 +2994,15 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           option.value = labelId;
           option.textContent = labelId;
           dropdown.appendChild(option);
+          
+          // Add short state field for state location field
+          if (locationField === 'state') {
+            const shortOption = document.createElement('option');
+            const shortLabelId = `${baseNodeId}_${locationField}_short`;
+            shortOption.value = shortLabelId;
+            shortOption.textContent = shortLabelId;
+            dropdown.appendChild(shortOption);
+          }
         });
       }
     } else {
@@ -3042,6 +3051,15 @@ function populateLinkedLogicDropdown(dropdown, cell) {
             option.value = labelId;
             option.textContent = labelId;
             dropdown.appendChild(option);
+            
+            // Add short state field for state location field
+            if (locationField === 'state') {
+              const shortOption = document.createElement('option');
+              const shortLabelId = `${baseNodeId}_${locationField}_short_${num}`;
+              shortOption.value = shortLabelId;
+              shortOption.textContent = shortLabelId;
+              dropdown.appendChild(shortOption);
+            }
           }
         });
       }
