@@ -64,20 +64,12 @@ function sanitizeQuestionText (str){
 
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    console.log('🔧 [STATE DEBUG] updateStateHiddenFields called with:', { hiddenFullId, hiddenShortId });
     
     const selectedState = dropdown.value;
-    console.log('🔧 [STATE DEBUG] selectedState:', selectedState);
     
     const fullField = document.getElementById(hiddenFullId);
     const shortField = document.getElementById(hiddenShortId);
     
-    console.log('🔧 [STATE DEBUG] fullField found:', !!fullField, fullField);
-    console.log('🔧 [STATE DEBUG] shortField found:', !!shortField, shortField);
-    console.log('🔧 [STATE DEBUG] fullField type:', fullField ? fullField.type : 'undefined');
-    console.log('🔧 [STATE DEBUG] shortField type:', shortField ? shortField.type : 'undefined');
-    console.log('🔧 [STATE DEBUG] fullField tagName:', fullField ? fullField.tagName : 'undefined');
-    console.log('🔧 [STATE DEBUG] shortField tagName:', shortField ? shortField.tagName : 'undefined');
     
     // State abbreviation mapping
     const stateAbbreviations = {
@@ -95,19 +87,13 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
     if (fullField && shortField) {
         if (selectedState) {
             const abbreviation = stateAbbreviations[selectedState] || '';
-            console.log('🔧 [STATE DEBUG] Setting fullField.value to:', selectedState);
-            console.log('🔧 [STATE DEBUG] Setting shortField.value to:', abbreviation);
             fullField.value = selectedState;
             shortField.value = abbreviation;
-            console.log('🔧 [STATE DEBUG] After setting - fullField.value:', fullField.value);
-            console.log('🔧 [STATE DEBUG] After setting - shortField.value:', shortField.value);
         } else {
-            console.log('🔧 [STATE DEBUG] Clearing fields');
             fullField.value = '';
             shortField.value = '';
         }
     } else {
-        console.log('🔧 [STATE DEBUG] Fields not found! fullField:', !!fullField, 'shortField:', !!shortField);
     }
 }
 
@@ -3039,31 +3025,24 @@ function triggerVisibilityUpdates() {
                               document.getElementById('answer' + questionId);
         
         if (questionElement) {
-                console.log('🔧 [VISIBILITY DEBUG] Found question element for', questionId, ':', questionElement.id);
             // Trigger change event to update visibility
             const event = new Event('change', { bubbles: true });
             questionElement.dispatchEvent(event);
-                console.log('🔧 [VISIBILITY DEBUG] Dispatched change event for', questionId);
             } else {
-                console.log('🔧 [VISIBILITY DEBUG] No question element found for', questionId);
             }
         } catch (error) {
-            console.log('🔧 [VISIBILITY DEBUG] Error processing question', questionId, ':', error);
         }
     });
 }
 
 // Fallback function to manually check and update visibility without relying on generated scripts
 function triggerVisibilityUpdatesFallback() {
-    console.log('🔧 [VISIBILITY FALLBACK DEBUG] triggerVisibilityUpdatesFallback() called');
     
     // Find all question containers
     const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found', questionContainers.length, 'question containers');
     
     questionContainers.forEach(container => {
         const questionId = container.id.replace('question-container-', '');
-        console.log('🔧 [VISIBILITY FALLBACK DEBUG] Processing question container:', questionId);
         
         // Check if this question has conditional logic by looking for data attributes or other indicators
         // For now, we'll manually check common conditional logic patterns
@@ -3079,7 +3058,6 @@ function triggerVisibilityUpdatesFallback() {
                 // Check if this input's value should affect the visibility of the current question
                 // This is a simplified check - in a real implementation, you'd need to parse the actual conditional logic
                 if (input.value && input.value.trim() !== '') {
-                    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found input with value:', input.id, '=', input.value);
                     // For now, we'll just log this - the actual conditional logic would be more complex
                 }
             }
@@ -3089,10 +3067,8 @@ function triggerVisibilityUpdatesFallback() {
         // In a real implementation, you'd implement the actual conditional logic here
         if (shouldBeVisible) {
             container.classList.remove('hidden');
-            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'visible');
         } else {
             container.classList.add('hidden');
-            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'hidden');
         }
     });
 }
@@ -3277,9 +3253,47 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// 🔧 NEW: Global flag to prevent duplicate function calls
+let isCreatingFields = false;
+
 function showTextboxLabels(questionId, count){
+    console.log('🔧 [GENERATE DEBUG] showTextboxLabels called with questionId:', questionId, 'count:', count);
+    
+    // 🔧 NEW: Check if we're already creating fields
+    if (isCreatingFields) {
+        console.log('🔧 [GENERATE DEBUG] ⚠️ Already creating fields, skipping this call');
+        return;
+    }
+    
     const container = document.getElementById("labelContainer" + questionId);
-    if(!container) return;
+    if(!container) {
+        console.log('🔧 [GENERATE DEBUG] ❌ No container found, returning');
+        return;
+    }
+
+    // 🔧 NEW: Check if we already have the right number of fields with values
+    const existingFields = container.querySelectorAll('input, select, textarea');
+    const expectedCount = parseInt(count) || 0;
+    console.log('🔧 [GENERATE DEBUG] Existing fields count:', existingFields.length, 'Expected count:', expectedCount);
+    
+    if (existingFields.length === expectedCount && expectedCount > 0) {
+        console.log('🔧 [GENERATE DEBUG] ⚠️ Fields already exist with correct count, checking if they have values...');
+        let hasValues = false;
+        let fieldValues = {};
+        existingFields.forEach(field => {
+            if (field.value && field.value.trim() !== '') {
+                hasValues = true;
+                fieldValues[field.id] = field.value;
+                console.log('🔧 [GENERATE DEBUG] Field has value:', field.id, '=', field.value);
+            }
+        });
+        
+        if (hasValues) {
+            console.log('🔧 [GENERATE DEBUG] ✅ Fields already exist with values, skipping recreation to preserve autofill');
+            console.log('🔧 [GENERATE DEBUG] Preserved field values:', fieldValues);
+            return;
+        }
+    }
 
     container.innerHTML = "";
     
@@ -3452,6 +3466,10 @@ function showTextboxLabels(questionId, count){
             }, 100); // 100ms delay to ensure value is set
         });
     });
+    
+    // 🔧 NEW: Clear flag after function completes
+    isCreatingFields = false;
+    console.log('🔧 [GENERATE DEBUG] ✅ Field creation completed, flag cleared');
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -3681,7 +3699,13 @@ function updateLinkedFields() {
             hiddenField.id = linkedFieldId;
             hiddenField.name = linkedFieldId;
             hiddenField.style.display = 'none';
-            document.body.appendChild(hiddenField);
+            // Append to the form instead of document.body so it gets submitted
+            const form = document.getElementById('customForm');
+            if (form) {
+                form.appendChild(hiddenField);
+            } else {
+                document.body.appendChild(hiddenField);
+            }
         }
         
         // Get all the linked textboxes
@@ -4893,37 +4917,28 @@ if (typeof handleNext === 'function') {
 
         // Helper: load answers
         async function loadAnswers() {
-            console.log('🔧 [AUTOFILL DEBUG] loadAnswers() called - isUserLoggedIn:', isUserLoggedIn, 'userId:', userId, 'formId:', formId);
             if (!isUserLoggedIn || !userId) {
-                console.log('🔧 [AUTOFILL DEBUG] Skipping loadAnswers - user not logged in or no userId');
                 return;
             }
             try {
                 // First, try to load user profile data from a user profile document
-                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch user profile data...');
                 const userProfileDoc = await db.collection('users').doc(userId).get();
-                console.log('🔧 [AUTOFILL DEBUG] User profile document exists:', userProfileDoc.exists);
                 
                 let userProfileData = {};
                 if (userProfileDoc.exists) {
                     userProfileData = userProfileDoc.data();
-                    console.log('🔧 [AUTOFILL DEBUG] User profile data loaded:', userProfileData);
                 }
                 
                 // Then, try to load form-specific data
-                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch Firebase document for formId:', formId);
                 const doc = await db.collection('users').doc(userId).collection('formAnswers').doc(formId).get();
-                console.log('🔧 [AUTOFILL DEBUG] Firebase document exists:', doc.exists);
                 
                 let formData = {};
                 if (doc.exists) {
                     formData = doc.data();
-                    console.log('🔧 [AUTOFILL DEBUG] Form data loaded:', formData);
                 }
                 
                 // Combine user profile data with form data
                 const data = { ...userProfileData, ...formData };
-                console.log('🔧 [AUTOFILL DEBUG] Combined data (user profile + form):', data);
                 
                 // Helper function to map Firebase data to form field names
                 function mapFirebaseDataToFormFields(firebaseData) {
@@ -4943,11 +4958,11 @@ if (typeof handleNext === 'function') {
                         if (firebaseData.address.zip) mappedData.user_zip = firebaseData.address.zip;
                     }
                     
-                    console.log('🔧 [AUTOFILL DEBUG] Mapped data for form fields:', mappedData);
                     return mappedData;
                 }
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
+                console.log('🔧 [AUTOFILL DEBUG] Firebase data loaded and mapped:', mappedData);
                     const fields = getFormFields();
                     fields.forEach(el => {
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -4958,7 +4973,6 @@ if (typeof handleNext === 'function') {
                                 return;
                             }
                             
-                        console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
                             if (el.type === 'checkbox' || el.type === 'radio') {
                             el.checked = !!mappedData[el.name];
                             } else {
@@ -4970,12 +4984,10 @@ if (typeof handleNext === 'function') {
                     // After autofilling, trigger visibility updates for dependent questions
                     // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
-                        console.log('🔧 [VISIBILITY DEBUG] Starting visibility updates after autofill...');
                         
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
                         fields.forEach(el => {
                             if (el.value || el.checked) {
-                                console.log('🔧 [VISIBILITY DEBUG] Triggering change event on autofilled element:', el.id || el.name);
                                 const event = new Event('change', { bubbles: true });
                                 el.dispatchEvent(event);
                             }
@@ -5015,7 +5027,6 @@ if (typeof handleNext === 'function') {
                     // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
                     fields.forEach(el => {
                         if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
-                            console.log('🔧 [AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
                             if (typeof dropdownMirror === 'function') {
                                 dropdownMirror(el, el.id);
                             }
@@ -5040,9 +5051,7 @@ if (typeof handleNext === 'function') {
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
-                        console.log('🔧 [AUTOFILL DEBUG] Starting second autofill pass for dynamically generated inputs');
                         const allFields = getFormFields();
-                        console.log('🔧 [AUTOFILL DEBUG] Found', allFields.length, 'total form fields');
                         
                         // Also try to find fields by ID directly as a fallback
                         const fieldsById = {};
@@ -5054,12 +5063,10 @@ if (typeof handleNext === 'function') {
                         
                         allFields.forEach(el => {
                             if (mappedData.hasOwnProperty(el.name)) {
-                                console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
                                 if (el.type === 'checkbox' || el.type === 'radio') {
                                     el.checked = !!mappedData[el.name];
                                 } else {
                                     el.value = mappedData[el.name];
-                                    console.log('🔧 [AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
                                 }
                             }
                         });
@@ -5068,12 +5075,10 @@ if (typeof handleNext === 'function') {
                         Object.keys(mappedData).forEach(fieldName => {
                             const fieldById = fieldsById[fieldName];
                             if (fieldById && !fieldById.value && mappedData[fieldName]) {
-                                console.log('🔧 [AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', mappedData[fieldName]);
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                     fieldById.checked = !!mappedData[fieldName];
                                 } else {
                                     fieldById.value = mappedData[fieldName];
-                                    console.log('🔧 [AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
                                 }
                             }
                         });
@@ -5102,7 +5107,6 @@ if (typeof handleNext === 'function') {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
                 }
             } catch (e) {
-                console.log('🔧 [AUTOFILL DEBUG] Error in loadAnswers:', e);
             }
         }
         
@@ -5246,6 +5250,7 @@ if (typeof handleNext === 'function') {
                 const savedData = localStorage.getItem('formData_' + formId);
                 if (savedData) {
                     const data = JSON.parse(savedData);
+                    console.log('🔧 [AUTOFILL DEBUG] LocalStorage data loaded:', data);
                     const fields = getFormFields();
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
@@ -5349,7 +5354,6 @@ if (typeof handleNext === 'function') {
                                         el.checked = !!data[el.name];
                                     } else {
                                         el.value = data[el.name];
-                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
                                     }
                                 }
                             });
@@ -5358,12 +5362,10 @@ if (typeof handleNext === 'function') {
                             Object.keys(data).forEach(fieldName => {
                                 const fieldById = fieldsById[fieldName];
                                 if (fieldById && !fieldById.value && data[fieldName]) {
-                                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', data[fieldName]);
                                     if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         fieldById.checked = !!data[fieldName];
                                     } else {
                                         fieldById.value = data[fieldName];
-                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
                                     }
                                 }
                             });
@@ -6608,20 +6610,12 @@ document.addEventListener('change', function() {
 
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    console.log('🔧 [STATE DEBUG] updateStateHiddenFields called with:', { hiddenFullId, hiddenShortId });
     
     const selectedState = dropdown.value;
-    console.log('🔧 [STATE DEBUG] selectedState:', selectedState);
     
     const fullField = document.getElementById(hiddenFullId);
     const shortField = document.getElementById(hiddenShortId);
     
-    console.log('🔧 [STATE DEBUG] fullField found:', !!fullField, fullField);
-    console.log('🔧 [STATE DEBUG] shortField found:', !!shortField, shortField);
-    console.log('🔧 [STATE DEBUG] fullField type:', fullField ? fullField.type : 'undefined');
-    console.log('🔧 [STATE DEBUG] shortField type:', shortField ? shortField.type : 'undefined');
-    console.log('🔧 [STATE DEBUG] fullField tagName:', fullField ? fullField.tagName : 'undefined');
-    console.log('🔧 [STATE DEBUG] shortField tagName:', shortField ? shortField.tagName : 'undefined');
     
     // State abbreviation mapping
     const stateAbbreviations = {
@@ -6639,19 +6633,13 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
     if (fullField && shortField) {
         if (selectedState) {
             const abbreviation = stateAbbreviations[selectedState] || '';
-            console.log('🔧 [STATE DEBUG] Setting fullField.value to:', selectedState);
-            console.log('🔧 [STATE DEBUG] Setting shortField.value to:', abbreviation);
             fullField.value = selectedState;
             shortField.value = abbreviation;
-            console.log('🔧 [STATE DEBUG] After setting - fullField.value:', fullField.value);
-            console.log('🔧 [STATE DEBUG] After setting - shortField.value:', shortField.value);
         } else {
-            console.log('🔧 [STATE DEBUG] Clearing fields');
             fullField.value = '';
             shortField.value = '';
         }
     } else {
-        console.log('🔧 [STATE DEBUG] Fields not found! fullField:', !!fullField, 'shortField:', !!shortField);
     }
 }
 
@@ -6688,10 +6676,28 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUserFullName();
   }, 2000);
 });
-
-function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
     if(!container) return;
+
+    // 🔧 NEW: Check if we already have the right number of fields with values
+    const existingFields = container.querySelectorAll('input, select, textarea');
+    const expectedCount = parseInt(count) || 0;
+    
+    if (existingFields.length === expectedCount && expectedCount > 0) {
+        let hasValues = false;
+        let fieldValues = {};
+        existingFields.forEach(field => {
+            if (field.value && field.value.trim() !== '') {
+                hasValues = true;
+                fieldValues[field.id] = field.value;
+            }
+        });
+        
+        if (hasValues) {
+            // Fields already exist with values, skip recreation to preserve autofill
+            return;
+        }
+    }
 
     container.innerHTML = "";
     

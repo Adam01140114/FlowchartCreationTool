@@ -823,10 +823,18 @@ if (!window.flowchartKeyboardInitialized) {
       console.log('🔍 [KEY DEBUG] Ctrl+S document listener triggered');
       if (isUserTyping(event)) return;
       event.preventDefault();
-      // Trigger the save button click
-      const saveButton = document.getElementById('saveFlowchartButton');
-      if (saveButton) {
-        saveButton.click();
+      // Call saveFlowchart function directly if it exists
+      if (typeof window.saveFlowchart === 'function') {
+        console.log('🔍 [KEY DEBUG] Calling saveFlowchart function directly');
+        window.saveFlowchart();
+      } else {
+        // Fallback: try to find and click save button
+        const saveButton = document.getElementById('saveFlowchartButton');
+        if (saveButton) {
+          saveButton.click();
+        } else {
+          console.log('🔍 [KEY DEBUG] No save functionality found');
+        }
       }
     }
   });
