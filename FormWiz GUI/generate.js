@@ -61,6 +61,7 @@ function sanitizeQuestionText (str){
                       .replace(/^_+|_+$/g, "");
 }
 
+
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
     console.log('🔧 [STATE DEBUG] updateStateHiddenFields called with:', { hiddenFullId, hiddenShortId });
@@ -146,64 +147,6 @@ function createAddressInput(id, label, index, type = 'text') {
            '</div>';
 }
 
-// Helper function to create US states dropdown
-function createStateDropdown(id, index) {
-    const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
-        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
-        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-        'Wisconsin', 'Wyoming'
-    ];
-    
-    // State abbreviation mapping
-    const stateAbbreviations = {
-        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
-        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
-        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
-        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
-        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
-        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
-        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
-        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
-        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
-    };
-    
-    let options = '<option value="">Select State</option>';
-    states.forEach(state => {
-        options += '<option value="' + state + '">' + state + '</option>';
-    });
-    
-    // Create hidden textboxes for full state name and abbreviation
-    const hiddenFullId = id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-    
-    // For numbered dropdown questions, transform the ID pattern
-    // from "how_many_state_1" to "how_many_state_short_1"
-    let hiddenShortId;
-    if (id.includes('_') && /\d+$/.test(id)) {
-        // Extract the base part and the number
-        const match = id.match(/^(.+)_(\d+)$/);
-        if (match) {
-            const basePart = match[1];
-            const number = match[2];
-            hiddenShortId = basePart + '_short_' + number;
-        } else {
-            hiddenShortId = id + '_short';
-        }
-    } else {
-        hiddenShortId = id + '_short';
-    }
-    
-    return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, ' + hiddenFullId + ', ' + hiddenShortId + '); updateLinkedFields();">' +
-           options +
-           '</select>' +
-           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
-           '<input type="hidden" id="' + hiddenShortId + '" name="' + hiddenShortId + '" value="">' +
-           '</div>';
-}
 
 function getFormHTML() {
 	
@@ -1944,6 +1887,108 @@ if (s > 1){
   // Set window.formId to the PDF name (without .pdf extension) for cart and form identification
   formHTML += `window.formId = '${escapedPdfFormName.replace(/\.pdf$/i, '')}';\n`;
   
+  // --- BEGIN: one-time helper injection ---
+  formHTML += `
+(function injectAddressHelpersOnce() {
+  if (window.__addressHelpersInjected) return;
+  window.__addressHelpersInjected = true;
+
+  // Create stylized address <input>
+  window.createAddressInput = function(id, label, index, type = 'text') {
+    const inputType = (type === 'number') ? 'number' : 'text';
+    const placeholder = label;
+    return (
+      '<div class="address-field">' +
+      '<input type="' + inputType + '" ' +
+      'id="' + id + '" ' +
+      'name="' + id + '" ' +
+      'placeholder="' + placeholder + '" ' +
+      'class="address-input">' +
+      '</div>'
+    );
+  };
+
+  // Create US state dropdown + the two hidden fields (full name + short)
+  window.createStateDropdown = function(id, index) {
+    const states = [
+      'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+      'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+      'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
+      'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
+      'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+      'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
+      'Washington','West Virginia','Wisconsin','Wyoming'
+    ];
+
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+      options += '<option value="' + state + '">' + state + '</option>';
+    });
+
+    // Hidden full-state input id (always different from the <select> id)
+    const hiddenFullId = id + '_hidden';
+
+    // Hidden short-state input id:
+    // transform "how_many_state_1" -> "how_many_state_short_1" (note the \\d)
+    let shortId;
+    if (id.includes('_') && /\\\\d+$/.test(id)) {
+      const match = id.match(/^(.+)_(\\\\d+)$/);
+      if (match) {
+        const basePart = match[1];
+        const number = match[2];
+        shortId = basePart + '_short_' + number;
+      } else {
+        shortId = id + '_short';
+      }
+    } else {
+      shortId = id + '_short';
+    }
+
+    // Keep both text inputs hidden — they're for PDF mapping
+    return (
+      '<div class="address-field">' +
+        '<select id="' + id + '" name="' + id + '" class="address-select" ' +
+        'onchange="if (window.updateStateHiddenFields) updateStateHiddenFields(this, \\'' + hiddenFullId + '\\', \\'' + shortId + '\\');">' +
+          options +
+        '</select>' +
+        '<input type="text" id="' + hiddenFullId + '" name="' + hiddenFullId + '" style="display:none" />' +
+        '<input type="text" id="' + shortId + '" name="' + shortId + '" style="display:none" />' +
+      '</div>'
+    );
+  };
+
+  // Derive "..._short_N" from a base id like "how_many_state_N"
+  window.toShortIdFromBase = function(baseId){
+    const m = baseId.match(/^(.+)_(\\\\d+)$/);
+    return m ? m[1] + '_short_' + m[2] : baseId + '_short';
+  };
+
+  // Keep these helpers global too (they may be called by onchange/autofill)
+  window.updateStateHiddenFields = function(selectEl, fullId, shortId) {
+    const fullField  = document.getElementById(fullId);
+    const shortField = document.getElementById(shortId);
+    if (!fullField || !shortField) return;
+
+    const full = (selectEl.value || '').trim();
+    // Map full -> short (two-letter)
+    const map = {
+      'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO',
+      'Connecticut': 'CT','Delaware': 'DE','Florida': 'FL','Georgia': 'GA','Hawaii': 'HI','Idaho': 'ID',
+      'Illinois': 'IL','Indiana': 'IN','Iowa': 'IA','Kansas': 'KS','Kentucky': 'KY','Louisiana': 'LA',
+      'Maine': 'ME','Maryland': 'MD','Massachusetts': 'MA','Michigan': 'MI','Minnesota': 'MN','Mississippi': 'MS',
+      'Missouri': 'MO','Montana': 'MT','Nebraska': 'NE','Nevada': 'NV','New Hampshire': 'NH','New Jersey': 'NJ',
+      'New Mexico': 'NM','New York': 'NY','North Carolina': 'NC','North Dakota': 'ND','Ohio': 'OH','Oklahoma': 'OK',
+      'Oregon': 'OR','Pennsylvania': 'PA','Rhode Island': 'RI','South Carolina': 'SC','South Dakota': 'SD',
+      'Tennessee': 'TN','Texas': 'TX','Utah': 'UT','Vermont': 'VT','Virginia': 'VA','Washington': 'WA',
+      'West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'
+    };
+    const short = map[full] || '';
+    fullField.value  = full;
+    shortField.value = short;
+  };
+})();
+`;
+  
  formHTML += `
 /*───────────────────────────────*
  * return the true checkbox prefix
@@ -1960,7 +2005,7 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\\\\W+/g, '_').toLowerCase();
     }
     // Return the name part directly without adding question prefix
     return namePart;
@@ -2823,7 +2868,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
+        .replace(/\\\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
         .replace(/^_+|_+$/g, "");
 }
 
@@ -3567,7 +3612,7 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
+    const idSuffix = val.replace(/\\\\W+/g, "_").toLowerCase();
     const checkboxId = baseName + "_" + idSuffix;
     
     const checkboxDiv = document.createElement("div");
@@ -4960,21 +5005,7 @@ if (typeof handleNext === 'function') {
                         if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                             // This is a state dropdown that was autofilled
                             const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-                            // For numbered dropdown questions, transform the ID pattern
-                            // from "how_many_state_1" to "how_many_state_short_1"
-                            let hiddenShortId;
-                            if (hiddenFullId.includes('_') && /\d+$/.test(hiddenFullId)) {
-                                const match = hiddenFullId.match(/^(.+)_(\d+)$/);
-                                if (match) {
-                                    const basePart = match[1];
-                                    const number = match[2];
-                                    hiddenShortId = basePart + '_short_' + number;
-                                } else {
-                                    hiddenShortId = hiddenFullId + '_short';
-                                }
-                            } else {
-                                hiddenShortId = hiddenFullId + '_short';
-                            }
+                            const hiddenShortId = window.toShortIdFromBase(el.id);
                             if (typeof updateStateHiddenFields === 'function') {
                                 updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
                             }
@@ -5058,21 +5089,7 @@ if (typeof handleNext === 'function') {
                             if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                                 // This is a state dropdown that was autofilled
                                 const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-                                // For numbered dropdown questions, transform the ID pattern
-                            // from "how_many_state_1" to "how_many_state_short_1"
-                            let hiddenShortId;
-                            if (hiddenFullId.includes('_') && /\d+$/.test(hiddenFullId)) {
-                                const match = hiddenFullId.match(/^(.+)_(\d+)$/);
-                                if (match) {
-                                    const basePart = match[1];
-                                    const number = match[2];
-                                    hiddenShortId = basePart + '_short_' + number;
-                                } else {
-                                    hiddenShortId = hiddenFullId + '_short';
-                                }
-                            } else {
-                                hiddenShortId = hiddenFullId + '_short';
-                            }
+                                const hiddenShortId = window.toShortIdFromBase(el.id);
                                 if (typeof updateStateHiddenFields === 'function') {
                                     updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
                                 }
@@ -5282,21 +5299,7 @@ if (typeof handleNext === 'function') {
                             if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                                 // This is a state dropdown that was autofilled
                                 const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-                                // For numbered dropdown questions, transform the ID pattern
-                            // from "how_many_state_1" to "how_many_state_short_1"
-                            let hiddenShortId;
-                            if (hiddenFullId.includes('_') && /\d+$/.test(hiddenFullId)) {
-                                const match = hiddenFullId.match(/^(.+)_(\d+)$/);
-                                if (match) {
-                                    const basePart = match[1];
-                                    const number = match[2];
-                                    hiddenShortId = basePart + '_short_' + number;
-                                } else {
-                                    hiddenShortId = hiddenFullId + '_short';
-                                }
-                            } else {
-                                hiddenShortId = hiddenFullId + '_short';
-                            }
+                                const hiddenShortId = window.toShortIdFromBase(el.id);
                                 if (typeof updateStateHiddenFields === 'function') {
                                     updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
                                 }
@@ -5376,21 +5379,7 @@ if (typeof handleNext === 'function') {
                                 if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                                     // This is a state dropdown that was autofilled
                                     const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-                                    // For numbered dropdown questions, transform the ID pattern
-                            // from "how_many_state_1" to "how_many_state_short_1"
-                            let hiddenShortId;
-                            if (hiddenFullId.includes('_') && /\d+$/.test(hiddenFullId)) {
-                                const match = hiddenFullId.match(/^(.+)_(\d+)$/);
-                                if (match) {
-                                    const basePart = match[1];
-                                    const number = match[2];
-                                    hiddenShortId = basePart + '_short_' + number;
-                                } else {
-                                    hiddenShortId = hiddenFullId + '_short';
-                                }
-                            } else {
-                                hiddenShortId = hiddenFullId + '_short';
-                            }
+                                    const hiddenShortId = window.toShortIdFromBase(el.id);
                                     if (typeof updateStateHiddenFields === 'function') {
                                         updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
                                     }
@@ -5792,51 +5781,6 @@ function createAddressInput(id, label, index, type = 'text') {
            '</div>';
 }
 
-// Helper function to create US states dropdown
-function createStateDropdown(id, index) {
-    const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
-        'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
-        'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia',
-        'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-    ];
-    
-    let options = '<option value="">Select State</option>';
-    states.forEach(state => {
-        options += '<option value="' + state + '">' + state + '</option>';
-    });
-    
-    // Create hidden textboxes for full state name and abbreviation
-    const hiddenFullId = id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
-    
-    // For numbered dropdown questions, transform the ID pattern
-    // from "how_many_state_1" to "how_many_state_short_1"
-    let shortId;
-    if (id.includes('_') && /\\d+$/.test(id)) {
-        // Extract the base part and the number
-        const match = id.match(/^(.+)_(\\d+)$/);
-        if (match) {
-            const basePart = match[1];
-            const number = match[2];
-            shortId = basePart + '_short_' + number;
-        } else {
-            shortId = id + '_short';
-        }
-    } else {
-        shortId = id + '_short';
-    }
-    
-    return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select" onchange="updateStateHiddenFields(this, ' + hiddenFullId + ', ' + shortId + '); updateLinkedFields();">' +
-           options +
-           '</select>' +
-           '<input type="hidden" id="' + hiddenFullId + '" name="' + hiddenFullId + '" value="">' +
-           '<input type="hidden" id="' + shortId + '" name="' + shortId + '" value="">' +
-           '</div>';
-}
 
 </script>
 
