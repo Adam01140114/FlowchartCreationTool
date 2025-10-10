@@ -231,7 +231,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_zip" name="form_zip" value="">
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
-        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>how much</h3></label><div class="text-input-container"><input type="number" id="how_much" name="how_much" min="0" step="0.01" placeholder="Enter amount"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -241,7 +242,6 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<div style="display:none;"><input type="checkbox" id="test" name="test" ></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
@@ -484,8 +484,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"how_much"};
-var questionNameIds = {"1":"how_much"};
+    var questionSlugMap       = {"1":"how_many"};
+var questionNameIds = {"1":"how_many"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -493,10 +493,10 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
-var unifiedFieldsMap = {};
+var labelMap = {"1":["Street","City","State"],"length":0};
+var amountMap = {"1":["Zip"],"length":0};
+var labelNodeIdsMap = {"1":["how_many_street","how_many_city","how_many_state"]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Street","nodeId":"how_many_street","order":1},{"type":"label","label":"City","nodeId":"how_many_city","order":2},{"type":"label","label":"State","nodeId":"how_many_state","order":3},{"type":"amount","label":"Zip","nodeId":"how_many_zip","order":4}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -584,7 +584,7 @@ var pdfOutputFileName = "example.html";
 var stripePriceId = "";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["example.html", ];
-var hiddenCheckboxCalculations = [{"hiddenFieldName":"test","calculations":[{"terms":[{"operator":"","questionNameId":"how_much"}],"compareOperator":">","threshold":"2500","result":"checked"}]}];
+var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
@@ -2556,7 +2556,8 @@ function runSingleHiddenCheckboxCalculation(calcObj){
     var cbox = document.getElementById(calcObj.hiddenFieldName);
     if(!cbox) return;  // hidden field not found
 
-    var finalState = cbox.checked;  // start with default
+    var finalState = false;  // start with unchecked, only check if calculation conditions are met
+    console.log('🔧 [CALC DEBUG] Running calculation for checkbox:', calcObj.hiddenFieldName);
 
     // Evaluate each multi-term condition in 'calculations'
     for(var c=0; c<calcObj.calculations.length; c++){
@@ -2566,6 +2567,7 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         // Sum up the terms
         if(oneCalc.terms && oneCalc.terms.length>0){
             val = parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId) )||0;
+            console.log('🔧 [CALC DEBUG] First term value for', oneCalc.terms[0].questionNameId, ':', val);
             for(var t=1; t<oneCalc.terms.length; t++){
                 var term = oneCalc.terms[t];
                 var op   = term.operator||'';
@@ -2588,14 +2590,18 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         else if(oneCalc.compareOperator==='<') matched = (val<thr);
         else if(oneCalc.compareOperator==='>') matched = (val>thr);
 
+        console.log('🔧 [CALC DEBUG] Comparison:', val, oneCalc.compareOperator, thr, '=', matched);
+
         // If matched, set final state
         if(matched){
             finalState = (oneCalc.result==='checked');
+            console.log('🔧 [CALC DEBUG] Condition matched, setting finalState to:', finalState);
         }
     }
 
     // Set the hidden checkbox state
     cbox.checked = finalState;
+    console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
 }
 
 
@@ -4197,7 +4203,7 @@ function createAddressInput(id, label, index, type = 'text') {
     
     <!-- Search Bar -->
     <div style="padding: 20px; border-bottom: 1px solid #eee;">
-      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value... (supports partial word matching)" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
       
       <!-- Filter Controls -->
       <div style="display: flex; gap: 15px; margin-top: 15px; align-items: center; flex-wrap: wrap;">
@@ -4588,8 +4594,6 @@ function populateDebugContent() {
   });
   
   // Filter by search term and type
-  const normalizedSearchTermUnderscore = searchTerm.replace(/[_s]/g, '_');
-  const normalizedSearchTermSpace = searchTerm.replace(/[_s]/g, ' ');
   
   const filteredData = inputData.filter(item => {
     // First check type filter
@@ -4626,41 +4630,27 @@ function populateDebugContent() {
       return true;
     }
     
-    // Apply search term filtering with bidirectional space/underscore normalization
-    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_s]/g, '_');
-    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_s]/g, '_');
-    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_s]/g, '_');
-    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_s]/g, '_');
+    // Helper function to check if all search words are found in text (partial word matching)
+    function matchesPartialWords(searchWords, text) {
+      if (!text || !searchWords.length) return false;
+      
+      const normalizedText = text.toLowerCase().replace(/[_s]/g, ' ');
+      return searchWords.every(word => normalizedText.includes(word.toLowerCase()));
+    }
     
-    const normalizedIdSpace = item.id.toLowerCase().replace(/[_s]/g, ' ');
-    const normalizedNameSpace = item.name.toLowerCase().replace(/[_s]/g, ' ');
-    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_s]/g, ' ');
-    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_s]/g, ' ');
+    // Split search term into individual words for partial matching
+    const searchWords = searchTerm.trim().split(/s+/).filter(word => word.length > 0);
     
-    // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
-    return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedNameUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedValueUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedPlaceholderUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedIdSpace.includes(normalizedSearchTermSpace) ||
-           normalizedNameSpace.includes(normalizedSearchTermSpace) ||
-           normalizedValueSpace.includes(normalizedSearchTermSpace) ||
-           normalizedPlaceholderSpace.includes(normalizedSearchTermSpace) ||
-           // Cross-matches: underscore search vs space data
-           normalizedIdSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedNameSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedValueSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedPlaceholderSpace.includes(normalizedSearchTermUnderscore) ||
-           // Cross-matches: space search vs underscore data
-           normalizedIdUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedNameUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedValueUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedPlaceholderUnderscore.includes(normalizedSearchTermSpace) ||
-           // Original exact matches for backward compatibility
-    item.id.toLowerCase().includes(searchTerm) ||
-    item.name.toLowerCase().includes(searchTerm) ||
-    String(item.value).toLowerCase().includes(searchTerm) ||
-           item.placeholder.toLowerCase().includes(searchTerm);
+    // Get all text fields to search in
+    const searchableTexts = [
+      item.id,
+      item.name,
+      String(item.value),
+      item.placeholder
+    ].filter(text => text && text.length > 0);
+    
+    // Check if all search words are found in any of the searchable texts
+    return searchableTexts.some(text => matchesPartialWords(searchWords, text));
   });
   
   // Group by type

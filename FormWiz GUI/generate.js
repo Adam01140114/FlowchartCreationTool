@@ -1895,10 +1895,10 @@ if (s > 1){
     const hiddenFullId = id + '_hidden';
 
     // Hidden short-state input id:
-    // transform "how_many_state_1" -> "how_many_state_short_1" (note the \\d)
+    // transform "how_many_state_1" -> "how_many_state_short_1" (note the \d)
     let shortId;
-    if (id.includes('_') && /\\\\d+$/.test(id)) {
-      const match = id.match(/^(.+)_(\\\\d+)$/);
+    if (id.includes('_') && /\\d+$/.test(id)) {
+      const match = id.match(/^(.+)_(\\d+)$/);
       if (match) {
         const basePart = match[1];
         const number = match[2];
@@ -1925,7 +1925,7 @@ if (s > 1){
 
   // Derive "..._short_N" from a base id like "how_many_state_N"
   window.toShortIdFromBase = function(baseId){
-    const m = baseId.match(/^(.+)_(\\\\d+)$/);
+    const m = baseId.match(/^(.+)_(\\d+)$/);
     return m ? m[1] + '_short_' + m[2] : baseId + '_short';
   };
 
@@ -5979,7 +5979,7 @@ function createAddressInput(id, label, index, type = 'text') {
     
     <!-- Search Bar -->
     <div style="padding: 20px; border-bottom: 1px solid #eee;">
-      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value... (supports partial word matching)" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
       
       <!-- Filter Controls -->
       <div style="display: flex; gap: 15px; margin-top: 15px; align-items: center; flex-wrap: wrap;">
@@ -6370,8 +6370,6 @@ function populateDebugContent() {
   });
   
   // Filter by search term and type
-  const normalizedSearchTermUnderscore = searchTerm.replace(/[_\s]/g, '_');
-  const normalizedSearchTermSpace = searchTerm.replace(/[_\s]/g, ' ');
   
   const filteredData = inputData.filter(item => {
     // First check type filter
@@ -6408,41 +6406,27 @@ function populateDebugContent() {
       return true;
     }
     
-    // Apply search term filtering with bidirectional space/underscore normalization
-    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_\s]/g, '_');
-    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_\s]/g, '_');
-    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_\s]/g, '_');
-    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_\s]/g, '_');
+    // Helper function to check if all search words are found in text (partial word matching)
+    function matchesPartialWords(searchWords, text) {
+      if (!text || !searchWords.length) return false;
+      
+      const normalizedText = text.toLowerCase().replace(/[_\s]/g, ' ');
+      return searchWords.every(word => normalizedText.includes(word.toLowerCase()));
+    }
     
-    const normalizedIdSpace = item.id.toLowerCase().replace(/[_\s]/g, ' ');
-    const normalizedNameSpace = item.name.toLowerCase().replace(/[_\s]/g, ' ');
-    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_\s]/g, ' ');
-    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_\s]/g, ' ');
+    // Split search term into individual words for partial matching
+    const searchWords = searchTerm.trim().split(/\s+/).filter(word => word.length > 0);
     
-    // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
-    return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedNameUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedValueUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedPlaceholderUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedIdSpace.includes(normalizedSearchTermSpace) ||
-           normalizedNameSpace.includes(normalizedSearchTermSpace) ||
-           normalizedValueSpace.includes(normalizedSearchTermSpace) ||
-           normalizedPlaceholderSpace.includes(normalizedSearchTermSpace) ||
-           // Cross-matches: underscore search vs space data
-           normalizedIdSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedNameSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedValueSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedPlaceholderSpace.includes(normalizedSearchTermUnderscore) ||
-           // Cross-matches: space search vs underscore data
-           normalizedIdUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedNameUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedValueUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedPlaceholderUnderscore.includes(normalizedSearchTermSpace) ||
-           // Original exact matches for backward compatibility
-    item.id.toLowerCase().includes(searchTerm) ||
-    item.name.toLowerCase().includes(searchTerm) ||
-    String(item.value).toLowerCase().includes(searchTerm) ||
-           item.placeholder.toLowerCase().includes(searchTerm);
+    // Get all text fields to search in
+    const searchableTexts = [
+      item.id,
+      item.name,
+      String(item.value),
+      item.placeholder
+    ].filter(text => text && text.length > 0);
+    
+    // Check if all search words are found in any of the searchable texts
+    return searchableTexts.some(text => matchesPartialWords(searchWords, text));
   });
   
   // Group by type
