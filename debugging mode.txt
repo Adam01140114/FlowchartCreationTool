@@ -18,23 +18,26 @@
 
 ## 🚨 **Current Issue Analysis:**
 
-### **Problem:** Numbered dropdown autofill not working for conditional dropdowns
+### **Problem:** Numbered dropdown autofill not working for conditional dropdowns in any section
 
 **Step 1 - Error in output.html:**
-- Console shows: `🔧 [SHOWTEXTBOX DEBUG] showTextboxLabels called with questionId: 1 count: 2` ❌
+- Console shows: `🔧 [SHOWTEXTBOX DEBUG] showTextboxLabels called with questionId: 2 count: 2` ❌
 - Console shows: `🔧 [SHOWTEXTBOX DEBUG] Container found: null` ❌
 - Console shows: `🔧 [SHOWTEXTBOX DEBUG] ❌ No container found, returning` ❌
-- **Expected:** Should be `questionId: 2` and find `labelContainer2`
+- **Expected:** Should be `questionId: 3` and find `labelContainer3` (since dropdown is now in section 3)
 
 **Step 2 - Why generate.js is generating this error:**
-- The autofill logic is hardcoded to use `questionId = '1'` for any dropdown starting with `how_many`
-- But the `how_many_people_are_suing_with_you` dropdown is actually in section 2 (question 2)
+- The autofill logic is hardcoded to use `questionId = '2'` for any dropdown starting with `how_many`
+- But the `how_many_people_are_suing_with_you` dropdown is now in section 3 (question 3)
 - The `showTextboxLabels` function is being called with the wrong question ID, so it can't find the correct container
+- This needs to be a dynamic solution that works regardless of which section the dropdown is in
 
 **Step 3 - How to fix generate.js:**
-- Update the question ID logic to correctly identify which section the dropdown belongs to
-- For `how_many_people_are_suing_with_you`, it should use `questionId = '2'` since it's in section 2
-- This will allow `showTextboxLabels` to find the correct `labelContainer2` and create the numbered fields
+- Make the question ID detection dynamic by parsing the dropdown's `onchange` attribute
+- Extract the question ID from `showTextboxLabels(3, this.value)` in the `onchange` attribute
+- Use regex to match `showTextboxLabels\((\d+),` and extract the correct question ID
+- Add fallback logic to scan for existing `labelContainer` elements if the regex fails
+- This will work for any section (1, 2, 3, 4, etc.) without hardcoding
 
 ## 🎯 **Debugging Best Practices:**
 

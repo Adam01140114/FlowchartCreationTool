@@ -1407,7 +1407,7 @@ formHTML += `</div><br></div>`;
         // Then build the dropdown - use nodeId if provided, otherwise fallback to answer + questionId
         const dropdownId = nodeId || "answer" + questionId;
         questionNameIds[questionId] = dropdownId;
-        formHTML += `<select id="${dropdownId}" name="${dropdownId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value)">
+        formHTML += `<select id="${dropdownId}" name="${dropdownId}" data-question-id="${questionId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         for (let rnum = ddMin; rnum <= ddMax; rnum++) {
           formHTML += `<option value="${rnum}">${rnum}</option>`;
@@ -1987,7 +1987,7 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\\\\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
     // Return the name part directly without adding question prefix
     return namePart;
@@ -2850,7 +2850,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\\\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
+        .replace(/\\W+/g, "_")
         .replace(/^_+|_+$/g, "");
 }
 
@@ -2898,6 +2898,16 @@ function toggleAmountField(amountFieldId, show) {
         amountField.style.display = show ? 'block' : 'none';
         if (!show) amountField.value = '';
     }
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Extract question ID from onchange attribute
+ *──────────────────────────────────────────────────────────────*/
+function extractQuestionIdFromOnchange(fn) {
+    if (!fn) return null;
+    const s = fn.toString();
+    const m = s.match(/showTextboxLabels\\s*\\(\\s*(\\d+)\\s*,/);
+    return m ? m[1] : null;
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -3645,7 +3655,7 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/\\\\W+/g, "_").toLowerCase();
+    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
     const checkboxId = baseName + "_" + idSuffix;
     
     const checkboxDiv = document.createElement("div");
@@ -5066,16 +5076,25 @@ if (typeof handleNext === 'function') {
                 fields.forEach(el => {
                     if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
                         let questionId;
-                        if (el.id.startsWith('answer')) {
+                        // First, try to get questionId from data attribute
+                        if (el.dataset && el.dataset.questionId) {
+                            questionId = el.dataset.questionId;
+                        } else if (el.id.startsWith('answer')) {
                             questionId = el.id.replace('answer', '');
                         } else if (el.id.startsWith('how_many')) {
-                            // For how_many dropdowns, we need to determine the correct question ID
-                            // Check if this is the main how_many dropdown (should be question 2)
-                            if (el.id === 'how_many_people_are_suing_with_you') {
-                                questionId = '2';
+                            // For how_many dropdowns, use the helper function to extract from onchange
+                            const dropdownElement = document.getElementById(el.id);
+                            const qFromOnchange = extractQuestionIdFromOnchange(dropdownElement && dropdownElement.onchange);
+                            if (qFromOnchange) {
+                                questionId = qFromOnchange;
                             } else {
-                                // For other how_many dropdowns, try to extract from the ID or default to 2
-                                questionId = '2';
+                                // Final fallback: try to find the container by checking which labelContainer exists
+                                for (let i = 1; i <= 10; i++) {
+                                    if (document.getElementById('labelContainer' + i)) {
+                                        questionId = i.toString();
+                                        break;
+                                    }
+                                }
                             }
                         }
                         if (typeof showTextboxLabels === 'function') {
@@ -5207,16 +5226,25 @@ if (typeof handleNext === 'function') {
                             if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
                                 console.log('🔧 [AUTOFILL DEBUG] Second pass - Found numbered dropdown:', el.id, 'value:', el.value);
                                 let questionId;
-                                if (el.id.startsWith('answer')) {
+                                // First, try to get questionId from data attribute
+                                if (el.dataset && el.dataset.questionId) {
+                                    questionId = el.dataset.questionId;
+                                } else if (el.id.startsWith('answer')) {
                                     questionId = el.id.replace('answer', '');
                                 } else if (el.id.startsWith('how_many')) {
-                                    // For how_many dropdowns, we need to determine the correct question ID
-                                    // Check if this is the main how_many dropdown (should be question 2)
-                                    if (el.id === 'how_many_people_are_suing_with_you') {
-                                        questionId = '2';
+                                    // For how_many dropdowns, use the helper function to extract from onchange
+                                    const dropdownElement = document.getElementById(el.id);
+                                    const qFromOnchange = extractQuestionIdFromOnchange(dropdownElement && dropdownElement.onchange);
+                                    if (qFromOnchange) {
+                                        questionId = qFromOnchange;
                                     } else {
-                                        // For other how_many dropdowns, try to extract from the ID or default to 2
-                                        questionId = '2';
+                                        // Final fallback: try to find the container by checking which labelContainer exists
+                                        for (let i = 1; i <= 10; i++) {
+                                            if (document.getElementById('labelContainer' + i)) {
+                                                questionId = i.toString();
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                                 if (typeof showTextboxLabels === 'function') {
