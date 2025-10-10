@@ -1069,26 +1069,95 @@ function showPropertiesPopup(cell) {
         const dropdownContainer = document.createElement('div');
         dropdownContainer.style.cssText = `
           display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+        `;
+        
+        // Create search bar
+        const searchBar = document.createElement('input');
+        searchBar.type = 'text';
+        searchBar.placeholder = 'Search for a field...';
+        searchBar.style.cssText = `
+          width: 100%;
+          padding: 6px 8px;
+          margin-bottom: 4px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 12px;
+          background-color: #f9f9f9;
+        `;
+        
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.cssText = `
+          display: flex;
           align-items: center;
           gap: 8px;
         `;
         
-        const dropdown = document.createElement('select');
-        dropdown.style.cssText = `
+        // Create custom dropdown container
+        const newDropdownContainer = document.createElement('div');
+        newDropdownContainer.style.cssText = `
           flex: 1;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        `;
+        
+        // Create the visible dropdown display
+        const dropdownDisplay = document.createElement('div');
+        dropdownDisplay.style.cssText = `
           padding: 8px;
           border: 1px solid #ddd;
           border-radius: 4px;
           font-size: 14px;
+          background-color: white;
+          cursor: pointer;
+          min-height: 20px;
+          display: flex;
+          align-items: center;
+        `;
+        dropdownDisplay.textContent = 'Select a textbox question...';
+        
+        // Create the options container (initially hidden)
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.cssText = `
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         `;
         
-        // Populate dropdown with textbox question Node IDs
-        populateLinkedLogicDropdown(dropdown, cell);
+        // Create hidden select for form compatibility
+        const hiddenSelect = document.createElement('select');
+        hiddenSelect.style.display = 'none';
+        
+        // Populate options
+        populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell);
         
         // Set selected value if it exists
         if (linkedFields[i]) {
-          dropdown.value = linkedFields[i];
+          const selectedOption = optionsContainer.querySelector(`[data-value="${linkedFields[i]}"]`);
+          if (selectedOption) {
+            dropdownDisplay.textContent = selectedOption.textContent;
+            hiddenSelect.value = linkedFields[i];
+          }
         }
+        
+        dropdownContainer.appendChild(dropdownDisplay);
+        dropdownContainer.appendChild(hiddenSelect);
+        
+        // Setup search functionality
+        setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
         
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
@@ -1102,13 +1171,35 @@ function showPropertiesPopup(cell) {
           font-size: 12px;
         `;
         deleteBtn.onclick = () => {
-          dropdownContainer.remove();
+          mainContainer.remove();
           updateLinkedFields(cell);
         };
         
-        dropdownContainer.appendChild(dropdown);
-        dropdownContainer.appendChild(deleteBtn);
-        linkedFieldsContainer.appendChild(dropdownContainer);
+        // Create the main container for this dropdown
+        const mainContainer = document.createElement('div');
+        mainContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+          position: relative;
+        `;
+        
+        // Add search bar to main container
+        mainContainer.appendChild(searchBar);
+        
+        // Add options container to main container (positioned relative to search bar)
+        mainContainer.appendChild(optionsContainer);
+        
+        // Add dropdown and delete button to controls container
+        controlsContainer.appendChild(dropdownContainer);
+        controlsContainer.appendChild(deleteBtn);
+        
+        // Add controls container to main container
+        mainContainer.appendChild(controlsContainer);
+        
+        // Add main container to linked fields container
+        linkedFieldsContainer.appendChild(mainContainer);
       }
       
       // Add "Link Another" button
@@ -1125,23 +1216,89 @@ function showPropertiesPopup(cell) {
         margin-top: 8px;
       `;
       linkAnotherBtn.onclick = () => {
-        const dropdownContainer = document.createElement('div');
-        dropdownContainer.style.cssText = `
+        const linkDropdownContainer = document.createElement('div');
+        linkDropdownContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+        `;
+        
+        // Create search bar
+        const searchBar = document.createElement('input');
+        searchBar.type = 'text';
+        searchBar.placeholder = 'Search for a field...';
+        searchBar.style.cssText = `
+          width: 100%;
+          padding: 6px 8px;
+          margin-bottom: 4px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 12px;
+          background-color: #f9f9f9;
+        `;
+        
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.cssText = `
           display: flex;
           align-items: center;
           gap: 8px;
         `;
         
-        const dropdown = document.createElement('select');
-        dropdown.style.cssText = `
+        // Create custom dropdown container
+        const linkNewDropdownContainer = document.createElement('div');
+        linkNewDropdownContainer.style.cssText = `
           flex: 1;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        `;
+        
+        // Create the visible dropdown display
+        const dropdownDisplay = document.createElement('div');
+        dropdownDisplay.style.cssText = `
           padding: 8px;
           border: 1px solid #ddd;
           border-radius: 4px;
           font-size: 14px;
+          background-color: white;
+          cursor: pointer;
+          min-height: 20px;
+          display: flex;
+          align-items: center;
+        `;
+        dropdownDisplay.textContent = 'Select a textbox question...';
+        
+        // Create the options container (initially hidden)
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.cssText = `
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         `;
         
-        populateLinkedLogicDropdown(dropdown, cell);
+        // Create hidden select for form compatibility
+        const hiddenSelect = document.createElement('select');
+        hiddenSelect.style.display = 'none';
+        
+        // Populate options
+        populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell);
+        
+        linkNewDropdownContainer.appendChild(dropdownDisplay);
+        linkNewDropdownContainer.appendChild(hiddenSelect);
+        
+        // Setup search functionality
+        setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
         
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
@@ -1155,13 +1312,35 @@ function showPropertiesPopup(cell) {
           font-size: 12px;
         `;
         deleteBtn.onclick = () => {
-          dropdownContainer.remove();
+          linkMainContainer.remove();
           updateLinkedFields(cell);
         };
         
-        dropdownContainer.appendChild(dropdown);
-        dropdownContainer.appendChild(deleteBtn);
-        linkedFieldsContainer.insertBefore(dropdownContainer, linkAnotherBtn);
+        // Create the main container for this dropdown
+        const linkMainContainer = document.createElement('div');
+        linkMainContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+          position: relative;
+        `;
+        
+        // Add search bar to main container
+        linkMainContainer.appendChild(searchBar);
+        
+        // Add options container to main container (positioned relative to search bar)
+        linkMainContainer.appendChild(optionsContainer);
+        
+        // Add dropdown and delete button to controls container
+        controlsContainer.appendChild(linkNewDropdownContainer);
+        controlsContainer.appendChild(deleteBtn);
+        
+        // Add controls container to main container
+        linkMainContainer.appendChild(controlsContainer);
+        
+        // Add main container to linked fields container
+        linkedFieldsContainer.insertBefore(linkMainContainer, linkAnotherBtn);
         updateLinkedFields(cell);
       };
       
@@ -2918,6 +3097,482 @@ window.testPropertiesPopup = function() {
     showPropertiesPopup(selectedCells[0]);
   }
 };
+
+/**
+ * Populate custom dropdown with textbox question Node IDs from flowchart
+ */
+function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell) {
+  // Clear existing options
+  optionsContainer.innerHTML = '';
+  hiddenSelect.innerHTML = '';
+  
+  // Add default option
+  const defaultOption = document.createElement('div');
+  defaultOption.textContent = 'Select a textbox question...';
+  defaultOption.style.cssText = `
+    padding: 8px;
+    color: #666;
+    cursor: pointer;
+  `;
+  defaultOption.setAttribute('data-value', '');
+  optionsContainer.appendChild(defaultOption);
+  
+  const defaultSelectOption = document.createElement('option');
+  defaultSelectOption.value = '';
+  defaultSelectOption.textContent = 'Select a textbox question...';
+  hiddenSelect.appendChild(defaultSelectOption);
+  
+  // Get all cells in the graph
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const allCells = graph.getChildVertices(graph.getDefaultParent());
+  
+  // Find all textbox question nodes and multiple dropdown question labels
+  const textboxNodes = allCells.filter(cell => {
+    // Check if it's a question node with textbox type
+    if (cell.style && cell.style.includes('nodeType=question')) {
+      // Check if it has textbox question type (exclude dropdown types)
+      const isTextbox = cell.style.includes('questionType=text') || 
+                       cell.style.includes('questionType=multipleTextboxes');
+      
+      // Make sure it's NOT a dropdown question (including text2 which is dropdown type)
+      const isDropdown = cell.style.includes('questionType=dropdown') ||
+                        cell.style.includes('questionType=text2') ||
+                        cell.style.includes('questionType=yesNo') ||
+                        cell.style.includes('questionType=multipleChoice') ||
+                        cell.style.includes('questionType=multipleDropdownType');
+      
+      return isTextbox && !isDropdown;
+    }
+    return false;
+  });
+  
+  // Find all multiple dropdown question nodes to extract their labels
+  const multipleDropdownNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           cell.style.includes('questionType=multipleDropdownType');
+  });
+  
+  // Add options for each textbox question
+  textboxNodes.forEach(node => {
+    // Check if it's a multiple textbox question
+    if (node.style && node.style.includes('questionType=multipleTextboxes') && 
+        node._textboxes && Array.isArray(node._textboxes)) {
+      // Add individual textbox entries
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const option = document.createElement('div');
+          // Convert nameId to lowercase to match the Copy ID format
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          const labelId = `${baseNodeId}_${lowercaseNameId}`;
+          option.textContent = labelId;
+          option.style.cssText = `
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+          `;
+          option.setAttribute('data-value', labelId);
+          optionsContainer.appendChild(option);
+          
+          const selectOption = document.createElement('option');
+          selectOption.value = labelId;
+          selectOption.textContent = labelId;
+          hiddenSelect.appendChild(selectOption);
+        }
+      });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          const option = document.createElement('div');
+          const labelId = `${baseNodeId}_${locationField}`;
+          option.textContent = labelId;
+          option.style.cssText = `
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+          `;
+          option.setAttribute('data-value', labelId);
+          optionsContainer.appendChild(option);
+          
+          const selectOption = document.createElement('option');
+          selectOption.value = labelId;
+          selectOption.textContent = labelId;
+          hiddenSelect.appendChild(selectOption);
+          
+          // Add short state field for state location field
+          if (locationField === 'state') {
+            const shortOption = document.createElement('div');
+            const shortLabelId = `${baseNodeId}_${locationField}_short`;
+            shortOption.textContent = shortLabelId;
+            shortOption.style.cssText = `
+              padding: 8px;
+              cursor: pointer;
+              border-bottom: 1px solid #eee;
+            `;
+            shortOption.setAttribute('data-value', shortLabelId);
+            optionsContainer.appendChild(shortOption);
+            
+            const shortSelectOption = document.createElement('option');
+            shortSelectOption.value = shortLabelId;
+            shortSelectOption.textContent = shortLabelId;
+            hiddenSelect.appendChild(shortSelectOption);
+          }
+        });
+      }
+    } else {
+      // Regular textbox question - add the base node ID
+      const option = document.createElement('div');
+      const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      option.textContent = nodeId || `Node ${node.id}`;
+      option.style.cssText = `
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      `;
+      option.setAttribute('data-value', nodeId);
+      optionsContainer.appendChild(option);
+      
+      const selectOption = document.createElement('option');
+      selectOption.value = nodeId;
+      selectOption.textContent = nodeId || `Node ${node.id}`;
+      hiddenSelect.appendChild(selectOption);
+    }
+  });
+  
+  // Add options for each multiple dropdown question label
+  multipleDropdownNodes.forEach(node => {
+    if (node._textboxes && Array.isArray(node._textboxes)) {
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      // Get the number range from _twoNumbers
+      const firstNumber = parseInt(node._twoNumbers?.first) || 1;
+      const secondNumber = parseInt(node._twoNumbers?.second) || 1;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          
+          // Generate options for each number in the range
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('div');
+            const labelId = `${baseNodeId}_${lowercaseNameId}_${num}`;
+            option.textContent = labelId;
+            option.style.cssText = `
+              padding: 8px;
+              cursor: pointer;
+              border-bottom: 1px solid #eee;
+            `;
+            option.setAttribute('data-value', labelId);
+            optionsContainer.appendChild(option);
+            
+            const selectOption = document.createElement('option');
+            selectOption.value = labelId;
+            selectOption.textContent = labelId;
+            hiddenSelect.appendChild(selectOption);
+          }
+        }
+      });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          // Generate options for each number in the range for each location field
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('div');
+            const labelId = `${baseNodeId}_${locationField}_${num}`;
+            option.textContent = labelId;
+            option.style.cssText = `
+              padding: 8px;
+              cursor: pointer;
+              border-bottom: 1px solid #eee;
+            `;
+            option.setAttribute('data-value', labelId);
+            optionsContainer.appendChild(option);
+            
+            const selectOption = document.createElement('option');
+            selectOption.value = labelId;
+            selectOption.textContent = labelId;
+            hiddenSelect.appendChild(selectOption);
+            
+            // Add short state field for state location field
+            if (locationField === 'state') {
+              const shortOption = document.createElement('div');
+              const shortLabelId = `${baseNodeId}_${locationField}_short_${num}`;
+              shortOption.textContent = shortLabelId;
+              shortOption.style.cssText = `
+                padding: 8px;
+                cursor: pointer;
+                border-bottom: 1px solid #eee;
+              `;
+              shortOption.setAttribute('data-value', shortLabelId);
+              optionsContainer.appendChild(shortOption);
+              
+              const shortSelectOption = document.createElement('option');
+              shortSelectOption.value = shortLabelId;
+              shortSelectOption.textContent = shortLabelId;
+              hiddenSelect.appendChild(shortSelectOption);
+            }
+          }
+        });
+      }
+    }
+  });
+  
+  // If no questions found, add a placeholder
+  if (textboxNodes.length === 0 && multipleDropdownNodes.length === 0) {
+    const noOptions = document.createElement('div');
+    noOptions.textContent = 'No textbox questions found';
+    noOptions.style.cssText = `
+      padding: 8px;
+      color: #666;
+      font-style: italic;
+    `;
+    optionsContainer.appendChild(noOptions);
+  }
+}
+
+/**
+ * Setup custom search functionality for Linked Logic dropdowns
+ */
+function setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar) {
+  // Store original options for filtering
+  let originalOptions = Array.from(optionsContainer.children);
+  
+  // Function to normalize search terms (handle spaces and underscores)
+  const normalizeSearchTerm = (term) => {
+    return term.toLowerCase().replace(/[\s_]+/g, '');
+  };
+  
+  // Function to normalize option text for comparison
+  const normalizeOptionText = (text) => {
+    return text.toLowerCase().replace(/[\s_]+/g, '');
+  };
+  
+  // Function to filter and update options
+  const updateOptions = (searchTerm) => {
+    // Clear options
+    optionsContainer.innerHTML = '';
+    
+    if (searchTerm.length === 0) {
+      // Show all options when search is empty
+      originalOptions.forEach(option => {
+        const newOption = option.cloneNode(true);
+        optionsContainer.appendChild(newOption);
+      });
+    } else {
+      // Filter and add matching options
+      const normalizedSearch = normalizeSearchTerm(searchTerm);
+      const filteredOptions = originalOptions.filter(option => {
+        const text = option.textContent;
+        const normalizedText = normalizeOptionText(text);
+        return normalizedText.includes(normalizedSearch);
+      });
+      
+      console.log('🔍 [SEARCH DEBUG] Filtered options:', filteredOptions.length);
+      
+      filteredOptions.forEach(option => {
+        const newOption = option.cloneNode(true);
+        optionsContainer.appendChild(newOption);
+      });
+      
+      // If no results, show a message
+      if (filteredOptions.length === 0) {
+        const noResultsOption = document.createElement('div');
+        noResultsOption.textContent = 'No matching fields found';
+        noResultsOption.style.cssText = `
+          padding: 8px;
+          color: #666;
+          font-style: italic;
+        `;
+        optionsContainer.appendChild(noResultsOption);
+      }
+    }
+  };
+  
+  // Add search functionality
+  searchBar.addEventListener('input', function() {
+    const searchTerm = this.value;
+    console.log('🔍 [SEARCH DEBUG] Searching for:', searchTerm);
+    updateOptions(searchTerm);
+    optionsContainer.style.display = 'block'; // Show options when typing
+  });
+  
+  // Show options when search bar is focused
+  searchBar.addEventListener('focus', function() {
+    this.style.borderColor = '#2196f3';
+    this.style.backgroundColor = 'white';
+    updateOptions(this.value);
+    optionsContainer.style.display = 'block';
+  });
+  
+  // Handle option selection
+  optionsContainer.addEventListener('click', function(e) {
+    const option = e.target;
+    if (option.getAttribute('data-value') !== null) {
+      const value = option.getAttribute('data-value');
+      const text = option.textContent;
+      
+      if (value) {
+        dropdownDisplay.textContent = text;
+        hiddenSelect.value = value;
+        searchBar.value = ''; // Clear search
+        optionsContainer.style.display = 'none'; // Hide options
+      }
+    }
+  });
+  
+  // Hide options when search bar loses focus
+  searchBar.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+    this.style.backgroundColor = '#f9f9f9';
+    
+    // Hide options after a short delay to allow for selection
+    setTimeout(() => {
+      optionsContainer.style.display = 'none';
+    }, 200);
+  });
+}
+
+/**
+ * Setup search functionality for Linked Logic dropdowns
+ */
+function setupLinkedLogicSearch(dropdown, searchBar) {
+  // Store original options for filtering - wait for dropdown to be populated
+  let originalOptions = [];
+  
+  // Function to update original options
+  const updateOriginalOptions = () => {
+    originalOptions = Array.from(dropdown.options);
+    console.log('🔍 [SEARCH DEBUG] Original options stored:', originalOptions.length);
+  };
+  
+  // Wait a bit for dropdown to be populated, then store options
+  setTimeout(updateOriginalOptions, 100);
+  
+  // Function to normalize search terms (handle spaces and underscores)
+  const normalizeSearchTerm = (term) => {
+    return term.toLowerCase().replace(/[\s_]+/g, '');
+  };
+  
+  // Function to normalize option text for comparison
+  const normalizeOptionText = (text) => {
+    return text.toLowerCase().replace(/[\s_]+/g, '');
+  };
+  
+  // Function to filter and update dropdown
+  const updateDropdown = (searchTerm) => {
+    // Clear dropdown
+    dropdown.innerHTML = '';
+    
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a textbox question...';
+    dropdown.appendChild(defaultOption);
+    
+    if (searchTerm.length === 0) {
+      // Show all options when search is empty
+      originalOptions.forEach(option => {
+        if (option.value) {
+          const newOption = document.createElement('option');
+          newOption.value = option.value;
+          newOption.textContent = option.textContent;
+          dropdown.appendChild(newOption);
+        }
+      });
+    } else {
+      // Filter and add matching options
+      const normalizedSearch = normalizeSearchTerm(searchTerm);
+      const filteredOptions = originalOptions.filter(option => {
+        if (!option.value) return false;
+        const normalizedText = normalizeOptionText(option.textContent);
+        return normalizedText.includes(normalizedSearch);
+      });
+      
+      console.log('🔍 [SEARCH DEBUG] Filtered options:', filteredOptions.length);
+      
+      filteredOptions.forEach(option => {
+        const newOption = document.createElement('option');
+        newOption.value = option.value;
+        newOption.textContent = option.textContent;
+        dropdown.appendChild(newOption);
+      });
+      
+      // If no results, show a message
+      if (filteredOptions.length === 0) {
+        const noResultsOption = document.createElement('option');
+        noResultsOption.value = '';
+        noResultsOption.textContent = 'No matching fields found';
+        noResultsOption.disabled = true;
+        dropdown.appendChild(noResultsOption);
+      }
+    }
+    
+    // Force dropdown to stay open by setting size attribute and multiple attribute
+    const optionCount = dropdown.options.length;
+    dropdown.size = Math.min(optionCount, 8); // Show up to 8 options
+    dropdown.multiple = true; // This forces the dropdown to stay open
+    dropdown.style.height = 'auto';
+    dropdown.style.minHeight = '120px'; // Ensure minimum height
+  };
+  
+  // Add search functionality
+  searchBar.addEventListener('input', function() {
+    const searchTerm = this.value;
+    console.log('🔍 [SEARCH DEBUG] Searching for:', searchTerm);
+    
+    // Update original options if not set yet
+    if (originalOptions.length === 0) {
+      updateOriginalOptions();
+    }
+    
+    updateDropdown(searchTerm);
+  });
+  
+  // Keep dropdown open when search bar is focused
+  searchBar.addEventListener('focus', function() {
+    this.style.borderColor = '#2196f3';
+    this.style.backgroundColor = 'white';
+    updateDropdown(this.value);
+  });
+  
+  // Auto-select when user clicks a filtered option
+  dropdown.addEventListener('change', function() {
+    // Get the selected option (for multiple select, get the first selected)
+    const selectedOptions = Array.from(this.selectedOptions);
+    if (selectedOptions.length > 0) {
+      const selectedValue = selectedOptions[0].value;
+      if (selectedValue) {
+        searchBar.value = ''; // Clear search
+        // Restore all options
+        updateDropdown('');
+        dropdown.value = selectedValue; // Set selected value
+        dropdown.size = 1; // Close dropdown
+        dropdown.multiple = false; // Reset to single select
+      }
+    }
+  });
+  
+  // Handle search bar blur - close dropdown after a delay
+  searchBar.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+    this.style.backgroundColor = '#f9f9f9';
+    
+    // Close dropdown after a short delay to allow for selection
+    setTimeout(() => {
+      dropdown.size = 1;
+      dropdown.multiple = false; // Reset to single select
+    }, 200);
+  });
+}
 
 /**
  * Populate dropdown with textbox question Node IDs from flowchart

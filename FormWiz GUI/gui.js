@@ -3430,7 +3430,9 @@ function populateLinkedFieldDropdown(dropdownIndex) {
     textQuestions.forEach(question => {
         const option = document.createElement('option');
         option.value = question.nodeId;
-        option.textContent = `${question.questionText} (${question.nodeId})`;
+        // Remove "Question X -" prefix and just show the field name
+        const displayText = question.questionText.replace(/^Question \d+ - /, '');
+        option.textContent = `${displayText} (${question.nodeId})`;
         select.appendChild(option);
         console.log(`✅ [DEBUG] Added option: ${option.textContent}`);
     });
@@ -3826,9 +3828,40 @@ function filterLinkedFieldOptions(dropdownIndex) {
     // Get all options from the select element
     const options = Array.from(selectElement.options).filter(option => option.value !== '');
     
-    // Filter options based on search term
+    // Smart search function that converts natural language to snake_case for matching
+    function smartSearch(searchTerm, optionText) {
+        const lowerOptionText = optionText.toLowerCase();
+        
+        // Direct text match
+        if (lowerOptionText.includes(searchTerm)) {
+            return true;
+        }
+        
+        // Convert search term to snake_case pattern
+        const snakeCasePattern = searchTerm.replace(/\s+/g, '_');
+        if (lowerOptionText.includes(snakeCasePattern)) {
+            return true;
+        }
+        
+        // Convert search term to camelCase pattern
+        const camelCasePattern = searchTerm.replace(/\s+(\w)/g, (match, letter) => letter.toUpperCase());
+        if (lowerOptionText.includes(camelCasePattern)) {
+            return true;
+        }
+        
+        // Split search term into words and check if all words appear
+        const searchWords = searchTerm.split(/\s+/);
+        const allWordsMatch = searchWords.every(word => 
+            lowerOptionText.includes(word) || 
+            lowerOptionText.includes(word.replace(/\s+/g, '_'))
+        );
+        
+        return allWordsMatch;
+    }
+    
+    // Filter options based on smart search
     const filteredOptions = options.filter(option => 
-        option.textContent.toLowerCase().includes(searchTerm)
+        smartSearch(searchTerm, option.textContent)
     );
     
     // Display filtered options

@@ -5000,8 +5000,8 @@ if (typeof handleNext === 'function') {
                 // 🔧 NEW: Add flag to prevent autosave during initial load
                 window.isInitialAutofill = true;
                 
-                const fields = getFormFields();
-                fields.forEach(el => {
+                    const fields = getFormFields();
+                    fields.forEach(el => {
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -5011,14 +5011,14 @@ if (typeof handleNext === 'function') {
                     }
                     
                     if (autofillValue !== null) {
-                        // Check if this answer would trigger a jump to the end
+                            // Check if this answer would trigger a jump to the end
                         if (wouldTriggerJumpToEnd(el, autofillValue)) {
-                            // Don't autofill this answer - keep it as default
-                            console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
-                            return;
-                        }
-                        
-                        if (el.type === 'checkbox' || el.type === 'radio') {
+                                // Don't autofill this answer - keep it as default
+                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
+                                return;
+                            }
+                            
+                            if (el.type === 'checkbox' || el.type === 'radio') {
                             console.log('🔧 [RADIO DEBUG] Processing radio/checkbox:', el.id, 'type:', el.type, 'name:', el.name, 'value:', el.value, 'autofillValue:', autofillValue);
                             
                             if (el.type === 'radio') {
@@ -5028,7 +5028,7 @@ if (typeof handleNext === 'function') {
                                 if (el.value === autofillValue) {
                                     el.checked = true;
                                     console.log('🔧 [RADIO DEBUG] ✅ SELECTED radio button:', el.id, 'because value matches autofillValue');
-                                } else {
+                            } else {
                                     el.checked = false;
                                     console.log('🔧 [RADIO DEBUG] ❌ UNSELECTED radio button:', el.id, 'because value does not match autofillValue');
                                 }
@@ -5040,13 +5040,13 @@ if (typeof handleNext === 'function') {
                         } else {
                             el.value = autofillValue;
                             console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.id, 'with value:', autofillValue);
+                            }
                         }
-                    }
-                });
-                
-                // After autofilling, trigger visibility updates for dependent questions
+                    });
+                    
+                    // After autofilling, trigger visibility updates for dependent questions
                 // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
-                setTimeout(() => {
+                    setTimeout(() => {
                     // Trigger change events on all autofilled elements to ensure conditional logic runs
                     fields.forEach(el => {
                         if (el.value || el.checked) {
@@ -5056,9 +5056,9 @@ if (typeof handleNext === 'function') {
                     });
                     
                     // Also call the global visibility updates function
-                    if (typeof triggerVisibilityUpdates === 'function') {
-                        triggerVisibilityUpdates();
-                    }
+                        if (typeof triggerVisibilityUpdates === 'function') {
+                            triggerVisibilityUpdates();
+                        }
                 }, 2000);
                 
                 // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
@@ -5213,10 +5213,10 @@ if (typeof handleNext === 'function') {
                         });
                     }, 1500);
                 
-                // Reset hidden questions to defaults after autofill and visibility updates
-                if (typeof currentSectionNumber === 'number') {
-                    resetHiddenQuestionsToDefaults(currentSectionNumber);
-                }
+                        // Reset hidden questions to defaults after autofill and visibility updates
+                        if (typeof currentSectionNumber === 'number') {
+                            resetHiddenQuestionsToDefaults(currentSectionNumber);
+                        }
                 
                 // 🔧 NEW: Clear autofill flag after autofill is complete
                 window.isInitialAutofill = false;
