@@ -17,7 +17,7 @@ let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, su
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
 let newSectionButton, untangleEdge, changeEdgeStyle, deleteEdge, edgeStyleCurved, edgeStyleDirect;
-let placeQuestionNode, placeOptionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode, placeHiddenCheckboxNode, placeHiddenTextboxNode, placeLinkedLogicNode;
+let placeQuestionNode, placeOptionNode, placeSampleQuestionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode, placeHiddenCheckboxNode, placeHiddenTextboxNode, placeLinkedLogicNode;
 
 
 // Initialize DOM element references
@@ -65,6 +65,7 @@ function initializeContextMenuElements() {
   
   placeQuestionNode = document.getElementById('placeQuestionNode');
   placeOptionNode = document.getElementById('placeOptionNode');
+  placeSampleQuestionNode = document.getElementById('placeSampleQuestionNode');
   placeCalcNode = document.getElementById('placeCalcNode');
   placeNotesNode = document.getElementById('placeNotesNode');
   placeChecklistNode = document.getElementById('placeChecklistNode');
@@ -1143,6 +1144,13 @@ function setupContextMenuEventListeners(graph) {
     });
   }
   
+  if (placeSampleQuestionNode) {
+    placeSampleQuestionNode.addEventListener('click', function() {
+      placeSampleQuestion(graph);
+      hideContextMenu();
+    });
+  }
+  
   if (placeCalcNode) {
     placeCalcNode.addEventListener('click', function() {
       placeNodeAtClickLocation(graph, 'calculation');
@@ -1628,6 +1636,66 @@ function placeNodeAtClickLocation(graph, nodeType) {
       window.requestAutosave();
     }
   }
+}
+
+/**
+ * Place a sample question with "Hungry?" text and yes/no options
+ */
+function placeSampleQuestion(graph) {
+  if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
+  
+  const graphToUse = graph || window.graph;
+  if (!graphToUse) {
+    console.error('Graph not available for sample question placement');
+    return;
+  }
+  
+  const parent = graphToUse.getDefaultParent();
+  graphToUse.getModel().beginUpdate();
+  
+  try {
+    // Create the main question node (dropdown type)
+    const questionStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;spacing=12;fontSize=16;align=center;verticalAlign=middle;pointerEvents=1;overflow=fill;";
+    const questionCell = graphToUse.insertVertex(parent, null, "Hungry?", 
+      window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, questionStyle);
+    
+    // Set question text
+    questionCell._questionText = "Hungry?";
+    
+    // Create Yes option - positioned slightly to the right of the dropdown
+    const yesOptionStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;spacing=12;fontSize=16;align=center;verticalAlign=middle;pointerEvents=1;overflow=fill;";
+    const yesOption = graphToUse.insertVertex(parent, null, "Yes", 
+      window.emptySpaceClickX + 20, window.emptySpaceClickY + 120, 80, 40, yesOptionStyle);
+    yesOption._optionText = "Yes";
+    
+    // Create No option - positioned slightly to the right of the dropdown
+    const noOptionStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;spacing=12;fontSize=16;align=center;verticalAlign=middle;pointerEvents=1;overflow=fill;";
+    const noOption = graphToUse.insertVertex(parent, null, "No", 
+      window.emptySpaceClickX + 120, window.emptySpaceClickY + 120, 80, 40, noOptionStyle);
+    noOption._optionText = "No";
+    
+    // Connect question to options
+    graphToUse.insertEdge(parent, null, "", questionCell, yesOption, "edgeStyle=none;rounded=0;orthogonalLoop=0;");
+    graphToUse.insertEdge(parent, null, "", questionCell, noOption, "edgeStyle=none;rounded=0;orthogonalLoop=0;");
+    
+    // Select the question cell
+    graphToUse.setSelectionCell(questionCell);
+    
+    // Call refreshAllCells to ensure proper display
+    if (typeof window.refreshAllCells === 'function') {
+      window.refreshAllCells();
+    }
+    
+    // Request autosave
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    
+  } catch (error) {
+    console.error('Error creating sample question:', error);
+  }
+  
+  graphToUse.getModel().endUpdate();
 }
 
 // Initialize the module

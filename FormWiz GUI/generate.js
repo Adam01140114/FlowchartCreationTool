@@ -4845,9 +4845,16 @@ if (typeof handleNext === 'function') {
             const fields = getFormFields();
             const answers = {};
             fields.forEach(el => {
-                if (el.type === 'checkbox' || el.type === 'radio') {
+                if (el.type === 'checkbox') {
+                    // For checkboxes, save true/false
                     answers[el.name] = el.checked;
+                } else if (el.type === 'radio') {
+                    // For radio buttons, save the selected value or null if none selected
+                    const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
+                    answers[el.name] = selectedRadio ? selectedRadio.value : null;
+                    console.log('🔧 [RADIO DEBUG] Saving radio button group:', el.name, 'selectedRadio:', selectedRadio ? selectedRadio.id : 'none', 'savedValue:', answers[el.name]);
                 } else {
+                    // For other fields, save the value
                     answers[el.name] = el.value;
                 }
             });
@@ -4983,23 +4990,56 @@ if (typeof handleNext === 'function') {
                 const mappedData = mapFirebaseDataToFormFields(data);
                 console.log('🔧 [AUTOFILL DEBUG] Firebase data loaded and mapped:', mappedData);
                 
+                // 🔧 NEW: Debug all radio buttons in the form
+                const allRadioButtons = document.querySelectorAll('input[type="radio"]');
+                console.log('🔧 [RADIO DEBUG] Found radio buttons in form:', allRadioButtons.length);
+                allRadioButtons.forEach(radio => {
+                    console.log('🔧 [RADIO DEBUG] Radio button:', radio.id, 'name:', radio.name, 'value:', radio.value, 'checked:', radio.checked);
+                });
+                
                 // 🔧 NEW: Add flag to prevent autosave during initial load
                 window.isInitialAutofill = true;
                 
                 const fields = getFormFields();
                 fields.forEach(el => {
+                    // Check both by name and by ID for autofill
+                    let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
+                        autofillValue = mappedData[el.name];
+                    } else if (el.id && mappedData.hasOwnProperty(el.id)) {
+                        autofillValue = mappedData[el.id];
+                    }
+                    
+                    if (autofillValue !== null) {
                         // Check if this answer would trigger a jump to the end
-                        if (wouldTriggerJumpToEnd(el, mappedData[el.name])) {
+                        if (wouldTriggerJumpToEnd(el, autofillValue)) {
                             // Don't autofill this answer - keep it as default
                             console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                             return;
                         }
                         
                         if (el.type === 'checkbox' || el.type === 'radio') {
-                            el.checked = !!mappedData[el.name];
+                            console.log('🔧 [RADIO DEBUG] Processing radio/checkbox:', el.id, 'type:', el.type, 'name:', el.name, 'value:', el.value, 'autofillValue:', autofillValue);
+                            
+                            if (el.type === 'radio') {
+                                // For radio buttons, we need to check if this specific radio button should be selected
+                                console.log('🔧 [RADIO DEBUG] Radio button details - ID:', el.id, 'Value:', el.value, 'AutofillValue:', autofillValue, 'Match:', el.value === autofillValue);
+                                
+                                if (el.value === autofillValue) {
+                                    el.checked = true;
+                                    console.log('🔧 [RADIO DEBUG] ✅ SELECTED radio button:', el.id, 'because value matches autofillValue');
+                                } else {
+                                    el.checked = false;
+                                    console.log('🔧 [RADIO DEBUG] ❌ UNSELECTED radio button:', el.id, 'because value does not match autofillValue');
+                                }
+                            } else {
+                                // For checkboxes, use the boolean value
+                                el.checked = !!autofillValue;
+                                console.log('🔧 [RADIO DEBUG] ✅ Checkbox set:', el.id, 'checked:', el.checked);
+                            }
                         } else {
-                            el.value = mappedData[el.name];
+                            el.value = autofillValue;
+                            console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.id, 'with value:', autofillValue);
                         }
                     }
                 });
@@ -5085,8 +5125,19 @@ if (typeof handleNext === 'function') {
                         
                         allFields.forEach(el => {
                             if (mappedData.hasOwnProperty(el.name)) {
-                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                if (el.type === 'checkbox') {
+                                    console.log('🔧 [RADIO DEBUG] Second pass simple autofill - checkbox:', el.id, 'name:', el.name, 'mappedDataValue:', mappedData[el.name], 'setting checked to:', !!mappedData[el.name]);
                                     el.checked = !!mappedData[el.name];
+                                } else if (el.type === 'radio') {
+                                    // For radio buttons, only check the one that matches the value
+                                    console.log('🔧 [RADIO DEBUG] Second pass simple autofill - radio:', el.id, 'name:', el.name, 'value:', el.value, 'mappedDataValue:', mappedData[el.name], 'match:', el.value === mappedData[el.name]);
+                                    if (el.value === mappedData[el.name]) {
+                                        el.checked = true;
+                                        console.log('🔧 [RADIO DEBUG] ✅ Second pass SELECTED radio button:', el.id, 'because value matches');
+                                    } else {
+                                        el.checked = false;
+                                        console.log('🔧 [RADIO DEBUG] ❌ Second pass UNSELECTED radio button:', el.id, 'because value does not match');
+                                    }
                                 } else {
                                     el.value = mappedData[el.name];
                                 }
@@ -5096,11 +5147,36 @@ if (typeof handleNext === 'function') {
                         // Additional pass: try to autofill by ID for any fields that might have been missed
                         Object.keys(mappedData).forEach(fieldName => {
                             const fieldById = fieldsById[fieldName];
-                            if (fieldById && !fieldById.value && mappedData[fieldName]) {
-                                if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
-                                    fieldById.checked = !!mappedData[fieldName];
-                                } else {
-                                    fieldById.value = mappedData[fieldName];
+                            if (fieldById && mappedData[fieldName]) {
+                                // Check if field needs autofilling (different logic for different field types)
+                                const needsAutofill = (fieldById.type === 'checkbox' || fieldById.type === 'radio') 
+                                    ? !fieldById.checked 
+                                    : !fieldById.value;
+                                
+                                if (needsAutofill) {
+                                    if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                        console.log('🔧 [RADIO DEBUG] Second pass processing radio/checkbox:', fieldById.id, 'type:', fieldById.type, 'name:', fieldById.name, 'value:', fieldById.value, 'mappedDataValue:', mappedData[fieldName]);
+                                        
+                                        if (fieldById.type === 'radio') {
+                                            // For radio buttons, check if this specific radio should be selected
+                                            console.log('🔧 [RADIO DEBUG] Second pass radio details - ID:', fieldById.id, 'Value:', fieldById.value, 'MappedValue:', mappedData[fieldName], 'Match:', fieldById.value === mappedData[fieldName]);
+                                            
+                                            if (fieldById.value === mappedData[fieldName]) {
+                                                fieldById.checked = true;
+                                                console.log('🔧 [RADIO DEBUG] ✅ Second pass SELECTED radio button:', fieldById.id, 'because value matches mappedData');
+                                            } else {
+                                                fieldById.checked = false;
+                                                console.log('🔧 [RADIO DEBUG] ❌ Second pass UNSELECTED radio button:', fieldById.id, 'because value does not match mappedData');
+                                            }
+                                        } else {
+                                            // For checkboxes, use boolean value
+                                            fieldById.checked = !!mappedData[fieldName];
+                                            console.log('🔧 [RADIO DEBUG] ✅ Second pass checkbox set:', fieldById.id, 'checked:', fieldById.checked);
+                                        }
+                                    } else {
+                                        fieldById.value = mappedData[fieldName];
+                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling field:', fieldById.id, 'with value:', mappedData[fieldName]);
+                                    }
                                 }
                             }
                         });
@@ -5145,6 +5221,32 @@ if (typeof handleNext === 'function') {
                 // 🔧 NEW: Clear autofill flag after autofill is complete
                 window.isInitialAutofill = false;
                 console.log('🔧 [AUTOFILL DEBUG] ✅ Autosave re-enabled after autofill');
+                
+                // 🔧 NEW: Debug final radio button state after autofill
+                console.log('🔧 [RADIO DEBUG] Final radio button state after autofill:');
+                const finalRadioButtons = document.querySelectorAll('input[type="radio"]');
+                finalRadioButtons.forEach(radio => {
+                    console.log('🔧 [RADIO DEBUG] Final state - Radio:', radio.id, 'name:', radio.name, 'value:', radio.value, 'checked:', radio.checked);
+                });
+                
+                // 🔧 NEW: Monitor radio button changes after autofill
+                const radioButtons = document.querySelectorAll('input[type="radio"]');
+                radioButtons.forEach(radio => {
+                    // Monitor change events
+                    radio.addEventListener('change', function() {
+                        console.log('🔧 [RADIO DEBUG] ⚠️ RADIO BUTTON CHANGED:', this.id, 'name:', this.name, 'value:', this.value, 'checked:', this.checked, 'stack trace:', new Error().stack);
+                    });
+                    
+                    // Monitor when checked property is set
+                    const originalChecked = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'checked');
+                    Object.defineProperty(radio, 'checked', {
+                        get: originalChecked.get,
+                        set: function(value) {
+                            console.log('🔧 [RADIO DEBUG] ⚠️ RADIO BUTTON CHECKED SET:', this.id, 'name:', this.name, 'value:', this.value, 'new checked:', value, 'stack trace:', new Error().stack);
+                            originalChecked.set.call(this, value);
+                        }
+                    });
+                });
             } catch (e) {
                 console.log('Error loading answers:', e);
             }
@@ -5271,9 +5373,16 @@ if (typeof handleNext === 'function') {
                 const fields = getFormFields();
                 const answers = {};
                 fields.forEach(el => {
-                    if (el.type === 'checkbox' || el.type === 'radio') {
+                    if (el.type === 'checkbox') {
+                        // For checkboxes, save true/false
                         answers[el.name] = el.checked;
+                    } else if (el.type === 'radio') {
+                        // For radio buttons, save the selected value or null if none selected
+                        const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
+                        answers[el.name] = selectedRadio ? selectedRadio.value : null;
+                        console.log('🔧 [RADIO DEBUG] LocalStorage saving radio button group:', el.name, 'selectedRadio:', selectedRadio ? selectedRadio.id : 'none', 'savedValue:', answers[el.name]);
                     } else {
+                        // For other fields, save the value
                         answers[el.name] = el.value;
                     }
                 });
@@ -5294,8 +5403,19 @@ if (typeof handleNext === 'function') {
                     const fields = getFormFields();
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
-                            if (el.type === 'checkbox' || el.type === 'radio') {
+                            if (el.type === 'checkbox') {
                                 el.checked = !!data[el.name];
+                            } else if (el.type === 'radio') {
+                                // For radio buttons, set the value and check the matching radio button
+                                console.log('🔧 [RADIO DEBUG] LocalStorage loading radio:', el.id, 'name:', el.name, 'value:', el.value, 'savedValue:', data[el.name], 'match:', el.value === data[el.name]);
+                                
+                                if (data[el.name] && el.value === data[el.name]) {
+                                    el.checked = true;
+                                    console.log('🔧 [RADIO DEBUG] ✅ LocalStorage SELECTED radio button:', el.id, 'because value matches saved value');
+                                } else {
+                                    el.checked = false;
+                                    console.log('🔧 [RADIO DEBUG] ❌ LocalStorage UNSELECTED radio button:', el.id, 'because value does not match saved value');
+                                }
                             } else {
                                 el.value = data[el.name];
                             }
