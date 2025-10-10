@@ -3272,13 +3272,14 @@ function showTextboxLabels(questionId, count){
         return;
     }
 
-    // 🔧 NEW: Check if we already have the right number of fields with values
+    // 🔧 NEW: Check if we already have fields with values (more flexible than exact count match)
     const existingFields = container.querySelectorAll('input, select, textarea');
     const expectedCount = parseInt(count) || 0;
     console.log('🔧 [SHOWTEXTBOX DEBUG] Existing fields count:', existingFields.length, 'Expected count:', expectedCount);
     
-    if (existingFields.length === expectedCount && expectedCount > 0) {
-        console.log('🔧 [SHOWTEXTBOX DEBUG] ⚠️ Fields already exist with correct count, checking if they have values...');
+    // Check if we have any fields with values (regardless of exact count)
+    if (existingFields.length > 0) {
+        console.log('🔧 [SHOWTEXTBOX DEBUG] ⚠️ Fields already exist, checking if they have values...');
         let hasValues = false;
         let fieldValues = {};
         existingFields.forEach(field => {
