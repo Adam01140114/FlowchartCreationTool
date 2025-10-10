@@ -1146,18 +1146,13 @@ formHTML += `</div><br></div>`;
         const amountVals = [];
         let allFieldsInOrder = []; // Declare here so it's available in the entire scope
         
-        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes qBlock found:', !!qBlock);
-        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes unifiedFields selector:', "#unifiedFields" + questionId + " .unified-field");
-        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Found', unifiedFields.length, 'unified fields for question', questionId);
         
         // If no unified fields found, try fallback to old containers
         if (unifiedFields.length === 0) {
-          console.log('🔧 [GENERATE DEBUG] MultipleTextboxes No unified fields found, trying fallback to old containers');
           const lblInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:first-of-type");
           const labelNodeIdInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:last-of-type");
           const amtInputs = qBlock.querySelectorAll("#textboxAmounts" + questionId + " input[type='text']");
           
-          console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Fallback found', lblInputs.length, 'labels and', amtInputs.length, 'amounts');
           
         for (let L = 0; L < lblInputs.length; L++) {
           labelVals.push(lblInputs[L].value.trim());
@@ -1190,7 +1185,6 @@ formHTML += `</div><br></div>`;
             const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
             const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
             
-            console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Processing field:', {fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl});
             
             if (labelTextEl && nodeIdTextEl) {
               const fieldData = {
@@ -1199,7 +1193,6 @@ formHTML += `</div><br></div>`;
                 nodeId: nodeIdTextEl.textContent.trim(),
                 order: fieldOrder
               };
-              console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Field data:', fieldData);
               allFieldsInOrder.push(fieldData);
             }
           });
@@ -1208,7 +1201,6 @@ formHTML += `</div><br></div>`;
           allFieldsInOrder.sort((a, b) => a.order - b.order);
         }
         
-        console.log('🔧 [GENERATE DEBUG] MultipleTextboxes Final arrays:', {labelVals, labelNodeIds, amountVals});
         
         // Store the unified fields data for use in showTextboxLabels
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
@@ -1309,18 +1301,13 @@ formHTML += `</div><br></div>`;
         const amountVals = [];
         let allFieldsInOrder = []; // Declare here so it's available in the entire scope
         
-        console.log('🔧 [GENERATE DEBUG] qBlock found:', !!qBlock);
-        console.log('🔧 [GENERATE DEBUG] unifiedFields selector:', "#unifiedFields" + questionId + " .unified-field");
-        console.log('🔧 [GENERATE DEBUG] Found', unifiedFields.length, 'unified fields for question', questionId);
         
         // If no unified fields found, try fallback to old containers
         if (unifiedFields.length === 0) {
-          console.log('🔧 [GENERATE DEBUG] No unified fields found, trying fallback to old containers');
           const lblInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:first-of-type");
           const labelNodeIdInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:last-of-type");
           const amtInputs = qBlock.querySelectorAll("#textboxAmounts" + questionId + " input[type='text']");
           
-          console.log('🔧 [GENERATE DEBUG] Fallback found', lblInputs.length, 'labels and', amtInputs.length, 'amounts');
           
         for (let L = 0; L < lblInputs.length; L++) {
           labelVals.push(lblInputs[L].value.trim());
@@ -1356,13 +1343,11 @@ formHTML += `</div><br></div>`;
           const labelTextEl = field.querySelector('#labelText' + questionId + '_' + fieldOrder);
           const nodeIdTextEl = field.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
           
-          console.log('🔧 [GENERATE DEBUG] Processing field:', { fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl });
           
           if (labelTextEl && nodeIdTextEl) {
             const labelText = labelTextEl.textContent.trim();
             const nodeIdText = nodeIdTextEl.textContent.trim();
             
-            console.log('🔧 [GENERATE DEBUG] Field data:', { labelText, nodeIdText, fieldType });
             
             // Add to allFieldsInOrder for unified order
             allElements.push({
@@ -1385,7 +1370,6 @@ formHTML += `</div><br></div>`;
         allElements.sort((a, b) => a.order - b.order);
         allFieldsInOrder = allElements;
         
-        console.log('🔧 [GENERATE DEBUG] Final arrays:', { labelVals, labelNodeIds, amountVals });
         }
         
         labelMap[questionId] = labelVals;
@@ -3263,63 +3247,50 @@ document.addEventListener('DOMContentLoaded', function() {
 let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
-    console.log('🔧 [SHOWTEXTBOX DEBUG] showTextboxLabels called with questionId:', questionId, 'count:', count);
     
     // 🔧 NEW: Check if we're already creating fields
     if (isCreatingFields) {
-        console.log('🔧 [SHOWTEXTBOX DEBUG] ⚠️ Already creating fields, skipping this call');
         return;
     }
     
     const container = document.getElementById("labelContainer" + questionId);
-    console.log('🔧 [SHOWTEXTBOX DEBUG] Container found:', container);
     if(!container) {
-        console.log('🔧 [SHOWTEXTBOX DEBUG] ❌ No container found, returning');
         return;
     }
 
     // 🔧 NEW: Check if we already have fields with values (more flexible than exact count match)
     const existingFields = container.querySelectorAll('input, select, textarea');
     const expectedCount = parseInt(count) || 0;
-    console.log('🔧 [SHOWTEXTBOX DEBUG] Existing fields count:', existingFields.length, 'Expected count:', expectedCount);
     
     // Check if we have any fields with values (regardless of exact count)
     if (existingFields.length > 0) {
-        console.log('🔧 [SHOWTEXTBOX DEBUG] ⚠️ Fields already exist, checking if they have values...');
         let hasValues = false;
         let fieldValues = {};
         existingFields.forEach(field => {
             if (field.value && field.value.trim() !== '') {
                 hasValues = true;
                 fieldValues[field.id] = field.value;
-                console.log('🔧 [SHOWTEXTBOX DEBUG] Field has value:', field.id, '=', field.value);
             }
         });
         
         if (hasValues) {
-            console.log('🔧 [SHOWTEXTBOX DEBUG] ✅ Fields already exist with values, skipping recreation to preserve autofill');
-            console.log('🔧 [SHOWTEXTBOX DEBUG] Preserved field values:', fieldValues);
             return;
         }
         
         // 🔧 NEW: If fields exist but have no values, check if we're in the middle of autofill
-        console.log('🔧 [SHOWTEXTBOX DEBUG] Fields exist but no values yet, checking if autofill is in progress...');
         
         // Check if autofill is currently running
         if (window.isInitialAutofill) {
-            console.log('🔧 [SHOWTEXTBOX DEBUG] Autofill is in progress, skipping recreation to preserve autofill');
             return;
         }
         
         // Check if there are any pending autofill operations
         const autofillInProgress = document.querySelector('[data-autofill-pending]');
         if (autofillInProgress) {
-            console.log('🔧 [SHOWTEXTBOX DEBUG] Autofill is pending, skipping recreation to preserve autofill');
             return;
         }
     }
 
-    console.log('🔧 [SHOWTEXTBOX DEBUG] Clearing container and creating fields...');
     container.innerHTML = "";
     
     // Try to get unified fields first, fallback to old arrays
@@ -3494,7 +3465,6 @@ function showTextboxLabels(questionId, count){
     
     // 🔧 NEW: Clear flag after function completes
     isCreatingFields = false;
-    console.log('🔧 [SHOWTEXTBOX DEBUG] ✅ Field creation completed, flag cleared');
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -4008,7 +3978,10 @@ function navigateSection(sectionNumber){
     currentSectionNumber = sectionNumber;
     
     // Reset hidden questions to default values after Firebase autosave
-    resetHiddenQuestionsToDefaults(sectionNumber);
+    // BUT NOT during initial autofill to preserve autofilled values
+    if (!window.isInitialAutofill) {
+        resetHiddenQuestionsToDefaults(sectionNumber);
+    }
     
     updateProgressBar();
 }
@@ -4114,24 +4087,18 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
-    console.log('🔧 [PDF DEBUG] processAllPdfs() called');
-    console.log('🔧 [PDF DEBUG] pdfOutputFileName:', pdfOutputFileName);
-    console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
-    console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
     
     // Track processed PDFs to prevent duplicates
     const processedPdfs = new Set();
     
     // Process main PDFs - use the actual PDF filename, not the form name
     if (pdfOutputFileName) {
-        console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
         if (!processedPdfs.has(baseName)) {
             processedPdfs.add(baseName);
         await editAndDownloadPDF(baseName);
         } else {
-            console.log('🔧 [PDF DEBUG] Skipping duplicate main PDF:', baseName);
         }
     }
     
@@ -4168,7 +4135,6 @@ async function processAllPdfs() {
                         processedPdfs.add(baseName);
                         await editAndDownloadPDF(baseName);
                     } else {
-                        console.log('🔧 [PDF DEBUG] Skipping duplicate conditional PDF:', baseName);
                     }
                 }
             }
@@ -4234,7 +4200,6 @@ async function processAllPdfs() {
                         processedPdfs.add(baseName);
                         await editAndDownloadPDF(baseName);
                     } else {
-                        console.log('🔧 [PDF DEBUG] Skipping duplicate PDF logic PDF:', baseName);
                     }
                 }
             }
@@ -4244,7 +4209,6 @@ async function processAllPdfs() {
 
 // Function to go back to the form from the thank you screen
 function goBackToForm() {
-    console.log('🔧 [BACK BUTTON] Going back to form');
     
     // Hide the thank you message
     const thankYouMessage = document.getElementById('thankYouMessage');
@@ -4264,19 +4228,15 @@ function goBackToForm() {
 
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
-    console.log('🔧 [PDF DEBUG] downloadAllPdfs() called');
     try {
         // Show loading state
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
-        console.log('🔧 [PDF DEBUG] Download button found:', !!downloadButton);
         if (downloadButton) {
             downloadButton.textContent = 'Processing...';
             downloadButton.disabled = true;
         }
         
-        console.log('🔧 [PDF DEBUG] Calling processAllPdfs()...');
         await processAllPdfs();
-        console.log('🔧 [PDF DEBUG] processAllPdfs() completed successfully');
         
         // Reset button
         if (downloadButton) {
@@ -4297,48 +4257,39 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
-        console.log('🔧 [PDF DEBUG] Starting PDF processing for:', pdfName);
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const fd = new FormData(document.getElementById('customForm'));
-        console.log('🔧 [PDF DEBUG] FormData created with', fd.entries().length, 'entries');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
         const baseName = pdfName.replace(/\.pdf$/i, '');
         const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
-        console.log('🔧 [PDF DEBUG] Making request to:', endpoint);
         
         const res = await fetch(endpoint, { 
             method: 'POST', 
             body: fd 
         });
         
-        console.log('🔧 [PDF DEBUG] Response status:', res.status, 'OK:', res.ok);
-        console.log('🔧 [PDF DEBUG] Response headers:', Object.fromEntries(res.headers.entries()));
         
         if (!res.ok) {
             const errorText = await res.text();
-            console.error('🔧 [PDF DEBUG] Server error response:', errorText);
             throw new Error("HTTP error! status: " + res.status + " - " + errorText);
         }
         
         const blob = await res.blob();
-        console.log('🔧 [PDF DEBUG] Blob created, size:', blob.size, 'type:', blob.type);
         
         if (blob.size === 0) {
             throw new Error("Received empty PDF blob from server");
         }
         
         const url = URL.createObjectURL(blob);
-        console.log('🔧 [PDF DEBUG] Object URL created:', url);
 
         // Trigger download
         const a = document.createElement('a');
         a.href = url;
         a.download = 'Edited_' + pdfName;
-        console.log('🔧 [PDF DEBUG] Triggering download for:', a.download);
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -4346,7 +4297,6 @@ async function editAndDownloadPDF (pdfName) {
         // Clean up the object URL after a delay
         setTimeout(() => {
             URL.revokeObjectURL(url);
-            console.log('🔧 [PDF DEBUG] Object URL cleaned up');
         }, 1000);
 
         // inline preview - only show the last one
@@ -4863,7 +4813,6 @@ if (typeof handleNext === 'function') {
                     // For radio buttons, save the selected value or null if none selected
                     const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
                     answers[el.name] = selectedRadio ? selectedRadio.value : null;
-                    console.log('🔧 [RADIO DEBUG] Saving radio button group:', el.name, 'selectedRadio:', selectedRadio ? selectedRadio.id : 'none', 'savedValue:', answers[el.name]);
                 } else {
                     // For other fields, save the value
                     answers[el.name] = el.value;
@@ -4910,7 +4859,6 @@ if (typeof handleNext === 'function') {
                         const totalChars = text.length;
                         const linesNeeded = Math.ceil(totalChars / lineLimit);
                         
-                        console.log('🔧 [LINE SPLITTING DEBUG] Creating', linesNeeded, 'hidden textboxes for textarea:', textarea.id);
                         
                         // Create or update hidden textboxes for each line
                         for (let i = 1; i <= linesNeeded; i++) {
@@ -4928,11 +4876,9 @@ if (typeof handleNext === 'function') {
                                 hiddenInput.id = hiddenInputId;
                                 hiddenInput.name = hiddenInputId;
                                 textarea.parentNode.appendChild(hiddenInput);
-                                console.log('🔧 [LINE SPLITTING DEBUG] Created hidden input:', hiddenInputId);
                             }
                             
                             hiddenInput.value = lineText;
-                            console.log('🔧 [LINE SPLITTING DEBUG] Set value for', hiddenInputId, 'to:', lineText);
                         }
                         
                         // Remove any extra hidden inputs that are no longer needed
@@ -4941,7 +4887,6 @@ if (typeof handleNext === 'function') {
                             const extraInput = document.getElementById(textarea.id + '_line' + lineNum);
                             if (extraInput) {
                                 extraInput.remove();
-                                console.log('🔧 [LINE SPLITTING DEBUG] Removed extra hidden input:', textarea.id + '_line' + lineNum);
                                 lineNum++;
                             } else {
                                 break;
@@ -4999,14 +4944,9 @@ if (typeof handleNext === 'function') {
                 }
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
-                console.log('🔧 [AUTOFILL DEBUG] Firebase data loaded and mapped:', mappedData);
                 
                 // 🔧 NEW: Debug all radio buttons in the form
                 const allRadioButtons = document.querySelectorAll('input[type="radio"]');
-                console.log('🔧 [RADIO DEBUG] Found radio buttons in form:', allRadioButtons.length);
-                allRadioButtons.forEach(radio => {
-                    console.log('🔧 [RADIO DEBUG] Radio button:', radio.id, 'name:', radio.name, 'value:', radio.value, 'checked:', radio.checked);
-                });
                 
                 // 🔧 NEW: Add flag to prevent autosave during initial load
                 window.isInitialAutofill = true;
@@ -5030,27 +4970,19 @@ if (typeof handleNext === 'function') {
                             }
                             
                             if (el.type === 'checkbox' || el.type === 'radio') {
-                            console.log('🔧 [RADIO DEBUG] Processing radio/checkbox:', el.id, 'type:', el.type, 'name:', el.name, 'value:', el.value, 'autofillValue:', autofillValue);
-                            
                             if (el.type === 'radio') {
                                 // For radio buttons, we need to check if this specific radio button should be selected
-                                console.log('🔧 [RADIO DEBUG] Radio button details - ID:', el.id, 'Value:', el.value, 'AutofillValue:', autofillValue, 'Match:', el.value === autofillValue);
-                                
                                 if (el.value === autofillValue) {
                                     el.checked = true;
-                                    console.log('🔧 [RADIO DEBUG] ✅ SELECTED radio button:', el.id, 'because value matches autofillValue');
                             } else {
                                     el.checked = false;
-                                    console.log('🔧 [RADIO DEBUG] ❌ UNSELECTED radio button:', el.id, 'because value does not match autofillValue');
                                 }
                             } else {
                                 // For checkboxes, use the boolean value
                                 el.checked = !!autofillValue;
-                                console.log('🔧 [RADIO DEBUG] ✅ Checkbox set:', el.id, 'checked:', el.checked);
                             }
                         } else {
                             el.value = autofillValue;
-                            console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.id, 'with value:', autofillValue);
                             }
                         }
                     });
@@ -5158,17 +5090,13 @@ if (typeof handleNext === 'function') {
                         allFields.forEach(el => {
                             if (mappedData.hasOwnProperty(el.name)) {
                                 if (el.type === 'checkbox') {
-                                    console.log('🔧 [RADIO DEBUG] Second pass simple autofill - checkbox:', el.id, 'name:', el.name, 'mappedDataValue:', mappedData[el.name], 'setting checked to:', !!mappedData[el.name]);
                                     el.checked = !!mappedData[el.name];
                                 } else if (el.type === 'radio') {
                                     // For radio buttons, only check the one that matches the value
-                                    console.log('🔧 [RADIO DEBUG] Second pass simple autofill - radio:', el.id, 'name:', el.name, 'value:', el.value, 'mappedDataValue:', mappedData[el.name], 'match:', el.value === mappedData[el.name]);
                                     if (el.value === mappedData[el.name]) {
                                         el.checked = true;
-                                        console.log('🔧 [RADIO DEBUG] ✅ Second pass SELECTED radio button:', el.id, 'because value matches');
                                     } else {
                                         el.checked = false;
-                                        console.log('🔧 [RADIO DEBUG] ❌ Second pass UNSELECTED radio button:', el.id, 'because value does not match');
                                     }
                                 } else {
                                     el.value = mappedData[el.name];
@@ -5187,27 +5115,19 @@ if (typeof handleNext === 'function') {
                                 
                                 if (needsAutofill) {
                                     if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
-                                        console.log('🔧 [RADIO DEBUG] Second pass processing radio/checkbox:', fieldById.id, 'type:', fieldById.type, 'name:', fieldById.name, 'value:', fieldById.value, 'mappedDataValue:', mappedData[fieldName]);
-                                        
                                         if (fieldById.type === 'radio') {
                                             // For radio buttons, check if this specific radio should be selected
-                                            console.log('🔧 [RADIO DEBUG] Second pass radio details - ID:', fieldById.id, 'Value:', fieldById.value, 'MappedValue:', mappedData[fieldName], 'Match:', fieldById.value === mappedData[fieldName]);
-                                            
                                             if (fieldById.value === mappedData[fieldName]) {
                                                 fieldById.checked = true;
-                                                console.log('🔧 [RADIO DEBUG] ✅ Second pass SELECTED radio button:', fieldById.id, 'because value matches mappedData');
                                             } else {
                                                 fieldById.checked = false;
-                                                console.log('🔧 [RADIO DEBUG] ❌ Second pass UNSELECTED radio button:', fieldById.id, 'because value does not match mappedData');
                                             }
                                         } else {
                                             // For checkboxes, use boolean value
                                             fieldById.checked = !!mappedData[fieldName];
-                                            console.log('🔧 [RADIO DEBUG] ✅ Second pass checkbox set:', fieldById.id, 'checked:', fieldById.checked);
                                         }
                                     } else {
                                         fieldById.value = mappedData[fieldName];
-                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling field:', fieldById.id, 'with value:', mappedData[fieldName]);
                                     }
                                 }
                             }
@@ -5220,9 +5140,7 @@ if (typeof handleNext === 'function') {
                         triggerParagraphLimitCheckForAutofilledTextareas();
                         
                         // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled in second pass
-                        console.log('🔧 [AUTOFILL DEBUG] Second pass - Processing allFields, count:', allFields.length);
                         allFields.forEach(el => {
-                            console.log('🔧 [AUTOFILL DEBUG] Second pass - Checking field:', el.tagName, el.id, el.value);
                             if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
                                 console.log('🔧 [AUTOFILL DEBUG] Second pass - Found numbered dropdown:', el.id, 'value:', el.value);
                                 let questionId;
@@ -5305,7 +5223,7 @@ if (typeof handleNext === 'function') {
                                         } else {
                                             console.log('🔧 [AUTOFILL DEBUG] Second pass - Count is 0 or invalid, skipping autofill');
                                         }
-                                    }, 100); // Small delay to ensure fields are created
+                                    }, 500); // Increased delay to ensure fields are created and DOM is updated
                                 }
                                 if (typeof updateHiddenCheckboxes === 'function') {
                                     updateHiddenCheckboxes(questionId, el.value);
@@ -5327,39 +5245,30 @@ if (typeof handleNext === 'function') {
                     }, 1500);
                 
                         // Reset hidden questions to defaults after autofill and visibility updates
-                        if (typeof currentSectionNumber === 'number') {
+                        // BUT NOT during initial autofill to preserve autofilled values
+                        if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
                         }
                 
                 // 🔧 NEW: Clear autofill flag after autofill is complete
                 window.isInitialAutofill = false;
-                console.log('🔧 [AUTOFILL DEBUG] ✅ Autosave re-enabled after autofill');
                 
-                // 🔧 NEW: Debug final radio button state after autofill
-                console.log('🔧 [RADIO DEBUG] Final radio button state after autofill:');
-                const finalRadioButtons = document.querySelectorAll('input[type="radio"]');
-                finalRadioButtons.forEach(radio => {
-                    console.log('🔧 [RADIO DEBUG] Final state - Radio:', radio.id, 'name:', radio.name, 'value:', radio.value, 'checked:', radio.checked);
-                });
-                
-                // 🔧 NEW: Monitor radio button changes after autofill
-                const radioButtons = document.querySelectorAll('input[type="radio"]');
-                radioButtons.forEach(radio => {
-                    // Monitor change events
-                    radio.addEventListener('change', function() {
-                        console.log('🔧 [RADIO DEBUG] ⚠️ RADIO BUTTON CHANGED:', this.id, 'name:', this.name, 'value:', this.value, 'checked:', this.checked, 'stack trace:', new Error().stack);
-                    });
-                    
-                    // Monitor when checked property is set
-                    const originalChecked = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'checked');
-                    Object.defineProperty(radio, 'checked', {
-                        get: originalChecked.get,
-                        set: function(value) {
-                            console.log('🔧 [RADIO DEBUG] ⚠️ RADIO BUTTON CHECKED SET:', this.id, 'name:', this.name, 'value:', this.value, 'new checked:', value, 'stack trace:', new Error().stack);
-                            originalChecked.set.call(this, value);
+                // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
+                setTimeout(() => {
+                    console.log('🔧 [AUTOFILL DEBUG] Fallback numbered dropdown autofill check');
+                    const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
+                    numberedDropdowns.forEach(dropdown => {
+                        if (dropdown.value && parseInt(dropdown.value) > 0) {
+                            console.log('🔧 [AUTOFILL DEBUG] Fallback found numbered dropdown:', dropdown.id, 'value:', dropdown.value);
+                            // Trigger the autofill logic again for any missed dropdowns
+                            const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
+                            if (typeof showTextboxLabels === 'function') {
+                                showTextboxLabels(questionId, dropdown.value);
+                            }
                         }
                     });
-                });
+                }, 1000); // 1 second delay for fallback
+                
             } catch (e) {
                 console.log('Error loading answers:', e);
             }
@@ -5493,7 +5402,6 @@ if (typeof handleNext === 'function') {
                         // For radio buttons, save the selected value or null if none selected
                         const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
                         answers[el.name] = selectedRadio ? selectedRadio.value : null;
-                        console.log('🔧 [RADIO DEBUG] LocalStorage saving radio button group:', el.name, 'selectedRadio:', selectedRadio ? selectedRadio.id : 'none', 'savedValue:', answers[el.name]);
                     } else {
                         // For other fields, save the value
                         answers[el.name] = el.value;
@@ -5512,7 +5420,6 @@ if (typeof handleNext === 'function') {
                 const savedData = localStorage.getItem('formData_' + formId);
                 if (savedData) {
                     const data = JSON.parse(savedData);
-                    console.log('🔧 [AUTOFILL DEBUG] LocalStorage data loaded:', data);
                     const fields = getFormFields();
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
@@ -5520,14 +5427,10 @@ if (typeof handleNext === 'function') {
                                 el.checked = !!data[el.name];
                             } else if (el.type === 'radio') {
                                 // For radio buttons, set the value and check the matching radio button
-                                console.log('🔧 [RADIO DEBUG] LocalStorage loading radio:', el.id, 'name:', el.name, 'value:', el.value, 'savedValue:', data[el.name], 'match:', el.value === data[el.name]);
-                                
                                 if (data[el.name] && el.value === data[el.name]) {
                                     el.checked = true;
-                                    console.log('🔧 [RADIO DEBUG] ✅ LocalStorage SELECTED radio button:', el.id, 'because value matches saved value');
                                 } else {
                                     el.checked = false;
-                                    console.log('🔧 [RADIO DEBUG] ❌ LocalStorage UNSELECTED radio button:', el.id, 'because value does not match saved value');
                                 }
                             } else {
                                 el.value = data[el.name];
@@ -6174,7 +6077,6 @@ document.addEventListener('keydown', function(e) {
       return;
     }
     
-    console.log('🔧 [TAB NAVIGATION] No suitable button found to press');
   }
 });
 
