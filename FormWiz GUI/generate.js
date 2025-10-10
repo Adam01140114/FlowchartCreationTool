@@ -835,7 +835,7 @@ questionSlugMap[questionId] = slug;
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
         questionNameIds[questionId] = nameId;
-        formHTML += `<div class="date-input-container"><input type="date" id="${nameId}" name="${nameId}"></div>`;
+        formHTML += `<div class="date-input-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('${nameId}').showPicker()"><input type="date" id="${nameId}" name="${nameId}" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;"></div>`;
       } else if (questionType === "dateRange") {
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
@@ -844,14 +844,14 @@ questionSlugMap[questionId] = slug;
         // Create two date inputs with IDs based on the slug (nameId_1 and nameId_2)
         formHTML += `
           <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 8px auto; width: 80%; max-width: 400px;">
-            <div class="date-input-container" style="flex: 1;">
+            <div class="date-input-container" style="flex: 1; position: relative; cursor: pointer;" onclick="document.getElementById('${nameId}_1').showPicker()">
               <label for="${nameId}_1" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Start Date</label>
-              <input type="date" id="${nameId}_1" name="${nameId}_1">
+              <input type="date" id="${nameId}_1" name="${nameId}_1" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;">
             </div>
             <div style="font-weight: 600; color: #666; margin: 0 10px;">to</div>
-            <div class="date-input-container" style="flex: 1;">
+            <div class="date-input-container" style="flex: 1; position: relative; cursor: pointer;" onclick="document.getElementById('${nameId}_2').showPicker()">
               <label for="${nameId}_2" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">End Date</label>
-              <input type="date" id="${nameId}_2" name="${nameId}_2">
+              <input type="date" id="${nameId}_2" name="${nameId}_2" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;">
             </div>
           </div>
           <script>
