@@ -1,0 +1,53 @@
+# Debugging Mode Documentation
+
+## 🔍 **Error Analysis Process:**
+
+### **Step 1: Analyze the Error in output.html**
+- Look at the console logs to see what's happening
+- Identify what's working vs. what's not working
+- Look for missing expected logs or unexpected behavior
+
+### **Step 2: Understand Why generate.js is Generating the Error**
+- Examine the generated code in output.html to see what generate.js actually produced
+- Compare it with what I intended to generate
+- Identify the root cause in generate.js logic
+
+### **Step 3: Fix generate.js to Prevent the Error**
+- Modify the generate.js code to produce the correct output.html
+- Test the fix by regenerating and checking the new output.html
+
+## 🚨 **Current Issue Analysis:**
+
+### **Problem:** Numbered dropdown autofill not working
+
+**Step 1 - Error in output.html:**
+- Console shows: `showTextboxLabels called with questionId: 1 count: 2` ✅
+- Console shows: `Autofilling field: how_many_people_are_suing_with_you with value: 2` ✅
+- Console shows: `Fields are created: showTextboxLabels called with questionId: 1 count: 2` ✅
+- Console shows: **MISSING** - No logs like `🔧 [AUTOFILL DEBUG] About to set setTimeout for dropdown: how_many_people_are_suing_with_you value: 2` ❌
+
+**Step 2 - Why generate.js is generating this error:**
+- The autofill logic is in a `fields.forEach` loop that only runs for dropdowns autofilled in the first pass
+- The `how_many` dropdown is being autofilled in the second pass, so it's not in the `fields` array
+- The `setTimeout` logic is never triggered because the condition `el.id === 'how_many'` is not met in the first pass
+
+**Step 3 - How to fix generate.js:**
+- Move the autofill logic to the second pass where `how_many` dropdowns are processed
+- Or add the autofill logic to both passes to ensure it runs regardless of when the dropdown is autofilled
+- Ensure the logic runs for all numbered dropdowns, not just those in the first pass
+
+## 🎯 **Debugging Best Practices:**
+
+1. **Always check output.html first** - see what generate.js actually produced
+2. **Compare expected vs. actual behavior** - look for missing logs or unexpected results
+3. **Trace the execution flow** - understand which code paths are being taken
+4. **Fix the root cause in generate.js** - don't just patch the symptoms
+5. **Test the fix** - regenerate and verify the new output.html works correctly
+
+## 📝 **Common Issues:**
+
+- **Logic in wrong pass**: Autofill logic in first pass but data in second pass
+- **Missing conditions**: Logic not triggered because conditions aren't met
+- **Scope issues**: Variables not accessible in callback functions
+- **Timing issues**: Code running before elements are created
+- **Duplicate logic**: Same logic in multiple places causing conflicts

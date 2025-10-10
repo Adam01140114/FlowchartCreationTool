@@ -5064,8 +5064,20 @@ if (typeof handleNext === 'function') {
                 
                 // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
                 fields.forEach(el => {
-                    if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id === 'how_many') && el.value) {
-                        const questionId = el.id.startsWith('answer') ? el.id.replace('answer', '') : '1';
+                    if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
+                        let questionId;
+                        if (el.id.startsWith('answer')) {
+                            questionId = el.id.replace('answer', '');
+                        } else if (el.id.startsWith('how_many')) {
+                            // For how_many dropdowns, we need to determine the correct question ID
+                            // Check if this is the main how_many dropdown (should be question 2)
+                            if (el.id === 'how_many_people_are_suing_with_you') {
+                                questionId = '2';
+                            } else {
+                                // For other how_many dropdowns, try to extract from the ID or default to 2
+                                questionId = '2';
+                            }
+                        }
                         if (typeof showTextboxLabels === 'function') {
                             showTextboxLabels(questionId, el.value);
                         }
@@ -5189,11 +5201,83 @@ if (typeof handleNext === 'function') {
                         triggerParagraphLimitCheckForAutofilledTextareas();
                         
                         // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled in second pass
+                        console.log('🔧 [AUTOFILL DEBUG] Second pass - Processing allFields, count:', allFields.length);
                         allFields.forEach(el => {
-                            if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id === 'how_many') && el.value) {
-                                const questionId = el.id.startsWith('answer') ? el.id.replace('answer', '') : '1';
+                            console.log('🔧 [AUTOFILL DEBUG] Second pass - Checking field:', el.tagName, el.id, el.value);
+                            if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
+                                console.log('🔧 [AUTOFILL DEBUG] Second pass - Found numbered dropdown:', el.id, 'value:', el.value);
+                                let questionId;
+                                if (el.id.startsWith('answer')) {
+                                    questionId = el.id.replace('answer', '');
+                                } else if (el.id.startsWith('how_many')) {
+                                    // For how_many dropdowns, we need to determine the correct question ID
+                                    // Check if this is the main how_many dropdown (should be question 2)
+                                    if (el.id === 'how_many_people_are_suing_with_you') {
+                                        questionId = '2';
+                                    } else {
+                                        // For other how_many dropdowns, try to extract from the ID or default to 2
+                                        questionId = '2';
+                                    }
+                                }
                                 if (typeof showTextboxLabels === 'function') {
                                     showTextboxLabels(questionId, el.value);
+                                    
+                                    // After creating numbered fields, autofill them with Firebase data
+                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - About to set setTimeout for dropdown:', el.id, 'value:', el.value);
+                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - mappedData available:', !!mappedData);
+                                    setTimeout(() => {
+                                        console.log('🔧 [AUTOFILL DEBUG] Second pass setTimeout callback triggered for dropdown:', el.id, 'value:', el.value);
+                                        const count = parseInt(el.value);
+                                        console.log('🔧 [AUTOFILL DEBUG] Second pass parsed count:', count);
+                                        if (count > 0) {
+                                            // Get the base field name from the dropdown
+                                            const baseFieldName = el.id;
+                                            
+                                            // Debug: Log all available keys in mappedData
+                                            console.log('🔧 [AUTOFILL DEBUG] Second pass - All mappedData keys:', Object.keys(mappedData));
+                                            
+                                            // Try to autofill numbered fields for each count
+                                            for (let i = 1; i <= count; i++) {
+                                                console.log('🔧 [AUTOFILL DEBUG] Second pass - Processing count i:', i);
+                                                // Common field patterns to check - using the actual Firebase naming pattern
+                                                const fieldPatterns = [
+                                                    'name', 
+                                                    'phone_number', 
+                                                    'mailing_address',
+                                                    'street',
+                                                    'city', 
+                                                    'state', 
+                                                    'zip'
+                                                ];
+                                                
+                                                fieldPatterns.forEach(pattern => {
+                                                    // Try both naming patterns: sc100_how_many_people_are_suing_with_you_1_name and how_many_people_are_suing_with_you_name_1
+                                                    const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
+                                                    const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
+                                                    
+                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Checking field patterns for i=' + i + ', pattern=' + pattern);
+                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Pattern 1 fieldId:', fieldId1, 'exists in mappedData:', !!mappedData[fieldId1]);
+                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Pattern 2 fieldId:', fieldId2, 'exists in mappedData:', !!mappedData[fieldId2]);
+                                                    
+                                                    // Check first pattern
+                                                    let fieldElement = document.getElementById(fieldId1);
+                                                    if (fieldElement && mappedData[fieldId1]) {
+                                                        fieldElement.value = mappedData[fieldId1];
+                                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling numbered field (pattern 1):', fieldId1, 'with value:', mappedData[fieldId1]);
+                                                    }
+                                                    
+                                                    // Check second pattern
+                                                    fieldElement = document.getElementById(fieldId2);
+                                                    if (fieldElement && mappedData[fieldId2]) {
+                                                        fieldElement.value = mappedData[fieldId2];
+                                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling numbered field (pattern 2):', fieldId2, 'with value:', mappedData[fieldId2]);
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            console.log('🔧 [AUTOFILL DEBUG] Second pass - Count is 0 or invalid, skipping autofill');
+                                        }
+                                    }, 100); // Small delay to ensure fields are created
                                 }
                                 if (typeof updateHiddenCheckboxes === 'function') {
                                     updateHiddenCheckboxes(questionId, el.value);
@@ -7015,7 +7099,7 @@ function generateHiddenPDFFields(formName) {
     // Add default checkbox based on form name inside the hidden fields div
     const formNameSafe = formName.replace(/\W+/g, '_').toLowerCase();
     hiddenFieldsHTML += `\n<input type="checkbox" id="${formNameSafe}_default_checkbox" name="${formNameSafe}_default_checkbox" checked style="display: none;">`;
-    
+
     hiddenFieldsHTML += "\n</div>";
     return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }

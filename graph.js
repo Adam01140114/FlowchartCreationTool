@@ -894,6 +894,42 @@ function showPropertiesPopup(cell) {
       editable: true,
       inputType: 'number'
     });
+    
+    // Add Copy ID button for Big Paragraph nodes
+    properties.push({
+      label: 'Copy ID',
+      value: '',
+      id: 'propCopyId',
+      editable: false,
+      isButton: true,
+      buttonText: 'Copy ID',
+      buttonAction: () => {
+        const nodeId = cell._nodeId || cell.id || 'node';
+        const copyText = `${nodeId}_overlimit`;
+        navigator.clipboard.writeText(copyText).then(() => {
+          // Show a brief success message
+          const button = document.getElementById('propCopyId');
+          if (button) {
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.style.backgroundColor = '#1976d2';
+            }, 1000);
+          }
+        }).catch(err => {
+          console.error('Failed to copy text: ', err);
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = copyText;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        });
+      }
+    });
   }
   
   // PDF Name field will be added later in the unified section
