@@ -4332,7 +4332,8 @@ function runSingleHiddenCheckboxCalculation(calcObj){
     var cbox = document.getElementById(calcObj.hiddenFieldName);
     if(!cbox) return;  // hidden field not found
 
-    var finalState = cbox.checked;  // start with default
+    var finalState = false;  // start with unchecked, only check if calculation conditions are met
+    console.log('🔧 [CALC DEBUG] Running calculation for checkbox:', calcObj.hiddenFieldName);
 
     // Evaluate each multi-term condition in 'calculations'
     for(var c=0; c<calcObj.calculations.length; c++){
@@ -4342,6 +4343,7 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         // Sum up the terms
         if(oneCalc.terms && oneCalc.terms.length>0){
             val = parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId) )||0;
+            console.log('🔧 [CALC DEBUG] First term value for', oneCalc.terms[0].questionNameId, ':', val);
             for(var t=1; t<oneCalc.terms.length; t++){
                 var term = oneCalc.terms[t];
                 var op   = term.operator||'';
@@ -4364,14 +4366,18 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         else if(oneCalc.compareOperator==='<') matched = (val<thr);
         else if(oneCalc.compareOperator==='>') matched = (val>thr);
 
+        console.log('🔧 [CALC DEBUG] Comparison:', val, oneCalc.compareOperator, thr, '=', matched);
+
         // If matched, set final state
         if(matched){
             finalState = (oneCalc.result==='checked');
+            console.log('🔧 [CALC DEBUG] Condition matched, setting finalState to:', finalState);
         }
     }
 
     // Set the hidden checkbox state
     cbox.checked = finalState;
+    console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
 }
 
 

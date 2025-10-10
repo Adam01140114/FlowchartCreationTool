@@ -1213,6 +1213,7 @@ function showPropertiesPopup(cell) {
         
         // Create the main container for this dropdown
         const mainContainer = document.createElement('div');
+        mainContainer.setAttribute('data-dropdown-container', 'true');
         mainContainer.style.cssText = `
           display: flex;
           flex-direction: column;
@@ -1354,6 +1355,7 @@ function showPropertiesPopup(cell) {
         
         // Create the main container for this dropdown
         const linkMainContainer = document.createElement('div');
+        linkMainContainer.setAttribute('data-dropdown-container', 'true');
         linkMainContainer.style.cssText = `
           display: flex;
           flex-direction: column;
@@ -1381,6 +1383,59 @@ function showPropertiesPopup(cell) {
       };
       
       linkedFieldsContainer.appendChild(linkAnotherBtn);
+      
+      // Add Save button
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cssText = `
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 8px;
+        width: 100%;
+      `;
+      
+      saveBtn.onclick = () => {
+        // Collect all current linked field values
+        const newLinkedFields = [];
+        const dropdownContainers = linkedFieldsContainer.querySelectorAll('[data-dropdown-container]');
+        
+        dropdownContainers.forEach(container => {
+          const hiddenSelect = container.querySelector('select[style*="display: none"]');
+          if (hiddenSelect && hiddenSelect.value) {
+            newLinkedFields.push(hiddenSelect.value);
+          }
+        });
+        
+        // Update the cell's linked fields
+        cell._linkedFields = newLinkedFields;
+        
+        // Update the cell's linked logic node ID
+        const nodeIdInput = document.getElementById('propLinkedLogicNodeId');
+        if (nodeIdInput) {
+          cell._linkedLogicNodeId = nodeIdInput.value;
+        }
+        
+        // Show success message
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saved!';
+        saveBtn.style.backgroundColor = '#45a049';
+        setTimeout(() => {
+          saveBtn.textContent = originalText;
+          saveBtn.style.backgroundColor = '#4CAF50';
+        }, 1000);
+        
+        console.log('Linked Logic Properties saved:', {
+          nodeId: cell._linkedLogicNodeId,
+          linkedFields: cell._linkedFields
+        });
+      };
+      
+      linkedFieldsContainer.appendChild(saveBtn);
       
       fieldDiv.appendChild(label);
       fieldDiv.appendChild(linkedFieldsContainer);
