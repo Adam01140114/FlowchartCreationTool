@@ -1739,12 +1739,8 @@ if (s > 1){
   }
 
   // Insert hidden fields (including multi-term calculations)
-  const genHidden = generateHiddenPDFFields();
+  const genHidden = generateHiddenPDFFields(formName);
   formHTML += genHidden.hiddenFieldsHTML;
-  
-  // Add default checkbox based on form name
-  const formNameSafe = formName.replace(/\W+/g, '_').toLowerCase();
-  formHTML += `<input type="checkbox" id="${formNameSafe}_default_checkbox" name="${formNameSafe}_default_checkbox" checked style="display: none;">`;
 
   // Close the form & add the thank-you message
   formHTML += [
@@ -3691,7 +3687,12 @@ function updateHiddenLogic(dropdownName, selectedValue) {
         }
         
         // Add the hidden element to the form
-        document.body.appendChild(hiddenElement);
+        const form = document.getElementById('customForm');
+        if (form) {
+            form.appendChild(hiddenElement);
+        } else {
+            document.body.appendChild(hiddenElement);
+        }
     } else {
         // Update existing element
         if (config.type === 'checkbox') {
@@ -6889,7 +6890,12 @@ function normaliseDesignerFieldRef(raw) {
  *     – now funnels every designer reference through
  *       normaliseDesignerFieldRef() so shorthand is fixed.
  *───────────────────────────────────────────────────────────────*/
-function generateHiddenPDFFields() {
+function generateHiddenPDFFields(formName) {
+    // Fallback if formName is not provided
+    if (!formName) {
+        formName = 'Example Form';
+    }
+    
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
 
     /* profile fields … (unchanged) */
@@ -7006,6 +7012,10 @@ function generateHiddenPDFFields() {
         }
     });
 
+    // Add default checkbox based on form name inside the hidden fields div
+    const formNameSafe = formName.replace(/\W+/g, '_').toLowerCase();
+    hiddenFieldsHTML += `\n<input type="checkbox" id="${formNameSafe}_default_checkbox" name="${formNameSafe}_default_checkbox" checked style="display: none;">`;
+    
     hiddenFieldsHTML += "\n</div>";
     return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
