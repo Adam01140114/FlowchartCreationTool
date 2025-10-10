@@ -309,7 +309,8 @@ window.exportGuiJson = function(download = true) {
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-      const sanitizedPdfName = pdfName ? sanitizeNameId(pdfName) : '';
+      // Process PDF name to remove .pdf extension and clean up formatting
+      const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
@@ -755,7 +756,8 @@ window.exportGuiJson = function(download = true) {
       
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-      const sanitizedPdfName = pdfName ? sanitizeNameId(pdfName) : '';
+      // Process PDF name to remove .pdf extension and clean up formatting
+      const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
@@ -1212,10 +1214,16 @@ window.exportGuiJson = function(download = true) {
   
   linkedLogicNodes.forEach((cell, index) => {
     if (cell._linkedLogicNodeId && cell._linkedFields && cell._linkedFields.length > 0) {
+      // Process linked fields to convert spaces to underscores while preserving PDF prefix
+      const processedFields = cell._linkedFields.map(field => {
+        // Convert all spaces to underscores in the field name
+        return field.replace(/\s+/g, '_');
+      });
+      
       linkedFields.push({
         id: `linkedField${index}`,
         linkedFieldId: cell._linkedLogicNodeId,
-        fields: cell._linkedFields
+        fields: processedFields
       });
     }
   });

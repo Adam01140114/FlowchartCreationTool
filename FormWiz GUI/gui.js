@@ -3042,9 +3042,41 @@ function openLinkedFieldModal() {
     document.getElementById('linkedFieldModal').style.display = 'block';
     console.log('🔍 [DEBUG] Modal displayed');
     
-    // Initialize with two dropdowns
-    addLinkedFieldDropdown();
-    addLinkedFieldDropdown();
+    // Check if we have a stored configuration to restore
+    if (window.lastLinkedFieldConfig && !window.editingLinkedFieldId) {
+        console.log('🔍 [DEBUG] Restoring last configuration:', window.lastLinkedFieldConfig);
+        
+        // Restore the linked field ID
+        const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+        if (linkedFieldIdInput) {
+            linkedFieldIdInput.value = window.lastLinkedFieldConfig.linkedFieldId || '';
+        }
+        
+        // Create dropdowns for each stored field
+        window.lastLinkedFieldConfig.selectedFields.forEach(fieldId => {
+            addLinkedFieldDropdown();
+            const dropdownIndex = currentLinkedFieldConfig.length - 1;
+            const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+            const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+            
+            if (select) {
+                select.value = fieldId;
+                currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+                
+                // Also update the search input field with the selected option text
+                if (searchInput) {
+                    const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
+                    if (selectedOption) {
+                        searchInput.value = selectedOption.textContent;
+                    }
+                }
+            }
+        });
+    } else {
+        // Initialize with two dropdowns (default behavior)
+        addLinkedFieldDropdown();
+        addLinkedFieldDropdown();
+    }
 }
 
 // Create the linked field modal
@@ -3140,7 +3172,16 @@ function addLinkedFieldDropdown() {
     dropdownDiv.innerHTML = `
         <div style="flex: 1; margin-right: 10px;">
             <label style="display: block; margin-bottom: 5px; font-weight: bold;">Text Question ${dropdownIndex + 1}:</label>
-            <select id="linkedFieldSelect${dropdownIndex}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="position: relative;">
+                <input type="text" id="linkedFieldSearch${dropdownIndex}" placeholder="Search for a text question..." 
+                       style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+                       onkeyup="filterLinkedFieldOptions(${dropdownIndex})" 
+                       onfocus="showLinkedFieldOptions(${dropdownIndex})"
+                       onblur="hideLinkedFieldOptions(${dropdownIndex})">
+                <div id="linkedFieldOptions${dropdownIndex}" style="display: none; position: absolute; top: 100%; left: 0; min-width: 400px; background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"></div>
+            </div>
+            <!-- Hidden select for form submission -->
+            <select id="linkedFieldSelect${dropdownIndex}" style="display: none;">
                 <option value="">Select a text question...</option>
             </select>
         </div>
@@ -3400,6 +3441,9 @@ function populateLinkedFieldDropdown(dropdownIndex) {
     select.addEventListener('change', function() {
         currentLinkedFieldConfig[dropdownIndex].selectedValue = this.value;
     });
+    
+    // Initialize search functionality
+    initializeLinkedFieldSearch(dropdownIndex);
 }
 
 // Remove a linked field dropdown
@@ -3499,6 +3543,12 @@ function finalizeLinkedField() {
         // Create the linked field display
         createLinkedFieldDisplay(selectedFields, linkedFieldId);
     }
+    
+    // Store the configuration for future autofill
+    window.lastLinkedFieldConfig = {
+        linkedFieldId: linkedFieldId,
+        selectedFields: selectedFields.map(field => field.selectedValue)
+    };
     
     // Close modal
     closeLinkedFieldModal();
@@ -3617,6 +3667,9 @@ function editLinkedFieldDisplay(displayId) {
     // Store the display ID we're editing
     window.editingLinkedFieldId = displayId;
     
+    // Clear any stored configuration since we're editing
+    window.lastLinkedFieldConfig = null;
+    
     // Create modal if it doesn't exist
     if (!document.getElementById('linkedFieldModal')) {
         console.log('🔍 [DEBUG] Creating linked field modal');
@@ -3637,9 +3690,19 @@ function editLinkedFieldDisplay(displayId) {
         addLinkedFieldDropdown();
         const dropdownIndex = currentLinkedFieldConfig.length - 1;
         const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+        const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+        
         if (select) {
             select.value = fieldId;
             currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+            
+            // Also update the search input field with the selected option text
+            if (searchInput) {
+                const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
+                if (selectedOption) {
+                    searchInput.value = selectedOption.textContent;
+                }
+            }
         }
     });
     
@@ -3747,5 +3810,132 @@ function createLinkedFieldDisplayFromImport(linkedFieldData) {
         id: displayId,
         linkedFieldId: linkedFieldId,
         fields: linkedFieldData.fields
+    });
+}
+
+// Search functionality for linked field dropdowns
+function filterLinkedFieldOptions(dropdownIndex) {
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    // Clear previous options
+    optionsContainer.innerHTML = '';
+    
+    // Get all options from the select element
+    const options = Array.from(selectElement.options).filter(option => option.value !== '');
+    
+    // Filter options based on search term
+    const filteredOptions = options.filter(option => 
+        option.textContent.toLowerCase().includes(searchTerm)
+    );
+    
+    // Display filtered options
+    if (filteredOptions.length > 0) {
+        optionsContainer.style.display = 'block';
+        filteredOptions.forEach(option => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'linked-field-option';
+            optionDiv.style.cssText = 'padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s; white-space: nowrap; overflow: visible;';
+            optionDiv.textContent = option.textContent;
+            optionDiv.onmouseover = function() { this.style.backgroundColor = '#f8f9fa'; };
+            optionDiv.onmouseout = function() { this.style.backgroundColor = 'white'; };
+            optionDiv.onclick = function() {
+                selectLinkedFieldOption(dropdownIndex, option.value, option.textContent);
+            };
+            optionsContainer.appendChild(optionDiv);
+        });
+    } else {
+        optionsContainer.style.display = 'none';
+    }
+}
+
+function showLinkedFieldOptions(dropdownIndex) {
+    const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    
+    // If search input is empty, show all options
+    if (searchInput.value === '') {
+        filterLinkedFieldOptions(dropdownIndex);
+    }
+}
+
+function hideLinkedFieldOptions(dropdownIndex) {
+    // Add a small delay to allow clicks on options to register
+    setTimeout(() => {
+        const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+        optionsContainer.style.display = 'none';
+    }, 200);
+}
+
+function selectLinkedFieldOption(dropdownIndex, value, text) {
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    
+    // Update search input with selected text
+    searchInput.value = text;
+    
+    // Update hidden select element
+    selectElement.value = value;
+    
+    // Hide options
+    optionsContainer.style.display = 'none';
+    
+    // Update the current configuration
+    if (currentLinkedFieldConfig[dropdownIndex]) {
+        currentLinkedFieldConfig[dropdownIndex].selectedValue = value;
+    }
+    
+    console.log(`🔍 [DEBUG] Selected linked field option: ${text} (${value}) for dropdown ${dropdownIndex}`);
+}
+
+// Initialize search functionality for a linked field dropdown
+function initializeLinkedFieldSearch(dropdownIndex) {
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    if (!searchInput) return;
+    
+    // Add keyboard navigation support
+    searchInput.addEventListener('keydown', function(e) {
+        const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+        const options = optionsContainer.querySelectorAll('.linked-field-option');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const currentActive = optionsContainer.querySelector('.linked-field-option.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const next = currentActive.nextElementSibling;
+                if (next) {
+                    next.classList.add('active');
+                    next.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (options.length > 0) {
+                options[0].classList.add('active');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const currentActive = optionsContainer.querySelector('.linked-field-option.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const prev = currentActive.previousElementSibling;
+                if (prev) {
+                    prev.classList.add('active');
+                    prev.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (options.length > 0) {
+                options[options.length - 1].classList.add('active');
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const activeOption = optionsContainer.querySelector('.linked-field-option.active');
+            if (activeOption) {
+                activeOption.click();
+            }
+        } else if (e.key === 'Escape') {
+            optionsContainer.style.display = 'none';
+            searchInput.blur();
+        }
     });
 }
