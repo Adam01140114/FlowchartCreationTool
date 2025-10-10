@@ -1212,7 +1212,17 @@ window.exportGuiJson = function(download = true) {
     typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)
   );
   
+  console.log('🔍 [GUI JSON DEBUG] Found linked logic nodes:', linkedLogicNodes.length);
+  
   linkedLogicNodes.forEach((cell, index) => {
+    console.log(`🔍 [GUI JSON DEBUG] Linked Logic node ${index}:`, {
+      cellId: cell.id,
+      _linkedLogicNodeId: cell._linkedLogicNodeId,
+      _linkedFields: cell._linkedFields,
+      hasNodeId: !!cell._linkedLogicNodeId,
+      hasFields: !!(cell._linkedFields && cell._linkedFields.length > 0)
+    });
+    
     if (cell._linkedLogicNodeId && cell._linkedFields && cell._linkedFields.length > 0) {
       // Process linked fields to convert spaces to underscores while preserving PDF prefix
       const processedFields = cell._linkedFields.map(field => {
@@ -1220,13 +1230,23 @@ window.exportGuiJson = function(download = true) {
         return field.replace(/\s+/g, '_');
       });
       
-      linkedFields.push({
+      const linkedFieldEntry = {
         id: `linkedField${index}`,
         linkedFieldId: cell._linkedLogicNodeId,
         fields: processedFields
+      };
+      
+      console.log('✅ [GUI JSON DEBUG] Adding linked field entry:', linkedFieldEntry);
+      linkedFields.push(linkedFieldEntry);
+    } else {
+      console.log('⚠️ [GUI JSON DEBUG] Skipping linked logic node due to missing data:', {
+        hasNodeId: !!cell._linkedLogicNodeId,
+        hasFields: !!(cell._linkedFields && cell._linkedFields.length > 0)
       });
     }
   });
+  
+  console.log('🔍 [GUI JSON DEBUG] Final linkedFields array:', linkedFields);
   
   // Create final output object
   const output = {

@@ -1404,8 +1404,25 @@ function showPropertiesPopup(cell) {
         const newLinkedFields = [];
         const dropdownContainers = linkedFieldsContainer.querySelectorAll('[data-dropdown-container]');
         
-        dropdownContainers.forEach(container => {
-          const hiddenSelect = container.querySelector('select[style*="display: none"]');
+        console.log('🔍 [SAVE DEBUG] Found dropdown containers:', dropdownContainers.length);
+        
+        dropdownContainers.forEach((container, index) => {
+          // Try multiple selectors to find the hidden select
+          let hiddenSelect = container.querySelector('select[style*="display: none"]');
+          if (!hiddenSelect) {
+            hiddenSelect = container.querySelector('select[style*="display:none"]');
+          }
+          if (!hiddenSelect) {
+            // Fallback: find any select element in the container
+            hiddenSelect = container.querySelector('select');
+          }
+          
+          console.log(`🔍 [SAVE DEBUG] Container ${index}:`, {
+            hasHiddenSelect: !!hiddenSelect,
+            selectValue: hiddenSelect ? hiddenSelect.value : 'none',
+            selectStyle: hiddenSelect ? hiddenSelect.style.display : 'none'
+          });
+          
           if (hiddenSelect && hiddenSelect.value) {
             newLinkedFields.push(hiddenSelect.value);
           }
@@ -1415,9 +1432,21 @@ function showPropertiesPopup(cell) {
         cell._linkedFields = newLinkedFields;
         
         // Update the cell's linked logic node ID
-        const nodeIdInput = document.getElementById('propLinkedLogicNodeId');
-        if (nodeIdInput) {
-          cell._linkedLogicNodeId = nodeIdInput.value;
+        const nodeIdElement = document.getElementById('propLinkedLogicNodeId');
+        console.log('🔍 [SAVE DEBUG] Node ID element:', nodeIdElement);
+        if (nodeIdElement) {
+          // Check if it's an input element or a span element
+          let nodeIdValue;
+          if (nodeIdElement.tagName === 'INPUT') {
+            nodeIdValue = nodeIdElement.value;
+          } else {
+            // It's a span element, get the text content
+            nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
+          }
+          console.log('🔍 [SAVE DEBUG] Node ID value:', nodeIdValue);
+          cell._linkedLogicNodeId = nodeIdValue;
+        } else {
+          console.log('⚠️ [SAVE DEBUG] Node ID element not found!');
         }
         
         // Show success message
@@ -1429,9 +1458,16 @@ function showPropertiesPopup(cell) {
           saveBtn.style.backgroundColor = '#4CAF50';
         }, 1000);
         
-        console.log('Linked Logic Properties saved:', {
+        console.log('✅ [SAVE SUCCESS] Linked Logic Properties saved:', {
           nodeId: cell._linkedLogicNodeId,
-          linkedFields: cell._linkedFields
+          linkedFields: cell._linkedFields,
+          cellId: cell.id
+        });
+        
+        // Verify the properties were actually set on the cell
+        console.log('🔍 [SAVE VERIFY] Cell properties after save:', {
+          _linkedLogicNodeId: cell._linkedLogicNodeId,
+          _linkedFields: cell._linkedFields
         });
       };
       
@@ -3437,14 +3473,22 @@ function setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDi
   // Store original options for filtering
   let originalOptions = Array.from(optionsContainer.children);
   
-  // Function to normalize search terms (handle spaces and underscores)
-  const normalizeSearchTerm = (term) => {
-    return term.toLowerCase().replace(/[\s_]+/g, '');
+  // Function to extract keywords from search term
+  const extractKeywords = (term) => {
+    return term.toLowerCase()
+      .split(/[\s_]+/)  // Split on spaces and underscores
+      .filter(keyword => keyword.length > 0);  // Remove empty strings
   };
   
   // Function to normalize option text for comparison
   const normalizeOptionText = (text) => {
-    return text.toLowerCase().replace(/[\s_]+/g, '');
+    return text.toLowerCase().replace(/[\s_]+/g, ' ');
+  };
+  
+  // Function to check if option matches all keywords
+  const matchesAllKeywords = (optionText, keywords) => {
+    const normalizedText = normalizeOptionText(optionText);
+    return keywords.every(keyword => normalizedText.includes(keyword));
   };
   
   // Function to filter and update options
@@ -3459,12 +3503,14 @@ function setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDi
         optionsContainer.appendChild(newOption);
       });
     } else {
+      // Extract keywords from search term
+      const keywords = extractKeywords(searchTerm);
+      console.log('🔍 [SEARCH DEBUG] Search keywords:', keywords);
+      
       // Filter and add matching options
-      const normalizedSearch = normalizeSearchTerm(searchTerm);
       const filteredOptions = originalOptions.filter(option => {
         const text = option.textContent;
-        const normalizedText = normalizeOptionText(text);
-        return normalizedText.includes(normalizedSearch);
+        return matchesAllKeywords(text, keywords);
       });
       
       console.log('🔍 [SEARCH DEBUG] Filtered options:', filteredOptions.length);
@@ -3548,14 +3594,22 @@ function setupLinkedLogicSearch(dropdown, searchBar) {
   // Wait a bit for dropdown to be populated, then store options
   setTimeout(updateOriginalOptions, 100);
   
-  // Function to normalize search terms (handle spaces and underscores)
-  const normalizeSearchTerm = (term) => {
-    return term.toLowerCase().replace(/[\s_]+/g, '');
+  // Function to extract keywords from search term
+  const extractKeywords = (term) => {
+    return term.toLowerCase()
+      .split(/[\s_]+/)  // Split on spaces and underscores
+      .filter(keyword => keyword.length > 0);  // Remove empty strings
   };
   
   // Function to normalize option text for comparison
   const normalizeOptionText = (text) => {
-    return text.toLowerCase().replace(/[\s_]+/g, '');
+    return text.toLowerCase().replace(/[\s_]+/g, ' ');
+  };
+  
+  // Function to check if option matches all keywords
+  const matchesAllKeywords = (optionText, keywords) => {
+    const normalizedText = normalizeOptionText(optionText);
+    return keywords.every(keyword => normalizedText.includes(keyword));
   };
   
   // Function to filter and update dropdown
@@ -3580,12 +3634,15 @@ function setupLinkedLogicSearch(dropdown, searchBar) {
         }
       });
     } else {
+      // Extract keywords from search term
+      const keywords = extractKeywords(searchTerm);
+      console.log('🔍 [SEARCH DEBUG] Search keywords:', keywords);
+      
       // Filter and add matching options
-      const normalizedSearch = normalizeSearchTerm(searchTerm);
       const filteredOptions = originalOptions.filter(option => {
         if (!option.value) return false;
-        const normalizedText = normalizeOptionText(option.textContent);
-        return normalizedText.includes(normalizedSearch);
+        const text = option.textContent;
+        return matchesAllKeywords(text, keywords);
       });
       
       console.log('🔍 [SEARCH DEBUG] Filtered options:', filteredOptions.length);
