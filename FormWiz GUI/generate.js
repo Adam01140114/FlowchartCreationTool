@@ -182,6 +182,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; text-align: center; }',
     '        .address-field:first-child { margin-top: 0; }',
     '        .address-field:last-child { margin-bottom: 0; }',
+    '        .hidden { display: none !important; }',
     '    </style>',
     "</head>",
     "<body>",
@@ -268,7 +269,6 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '<div id="pdfPreview" style="display:none;">',
     '    <iframe id="pdfFrame" style="display:none"></iframe>',
     "</div>",
-    '<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">',
     "",
     "<!-- Firebase includes -->",
     '<script src="https://js.stripe.com/v3/"></script>',
@@ -304,7 +304,6 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    });',
     '} else {',
     '    // Fallback for when Firebase is not available',
-    '    console.log("Firebase not available, using fallback authentication");',
     '}',
     '',
     '// Function to update button display based on auth state',
@@ -411,6 +410,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        <input type="hidden" id="form_county" name="form_county" value="">',
     '        <input type="hidden" id="form_defendant" name="form_defendant" value="">',
     '        <input type="hidden" id="form_ID" name="form_ID" value="">',
+    '        <input type="hidden" id="current_date" name="current_date" value="">',
   ].join("\n");
 
   // Get all PDF names
@@ -1109,7 +1109,7 @@ if (noneEl?.checked){
     const noneOnChangeHandler = markOnlyOne ? 
       `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
       `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
-
+    
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
@@ -1311,8 +1311,8 @@ formHTML += `</div><br></div>`;
           
         for (let L = 0; L < lblInputs.length; L++) {
           labelVals.push(lblInputs[L].value.trim());
-            labelNodeIds.push(labelNodeIdInputs[L] ? labelNodeIdInputs[L].value.trim() : "");
-          }
+          labelNodeIds.push(labelNodeIdInputs[L] ? labelNodeIdInputs[L].value.trim() : "");
+        }
         for (let A = 0; A < amtInputs.length; A++) {
           amountVals.push(amtInputs[A].value.trim());
         }
@@ -1377,7 +1377,7 @@ formHTML += `</div><br></div>`;
         // Store label node IDs for use in showTextboxLabels function
         window.labelNodeIdsMap = window.labelNodeIdsMap || {};
         window.labelNodeIdsMap[questionId] = labelNodeIds;
-        
+
         // Store unified field data for use in showTextboxLabels function
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
         window.unifiedFieldsMap[questionId] = allFieldsInOrder;
@@ -1429,16 +1429,17 @@ formHTML += `</div><br></div>`;
 
             logicScriptBuffer += `  (function(){\n`;
             logicScriptBuffer += `    var cPrevType="${pType}";\n`;
-            logicScriptBuffer += `    var cPrevAns="${paVal}";\n`;
+            logicScriptBuffer += `    var cPrevAns="${paVal.toLowerCase()}";\n`;
             logicScriptBuffer += `    var cPrevQNum="${pqVal}";\n`;
             logicScriptBuffer += `    if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `      var cbPrefix = getCbPrefix(cPrevQNum);\n`;
-			
-
-            logicScriptBuffer += `      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
+            logicScriptBuffer += `      // For checkboxes, look for all checkboxes in the question container\n`;
+            logicScriptBuffer += `      var questionContainer = document.getElementById('question-container-' + cPrevQNum);\n`;
+            logicScriptBuffer += `      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"]') : [];\n`;
+            logicScriptBuffer += `      console.log('🔧 [CONDITIONAL DEBUG] Question ` + pqVal + `: Found', cbs.length, 'checkboxes in container, looking for:', cPrevAns);\n`;
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
-            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
+            logicScriptBuffer += `      console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);\n`;
+            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');}\n`;
             logicScriptBuffer += `    } else {\n`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
@@ -1470,7 +1471,8 @@ formHTML += `</div><br></div>`;
               logicScriptBuffer += ` (function(){\n`;
               // Use explicit question ID value rather than relying on variable scope
               logicScriptBuffer += `   var checkQuestion = "${pqVal2}";\n`;
-              logicScriptBuffer += `   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');\n`;
+              logicScriptBuffer += `   var questionContainer = document.getElementById('question-container-' + checkQuestion);\n`;
+              logicScriptBuffer += `   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"]') : [];\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
@@ -1512,13 +1514,7 @@ formHTML += `</div><br></div>`;
         const pdfLogicStripePriceIdEl = qBlock.querySelector("#pdfLogicStripePriceId" + questionId);
         const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
         
-        console.log(`🔍 [PDF LOGIC DEBUG] Question ${questionId}:`, {
-          pdfLogicEnabled,
-          pdfLogicRows: pdfLogicRows.length,
-          pdfLogicPdfName,
-          pdfLogicPdfDisplayName,
-          pdfLogicStripePriceId
-        });
+        // PDF Logic processing for question ' + questionId + '
         
         if (pdfLogicRows.length > 0 && pdfLogicPdfName) {
           // Add to PDF Logic array for later processing
@@ -1532,12 +1528,10 @@ formHTML += `</div><br></div>`;
           });
           
           // Process conditions
-          console.log(`🔍 [PDF LOGIC DEBUG] Processing ${pdfLogicRows.length} conditions for question ${questionId}`);
           for (let lr = 0; lr < pdfLogicRows.length; lr++) {
             const row = pdfLogicRows[lr];
             const rowIndex = lr + 1;
             
-            console.log(`🔍 [PDF LOGIC DEBUG] Processing condition ${rowIndex} for question ${questionId}, questionType: ${questionType}`);
             
             if (questionType === "bigParagraph") {
               // For Big Paragraph, process character limit
@@ -1571,35 +1565,18 @@ formHTML += `</div><br></div>`;
               "#pdfPrevAnswer" + questionId + "_" + rowIndex
             );
 
-            console.log(`🔍 [PDF LOGIC DEBUG] Found elements for condition ${rowIndex}:`, {
-              pqEl: !!pqEl,
-              paEl: !!paEl,
-              pqElId: pqEl ? pqEl.id : 'not found',
-              paElId: paEl ? paEl.id : 'not found'
-            });
-
             if (!pqEl || !paEl) {
-              console.log(`❌ [PDF LOGIC DEBUG] Missing elements for condition ${rowIndex}, skipping`);
               continue;
             }
             const pqVal = pqEl.value.trim();
             const paVal = paEl.value.trim();
-            console.log(`🔍 [PDF LOGIC DEBUG] Values for condition ${rowIndex}:`, {
-              pqVal,
-              paVal
-            });
             if (!pqVal || !paVal) {
-              console.log(`❌ [PDF LOGIC DEBUG] Empty values for condition ${rowIndex}, skipping`);
               continue;
             }
 
             // Add condition to the PDF Logic array
             const pdfLogicIndex = pdfLogicPDFs.length - 1;
             pdfLogicPDFs[pdfLogicIndex].conditions.push({
-              prevQuestion: pqVal,
-              prevAnswer: paVal
-            });
-            console.log(`✅ [PDF LOGIC DEBUG] Added condition to PDF Logic array:`, {
               prevQuestion: pqVal,
               prevAnswer: paVal
             });
@@ -2069,6 +2046,50 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
+  // Dynamic conditional logic for business type question to show county question
+  formHTML += `
+// Dynamic conditional logic for business type question to show county question
+function setupBusinessTypeConditionalLogic() {
+  console.log('🔍 [COUNTY QUESTION DEBUG] Setting up business type conditional logic');
+  
+  // Use dynamic approach - find question 11's name from questionNameIds
+  const businessTypeQuestionName = questionNameIds['11'] || 'what_are_you_doing_business_as';
+  console.log('🔍 [COUNTY QUESTION DEBUG] Business type question name:', businessTypeQuestionName);
+  
+  // Find all radio buttons for the business type question
+  const businessTypeRadios = document.querySelectorAll('input[name="' + businessTypeQuestionName + '"]');
+  console.log('🔍 [COUNTY QUESTION DEBUG] Found', businessTypeRadios.length, 'business type radio buttons');
+  
+  businessTypeRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.checked) {
+        console.log('🔍 [COUNTY QUESTION DEBUG] Business type selected:', this.value);
+        // Show county question (question-container-16) when any business type is selected
+        const countyQuestion = document.getElementById('question-container-16');
+        if (countyQuestion) {
+          countyQuestion.classList.remove('hidden');
+          console.log('🔍 [COUNTY QUESTION DEBUG] County question shown');
+        } else {
+          console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: County question container not found');
+        }
+      }
+    });
+  });
+}
+
+// Set up the conditional logic when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  setupBusinessTypeConditionalLogic();
+});
+
+// Also set it up immediately in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupBusinessTypeConditionalLogic);
+} else {
+  setupBusinessTypeConditionalLogic();
+}
+`;
+  
   // URL Parameter parsing and auto-population
   formHTML += '// Function to get URL parameters\n' +
 'function getUrlParameter(name) {\n' +
@@ -2186,7 +2207,6 @@ function showAlert(message) {
     
     if (timeSinceLoad < ALERT_DELAY_MS) {
         // If less than 3 seconds have passed, don't show the alert
-        console.log('Alert blocked: Page loaded less than 3 seconds ago');
         return;
     }
     
@@ -3683,6 +3703,31 @@ function updateHiddenLogic(dropdownName, selectedValue) {
     }
 }
 
+// Function to show/hide questions based on conditional logic
+function updateQuestionVisibility(questionId, shouldShow) {
+    console.log('🔍 [COUNTY QUESTION DEBUG] updateQuestionVisibility called with questionId:', questionId, 'shouldShow:', shouldShow);
+    const questionContainer = document.getElementById('question-container-' + questionId);
+    console.log('🔍 [COUNTY QUESTION DEBUG] questionContainer found:', !!questionContainer);
+    if (questionContainer) {
+        if (shouldShow) {
+            questionContainer.classList.remove('hidden');
+            console.log('🔍 [COUNTY QUESTION DEBUG] Removed hidden class from question-container-' + questionId);
+        } else {
+            questionContainer.classList.add('hidden');
+            console.log('🔍 [COUNTY QUESTION DEBUG] Added hidden class to question-container-' + questionId);
+        }
+    } else {
+        console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: question-container-' + questionId + ' not found!');
+    }
+}
+
+// Function to handle business type selection and show county question
+function handleBusinessTypeSelection() {
+    console.log('🔍 [COUNTY QUESTION DEBUG] handleBusinessTypeSelection called');
+    // Show the county question (question-container-16) when any business type is selected
+    updateQuestionVisibility(16, true);
+}
+
 // Function to handle linked fields synchronization
 function updateLinkedFields() {
     if (!linkedFields || linkedFields.length === 0) return;
@@ -3980,7 +4025,7 @@ function navigateSection(sectionNumber){
     // Reset hidden questions to default values after Firebase autosave
     // BUT NOT during initial autofill to preserve autofilled values
     if (!window.isInitialAutofill) {
-        resetHiddenQuestionsToDefaults(sectionNumber);
+    resetHiddenQuestionsToDefaults(sectionNumber);
     }
     
     updateProgressBar();
@@ -4801,7 +4846,9 @@ if (typeof handleNext === 'function') {
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
-                !['hidden', 'button', 'submit', 'reset'].includes(el.type)
+                !['button', 'submit', 'reset'].includes(el.type) &&
+                // Include hidden fields except for specific ones we don't want to send
+                (el.type !== 'hidden' || el.id === 'current_date' || el.id === 'form_zip' || el.id === 'form_county' || el.id === 'form_defendant' || el.id === 'form_ID')
             );
             return fields;
         }
@@ -4994,24 +5041,24 @@ if (typeof handleNext === 'function') {
                     });
                     
                     // After autofilling, trigger visibility updates for dependent questions
-                // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
+                    // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
-                    // Trigger change events on all autofilled elements to ensure conditional logic runs
-                    fields.forEach(el => {
-                        if (el.value || el.checked) {
-                            const event = new Event('change', { bubbles: true });
-                            el.dispatchEvent(event);
-                        }
-                    });
-                    
-                    // Also call the global visibility updates function
+                        // Trigger change events on all autofilled elements to ensure conditional logic runs
+                        fields.forEach(el => {
+                            if (el.value || el.checked) {
+                                const event = new Event('change', { bubbles: true });
+                                el.dispatchEvent(event);
+                            }
+                        });
+                        
+                        // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
-                }, 2000);
-                
-                // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
-                fields.forEach(el => {
+                    }, 2000);
+                    
+                    // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                    fields.forEach(el => {
                     if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
                         let questionId;
                         // First, try to get questionId from data attribute
@@ -5035,14 +5082,14 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         }
-                        if (typeof showTextboxLabels === 'function') {
-                            showTextboxLabels(questionId, el.value);
+                            if (typeof showTextboxLabels === 'function') {
+                                showTextboxLabels(questionId, el.value);
+                            }
+                            if (typeof updateHiddenCheckboxes === 'function') {
+                                updateHiddenCheckboxes(questionId, el.value);
+                            }
                         }
-                        if (typeof updateHiddenCheckboxes === 'function') {
-                            updateHiddenCheckboxes(questionId, el.value);
-                        }
-                    }
-                });
+                    });
                 
                 // Trigger state hidden field updates for any state dropdowns that were autofilled
                 fields.forEach(el => {
@@ -5052,37 +5099,37 @@ if (typeof handleNext === 'function') {
                         const hiddenShortId = window.toShortIdFromBase(el.id);
                         if (typeof updateStateHiddenFields === 'function') {
                             updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                            }
                         }
-                    }
-                });
-                
-                // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
-                fields.forEach(el => {
-                    if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
-                        if (typeof dropdownMirror === 'function') {
-                            dropdownMirror(el, el.id);
-                        }
+                    });
+                    
+                    // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(el, el.id);
+                            }
                         // Trigger hidden logic for autofilled dropdowns
                         if (typeof updateHiddenLogic === 'function') {
                             updateHiddenLogic(el.id, el.value);
+                            }
                         }
+                    });
+                    
+                    // Create hidden checkboxes for all autofilled dropdowns
+                    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                        createHiddenCheckboxesForAutofilledDropdowns();
                     }
-                });
-                
-                // Create hidden checkboxes for all autofilled dropdowns
-                if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
-                    createHiddenCheckboxesForAutofilledDropdowns();
-                }
                 
                 // Trigger line splitting for autofilled textareas
                 triggerLineSplittingForAutofilledTextareas();
                 
                 // Trigger paragraph limit checking for autofilled textareas
                 triggerParagraphLimitCheckForAutofilledTextareas();
-                
-                // Second autofill pass for dynamically generated textbox inputs
-                // Use a longer delay to ensure textbox inputs are fully generated
-                setTimeout(() => {
+                    
+                    // Second autofill pass for dynamically generated textbox inputs
+                    // Use a longer delay to ensure textbox inputs are fully generated
+                    setTimeout(() => {
                         const allFields = getFormFields();
                         
                         // Also try to find fields by ID directly as a fallback
@@ -5120,7 +5167,7 @@ if (typeof handleNext === 'function') {
                                     : !fieldById.value;
                                 
                                 if (needsAutofill) {
-                                    if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
                                             // For radio buttons, check if this specific radio should be selected
                                             if (fieldById.value === mappedData[fieldName]) {
@@ -5130,10 +5177,10 @@ if (typeof handleNext === 'function') {
                                             }
                                         } else {
                                             // For checkboxes, use boolean value
-                                            fieldById.checked = !!mappedData[fieldName];
+                                    fieldById.checked = !!mappedData[fieldName];
                                         }
-                                    } else {
-                                        fieldById.value = mappedData[fieldName];
+                                } else {
+                                    fieldById.value = mappedData[fieldName];
                                     }
                                 }
                             }
@@ -5249,12 +5296,12 @@ if (typeof handleNext === 'function') {
                             }
                         });
                     }, 1500);
-                
+                    
                         // Reset hidden questions to defaults after autofill and visibility updates
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                        }
+                }
                 
                 // 🔧 NEW: Clear autofill flag after autofill is complete
                 window.isInitialAutofill = false;
@@ -5999,9 +6046,9 @@ function createAddressInput(id, label, index, type = 'text') {
           </select>
         </div>
         <div style="flex-shrink: 0;">
-          <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
-            📋 Export Names/IDs
-          </button>
+        <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
+          📋 Export Names/IDs
+        </button>
         </div>
       </div>
     </div>

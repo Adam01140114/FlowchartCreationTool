@@ -16,6 +16,7 @@
         .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; text-align: center; }
         .address-field:first-child { margin-top: 0; }
         .address-field:last-child { margin-bottom: 0; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -89,7 +90,6 @@
 <div id="pdfPreview" style="display:none;">
     <iframe id="pdfFrame" style="display:none"></iframe>
 </div>
-<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
 
 <!-- Firebase includes -->
 <script src="https://js.stripe.com/v3/"></script>
@@ -125,7 +125,6 @@ if (typeof firebase !== "undefined" && firebase.apps.length > 0) {
     });
 } else {
     // Fallback for when Firebase is not available
-    console.log("Firebase not available, using fallback authentication");
 }
 
 // Function to update button display based on auth state
@@ -231,8 +230,27 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_zip" name="form_zip" value="">
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
-        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="form_ID" name="form_ID" value="">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
+                      onchange="dropdownMirror(this, 'thirsty'); updateHiddenLogic('thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_thirsty"></div>
+              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2" class="question-container"><label><h3>Hungry?</h3></label><div><center><div id="checkmark" class="checkbox-group-2">
+      <span class="checkbox-inline" id="checkbox-container-sc100_hungry_yes">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100_hungry_yes" name="sc100_hungry_yes" value="Yes" 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          Yes
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100_hungry_no">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100_hungry_no" name="sc100_hungry_no" value="No" 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          No
+        </label>
+      </span></div><br></div></div><div id="question-container-3" class="question-container hidden"><label><h3>Name</h3></label><div class="text-input-container"><input type="text" id="sc100_name" name="sc100_name" placeholder=""></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -400,10 +418,10 @@ window.formId = '';
     const hiddenFullId = id + '_hidden';
 
     // Hidden short-state input id:
-    // transform "how_many_state_1" -> "how_many_state_short_1" (note the \d)
+    // transform "how_many_state_1" -> "how_many_state_short_1" (note the d)
     let shortId;
-    if (id.includes('_') && /\\d+$/.test(id)) {
-      const match = id.match(/^(.+)_(\\d+)$/);
+    if (id.includes('_') && /\d+$/.test(id)) {
+      const match = id.match(/^(.+)_(\d+)$/);
       if (match) {
         const basePart = match[1];
         const number = match[2];
@@ -430,7 +448,7 @@ window.formId = '';
 
   // Derive "..._short_N" from a base id like "how_many_state_N"
   window.toShortIdFromBase = function(baseId){
-    const m = baseId.match(/^(.+)_(\\d+)$/);
+    const m = baseId.match(/^(.+)_(\d+)$/);
     return m ? m[1] + '_short_' + m[2] : baseId + '_short';
   };
 
@@ -484,23 +502,64 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"how_many"};
-var questionNameIds = {"1":"how_many"};
+    var questionSlugMap       = {"1":"thirsty","2":"hungry","3":"name"};
+var questionNameIds = {"1":"thirsty","2":"hungry","3":"sc100_name"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc100.pdf","pdfDisplayName":"sc100","stripePriceId":"1234","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Street","City","State"],"length":0};
-var amountMap = {"1":["Zip"],"length":0};
-var labelNodeIdsMap = {"1":["how_many_street","how_many_city","how_many_state"]};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Street","nodeId":"how_many_street","order":1},{"type":"label","label":"City","nodeId":"how_many_city","order":2},{"type":"label","label":"State","nodeId":"how_many_state","order":3},{"type":"amount","label":"Zip","nodeId":"how_many_zip","order":4}]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
+var unifiedFieldsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
 var isHandlingLink = false;
+
+// Dynamic conditional logic for business type question to show county question
+function setupBusinessTypeConditionalLogic() {
+  console.log('🔍 [COUNTY QUESTION DEBUG] Setting up business type conditional logic');
+  
+  // Use dynamic approach - find question 11's name from questionNameIds
+  const businessTypeQuestionName = questionNameIds['11'] || 'what_are_you_doing_business_as';
+  console.log('🔍 [COUNTY QUESTION DEBUG] Business type question name:', businessTypeQuestionName);
+  
+  // Find all radio buttons for the business type question
+  const businessTypeRadios = document.querySelectorAll('input[name="' + businessTypeQuestionName + '"]');
+  console.log('🔍 [COUNTY QUESTION DEBUG] Found', businessTypeRadios.length, 'business type radio buttons');
+  
+  businessTypeRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.checked) {
+        console.log('🔍 [COUNTY QUESTION DEBUG] Business type selected:', this.value);
+        // Show county question (question-container-16) when any business type is selected
+        const countyQuestion = document.getElementById('question-container-16');
+        if (countyQuestion) {
+          countyQuestion.classList.remove('hidden');
+          console.log('🔍 [COUNTY QUESTION DEBUG] County question shown');
+        } else {
+          console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: County question container not found');
+        }
+      }
+    });
+  });
+}
+
+// Set up the conditional logic when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  setupBusinessTypeConditionalLogic();
+});
+
+// Also set it up immediately in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupBusinessTypeConditionalLogic);
+} else {
+  setupBusinessTypeConditionalLogic();
+}
 // Function to get URL parameters
 function getUrlParameter(name) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -588,6 +647,55 @@ var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="no";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="yes";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
 
 // Alert Logic Functions
 // Track page load time to prevent alerts in first 3 seconds
@@ -601,7 +709,6 @@ function showAlert(message) {
     
     if (timeSinceLoad < ALERT_DELAY_MS) {
         // If less than 3 seconds have passed, don't show the alert
-        console.log('Alert blocked: Page loaded less than 3 seconds ago');
         return;
     }
     
@@ -1907,6 +2014,31 @@ function updateHiddenLogic(dropdownName, selectedValue) {
     }
 }
 
+// Function to show/hide questions based on conditional logic
+function updateQuestionVisibility(questionId, shouldShow) {
+    console.log('🔍 [COUNTY QUESTION DEBUG] updateQuestionVisibility called with questionId:', questionId, 'shouldShow:', shouldShow);
+    const questionContainer = document.getElementById('question-container-' + questionId);
+    console.log('🔍 [COUNTY QUESTION DEBUG] questionContainer found:', !!questionContainer);
+    if (questionContainer) {
+        if (shouldShow) {
+            questionContainer.classList.remove('hidden');
+            console.log('🔍 [COUNTY QUESTION DEBUG] Removed hidden class from question-container-' + questionId);
+        } else {
+            questionContainer.classList.add('hidden');
+            console.log('🔍 [COUNTY QUESTION DEBUG] Added hidden class to question-container-' + questionId);
+        }
+    } else {
+        console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: question-container-' + questionId + ' not found!');
+    }
+}
+
+// Function to handle business type selection and show county question
+function handleBusinessTypeSelection() {
+    console.log('🔍 [COUNTY QUESTION DEBUG] handleBusinessTypeSelection called');
+    // Show the county question (question-container-16) when any business type is selected
+    updateQuestionVisibility(16, true);
+}
+
 // Function to handle linked fields synchronization
 function updateLinkedFields() {
     if (!linkedFields || linkedFields.length === 0) return;
@@ -2204,7 +2336,7 @@ function navigateSection(sectionNumber){
     // Reset hidden questions to default values after Firebase autosave
     // BUT NOT during initial autofill to preserve autofilled values
     if (!window.isInitialAutofill) {
-        resetHiddenQuestionsToDefaults(sectionNumber);
+    resetHiddenQuestionsToDefaults(sectionNumber);
     }
     
     updateProgressBar();
@@ -3025,7 +3157,9 @@ if (typeof handleNext === 'function') {
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
-                !['hidden', 'button', 'submit', 'reset'].includes(el.type)
+                !['button', 'submit', 'reset'].includes(el.type) &&
+                // Include hidden fields except for specific ones we don't want to send
+                (el.type !== 'hidden' || el.id === 'current_date' || el.id === 'form_zip' || el.id === 'form_county' || el.id === 'form_defendant' || el.id === 'form_ID')
             );
             return fields;
         }
@@ -3218,24 +3352,24 @@ if (typeof handleNext === 'function') {
                     });
                     
                     // After autofilling, trigger visibility updates for dependent questions
-                // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
+                    // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
-                    // Trigger change events on all autofilled elements to ensure conditional logic runs
-                    fields.forEach(el => {
-                        if (el.value || el.checked) {
-                            const event = new Event('change', { bubbles: true });
-                            el.dispatchEvent(event);
-                        }
-                    });
-                    
-                    // Also call the global visibility updates function
+                        // Trigger change events on all autofilled elements to ensure conditional logic runs
+                        fields.forEach(el => {
+                            if (el.value || el.checked) {
+                                const event = new Event('change', { bubbles: true });
+                                el.dispatchEvent(event);
+                            }
+                        });
+                        
+                        // Also call the global visibility updates function
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
-                }, 2000);
-                
-                // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
-                fields.forEach(el => {
+                    }, 2000);
+                    
+                    // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                    fields.forEach(el => {
                     if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
                         let questionId;
                         // First, try to get questionId from data attribute
@@ -3259,14 +3393,14 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         }
-                        if (typeof showTextboxLabels === 'function') {
-                            showTextboxLabels(questionId, el.value);
+                            if (typeof showTextboxLabels === 'function') {
+                                showTextboxLabels(questionId, el.value);
+                            }
+                            if (typeof updateHiddenCheckboxes === 'function') {
+                                updateHiddenCheckboxes(questionId, el.value);
+                            }
                         }
-                        if (typeof updateHiddenCheckboxes === 'function') {
-                            updateHiddenCheckboxes(questionId, el.value);
-                        }
-                    }
-                });
+                    });
                 
                 // Trigger state hidden field updates for any state dropdowns that were autofilled
                 fields.forEach(el => {
@@ -3276,37 +3410,37 @@ if (typeof handleNext === 'function') {
                         const hiddenShortId = window.toShortIdFromBase(el.id);
                         if (typeof updateStateHiddenFields === 'function') {
                             updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                            }
                         }
-                    }
-                });
-                
-                // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
-                fields.forEach(el => {
-                    if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
-                        if (typeof dropdownMirror === 'function') {
-                            dropdownMirror(el, el.id);
-                        }
+                    });
+                    
+                    // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(el, el.id);
+                            }
                         // Trigger hidden logic for autofilled dropdowns
                         if (typeof updateHiddenLogic === 'function') {
                             updateHiddenLogic(el.id, el.value);
+                            }
                         }
+                    });
+                    
+                    // Create hidden checkboxes for all autofilled dropdowns
+                    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                        createHiddenCheckboxesForAutofilledDropdowns();
                     }
-                });
-                
-                // Create hidden checkboxes for all autofilled dropdowns
-                if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
-                    createHiddenCheckboxesForAutofilledDropdowns();
-                }
                 
                 // Trigger line splitting for autofilled textareas
                 triggerLineSplittingForAutofilledTextareas();
                 
                 // Trigger paragraph limit checking for autofilled textareas
                 triggerParagraphLimitCheckForAutofilledTextareas();
-                
-                // Second autofill pass for dynamically generated textbox inputs
-                // Use a longer delay to ensure textbox inputs are fully generated
-                setTimeout(() => {
+                    
+                    // Second autofill pass for dynamically generated textbox inputs
+                    // Use a longer delay to ensure textbox inputs are fully generated
+                    setTimeout(() => {
                         const allFields = getFormFields();
                         
                         // Also try to find fields by ID directly as a fallback
@@ -3344,7 +3478,7 @@ if (typeof handleNext === 'function') {
                                     : !fieldById.value;
                                 
                                 if (needsAutofill) {
-                                    if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
                                             // For radio buttons, check if this specific radio should be selected
                                             if (fieldById.value === mappedData[fieldName]) {
@@ -3354,10 +3488,10 @@ if (typeof handleNext === 'function') {
                                             }
                                         } else {
                                             // For checkboxes, use boolean value
-                                            fieldById.checked = !!mappedData[fieldName];
+                                    fieldById.checked = !!mappedData[fieldName];
                                         }
-                                    } else {
-                                        fieldById.value = mappedData[fieldName];
+                                } else {
+                                    fieldById.value = mappedData[fieldName];
                                     }
                                 }
                             }
@@ -3473,12 +3607,12 @@ if (typeof handleNext === 'function') {
                             }
                         });
                     }, 1500);
-                
+                    
                         // Reset hidden questions to defaults after autofill and visibility updates
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                        }
+                }
                 
                 // 🔧 NEW: Clear autofill flag after autofill is complete
                 window.isInitialAutofill = false;
@@ -4223,9 +4357,9 @@ function createAddressInput(id, label, index, type = 'text') {
           </select>
         </div>
         <div style="flex-shrink: 0;">
-          <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
-            📋 Export Names/IDs
-          </button>
+        <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
+          📋 Export Names/IDs
+        </button>
         </div>
       </div>
     </div>
