@@ -231,26 +231,21 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
-                      onchange="dropdownMirror(this, 'thirsty'); updateHiddenLogic('thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_thirsty"></div>
-              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2" class="question-container"><label><h3>Hungry?</h3></label><div><center><div id="checkmark" class="checkbox-group-2">
-      <span class="checkbox-inline" id="checkbox-container-sc100_hungry_yes">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+      <span class="checkbox-inline" id="checkbox-container-hungry_yes">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc100_hungry_yes" name="sc100_hungry_yes" value="Yes" 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          <input type="radio" id="hungry_yes" name="hungry" value="Yes" 
+                 onchange="handleMarkOnlyOneSelection(this, 1);  updateCheckboxStyle(this);">
           Yes
         </label>
       </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100_hungry_no">
+      <span class="checkbox-inline" id="checkbox-container-hungry_no">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc100_hungry_no" name="sc100_hungry_no" value="No" 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          <input type="radio" id="hungry_no" name="hungry" value="No" 
+                 onchange="handleMarkOnlyOneSelection(this, 1);  updateCheckboxStyle(this);">
           No
         </label>
-      </span></div><br></div></div><div id="question-container-3" class="question-container hidden"><label><h3>Name</h3></label><div class="text-input-container"><input type="text" id="sc100_name" name="sc100_name" placeholder=""></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -502,11 +497,11 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"thirsty","2":"hungry","3":"name"};
-var questionNameIds = {"1":"thirsty","2":"hungry","3":"sc100_name"};
+    var questionSlugMap       = {"1":"hungry"};
+var questionNameIds = {"1":"hungry"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc100.pdf","pdfDisplayName":"sc100","stripePriceId":"1234","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
+var pdfLogicPDFs = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
@@ -647,55 +642,80 @@ var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="no";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="yes";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
+/*──────────────────────────────────────────────────────────────*
+ * Handle "Mark only one" selection functionality
+ *──────────────────────────────────────────────────────────────*/
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    if (!selectedInput.checked) return;
+    
+    // Find all radio buttons in this question group
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            // Update styling for unchecked inputs
+            updateCheckboxStyle(input);
+            // Remove hidden checkbox for unchecked inputs
+            removeHiddenCheckbox(input.id);
+        }
+    });
+    
+    // Update styling for the selected input
+    updateCheckboxStyle(selectedInput);
+    
+    // Create hidden checkbox for the selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Create hidden checkbox for radio button selection
+ *──────────────────────────────────────────────────────────────*/
+function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+        // Create the hidden fields container if it doesn't exist
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        
+        // Find the form and append the hidden container
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId + '_hidden';
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId + '_hidden', 'for radio:', radioId);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Remove hidden checkbox for radio button
+ *──────────────────────────────────────────────────────────────*/
+function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId + '_hidden');
+    if (hiddenCheckbox) {
+        hiddenCheckbox.remove();
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId + '_hidden');
+    }
+}
 
 // Alert Logic Functions
 // Track page load time to prevent alerts in first 3 seconds
@@ -1241,11 +1261,62 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
             input.checked = false;
             // Update styling for unchecked inputs
             updateCheckboxStyle(input);
+            // Remove hidden checkbox for unchecked inputs
+            removeHiddenCheckbox(input.id);
         }
     });
     
     // Update styling for the selected input
     updateCheckboxStyle(selectedInput);
+    
+    // Create hidden checkbox for the selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Create hidden checkbox for radio button selection
+ *──────────────────────────────────────────────────────────────*/
+function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+        // Create the hidden fields container if it doesn't exist
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        
+        // Find the form and append the hidden container
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId + '_hidden';
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId + '_hidden', 'for radio:', radioId);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Remove hidden checkbox for radio button
+ *──────────────────────────────────────────────────────────────*/
+function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId + '_hidden');
+    if (hiddenCheckbox) {
+        hiddenCheckbox.remove();
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId + '_hidden');
+    }
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -4323,7 +4394,6 @@ function createAddressInput(id, label, index, type = 'text') {
            '</div>';
 }
 
-
 </script>
 
 <!-- Debug Menu -->
@@ -4769,7 +4839,13 @@ function populateDebugContent() {
       if (!text || !searchWords.length) return false;
       
       const normalizedText = text.toLowerCase().replace(/[_s]/g, ' ');
-      return searchWords.every(word => normalizedText.includes(word.toLowerCase()));
+      const originalText = text.toLowerCase();
+      
+      return searchWords.every(word => {
+        const normalizedWord = word.toLowerCase().replace(/[_s]/g, ' ');
+        // Check both normalized text (spaces) and original text (underscores)
+        return normalizedText.includes(normalizedWord) || originalText.includes(word.toLowerCase());
+      });
     }
     
     // Split search term into individual words for partial matching

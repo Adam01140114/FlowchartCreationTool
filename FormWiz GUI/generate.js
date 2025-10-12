@@ -2192,6 +2192,83 @@ formHTML += `var allPdfFileNames = ["${escapedPdfOutputName.replace(/\.pdf$/i, '
 
   // 3) Append the logicScriptBuffer
   formHTML += logicScriptBuffer + "\n";
+  
+  // 4) Add the hidden checkbox functions for radio buttons
+  formHTML += `
+/*──────────────────────────────────────────────────────────────*
+ * Handle "Mark only one" selection functionality
+ *──────────────────────────────────────────────────────────────*/
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    if (!selectedInput.checked) return;
+    
+    // Find all radio buttons in this question group
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            // Update styling for unchecked inputs
+            updateCheckboxStyle(input);
+            // Remove hidden checkbox for unchecked inputs
+            removeHiddenCheckbox(input.id);
+        }
+    });
+    
+    // Update styling for the selected input
+    updateCheckboxStyle(selectedInput);
+    
+    // Create hidden checkbox for the selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Create hidden checkbox for radio button selection
+ *──────────────────────────────────────────────────────────────*/
+function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+        // Create the hidden fields container if it doesn't exist
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        
+        // Find the form and append the hidden container
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId;
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Remove hidden checkbox for radio button
+ *──────────────────────────────────────────────────────────────*/
+function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+        hiddenCheckbox.remove();
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+    }
+}
+`;
 
   // Add alert functions (always available for validation popups)
   formHTML += `
@@ -2930,11 +3007,62 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
             input.checked = false;
             // Update styling for unchecked inputs
             updateCheckboxStyle(input);
+            // Remove hidden checkbox for unchecked inputs
+            removeHiddenCheckbox(input.id);
         }
     });
     
     // Update styling for the selected input
     updateCheckboxStyle(selectedInput);
+    
+    // Create hidden checkbox for the selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Create hidden checkbox for radio button selection
+ *──────────────────────────────────────────────────────────────*/
+function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+        // Create the hidden fields container if it doesn't exist
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        
+        // Find the form and append the hidden container
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId;
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Remove hidden checkbox for radio button
+ *──────────────────────────────────────────────────────────────*/
+function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+        hiddenCheckbox.remove();
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+    }
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -6012,7 +6140,6 @@ function createAddressInput(id, label, index, type = 'text') {
            '</div>';
 }
 
-
 </script>
 
 <!-- Debug Menu -->
@@ -6458,7 +6585,13 @@ function populateDebugContent() {
       if (!text || !searchWords.length) return false;
       
       const normalizedText = text.toLowerCase().replace(/[_\s]/g, ' ');
-      return searchWords.every(word => normalizedText.includes(word.toLowerCase()));
+      const originalText = text.toLowerCase();
+      
+      return searchWords.every(word => {
+        const normalizedWord = word.toLowerCase().replace(/[_\s]/g, ' ');
+        // Check both normalized text (spaces) and original text (underscores)
+        return normalizedText.includes(normalizedWord) || originalText.includes(word.toLowerCase());
+      });
     }
     
     // Split search term into individual words for partial matching
