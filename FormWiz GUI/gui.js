@@ -1126,10 +1126,14 @@ function toggleOptions(questionId) {
         pdfBlock.style.display = 'none';
     }
 
-    // Handle hidden logic visibility - show only for dropdown questions
+    // Handle hidden logic visibility - show for dropdown and numbered dropdown questions
     const hiddenLogicBlock = document.getElementById(`hiddenLogic${questionId}`);
-    if (questionType === 'dropdown') {
+    if (questionType === 'dropdown' || questionType === 'numberedDropdown') {
         hiddenLogicBlock.style.display = 'block';
+        // Update hidden logic trigger options for numbered dropdown
+        if (questionType === 'numberedDropdown') {
+            updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
+        }
     } else {
         hiddenLogicBlock.style.display = 'none';
     }
@@ -1613,14 +1617,20 @@ function toggleConditionalPDFLogic(questionId) {
 
 // Hidden logic toggling
 function toggleHiddenLogic(questionId) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] toggleHiddenLogic called for question:', questionId);
     const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`).checked;
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden logic enabled:', hiddenLogicEnabled);
+    
     const hiddenLogicBlock = document.getElementById(`hiddenLogicBlock${questionId}`);
     hiddenLogicBlock.style.display = hiddenLogicEnabled ? 'block' : 'none';
     
     // Create first configuration when enabling
     if (hiddenLogicEnabled) {
         const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Configs container found:', !!configsContainer, 'Children count:', configsContainer ? configsContainer.children.length : 0);
+        
         if (configsContainer && configsContainer.children.length === 0) {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Adding first hidden logic config for question:', questionId);
             addHiddenLogicConfig(questionId);
         }
     }
@@ -1682,14 +1692,68 @@ function updateHiddenLogicTriggerOptions(questionId) {
     });
 }
 
+// Update hidden logic trigger options for numbered dropdown questions
+function updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogicTriggerOptionsForNumberedDropdown called for question:', questionId);
+    
+    // Update all trigger selects for this question
+    const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Found trigger selects:', triggerSelects.length);
+    
+    triggerSelects.forEach((triggerSelect, index) => {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing trigger select', index, ':', triggerSelect.id);
+        
+        // Save current value
+        const currentValue = triggerSelect.value;
+        
+        // Clear existing options except the first one
+        triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
+        
+        // Get the number range from the numbered dropdown
+        const startInput = document.getElementById(`numberRangeStart${questionId}`);
+        const endInput = document.getElementById(`numberRangeEnd${questionId}`);
+        
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Start input found:', !!startInput, 'End input found:', !!endInput);
+        
+        if (startInput && endInput) {
+            const start = parseInt(startInput.value) || 1;
+            const end = parseInt(endInput.value) || 1;
+            
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Range:', start, 'to', end);
+            
+            // Add options for each number in the range
+            for (let i = start; i <= end; i++) {
+                const opt = document.createElement('option');
+                opt.value = i.toString();
+                opt.textContent = i.toString();
+                triggerSelect.appendChild(opt);
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Added option:', i);
+            }
+            
+            // Restore the current value if it's still valid
+            if (currentValue && parseInt(currentValue) >= start && parseInt(currentValue) <= end) {
+                triggerSelect.value = currentValue;
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Restored value:', currentValue);
+            }
+        } else {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Start or end input not found for question:', questionId);
+        }
+    });
+}
+
 // Add a new hidden logic configuration
 function addHiddenLogicConfig(questionId) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] addHiddenLogicConfig called for question:', questionId);
     const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
-    if (!configsContainer) return;
+    if (!configsContainer) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Configs container not found for question:', questionId);
+        return;
+    }
     
     // Get the next config index
     const existingConfigs = configsContainer.querySelectorAll('.hidden-logic-config');
     const configIndex = existingConfigs.length;
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Creating config with index:', configIndex);
     
     // Create the configuration HTML
     const configHtml = `
@@ -1723,7 +1787,16 @@ function addHiddenLogicConfig(questionId) {
     configsContainer.insertAdjacentHTML('beforeend', configHtml);
     
     // Populate trigger options for the new configuration
-    updateHiddenLogicTriggerOptions(questionId);
+    const questionType = document.getElementById(`questionType${questionId}`).value;
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Question type for trigger options:', questionType);
+    
+    if (questionType === 'numberedDropdown') {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptionsForNumberedDropdown');
+        updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
+    } else {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptions');
+        updateHiddenLogicTriggerOptions(questionId);
+    }
 }
 
 // Remove a hidden logic configuration
@@ -2599,6 +2672,12 @@ function updateNumberedDropdownEvents(questionId) {
         const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
         if (pdfLogicEnabled) {
             updatePdfLogicTriggerOptions(questionId);
+        }
+        
+        // 5. Update hidden logic trigger options if hidden logic is enabled
+        const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`)?.checked;
+        if (hiddenLogicEnabled) {
+            updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
         }
     }
 }

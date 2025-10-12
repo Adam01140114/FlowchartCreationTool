@@ -968,7 +968,10 @@ window.exportGuiJson = function(download = true) {
     // --- END PATCH ---
     
     // --- PATCH: Add PDF Logic detection ---
-    // Check if this question is connected to a PDF node (directly or through options)
+    // Check if this question is connected to PDF nodes (directly or through options)
+    const pdfs = [];
+    const pdfConditions = [];
+    
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
@@ -976,27 +979,29 @@ window.exportGuiJson = function(download = true) {
         // Check for direct connection to PDF node
         if (targetCell && isPdfNode(targetCell)) {
           // This question is directly connected to a PDF node
-          question.pdfLogic.enabled = true;
-          question.pdfLogic.pdfName = targetCell._pdfFile || targetCell._pdfUrl || "";
-          question.pdfLogic.pdfDisplayName = targetCell._pdfName || "";
-          question.pdfLogic.stripePriceId = targetCell._pdfPrice || targetCell._priceId || "";
+          const pdfEntry = {
+            pdfName: targetCell._pdfFile || targetCell._pdfUrl || "",
+            pdfDisplayName: targetCell._pdfName || "",
+            stripePriceId: targetCell._pdfPrice || targetCell._priceId || "",
+            triggerOption: "direct" // For direct connections
+          };
+          pdfs.push(pdfEntry);
           
           // If this is a Big Paragraph question and the PDF node has a character limit
           if (questionType === "bigParagraph" && targetCell._characterLimit) {
-            question.pdfLogic.conditions = [{
+            pdfConditions.push({
               characterLimit: parseInt(targetCell._characterLimit) || 0
-            }];
+            });
           } else {
             // For regular questions, use the same logic conditions as the question logic
             if (directParentCondition) {
               if (Array.isArray(directParentCondition)) {
-                question.pdfLogic.conditions = directParentCondition;
+                pdfConditions.push(...directParentCondition);
               } else {
-                question.pdfLogic.conditions = [directParentCondition];
+                pdfConditions.push(directParentCondition);
               }
             }
           }
-          break; // Only process the first PDF connection
         }
         
         // Check for connection through options
@@ -1008,10 +1013,12 @@ window.exportGuiJson = function(download = true) {
               const pdfCell = optionEdge.target;
               if (pdfCell && isPdfNode(pdfCell)) {
                 // This question's option leads to a PDF node
-                question.pdfLogic.enabled = true;
-                question.pdfLogic.pdfName = pdfCell._pdfFile || pdfCell._pdfUrl || "";
-                question.pdfLogic.pdfDisplayName = pdfCell._pdfName || "";
-                question.pdfLogic.stripePriceId = pdfCell._pdfPrice || pdfCell._priceId || "";
+                const pdfEntry = {
+                  pdfName: pdfCell._pdfFile || pdfCell._pdfUrl || "",
+                  pdfDisplayName: pdfCell._pdfName || "",
+                  stripePriceId: pdfCell._pdfPrice || pdfCell._priceId || "",
+                  triggerOption: "" // Will be set below
+                };
                 
                 // Extract the option text
                 let optionText = targetCell.value || "";
@@ -1023,17 +1030,26 @@ window.exportGuiJson = function(download = true) {
                   optionText = optionText.trim();
                 }
                 
-                // Set the conditions based on the option
-                question.pdfLogic.conditions = [{
+                pdfEntry.triggerOption = optionText;
+                pdfs.push(pdfEntry);
+                
+                // Add condition for this option
+                pdfConditions.push({
                   prevQuestion: String(cell._questionId || ""),
                   prevAnswer: optionText
-                }];
-                break; // Only process the first PDF connection
+                });
               }
             }
           }
         }
       }
+    }
+    
+    // Set up the PDF logic structure
+    if (pdfs.length > 0) {
+      question.pdfLogic.enabled = true;
+      question.pdfLogic.conditions = pdfConditions;
+      question.pdfLogic.pdfs = pdfs;
     }
     // --- END PDF Logic PATCH ---
     

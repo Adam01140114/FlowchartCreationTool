@@ -316,15 +316,22 @@ function setupGraphEventListeners(graph) {
     };
 
     movedCells.forEach(cell => {
-      // Check if it's a dropdown or checkbox question node
+      // Check if it's a dropdown, checkbox, multiple dropdown, or multiple textbox question node
       const isDropdownQuestion = cell.style && cell.style.includes('questionType=dropdown') && cell.style.includes('nodeType=question');
       const isCheckboxQuestion = cell.style && cell.style.includes('questionType=checkbox') && cell.style.includes('nodeType=question');
+      const isMultipleDropdownQuestion = cell.style && cell.style.includes('questionType=multipleDropdown') && cell.style.includes('nodeType=question');
+      const isMultipleTextboxQuestion = cell.style && cell.style.includes('questionType=multipleTextboxes') && cell.style.includes('nodeType=question');
       
-      if (isDropdownQuestion || isCheckboxQuestion) {
-        const questionType = isDropdownQuestion ? 'dropdown' : 'checkbox';
+      if (isDropdownQuestion || isCheckboxQuestion || isMultipleDropdownQuestion || isMultipleTextboxQuestion) {
+        let questionType = 'unknown';
+        if (isDropdownQuestion) questionType = 'dropdown';
+        else if (isCheckboxQuestion) questionType = 'checkbox';
+        else if (isMultipleDropdownQuestion) questionType = 'multipleDropdown';
+        else if (isMultipleTextboxQuestion) questionType = 'multipleTextboxes';
+        
         console.log('🎯 [HIERARCHICAL DRAG]', questionType, 'question node detected');
         
-        // When dragging a dropdown or checkbox question node, move all connected descendants
+        // When dragging a question node, move all connected descendants
         const descendants = getConnectedDescendants(cell);
         console.log('🎯 [HIERARCHICAL DRAG] Moving', descendants.length, 'connected descendants');
         

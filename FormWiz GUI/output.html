@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">SC-100</h1><div id="question-container-1" class="question-container"><label><h3>How many people are suing with you?</h3></label><select id="sc100_how_many_people_are_suing_with_you" name="sc100_how_many_people_are_suing_with_you" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">SC-100</h1><div id="question-container-1" class="question-container"><label><h3>How many people are suing with you?</h3></label><select id="how_many_people_are_suing_with_you" name="how_many_people_are_suing_with_you" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_suing_with_you', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
@@ -358,7 +358,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'sc100';
+window.formId = '';
 
 (function injectAddressHelpersOnce() {
   if (window.__addressHelpersInjected) return;
@@ -485,46 +485,40 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
     var questionSlugMap       = {"1":"how_many_people_are_suing_with_you"};
-var questionNameIds = {"1":"sc100_how_many_people_are_suing_with_you"};
+var questionNameIds = {"1":"how_many_people_are_suing_with_you"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc120.pdf","pdfDisplayName":"sc120","stripePriceId":"1234","triggerOption":"1","conditions":[],"isBigParagraph":false},{"questionId":"1","pdfName":"sc103.pdf","pdfDisplayName":"sc103","stripePriceId":"1234","triggerOption":"1","conditions":[],"isBigParagraph":false}];
+var pdfLogicPDFs = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
 var labelMap = {"1":["Name"],"length":0};
 var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["sc100_how_many_people_are_suing_with_you_name"]};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"sc100_how_many_people_are_suing_with_you_name","order":1}]};
+var labelNodeIdsMap = {"1":["how_many_people_are_suing_with_you_name"]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_suing_with_you_name","order":1}]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [];
+var hiddenLogicConfigs = [{"questionNameId":"how_many_people_are_suing_with_you","trigger":"1","type":"checkbox","nodeId":"test","textboxText":""}];
 var linkedFields = [];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
 function setupBusinessTypeConditionalLogic() {
-  console.log('🔍 [COUNTY QUESTION DEBUG] Setting up business type conditional logic');
   
   // Use dynamic approach - find question 11's name from questionNameIds
   const businessTypeQuestionName = questionNameIds['11'] || 'what_are_you_doing_business_as';
-  console.log('🔍 [COUNTY QUESTION DEBUG] Business type question name:', businessTypeQuestionName);
   
   // Find all radio buttons for the business type question
   const businessTypeRadios = document.querySelectorAll('input[name="' + businessTypeQuestionName + '"]');
-  console.log('🔍 [COUNTY QUESTION DEBUG] Found', businessTypeRadios.length, 'business type radio buttons');
   
   businessTypeRadios.forEach(radio => {
     radio.addEventListener('change', function() {
       if (this.checked) {
-        console.log('🔍 [COUNTY QUESTION DEBUG] Business type selected:', this.value);
         // Show county question (question-container-16) when any business type is selected
         const countyQuestion = document.getElementById('question-container-16');
         if (countyQuestion) {
           countyQuestion.classList.remove('hidden');
-          console.log('🔍 [COUNTY QUESTION DEBUG] County question shown');
         } else {
-          console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: County question container not found');
         }
       }
     });
@@ -620,9 +614,9 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "sc100.pdf";
-var pdfOutputFileName = "sc100.pdf";
-var stripePriceId = "123";
+var pdfFileName = "";
+var pdfOutputFileName = "";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
@@ -2141,16 +2135,24 @@ function dropdownMirror(selectEl, baseName){
 
 // Function to handle hidden logic for dropdowns
 function updateHiddenLogic(dropdownName, selectedValue) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogic called with dropdownName:', dropdownName, 'selectedValue:', selectedValue);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] hiddenLogicConfigs:', hiddenLogicConfigs);
+    
     // Find the hidden logic configuration for this dropdown
     const config = hiddenLogicConfigs.find(c => c.questionNameId === dropdownName);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Found config:', config);
+    
     if (!config || config.trigger !== selectedValue) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config or trigger mismatch. Config exists:', !!config, 'Trigger match:', config ? config.trigger === selectedValue : false);
         return;
     }
     
     // Check if the hidden element already exists
     let hiddenElement = document.getElementById(config.nodeId);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists:', !!hiddenElement);
     
     if (!hiddenElement) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', config.type, 'with nodeId:', config.nodeId);
         // Create the hidden element based on type
         if (config.type === 'checkbox') {
             hiddenElement = document.createElement('input');
@@ -2159,6 +2161,7 @@ function updateHiddenLogic(dropdownName, selectedValue) {
             hiddenElement.name = config.nodeId;
             hiddenElement.checked = true;
             hiddenElement.style.display = 'none';
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
         } else if (config.type === 'textbox') {
             hiddenElement = document.createElement('input');
             hiddenElement.type = 'text';
@@ -2166,16 +2169,20 @@ function updateHiddenLogic(dropdownName, selectedValue) {
             hiddenElement.name = config.nodeId;
             hiddenElement.value = config.textboxText || '';
             hiddenElement.style.display = 'none';
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
         }
         
         // Add the hidden element to the form
         const form = document.getElementById('customForm');
         if (form) {
             form.appendChild(hiddenElement);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
         } else {
             document.body.appendChild(hiddenElement);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
         }
     } else {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element');
         // Update existing element
         if (config.type === 'checkbox') {
             hiddenElement.checked = true;
@@ -2187,25 +2194,19 @@ function updateHiddenLogic(dropdownName, selectedValue) {
 
 // Function to show/hide questions based on conditional logic
 function updateQuestionVisibility(questionId, shouldShow) {
-    console.log('🔍 [COUNTY QUESTION DEBUG] updateQuestionVisibility called with questionId:', questionId, 'shouldShow:', shouldShow);
     const questionContainer = document.getElementById('question-container-' + questionId);
-    console.log('🔍 [COUNTY QUESTION DEBUG] questionContainer found:', !!questionContainer);
     if (questionContainer) {
         if (shouldShow) {
             questionContainer.classList.remove('hidden');
-            console.log('🔍 [COUNTY QUESTION DEBUG] Removed hidden class from question-container-' + questionId);
         } else {
             questionContainer.classList.add('hidden');
-            console.log('🔍 [COUNTY QUESTION DEBUG] Added hidden class to question-container-' + questionId);
         }
     } else {
-        console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: question-container-' + questionId + ' not found!');
     }
 }
 
 // Function to handle business type selection and show county question
 function handleBusinessTypeSelection() {
-    console.log('🔍 [COUNTY QUESTION DEBUG] handleBusinessTypeSelection called');
     // Show the county question (question-container-16) when any business type is selected
     updateQuestionVisibility(16, true);
 }
@@ -3708,7 +3709,6 @@ if (typeof handleNext === 'function') {
                         // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled in second pass
                         allFields.forEach(el => {
                             if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
-                                console.log('🔧 [AUTOFILL DEBUG] Second pass - Found numbered dropdown:', el.id, 'value:', el.value);
                                 let questionId;
                                 // First, try to get questionId from data attribute
                                 if (el.dataset && el.dataset.questionId) {
@@ -3735,22 +3735,15 @@ if (typeof handleNext === 'function') {
                                     showTextboxLabels(questionId, el.value);
                                     
                                     // After creating numbered fields, autofill them with Firebase data
-                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - About to set setTimeout for dropdown:', el.id, 'value:', el.value);
-                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - mappedData available:', !!mappedData);
                                     setTimeout(() => {
-                                        console.log('🔧 [AUTOFILL DEBUG] Second pass setTimeout callback triggered for dropdown:', el.id, 'value:', el.value);
                                         const count = parseInt(el.value);
-                                        console.log('🔧 [AUTOFILL DEBUG] Second pass parsed count:', count);
                                         if (count > 0) {
                                             // Get the base field name from the dropdown
                                             const baseFieldName = el.id;
                                             
-                                            // Debug: Log all available keys in mappedData
-                                            console.log('🔧 [AUTOFILL DEBUG] Second pass - All mappedData keys:', Object.keys(mappedData));
                                             
                                             // Try to autofill numbered fields for each count
                                             for (let i = 1; i <= count; i++) {
-                                                console.log('🔧 [AUTOFILL DEBUG] Second pass - Processing count i:', i);
                                                 // Common field patterns to check - using the actual Firebase naming pattern
                                                 const fieldPatterns = [
                                                     'name', 
@@ -3767,27 +3760,21 @@ if (typeof handleNext === 'function') {
                                                     const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
                                                     const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
                                                     
-                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Checking field patterns for i=' + i + ', pattern=' + pattern);
-                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Pattern 1 fieldId:', fieldId1, 'exists in mappedData:', !!mappedData[fieldId1]);
-                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Pattern 2 fieldId:', fieldId2, 'exists in mappedData:', !!mappedData[fieldId2]);
                                                     
                                                     // Check first pattern
                                                     let fieldElement = document.getElementById(fieldId1);
                                                     if (fieldElement && mappedData[fieldId1]) {
                                                         fieldElement.value = mappedData[fieldId1];
-                                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling numbered field (pattern 1):', fieldId1, 'with value:', mappedData[fieldId1]);
                                                     }
                                                     
                                                     // Check second pattern
                                                     fieldElement = document.getElementById(fieldId2);
                                                     if (fieldElement && mappedData[fieldId2]) {
                                                         fieldElement.value = mappedData[fieldId2];
-                                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling numbered field (pattern 2):', fieldId2, 'with value:', mappedData[fieldId2]);
                                                     }
                                                 });
                                             }
                                         } else {
-                                            console.log('🔧 [AUTOFILL DEBUG] Second pass - Count is 0 or invalid, skipping autofill');
                                         }
                                     }, 500); // Increased delay to ensure fields are created and DOM is updated
                                 }
@@ -3855,27 +3842,21 @@ if (typeof handleNext === 'function') {
                                                 const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
                                                 const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
                                                 
-                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Checking field patterns for i=' + i + ', pattern=' + pattern);
-                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Pattern 1 fieldId:', fieldId1, 'exists in mappedData:', !!mappedData[fieldId1]);
-                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Pattern 2 fieldId:', fieldId2, 'exists in mappedData:', !!mappedData[fieldId2]);
                                                 
                                                 // Check first pattern
                                                 let fieldElement = document.getElementById(fieldId1);
                                                 if (fieldElement && mappedData[fieldId1]) {
                                                     fieldElement.value = mappedData[fieldId1];
-                                                    console.log('🔧 [AUTOFILL DEBUG] Fallback autofilling numbered field (pattern 1):', fieldId1, 'with value:', mappedData[fieldId1]);
                                                 }
                                                 
                                                 // Check second pattern
                                                 fieldElement = document.getElementById(fieldId2);
                                                 if (fieldElement && mappedData[fieldId2]) {
                                                     fieldElement.value = mappedData[fieldId2];
-                                                    console.log('🔧 [AUTOFILL DEBUG] Fallback autofilling numbered field (pattern 2):', fieldId2, 'with value:', mappedData[fieldId2]);
                                                 }
                                             });
                                         }
                                     } else {
-                                        console.log('🔧 [AUTOFILL DEBUG] Fallback - Count is 0 or invalid, skipping autofill');
                                     }
                                 }, 500); // 500ms delay to ensure fields are created
                             }
@@ -3886,7 +3867,6 @@ if (typeof handleNext === 'function') {
         // 🔧 NEW: Clear autofill flag after fallback autofill is complete
         setTimeout(() => {
             window.isInitialAutofill = false;
-            console.log('🔧 [AUTOFILL DEBUG] Autofill flag cleared after fallback completion');
             
             // 🔧 NEW: Update all hidden address fields after autofill completes
             if (typeof updateAllHiddenAddressFields === 'function') {
@@ -5491,7 +5471,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Get the base field name from the question
       const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] baseFieldName:', baseFieldName);
       
       // Remove existing hidden address textboxes for this question
       for (let i = 1; i <= 10; i++) { // Check up to 10 entries
@@ -5515,7 +5494,6 @@ document.addEventListener('DOMContentLoaded', function() {
           const hiddenContainer = document.getElementById('hidden_pdf_fields');
           if (hiddenContainer) {
               hiddenContainer.appendChild(addressInput);
-              console.log('🔧 [HIDDEN ADDRESS] Created hidden address textbox:', addressId);
           }
           
           // Set up event listeners to update the address when location fields change
@@ -5566,25 +5544,21 @@ document.addEventListener('DOMContentLoaded', function() {
           const fullAddress = addressParts.join(', ');
           
           addressInput.value = fullAddress;
-          console.log('🔧 [HIDDEN ADDRESS] Updated address for', addressId, ':', fullAddress);
       };
       
       // Set up listeners for all location fields
       const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] Setting up listeners for baseFieldName:', baseFieldName, 'entryNumber:', entryNumber);
       
       locationFields.forEach(fieldType => {
           // For single-entry questions, don't add number suffix to field IDs
           const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
           const field = document.getElementById(fieldId);
           
-          console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for field:', fieldId, 'Found:', !!field);
           
           if (field) {
               // Listen for input changes
               field.addEventListener('input', updateAddress);
               field.addEventListener('change', updateAddress);
-              console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
           } else {
               console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
           }
@@ -5644,7 +5618,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             field.addEventListener('input', updateAddress);
             field.addEventListener('change', updateAddress);
-            console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
           } else {
             console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
           }

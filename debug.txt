@@ -1,9 +1,22 @@
 # Debugging Mode Documentation
 
+Heres how this basically works. First the user is gonna give you a problem and tell you to go into debug Mode
+Your goal is to edit generate.js until it generates the correct output.html
+Everytime the user prompts you in debug mode, it will usually just be with a console log (always from output.html)
+Your goal is to assess the console log to see if your edits to generate.js actually solved the issue in output.html
+If it didnt solve the issue, then asses whats going wrong using the console logs and then fix it
+If you cant tell whats wrong, then add more console logs in generate.js so it generates output.html which is easier to debug
+We will rinse and repeat this process until output.html has the correct functionality, validated by the console logs
+You should remove any console logs that do no pertain to the current issue you are trying to solve
+This will help keep the console log clear and concise 
+You should always be reading output.html for context on what the current generate.js is producing. 
+You can always assume that the output.html is the most up to date one and generated using the most recently updated generate.js
+
 ## 🔍 **Error Analysis Process:**
 
 ### **Step 1: Analyze the Error in output.html**
-- Look at the console logs to see what's happening
+- First asses your goal, what should be happening
+- Look at the console logs to see what's actually happening
 - Identify what's working vs. what's not working
 - Look for missing expected logs or unexpected behavior
 
@@ -16,33 +29,13 @@
 - Modify the generate.js code to produce the correct output.html
 - Test the fix by regenerating and checking the new output.html
 
-## 🚨 **Current Issue Analysis:**
-
-### **Problem:** Numbered dropdown autofill not working
-
-**Step 1 - Error in output.html:**
-- Console shows: `showTextboxLabels called with questionId: 1 count: 2` ✅
-- Console shows: `Autofilling field: how_many_people_are_suing_with_you with value: 2` ✅
-- Console shows: `Fields are created: showTextboxLabels called with questionId: 1 count: 2` ✅
-- Console shows: **MISSING** - No logs like `🔧 [AUTOFILL DEBUG] About to set setTimeout for dropdown: how_many_people_are_suing_with_you value: 2` ❌
-
-**Step 2 - Why generate.js is generating this error:**
-- The autofill logic is in a `fields.forEach` loop that only runs for dropdowns autofilled in the first pass
-- The `how_many` dropdown is being autofilled in the second pass, so it's not in the `fields` array
-- The `setTimeout` logic is never triggered because the condition `el.id === 'how_many'` is not met in the first pass
-
-**Step 3 - How to fix generate.js:**
-- Move the autofill logic to the second pass where `how_many` dropdowns are processed
-- Or add the autofill logic to both passes to ensure it runs regardless of when the dropdown is autofilled
-- Ensure the logic runs for all numbered dropdowns, not just those in the first pass
-
 ## 🎯 **Debugging Best Practices:**
 
 1. **Always check output.html first** - see what generate.js actually produced
 2. **Compare expected vs. actual behavior** - look for missing logs or unexpected results
 3. **Trace the execution flow** - understand which code paths are being taken
 4. **Fix the root cause in generate.js** - don't just patch the symptoms
-5. **Test the fix** - regenerate and verify the new output.html works correctly
+5. **Use console logs** - whenever the user gives you console logs, assume that they are from output.html These are your best shot at figuring out the problem quickly.
 
 ## 📝 **Common Issues:**
 

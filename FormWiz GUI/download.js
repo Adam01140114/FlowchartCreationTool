@@ -62,11 +62,19 @@ function findCheckboxOptionsByQuestionId(questionId) {
 }
 
 function generateAndDownloadForm() {
-    const formHTML = getFormHTML();
-    navigator.clipboard.writeText(formHTML).then(() => {
-        alert("HTML code has been copied to the clipboard.");
-    });
-    downloadHTML(formHTML, "custom_form.html");
+    console.log('🔧 [EXPORT DEBUG] generateAndDownloadForm() called');
+    try {
+        console.log('🔧 [EXPORT DEBUG] Calling getFormHTML()...');
+        const formHTML = getFormHTML();
+        console.log('🔧 [EXPORT DEBUG] getFormHTML() completed successfully, HTML length:', formHTML ? formHTML.length : 'null');
+        navigator.clipboard.writeText(formHTML).then(() => {
+            alert("HTML code has been copied to the clipboard.");
+        });
+        downloadHTML(formHTML, "custom_form.html");
+    } catch (error) {
+        console.error('🔧 [EXPORT DEBUG] Error in generateAndDownloadForm():', error);
+        alert('Error generating form: ' + error.message);
+    }
 }
 
 function showPreview() {
@@ -848,6 +856,15 @@ function loadFormData(formData) {
                     if (hiddenLogicCbox) {
                         hiddenLogicCbox.checked = true;
                         toggleHiddenLogic(question.questionId);
+                        
+                        // Update hidden logic trigger options for numbered dropdown
+                        if (question.type === 'numberedDropdown') {
+                            console.log('🔧 [HIDDEN LOGIC DEBUG] Updating trigger options for numbered dropdown question:', question.questionId);
+                            setTimeout(() => {
+                                console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptionsForNumberedDropdown for question:', question.questionId);
+                                updateHiddenLogicTriggerOptionsForNumberedDropdown(question.questionId);
+                            }, 100);
+                        }
                     }
                     
                     // Clear existing configurations
@@ -862,7 +879,7 @@ function loadFormData(formData) {
                             // Add configuration
                             addHiddenLogicConfig(question.questionId);
                             
-                            // Wait a moment for DOM to update, then set values
+                            // Wait for DOM to update, then set values
                             setTimeout(() => {
                                 const triggerSelect = questionBlock.querySelector(`#hiddenLogicTrigger${question.questionId}_${index}`);
                                 const typeSelect = questionBlock.querySelector(`#hiddenLogicType${question.questionId}_${index}`);
@@ -882,8 +899,17 @@ function loadFormData(formData) {
                                 if (textboxTextInput) {
                                     textboxTextInput.value = config.textboxText;
                                 }
-                            }, 10);
+                            }, 50); // Increased timeout to ensure DOM is ready
                         });
+                    }
+                    
+                    // Update hidden logic trigger options for numbered dropdown
+                    if (question.type === 'numberedDropdown') {
+                        console.log('🔧 [HIDDEN LOGIC DEBUG] Second update for numbered dropdown question:', question.questionId);
+                        setTimeout(() => {
+                            console.log('🔧 [HIDDEN LOGIC DEBUG] Second call to updateHiddenLogicTriggerOptionsForNumberedDropdown for question:', question.questionId);
+                            updateHiddenLogicTriggerOptionsForNumberedDropdown(question.questionId);
+                        }, 50);
                     }
                 }
 

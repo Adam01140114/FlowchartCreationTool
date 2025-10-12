@@ -135,24 +135,18 @@ function createAddressInput(id, label, index, type = 'text') {
 
 // Generate hidden address textboxes for numbered dropdown questions with location fields
 function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
-    console.log('🔧 [HIDDEN ADDRESS DEBUG] generateHiddenAddressTextboxes called with questionId:', questionId, 'count:', count);
-    console.log('🔧 [HIDDEN ADDRESS DEBUG] allFieldsInOrder:', allFieldsInOrder);
     
     // Check if this question has location fields (Street, City, State, Zip)
     const hasLocationFields = allFieldsInOrder.some(field => 
         ['Street', 'City', 'State', 'Zip'].includes(field.label)
     );
     
-    console.log('🔧 [HIDDEN ADDRESS DEBUG] hasLocationFields:', hasLocationFields);
-    
     if (!hasLocationFields) {
-        console.log('🔧 [HIDDEN ADDRESS] No location fields found for question', questionId);
         return;
     }
     
     // Get the base field name from the question
     const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-    console.log('🔧 [HIDDEN ADDRESS DEBUG] baseFieldName:', baseFieldName);
     
     // Remove existing hidden address textboxes for this question
     for (let i = 1; i <= 10; i++) { // Check up to 10 entries
@@ -176,7 +170,6 @@ function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
         const hiddenContainer = document.getElementById('hidden_pdf_fields');
         if (hiddenContainer) {
             hiddenContainer.appendChild(addressInput);
-            console.log('🔧 [HIDDEN ADDRESS] Created hidden address textbox:', addressId);
         }
         
         // Set up event listeners to update the address when location fields change
@@ -210,8 +203,6 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
         const stateShortField = document.getElementById(stateShortFieldId);
         
         // Debug: Log what fields we're looking for and what we found
-        console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
-        console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
         console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
         console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
         console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
@@ -227,25 +218,21 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
         const fullAddress = addressParts.join(', ');
         
         addressInput.value = fullAddress;
-        console.log('🔧 [HIDDEN ADDRESS] Updated address for', addressId, ':', fullAddress);
     };
     
     // Set up listeners for all location fields
     const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
-    console.log('🔧 [HIDDEN ADDRESS DEBUG] Setting up listeners for baseFieldName:', baseFieldName, 'entryNumber:', entryNumber);
     
     locationFields.forEach(fieldType => {
         // For single-entry questions, don't add number suffix to field IDs
         const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
         const field = document.getElementById(fieldId);
         
-        console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for field:', fieldId, 'Found:', !!field);
         
         if (field) {
             // Listen for input changes
             field.addEventListener('input', updateAddress);
             field.addEventListener('change', updateAddress);
-            console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
         } else {
             console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
         }
@@ -325,8 +312,10 @@ function updateAllHiddenAddressFields() {
 }
 
 function getFormHTML() {
+	console.log('🔧 [FORM GENERATION DEBUG] getFormHTML() function called');
 	
-	// RESET all globals before building
+	try {
+		// RESET all globals before building
 Object.keys(questionSlugMap).forEach(key => delete questionSlugMap[key]);
 Object.keys(questionNameIds).forEach(key => delete questionNameIds[key]);
 Object.keys(questionTypesMap).forEach(key => delete questionTypesMap[key]);
@@ -342,6 +331,8 @@ amountMap.length = 0;
 hiddenLogicConfigs.length = 0;
 linkedFields.length = 0;
 logicScriptBuffer = "";
+
+console.log('🔧 [HIDDEN LOGIC DEBUG] Starting form generation - hiddenLogicConfigs cleared');
 
 // Check if test mode is enabled
 const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
@@ -1186,9 +1177,54 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         // handle Hidden Logic
         const hiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
         const hiddenLogicEnabled = hiddenLogicEnabledEl && hiddenLogicEnabledEl.checked;
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Question', questionId, 'hiddenLogicEnabled:', hiddenLogicEnabled);
         if (hiddenLogicEnabled) {
           // Get all hidden logic configurations
           const configElements = qBlock.querySelectorAll('.hidden-logic-config');
+          console.log('🔧 [HIDDEN LOGIC DEBUG] Found', configElements.length, 'config elements for question', questionId);
+          configElements.forEach((configElement, index) => {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Processing config element', index, ':', configElement);
+            const hiddenLogicTriggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
+            const hiddenLogicTypeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
+            const hiddenLogicNodeIdEl = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`);
+            const hiddenLogicTextboxTextEl = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`);
+            
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Found elements - trigger:', !!hiddenLogicTriggerEl, 'type:', !!hiddenLogicTypeEl, 'nodeId:', !!hiddenLogicNodeIdEl);
+            
+            const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
+            const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
+            const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
+            const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
+            
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Config', index, 'trigger:', hiddenLogicTrigger, 'type:', hiddenLogicType, 'nodeId:', hiddenLogicNodeId);
+            
+            if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
+              console.log('🔧 [HIDDEN LOGIC DEBUG] Adding config to hiddenLogicConfigs array');
+              hiddenLogicConfigs.push({
+                questionId: questionId,
+                questionNameId: ddNm,
+                trigger: hiddenLogicTrigger,
+                type: hiddenLogicType,
+                nodeId: hiddenLogicNodeId,
+                textboxText: hiddenLogicTextboxText
+              });
+            } else {
+              console.log('🔧 [HIDDEN LOGIC DEBUG] Skipping config - missing required fields');
+            }
+          });
+        }
+
+        // handle Hidden Logic for numbered dropdown
+        console.log('🔧 [FORM GENERATION DEBUG] About to check hidden logic for numbered dropdown question:', questionId);
+        console.log('🔧 [FORM GENERATION DEBUG] Checking hidden logic for numbered dropdown question:', questionId);
+        const numberedHiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
+        const numberedHiddenLogicEnabled = numberedHiddenLogicEnabledEl && numberedHiddenLogicEnabledEl.checked;
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown hidden logic enabled:', numberedHiddenLogicEnabled);
+        if (numberedHiddenLogicEnabled) {
+          console.log('🔧 [HIDDEN LOGIC DEBUG] Processing numbered dropdown hidden logic for question:', questionId);
+          // Get all hidden logic configurations
+          const configElements = qBlock.querySelectorAll('.hidden-logic-config');
+          console.log('🔧 [HIDDEN LOGIC DEBUG] Found', configElements.length, 'numbered dropdown config elements');
           configElements.forEach((configElement, index) => {
             const hiddenLogicTriggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
             const hiddenLogicTypeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
@@ -1200,18 +1236,24 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
             const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
             const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
             
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown config', index, 'trigger:', hiddenLogicTrigger, 'type:', hiddenLogicType, 'nodeId:', hiddenLogicNodeId);
+            
             if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
+              console.log('🔧 [HIDDEN LOGIC DEBUG] Adding numbered dropdown config to hiddenLogicConfigs array');
               hiddenLogicConfigs.push({
                 questionId: questionId,
-                questionNameId: ddNm,
+                questionNameId: dropdownId,
                 trigger: hiddenLogicTrigger,
                 type: hiddenLogicType,
                 nodeId: hiddenLogicNodeId,
                 textboxText: hiddenLogicTextboxText
               });
+            } else {
+              console.log('🔧 [HIDDEN LOGIC DEBUG] Skipping numbered dropdown config - missing required fields');
             }
           });
         }
+        console.log('🔧 [FORM GENERATION DEBUG] Completed numbered dropdown processing for question:', questionId);
       } else if (questionType === "checkbox") {
        /* ---------- CHECKBOX QUESTION ---------- */
 const cOptsDivs = qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
@@ -1494,14 +1536,17 @@ formHTML += `</div><br></div>`;
           }
         }
       } else if (questionType === "numberedDropdown") {
+        console.log('🔧 [FORM GENERATION DEBUG] Processing numbered dropdown question:', questionId);
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
-        const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
-        const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
-        const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
-        const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
-        const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
+          const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
+          const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
+          const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
+          const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
+          const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
+          console.log('🔧 [FORM GENERATION DEBUG] Numbered dropdown params - ddMin:', ddMin, 'ddMax:', ddMax, 'nodeId:', nodeId);
 
         // gather unified field data from the new unified container
+        console.log('🔧 [FORM GENERATION DEBUG] About to gather unified field data for question:', questionId);
         const unifiedFields = qBlock.querySelectorAll("#unifiedFields" + questionId + " .unified-field");
         const labelVals = [];
         const labelNodeIds = [];
@@ -1576,6 +1621,7 @@ formHTML += `</div><br></div>`;
         // Sort by data-order attribute (creation order)
         allElements.sort((a, b) => a.order - b.order);
         allFieldsInOrder = allElements;
+        console.log('🔧 [FORM GENERATION DEBUG] Processed unified fields, allFieldsInOrder:', allFieldsInOrder);
         
         }
         
@@ -1588,22 +1634,68 @@ formHTML += `</div><br></div>`;
         // Store unified field data for use in showTextboxLabels function
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
         window.unifiedFieldsMap[questionId] = allFieldsInOrder;
+        console.log('🔧 [FORM GENERATION DEBUG] Stored unified field data, about to continue numbered dropdown processing');
         
         // Add unifiedFieldsMap to the generated HTML
+        console.log('🔧 [FORM GENERATION DEBUG] About to add unifiedFieldsMap to generated HTML');
         if (!window.unifiedFieldsMapDeclared) {
             window.unifiedFieldsMapDeclared = true;
             // This will be added to the HTML output
         }
+        console.log('🔧 [FORM GENERATION DEBUG] Completed unifiedFieldsMap addition, about to continue numbered dropdown processing');
 
         // Then build the dropdown - use nodeId if provided, otherwise fallback to answer + questionId
         const dropdownId = nodeId || "answer" + questionId;
         questionNameIds[questionId] = dropdownId;
-        formHTML += `<select id="${dropdownId}" name="${dropdownId}" data-question-id="${questionId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value)">
+        console.log('🔧 [FORM GENERATION DEBUG] About to build dropdown HTML for question:', questionId, 'dropdownId:', dropdownId);
+        formHTML += `<select id="${dropdownId}" name="${dropdownId}" data-question-id="${questionId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value); updateHiddenLogic('${dropdownId}', this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         for (let rnum = ddMin; rnum <= ddMax; rnum++) {
           formHTML += `<option value="${rnum}">${rnum}</option>`;
         }
         formHTML += `</select><br><div id="labelContainer${questionId}"></div>`;
+        console.log('🔧 [FORM GENERATION DEBUG] Completed dropdown HTML building for question:', questionId);
+        
+        // Handle Hidden Logic for numbered dropdown
+        console.log('🔧 [FORM GENERATION DEBUG] About to check hidden logic for numbered dropdown question:', questionId);
+        const numberedHiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
+        const numberedHiddenLogicEnabled = numberedHiddenLogicEnabledEl && numberedHiddenLogicEnabledEl.checked;
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown hidden logic enabled:', numberedHiddenLogicEnabled);
+        
+        if (numberedHiddenLogicEnabled) {
+          console.log('🔧 [HIDDEN LOGIC DEBUG] Processing numbered dropdown hidden logic for question:', questionId);
+          const configElements = qBlock.querySelectorAll(`#hiddenLogicConfigs${questionId} .hidden-logic-config`);
+          console.log('🔧 [HIDDEN LOGIC DEBUG] Found', configElements.length, 'numbered dropdown config elements');
+          
+          configElements.forEach((configElement, index) => {
+            const hiddenLogicTriggerEl = configElement.querySelector(`select[id^="hiddenLogicTrigger${questionId}"]`);
+            const hiddenLogicTypeEl = configElement.querySelector(`select[id^="hiddenLogicType${questionId}"]`);
+            const hiddenLogicNodeIdEl = configElement.querySelector(`input[id^="hiddenLogicNodeId${questionId}"]`);
+            const hiddenLogicTextboxTextEl = configElement.querySelector(`input[id^="hiddenLogicTextboxText${questionId}"]`);
+            
+            const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value.trim() : '';
+            const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value.trim() : '';
+            const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value.trim() : '';
+            const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value.trim() : '';
+            
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown config', index, 'trigger:', hiddenLogicTrigger, 'type:', hiddenLogicType, 'nodeId:', hiddenLogicNodeId);
+            
+            if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
+              console.log('🔧 [HIDDEN LOGIC DEBUG] Adding numbered dropdown config to hiddenLogicConfigs array');
+              hiddenLogicConfigs.push({
+                questionNameId: dropdownId,
+                trigger: hiddenLogicTrigger,
+                type: hiddenLogicType,
+                nodeId: hiddenLogicNodeId,
+                textboxText: hiddenLogicTextboxText
+              });
+            } else {
+              console.log('🔧 [HIDDEN LOGIC DEBUG] Skipping numbered dropdown config - missing required fields');
+            }
+          });
+        }
+        
+        console.log('🔧 [FORM GENERATION DEBUG] Completed numbered dropdown processing for question:', questionId);
       }
 
       // end question container
@@ -2285,27 +2377,21 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `
 // Dynamic conditional logic for business type question to show county question
 function setupBusinessTypeConditionalLogic() {
-  console.log('🔍 [COUNTY QUESTION DEBUG] Setting up business type conditional logic');
   
   // Use dynamic approach - find question 11's name from questionNameIds
   const businessTypeQuestionName = questionNameIds['11'] || 'what_are_you_doing_business_as';
-  console.log('🔍 [COUNTY QUESTION DEBUG] Business type question name:', businessTypeQuestionName);
   
   // Find all radio buttons for the business type question
   const businessTypeRadios = document.querySelectorAll('input[name="' + businessTypeQuestionName + '"]');
-  console.log('🔍 [COUNTY QUESTION DEBUG] Found', businessTypeRadios.length, 'business type radio buttons');
   
   businessTypeRadios.forEach(radio => {
     radio.addEventListener('change', function() {
       if (this.checked) {
-        console.log('🔍 [COUNTY QUESTION DEBUG] Business type selected:', this.value);
         // Show county question (question-container-16) when any business type is selected
         const countyQuestion = document.getElementById('question-container-16');
         if (countyQuestion) {
           countyQuestion.classList.remove('hidden');
-          console.log('🔍 [COUNTY QUESTION DEBUG] County question shown');
         } else {
-          console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: County question container not found');
         }
       }
     });
@@ -4135,16 +4221,24 @@ function dropdownMirror(selectEl, baseName){
 
 // Function to handle hidden logic for dropdowns
 function updateHiddenLogic(dropdownName, selectedValue) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogic called with dropdownName:', dropdownName, 'selectedValue:', selectedValue);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] hiddenLogicConfigs:', hiddenLogicConfigs);
+    
     // Find the hidden logic configuration for this dropdown
     const config = hiddenLogicConfigs.find(c => c.questionNameId === dropdownName);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Found config:', config);
+    
     if (!config || config.trigger !== selectedValue) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config or trigger mismatch. Config exists:', !!config, 'Trigger match:', config ? config.trigger === selectedValue : false);
         return;
     }
     
     // Check if the hidden element already exists
     let hiddenElement = document.getElementById(config.nodeId);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists:', !!hiddenElement);
     
     if (!hiddenElement) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', config.type, 'with nodeId:', config.nodeId);
         // Create the hidden element based on type
         if (config.type === 'checkbox') {
             hiddenElement = document.createElement('input');
@@ -4153,6 +4247,7 @@ function updateHiddenLogic(dropdownName, selectedValue) {
             hiddenElement.name = config.nodeId;
             hiddenElement.checked = true;
             hiddenElement.style.display = 'none';
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
         } else if (config.type === 'textbox') {
             hiddenElement = document.createElement('input');
             hiddenElement.type = 'text';
@@ -4160,16 +4255,20 @@ function updateHiddenLogic(dropdownName, selectedValue) {
             hiddenElement.name = config.nodeId;
             hiddenElement.value = config.textboxText || '';
             hiddenElement.style.display = 'none';
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
         }
         
         // Add the hidden element to the form
         const form = document.getElementById('customForm');
         if (form) {
             form.appendChild(hiddenElement);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
         } else {
             document.body.appendChild(hiddenElement);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
         }
     } else {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element');
         // Update existing element
         if (config.type === 'checkbox') {
             hiddenElement.checked = true;
@@ -4181,25 +4280,19 @@ function updateHiddenLogic(dropdownName, selectedValue) {
 
 // Function to show/hide questions based on conditional logic
 function updateQuestionVisibility(questionId, shouldShow) {
-    console.log('🔍 [COUNTY QUESTION DEBUG] updateQuestionVisibility called with questionId:', questionId, 'shouldShow:', shouldShow);
     const questionContainer = document.getElementById('question-container-' + questionId);
-    console.log('🔍 [COUNTY QUESTION DEBUG] questionContainer found:', !!questionContainer);
     if (questionContainer) {
         if (shouldShow) {
             questionContainer.classList.remove('hidden');
-            console.log('🔍 [COUNTY QUESTION DEBUG] Removed hidden class from question-container-' + questionId);
         } else {
             questionContainer.classList.add('hidden');
-            console.log('🔍 [COUNTY QUESTION DEBUG] Added hidden class to question-container-' + questionId);
         }
     } else {
-        console.log('🔍 [COUNTY QUESTION DEBUG] ERROR: question-container-' + questionId + ' not found!');
     }
 }
 
 // Function to handle business type selection and show county question
 function handleBusinessTypeSelection() {
-    console.log('🔍 [COUNTY QUESTION DEBUG] handleBusinessTypeSelection called');
     // Show the county question (question-container-16) when any business type is selected
     updateQuestionVisibility(16, true);
 }
@@ -5702,7 +5795,6 @@ if (typeof handleNext === 'function') {
                         // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled in second pass
                         allFields.forEach(el => {
                             if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
-                                console.log('🔧 [AUTOFILL DEBUG] Second pass - Found numbered dropdown:', el.id, 'value:', el.value);
                                 let questionId;
                                 // First, try to get questionId from data attribute
                                 if (el.dataset && el.dataset.questionId) {
@@ -5729,22 +5821,15 @@ if (typeof handleNext === 'function') {
                                     showTextboxLabels(questionId, el.value);
                                     
                                     // After creating numbered fields, autofill them with Firebase data
-                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - About to set setTimeout for dropdown:', el.id, 'value:', el.value);
-                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - mappedData available:', !!mappedData);
                                     setTimeout(() => {
-                                        console.log('🔧 [AUTOFILL DEBUG] Second pass setTimeout callback triggered for dropdown:', el.id, 'value:', el.value);
                                         const count = parseInt(el.value);
-                                        console.log('🔧 [AUTOFILL DEBUG] Second pass parsed count:', count);
                                         if (count > 0) {
                                             // Get the base field name from the dropdown
                                             const baseFieldName = el.id;
                                             
-                                            // Debug: Log all available keys in mappedData
-                                            console.log('🔧 [AUTOFILL DEBUG] Second pass - All mappedData keys:', Object.keys(mappedData));
                                             
                                             // Try to autofill numbered fields for each count
                                             for (let i = 1; i <= count; i++) {
-                                                console.log('🔧 [AUTOFILL DEBUG] Second pass - Processing count i:', i);
                                                 // Common field patterns to check - using the actual Firebase naming pattern
                                                 const fieldPatterns = [
                                                     'name', 
@@ -5761,27 +5846,21 @@ if (typeof handleNext === 'function') {
                                                     const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
                                                     const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
                                                     
-                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Checking field patterns for i=' + i + ', pattern=' + pattern);
-                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Pattern 1 fieldId:', fieldId1, 'exists in mappedData:', !!mappedData[fieldId1]);
-                                                    console.log('🔧 [AUTOFILL DEBUG] Second pass - Pattern 2 fieldId:', fieldId2, 'exists in mappedData:', !!mappedData[fieldId2]);
                                                     
                                                     // Check first pattern
                                                     let fieldElement = document.getElementById(fieldId1);
                                                     if (fieldElement && mappedData[fieldId1]) {
                                                         fieldElement.value = mappedData[fieldId1];
-                                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling numbered field (pattern 1):', fieldId1, 'with value:', mappedData[fieldId1]);
                                                     }
                                                     
                                                     // Check second pattern
                                                     fieldElement = document.getElementById(fieldId2);
                                                     if (fieldElement && mappedData[fieldId2]) {
                                                         fieldElement.value = mappedData[fieldId2];
-                                                        console.log('🔧 [AUTOFILL DEBUG] Second pass autofilling numbered field (pattern 2):', fieldId2, 'with value:', mappedData[fieldId2]);
                                                     }
                                                 });
                                             }
                                         } else {
-                                            console.log('🔧 [AUTOFILL DEBUG] Second pass - Count is 0 or invalid, skipping autofill');
                                         }
                                     }, 500); // Increased delay to ensure fields are created and DOM is updated
                                 }
@@ -5849,27 +5928,21 @@ if (typeof handleNext === 'function') {
                                                 const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
                                                 const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
                                                 
-                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Checking field patterns for i=' + i + ', pattern=' + pattern);
-                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Pattern 1 fieldId:', fieldId1, 'exists in mappedData:', !!mappedData[fieldId1]);
-                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Pattern 2 fieldId:', fieldId2, 'exists in mappedData:', !!mappedData[fieldId2]);
                                                 
                                                 // Check first pattern
                                                 let fieldElement = document.getElementById(fieldId1);
                                                 if (fieldElement && mappedData[fieldId1]) {
                                                     fieldElement.value = mappedData[fieldId1];
-                                                    console.log('🔧 [AUTOFILL DEBUG] Fallback autofilling numbered field (pattern 1):', fieldId1, 'with value:', mappedData[fieldId1]);
                                                 }
                                                 
                                                 // Check second pattern
                                                 fieldElement = document.getElementById(fieldId2);
                                                 if (fieldElement && mappedData[fieldId2]) {
                                                     fieldElement.value = mappedData[fieldId2];
-                                                    console.log('🔧 [AUTOFILL DEBUG] Fallback autofilling numbered field (pattern 2):', fieldId2, 'with value:', mappedData[fieldId2]);
                                                 }
                                             });
                                         }
                                     } else {
-                                        console.log('🔧 [AUTOFILL DEBUG] Fallback - Count is 0 or invalid, skipping autofill');
                                     }
                                 }, 500); // 500ms delay to ensure fields are created
                             }
@@ -5880,7 +5953,6 @@ if (typeof handleNext === 'function') {
         // 🔧 NEW: Clear autofill flag after fallback autofill is complete
         setTimeout(() => {
             window.isInitialAutofill = false;
-            console.log('🔧 [AUTOFILL DEBUG] Autofill flag cleared after fallback completion');
             
             // 🔧 NEW: Update all hidden address fields after autofill completes
             if (typeof updateAllHiddenAddressFields === 'function') {
@@ -7488,7 +7560,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Get the base field name from the question
       const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] baseFieldName:', baseFieldName);
       
       // Remove existing hidden address textboxes for this question
       for (let i = 1; i <= 10; i++) { // Check up to 10 entries
@@ -7512,7 +7583,6 @@ document.addEventListener('DOMContentLoaded', function() {
           const hiddenContainer = document.getElementById('hidden_pdf_fields');
           if (hiddenContainer) {
               hiddenContainer.appendChild(addressInput);
-              console.log('🔧 [HIDDEN ADDRESS] Created hidden address textbox:', addressId);
           }
           
           // Set up event listeners to update the address when location fields change
@@ -7563,25 +7633,21 @@ document.addEventListener('DOMContentLoaded', function() {
           const fullAddress = addressParts.join(', ');
           
           addressInput.value = fullAddress;
-          console.log('🔧 [HIDDEN ADDRESS] Updated address for', addressId, ':', fullAddress);
       };
       
       // Set up listeners for all location fields
       const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] Setting up listeners for baseFieldName:', baseFieldName, 'entryNumber:', entryNumber);
       
       locationFields.forEach(fieldType => {
           // For single-entry questions, don't add number suffix to field IDs
           const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
           const field = document.getElementById(fieldId);
           
-          console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for field:', fieldId, 'Found:', !!field);
           
           if (field) {
               // Listen for input changes
               field.addEventListener('input', updateAddress);
               field.addEventListener('change', updateAddress);
-              console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
           } else {
               console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
           }
@@ -7641,7 +7707,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             field.addEventListener('input', updateAddress);
             field.addEventListener('change', updateAddress);
-            console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
           } else {
             console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
           }
@@ -7672,7 +7737,13 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>`;
 
   // Finally, return the assembled HTML
+  console.log('🔧 [HIDDEN LOGIC DEBUG] Final hiddenLogicConfigs array:', hiddenLogicConfigs);
   return formHTML;
+  
+  } catch (error) {
+    console.error('🔧 [FORM GENERATION DEBUG] Error in getFormHTML():', error);
+    throw error;
+  }
 }
 
 
