@@ -133,6 +133,196 @@ function createAddressInput(id, label, index, type = 'text') {
            '</div>';
 }
 
+// Generate hidden address textboxes for numbered dropdown questions with location fields
+function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
+    console.log('🔧 [HIDDEN ADDRESS DEBUG] generateHiddenAddressTextboxes called with questionId:', questionId, 'count:', count);
+    console.log('🔧 [HIDDEN ADDRESS DEBUG] allFieldsInOrder:', allFieldsInOrder);
+    
+    // Check if this question has location fields (Street, City, State, Zip)
+    const hasLocationFields = allFieldsInOrder.some(field => 
+        ['Street', 'City', 'State', 'Zip'].includes(field.label)
+    );
+    
+    console.log('🔧 [HIDDEN ADDRESS DEBUG] hasLocationFields:', hasLocationFields);
+    
+    if (!hasLocationFields) {
+        console.log('🔧 [HIDDEN ADDRESS] No location fields found for question', questionId);
+        return;
+    }
+    
+    // Get the base field name from the question
+    const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+    console.log('🔧 [HIDDEN ADDRESS DEBUG] baseFieldName:', baseFieldName);
+    
+    // Remove existing hidden address textboxes for this question
+    for (let i = 1; i <= 10; i++) { // Check up to 10 entries
+        const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
+        if (existingAddress && existingAddress.type === 'text' && existingAddress.style.display === 'none') {
+            existingAddress.remove();
+        }
+    }
+    
+    // Generate hidden address textboxes for the selected count
+    for (let i = 1; i <= count; i++) {
+        // For single-entry questions (like multipleTextboxes), don't add number suffix
+        const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
+        const addressInput = document.createElement('input');
+        addressInput.type = 'text';
+        addressInput.id = addressId;
+        addressInput.name = addressId;
+        addressInput.style.display = 'none';
+        
+        // Add to hidden fields container
+        const hiddenContainer = document.getElementById('hidden_pdf_fields');
+        if (hiddenContainer) {
+            hiddenContainer.appendChild(addressInput);
+            console.log('🔧 [HIDDEN ADDRESS] Created hidden address textbox:', addressId);
+        }
+        
+        // Set up event listeners to update the address when location fields change
+        // Delay this to ensure location fields are created first
+        setTimeout(() => {
+            setupAddressUpdateListeners(questionId, i, baseFieldName, allFieldsInOrder, count);
+        }, 1000); // 1 second delay to ensure fields are created
+    }
+}
+
+function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, allFieldsInOrder, count = 1) {
+    // For single-entry questions (like multipleTextboxes), don't add number suffix
+    const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
+    const addressInput = document.getElementById(addressId);
+    
+    if (!addressInput) return;
+    
+    // Function to update the address field
+    const updateAddress = () => {
+        // For single-entry questions, don't add number suffix to field IDs
+        const streetFieldId = count === 1 ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
+        const cityFieldId = count === 1 ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
+        const stateFieldId = count === 1 ? baseFieldName + '_state' : baseFieldName + '_state_' + entryNumber;
+        const zipFieldId = count === 1 ? baseFieldName + '_zip' : baseFieldName + '_zip_' + entryNumber;
+        const stateShortFieldId = count === 1 ? baseFieldName + '_state_short' : baseFieldName + '_state_short_' + entryNumber;
+        
+        const streetField = document.getElementById(streetFieldId);
+        const cityField = document.getElementById(cityFieldId);
+        const stateField = document.getElementById(stateFieldId);
+        const zipField = document.getElementById(zipFieldId);
+        const stateShortField = document.getElementById(stateShortFieldId);
+        
+        // Debug: Log what fields we're looking for and what we found
+        console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
+        console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+        console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+        console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+        console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+        console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+        
+        const street = streetField ? streetField.value.trim() : '';
+        const city = cityField ? cityField.value.trim() : '';
+        const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+        const zip = zipField ? zipField.value.trim() : '';
+        
+        // Build the full address
+        const addressParts = [street, city, state, zip].filter(part => part !== '');
+        const fullAddress = addressParts.join(', ');
+        
+        addressInput.value = fullAddress;
+        console.log('🔧 [HIDDEN ADDRESS] Updated address for', addressId, ':', fullAddress);
+    };
+    
+    // Set up listeners for all location fields
+    const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+    console.log('🔧 [HIDDEN ADDRESS DEBUG] Setting up listeners for baseFieldName:', baseFieldName, 'entryNumber:', entryNumber);
+    
+    locationFields.forEach(fieldType => {
+        // For single-entry questions, don't add number suffix to field IDs
+        const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
+        const field = document.getElementById(fieldId);
+        
+        console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for field:', fieldId, 'Found:', !!field);
+        
+        if (field) {
+            // Listen for input changes
+            field.addEventListener('input', updateAddress);
+            field.addEventListener('change', updateAddress);
+            console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
+        } else {
+            console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
+        }
+    });
+    
+    // Initial update with longer delay to ensure fields are created
+    setTimeout(updateAddress, 500);
+    
+    // Also trigger update after autofill completes (additional safety)
+    setTimeout(updateAddress, 2000);
+}
+
+// Global function to update all hidden address fields after autofill
+function updateAllHiddenAddressFields() {
+    console.log('🔧 [HIDDEN ADDRESS] Updating all hidden address fields after autofill');
+    
+    // Find all hidden address textboxes
+    const hiddenAddressFields = document.querySelectorAll('input[type="text"][id*="_address_"][style*="display: none"]');
+    
+    hiddenAddressFields.forEach(addressField => {
+        const addressId = addressField.id;
+        console.log('🔧 [HIDDEN ADDRESS] Found hidden address field:', addressId);
+        
+        // Extract base field name and entry number from ID
+        // Handle both numbered (_address_1) and single-entry (_address) patterns
+        const numberedMatch = addressId.match(/^(.+)_address_(\d+)$/);
+        const singleMatch = addressId.match(/^(.+)_address$/);
+        
+        let baseFieldName, entryNumber, isSingleEntry = false;
+        
+        if (numberedMatch) {
+            baseFieldName = numberedMatch[1];
+            entryNumber = numberedMatch[2];
+        } else if (singleMatch) {
+            baseFieldName = singleMatch[1];
+            entryNumber = '1';
+            isSingleEntry = true;
+        } else {
+            console.log('🔧 [HIDDEN ADDRESS] Could not parse address ID:', addressId);
+            return;
+        }
+        
+        console.log('🔧 [HIDDEN ADDRESS] Extracted baseFieldName:', baseFieldName, 'entryNumber:', entryNumber, 'isSingleEntry:', isSingleEntry);
+        
+        // Manually update this address field
+        const streetFieldId = isSingleEntry ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
+        const cityFieldId = isSingleEntry ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
+        const stateFieldId = isSingleEntry ? baseFieldName + '_state' : baseFieldName + '_state_' + entryNumber;
+        const zipFieldId = isSingleEntry ? baseFieldName + '_zip' : baseFieldName + '_zip_' + entryNumber;
+        const stateShortFieldId = isSingleEntry ? baseFieldName + '_state_short' : baseFieldName + '_state_short_' + entryNumber;
+            
+            const streetField = document.getElementById(streetFieldId);
+            const cityField = document.getElementById(cityFieldId);
+            const stateField = document.getElementById(stateFieldId);
+            const zipField = document.getElementById(zipFieldId);
+            const stateShortField = document.getElementById(stateShortFieldId);
+            
+            console.log('🔧 [HIDDEN ADDRESS] Manual update - Looking for fields:');
+            console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+            console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+            console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+            console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+            console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+            
+            const street = streetField ? streetField.value.trim() : '';
+            const city = cityField ? cityField.value.trim() : '';
+            const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+            const zip = zipField ? zipField.value.trim() : '';
+            
+            // Build the full address
+            const addressParts = [street, city, state, zip].filter(part => part !== '');
+            const fullAddress = addressParts.join(', ');
+            
+            addressField.value = fullAddress;
+            console.log('🔧 [HIDDEN ADDRESS] Manual update - Updated address for', addressId, ':', fullAddress);
+    });
+}
 
 function getFormHTML() {
 	
@@ -1109,7 +1299,7 @@ if (noneEl?.checked){
     const noneOnChangeHandler = markOnlyOne ? 
       `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
       `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
-    
+
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
@@ -1215,6 +1405,9 @@ formHTML += `</div><br></div>`;
         const questionH3 = document.getElementById("question-container-" + questionId)?.querySelector("h3")?.textContent || ("answer" + questionId);
         const qSafe = sanitizeQuestionText(questionH3);
         
+        // Set the questionNameIds for this question (same as numberedDropdown)
+        questionNameIds[questionId] = questionNodeId;
+        
         // Generate the fields directly in the HTML (similar to numberedDropdown but without dropdown)
         if (allFieldsInOrder.length > 0) {
           // Create a container for the multiple textboxes fields
@@ -1222,6 +1415,20 @@ formHTML += `</div><br></div>`;
           
           // Generate the fields for a default count of 1 (since multipleTextboxes doesn't have a dropdown)
           const count = 1;
+          
+          // Generate hidden address textboxes for location fields
+          // For multipleTextboxes, we need to create the hidden address input in the HTML
+          // since the DOM doesn't exist yet during HTML generation
+          const hasLocationFields = allFieldsInOrder.some(field => 
+              ['Street', 'City', 'State', 'Zip'].includes(field.label)
+          );
+          
+          if (hasLocationFields) {
+              const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+              const addressId = baseFieldName + '_address';
+              // Add the hidden address input to the HTML string
+              formHTML += `<input type="text" id="${addressId}" name="${addressId}" style="display: none;">`;
+          }
           
           // Define location field names for visual separation
           const locationFields = ['Street', 'City', 'State', 'Zip'];
@@ -3516,6 +3723,9 @@ function showTextboxLabels(questionId, count){
     // Generate hidden checkboxes for the selected count
     generateHiddenCheckboxes(questionId, qSafe, count);
 
+    // Generate hidden address textboxes for location fields
+    generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder);
+
     // Define location field names for visual separation
     const locationFields = ['Street', 'City', 'State', 'Zip'];
 
@@ -3657,6 +3867,74 @@ function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
     }
 }
 
+
+// Helper function to get fields in order for a question
+function getFieldsInOrderForQuestion(questionId) {
+    // Try to get unified fields first, fallback to old arrays
+    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
+                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
+    
+    let allFieldsInOrder = [];
+    
+    if (qBlock) {
+        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
+        
+        if (unifiedFields.length > 0) {
+            // Use unified container data
+            const allElements = [];
+            
+            unifiedFields.forEach((el) => {
+                const fieldType = el.getAttribute('data-type');
+                const fieldOrder = parseInt(el.getAttribute('data-order'));
+                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                
+                if (labelTextEl && nodeIdTextEl) {
+                    allElements.push({
+                        type: fieldType,
+                        label: labelTextEl.textContent.trim(),
+                        nodeId: nodeIdTextEl.textContent.trim(),
+                        order: fieldOrder
+                    });
+                }
+            });
+            
+            // Sort by data-order attribute (creation order)
+            allElements.sort((a, b) => a.order - b.order);
+            allFieldsInOrder = allElements;
+        }
+    }
+    
+    // Fallback to unified fields map or old arrays if no unified fields found
+    if (allFieldsInOrder.length === 0) {
+        // Try unified fields map first
+        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+            allFieldsInOrder = window.unifiedFieldsMap[questionId];
+        } else {
+            // Fallback to old arrays
+            const theseLabels = labelMap[questionId] || [];
+            const theseAmounts = amountMap[questionId] || [];
+            
+            allFieldsInOrder = [
+                ...theseLabels.map((lbl, index) => ({
+                    type: 'label',
+                    label: lbl,
+                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
+                    order: index
+                })),
+                ...theseAmounts.map((amt, index) => ({
+                    type: 'amount',
+                    label: amt,
+                    nodeId: "",
+                    order: index
+                }))
+            ];
+        }
+    }
+    
+    return allFieldsInOrder;
+}
+
 // Update hidden checkboxes when dropdown selection changes
 function updateHiddenCheckboxes(questionId, selectedCount) {
     // Get the question's safe name
@@ -3698,6 +3976,15 @@ function updateHiddenCheckboxes(questionId, selectedCount) {
         
         // Update the checked state based on the selected count
         checkbox.checked = i <= selectedCount;
+    }
+    
+    // Also update hidden address textboxes if this question has location fields
+    const questionContainer = document.getElementById('question-container-' + questionId);
+    if (questionContainer) {
+        const allFieldsInOrder = getFieldsInOrderForQuestion(questionId);
+        if (allFieldsInOrder && allFieldsInOrder.length > 0) {
+            generateHiddenAddressTextboxes(questionId, selectedCount, allFieldsInOrder);
+        }
     }
 }
 
@@ -5433,10 +5720,7 @@ if (typeof handleNext === 'function') {
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                }
-                
-                // 🔧 NEW: Clear autofill flag after autofill is complete
-                window.isInitialAutofill = false;
+                        }
                 
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
@@ -5449,10 +5733,81 @@ if (typeof handleNext === 'function') {
                             const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
                             if (typeof showTextboxLabels === 'function') {
                                 showTextboxLabels(questionId, dropdown.value);
+                                
+                                // 🔧 NEW: Add the missing autofill logic for numbered fields
+                                console.log('🔧 [AUTOFILL DEBUG] Fallback - About to set setTimeout for dropdown:', dropdown.id, 'value:', dropdown.value);
+                                console.log('🔧 [AUTOFILL DEBUG] Fallback - mappedData available:', !!mappedData);
+                                setTimeout(() => {
+                                    console.log('🔧 [AUTOFILL DEBUG] Fallback setTimeout callback triggered for dropdown:', dropdown.id, 'value:', dropdown.value);
+                                    const count = parseInt(dropdown.value);
+                                    console.log('🔧 [AUTOFILL DEBUG] Fallback parsed count:', count);
+                                    if (count > 0) {
+                                        // Get the base field name from the dropdown
+                                        const baseFieldName = dropdown.id;
+                                        
+                                        // Debug: Log all available keys in mappedData
+                                        console.log('🔧 [AUTOFILL DEBUG] Fallback - All mappedData keys:', Object.keys(mappedData));
+                                        
+                                        // Try to autofill numbered fields for each count
+                                        for (let i = 1; i <= count; i++) {
+                                            console.log('🔧 [AUTOFILL DEBUG] Fallback - Processing count i:', i);
+                                            // Common field patterns to check - using the actual Firebase naming pattern
+                                            const fieldPatterns = [
+                                                'name', 
+                                                'phone_number', 
+                                                'mailing_address',
+                                                'street',
+                                                'city', 
+                                                'state',
+                                                'zip',
+                                                'zip_code',
+                                                'email',
+                                                'address'
+                                            ];
+                                            
+                                            fieldPatterns.forEach(pattern => {
+                                                // Try both naming patterns: sc100_how_many_people_are_suing_with_you_1_name and how_many_people_are_suing_with_you_name_1
+                                                const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
+                                                const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
+                                                
+                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Checking field patterns for i=' + i + ', pattern=' + pattern);
+                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Pattern 1 fieldId:', fieldId1, 'exists in mappedData:', !!mappedData[fieldId1]);
+                                                console.log('🔧 [AUTOFILL DEBUG] Fallback - Pattern 2 fieldId:', fieldId2, 'exists in mappedData:', !!mappedData[fieldId2]);
+                                                
+                                                // Check first pattern
+                                                let fieldElement = document.getElementById(fieldId1);
+                                                if (fieldElement && mappedData[fieldId1]) {
+                                                    fieldElement.value = mappedData[fieldId1];
+                                                    console.log('🔧 [AUTOFILL DEBUG] Fallback autofilling numbered field (pattern 1):', fieldId1, 'with value:', mappedData[fieldId1]);
+                                                }
+                                                
+                                                // Check second pattern
+                                                fieldElement = document.getElementById(fieldId2);
+                                                if (fieldElement && mappedData[fieldId2]) {
+                                                    fieldElement.value = mappedData[fieldId2];
+                                                    console.log('🔧 [AUTOFILL DEBUG] Fallback autofilling numbered field (pattern 2):', fieldId2, 'with value:', mappedData[fieldId2]);
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        console.log('🔧 [AUTOFILL DEBUG] Fallback - Count is 0 or invalid, skipping autofill');
+                                    }
+                                }, 500); // 500ms delay to ensure fields are created
                             }
                         }
                     });
                 }, 1000); // 1 second delay for fallback
+                
+        // 🔧 NEW: Clear autofill flag after fallback autofill is complete
+        setTimeout(() => {
+            window.isInitialAutofill = false;
+            console.log('🔧 [AUTOFILL DEBUG] Autofill flag cleared after fallback completion');
+            
+            // 🔧 NEW: Update all hidden address fields after autofill completes
+            if (typeof updateAllHiddenAddressFields === 'function') {
+                updateAllHiddenAddressFields();
+            }
+        }, 2000); // 2 second delay to ensure fallback autofill completes
                 
             } catch (e) {
                 console.log('Error loading answers:', e);
@@ -7031,6 +7386,211 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 </html>
 `;
+
+  // Add script to set up address listeners for multipleTextboxes after DOM loads
+  formHTML += `
+  <script>
+  // Include the generateHiddenAddressTextboxes function and helpers in the runtime
+  function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] generateHiddenAddressTextboxes called with questionId:', questionId, 'count:', count);
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] allFieldsInOrder:', allFieldsInOrder);
+      
+      // Check if this question has location fields (Street, City, State, Zip)
+      const hasLocationFields = allFieldsInOrder.some(field => 
+          ['Street', 'City', 'State', 'Zip'].includes(field.label)
+      );
+      
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] hasLocationFields:', hasLocationFields);
+      
+      if (!hasLocationFields) {
+          console.log('🔧 [HIDDEN ADDRESS] No location fields found for question', questionId);
+          return;
+      }
+      
+      // Get the base field name from the question
+      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] baseFieldName:', baseFieldName);
+      
+      // Remove existing hidden address textboxes for this question
+      for (let i = 1; i <= 10; i++) { // Check up to 10 entries
+          const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
+          if (existingAddress && existingAddress.type === 'text' && existingAddress.style.display === 'none') {
+              existingAddress.remove();
+          }
+      }
+      
+      // Generate hidden address textboxes for the selected count
+      for (let i = 1; i <= count; i++) {
+          // For single-entry questions (like multipleTextboxes), don't add number suffix
+          const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
+          const addressInput = document.createElement('input');
+          addressInput.type = 'text';
+          addressInput.id = addressId;
+          addressInput.name = addressId;
+          addressInput.style.display = 'none';
+          
+          // Add to hidden fields container
+          const hiddenContainer = document.getElementById('hidden_pdf_fields');
+          if (hiddenContainer) {
+              hiddenContainer.appendChild(addressInput);
+              console.log('🔧 [HIDDEN ADDRESS] Created hidden address textbox:', addressId);
+          }
+          
+          // Set up event listeners to update the address when location fields change
+          // Delay this to ensure location fields are created first
+          setTimeout(() => {
+              setupAddressUpdateListeners(questionId, i, baseFieldName, allFieldsInOrder, count);
+          }, 1000); // 1 second delay to ensure fields are created
+      }
+  }
+
+  function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, allFieldsInOrder, count = 1) {
+      // For single-entry questions (like multipleTextboxes), don't add number suffix
+      const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
+      const addressInput = document.getElementById(addressId);
+      
+      if (!addressInput) return;
+      
+      // Function to update the address field
+      const updateAddress = () => {
+          // For single-entry questions, don't add number suffix to field IDs
+          const streetFieldId = count === 1 ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
+          const cityFieldId = count === 1 ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
+          const stateFieldId = count === 1 ? baseFieldName + '_state' : baseFieldName + '_state_' + entryNumber;
+          const zipFieldId = count === 1 ? baseFieldName + '_zip' : baseFieldName + '_zip_' + entryNumber;
+          const stateShortFieldId = count === 1 ? baseFieldName + '_state_short' : baseFieldName + '_state_short_' + entryNumber;
+          
+          const streetField = document.getElementById(streetFieldId);
+          const cityField = document.getElementById(cityFieldId);
+          const stateField = document.getElementById(stateFieldId);
+          const zipField = document.getElementById(zipFieldId);
+          const stateShortField = document.getElementById(stateShortFieldId);
+          
+          // Debug: Log what fields we're looking for and what we found
+          console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
+          console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+          console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+          console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+          console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+          console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+          
+          const street = streetField ? streetField.value.trim() : '';
+          const city = cityField ? cityField.value.trim() : '';
+          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+          const zip = zipField ? zipField.value.trim() : '';
+          
+          // Build the full address
+          const addressParts = [street, city, state, zip].filter(part => part !== '');
+          const fullAddress = addressParts.join(', ');
+          
+          addressInput.value = fullAddress;
+          console.log('🔧 [HIDDEN ADDRESS] Updated address for', addressId, ':', fullAddress);
+      };
+      
+      // Set up listeners for all location fields
+      const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] Setting up listeners for baseFieldName:', baseFieldName, 'entryNumber:', entryNumber);
+      
+      locationFields.forEach(fieldType => {
+          // For single-entry questions, don't add number suffix to field IDs
+          const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
+          const field = document.getElementById(fieldId);
+          
+          console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for field:', fieldId, 'Found:', !!field);
+          
+          if (field) {
+              // Listen for input changes
+              field.addEventListener('input', updateAddress);
+              field.addEventListener('change', updateAddress);
+              console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
+          } else {
+              console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
+          }
+      });
+      
+      // Initial update with longer delay to ensure fields are created
+      setTimeout(updateAddress, 500);
+      
+      // Also trigger update after autofill completes (additional safety)
+      setTimeout(updateAddress, 2000);
+  }
+
+  // Set up address listeners for multipleTextboxes questions after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all multipleTextboxes questions with location fields
+    const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
+    multipleTextboxesQuestions.forEach(container => {
+      const questionId = container.id.replace('labelContainer', '');
+      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      const addressField = document.getElementById(baseFieldName + '_address');
+      
+      if (addressField) {
+        console.log('🔧 [HIDDEN ADDRESS] Setting up listeners for multipleTextboxes question:', questionId);
+        
+        // Set up listeners for location fields
+        const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+        locationFields.forEach(fieldType => {
+          const fieldId = baseFieldName + '_' + fieldType;
+          const field = document.getElementById(fieldId);
+          
+          if (field) {
+            const updateAddress = () => {
+              const streetField = document.getElementById(baseFieldName + '_street');
+              const cityField = document.getElementById(baseFieldName + '_city');
+              const stateField = document.getElementById(baseFieldName + '_state');
+              const zipField = document.getElementById(baseFieldName + '_zip');
+              const stateShortField = document.getElementById(baseFieldName + '_state_short');
+              
+              console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
+              console.log('  - Street field ID:', baseFieldName + '_street', 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+              console.log('  - City field ID:', baseFieldName + '_city', 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+              console.log('  - State field ID:', baseFieldName + '_state', 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+              console.log('  - Zip field ID:', baseFieldName + '_zip', 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+              console.log('  - State Short field ID:', baseFieldName + '_state_short', 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+              
+              const street = streetField ? streetField.value.trim() : '';
+              const city = cityField ? cityField.value.trim() : '';
+              const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+              const zip = zipField ? zipField.value.trim() : '';
+              
+              const addressParts = [street, city, state, zip].filter(part => part !== '');
+              const fullAddress = addressParts.join(', ');
+              
+              addressField.value = fullAddress;
+              console.log('🔧 [HIDDEN ADDRESS] Updated address for', baseFieldName + '_address', ':', fullAddress);
+            };
+            
+            field.addEventListener('input', updateAddress);
+            field.addEventListener('change', updateAddress);
+            console.log('🔧 [HIDDEN ADDRESS] Set up listener for field:', fieldId);
+          } else {
+            console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
+          }
+        });
+        
+        // Initial update
+        setTimeout(() => {
+          const streetField = document.getElementById(baseFieldName + '_street');
+          const cityField = document.getElementById(baseFieldName + '_city');
+          const stateField = document.getElementById(baseFieldName + '_state');
+          const zipField = document.getElementById(baseFieldName + '_zip');
+          const stateShortField = document.getElementById(baseFieldName + '_state_short');
+          
+          const street = streetField ? streetField.value.trim() : '';
+          const city = cityField ? cityField.value.trim() : '';
+          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+          const zip = zipField ? zipField.value.trim() : '';
+          
+          const addressParts = [street, city, state, zip].filter(part => part !== '');
+          const fullAddress = addressParts.join(', ');
+          
+          addressField.value = fullAddress;
+          console.log('🔧 [HIDDEN ADDRESS] Initial address update for', baseFieldName + '_address', ':', fullAddress);
+        }, 1000);
+      }
+    });
+  });
+  </script>`;
 
   // Finally, return the assembled HTML
   return formHTML;
