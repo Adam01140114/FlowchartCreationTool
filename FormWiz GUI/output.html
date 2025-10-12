@@ -231,8 +231,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">SC-100</h1><div id="question-container-1" class="question-container"><label><h3>How many people are suing with you?</h3></label><select id="sc100_how_many_people_are_suing_with_you" name="sc100_how_many_people_are_suing_with_you" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -358,7 +358,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
+window.formId = 'sc100';
 
 (function injectAddressHelpersOnce() {
   if (window.__addressHelpersInjected) return;
@@ -484,19 +484,19 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"how_many"};
-var questionNameIds = {"1":"how_many"};
+    var questionSlugMap       = {"1":"how_many_people_are_suing_with_you"};
+var questionNameIds = {"1":"sc100_how_many_people_are_suing_with_you"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc120.pdf","pdfDisplayName":"sc120","stripePriceId":"1234","triggerOption":"1","conditions":[],"isBigParagraph":false},{"questionId":"1","pdfName":"sc103.pdf","pdfDisplayName":"sc103","stripePriceId":"1234","triggerOption":"2","conditions":[],"isBigParagraph":false}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Street","City","State"],"length":0};
-var amountMap = {"1":["Zip"],"length":0};
-var labelNodeIdsMap = {"1":["how_many_street","how_many_city","how_many_state"]};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Street","nodeId":"how_many_street","order":1},{"type":"label","label":"City","nodeId":"how_many_city","order":2},{"type":"label","label":"State","nodeId":"how_many_state","order":3},{"type":"amount","label":"Zip","nodeId":"how_many_zip","order":4}]};
+var labelMap = {"1":["Name"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["sc100_how_many_people_are_suing_with_you_name"]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"sc100_how_many_people_are_suing_with_you_name","order":1}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -620,9 +620,9 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "sc100.pdf";
+var pdfOutputFileName = "sc100.pdf";
+var stripePriceId = "123";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
@@ -957,28 +957,57 @@ window.addFormToCart = function (priceId) {
         console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
 
         let matched = false;
-        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-        for (const c of conds) {
-          const prevId = c?.prevQuestion;
-          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-          if (!prevId) continue;
-
-          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                     document.getElementById('answer' + prevId);
-          if (!el) {
-            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
-            continue;
+        
+        // Check if this is a numbered dropdown with trigger option
+        if (pdfLogic.triggerOption) {
+          // For numbered dropdown with trigger option, check if the selected value matches the trigger
+          const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                     document.getElementById('answer' + pdfLogic.questionId);
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Trigger Option:', pdfLogic.triggerOption);
+          console.log('  - Element found:', el);
+          console.log('  - Question Name IDs:', window.questionNameIds);
+          
+          if (el) {
+            const val = el.value || '';
+            console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
+            
+            if (val === pdfLogic.triggerOption) {
+              matched = true;
+              console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
+            } else {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
+            }
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
           }
+        } else {
+          // For regular conditions, check previous question logic
+          const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+          for (const c of conds) {
+            const prevId = c?.prevQuestion;
+            const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+            if (!prevId) continue;
 
-          let val = '';
-          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-          else                        { val = el.value || ''; }
+            const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                       document.getElementById('answer' + prevId);
+            if (!el) {
+              console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+              continue;
+            }
 
-          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+            let val = '';
+            if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+            else                        { val = el.value || ''; }
 
-          if (val.toString().toLowerCase() === expect) {
-            matched = true; // any condition match includes the PDF
-            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
+            if (val.toString().toLowerCase() === expect) {
+              matched = true; // any condition match includes the PDF
+              console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            }
           }
         }
 
@@ -2640,8 +2669,10 @@ async function processAllPdfs() {
     }
     
     // Process PDF Logic PDFs
+    console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic PDFs:', pdfLogicPDFs);
     if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
         for (const pdfLogic of pdfLogicPDFs) {
+            console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic:', pdfLogic);
             if (pdfLogic.pdfName) {
                 // Check if conditions are met
                 let shouldDownload = false;
@@ -2666,29 +2697,58 @@ async function processAllPdfs() {
                     });
                 } else {
                     // For other question types, check previous question conditions
-                pdfLogic.conditions.forEach(condition => {
-                    const prevQuestionId = condition.prevQuestion;
-                    const prevAnswer = condition.prevAnswer;
+                // First check if this is a numbered dropdown with trigger option
+                if (pdfLogic.triggerOption) {
+                    // For numbered dropdown with trigger option, check if the selected value matches the trigger
+                    const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                          document.getElementById('answer' + pdfLogic.questionId);
                     
-                    // Get the previous question's value
-                    const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                              document.getElementById('answer' + prevQuestionId);
+                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking trigger option:');
+                    console.log('  - Question ID:', pdfLogic.questionId);
+                    console.log('  - Trigger Option:', pdfLogic.triggerOption);
+                    console.log('  - Question Element:', questionElement);
+                    console.log('  - Question Name IDs:', questionNameIds);
                     
-                    if (prevQuestionElement) {
-                        let prevValue = '';
+                    if (questionElement) {
+                        const selectedValue = questionElement.value;
+                        console.log('  - Selected Value:', selectedValue);
                         
-                        if (prevQuestionElement.type === 'checkbox') {
-                            prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                        } else {
-                            prevValue = prevQuestionElement.value;
-                        }
-                        
-                        // Check if the condition matches
-                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                        // Check if the selected value matches the trigger option
+                        if (selectedValue === pdfLogic.triggerOption) {
                             shouldDownload = true;
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger option matched - will download PDF');
+                        } else {
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Trigger option NOT matched');
                         }
+                    } else {
+                        console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
-                });
+                } else {
+                        // For regular conditions, check previous question logic
+                        pdfLogic.conditions.forEach(condition => {
+                            const prevQuestionId = condition.prevQuestion;
+                            const prevAnswer = condition.prevAnswer;
+                            
+                            // Get the previous question's value
+                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                                      document.getElementById('answer' + prevQuestionId);
+                            
+                            if (prevQuestionElement) {
+                                let prevValue = '';
+                                
+                                if (prevQuestionElement.type === 'checkbox') {
+                                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                                } else {
+                                    prevValue = prevQuestionElement.value;
+                                }
+                                
+                                // Check if the condition matches
+                                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                                    shouldDownload = true;
+                                }
+                            }
+                        });
+                    }
                 }
                 
                 // Download PDF if conditions are met
@@ -3758,33 +3818,24 @@ if (typeof handleNext === 'function') {
                 
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
-                    console.log('🔧 [AUTOFILL DEBUG] Fallback numbered dropdown autofill check');
                     const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
                     numberedDropdowns.forEach(dropdown => {
                         if (dropdown.value && parseInt(dropdown.value) > 0) {
-                            console.log('🔧 [AUTOFILL DEBUG] Fallback found numbered dropdown:', dropdown.id, 'value:', dropdown.value);
                             // Trigger the autofill logic again for any missed dropdowns
                             const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
                             if (typeof showTextboxLabels === 'function') {
                                 showTextboxLabels(questionId, dropdown.value);
                                 
                                 // 🔧 NEW: Add the missing autofill logic for numbered fields
-                                console.log('🔧 [AUTOFILL DEBUG] Fallback - About to set setTimeout for dropdown:', dropdown.id, 'value:', dropdown.value);
-                                console.log('🔧 [AUTOFILL DEBUG] Fallback - mappedData available:', !!mappedData);
                                 setTimeout(() => {
-                                    console.log('🔧 [AUTOFILL DEBUG] Fallback setTimeout callback triggered for dropdown:', dropdown.id, 'value:', dropdown.value);
                                     const count = parseInt(dropdown.value);
-                                    console.log('🔧 [AUTOFILL DEBUG] Fallback parsed count:', count);
                                     if (count > 0) {
                                         // Get the base field name from the dropdown
                                         const baseFieldName = dropdown.id;
                                         
-                                        // Debug: Log all available keys in mappedData
-                                        console.log('🔧 [AUTOFILL DEBUG] Fallback - All mappedData keys:', Object.keys(mappedData));
                                         
                                         // Try to autofill numbered fields for each count
                                         for (let i = 1; i <= count; i++) {
-                                            console.log('🔧 [AUTOFILL DEBUG] Fallback - Processing count i:', i);
                                             // Common field patterns to check - using the actual Firebase naming pattern
                                             const fieldPatterns = [
                                                 'name', 

@@ -60,3 +60,55 @@ When building JavaScript code strings dynamically in Node.js:
 - Always test the generated JavaScript for syntax errors
 
 This fix resolved the "Unexpected end of input" error and allowed the form generation to complete successfully.
+
+## Additional Template Literal Issue: "Unexpected identifier"
+
+### The Problem
+When using template literals in console.log statements within generated JavaScript, you may encounter "SyntaxError: Unexpected identifier" errors, particularly with identifiers like "ID" in template strings.
+
+### The Issue
+Template literals with complex variable names or special characters can cause parsing issues:
+
+```javascript
+// ❌ PROBLEMATIC - Can cause "Unexpected identifier" errors
+console.log(`  - Question ID: ${pdfLogic.questionId}`);
+console.log(`  - Trigger Option: "${pdfLogic.triggerOption}"`);
+```
+
+### The Solution
+Replace template literals with regular string concatenation for console.log statements:
+
+```javascript
+// ✅ CORRECT - Use string concatenation for console.log
+console.log('  - Question ID:', pdfLogic.questionId);
+console.log('  - Trigger Option:', pdfLogic.triggerOption);
+```
+
+### Why This Works
+1. **Template literals** can have parsing issues with certain variable names or special characters
+2. **String concatenation** with comma separation is more reliable for console.log
+3. **Comma separation** automatically handles type conversion and formatting
+
+### Examples of the Fix
+
+#### Before (Problematic):
+```javascript
+console.log(`🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:`);
+console.log(`  - Question ID: ${pdfLogic.questionId}`);
+console.log(`  - Trigger Option: "${pdfLogic.triggerOption}"`);
+console.log(`  - Element found:`, el);
+```
+
+#### After (Fixed):
+```javascript
+console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+console.log('  - Question ID:', pdfLogic.questionId);
+console.log('  - Trigger Option:', pdfLogic.triggerOption);
+console.log('  - Element found:', el);
+```
+
+### Key Takeaway
+For console.log statements in generated JavaScript:
+- Use **comma separation** (`console.log('text:', variable)`) instead of template literals
+- This avoids parsing issues with special characters and variable names
+- Provides better type handling and formatting

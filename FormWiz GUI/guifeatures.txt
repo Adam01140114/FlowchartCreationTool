@@ -1,0 +1,535 @@
+# FormWiz GUI Features Documentation
+# =====================================
+
+This document provides a comprehensive overview of all features implemented in the FormWiz GUI system, including their implementation details and usage.
+
+## Table of Contents
+1. [Hidden Checkbox Features](#hidden-checkbox-features)
+2. [Hidden Address Textbox Features](#hidden-address-textbox-features)
+3. [Numbered Dropdown Autofill Features](#numbered-dropdown-autofill-features)
+4. [Multiple Textboxes Features](#multiple-textboxes-features)
+5. [Radio Button Features](#radio-button-features)
+6. [State Management Features](#state-management-features)
+7. [Autofill System Features](#autofill-system-features)
+
+---
+
+## Hidden Checkbox Features
+
+### Feature: Hidden Checkbox Creation for Radio Buttons
+**Purpose**: Creates hidden checkboxes that mirror radio button selections for PDF generation and data collection.
+
+**Implementation**:
+- **Location**: `generate.js` lines 687-710, 712-750
+- **Function**: `handleMarkOnlyOneSelection()`, `createHiddenCheckboxForRadio()`, `removeHiddenCheckbox()`
+- **Trigger**: When radio buttons are selected in "Mark only one" mode
+
+**How it works**:
+1. When a radio button is selected, `handleMarkOnlyOneSelection()` is called
+2. Unchecks all other radio buttons in the same group
+3. Creates a hidden checkbox with the same ID as the selected radio button
+4. Removes hidden checkboxes for unselected radio buttons
+
+**Code Example**:
+```javascript
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    // Uncheck other radio buttons
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            removeHiddenCheckbox(input.id);
+        }
+    });
+    
+    // Create hidden checkbox for selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+```
+
+### Feature: Hidden Checkbox Generation for Numbered Dropdowns
+**Purpose**: Creates hidden checkboxes for numbered dropdown questions to track which entries are selected.
+
+**Implementation**:
+- **Location**: `generate.js` lines 1917-1953
+- **Function**: `generateHiddenCheckboxes()`
+- **Trigger**: When numbered dropdown values change
+
+**How it works**:
+1. Finds the maximum range from dropdown options
+2. Creates hidden checkboxes for the full range (1 to max)
+3. Checks checkboxes for entries within the selected count
+4. Unchecks checkboxes for entries beyond the selected count
+
+**Code Example**:
+```javascript
+function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
+    // Generate hidden checkboxes for the full range
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = questionSafe + "_" + i;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = checkboxId;
+        checkbox.checked = i <= selectedCount; // Check if within selected range
+    }
+}
+```
+
+---
+
+## Hidden Address Textbox Features
+
+### Feature: Hidden Address Textbox Creation
+**Purpose**: Creates hidden textboxes that automatically combine address components (street, city, state, zip) into a single address field.
+
+**Implementation**:
+- **Location**: `generate.js` lines 136-188, 7394-5527
+- **Function**: `generateHiddenAddressTextboxes()`, `setupAddressUpdateListeners()`
+- **Trigger**: For questions with location fields (Street, City, State, Zip)
+
+**How it works**:
+1. Detects if a question has location fields
+2. Creates hidden address textbox with ID pattern: `{baseFieldName}_address`
+3. Sets up event listeners on all location fields
+4. Automatically updates the hidden address field when any location field changes
+5. Combines fields in format: "Street, City, State, Zip"
+
+**Code Example**:
+```javascript
+function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
+    const hasLocationFields = allFieldsInOrder.some(field => 
+        ['Street', 'City', 'State', 'Zip'].includes(field.label)
+    );
+    
+    if (hasLocationFields) {
+        const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+        const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
+        
+        // Create hidden address input
+        const addressInput = document.createElement('input');
+        addressInput.type = 'text';
+        addressInput.id = addressId;
+        addressInput.style.display = 'none';
+    }
+}
+```
+
+### Feature: Address Field Auto-Update
+**Purpose**: Automatically updates hidden address fields when location fields change.
+
+**Implementation**:
+- **Location**: `generate.js` lines 190-259, 5529-5598
+- **Function**: `setupAddressUpdateListeners()`
+- **Trigger**: On input/change events for location fields
+
+**How it works**:
+1. Sets up event listeners for street, city, state, zip, and state_short fields
+2. When any field changes, combines all values into a single address
+3. Updates the hidden address field with the combined value
+4. Uses state_short field if available, otherwise falls back to state field
+
+**Code Example**:
+```javascript
+const updateAddress = () => {
+    const street = streetField ? streetField.value.trim() : '';
+    const city = cityField ? cityField.value.trim() : '';
+    const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+    const zip = zipField ? zipField.value.trim() : '';
+    
+    const addressParts = [street, city, state, zip].filter(part => part !== '');
+    const fullAddress = addressParts.join(', ');
+    
+    addressInput.value = fullAddress;
+};
+```
+
+---
+
+## Numbered Dropdown Autofill Features
+
+### Feature: Dynamic Field Generation
+**Purpose**: Dynamically generates input fields based on dropdown selection count.
+
+**Implementation**:
+- **Location**: `generate.js` lines 1695-1915
+- **Function**: `showTextboxLabels()`
+- **Trigger**: When numbered dropdown value changes
+
+**How it works**:
+1. Parses the selected count from dropdown
+2. Clears existing fields in the container
+3. Generates new fields based on the count and field configuration
+4. Creates entry containers with proper styling
+5. Sets up event listeners for all generated fields
+
+**Code Example**:
+```javascript
+function showTextboxLabels(questionId, count) {
+    const container = document.getElementById("labelContainer" + questionId);
+    container.innerHTML = "";
+    
+    for(let j = 1; j <= count; j++){
+        const entryContainer = document.createElement('div');
+        entryContainer.className = 'entry-container';
+        
+        // Generate fields for this entry
+        allFieldsInOrder.forEach(field => {
+            // Create appropriate input based on field type
+        });
+    }
+}
+```
+
+### Feature: Autofill Integration
+**Purpose**: Integrates with the autofill system to populate dynamically generated fields.
+
+**Implementation**:
+- **Location**: `generate.js` lines 3810-3844
+- **Function**: Fallback autofill logic in `loadAnswers()`
+- **Trigger**: After autofill completes
+
+**How it works**:
+1. Detects numbered dropdowns with values
+2. Triggers `showTextboxLabels()` to generate fields
+3. Sets up additional autofill logic for numbered fields
+4. Uses setTimeout to ensure fields are created before autofilling
+
+**Code Example**:
+```javascript
+setTimeout(() => {
+    const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
+    numberedDropdowns.forEach(dropdown => {
+        if (dropdown.value && parseInt(dropdown.value) > 0) {
+            const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
+            showTextboxLabels(questionId, dropdown.value);
+        }
+    });
+}, 2000);
+```
+
+---
+
+## Multiple Textboxes Features
+
+### Feature: Multiple Textboxes Support
+**Purpose**: Supports multiple textbox questions with location fields and hidden address generation.
+
+**Implementation**:
+- **Location**: `generate.js` lines 1331-1470
+- **Function**: `multipleTextboxes` case in `getFormHTML()`
+- **Trigger**: During HTML generation for multipleTextboxes questions
+
+**How it works**:
+1. Extracts field configuration from unified fields
+2. Sets `questionNameIds[questionId]` for proper field naming
+3. Creates hidden address input in HTML string
+4. Generates location fields with proper styling
+5. Sets up event listeners after DOM loads
+
+**Code Example**:
+```javascript
+} else if (questionType === "multipleTextboxes") {
+    const questionNodeId = nodeIdEl ? nodeIdEl.value.trim() : "test";
+    questionNameIds[questionId] = questionNodeId;
+    
+    if (hasLocationFields) {
+        const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+        const addressId = baseFieldName + '_address';
+        formHTML += `<input type="text" id="${addressId}" name="${addressId}" style="display: none;">`;
+    }
+}
+```
+
+### Feature: Runtime Event Listener Setup
+**Purpose**: Sets up event listeners for multipleTextboxes questions after DOM loads.
+
+**Implementation**:
+- **Location**: `generate.js` lines 5600-5674
+- **Function**: DOMContentLoaded event listener
+- **Trigger**: After page loads
+
+**How it works**:
+1. Finds all multipleTextboxes questions with location fields
+2. Sets up event listeners for each location field
+3. Creates update functions that combine address components
+4. Performs initial address update after 1 second delay
+
+**Code Example**:
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+    const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
+    multipleTextboxesQuestions.forEach(container => {
+        const questionId = container.id.replace('labelContainer', '');
+        const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+        const addressField = document.getElementById(baseFieldName + '_address');
+        
+        if (addressField) {
+            // Set up listeners for location fields
+            const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+            locationFields.forEach(fieldType => {
+                const fieldId = baseFieldName + '_' + fieldType;
+                const field = document.getElementById(fieldId);
+                
+                if (field) {
+                    field.addEventListener('input', updateAddress);
+                    field.addEventListener('change', updateAddress);
+                }
+            });
+        }
+    });
+});
+```
+
+---
+
+## Radio Button Features
+
+### Feature: Mark Only One Selection
+**Purpose**: Ensures only one radio button can be selected in a group and manages hidden checkboxes.
+
+**Implementation**:
+- **Location**: `generate.js` lines 687-710
+- **Function**: `handleMarkOnlyOneSelection()`
+- **Trigger**: On radio button change events
+
+**How it works**:
+1. Finds all radio buttons in the same group
+2. Unchecks all other radio buttons
+3. Updates styling for all buttons
+4. Manages hidden checkbox creation/removal
+
+**Code Example**:
+```javascript
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            updateCheckboxStyle(input);
+            removeHiddenCheckbox(input.id);
+        }
+    });
+    
+    updateCheckboxStyle(selectedInput);
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+```
+
+### Feature: Checkbox Style Management
+**Purpose**: Updates visual styling of radio buttons based on selection state.
+
+**Implementation**:
+- **Location**: `generate.js` lines 712-750
+- **Function**: `updateCheckboxStyle()`
+- **Trigger**: When radio button selection changes
+
+**How it works**:
+1. Updates container styling based on checked state
+2. Adds/removes visual indicators for selection
+3. Maintains consistent styling across all radio buttons
+
+---
+
+## State Management Features
+
+### Feature: State Field Management
+**Purpose**: Manages state dropdown fields and their hidden counterparts.
+
+**Implementation**:
+- **Location**: `generate.js` lines 5400-5433
+- **Function**: `updateStateHiddenFields()`
+- **Trigger**: When state dropdown selection changes
+
+**How it works**:
+1. Maps full state names to abbreviations
+2. Updates both full state name and abbreviation hidden fields
+3. Handles empty selections by clearing both fields
+
+**Code Example**:
+```javascript
+function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    const selectedState = dropdown.value;
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', // ... etc
+    };
+    
+    if (fullField && shortField) {
+        if (selectedState) {
+            const abbreviation = stateAbbreviations[selectedState] || '';
+            fullField.value = selectedState;
+            shortField.value = abbreviation;
+        } else {
+            fullField.value = '';
+            shortField.value = '';
+        }
+    }
+}
+```
+
+---
+
+## Autofill System Features
+
+### Feature: Comprehensive Autofill System
+**Purpose**: Provides robust autofill functionality for all field types with multiple fallback mechanisms.
+
+**Implementation**:
+- **Location**: `generate.js` lines 3498-3844
+- **Function**: `loadAnswers()`
+- **Trigger**: On page load and user authentication
+
+**How it works**:
+1. **Primary Autofill**: Attempts to fill fields by name matching
+2. **Secondary Autofill**: Fills fields by ID matching
+3. **Fallback Autofill**: Additional passes for numbered dropdowns
+4. **State Field Updates**: Triggers state hidden field updates
+5. **Hidden Checkbox Creation**: Creates checkboxes for autofilled dropdowns
+
+**Key Features**:
+- **Timing Management**: Uses multiple setTimeout delays to ensure proper field creation
+- **Field Type Handling**: Different logic for checkboxes, radio buttons, and text inputs
+- **Error Handling**: Graceful handling of missing fields or data
+- **Debug Logging**: Comprehensive logging for troubleshooting
+
+**Code Example**:
+```javascript
+async function loadAnswers() {
+    // Primary autofill pass
+    fields.forEach(el => {
+        if (mappedData.hasOwnProperty(el.name)) {
+            if (el.type === 'checkbox') {
+                el.checked = !!mappedData[el.name];
+            } else if (el.type === 'radio') {
+                if (el.value === mappedData[el.name]) {
+                    el.checked = true;
+                } else {
+                    el.checked = false;
+                }
+            } else {
+                el.value = mappedData[el.name];
+            }
+        }
+    });
+    
+    // Fallback autofill for numbered dropdowns
+    setTimeout(() => {
+        const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
+        numberedDropdowns.forEach(dropdown => {
+            if (dropdown.value && parseInt(dropdown.value) > 0) {
+                const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
+                showTextboxLabels(questionId, dropdown.value);
+            }
+        });
+    }, 2000);
+}
+```
+
+### Feature: Autofill Flag Management
+**Purpose**: Prevents conflicts between autofill and user interactions.
+
+**Implementation**:
+- **Location**: Throughout autofill functions
+- **Variable**: `window.isInitialAutofill`
+- **Usage**: Prevents certain operations during autofill
+
+**How it works**:
+1. Sets flag to true during autofill operations
+2. Prevents field regeneration during autofill
+3. Clears flag after autofill completes
+4. Allows normal operation after autofill
+
+---
+
+## Technical Implementation Notes
+
+### Function Definition Order
+**Issue**: Functions called before being defined
+**Solution**: Moved function definitions to top of file before `getFormHTML()`
+
+### Runtime Function Availability
+**Issue**: Functions not available in generated HTML
+**Solution**: Added function definitions to generated HTML script section
+
+### Timing Issues
+**Issue**: Functions called before DOM elements exist
+**Solution**: Used setTimeout delays and DOMContentLoaded events
+
+### Field Name Consistency
+**Issue**: Inconsistent field naming between question types
+**Solution**: Properly set `questionNameIds[questionId]` for all question types
+
+### Event Listener Management
+**Issue**: Event listeners not properly set up for dynamically generated fields
+**Solution**: Comprehensive event listener setup with proper timing and error handling
+
+---
+
+## Usage Examples
+
+### Creating a Hidden Address Field
+```javascript
+// For a question with location fields, the system automatically:
+// 1. Detects location fields (Street, City, State, Zip)
+// 2. Creates hidden address field: {questionName}_address
+// 3. Sets up event listeners to update the address
+// 4. Combines fields into format: "123 Main St, Anytown, CA, 12345"
+```
+
+### Managing Radio Button Selections
+```javascript
+// When a radio button is selected:
+// 1. Unchecks all other radio buttons in the group
+// 2. Creates hidden checkbox with same ID as radio button
+// 3. Updates visual styling
+// 4. Removes hidden checkboxes for unselected options
+```
+
+### Dynamic Field Generation
+```javascript
+// For numbered dropdowns:
+// 1. User selects count (e.g., "3")
+// 2. System generates 3 sets of input fields
+// 3. Creates hidden checkboxes for entries 1, 2, 3
+// 4. Sets up event listeners for all generated fields
+// 5. Integrates with autofill system
+```
+
+---
+
+## Debugging and Troubleshooting
+
+### Console Logging
+The system includes comprehensive console logging with prefixes:
+- `🔧 [HIDDEN ADDRESS DEBUG]`: Address field operations
+- `🔧 [AUTOFILL DEBUG]`: Autofill operations
+- `🔍 [COUNTY QUESTION DEBUG]`: Conditional logic operations
+
+### Common Issues and Solutions
+1. **Function not defined**: Check function definition order and runtime availability
+2. **Fields not updating**: Check event listener setup and timing
+3. **Wrong field names**: Verify `questionNameIds` is properly set
+4. **Autofill conflicts**: Check `isInitialAutofill` flag usage
+
+---
+
+## Future Enhancements
+
+### Potential Improvements
+1. **Performance Optimization**: Reduce setTimeout delays where possible
+2. **Error Handling**: More robust error handling for edge cases
+3. **Code Organization**: Further modularization of functions
+4. **Testing**: Automated testing for all features
+5. **Documentation**: More detailed inline code documentation
+
+### Extensibility
+The system is designed to be easily extensible:
+- New question types can be added by following existing patterns
+- New field types can be supported by extending the field generation logic
+- Additional autofill sources can be integrated by extending the autofill system
+- New hidden field types can be added by following the existing patterns
+
+---
+
+*This documentation is maintained alongside the codebase and should be updated when new features are added or existing features are modified.*

@@ -894,17 +894,79 @@ function loadFormData(formData) {
                         pdfLogicCbox.checked = true;
                         togglePdfLogic(question.questionId);
                     }
-                    const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}`);
+                    
+                    // Load multiple PDFs with trigger options
+                    if (question.pdfLogic.pdfs && question.pdfLogic.pdfs.length > 0) {
+                        const pdfDetailsContainer = questionBlock.querySelector(`#pdfDetailsContainer${question.questionId}`);
+                        if (pdfDetailsContainer) {
+                            // Clear existing PDF groups except the first one
+                            const existingPdfGroups = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
+                            for (let i = 1; i < existingPdfGroups.length; i++) {
+                                existingPdfGroups[i].remove();
+                            }
+                            
+                            // Load each PDF
+                            question.pdfLogic.pdfs.forEach((pdf, pdfIndex) => {
+                                const pdfIndexNum = pdfIndex + 1;
+                                
+                                if (pdfIndexNum === 1) {
+                                    // Update the first PDF group
+                                    const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}_1`);
                     if (pdfLogicPdfNameInput) {
+                                        pdfLogicPdfNameInput.value = pdf.pdfName || "";
+                                    }
+                                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}_1`);
+                                    if (pdfLogicPdfDisplayNameInput) {
+                                        pdfLogicPdfDisplayNameInput.value = pdf.pdfDisplayName || "";
+                                    }
+                                    const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}_1`);
+                                    if (pdfLogicStripePriceIdInput) {
+                                        pdfLogicStripePriceIdInput.value = pdf.stripePriceId || "";
+                                    }
+                                    const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}`);
+                                    if (triggerOptionSelect && pdf.triggerOption) {
+                                        triggerOptionSelect.value = pdf.triggerOption;
+                                    }
+                                } else {
+                                    // Add additional PDF groups
+                                    addAnotherPdf(question.questionId);
+                                    
+                                    // Set the values for the new PDF group
+                                    setTimeout(() => {
+                                        const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}_${pdfIndexNum}`);
+                                        if (pdfLogicPdfNameInput) {
+                                            pdfLogicPdfNameInput.value = pdf.pdfName || "";
+                                        }
+                                        const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}_${pdfIndexNum}`);
+                                        if (pdfLogicPdfDisplayNameInput) {
+                                            pdfLogicPdfDisplayNameInput.value = pdf.pdfDisplayName || "";
+                                        }
+                                        const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}_${pdfIndexNum}`);
+                                        if (pdfLogicStripePriceIdInput) {
+                                            pdfLogicStripePriceIdInput.value = pdf.stripePriceId || "";
+                                        }
+                                        const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}_${pdfIndexNum}`);
+                                        if (triggerOptionSelect && pdf.triggerOption) {
+                                            triggerOptionSelect.value = pdf.triggerOption;
+                                        }
+                                    }, 100);
+                                }
+                            });
+                        }
+                    } else {
+                        // Handle legacy single PDF structure
+                        const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}_1`);
+                        if (pdfLogicPdfNameInput && question.pdfLogic.pdfName) {
                         pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
                     }
-                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}`);
+                        const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}_1`);
                     if (pdfLogicPdfDisplayNameInput && question.pdfLogic.pdfDisplayName) {
                         pdfLogicPdfDisplayNameInput.value = question.pdfLogic.pdfDisplayName;
                     }
-                    const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
-                    if (pdfLogicStripePriceIdInput) {
-                        pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId || "";
+                        const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}_1`);
+                        if (pdfLogicStripePriceIdInput && question.pdfLogic.stripePriceId) {
+                            pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId;
+                        }
                     }
                     
                     // Load PDF Logic conditions
@@ -1283,9 +1345,9 @@ function exportForm() {
 
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
-            const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
-            const pdfLogicPdfDisplayName = questionBlock.querySelector(`#pdfLogicPdfDisplayName${questionId}`)?.value || "";
-            const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
+            
+            // Debug logging for PDF logic
+            console.log(`🔧 [EXPORT DEBUG] Question ${questionId} (${questionType}): PDF Logic enabled: ${pdfLogicEnabled}`);
             
             // Collect PDF Logic conditions
             const pdfLogicConditionsArray = [];
@@ -1323,6 +1385,92 @@ function exportForm() {
                                     prevAnswer: prevAnswer
                                 });
                             }
+                        }
+                    });
+                }
+            }
+            
+            // Collect multiple PDFs with trigger options
+            const pdfLogicPdfs = [];
+            if (pdfLogicEnabled) {
+                const pdfDetailsContainer = questionBlock.querySelector(`#pdfDetailsContainer${questionId}`);
+                if (pdfDetailsContainer) {
+                    const pdfGroups = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
+                    console.log(`🔧 [EXPORT DEBUG] Found ${pdfGroups.length} PDF groups for question ${questionId}`);
+                    pdfGroups.forEach((pdfGroup, pdfIndex) => {
+                        const pdfIndexNum = pdfIndex + 1;
+                        const pdfLogicPdfName = pdfGroup.querySelector(`#pdfLogicPdfName${questionId}_${pdfIndexNum}`)?.value || "";
+                        const pdfLogicPdfDisplayName = pdfGroup.querySelector(`#pdfLogicPdfDisplayName${questionId}_${pdfIndexNum}`)?.value || "";
+                        const pdfLogicStripePriceId = pdfGroup.querySelector(`#pdfLogicStripePriceId${questionId}_${pdfIndexNum}`)?.value || "";
+                        // For the first PDF, look for the main trigger option dropdown
+                        // For additional PDFs, look for the PDF-specific trigger option dropdown
+                        let triggerOption = "";
+                        if (pdfIndexNum === 1) {
+                            // First PDF uses the main trigger option dropdown
+                            const mainTriggerSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`);
+                            triggerOption = mainTriggerSelect?.value || "";
+                        } else {
+                            // Additional PDFs use PDF-specific trigger option dropdowns
+                            const pdfTriggerSelect = pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`);
+                            triggerOption = pdfTriggerSelect?.value || "";
+                        }
+                        
+                        // Debug logging
+                        console.log(`🔧 [EXPORT DEBUG] PDF ${pdfIndexNum} for question ${questionId}:`);
+                        console.log(`  - PDF Name: ${pdfLogicPdfName}`);
+                        console.log(`  - Question Type: ${questionType}`);
+                        if (pdfIndexNum === 1) {
+                            console.log(`  - Main Trigger Option Element:`, questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`));
+                        } else {
+                            console.log(`  - PDF Trigger Option Element:`, pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`));
+                        }
+                        console.log(`  - Trigger Option Value: "${triggerOption}"`);
+                        
+                        // Check if trigger option block is visible
+                        let triggerOptionBlock = null;
+                        if (pdfIndexNum === 1) {
+                            triggerOptionBlock = questionBlock.querySelector(`#triggerOptionBlock${questionId}`);
+                        } else {
+                            triggerOptionBlock = pdfGroup.querySelector(`#triggerOptionBlock${questionId}_${pdfIndexNum}`);
+                        }
+                        
+                        if (triggerOptionBlock) {
+                            console.log(`  - Trigger Option Block Display: ${triggerOptionBlock.style.display}`);
+                        } else {
+                            console.log(`  - Trigger Option Block: Not found`);
+                        }
+                        
+                        // Check if this is a numbered dropdown and trigger options should be available
+                        if (questionType === 'numberedDropdown') {
+                            console.log(`  - This is a numbered dropdown, trigger options should be available`);
+                        } else {
+                            console.log(`  - This is not a numbered dropdown (${questionType}), trigger options may not be available`);
+                        }
+                        
+                        // Check if the trigger option dropdown has options
+                        let triggerSelect = null;
+                        if (pdfIndexNum === 1) {
+                            triggerSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`);
+                        } else {
+                            triggerSelect = pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`);
+                        }
+                        
+                        if (triggerSelect) {
+                            console.log(`  - Trigger Select Options:`, triggerSelect.options.length);
+                            for (let i = 0; i < triggerSelect.options.length; i++) {
+                                console.log(`    Option ${i}: "${triggerSelect.options[i].value}" - "${triggerSelect.options[i].text}"`);
+                            }
+                            console.log(`  - Trigger Select Display: ${triggerSelect.style.display}`);
+                            console.log(`  - Trigger Select Parent Display: ${triggerSelect.parentElement.style.display}`);
+                        }
+                        
+                        if (pdfLogicPdfName) {
+                            pdfLogicPdfs.push({
+                                pdfName: pdfLogicPdfName,
+                                pdfDisplayName: pdfLogicPdfDisplayName,
+                                stripePriceId: pdfLogicStripePriceId,
+                                triggerOption: triggerOption
+                            });
                         }
                     });
                 }
@@ -1413,10 +1561,8 @@ function exportForm() {
                 },
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
-                    pdfName: pdfLogicPdfName,
-                    pdfDisplayName: pdfLogicPdfDisplayName,
-                    stripePriceId: pdfLogicStripePriceId,
-                    conditions: pdfLogicConditionsArray
+                    conditions: pdfLogicConditionsArray,
+                    pdfs: pdfLogicPdfs
                 },
                 alertLogic: {
                     enabled: alertLogicEnabled,

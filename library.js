@@ -265,7 +265,7 @@ window.exportGuiJson = function(download = true) {
     if (questionType !== "multipleTextboxes") {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
-      }
+    }
       
       // Add line limit and character limit for big paragraph questions
       if (questionType === "bigParagraph") {
@@ -278,7 +278,7 @@ window.exportGuiJson = function(download = true) {
         if (cell._paragraphLimit !== undefined && cell._paragraphLimit !== '') {
           question.paragraphLimit = parseInt(cell._paragraphLimit) || 0;
         }
-      }
+    }
     
     // For text2, clean the text from HTML
     if (questionType === "text2" && question.text) {
@@ -335,8 +335,13 @@ window.exportGuiJson = function(download = true) {
         });
       });
       
-      // Insert location fields at the correct position if locationIndex is set
-      if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+      // Insert location fields at the correct position if locationIndex is set AND location fields actually exist
+      // Check if location fields are actually present in the current UI state
+      const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
+        ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
+      );
+      
+      if (locationIndex >= 0 && locationIndex <= cell._textboxes.length && hasLocationFieldsInUI) {
         const locationFields = [
           { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
           { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
@@ -785,8 +790,13 @@ window.exportGuiJson = function(download = true) {
           });
         });
         
-        // Insert location fields at the correct position if locationIndex is set
-        if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+        // Insert location fields at the correct position if locationIndex is set AND location fields actually exist
+        // Check if location fields are actually present in the current UI state
+        const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
+          ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
+        );
+        
+        if (locationIndex >= 0 && locationIndex <= cell._textboxes.length && hasLocationFieldsInUI) {
           const locationFields = [
             { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
             { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
@@ -1499,8 +1509,8 @@ window.saveFlowchart = function() {
     if (formName) {
       flowchartName = formName;
     } else {
-      flowchartName = prompt("Enter a name for this flowchart:");
-      if (!flowchartName || !flowchartName.trim()) return;
+    flowchartName = prompt("Enter a name for this flowchart:");
+    if (!flowchartName || !flowchartName.trim()) return;
     }
     currentFlowchartName = flowchartName;
   }
@@ -1577,7 +1587,144 @@ window.saveFlowchart = function() {
     flowchart: data,
     lastUsed: Date.now()
   })
-    .then(()=>alert("Flowchart saved as: " + flowchartName))
+    .then(()=>{
+      alert("Flowchart saved as: " + flowchartName);
+      // Trigger autosave to update the library flowchart name
+      if (typeof autosaveFlowchartToLocalStorage === 'function') {
+        autosaveFlowchartToLocalStorage();
+      }
+    })
+    .catch(err=>alert("Error saving: " + err));
+};
+
+// Save flowchart as a new flowchart (Save As functionality)
+window.saveAsFlowchart = function() {
+  console.log('💾 [LIBRARY SAVE AS] saveAsFlowchart function called');
+  if (!window.currentUser || window.currentUser.isGuest) { 
+    alert("Please log in with a real account to save flowcharts. Guest users cannot save."); 
+    return;
+  }  
+  
+  // Automatically reset PDF inheritance and Node IDs before saving
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  
+  // Check Linked Logic properties BEFORE reset
+  const graph = window.graph;
+  const parent = graph.getDefaultParent();
+  const allCells = graph.getChildVertices(parent);
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [BEFORE RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
+  
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+  }
+  
+  // Check Linked Logic properties AFTER reset
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [AFTER RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
+  
+  renumberQuestionIds();
+  
+  // Always prompt for a new name for "Save As"
+  let flowchartName = prompt("Enter a name for this new flowchart:");
+  if (!flowchartName || !flowchartName.trim()) return;
+  
+  // Update the current flowchart name to the new name
+  currentFlowchartName = flowchartName;
+  
+  // Gather data and save (same logic as saveFlowchart)
+  const data = { cells: [] };
+  const cells = graph.getModel().cells;
+  for (let id in cells) {
+    if (id === "0" || id === "1") continue;
+    const cell = cells[id];
+    const cellData = {
+      id: cell.id, 
+      value: cell.value || "",
+      geometry: cell.geometry ? { 
+        x: cell.geometry.x, 
+        y: cell.geometry.y, 
+        width: cell.geometry.width, 
+        height: cell.geometry.height 
+      } : null,
+      style: cleanStyle(cell.style || ""),
+      vertex: !!cell.vertex, 
+      edge: !!cell.edge,
+      source: cell.edge ? (cell.source? cell.source.id:null) : null,
+      target: cell.edge ? (cell.target? cell.target.id:null) : null,
+      // Save edge geometry (articulation points) if it exists
+      edgeGeometry: cell.edge && cell.geometry && cell.geometry.points && cell.geometry.points.length > 0 ? {
+        points: cell.geometry.points.map(point => ({
+          x: point.x,
+          y: point.y
+        }))
+      } : null,
+      _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
+      _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
+      _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
+      _image: cell._image||null,
+      _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
+      _checkboxAvailability: cell._checkboxAvailability||null,
+      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
+      _locationIndex: cell._locationIndex||null,
+      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
+    };
+    
+    // Debug logging for Linked Logic properties
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('💾 [LIBRARY SAVE AS] Saving Linked Logic properties for cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+    if (isCalculationNode(cell)) {
+      cellData._calcTitle = cell._calcTitle || null;
+      cellData._calcAmountLabel = cell._calcAmountLabel || null;
+      cellData._calcOperator = cell._calcOperator || null;
+      cellData._calcThreshold = cell._calcThreshold || null;
+      cellData._calcFinalText = cell._calcFinalText || null;
+      cellData._calcTerms = cell._calcTerms || null;
+      cellData._calcFinalOutputType = cell._calcFinalOutputType || null;
+      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked || null;
+    }
+    data.cells.push(cellData);
+  }
+  // Get current section preferences using the proper function
+  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
+  data.sectionPrefs = currentSectionPrefs;
+  data.groups = getGroupsData();
+  
+  // Get default PDF properties
+  const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
+    window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
+  data.defaultPdfProperties = defaultPdfProps;
+  
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  data.formName = formName;
+  
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
+    flowchart: data,
+    lastUsed: Date.now()
+  })
+    .then(()=>{
+      alert("Flowchart saved as: " + flowchartName);
+      // Trigger autosave to update the library flowchart name
+      if (typeof autosaveFlowchartToLocalStorage === 'function') {
+        autosaveFlowchartToLocalStorage();
+      }
+    })
     .catch(err=>alert("Error saving: " + err));
 };
 
@@ -1676,7 +1823,16 @@ window.renameFlowchart = function(oldName, element) {
   docRef.get().then(docSnap=>{
     if (docSnap.exists) {
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(newName).set(docSnap.data())
-        .then(()=>{ docRef.delete(); element.textContent=newName; if(currentFlowchartName===oldName) currentFlowchartName=newName; alert("Renamed to: " + newName); })
+        .then(()=>{ 
+          docRef.delete(); 
+          element.textContent=newName; 
+          if(currentFlowchartName===oldName) currentFlowchartName=newName; 
+          alert("Renamed to: " + newName);
+          // Trigger autosave to update the library flowchart name
+          if (typeof autosaveFlowchartToLocalStorage === 'function') {
+            autosaveFlowchartToLocalStorage();
+          }
+        })
         .catch(err=>alert("Error renaming: " + err));
     }
   });

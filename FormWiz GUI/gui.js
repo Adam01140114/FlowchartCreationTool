@@ -743,14 +743,33 @@ function addQuestion(sectionId, questionId = null) {
             <div id="pdfLogicConditions${currentQuestionId}"></div>
             <button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
             <br><br>
-            <label>PDF Name (for cart display):</label>
-            <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
-            <br><br>
-            <label>Additional PDF to download:</label>
-            <input type="text" id="pdfLogicPdfName${currentQuestionId}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
-            <br><br>
-            <label>Choose your Price ID:</label>
-            <input type="text" id="pdfLogicStripePriceId${currentQuestionId}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+            
+            <!-- Trigger Option for Numbered Dropdown -->
+            <div id="triggerOptionBlock${currentQuestionId}" style="display: none;">
+                <label>Trigger option:</label>
+                <select id="pdfLogicTriggerOption${currentQuestionId}">
+                    <option value="">Select trigger option</option>
+                </select>
+                <br><br>
+            </div>
+            
+            <!-- PDF Details Container -->
+            <div id="pdfDetailsContainer${currentQuestionId}">
+                <div class="pdf-detail-group" data-pdf-index="1">
+                    <label>PDF Name (for cart display):</label>
+                    <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}_1" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+                    <br><br>
+                    <label>Additional PDF to download:</label>
+                    <input type="text" id="pdfLogicPdfName${currentQuestionId}_1" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+                    <br><br>
+                    <label>Choose your Price ID:</label>
+                    <input type="text" id="pdfLogicStripePriceId${currentQuestionId}_1" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+                    <br><br>
+                </div>
+            </div>
+            
+            <!-- Add Another PDF Button -->
+            <button type="button" onclick="addAnotherPdf(${currentQuestionId})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">+ Add Another PDF</button>
         </div><br>
 
         <!-- Alert Logic -->
@@ -1072,6 +1091,11 @@ function toggleOptions(questionId) {
                 const conditionId = condition.id.split('_')[1];
                 updateJumpOptionsForNumberedDropdown(questionId, conditionId);
             });
+            // Update PDF logic trigger options if PDF logic is enabled
+            const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
+            if (pdfLogicEnabled) {
+                updatePdfLogicTriggerOptions(questionId);
+            }
             break;
 
         case 'money':
@@ -1749,18 +1773,126 @@ function renumberHiddenLogicConfigs(questionId) {
     });
 }
 
+// Add another PDF to the PDF logic
+function addAnotherPdf(questionId) {
+    const pdfDetailsContainer = document.getElementById(`pdfDetailsContainer${questionId}`);
+    const existingPdfs = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
+    const nextIndex = existingPdfs.length + 1;
+    
+    const newPdfGroup = document.createElement('div');
+    newPdfGroup.className = 'pdf-detail-group';
+    newPdfGroup.setAttribute('data-pdf-index', nextIndex);
+    newPdfGroup.innerHTML = `
+        <div style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #007bff;">PDF ${nextIndex}</h4>
+                <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove PDF</button>
+            </div>
+            
+            <!-- Trigger Option for Numbered Dropdown -->
+            <div id="triggerOptionBlock${questionId}_${nextIndex}" style="display: none;">
+                <label>Trigger option:</label>
+                <select id="pdfLogicTriggerOption${questionId}_${nextIndex}">
+                    <option value="">Select trigger option</option>
+                </select>
+                <br><br>
+            </div>
+            
+            <label>PDF Name (for cart display):</label>
+            <input type="text" id="pdfLogicPdfDisplayName${questionId}_${nextIndex}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+            <br><br>
+            <label>Additional PDF to download:</label>
+            <input type="text" id="pdfLogicPdfName${questionId}_${nextIndex}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+            <br><br>
+            <label>Choose your Price ID:</label>
+            <input type="text" id="pdfLogicStripePriceId${questionId}_${nextIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+        </div>
+    `;
+    
+    pdfDetailsContainer.appendChild(newPdfGroup);
+    
+    // Update trigger options for the new PDF if it's a numbered dropdown
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    
+    if (questionType === 'numberedDropdown') {
+        const triggerOptionBlock = newPdfGroup.querySelector(`#triggerOptionBlock${questionId}_${nextIndex}`);
+        triggerOptionBlock.style.display = 'block';
+        updatePdfLogicTriggerOptions(questionId);
+    }
+}
+
+// Remove a PDF from the PDF logic
+function removePdf(questionId, pdfIndex) {
+    const pdfDetailsContainer = document.getElementById(`pdfDetailsContainer${questionId}`);
+    const pdfGroup = pdfDetailsContainer.querySelector(`[data-pdf-index="${pdfIndex}"]`);
+    if (pdfGroup) {
+        pdfGroup.remove();
+    }
+}
+
+// Update PDF Logic trigger options for numbered dropdown
+function updatePdfLogicTriggerOptions(questionId) {
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    
+    if (questionType === 'numberedDropdown') {
+        const rangeStartEl = questionBlock.querySelector(`#numberRangeStart${questionId}`);
+        const rangeEndEl = questionBlock.querySelector(`#numberRangeEnd${questionId}`);
+        
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value) || 1;
+            const max = parseInt(rangeEndEl.value) || min;
+            
+            // Update all trigger selects for all PDFs
+            const allTriggerSelects = document.querySelectorAll(`[id^="pdfLogicTriggerOption${questionId}"]`);
+            allTriggerSelects.forEach(triggerSelect => {
+                // Save the currently selected value
+                const currentValue = triggerSelect.value;
+                
+                // Clear existing options except the first one
+                triggerSelect.innerHTML = '<option value="">Select trigger option</option>';
+                
+                // Add each number in the range as an option
+                for (let i = min; i <= max; i++) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = i.toString();
+                    optionEl.textContent = i.toString();
+                    triggerSelect.appendChild(optionEl);
+                }
+                
+                // Restore the selected value if it's still valid
+                if (currentValue && parseInt(currentValue) >= min && parseInt(currentValue) <= max) {
+                    triggerSelect.value = currentValue;
+                }
+            });
+        }
+    }
+}
+
 // PDF Logic toggling
 function togglePdfLogic(questionId) {
     const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`).checked;
     const pdfLogicBlock = document.getElementById(`pdfLogicBlock${questionId}`);
     pdfLogicBlock.style.display = pdfLogicEnabled ? 'block' : 'none';
     
+    // Show/hide trigger option for numbered dropdown questions
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    const triggerOptionBlock = document.getElementById(`triggerOptionBlock${questionId}`);
+    
+    if (pdfLogicEnabled && questionType === 'numberedDropdown') {
+        triggerOptionBlock.style.display = 'block';
+        updatePdfLogicTriggerOptions(questionId);
+    } else {
+        triggerOptionBlock.style.display = 'none';
+    }
+    
     // If enabling PDF logic for a Big Paragraph question, clear any existing conditions
     if (pdfLogicEnabled) {
-        const questionBlock = document.getElementById(`questionBlock${questionId}`);
-        const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
-        const questionType = questionTypeSelect ? questionTypeSelect.value : '';
-        
         if (questionType === 'bigParagraph') {
             const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
             if (pdfLogicConditionsDiv) {
@@ -2397,6 +2529,12 @@ function updateNumberedDropdownEvents(questionId) {
         
         // 3. Update any hidden field conditional logic that might reference this question
         updateHiddenFieldConditionsForNumberedDropdown(questionId);
+        
+        // 4. Update PDF logic trigger options if PDF logic is enabled
+        const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
+        if (pdfLogicEnabled) {
+            updatePdfLogicTriggerOptions(questionId);
+        }
     }
 }
 
@@ -2750,8 +2888,8 @@ function removeUnifiedField(questionId, fieldOrder) {
             field.setAttribute('data-order', newOrder);
             field.className = `unified-field field-${newOrder}`;
             
-            // Update the order display
-            const orderDisplay = field.querySelector('div:last-of-type');
+            // Update the order display - find the div that contains "Order:"
+            const orderDisplay = field.querySelector('div[style*="font-size: 0.8em"]');
             if (orderDisplay && orderDisplay.textContent.includes('Order:')) {
                 orderDisplay.textContent = orderDisplay.textContent.replace(/Order: \d+/, `Order: ${newOrder}`);
             }
@@ -2762,19 +2900,19 @@ function removeUnifiedField(questionId, fieldOrder) {
                 removeButton.setAttribute('onclick', `removeUnifiedField(${questionId}, ${newOrder})`);
             }
             
-            // Update double-click event
-            const displayDiv = field.querySelector('div');
+            // Update double-click event - find the container div with cursor pointer
+            const displayDiv = field.querySelector('div[style*="cursor: pointer"]');
             if (displayDiv) {
-            // Remove any existing event listeners to prevent duplicates
-            if (displayDiv._dblclickHandler) {
-                displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
-            }
-            
-            // Add event listener for double-click editing
-            displayDiv._dblclickHandler = function() {
-                editUnifiedField(questionId, newOrder);
-            };
-            displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+                // Remove any existing event listeners to prevent duplicates
+                if (displayDiv._dblclickHandler) {
+                    displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+                }
+                
+                // Add event listener for double-click editing
+                displayDiv._dblclickHandler = function() {
+                    editUnifiedField(questionId, newOrder);
+                };
+                displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
             }
         });
         
