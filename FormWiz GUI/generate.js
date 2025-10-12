@@ -4230,6 +4230,15 @@ function updateHiddenLogic(dropdownName, selectedValue) {
     
     if (!config || config.trigger !== selectedValue) {
         console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config or trigger mismatch. Config exists:', !!config, 'Trigger match:', config ? config.trigger === selectedValue : false);
+        
+        // If there's a config but trigger doesn't match, uncheck the existing hidden element
+        if (config && config.trigger !== selectedValue) {
+            const existingElement = document.getElementById(config.nodeId);
+            if (existingElement) {
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Unchecking existing hidden element:', config.nodeId);
+                existingElement.checked = false;
+            }
+        }
         return;
     }
     
@@ -6712,6 +6721,19 @@ document.addEventListener('keydown', function(e) {
 // Close debug menu
 document.getElementById('closeDebugMenu').addEventListener('click', hideDebugMenu);
 
+// Click-outside-to-close functionality
+document.addEventListener('click', function(event) {
+  const debugMenu = document.getElementById('debugMenu');
+  
+  // If debug menu is visible
+  if (debugMenuVisible) {
+    // Check if click is on the overlay background (not on the content area)
+    if (event.target === debugMenu) {
+      hideDebugMenu();
+    }
+  }
+});
+
 // Close on escape key
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && debugMenuVisible) {
@@ -6791,6 +6813,9 @@ function addVirtualDropdownCheckboxes(inputData) {
   
   dropdowns.forEach(dropdown => {
     if (!dropdown.id) return;
+    
+    // Skip debug-related dropdowns
+    if (dropdown.id.startsWith('debug')) return;
     
     // Check if this is a numbered dropdown
     const isNumberedDropdown = dropdown.id.startsWith('answer') && dropdown.querySelector('option[value="1"]');
@@ -7008,7 +7033,8 @@ function populateDebugContent() {
   
   inputs.forEach(input => {
     // Include all inputs that have either an ID or a name (or both)
-    if (input.id || input.name) {
+    // Exclude debugTypeFilter_* fields
+    if ((input.id || input.name) && !input.id.startsWith('debugTypeFilter_')) {
       const value = input.type === 'checkbox' ? input.checked : input.value;
       const type = input.tagName.toLowerCase();
       const inputType = input.type || 'text';
@@ -7032,7 +7058,8 @@ function populateDebugContent() {
   const updatedInputs = document.querySelectorAll('input, select, textarea');
   updatedInputs.forEach(input => {
     // Include all inputs that have either an ID or a name (or both)
-    if (input.id || input.name) {
+    // Exclude debugTypeFilter_* fields
+    if ((input.id || input.name) && !input.id.startsWith('debugTypeFilter_')) {
       // Check if this input is already in inputData
       const exists = inputData.some(item => item.id === input.id && item.name === input.name);
       if (!exists) {

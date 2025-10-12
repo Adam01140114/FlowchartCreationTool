@@ -11,6 +11,7 @@ You should remove any console logs that do no pertain to the current issue you a
 This will help keep the console log clear and concise 
 You should always be reading output.html for context on what the current generate.js is producing. 
 You can always assume that the output.html is the most up to date one and generated using the most recently updated generate.js
+NEVER edit output.html directly, your goal is to edit generate.js which will then regenerate output.html
 
 ## 🔍 **Error Analysis Process:**
 

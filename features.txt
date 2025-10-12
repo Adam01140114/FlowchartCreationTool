@@ -282,7 +282,33 @@
   - PDF pricing integration
   - Filename sanitization (removes .pdf, non-alphanumeric chars)
 
-### **5. GUI JSON Generation**
+### **5. Form Debug Menu** ⭐ **NEW FEATURE**
+- **Description**: Comprehensive debugging interface for form analysis
+- **Implementation**: `output.html` - Debug menu system with advanced filtering
+- **Key Features**:
+  - **Real-time Form Analysis**: Live scanning of all form inputs, selects, and textareas
+  - **Advanced Search**: Partial word matching across field names, IDs, and values
+  - **Type Filtering**: Filter by input types (text, email, checkbox, radio, etc.)
+  - **Virtual Checkbox Detection**: Automatically detects and displays virtual checkboxes from dropdown selections
+  - **Export Functionality**: Export all field names and IDs for external analysis
+  - **Click-Outside-to-Close**: Intuitive UX with automatic menu closure on overlay background clicks
+  - **Clean Interface**: Filters out internal debug fields for user-friendly display
+- **Technical Implementation**:
+  - **Event-Driven Updates**: Real-time updates on form changes and user interactions
+  - **Virtual Element Handling**: `addVirtualDropdownCheckboxes()` creates virtual entries for dropdown combinations
+  - **Smart Filtering**: Excludes internal `debugTypeFilter_*` fields from display
+  - **DOM Event Management**: Comprehensive event listeners for form state changes
+  - **Overlay Click Detection**: Uses `event.target === debugMenu` to detect clicks on overlay background vs content area
+  - **Full-Screen Overlay**: 100% width/height overlay with high z-index for proper click detection
+- **Access Method**: Press `Ctrl+Shift` to open debug menu
+- **Use Cases**:
+  - Form validation debugging
+  - Field mapping verification
+  - Hidden element detection
+  - Form structure analysis
+  - Development and testing support
+
+### **6. GUI JSON Generation**
 - **Description**: Generate structured JSON for form applications
 - **Implementation**: `library.js` - `exportGuiJson()` function
 - **Key Features**:
