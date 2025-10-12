@@ -3410,19 +3410,23 @@ function showTextboxLabels(questionId, count){
     const existingFields = container.querySelectorAll('input, select, textarea');
     const expectedCount = parseInt(count) || 0;
     
-    // Check if we have any fields with values (regardless of exact count)
+    // Check if we have the correct number of fields already
     if (existingFields.length > 0) {
-        let hasValues = false;
-        let fieldValues = {};
-        existingFields.forEach(field => {
-            if (field.value && field.value.trim() !== '') {
-                hasValues = true;
-                fieldValues[field.id] = field.value;
-            }
-        });
+        const currentCount = existingFields.length / (labelMap[questionId]?.length || 1); // Calculate how many entries we currently have
         
-        if (hasValues) {
-            return;
+        // Only skip if we have the exact right number of fields AND they have values
+        if (currentCount === expectedCount) {
+            let hasValues = false;
+            existingFields.forEach(field => {
+                if (field.value && field.value.trim() !== '') {
+                    hasValues = true;
+                }
+            });
+            
+            // If we have the right count and values, only skip during initial autofill
+            if (hasValues && window.isInitialAutofill) {
+                return;
+            }
         }
         
         // 🔧 NEW: If fields exist but have no values, check if we're in the middle of autofill

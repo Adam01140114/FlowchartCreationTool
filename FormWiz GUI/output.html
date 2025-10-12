@@ -231,21 +231,13 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
-      <span class="checkbox-inline" id="checkbox-container-hungry_yes">
-        <label class="checkbox-label">
-          <input type="radio" id="hungry_yes" name="hungry" value="Yes" 
-                 onchange="handleMarkOnlyOneSelection(this, 1);  updateCheckboxStyle(this);">
-          Yes
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-hungry_no">
-        <label class="checkbox-label">
-          <input type="radio" id="hungry_no" name="hungry" value="No" 
-                 onchange="handleMarkOnlyOneSelection(this, 1);  updateCheckboxStyle(this);">
-          No
-        </label>
-      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-2" class="question-container"><label><h3>How many people are suing with you?</h3></label><select id="how_many_people_are_suing_with_you" name="how_many_people_are_suing_with_you" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -371,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
+window.formId = 'SC-100';
 
 (function injectAddressHelpersOnce() {
   if (window.__addressHelpersInjected) return;
@@ -497,8 +489,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry"};
-var questionNameIds = {"1":"hungry"};
+    var questionSlugMap       = {"1":"hungry","2":"how_many_people_are_suing_with_you"};
+var questionNameIds = {"1":"hungry","2":"how_many_people_are_suing_with_you"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -506,10 +498,10 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
-var unifiedFieldsMap = {};
+var labelMap = {"2":["Name","Phone Number","Street","City","State"],"length":0};
+var amountMap = {"2":["Zip"],"length":0};
+var labelNodeIdsMap = {"2":["how_many_people_are_suing_with_you_name","how_many_people_are_suing_with_you_phone_number","how_many_people_are_suing_with_you_street","how_many_people_are_suing_with_you_city","how_many_people_are_suing_with_you_state"]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_people_are_suing_with_you_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_people_are_suing_with_you_phone_number","order":2},{"type":"label","label":"Street","nodeId":"how_many_people_are_suing_with_you_street","order":3},{"type":"label","label":"City","nodeId":"how_many_people_are_suing_with_you_city","order":4},{"type":"label","label":"State","nodeId":"how_many_people_are_suing_with_you_state","order":5},{"type":"amount","label":"Zip","nodeId":"how_many_people_are_suing_with_you_zip","order":6}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -633,11 +625,11 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "SC-100";
+var pdfOutputFileName = "sc100.pdf";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc100", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -694,7 +686,7 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Create the hidden checkbox
     const hiddenCheckbox = document.createElement('input');
     hiddenCheckbox.type = 'checkbox';
-    hiddenCheckbox.id = radioId + '_hidden';
+    hiddenCheckbox.id = radioId;
     hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
     hiddenCheckbox.value = radioValue;
     hiddenCheckbox.checked = true;
@@ -703,17 +695,17 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId + '_hidden', 'for radio:', radioId);
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
 }
 
 /*──────────────────────────────────────────────────────────────*
  * Remove hidden checkbox for radio button
  *──────────────────────────────────────────────────────────────*/
 function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId + '_hidden');
-    if (hiddenCheckbox) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
         hiddenCheckbox.remove();
-        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId + '_hidden');
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
 }
 
@@ -1296,7 +1288,7 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Create the hidden checkbox
     const hiddenCheckbox = document.createElement('input');
     hiddenCheckbox.type = 'checkbox';
-    hiddenCheckbox.id = radioId + '_hidden';
+    hiddenCheckbox.id = radioId;
     hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
     hiddenCheckbox.value = radioValue;
     hiddenCheckbox.checked = true;
@@ -1305,17 +1297,17 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId + '_hidden', 'for radio:', radioId);
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
 }
 
 /*──────────────────────────────────────────────────────────────*
  * Remove hidden checkbox for radio button
  *──────────────────────────────────────────────────────────────*/
 function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId + '_hidden');
-    if (hiddenCheckbox) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
         hiddenCheckbox.remove();
-        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId + '_hidden');
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
 }
 
