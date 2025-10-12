@@ -753,20 +753,28 @@ function addQuestion(sectionId, questionId = null) {
                 <br><br>
             </div>
             
-            <!-- PDF Details Container -->
-            <div id="pdfDetailsContainer${currentQuestionId}">
-                <div class="pdf-detail-group" data-pdf-index="1">
-                    <label>PDF Name (for cart display):</label>
-                    <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}_1" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
-                    <br><br>
-                    <label>Additional PDF to download:</label>
-                    <input type="text" id="pdfLogicPdfName${currentQuestionId}_1" placeholder="Enter PDF name (e.g., additional_form.pdf)">
-                    <br><br>
-                    <label>Choose your Price ID:</label>
-                    <input type="text" id="pdfLogicStripePriceId${currentQuestionId}_1" placeholder="Enter Stripe Price ID (e.g., price_12345)">
-                    <br><br>
+                <!-- PDF Details Container -->
+                <div id="pdfDetailsContainer${currentQuestionId}">
+                    <div class="pdf-detail-group" data-pdf-index="1">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h4 style="margin: 0; color: #007bff;">PDF 1</h4>
+                            <div>
+                                <button type="button" onclick="addExtraPdf(${currentQuestionId}, 1)" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Extra PDF</button>
+                                <button type="button" onclick="removePdf(${currentQuestionId}, 1)" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove PDF</button>
+                            </div>
+                        </div>
+                        
+                        <label>PDF Name (for cart display):</label>
+                        <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}_1" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+                        <br><br>
+                        <label>Additional PDF to download:</label>
+                        <input type="text" id="pdfLogicPdfName${currentQuestionId}_1" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+                        <br><br>
+                        <label>Choose your Price ID:</label>
+                        <input type="text" id="pdfLogicStripePriceId${currentQuestionId}_1" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+                        <br><br>
+                    </div>
                 </div>
-            </div>
             
             <!-- Add Another PDF Button -->
             <button type="button" onclick="addAnotherPdf(${currentQuestionId})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">+ Add Another PDF</button>
@@ -1786,7 +1794,10 @@ function addAnotherPdf(questionId) {
         <div style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h4 style="margin: 0; color: #007bff;">PDF ${nextIndex}</h4>
-                <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove PDF</button>
+                <div>
+                    <button type="button" onclick="addExtraPdf(${questionId}, ${nextIndex})" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Extra PDF</button>
+                    <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove PDF</button>
+                </div>
             </div>
             
             <!-- Trigger Option for Numbered Dropdown -->
@@ -1829,6 +1840,59 @@ function removePdf(questionId, pdfIndex) {
     const pdfGroup = pdfDetailsContainer.querySelector(`[data-pdf-index="${pdfIndex}"]`);
     if (pdfGroup) {
         pdfGroup.remove();
+    }
+}
+
+// Add extra PDF inputs to an existing PDF group
+function addExtraPdf(questionId, pdfIndex) {
+    const pdfGroup = document.getElementById(`pdfDetailsContainer${questionId}`).querySelector(`[data-pdf-index="${pdfIndex}"]`);
+    if (!pdfGroup) return;
+    
+    // Count existing extra PDFs in this group
+    const existingExtraPdfs = pdfGroup.querySelectorAll('.extra-pdf-inputs');
+    const extraPdfIndex = existingExtraPdfs.length + 1;
+    
+    // Create the extra PDF inputs container
+    const extraPdfContainer = document.createElement('div');
+    extraPdfContainer.className = 'extra-pdf-inputs';
+    extraPdfContainer.style.cssText = 'border: 1px solid #28a745; border-radius: 6px; padding: 12px; margin: 10px 0; background: #f8fff8;';
+    
+    extraPdfContainer.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h5 style="margin: 0; color: #28a745;">Extra PDF ${extraPdfIndex}</h5>
+            <button type="button" onclick="removeExtraPdf(this)" style="background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 0.8em;">Remove</button>
+        </div>
+        
+        <label>PDF Name (for cart display):</label>
+        <input type="text" id="pdfLogicPdfDisplayName${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+        <br><br>
+        <label>Additional PDF to download:</label>
+        <input type="text" id="pdfLogicPdfName${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+        <br><br>
+        <label>Choose your Price ID:</label>
+        <input type="text" id="pdfLogicStripePriceId${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+    `;
+    
+    // Insert the extra PDF container after the trigger option block (if it exists) or after the main PDF inputs
+    const triggerOptionBlock = pdfGroup.querySelector(`#triggerOptionBlock${questionId}_${pdfIndex}`);
+    if (triggerOptionBlock && triggerOptionBlock.style.display !== 'none') {
+        triggerOptionBlock.insertAdjacentElement('afterend', extraPdfContainer);
+    } else {
+        // Find the last input in the main PDF group and insert after it
+        const lastInput = pdfGroup.querySelector('input:last-of-type');
+        if (lastInput) {
+            lastInput.parentNode.insertBefore(extraPdfContainer, lastInput.nextSibling);
+        } else {
+            pdfGroup.appendChild(extraPdfContainer);
+        }
+    }
+}
+
+// Remove an extra PDF input container
+function removeExtraPdf(button) {
+    const extraPdfContainer = button.closest('.extra-pdf-inputs');
+    if (extraPdfContainer) {
+        extraPdfContainer.remove();
     }
 }
 

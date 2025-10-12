@@ -923,10 +923,14 @@ function loadFormData(formData) {
                                     if (pdfLogicStripePriceIdInput) {
                                         pdfLogicStripePriceIdInput.value = pdf.stripePriceId || "";
                                     }
-                                    const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}`);
-                                    if (triggerOptionSelect && pdf.triggerOption) {
-                                        triggerOptionSelect.value = pdf.triggerOption;
-                                    }
+                                const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}`);
+                                if (triggerOptionSelect && pdf.triggerOption) {
+                                    triggerOptionSelect.value = pdf.triggerOption;
+                                }
+                                
+                                // Load extra PDFs for this PDF group
+                                // Note: We'll need to handle this differently since extra PDFs are added dynamically
+                                // For now, we'll store them and add them after the main PDF is loaded
                                 } else {
                                     // Add additional PDF groups
                                     addAnotherPdf(question.questionId);
@@ -1472,6 +1476,24 @@ function exportForm() {
                                 triggerOption: triggerOption
                             });
                         }
+                        
+                        // Collect extra PDFs for this PDF group
+                        const extraPdfContainers = pdfGroup.querySelectorAll('.extra-pdf-inputs');
+                        extraPdfContainers.forEach((extraContainer, extraIndex) => {
+                            const extraPdfIndex = extraIndex + 1;
+                            const extraPdfName = extraContainer.querySelector(`#pdfLogicPdfName${questionId}_${pdfIndexNum}_extra${extraPdfIndex}`)?.value || "";
+                            const extraPdfDisplayName = extraContainer.querySelector(`#pdfLogicPdfDisplayName${questionId}_${pdfIndexNum}_extra${extraPdfIndex}`)?.value || "";
+                            const extraStripePriceId = extraContainer.querySelector(`#pdfLogicStripePriceId${questionId}_${pdfIndexNum}_extra${extraPdfIndex}`)?.value || "";
+                            
+                            if (extraPdfName) {
+                                pdfLogicPdfs.push({
+                                    pdfName: extraPdfName,
+                                    pdfDisplayName: extraPdfDisplayName,
+                                    stripePriceId: extraStripePriceId,
+                                    triggerOption: triggerOption // Same trigger option as the main PDF
+                                });
+                            }
+                        });
                     });
                 }
             }
