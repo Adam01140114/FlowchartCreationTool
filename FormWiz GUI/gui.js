@@ -755,13 +755,9 @@ function addQuestion(sectionId, questionId = null) {
             
                 <!-- PDF Details Container -->
                 <div id="pdfDetailsContainer${currentQuestionId}">
-                    <div class="pdf-detail-group" data-pdf-index="1">
+                    <div class="pdf-detail-group" data-pdf-index="1" style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <h4 style="margin: 0; color: #007bff;">PDF 1</h4>
-                            <div>
-                                <button type="button" onclick="addExtraPdf(${currentQuestionId}, 1)" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Extra PDF</button>
-                                <button type="button" onclick="removePdf(${currentQuestionId}, 1)" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove PDF</button>
-                            </div>
                         </div>
                         
                         <label>PDF Name (for cart display):</label>
@@ -773,6 +769,10 @@ function addQuestion(sectionId, questionId = null) {
                         <label>Choose your Price ID:</label>
                         <input type="text" id="pdfLogicStripePriceId${currentQuestionId}_1" placeholder="Enter Stripe Price ID (e.g., price_12345)">
                         <br><br>
+                        
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button type="button" onclick="removePdf(${currentQuestionId}, 1)" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Remove PDF</button>
+                        </div>
                     </div>
                 </div>
             
@@ -1794,10 +1794,6 @@ function addAnotherPdf(questionId) {
         <div style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h4 style="margin: 0; color: #007bff;">PDF ${nextIndex}</h4>
-                <div>
-                    <button type="button" onclick="addExtraPdf(${questionId}, ${nextIndex})" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Extra PDF</button>
-                    <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove PDF</button>
-                </div>
             </div>
             
             <!-- Trigger Option for Numbered Dropdown -->
@@ -1817,6 +1813,11 @@ function addAnotherPdf(questionId) {
             <br><br>
             <label>Choose your Price ID:</label>
             <input type="text" id="pdfLogicStripePriceId${questionId}_${nextIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+            <br><br>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Remove PDF</button>
+            </div>
         </div>
     `;
     
