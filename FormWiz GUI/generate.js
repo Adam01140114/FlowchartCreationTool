@@ -4636,7 +4636,8 @@ function setCurrentDate () {
     const year = t.getFullYear();
     const currentDateElement = document.getElementById('current_date');
     if (currentDateElement) {
-        currentDateElement.value = month + '/' + day + '/' + year;
+        // Format as dd/mm/yyyy for server
+        currentDateElement.value = day + '/' + month + '/' + year;
         // Mark this field as protected from autofill
         currentDateElement.setAttribute('data-protected', 'true');
     }
@@ -5691,6 +5692,12 @@ if (typeof handleNext === 'function') {
                     }
                     
                     if (autofillValue !== null) {
+                            // Skip current_date field - it should be set dynamically
+                            if (el.id === 'current_date' || el.name === 'current_date') {
+                                console.log('Skipping autofill for current_date - should be set dynamically');
+                                return;
+                            }
+                            
                             // Check if this answer would trigger a jump to the end
                         if (wouldTriggerJumpToEnd(el, autofillValue)) {
                                 // Don't autofill this answer - keep it as default
@@ -5818,6 +5825,11 @@ if (typeof handleNext === 'function') {
                         
                         allFields.forEach(el => {
                             if (mappedData.hasOwnProperty(el.name)) {
+                                // Skip current_date field - it should be set dynamically
+                                if (el.id === 'current_date' || el.name === 'current_date') {
+                                    return;
+                                }
+                                
                                 if (el.type === 'checkbox') {
                                     el.checked = !!mappedData[el.name];
                                 } else if (el.type === 'radio') {
@@ -5835,6 +5847,11 @@ if (typeof handleNext === 'function') {
                         
                         // Additional pass: try to autofill by ID for any fields that might have been missed
                         Object.keys(mappedData).forEach(fieldName => {
+                            // Skip current_date field - it should be set dynamically
+                            if (fieldName === 'current_date') {
+                                return;
+                            }
+                            
                             const fieldById = fieldsById[fieldName];
                             if (fieldById && mappedData[fieldName]) {
                                 // Check if field needs autofilling (different logic for different field types)
