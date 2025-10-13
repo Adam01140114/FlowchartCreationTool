@@ -4208,70 +4208,85 @@ function updateHiddenLogic(dropdownName, selectedValue) {
         return;
     }
     
-    // Process each matching configuration
+    // Group configurations by nodeId to handle multiple triggers for the same element
+    const configsByNodeId = {};
     matchingConfigs.forEach(config => {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing config:', config);
+        if (!configsByNodeId[config.nodeId]) {
+            configsByNodeId[config.nodeId] = [];
+        }
+        configsByNodeId[config.nodeId].push(config);
+    });
+    
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Configs grouped by nodeId:', configsByNodeId);
+    
+    // Process each nodeId
+    Object.keys(configsByNodeId).forEach(nodeId => {
+        const configsForNode = configsByNodeId[nodeId];
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing nodeId:', nodeId, 'with configs:', configsForNode);
         
-        if (config.trigger !== selectedValue) {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Trigger mismatch for config:', config.nodeId, 'Expected:', config.trigger, 'Got:', selectedValue);
+        // Check if ANY config for this nodeId matches the selected value
+        const matchingConfig = configsForNode.find(config => config.trigger === selectedValue);
+        
+        if (matchingConfig) {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Found matching config for nodeId:', nodeId, 'config:', matchingConfig);
+    
+            // Check if the hidden element already exists
+            let hiddenElement = document.getElementById(nodeId);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists for', nodeId, ':', !!hiddenElement);
             
-            // If trigger doesn't match, uncheck/clear the existing hidden element
-            const existingElement = document.getElementById(config.nodeId);
+            if (!hiddenElement) {
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', matchingConfig.type, 'with nodeId:', nodeId);
+                // Create the hidden element based on type
+                if (matchingConfig.type === 'checkbox') {
+                    hiddenElement = document.createElement('input');
+                    hiddenElement.type = 'checkbox';
+                    hiddenElement.id = nodeId;
+                    hiddenElement.name = nodeId;
+                    hiddenElement.checked = true;
+                    hiddenElement.style.display = 'none';
+                    console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
+                } else if (matchingConfig.type === 'textbox') {
+                    hiddenElement = document.createElement('input');
+                    hiddenElement.type = 'text';
+                    hiddenElement.id = nodeId;
+                    hiddenElement.name = nodeId;
+                    hiddenElement.value = matchingConfig.textboxText || '';
+                    hiddenElement.style.display = 'none';
+                    console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
+                }
+                
+                // Add the hidden element to the form
+                const form = document.getElementById('customForm');
+                if (form) {
+                    form.appendChild(hiddenElement);
+                    console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
+                } else {
+                    document.body.appendChild(hiddenElement);
+                    console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
+                }
+            } else {
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element for', nodeId);
+                // Update existing element
+                if (matchingConfig.type === 'checkbox') {
+                    hiddenElement.checked = true;
+                } else if (matchingConfig.type === 'textbox') {
+                    hiddenElement.value = matchingConfig.textboxText || '';
+                }
+            }
+        } else {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config found for nodeId:', nodeId, 'with selectedValue:', selectedValue);
+            // No matching config found, uncheck/clear the existing element
+            const existingElement = document.getElementById(nodeId);
             if (existingElement) {
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Unchecking/clearing existing hidden element:', config.nodeId);
-                if (config.type === 'checkbox') {
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Unchecking/clearing existing hidden element:', nodeId);
+                if (configsForNode[0].type === 'checkbox') {
                     existingElement.checked = false;
-                } else if (config.type === 'textbox') {
+                } else if (configsForNode[0].type === 'textbox') {
                     existingElement.value = '';
                 }
             }
-            return; // Skip creating/updating this config
         }
-    
-        // Check if the hidden element already exists
-        let hiddenElement = document.getElementById(config.nodeId);
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists for', config.nodeId, ':', !!hiddenElement);
-        
-        if (!hiddenElement) {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', config.type, 'with nodeId:', config.nodeId);
-            // Create the hidden element based on type
-            if (config.type === 'checkbox') {
-                hiddenElement = document.createElement('input');
-                hiddenElement.type = 'checkbox';
-                hiddenElement.id = config.nodeId;
-                hiddenElement.name = config.nodeId;
-                hiddenElement.checked = true;
-                hiddenElement.style.display = 'none';
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
-            } else if (config.type === 'textbox') {
-                hiddenElement = document.createElement('input');
-                hiddenElement.type = 'text';
-                hiddenElement.id = config.nodeId;
-                hiddenElement.name = config.nodeId;
-                hiddenElement.value = config.textboxText || '';
-                hiddenElement.style.display = 'none';
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
-            }
-            
-            // Add the hidden element to the form
-            const form = document.getElementById('customForm');
-            if (form) {
-                form.appendChild(hiddenElement);
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
-            } else {
-                document.body.appendChild(hiddenElement);
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
-            }
-        } else {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element for', config.nodeId);
-            // Update existing element
-            if (config.type === 'checkbox') {
-                hiddenElement.checked = true;
-            } else if (config.type === 'textbox') {
-                hiddenElement.value = config.textboxText || '';
-            }
-        }
-    }); // End of forEach loop
+    }); // End of forEach loop for nodeIds
 }
 
 // Function to show/hide questions based on conditional logic
