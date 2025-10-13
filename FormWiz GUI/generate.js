@@ -2758,34 +2758,157 @@ window.showCartModal = function () {
     for (const pdfLogic of window.pdfLogicPDFs) {
       if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
       
+      console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+      console.log('🛒 [CART DEBUG] PDF Logic details:', {
+        questionId: pdfLogic.questionId,
+        pdfName: pdfLogic.pdfName,
+        isBigParagraph: pdfLogic.isBigParagraph,
+        conditions: pdfLogic.conditions,
+        triggerOption: pdfLogic.triggerOption,
+        numberTrigger: pdfLogic.numberTrigger,
+        numberValue: pdfLogic.numberValue
+      });
+
       let matched = false;
-      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-      for (const c of conds) {
-        const prevId = c?.prevQuestion;
-        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-        if (!prevId) continue;
+      
+      // Check if this is a bigParagraph with character limit
+      if (pdfLogic.isBigParagraph) {
+        // For Big Paragraph questions, check character limit
+        const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                   document.getElementById('answer' + pdfLogic.questionId);
         
-        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                   document.getElementById('answer' + prevId);
-        if (!el) continue;
+        console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Element found:', el);
+        console.log('  - Conditions:', pdfLogic.conditions);
         
-        let val = '';
-        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-        else                        { val = el.value || ''; }
-        
-        if (val.toString().toLowerCase() === expect) {
-          matched = true;
-          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        if (el) {
+          const questionValue = el.value || '';
+          console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
+          
+          // Check each character limit condition
+          for (const condition of pdfLogic.conditions) {
+            if (condition.characterLimit) {
+              console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
+              if (questionValue.length > condition.characterLimit) {
+                matched = true;
+                console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
+                break; // Exit the loop once we find a match
+              }
+            }
+          }
+          
+          if (!matched) {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
+          }
+        } else {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
         }
-      }
+      } else if (pdfLogic.triggerOption) {
+        // For numbered dropdown with trigger option, check if the selected value matches the trigger
+        const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                   document.getElementById('answer' + pdfLogic.questionId);
+        
+        console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Trigger Option:', pdfLogic.triggerOption);
+        console.log('  - Element found:', el);
+        console.log('  - Question Name IDs:', window.questionNameIds);
+        
+        if (el) {
+          const val = el.value || '';
+          console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
+          
+          if (val === pdfLogic.triggerOption) {
+            matched = true;
+            console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
+          }
+        } else {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
+        }
+      } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+        // For number questions with trigger conditions, check if the number meets the condition
+        const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                   document.getElementById('answer' + pdfLogic.questionId);
+        
+        console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+        console.log('  - Number Value:', pdfLogic.numberValue);
+        console.log('  - Element found:', el);
+        
+        if (el) {
+          const val = parseFloat(el.value) || 0;
+          const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+          console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+          
+          let conditionMet = false;
+          if (pdfLogic.numberTrigger === '=') {
+            conditionMet = val === triggerValue;
+          } else if (pdfLogic.numberTrigger === '>') {
+            conditionMet = val > triggerValue;
+          } else if (pdfLogic.numberTrigger === '<') {
+            conditionMet = val < triggerValue;
+          }
+          
+          if (conditionMet) {
+            matched = true;
+            console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number trigger:', pdfLogic.pdfDisplayName);
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - number condition not met');
+          }
+        } else {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
+        }
+      } else {
+        // For regular conditions, check previous question logic
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
+
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
+
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
+
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            }
+          }
+        }
       
       if (matched) {
+        // Format the display name properly (e.g., "sc103" -> "SC-103")
+        let displayTitle;
+        if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
+          const baseName = pdfLogic.pdfDisplayName.trim();
+          displayTitle = baseName.toUpperCase().replace(/([A-Z])(\d+)/g, '$1-$2');
+        } else {
+          displayTitle = pdfLogic.pdfName.replace(/.pdf$/i, '');
+        }
+        
         allPdfsToAdd.push({
           formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
-          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          title: displayTitle,
           priceId: pdfLogic.stripePriceId,
           pdfName: pdfLogic.pdfName
         });
+        console.log('🛒 [CART DEBUG] Added PDF logic item to showCartModal:', displayTitle);
+      } else {
+        console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
       }
     }
   }
@@ -2882,7 +3005,35 @@ window.addFormToCart = function (priceId) {
   clearCartState();
 
   // 2) Collect form data
+  console.log('🔍 [CART DEBUG] Starting form data collection...');
+  
+  // First, ensure all dynamic fields are up-to-date
+  console.log('🔍 [CART DEBUG] Updating dynamic fields...');
+  if (typeof updateUserFullName === 'function') {
+    console.log('🔍 [CART DEBUG] Calling updateUserFullName()...');
+    updateUserFullName();
+    
+    // Check if user_fullname was updated
+    const fullNameField = document.getElementById('user_fullname');
+    if (fullNameField) {
+      console.log('🔍 [CART DEBUG] user_fullname field value after updateUserFullName():', fullNameField.value);
+    } else {
+      console.log('🔍 [CART DEBUG] user_fullname field not found in DOM');
+    }
+  } else {
+    console.log('🔍 [CART DEBUG] updateUserFullName function not available');
+  }
+  
+  if (typeof updateUserAddressFields === 'function') {
+    console.log('🔍 [CART DEBUG] Calling updateUserAddressFields()...');
+    updateUserAddressFields();
+  } else {
+    console.log('🔍 [CART DEBUG] updateUserAddressFields function not available');
+  }
+  
   const form = document.getElementById('customForm');
+  console.log('🔍 [CART DEBUG] Form element found:', !!form);
+  
   const formData = {};
   if (form) {
     // Include both elements inside the form AND elements with form="customForm" attribute
@@ -2890,22 +3041,72 @@ window.addFormToCart = function (priceId) {
     const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
     const allFormElements = [...formElements, ...externalFormElements];
     
+    console.log('🔍 [CART DEBUG] Form elements found:');
+    console.log('  - Elements inside form:', formElements.length);
+    console.log('  - External elements with form="customForm":', externalFormElements.length);
+    console.log('  - Total elements to process:', allFormElements.length);
+    
+    // Log all elements we're about to process
+    console.log('🔍 [CART DEBUG] All form elements:');
+    allFormElements.forEach((el, index) => {
+      console.log('  ' + (index + 1) + '. ' + el.tagName + ' - id: "' + el.id + '" - name: "' + el.name + '" - type: "' + el.type + '" - value: "' + el.value + '" - disabled: ' + el.disabled);
+    });
+    
     for (const el of allFormElements) {
-      if (!el.name || el.disabled) continue;
-      if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
-      if (['hidden','button','submit','reset'].includes(el.type)) continue;
+      if (!el.name || el.disabled) {
+        console.log('🔍 [CART DEBUG] Skipping element - id: "' + el.id + '" - name: "' + el.name + '" - disabled: ' + el.disabled);
+        continue;
+      }
+      if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) {
+        console.log('🔍 [CART DEBUG] Skipping non-form element - tagName: "' + el.tagName + '"');
+        continue;
+      }
+      if (['button','submit','reset'].includes(el.type)) {
+        console.log('🔍 [CART DEBUG] Skipping ' + el.type + ' element - id: "' + el.id + '"');
+        continue;
+      }
+      
+      // For hidden fields, include them if they have values
+      if (el.type === 'hidden') {
+        if (el.value && el.value.trim() !== '') {
+          formData[el.name] = el.value;
+          console.log('🔍 [CART DEBUG] Added hidden field - name: "' + el.name + '" - value: "' + el.value + '"');
+        } else {
+          console.log('🔍 [CART DEBUG] Skipping empty hidden field - name: "' + el.name + '" - value: "' + el.value + '"');
+        }
+        continue;
+      }
       
       // For checkboxes and radios, only include if checked
       if (el.type === 'checkbox' || el.type === 'radio') {
         if (el.checked) {
           formData[el.name] = 'on'; // Send 'on' for checked checkboxes (standard HTML form behavior)
+          console.log('🔍 [CART DEBUG] Added checked ' + el.type + ' - name: "' + el.name + '" - value: "on"');
+        } else {
+          console.log('🔍 [CART DEBUG] Skipping unchecked ' + el.type + ' - name: "' + el.name + '"');
         }
         // Skip unchecked checkboxes entirely - don't send them to server
       } else {
-        formData[el.name] = el.value;
+        let value = el.value;
+        
+        // Format date inputs to mm/dd/yyyy (same as manual download)
+        if (el.type === 'date' && value) {
+          const originalValue = value;
+          value = formatDateForServer(value);
+          console.log('🔍 [CART DEBUG] Formatted date - name: "' + el.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
+        }
+        
+        formData[el.name] = value;
+        console.log('🔍 [CART DEBUG] Added field - name: "' + el.name + '" - value: "' + value + '"');
       }
     }
   }
+  
+  console.log('🔍 [CART DEBUG] Final form data collected:');
+  console.log('🔍 [CART DEBUG] Total fields:', Object.keys(formData).length);
+  Object.keys(formData).forEach(key => {
+    console.log('🔍 [CART DEBUG]   ' + key + ': "' + formData[key] + '"');
+  });
 
   console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
 
@@ -2933,11 +3134,52 @@ window.addFormToCart = function (priceId) {
         }
         
         console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+        console.log('🛒 [CART DEBUG] PDF Logic details:', {
+          questionId: pdfLogic.questionId,
+          pdfName: pdfLogic.pdfName,
+          isBigParagraph: pdfLogic.isBigParagraph,
+          conditions: pdfLogic.conditions,
+          triggerOption: pdfLogic.triggerOption,
+          numberTrigger: pdfLogic.numberTrigger,
+          numberValue: pdfLogic.numberValue
+        });
 
         let matched = false;
         
-        // Check if this is a numbered dropdown with trigger option
-        if (pdfLogic.triggerOption) {
+        // Check if this is a bigParagraph with character limit
+        if (pdfLogic.isBigParagraph) {
+          // For Big Paragraph questions, check character limit
+          const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                     document.getElementById('answer' + pdfLogic.questionId);
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Element found:', el);
+          console.log('  - Conditions:', pdfLogic.conditions);
+          
+          if (el) {
+            const questionValue = el.value || '';
+            console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
+            
+            // Check each character limit condition
+            for (const condition of pdfLogic.conditions) {
+              if (condition.characterLimit) {
+                console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
+                if (questionValue.length > condition.characterLimit) {
+                  matched = true;
+                  console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
+                  break; // Exit the loop once we find a match
+                }
+              }
+            }
+            
+            if (!matched) {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
+            }
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
+          }
+        } else if (pdfLogic.triggerOption) {
           // For numbered dropdown with trigger option, check if the selected value matches the trigger
           const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                      document.getElementById('answer' + pdfLogic.questionId);
@@ -3029,7 +3271,10 @@ window.addFormToCart = function (priceId) {
           
           // If there's a custom PDF display name from the PDF logic, use it
           if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
-            displayTitle = pdfLogic.pdfDisplayName.trim();
+            // Format the display name properly (e.g., "sc103" -> "SC-103")
+            const baseName = pdfLogic.pdfDisplayName.trim();
+            // Convert to uppercase and add dashes for better formatting
+            displayTitle = baseName.toUpperCase().replace(/([A-Z])(\d+)/g, '$1-$2');
           } else {
             // Create a title based on the main form name + PDF name
             const mainFormName = window.pdfFileName || 'Form';
@@ -3050,9 +3295,9 @@ window.addFormToCart = function (priceId) {
             timestamp: nowTs
           };
           pdfLogicItems.push(item);
-          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
+          console.log('🛒 [CART DEBUG] Added PDF logic item to cart:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
         } else {
-          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
         }
       }
     } else {
@@ -5025,11 +5270,14 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Starting manual PDF download for:', pdfName);
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const form = document.getElementById('customForm');
         const fd = new FormData();
+        
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form element found:', !!form);
         
         // Manually collect form data to format dates
         // Include both elements inside the form AND elements with form="customForm" attribute
@@ -5037,12 +5285,26 @@ async function editAndDownloadPDF (pdfName) {
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
         
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form elements found:');
+        console.log('  - Elements inside form:', formElements.length);
+        console.log('  - External elements with form="customForm":', externalFormElements.length);
+        console.log('  - Total elements to process:', allFormElements.length);
+        
+        // Log all elements we're about to process
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] All form elements:');
+        allFormElements.forEach((element, index) => {
+            console.log('  ' + (index + 1) + '. ' + element.tagName + ' - id: "' + element.id + '" - name: "' + element.name + '" - type: "' + element.type + '" - value: "' + element.value + '" - disabled: ' + element.disabled);
+        });
+        
         allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     if (element.checked) {
                         fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added checked ' + element.type + ' - name: "' + element.name + '" - value: "on"');
+                    } else {
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping unchecked ' + element.type + ' - name: "' + element.name + '"');
                     }
                     // Skip unchecked checkboxes entirely - don't send them to server
                 } else {
@@ -5050,13 +5312,25 @@ async function editAndDownloadPDF (pdfName) {
                     
                     // Format date inputs to mm/dd/yyyy
                     if (element.type === 'date' && value) {
+                        const originalValue = value;
                         value = formatDateForServer(value);
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Formatted date - name: "' + element.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
                     }
                     
-                    fd.append(element.name, value);
+                    // Include ALL fields with values, including hidden ones
+                    if (value && value.trim() !== '') {
+                        fd.append(element.name, value);
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
+                    } else {
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping empty field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
+                    }
                 }
+            } else {
+                console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping element - id: "' + element.id + '" - name: "' + element.name + '" - disabled: ' + element.disabled);
             }
         });
+        
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Manual download form data collection complete');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
@@ -7759,14 +8033,34 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
 
 // Function to update user full name
 function updateUserFullName() {
-  const firstName = document.getElementById('user_firstname')?.value || '';
-  const lastName = document.getElementById('user_lastname')?.value || '';
+  console.log('🔍 [UPDATE FULL NAME DEBUG] updateUserFullName() called');
+  
+  const firstNameField = document.getElementById('user_firstname');
+  const lastNameField = document.getElementById('user_lastname');
   const fullNameField = document.getElementById('user_fullname');
+  
+  console.log('🔍 [UPDATE FULL NAME DEBUG] Field elements found:');
+  console.log('  - firstNameField:', !!firstNameField, firstNameField ? 'value: "' + firstNameField.value + '"' : 'not found');
+  console.log('  - lastNameField:', !!lastNameField, lastNameField ? 'value: "' + lastNameField.value + '"' : 'not found');
+  console.log('  - fullNameField:', !!fullNameField, fullNameField ? 'current value: "' + fullNameField.value + '"' : 'not found');
+  
+  const firstName = firstNameField?.value || '';
+  const lastName = lastNameField?.value || '';
+  
+  console.log('🔍 [UPDATE FULL NAME DEBUG] Extracted values:');
+  console.log('  - firstName:', '"' + firstName + '"');
+  console.log('  - lastName:', '"' + lastName + '"');
   
   if (fullNameField) {
     // Simply combine first and last name with a space
     const fullName = (firstName + ' ' + lastName).trim();
+    console.log('🔍 [UPDATE FULL NAME DEBUG] Setting fullName to:', '"' + fullName + '"');
     fullNameField.value = fullName;
+    
+    // Verify the value was set
+    console.log('🔍 [UPDATE FULL NAME DEBUG] fullNameField.value after setting:', '"' + fullNameField.value + '"');
+  } else {
+    console.log('🔍 [UPDATE FULL NAME DEBUG] fullNameField not found - cannot update');
   }
 }
 
