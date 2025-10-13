@@ -315,7 +315,7 @@ function getFormHTML() {
 	console.log('🔧 [FORM GENERATION DEBUG] getFormHTML() function called');
 	
 	try {
-		// RESET all globals before building
+	// RESET all globals before building
 Object.keys(questionSlugMap).forEach(key => delete questionSlugMap[key]);
 Object.keys(questionNameIds).forEach(key => delete questionNameIds[key]);
 Object.keys(questionTypesMap).forEach(key => delete questionTypesMap[key]);
@@ -1301,7 +1301,7 @@ if (noneEl?.checked){
     const noneOnChangeHandler = markOnlyOne ? 
       `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
       `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
-
+    
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
@@ -1498,11 +1498,11 @@ formHTML += `</div><br></div>`;
       } else if (questionType === "numberedDropdown") {
         console.log('🔧 [FORM GENERATION DEBUG] Processing numbered dropdown question:', questionId);
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
-          const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
-          const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
-          const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
-          const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
-          const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
+        const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
+        const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
+        const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
+        const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
+        const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
           console.log('🔧 [FORM GENERATION DEBUG] Numbered dropdown params - ddMin:', ddMin, 'ddMax:', ddMax, 'nodeId:', nodeId);
 
         // gather unified field data from the new unified container
@@ -1776,12 +1776,12 @@ formHTML += `</div><br></div>`;
           pdfGroups.forEach((pdfGroup, pdfIndex) => {
             const pdfIndexNum = pdfIndex + 1;
             const pdfLogicPdfNameEl = pdfGroup.querySelector("#pdfLogicPdfName" + questionId + "_" + pdfIndexNum);
-            const pdfLogicPdfName = pdfLogicPdfNameEl ? pdfLogicPdfNameEl.value.trim() : "";
+        const pdfLogicPdfName = pdfLogicPdfNameEl ? pdfLogicPdfNameEl.value.trim() : "";
             const pdfLogicPdfDisplayNameEl = pdfGroup.querySelector("#pdfLogicPdfDisplayName" + questionId + "_" + pdfIndexNum);
-            const pdfLogicPdfDisplayName = pdfLogicPdfDisplayNameEl ? pdfLogicPdfDisplayNameEl.value.trim() : "";
+        const pdfLogicPdfDisplayName = pdfLogicPdfDisplayNameEl ? pdfLogicPdfDisplayNameEl.value.trim() : "";
             const pdfLogicStripePriceIdEl = pdfGroup.querySelector("#pdfLogicStripePriceId" + questionId + "_" + pdfIndexNum);
-            const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
-            
+        const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
+        
             // Get trigger option for numbered dropdown
             // For the first PDF, look for the main trigger option dropdown
             // For additional PDFs, look for the PDF-specific trigger option dropdown
@@ -1802,71 +1802,71 @@ formHTML += `</div><br></div>`;
             console.log('  - Trigger Option Value:', triggerOption);
             
             if (pdfLogicPdfName) {
-              // Add to PDF Logic array for later processing
-              pdfLogicPDFs.push({
-                questionId: questionId,
-                pdfName: pdfLogicPdfName,
-                pdfDisplayName: pdfLogicPdfDisplayName || pdfLogicPdfName.replace(/\.pdf$/i, ''),
-                stripePriceId: pdfLogicStripePriceId,
+          // Add to PDF Logic array for later processing
+          pdfLogicPDFs.push({
+            questionId: questionId,
+            pdfName: pdfLogicPdfName,
+            pdfDisplayName: pdfLogicPdfDisplayName || pdfLogicPdfName.replace(/\.pdf$/i, ''),
+            stripePriceId: pdfLogicStripePriceId,
                 triggerOption: triggerOption, // Add trigger option for numbered dropdown
-                conditions: [],
-                isBigParagraph: questionType === "bigParagraph"
-              });
+            conditions: [],
+            isBigParagraph: questionType === "bigParagraph"
+          });
+          
+          // Process conditions
+          for (let lr = 0; lr < pdfLogicRows.length; lr++) {
+            const row = pdfLogicRows[lr];
+            const rowIndex = lr + 1;
+            
+            if (questionType === "bigParagraph") {
+              // For Big Paragraph, process character limit
+              const charLimitEl = row.querySelector(
+                "#pdfCharacterLimit" + questionId + "_" + rowIndex
+              );
+              const customCharLimitEl = row.querySelector(
+                "#pdfCustomCharacterLimit" + questionId + "_" + rowIndex
+              );
               
-              // Process conditions
-              for (let lr = 0; lr < pdfLogicRows.length; lr++) {
-                const row = pdfLogicRows[lr];
-                const rowIndex = lr + 1;
-                
-                if (questionType === "bigParagraph") {
-                  // For Big Paragraph, process character limit
-                  const charLimitEl = row.querySelector(
-                    "#pdfCharacterLimit" + questionId + "_" + rowIndex
-                  );
-                  const customCharLimitEl = row.querySelector(
-                    "#pdfCustomCharacterLimit" + questionId + "_" + rowIndex
-                  );
-                  
-                  if (!charLimitEl) continue;
-                  
-                  let charLimit = charLimitEl.value.trim();
-                  if (charLimit === 'custom') {
-                    charLimit = customCharLimitEl ? customCharLimitEl.value.trim() : '';
-                  }
-                  
-                  if (!charLimit) continue;
-                  
-                  // Add character limit condition to the PDF Logic array
-                  const pdfLogicIndex = pdfLogicPDFs.length - 1;
-                  pdfLogicPDFs[pdfLogicIndex].conditions.push({
-                    characterLimit: parseInt(charLimit)
-                  });
-                } else {
-                  // For other question types, process previous question logic
-                  const pqEl = row.querySelector(
-                    "#pdfPrevQuestion" + questionId + "_" + rowIndex
-                  );
-                  const paEl = row.querySelector(
-                    "#pdfPrevAnswer" + questionId + "_" + rowIndex
-                  );
-
-                  if (!pqEl || !paEl) {
-                    continue;
-                  }
-                  const pqVal = pqEl.value.trim();
-                  const paVal = paEl.value.trim();
-                  if (!pqVal || !paVal) {
-                    continue;
-                  }
-
-                  // Add condition to the PDF Logic array
-                  const pdfLogicIndex = pdfLogicPDFs.length - 1;
-                  pdfLogicPDFs[pdfLogicIndex].conditions.push({
-                    prevQuestion: pqVal,
-                    prevAnswer: paVal
-                  });
-                }
+              if (!charLimitEl) continue;
+              
+              let charLimit = charLimitEl.value.trim();
+              if (charLimit === 'custom') {
+                charLimit = customCharLimitEl ? customCharLimitEl.value.trim() : '';
               }
+              
+              if (!charLimit) continue;
+              
+              // Add character limit condition to the PDF Logic array
+              const pdfLogicIndex = pdfLogicPDFs.length - 1;
+              pdfLogicPDFs[pdfLogicIndex].conditions.push({
+                characterLimit: parseInt(charLimit)
+              });
+            } else {
+              // For other question types, process previous question logic
+            const pqEl = row.querySelector(
+              "#pdfPrevQuestion" + questionId + "_" + rowIndex
+            );
+            const paEl = row.querySelector(
+              "#pdfPrevAnswer" + questionId + "_" + rowIndex
+            );
+
+            if (!pqEl || !paEl) {
+              continue;
+            }
+            const pqVal = pqEl.value.trim();
+            const paVal = paEl.value.trim();
+            if (!pqVal || !paVal) {
+              continue;
+            }
+
+            // Add condition to the PDF Logic array
+            const pdfLogicIndex = pdfLogicPDFs.length - 1;
+            pdfLogicPDFs[pdfLogicIndex].conditions.push({
+              prevQuestion: pqVal,
+              prevAnswer: paVal
+            });
+            }
+          }
             }
           });
         }
@@ -2928,28 +2928,28 @@ window.addFormToCart = function (priceId) {
           }
         } else {
           // For regular conditions, check previous question logic
-          const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-          for (const c of conds) {
-            const prevId = c?.prevQuestion;
-            const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-            if (!prevId) continue;
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
 
-            const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                       document.getElementById('answer' + prevId);
-            if (!el) {
-              console.log('🛒 [CART DEBUG] Element not found for question', prevId);
-              continue;
-            }
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
 
-            let val = '';
-            if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-            else                        { val = el.value || ''; }
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
 
-            console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
-            if (val.toString().toLowerCase() === expect) {
-              matched = true; // any condition match includes the PDF
-              console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
           }
         }
@@ -4589,10 +4589,25 @@ function goBack(){
 /*──────────────── helpers ───────────────*/
 function setCurrentDate () {
     const t = new Date();
-    document.getElementById('current_date').value =
-        t.getFullYear() + '-' +
-        String(t.getMonth() + 1).padStart(2, '0') + '-' +
-        String(t.getDate()).padStart(2, '0');
+    const month = String(t.getMonth() + 1).padStart(2, '0');
+    const day = String(t.getDate()).padStart(2, '0');
+    const year = t.getFullYear();
+    const currentDateElement = document.getElementById('current_date');
+    if (currentDateElement) {
+        currentDateElement.value = month + '/' + day + '/' + year;
+        // Mark this field as protected from autofill
+        currentDateElement.setAttribute('data-protected', 'true');
+    }
+}
+
+// Helper function to format date from yyyy-mm-dd to mm/dd/yyyy
+function formatDateForServer(dateString) {
+    if (!dateString) return '';
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+        return parts[1] + '/' + parts[2] + '/' + parts[0];
+    }
+    return dateString;
 }
 
 
@@ -4781,29 +4796,29 @@ async function processAllPdfs() {
                     }
                 } else {
                         // For regular conditions, check previous question logic
-                        pdfLogic.conditions.forEach(condition => {
-                            const prevQuestionId = condition.prevQuestion;
-                            const prevAnswer = condition.prevAnswer;
-                            
-                            // Get the previous question's value
-                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                                      document.getElementById('answer' + prevQuestionId);
-                            
-                            if (prevQuestionElement) {
-                                let prevValue = '';
-                                
-                                if (prevQuestionElement.type === 'checkbox') {
-                                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                                } else {
-                                    prevValue = prevQuestionElement.value;
-                                }
-                                
-                                // Check if the condition matches
-                                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                                    shouldDownload = true;
-                                }
-                            }
-                        });
+                pdfLogic.conditions.forEach(condition => {
+                    const prevQuestionId = condition.prevQuestion;
+                    const prevAnswer = condition.prevAnswer;
+                    
+                    // Get the previous question's value
+                    const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                              document.getElementById('answer' + prevQuestionId);
+                    
+                    if (prevQuestionElement) {
+                        let prevValue = '';
+                        
+                        if (prevQuestionElement.type === 'checkbox') {
+                            prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                        } else {
+                            prevValue = prevQuestionElement.value;
+                        }
+                        
+                        // Check if the condition matches
+                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                            shouldDownload = true;
+                        }
+                    }
+                });
                     }
                 }
                 
@@ -4874,7 +4889,23 @@ async function editAndDownloadPDF (pdfName) {
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
-        const fd = new FormData(document.getElementById('customForm'));
+        const form = document.getElementById('customForm');
+        const fd = new FormData();
+        
+        // Manually collect form data to format dates
+        const formElements = form.querySelectorAll('input, textarea, select');
+        formElements.forEach(element => {
+            if (element.name && !element.disabled) {
+                let value = element.value;
+                
+                // Format date inputs to mm/dd/yyyy
+                if (element.type === 'date' && value) {
+                    value = formatDateForServer(value);
+                }
+                
+                fd.append(element.name, value);
+            }
+        });
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
@@ -5856,7 +5887,7 @@ if (typeof handleNext === 'function') {
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                        }
+                }
                 
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
@@ -6089,11 +6120,14 @@ if (typeof handleNext === 'function') {
                                 // For radio buttons, set the value and check the matching radio button
                                 if (data[el.name] && el.value === data[el.name]) {
                                     el.checked = true;
-                                } else {
+                            } else {
                                     el.checked = false;
                                 }
                             } else {
+                                // Skip current_date field - it should be set dynamically
+                                if (el.id !== 'current_date') {
                                 el.value = data[el.name];
+                                }
                             }
                         }
                     });
@@ -6102,6 +6136,10 @@ if (typeof handleNext === 'function') {
                     setTimeout(() => {
                         if (typeof updateUserFullName === 'function') {
                             updateUserFullName();
+                        }
+                        // Always set current_date to today's date after autofill
+                        if (typeof setCurrentDate === 'function') {
+                            setCurrentDate();
                         }
                     }, 2000);
                     
@@ -6189,7 +6227,10 @@ if (typeof handleNext === 'function') {
                                     if (el.type === 'checkbox' || el.type === 'radio') {
                                         el.checked = !!data[el.name];
                                     } else {
+                                        // Skip current_date field - it should be set dynamically
+                                        if (el.id !== 'current_date') {
                                         el.value = data[el.name];
+                                        }
                                     }
                                 }
                             });
@@ -6223,6 +6264,11 @@ if (typeof handleNext === 'function') {
                                     }
                                 }
                             });
+                            
+                            // Always set current_date to today's date after second autofill pass
+                            if (typeof setCurrentDate === 'function') {
+                                setCurrentDate();
+                            }
                         }, 1500);
                     }, 2000);
                 }

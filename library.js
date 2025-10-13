@@ -229,10 +229,8 @@ window.exportGuiJson = function(download = true) {
       },
       pdfLogic: {
         enabled: false,
-        pdfName: "",
-        pdfDisplayName: "",
-        stripePriceId: "",
-        conditions: []
+        conditions: [],
+        pdfs: []
       },
       alertLogic: {
         enabled: false,
@@ -1001,7 +999,7 @@ window.exportGuiJson = function(download = true) {
             pdfName: targetCell._pdfFile || targetCell._pdfUrl || "",
             pdfDisplayName: targetCell._pdfName || "",
             stripePriceId: targetCell._pdfPrice || targetCell._priceId || "",
-            triggerOption: "direct" // For direct connections
+            triggerOption: "" // For direct connections
           };
           pdfs.push(pdfEntry);
           
@@ -1145,6 +1143,16 @@ window.exportGuiJson = function(download = true) {
     sectionMap[section].questions.push(question);
   }
   
+  // Create a map of questions by their clean names for calculation lookups
+  const questionNameMap = new Map();
+  questions.forEach(questionCell => {
+    const cleanName = questionCell._questionText || questionCell.value || "";
+    const nodeId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || questionCell._nameId || questionCell._questionText || questionCell.value || "unnamed");
+    // Use the sanitized version of the clean name as the key to match calculation term processing
+    const sanitizedCleanName = sanitizeNameId(cleanName);
+    questionNameMap.set(sanitizedCleanName.toLowerCase().trim(), nodeId);
+  });
+
   // Process calculation nodes and convert them to hidden fields
   const calculationNodes = vertices.filter(cell => typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell));
   for (const cell of calculationNodes) {
@@ -1163,54 +1171,53 @@ window.exportGuiJson = function(download = true) {
       calculations: []
     };
     
-    // For checkbox type, don't add calculations - just add the hidden field
-    if (cell._calcFinalOutputType === "checkbox") {
+    // Convert calculation terms to the expected format for both checkbox and text types
+    const calculation = {
+      terms: [],
+      compareOperator: cell._calcOperator || "=",
+      threshold: cell._calcThreshold || "0",
+      result: cell._calcFinalOutputType === "checkbox" ? 
+        "checked" : 
+        cell._calcFinalText || ""
+    };
+    
+    // Process each calculation term
+    for (const term of cell._calcTerms) {
+      if (term.amountLabel) {
+        // Extract the question name from the amount label
+        let cleanQuestionName = term.amountLabel;
+        
+        // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
+        if (term.amountLabel.startsWith('question_value:')) {
+          const parts = term.amountLabel.split(':');
+          if (parts.length >= 3) {
+            // Extract the clean question name from the display part
+            // Format: "question_value:answer1:how_much (answer1)"
+            // We want "how_much" from the third part
+            const displayPart = parts[2];
+            // Remove the "(answer1)" part if it exists
+            cleanQuestionName = displayPart.replace(/\s*\([^)]*\)$/, '');
+          }
+        } else {
+          // For regular labels, use as-is
+          cleanQuestionName = term.amountLabel;
+        }
+        
+        // Look up the actual nodeId from the question name map
+        const questionNameId = questionNameMap.get(cleanQuestionName.toLowerCase().trim()) || cleanQuestionName;
+        
+        calculation.terms.push({
+          operator: term.mathOperator || "",
+          questionNameId: questionNameId
+        });
+      }
+    }
+    
+    // Only add the calculation if it has terms
+    if (calculation.terms.length > 0) {
+      hiddenField.calculations.push(calculation);
       hiddenFields.push(hiddenField);
       hiddenFieldCounter++;
-    } else {
-      // For text type, convert calculation terms to the expected format
-      const calculation = {
-        terms: [],
-        compareOperator: cell._calcOperator || "=",
-        threshold: cell._calcThreshold || "0",
-        fillValue: cell._calcFinalText || ""
-      };
-      
-      // Process each calculation term
-      for (const term of cell._calcTerms) {
-        if (term.amountLabel) {
-          // Extract the question name from the amount label
-          let questionNameId = term.amountLabel;
-          
-          // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
-          if (term.amountLabel.startsWith('question_value:')) {
-            const parts = term.amountLabel.split(':');
-            if (parts.length >= 3) {
-              // Extract the clean question name from the display part
-              // Format: "question_value:answer1:how_much (answer1)"
-              // We want "how_much" from the third part
-              const displayPart = parts[2];
-              // Remove the "(answer1)" part if it exists
-              questionNameId = displayPart.replace(/\s*\([^)]*\)$/, '');
-            }
-          } else {
-            // For regular labels, use as-is
-            questionNameId = term.amountLabel;
-          }
-          
-          calculation.terms.push({
-            operator: term.mathOperator || "",
-            questionNameId: questionNameId
-          });
-        }
-      }
-      
-      // Only add the calculation if it has terms
-      if (calculation.terms.length > 0) {
-        hiddenField.calculations.push(calculation);
-        hiddenFields.push(hiddenField);
-        hiddenFieldCounter++;
-      }
     }
   }
   

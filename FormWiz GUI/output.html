@@ -3195,28 +3195,28 @@ window.addFormToCart = function (priceId) {
           }
         } else {
           // For regular conditions, check previous question logic
-          const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-          for (const c of conds) {
-            const prevId = c?.prevQuestion;
-            const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-            if (!prevId) continue;
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
 
-            const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                       document.getElementById('answer' + prevId);
-            if (!el) {
-              console.log('🛒 [CART DEBUG] Element not found for question', prevId);
-              continue;
-            }
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
 
-            let val = '';
-            if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-            else                        { val = el.value || ''; }
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
 
-            console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
-            if (val.toString().toLowerCase() === expect) {
-              matched = true; // any condition match includes the PDF
-              console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
           }
         }
@@ -4951,29 +4951,29 @@ async function processAllPdfs() {
                     }
                 } else {
                         // For regular conditions, check previous question logic
-                        pdfLogic.conditions.forEach(condition => {
-                            const prevQuestionId = condition.prevQuestion;
-                            const prevAnswer = condition.prevAnswer;
-                            
-                            // Get the previous question's value
-                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                                      document.getElementById('answer' + prevQuestionId);
-                            
-                            if (prevQuestionElement) {
-                                let prevValue = '';
-                                
-                                if (prevQuestionElement.type === 'checkbox') {
-                                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                                } else {
-                                    prevValue = prevQuestionElement.value;
-                                }
-                                
-                                // Check if the condition matches
-                                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                                    shouldDownload = true;
-                                }
-                            }
-                        });
+                pdfLogic.conditions.forEach(condition => {
+                    const prevQuestionId = condition.prevQuestion;
+                    const prevAnswer = condition.prevAnswer;
+                    
+                    // Get the previous question's value
+                    const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                              document.getElementById('answer' + prevQuestionId);
+                    
+                    if (prevQuestionElement) {
+                        let prevValue = '';
+                        
+                        if (prevQuestionElement.type === 'checkbox') {
+                            prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                        } else {
+                            prevValue = prevQuestionElement.value;
+                        }
+                        
+                        // Check if the condition matches
+                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                            shouldDownload = true;
+                        }
+                    }
+                });
                     }
                 }
                 
@@ -5859,9 +5859,9 @@ if (typeof handleNext === 'function') {
                     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
                     }
-                
-                // Trigger line splitting for autofilled textareas
-                triggerLineSplittingForAutofilledTextareas();
+                    
+                    // Trigger line splitting for autofilled textareas
+                    triggerLineSplittingForAutofilledTextareas();
                 
                 // Trigger paragraph limit checking for autofilled textareas
                 triggerParagraphLimitCheckForAutofilledTextareas();
@@ -6026,7 +6026,7 @@ if (typeof handleNext === 'function') {
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                        }
+                }
                 
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
