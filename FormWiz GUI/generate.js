@@ -1301,7 +1301,7 @@ if (noneEl?.checked){
     const noneOnChangeHandler = markOnlyOne ? 
       `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
       `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
-    
+
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
@@ -2276,9 +2276,10 @@ function buildCheckboxName (questionId, rawNameId, labelText){
                       document.getElementById('user_email').value = userData.email || '';
                       document.getElementById('user_phone').value = userData.phone || '';
                       
-                      // Update full name with 2-second delay to ensure DOM is ready
+                      // Update full name and address fields with 2-second delay to ensure DOM is ready
                       setTimeout(() => {
                       updateUserFullName();
+                      updateUserAddressFields();
                       }, 2000);
                       document.getElementById('user_street').value = userData.address?.street || '';
                       document.getElementById('user_city').value = userData.address?.city || '';
@@ -2865,7 +2866,12 @@ window.addFormToCart = function (priceId) {
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
-    for (const el of form.elements) {
+    // Include both elements inside the form AND elements with form="customForm" attribute
+    const formElements = Array.from(form.elements);
+    const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
+    const allFormElements = [...formElements, ...externalFormElements];
+    
+    for (const el of allFormElements) {
       if (!el.name || el.disabled) continue;
       if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
       if (['hidden','button','submit','reset'].includes(el.type)) continue;
@@ -4193,67 +4199,79 @@ function updateHiddenLogic(dropdownName, selectedValue) {
     console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogic called with dropdownName:', dropdownName, 'selectedValue:', selectedValue);
     console.log('🔧 [HIDDEN LOGIC DEBUG] hiddenLogicConfigs:', hiddenLogicConfigs);
     
-    // Find the hidden logic configuration for this dropdown
-    const config = hiddenLogicConfigs.find(c => c.questionNameId === dropdownName);
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Found config:', config);
+    // Find ALL hidden logic configurations for this dropdown
+    const matchingConfigs = hiddenLogicConfigs.filter(c => c.questionNameId === dropdownName);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Found matching configs:', matchingConfigs);
     
-    if (!config || config.trigger !== selectedValue) {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config or trigger mismatch. Config exists:', !!config, 'Trigger match:', config ? config.trigger === selectedValue : false);
-        
-        // If there's a config but trigger doesn't match, uncheck the existing hidden element
-        if (config && config.trigger !== selectedValue) {
-            const existingElement = document.getElementById(config.nodeId);
-            if (existingElement) {
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Unchecking existing hidden element:', config.nodeId);
-                existingElement.checked = false;
-            }
-        }
+    if (matchingConfigs.length === 0) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] No matching configs found for dropdown:', dropdownName);
         return;
     }
     
-    // Check if the hidden element already exists
-    let hiddenElement = document.getElementById(config.nodeId);
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists:', !!hiddenElement);
-    
-    if (!hiddenElement) {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', config.type, 'with nodeId:', config.nodeId);
-        // Create the hidden element based on type
-        if (config.type === 'checkbox') {
-            hiddenElement = document.createElement('input');
-            hiddenElement.type = 'checkbox';
-            hiddenElement.id = config.nodeId;
-            hiddenElement.name = config.nodeId;
-            hiddenElement.checked = true;
-            hiddenElement.style.display = 'none';
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
-        } else if (config.type === 'textbox') {
-            hiddenElement = document.createElement('input');
-            hiddenElement.type = 'text';
-            hiddenElement.id = config.nodeId;
-            hiddenElement.name = config.nodeId;
-            hiddenElement.value = config.textboxText || '';
-            hiddenElement.style.display = 'none';
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
-        }
+    // Process each matching configuration
+    matchingConfigs.forEach(config => {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing config:', config);
         
-        // Add the hidden element to the form
-        const form = document.getElementById('customForm');
-        if (form) {
-            form.appendChild(hiddenElement);
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
+        if (config.trigger !== selectedValue) {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Trigger mismatch for config:', config.nodeId, 'Expected:', config.trigger, 'Got:', selectedValue);
+            
+            // If trigger doesn't match, uncheck/clear the existing hidden element
+            const existingElement = document.getElementById(config.nodeId);
+            if (existingElement) {
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Unchecking/clearing existing hidden element:', config.nodeId);
+                if (config.type === 'checkbox') {
+                    existingElement.checked = false;
+                } else if (config.type === 'textbox') {
+                    existingElement.value = '';
+                }
+            }
+            return; // Skip creating/updating this config
+        }
+    
+        // Check if the hidden element already exists
+        let hiddenElement = document.getElementById(config.nodeId);
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists for', config.nodeId, ':', !!hiddenElement);
+        
+        if (!hiddenElement) {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', config.type, 'with nodeId:', config.nodeId);
+            // Create the hidden element based on type
+            if (config.type === 'checkbox') {
+                hiddenElement = document.createElement('input');
+                hiddenElement.type = 'checkbox';
+                hiddenElement.id = config.nodeId;
+                hiddenElement.name = config.nodeId;
+                hiddenElement.checked = true;
+                hiddenElement.style.display = 'none';
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
+            } else if (config.type === 'textbox') {
+                hiddenElement = document.createElement('input');
+                hiddenElement.type = 'text';
+                hiddenElement.id = config.nodeId;
+                hiddenElement.name = config.nodeId;
+                hiddenElement.value = config.textboxText || '';
+                hiddenElement.style.display = 'none';
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
+            }
+            
+            // Add the hidden element to the form
+            const form = document.getElementById('customForm');
+            if (form) {
+                form.appendChild(hiddenElement);
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
+            } else {
+                document.body.appendChild(hiddenElement);
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
+            }
         } else {
-            document.body.appendChild(hiddenElement);
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element for', config.nodeId);
+            // Update existing element
+            if (config.type === 'checkbox') {
+                hiddenElement.checked = true;
+            } else if (config.type === 'textbox') {
+                hiddenElement.value = config.textboxText || '';
+            }
         }
-    } else {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element');
-        // Update existing element
-        if (config.type === 'checkbox') {
-            hiddenElement.checked = true;
-        } else if (config.type === 'textbox') {
-            hiddenElement.value = config.textboxText || '';
-        }
-    }
+    }); // End of forEach loop
 }
 
 // Function to show/hide questions based on conditional logic
@@ -4902,8 +4920,12 @@ async function editAndDownloadPDF (pdfName) {
         const fd = new FormData();
         
         // Manually collect form data to format dates
+        // Include both elements inside the form AND elements with form="customForm" attribute
         const formElements = form.querySelectorAll('input, textarea, select');
-        formElements.forEach(element => {
+        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+        const allFormElements = [...formElements, ...externalFormElements];
+        
+        allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
@@ -5476,7 +5498,12 @@ if (typeof handleNext === 'function') {
             if (!form) {
                 return [];
             }
-            const fields = Array.from(form.elements).filter(el =>
+            // Include both elements inside the form AND elements with form="customForm" attribute
+            const formElements = Array.from(form.elements);
+            const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
+            const allFormElements = [...formElements, ...externalFormElements];
+            
+            const fields = allFormElements.filter(el =>
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
@@ -5921,7 +5948,7 @@ if (typeof handleNext === 'function') {
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                }
+                        }
                 
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
@@ -6059,6 +6086,13 @@ if (typeof handleNext === 'function') {
                             updateUserFullName();
                         }
                     }
+                    
+                    // Update address fields if any address field changed
+                    if (el.id === 'user_street' || el.id === 'user_city' || el.id === 'user_state' || el.id === 'user_zip') {
+                        if (typeof updateUserAddressFields === 'function') {
+                            updateUserAddressFields();
+                        }
+                    }
                 });
                 el.addEventListener('change', function() {
                     if (isUserLoggedIn) {
@@ -6071,6 +6105,13 @@ if (typeof handleNext === 'function') {
                     if (el.id === 'user_firstname' || el.id === 'user_lastname') {
                         if (typeof updateUserFullName === 'function') {
                             updateUserFullName();
+                        }
+                    }
+                    
+                    // Update address fields if any address field changed
+                    if (el.id === 'user_street' || el.id === 'user_city' || el.id === 'user_state' || el.id === 'user_zip') {
+                        if (typeof updateUserAddressFields === 'function') {
+                            updateUserAddressFields();
                         }
                     }
                 });
@@ -6158,18 +6199,21 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 }
                             } else {
-                                // Skip current_date field - it should be set dynamically
-                                if (el.id !== 'current_date') {
+                                // Skip current_date field and any field marked as protected - they should be set dynamically
+                                if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
                                 el.value = data[el.name];
                                 }
                             }
                         }
                     });
                     
-                    // Update full name after autofilling with delay to ensure DOM is ready
+                    // Update full name and address fields after autofilling with delay to ensure DOM is ready
                     setTimeout(() => {
                         if (typeof updateUserFullName === 'function') {
                             updateUserFullName();
+                        }
+                        if (typeof updateUserAddressFields === 'function') {
+                            updateUserAddressFields();
                         }
                         // Always set current_date to today's date after autofill
                         if (typeof setCurrentDate === 'function') {
@@ -6261,8 +6305,8 @@ if (typeof handleNext === 'function') {
                                     if (el.type === 'checkbox' || el.type === 'radio') {
                                         el.checked = !!data[el.name];
                                     } else {
-                                        // Skip current_date field - it should be set dynamically
-                                        if (el.id !== 'current_date') {
+                                        // Skip current_date field and any field marked as protected - they should be set dynamically
+                                        if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
                                         el.value = data[el.name];
                                         }
                                     }
@@ -7578,6 +7622,24 @@ function updateUserFullName() {
   }
 }
 
+// Function to update user address fields
+function updateUserAddressFields() {
+  const street = document.getElementById('user_street')?.value || '';
+  const city = document.getElementById('user_city')?.value || '';
+  const state = document.getElementById('user_state')?.value || '';
+  const zip = document.getElementById('user_zip')?.value || '';
+  
+  const streetHidden = document.getElementById('user_street_hidden');
+  const cityHidden = document.getElementById('user_city_hidden');
+  const stateHidden = document.getElementById('user_state_hidden');
+  const zipHidden = document.getElementById('user_zip_hidden');
+  
+  if (streetHidden) streetHidden.value = street;
+  if (cityHidden) cityHidden.value = city;
+  if (stateHidden) stateHidden.value = state;
+  if (zipHidden) zipHidden.value = zip;
+}
+
 // Add event listeners for first and last name fields
 document.addEventListener('DOMContentLoaded', function() {
   const firstNameField = document.getElementById('user_firstname');
@@ -7593,9 +7655,36 @@ document.addEventListener('DOMContentLoaded', function() {
     lastNameField.addEventListener('change', updateUserFullName);
   }
   
-  // Set user_fullname 2 seconds after page loads to ensure all autopopulation is complete
+  // Add event listeners for address fields
+  const streetField = document.getElementById('user_street');
+  const cityField = document.getElementById('user_city');
+  const stateField = document.getElementById('user_state');
+  const zipField = document.getElementById('user_zip');
+  
+  if (streetField) {
+    streetField.addEventListener('input', updateUserAddressFields);
+    streetField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  if (cityField) {
+    cityField.addEventListener('input', updateUserAddressFields);
+    cityField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  if (stateField) {
+    stateField.addEventListener('input', updateUserAddressFields);
+    stateField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  if (zipField) {
+    zipField.addEventListener('input', updateUserAddressFields);
+    zipField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  // Set user_fullname and address fields 2 seconds after page loads to ensure all autopopulation is complete
   setTimeout(() => {
     updateUserFullName();
+    updateUserAddressFields();
   }, 2000);
 });
            

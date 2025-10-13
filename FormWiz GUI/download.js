@@ -65,12 +65,12 @@ function generateAndDownloadForm() {
     console.log('🔧 [EXPORT DEBUG] generateAndDownloadForm() called');
     try {
         console.log('🔧 [EXPORT DEBUG] Calling getFormHTML()...');
-        const formHTML = getFormHTML();
+    const formHTML = getFormHTML();
         console.log('🔧 [EXPORT DEBUG] getFormHTML() completed successfully, HTML length:', formHTML ? formHTML.length : 'null');
-        navigator.clipboard.writeText(formHTML).then(() => {
-            alert("HTML code has been copied to the clipboard.");
-        });
-        downloadHTML(formHTML, "custom_form.html");
+    navigator.clipboard.writeText(formHTML).then(() => {
+        alert("HTML code has been copied to the clipboard.");
+    });
+    downloadHTML(formHTML, "custom_form.html");
     } catch (error) {
         console.error('🔧 [EXPORT DEBUG] Error in generateAndDownloadForm():', error);
         alert('Error generating form: ' + error.message);

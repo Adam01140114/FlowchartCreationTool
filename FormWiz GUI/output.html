@@ -945,8 +945,8 @@ var amountMap = {"15":["Zip"],"21":["Zip"],"length":0};
 var labelNodeIdsMap = {"15":["sc100_how_many_people_are_suing_with_you_name","sc100_how_many_people_are_suing_with_you_phone_number","sc100_how_many_people_are_suing_with_you_street","sc100_how_many_people_are_suing_with_you_city","sc100_how_many_people_are_suing_with_you_state"],"21":["sc100_how_many_people_are_you_suing_name","sc100_how_many_people_are_you_suing_phone_number","sc100_how_many_people_are_you_suing_street","sc100_how_many_people_are_you_suing_city","sc100_how_many_people_are_you_suing_state"]};
 var unifiedFieldsMap = {"9":[{"type":"label","label":"Name","nodeId":"sc103_please_enter_your_business_details_name","order":1},{"type":"label","label":"Street","nodeId":"sc103_please_enter_your_business_details_street","order":2},{"type":"label","label":"City","nodeId":"sc103_please_enter_your_business_details_city","order":3},{"type":"label","label":"State","nodeId":"sc103_please_enter_your_business_details_state","order":4},{"type":"amount","label":"Zip","nodeId":"sc103_please_enter_your_business_details_zip","order":5}],"15":[{"type":"label","label":"Name","nodeId":"sc100_how_many_people_are_suing_with_you_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_how_many_people_are_suing_with_you_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_how_many_people_are_suing_with_you_street","order":3},{"type":"label","label":"City","nodeId":"sc100_how_many_people_are_suing_with_you_city","order":4},{"type":"label","label":"State","nodeId":"sc100_how_many_people_are_suing_with_you_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_how_many_people_are_suing_with_you_zip","order":6}],"21":[{"type":"label","label":"Name","nodeId":"sc100_how_many_people_are_you_suing_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_how_many_people_are_you_suing_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_how_many_people_are_you_suing_street","order":3},{"type":"label","label":"City","nodeId":"sc100_how_many_people_are_you_suing_city","order":4},{"type":"label","label":"State","nodeId":"sc100_how_many_people_are_you_suing_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_how_many_people_are_you_suing_zip","order":6}],"25":[{"type":"label","label":"Name","nodeId":"sc100_who_are_you_suing_on_military_duty_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_who_are_you_suing_on_military_duty_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_who_are_you_suing_on_military_duty_street","order":3},{"type":"label","label":"City","nodeId":"sc100_who_are_you_suing_on_military_duty_city","order":4},{"type":"label","label":"State","nodeId":"sc100_who_are_you_suing_on_military_duty_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_who_are_you_suing_on_military_duty_zip","order":6}],"26":[{"type":"label","label":"Name","nodeId":"sc100_who_are_you_suing_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_who_are_you_suing_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_who_are_you_suing_street","order":3},{"type":"label","label":"City","nodeId":"sc100_who_are_you_suing_city","order":4},{"type":"label","label":"State","nodeId":"sc100_who_are_you_suing_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_who_are_you_suing_zip","order":6}],"29":[{"type":"label","label":"Name","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_name","order":1},{"type":"label","label":"Job","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_job","order":2},{"type":"label","label":"Street","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_street","order":3},{"type":"label","label":"City","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_city","order":4},{"type":"label","label":"State","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_zip","order":6}]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [{"questionId":"3","questionNameId":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","trigger":"Yes","type":"checkbox","nodeId":"personal_claim","textboxText":""},{"questionId":"4","questionNameId":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","trigger":"Yes","type":"checkbox","nodeId":"retail_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"No","type":"checkbox","nodeId":"regular_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"Yes","type":"checkbox","nodeId":"vehicle_claim","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"sc100_form","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"Yes","type":"checkbox","nodeId":"sc100_form","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"4","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"5","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_2_d","textboxText":""}];
-var linkedFields = [{"linkedFieldId":"defendant_phone","fields":["sc100_who_are_you_suing_phone_number","sc100_who_are_you_suing_on_military_duty_phone_number","sc100a_how_many_people_are_you_suing_phone_number_1"]},{"linkedFieldId":"military_name","fields":["sc100_what_is_the_name_of_the_person_on_military_duty","sc100_who_are_you_suing_on_military_duty_name"]},{"linkedFieldId":"defendant_name","fields":["sc100_who_are_you_suing_name","sc100_who_are_you_suing_on_military_duty_name","sc100a_how_many_people_are_you_suing_name_1"]},{"linkedFieldId":"defendant_street","fields":["sc100_who_are_you_suing_street","sc100_who_are_you_suing_on_military_duty_street","sc100a_how_many_people_are_you_suing_street_1"]},{"linkedFieldId":"defendant_city","fields":["sc100_who_are_you_suing_city","sc100_who_are_you_suing_on_military_duty_city","sc100a_how_many_people_are_you_suing_city_1"]},{"linkedFieldId":"defendant_state","fields":["sc100_who_are_you_suing_state_short","sc100_who_are_you_suing_on_military_duty_state_short","sc100a_how_many_people_are_you_suing_state_short_1"]},{"linkedFieldId":"defendant_zip","fields":["sc100_who_are_you_suing_zip","sc100_who_are_you_suing_on_military_duty_zip","sc100a_how_many_people_are_you_suing_zip_1"]}];
+var hiddenLogicConfigs = [{"questionId":"3","questionNameId":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","trigger":"Yes","type":"checkbox","nodeId":"personal_claim","textboxText":""},{"questionId":"4","questionNameId":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","trigger":"Yes","type":"checkbox","nodeId":"retail_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"No","type":"checkbox","nodeId":"regular_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"Yes","type":"checkbox","nodeId":"vehicle_claim","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"sc100_form","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"Yes","type":"checkbox","nodeId":"sc100_form","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"4","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"5","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_2_d","textboxText":""}];
+var linkedFields = [{"linkedFieldId":"defendant_phone","fields":["sc100_who_are_you_suing_phone_number","sc100_who_are_you_suing_on_military_duty_phone_number","sc100_how_many_people_are_you_suing_phone_number_1"]},{"linkedFieldId":"military_name","fields":["sc100_what_is_the_name_of_the_person_on_military_duty","sc100_who_are_you_suing_on_military_duty_name"]},{"linkedFieldId":"defendant_name","fields":["sc100_who_are_you_suing_name","sc100_who_are_you_suing_on_military_duty_name","sc100_how_many_people_are_you_suing_name_1"]},{"linkedFieldId":"defendant_street","fields":["sc100_who_are_you_suing_street","sc100_who_are_you_suing_on_military_duty_street","sc100_how_many_people_are_you_suing_street_1"]},{"linkedFieldId":"defendant_city","fields":["sc100_who_are_you_suing_city","sc100_who_are_you_suing_on_military_duty_city","sc100_how_many_people_are_you_suing_city_1"]},{"linkedFieldId":"defendant_state","fields":["sc100_who_are_you_suing_state_short","sc100_who_are_you_suing_on_military_duty_state_short","sc100_how_many_people_are_you_suing_state_1"]},{"linkedFieldId":"defendant_zip","fields":["sc100_who_are_you_suing_zip","sc100_who_are_you_suing_on_military_duty_zip","sc100_how_many_people_are_you_suing_zip_1"]}];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
@@ -3132,7 +3132,12 @@ window.addFormToCart = function (priceId) {
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
-    for (const el of form.elements) {
+    // Include both elements inside the form AND elements with form="customForm" attribute
+    const formElements = Array.from(form.elements);
+    const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
+    const allFormElements = [...formElements, ...externalFormElements];
+    
+    for (const el of allFormElements) {
       if (!el.name || el.disabled) continue;
       if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
       if (['hidden','button','submit','reset'].includes(el.type)) continue;
@@ -5072,8 +5077,12 @@ async function editAndDownloadPDF (pdfName) {
         const fd = new FormData();
         
         // Manually collect form data to format dates
+        // Include both elements inside the form AND elements with form="customForm" attribute
         const formElements = form.querySelectorAll('input, textarea, select');
-        formElements.forEach(element => {
+        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+        const allFormElements = [...formElements, ...externalFormElements];
+        
+        allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
@@ -5646,7 +5655,12 @@ if (typeof handleNext === 'function') {
             if (!form) {
                 return [];
             }
-            const fields = Array.from(form.elements).filter(el =>
+            // Include both elements inside the form AND elements with form="customForm" attribute
+            const formElements = Array.from(form.elements);
+            const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
+            const allFormElements = [...formElements, ...externalFormElements];
+            
+            const fields = allFormElements.filter(el =>
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
@@ -6091,7 +6105,7 @@ if (typeof handleNext === 'function') {
                         // BUT NOT during initial autofill to preserve autofilled values
                         if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                }
+                        }
                 
                 // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
                 setTimeout(() => {
@@ -6229,6 +6243,13 @@ if (typeof handleNext === 'function') {
                             updateUserFullName();
                         }
                     }
+                    
+                    // Update address fields if any address field changed
+                    if (el.id === 'user_street' || el.id === 'user_city' || el.id === 'user_state' || el.id === 'user_zip') {
+                        if (typeof updateUserAddressFields === 'function') {
+                            updateUserAddressFields();
+                        }
+                    }
                 });
                 el.addEventListener('change', function() {
                     if (isUserLoggedIn) {
@@ -6241,6 +6262,13 @@ if (typeof handleNext === 'function') {
                     if (el.id === 'user_firstname' || el.id === 'user_lastname') {
                         if (typeof updateUserFullName === 'function') {
                             updateUserFullName();
+                        }
+                    }
+                    
+                    // Update address fields if any address field changed
+                    if (el.id === 'user_street' || el.id === 'user_city' || el.id === 'user_state' || el.id === 'user_zip') {
+                        if (typeof updateUserAddressFields === 'function') {
+                            updateUserAddressFields();
                         }
                     }
                 });
@@ -6328,18 +6356,21 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 }
                             } else {
-                                // Skip current_date field - it should be set dynamically
-                                if (el.id !== 'current_date') {
+                                // Skip current_date field and any field marked as protected - they should be set dynamically
+                                if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
                                 el.value = data[el.name];
                                 }
                             }
                         }
                     });
                     
-                    // Update full name after autofilling with delay to ensure DOM is ready
+                    // Update full name and address fields after autofilling with delay to ensure DOM is ready
                     setTimeout(() => {
                         if (typeof updateUserFullName === 'function') {
                             updateUserFullName();
+                        }
+                        if (typeof updateUserAddressFields === 'function') {
+                            updateUserAddressFields();
                         }
                         // Always set current_date to today's date after autofill
                         if (typeof setCurrentDate === 'function') {
@@ -6431,8 +6462,8 @@ if (typeof handleNext === 'function') {
                                     if (el.type === 'checkbox' || el.type === 'radio') {
                                         el.checked = !!data[el.name];
                                     } else {
-                                        // Skip current_date field - it should be set dynamically
-                                        if (el.id !== 'current_date') {
+                                        // Skip current_date field and any field marked as protected - they should be set dynamically
+                                        if (el.id !== 'current_date' && el.name !== 'current_date' && !el.hasAttribute('data-protected')) {
                                         el.value = data[el.name];
                                         }
                                     }
@@ -7748,6 +7779,24 @@ function updateUserFullName() {
   }
 }
 
+// Function to update user address fields
+function updateUserAddressFields() {
+  const street = document.getElementById('user_street')?.value || '';
+  const city = document.getElementById('user_city')?.value || '';
+  const state = document.getElementById('user_state')?.value || '';
+  const zip = document.getElementById('user_zip')?.value || '';
+  
+  const streetHidden = document.getElementById('user_street_hidden');
+  const cityHidden = document.getElementById('user_city_hidden');
+  const stateHidden = document.getElementById('user_state_hidden');
+  const zipHidden = document.getElementById('user_zip_hidden');
+  
+  if (streetHidden) streetHidden.value = street;
+  if (cityHidden) cityHidden.value = city;
+  if (stateHidden) stateHidden.value = state;
+  if (zipHidden) zipHidden.value = zip;
+}
+
 // Add event listeners for first and last name fields
 document.addEventListener('DOMContentLoaded', function() {
   const firstNameField = document.getElementById('user_firstname');
@@ -7763,9 +7812,36 @@ document.addEventListener('DOMContentLoaded', function() {
     lastNameField.addEventListener('change', updateUserFullName);
   }
   
-  // Set user_fullname 2 seconds after page loads to ensure all autopopulation is complete
+  // Add event listeners for address fields
+  const streetField = document.getElementById('user_street');
+  const cityField = document.getElementById('user_city');
+  const stateField = document.getElementById('user_state');
+  const zipField = document.getElementById('user_zip');
+  
+  if (streetField) {
+    streetField.addEventListener('input', updateUserAddressFields);
+    streetField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  if (cityField) {
+    cityField.addEventListener('input', updateUserAddressFields);
+    cityField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  if (stateField) {
+    stateField.addEventListener('input', updateUserAddressFields);
+    stateField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  if (zipField) {
+    zipField.addEventListener('input', updateUserAddressFields);
+    zipField.addEventListener('change', updateUserAddressFields);
+  }
+  
+  // Set user_fullname and address fields 2 seconds after page loads to ensure all autopopulation is complete
   setTimeout(() => {
     updateUserFullName();
+    updateUserAddressFields();
   }, 2000);
 });
            
