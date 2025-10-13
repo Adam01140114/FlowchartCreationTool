@@ -276,6 +276,20 @@ window.exportGuiJson = function(download = true) {
         if (cell._paragraphLimit !== undefined && cell._paragraphLimit !== '') {
           question.paragraphLimit = parseInt(cell._paragraphLimit) || 0;
         }
+        
+        // Add Big Paragraph PDF Logic if enabled
+        if (cell._pdfLogicEnabled) {
+          question.pdfLogic.enabled = true;
+          question.pdfLogic.conditions = [{
+            characterLimit: parseInt(cell._pdfTriggerLimit) || 0
+          }];
+          question.pdfLogic.pdfs = [{
+            pdfName: cell._bigParagraphPdfFile || "",
+            pdfDisplayName: cell._bigParagraphPdfName || "",
+            stripePriceId: cell._bigParagraphPdfPrice || "",
+            triggerOption: ""
+          }];
+        }
     }
     
     // For text2, clean the text from HTML
@@ -1409,6 +1423,9 @@ window.exportBothJson = function() {
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
       if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
       if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
+      if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
+      if (cell._bigParagraphPdfFile !== undefined) cellData._bigParagraphPdfFile = cell._bigParagraphPdfFile;
+      if (cell._bigParagraphPdfPrice !== undefined) cellData._bigParagraphPdfPrice = cell._bigParagraphPdfPrice;
       
       // calculation node properties
       if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
@@ -2730,6 +2747,13 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         // Legacy PDF properties for backward compatibility
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
+        
+        // Big Paragraph PDF Logic properties
+        if (item._pdfLogicEnabled !== undefined) newCell._pdfLogicEnabled = item._pdfLogicEnabled;
+        if (item._pdfTriggerLimit !== undefined) newCell._pdfTriggerLimit = item._pdfTriggerLimit;
+        if (item._bigParagraphPdfName !== undefined) newCell._bigParagraphPdfName = item._bigParagraphPdfName;
+        if (item._bigParagraphPdfFile !== undefined) newCell._bigParagraphPdfFile = item._bigParagraphPdfFile;
+        if (item._bigParagraphPdfPrice !== undefined) newCell._bigParagraphPdfPrice = item._bigParagraphPdfPrice;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
         
         // Notes node properties

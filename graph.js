@@ -897,7 +897,7 @@ function showPropertiesPopup(cell) {
     
     // Add Copy ID button for Big Paragraph nodes
     properties.push({
-      label: 'Copy ID',
+      label: '',
       value: '',
       id: 'propCopyId',
       editable: false,
@@ -933,7 +933,7 @@ function showPropertiesPopup(cell) {
     
     // Add Enable PDF Logic button for Big Paragraph nodes
     properties.push({
-      label: 'Enable PDF Logic',
+      label: '',
       value: '',
       id: 'propEnablePdfLogic',
       editable: false,
@@ -993,7 +993,7 @@ function showPropertiesPopup(cell) {
       
       // Add Save button for PDF Logic
       properties.push({
-        label: 'Save PDF Logic',
+        label: '',
         value: '',
         id: 'propSavePdfLogic',
         editable: false,
@@ -1854,7 +1854,7 @@ function showPropertiesPopup(cell) {
         font-size: 14px;
         cursor: pointer;
         transition: all 0.2s ease;
-        display: ${prop.initiallyHidden ? 'none' : 'block'};
+        display: ${prop.initiallyHidden ? 'none' : 'inline-block'};
       `;
       
       button.addEventListener('click', () => {
@@ -1875,6 +1875,10 @@ function showPropertiesPopup(cell) {
       if (!prop.label) {
         fieldDiv.style.justifyContent = 'center';
         fieldDiv.style.width = '100%';
+        fieldDiv.style.padding = '0';
+        fieldDiv.style.margin = '0 0 16px 0';
+        // Add left margin to center the 200px button
+        button.style.marginLeft = 'calc(50% - 100px)';
         fieldDiv.appendChild(button);
       } else {
         fieldDiv.appendChild(label);
@@ -3338,6 +3342,14 @@ window.saveBigParagraphPdfLogic = function(cell) {
     cell._bigParagraphPdfPrice = pdfPriceInput.value;
     console.log('Saved _bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
   }
+  
+  // Debug: Check all cell properties after saving
+  console.log('🔍 [CELL DEBUG] All cell properties after saving:');
+  console.log('cell._pdfLogicEnabled:', cell._pdfLogicEnabled);
+  console.log('cell._pdfTriggerLimit:', cell._pdfTriggerLimit);
+  console.log('cell._bigParagraphPdfName:', cell._bigParagraphPdfName);
+  console.log('cell._bigParagraphPdfFile:', cell._bigParagraphPdfFile);
+  console.log('cell._bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
   
   // Show success message
   const saveButton = document.getElementById('propSavePdfLogic');

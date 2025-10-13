@@ -264,6 +264,13 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
     if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
     if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
+    
+    // Big Paragraph PDF Logic properties
+    if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
+    if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
+    if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
+    if (cell._bigParagraphPdfFile !== undefined) cellData._bigParagraphPdfFile = cell._bigParagraphPdfFile;
+    if (cell._bigParagraphPdfPrice !== undefined) cellData._bigParagraphPdfPrice = cell._bigParagraphPdfPrice;
     if (cell._checklistText) cellData._checklistText = cell._checklistText;
     if (cell._alertText) cellData._alertText = cell._alertText;
     if (cell._calcTitle) cellData._calcTitle = cell._calcTitle;
