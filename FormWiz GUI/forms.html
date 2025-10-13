@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forms - FormWiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="cart.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #2980b9;
@@ -20,48 +22,156 @@
             display: flex;
             flex-direction: column;
             font-family: 'Montserrat', sans-serif;
-            color: var(--text-color);
-            background-color: var(--background-color);
+            color: #333;
+            background-color: #eaf1f8;
+            zoom: 0.90;
+            min-height: 100vh;
         }
-
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         header {
-            background-color: var(--header-color);
-            padding: 20px 40px;
+            background-color: #2c3e50;
+            padding: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             position: relative;
         }
-
         header img {
-            position: absolute;
-            left: 20px;
             cursor: pointer;
-            width: 130px;
-            height: 80px;
         }
-
         nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            gap: 38px;
+            z-index: 2;
         }
-
         nav a {
-            color: #ffffff;
+            color: #fff;
             text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-            padding: 5px 10px;
+            font-weight: 700;
+            font-size: 1.18em;
+            letter-spacing: 0.02em;
+            padding: 2px 8px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
         }
-
         nav a:hover {
-            color: var(--primary-color);
+            color: #ff7043;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
         }
-
+        .nav-chevron {
+            display: inline-block;
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        .nav-chevron svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-left: auto;
+        }
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 1002;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 10px;
+            }
+            nav {
+                position: static;
+                transform: none;
+                margin-top: 10px;
+            }
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
         .user-info {
             position: absolute;
-            right: 20px;
+            right: 70px;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -70,7 +180,7 @@
         .welcome-message {
             color: #ffffff;
             font-weight: 500;
-            font-size: 0.95em;
+            font-size: 1.5em;
         }
 
         .settings-button {
@@ -128,45 +238,45 @@
         }
 
         .forms-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
             list-style: none;
             padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
+            margin: 0;
+            justify-items: center;
         }
 
         .forms-list li {
-            margin: 10px;
-            width: 220px;
+            background: #f8fafc;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            padding: 28px 22px 22px 22px;
+            min-width: 220px;
+            max-width: 340px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 2px solid var(--primary-color);
-            border-radius: 5px;
-            background-color: #EBE7D9;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            padding: 15px;
-            padding-top: 25px;
-            padding-left: 20px;
-            padding-right: 20px;
-            text-align: center;
+            transition: box-shadow 0.2s, background 0.2s;
+            border: none;
             position: relative;
         }
 
         .forms-list li:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: #eaf1f8;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.03);
         }
 
         .forms-list li a {
-            color: var(--primary-color);
+            color: #2980b9;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 12px;
             width: 100%;
-            margin-bottom: 10px;
-            font-size: 0.95em;
+            text-align: center;
         }
 
         .remove-button {
@@ -190,14 +300,6 @@
             color: #7f8c8d;
             font-size: 18px;
             margin-top: 20px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: var(--header-color);
-            color: #EBE7D9;
-            margin-top: auto;
         }
 
         /* Modal Styles */
@@ -319,8 +421,8 @@
             position: absolute;
             top: 5px;
             left: 3px;
-            width: 15px;
-            height: 15px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
             z-index: 1;
             margin-bottom: 5px;
@@ -356,31 +458,683 @@
             display: none;
             width:100%;
             height:40px;
+            max-width: 180px !important;
+            width: 100% !important;
+            margin: 20px auto 0 auto !important;
+            display: block;
         }
 
         #remove-selected-button:hover {
             background-color: #c0392b;
         }
 
-        .protected-section { display: none; }
+        .main-forms-wrapper {
+            max-width: 1200px;
+            margin: 8px auto 48px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .forms-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 4px 32px rgba(44,62,80,0.10);
+            padding: 40px 38px 32px 38px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .forms-card h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            font-family: 'Montserrat', serif;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .forms-card .subtitle {
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        .forms-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: center;
+        }
+
+        .forms-list li {
+            background: #f8fafc;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            padding: 28px 22px 22px 22px;
+            width: 28%;
+            min-width: 220px;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.2s, background 0.2s;
+            border: none;
+            position: relative;
+        }
+
+        .forms-list li:hover {
+            background: #eaf1f8;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .forms-list li a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .remove-button, .form-action-button, .logout-button {
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            transition: background 0.2s;
+        }
+
+        .remove-button:hover, .form-action-button:hover, .logout-button:hover {
+            background-color: #1c598a;
+        }
+
+        .no-forms-message {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-top: 18px;
+            text-align: center;
+            background: #eaf6ff;
+            border: 2px solid #b3e0ff;
+            border-radius: 16px;
+            padding: 18px 24px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+        }
+
+        @media (max-width: 1100px) {
+            .forms-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 700px) {
+            .forms-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #portfolio-welcome-message {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        #portfolio-section {
+            display: none;
+        }
+
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 32px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+            margin-top: 0;
+        }
+        .pro-footer-col {
+            flex: 1 1 320px;
+            min-width: 220px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .address-col {
+            border-right: 1.5px solid #2c7a7d;
+            padding-right: 48px;
+            align-items: flex-start;
+        }
+        .nav-col {
+            align-items: flex-start;
+            padding-left: 32px;
+            padding-right: 32px;
+            border-right: 1.5px solid #2c7a7d;
+        }
+        .company-col {
+            align-items: flex-start;
+            padding-left: 48px;
+        }
+        .pro-footer-title {
+            font-weight: 700;
+            font-size: 1.25em;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .company-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        .pro-footer-contact a {
+            color: #b6e2e6;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043;
+        }
+        .pro-footer-logo {
+            margin-bottom: 8px;
+        }
+        .pro-footer-desc {
+            color: #e0e6ea;
+            font-size: 1em;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+            font-size: 1em;
+        }
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px;
+        }
+        @media (max-width: 900px) {
+            .pro-footer {
+                flex-direction: column;
+                gap: 32px;
+                padding: 32px 4vw 18px 4vw;
+            }
+            .address-col, .company-col, .nav-col {
+                border: none;
+                padding: 0;
+                min-width: unset;
+                max-width: unset;
+            }
+            .company-col, .nav-col {
+                align-items: flex-start;
+            }
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+        .user-actions-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            width: 100%;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .settings-button, .logout-button {
+            height: 44px !important;
+            min-width: 120px;
+            max-width: 320px;
+            width: 100%;
+            margin: 0;
+            font-size: 1em;
+            border-radius: 7px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        }
+        .forms-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            margin-top: 38px;
+        }
+        .circle-arrow-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #2980b9;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+            outline: none;
+            position: relative;
+        }
+        .circle-arrow-btn:disabled {
+            background: #b3cbe6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .circle-arrow-btn svg {
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+        .forms-list {
+            transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .forms-list.fade-out {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        .forms-list.fade-in {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        #portfolio-section .forms-list {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center;
+            gap: 32px;
+            width: 100%;
+        }
+        #portfolio-section .forms-list li {
+            width: 90% !important;
+            max-width: 600px !important;
+            min-width: 320px !important;
+            padding: 18px 32px 14px 32px !important;
+            border-radius: 18px !important;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10) !important;
+            margin: 0 auto !important;
+            height: auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #portfolio-section .last-opened {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            font-size: 0.95em;
+            color: #7f8c8d;
+            background: rgba(255,255,255,0.85);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 2;
+        }
+        @media (max-width: 700px) {
+            #portfolio-section .forms-list li {
+                width: 98% !important;
+                max-width: 98vw !important;
+                min-width: unset !important;
+                padding: 12px 6vw 10px 6vw !important;
+            }
+        }
+        #portfolio-section .form-action-button {
+            max-width: 220px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        .welcome-header {
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.06);
+            border-radius: 0 0 24px 24px;
+            margin: 0 auto 32px auto;
+            padding: 36px 0 32px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            position: relative;
+        }
+        .welcome-header-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--header-color);
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+        }
+        .welcome-header-options {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: nowrap;
+        }
+        .welcome-header-option {
+            background: #f8fafc;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            padding: 22px 18px 16px 18px;
+            min-width: 120px;
+            max-width: 180px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+            border: none;
+            outline: none;
+            position: relative;
+        }
+        .welcome-header-option:hover {
+            background: #eaf1f8;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .welcome-header-option-icon {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #2980b9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome-header-option-label {
+            font-size: 1.18em;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .welcome-header-options {
+                flex-direction: column;
+                gap: 18px;
+            }
+            .welcome-header {
+                padding: 24px 0 18px 0;
+            }
+        }
+        #portfolio-section .form-county {
+            font-size: 0.98em;
+            color: #153a5b;
+            font-weight: 600;
+            margin-top: 2px;
+            margin-bottom: 6px;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+
+        #settings-logout-btn {
+            display: block;
+            margin: 18px auto 0 auto !important;
+            width: 100%;
+            max-width: 320px;
+            min-width: 120px;
+            text-align: center;
+        }
+        #user-settings-form .btn {
+            width: 100%;
+            max-width: 320px;
+            min-width: 120px;
+            display: block;
+            margin: 0 auto 0 auto;
+            text-align: center;
+        }
+        #saving-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 62, 80, 0.45);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+        }
+        #saving-overlay .saving-modal {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+            padding: 32px 28px 24px 28px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            font-size: 1.25em;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        #saving-overlay .saving-modal.error {
+            color: #e74c3c;
+        }
+        .delete-account-button {
+            background: #e74c3c !important;
+            color: #fff !important;
+            border: none;
+            border-radius: 7px;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 14px auto 0 auto !important;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            transition: background 0.2s;
+            display: block;
+            max-width: 320px;
+            min-width: 120px;
+            text-align: center;
+        }
+        .delete-account-button:hover {
+            background: #c0392b !important;
+        }
+
+        /* Duplicate Form Modal Styles */
+        #duplicate-form-modal .modal-content {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        #duplicate-form-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        #duplicate-form-modal p {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+
+        #duplicate-form-modal .btn {
+            width: auto;
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        #duplicate-form-yes-btn {
+            background-color: #2980b9;
+        }
+
+        #duplicate-form-yes-btn:hover {
+            background-color: #1c598a;
+        }
+
+        #duplicate-form-cancel-btn {
+            background-color: #95a5a6;
+        }
+
+        #duplicate-form-cancel-btn:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* ───────── My Documents timestamp (matches My Form Portfolio) ───────── */
+#documents-section .forms-list li {         /* make the card a positioning context   */
+    position: relative;                     /* so the timestamp can sit top-right    */
+}
+
+#documents-section .last-opened {           /* copy of #portfolio-section rule       */
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    font-size: 0.95em;
+    color: #7f8c8d;
+    background: rgba(255,255,255,0.85);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 2;
+}
+
+        #documents-section .form-county {
+            font-size: 0.98em;
+            color: #153a5b;
+            font-weight: 600;
+            margin-top: 2px;
+            margin-bottom: 6px;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+
+
+        /* Defendant Modal Styles */
+        #defendant-modal .modal-content {
+            text-align: center;
+            max-width: 500px;
+        }
+        #defendant-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #defendant-modal p {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+        #defendant-modal .btn {
+            width: auto;
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        #defendant-modal-submit {
+            background-color: #2980b9;
+        }
+        #defendant-modal-submit:hover {
+            background-color: #1c598a;
+        }
+        #defendant-modal-cancel {
+            background-color: #95a5a6;
+        }
+        #defendant-modal-cancel:hover {
+            background-color: #7f8c8d;
+        }
     </style>
 </head>
 <body>
-    <header class="protected-section">
-        <img src="logo.png" alt="FormWiz Logo" onclick="location.href='index.html';">
+    <header>
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
         <nav>
-            <a href="index.html">Home</a>
-            <a href="forms.html">Forms</a>
-            <a href="contact.html">Contact Us</a>
+            <a href="../index.html">Home
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+                <a href="#" id="forms-nav-link">Forms
+                    <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </a>
+                <div class="dropdown-menu" id="forms-dropdown-menu">
+                    <a href="forms.html">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Family.html">Family</a>
+                    <a href="Property.html">Property</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="contact.html">Contact Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="FAQ.html">FAQ
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
         </nav>
-        <div class="user-info">
-            <span class="welcome-message" id="welcome-message"></span>
-            <button class="settings-button" id="settings-button">👤</button>
+        <div class="header-actions">
+            <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
+            <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                </span>
+            </a>
         </div>
     </header>
+    <div class="welcome-header">
+        <div class="welcome-header-title">Welcome To FormWiz!</div>
+        <div class="welcome-header-options">
+            <div class="welcome-header-option" id="new-form-btn" tabindex="0">
+                <span class="welcome-header-option-icon">📄</span>
+                <span class="welcome-header-option-label">New Form</span>
+            </div>
+            <div class="welcome-header-option" id="my-forms-btn" tabindex="0">
+                <span class="welcome-header-option-icon">📁</span>
+                <span class="welcome-header-option-label">My Forms</span>
+            </div>
+            <div class="welcome-header-option" id="documents-btn" tabindex="0">
+                <span class="welcome-header-option-icon">📑</span>
+                <span class="welcome-header-option-label"> My Documents</span>
+            </div>
+            <div class="welcome-header-option" id="settings-btn" tabindex="0">
+                <span class="welcome-header-option-icon">⚙️</span>
+                <span class="welcome-header-option-label">Settings</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Settings Modal -->
-    <div id="settings-modal" class="modal protected-section">
+    <div id="settings-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeSettings()">&times;</span>
             <h2>User Information</h2>
@@ -472,58 +1226,111 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input type="text" id="settings-zip" placeholder="ZIP" pattern="[0-9]{5}" required>
+                                <input type="text" id="settings-zip" placeholder="ZIP" pattern="[0-9]{5}" required inputmode="numeric" pattern="[0-9]*" maxlength="5">
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn">Save Changes</button>
+                <button type="submit" class="btn" id="settings-save-btn">Back</button>
+                <button type="button" id="settings-logout-btn" class="logout-button">Logout</button>
+                <button type="button" id="settings-delete-btn" class="delete-account-button" style="background:#e74c3c; color:#fff; margin: 14px auto 0 auto; width:100%; max-width:320px; min-width:120px; display:block; font-weight:700;">Delete Account</button>
                 <div class="error-message" id="settings-error"></div>
             </form>
         </div>
     </div>
-	
-	<br>
-	<center>
-	<h2 id="portfolio-welcome-message" class="protected-section" style="color: var(--text-color); margin-bottom: 10px;"></h2>
-	</center>
-	
 
-<section class="forms-section protected-section">
-
- 
- 
- 
-    <h1>My Form Portfolio</h1>
-    <ul id="my-forms-list" class="forms-list">
-        <!-- User's forms will be dynamically inserted here -->
-    </ul>
-    <div id="no-forms-message" class="no-forms-message" style="display: none;">
-        You currently have no forms in your portfolio.
+    <!-- Duplicate Form Confirmation Modal -->
+    <div id="duplicate-form-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" onclick="closeDuplicateFormModal()">&times;</span>
+            <h2>Duplicate Form Detected</h2>
+            <p id="duplicate-form-message" style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;"></p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                <button type="button" id="duplicate-form-cancel-btn" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                <button type="button" id="duplicate-form-yes-btn" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Yes</button>
+            </div>
+        </div>
     </div>
-    <center>
-    <button id="remove-selected-button" class="remove-button">Remove Forms</button>
-</section>
+	
 
-    
-    <!-- Available Forms Section -->
-    <section class="forms-section">
-        <h1>Available Forms</h1>
-        <ul id="available-forms-list" class="forms-list">
-            <li><a href="#" data-form-id="fee-waiver" data-form-url="fee-waiver.html?formId=fee-waiver">Court Fees Waiver</a></li>
-            <li><a href="#" data-form-id="example" data-form-url="example.html?formId=example">Example</a></li>
-            <li><a href="#" data-form-id="example2" data-form-url="example2.html?formId=example2">Example2</a></li>
-            <li><a href="#" data-form-id="example3" data-form-url="example3.html?formId=example3">Example3</a></li>
-			<li><a href="#" data-form-id="smallclaims" data-form-url="smallclaims.html?formId=example3">Small Claims</a></li>
+<div class="main-forms-wrapper">
+    <div id="portfolio-section" class="forms-card">
+       <center> <h1>My Form Portfolio</h1><br></center>
+        <div class="subtitle">All your saved forms in one place. Open, manage, or remove forms below.</div><br>
+        <ul id="my-forms-list" class="forms-list">
+            <!-- User's forms will be dynamically inserted here -->
         </ul>
-    </section>
+        <div id="no-forms-message" class="no-forms-message" style="display: none;">
+            You currently have no forms in your portfolio.
+        </div><br>
+        <button id="remove-selected-button" class="remove-button">Remove Forms</button><br><br><br></b>
+        <div class="user-actions-row" style="display: none; flex-direction: column; justify-content: center; gap: 14px; margin-bottom: 18px; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto;">
+            <button class="settings-button" id="user-settings-btn" style="width: 100%; height: 44px; display: none;">User Settings</button>
+            <button class="logout-button" id="logout-button" style="width: 100%; height: 44px;">Logout</button>
+        </div>
+    </div>
+    <!-- My Documents Section -->
+    <div id="documents-section" class="forms-card">
+        <center><h1>My Documents</h1><br></center>
+        <div class="subtitle">All your completed and purchased forms. Download or view your documents below.</div><br>
+        <ul id="my-documents-list" class="forms-list">
+            <!-- User's purchased documents will be dynamically inserted here -->
+        </ul>
+        <div id="no-documents-message" class="no-forms-message" style="display: none;">
+            You have not purchased any documents yet.
+        </div><br>
+    </div>
+    <div class="forms-card">
+        <h1>Available Forms</h1><br>
+        <div class="subtitle">Browse and add new forms to your portfolio. Click a form to add it below.</div>
+        <!-- Search Bar for Available Forms -->
+        <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 100%; max-width: 400px; margin-bottom: 18px; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0;">
+        
+      <br>
+        <ul id="available-forms-list" class="forms-list">
+            <!-- Available forms will be dynamically loaded here -->
+        </ul>
+        <div class="forms-pagination">
+            <button id="forms-prev-btn" class="circle-arrow-btn" aria-label="Previous" disabled>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.5 19L8.5 12L15.5 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="forms-next-btn" class="circle-arrow-btn" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 5L15.5 12L8.5 19" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <br>
+    </div>
+</div>
 
-    <center>
-	<br>
-        <button class="logout-button protected-section" id="logout-button">Logout</button>
-    </center><br><br>
-
+    <div class="pro-footer">
+        <div class="pro-footer-col address-col">
+            <div class="pro-footer-logo">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+            </div>
+            <div class="pro-footer-title">FormWiz</div>
+            <div class="pro-footer-contact">
+                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+            </div>
+        </div>
+        <div class="pro-footer-col nav-col">
+            <div class="pro-footer-title">Navigation</div>
+            <a href="../index.html">Home</a>
+            <a href="FreeForm.html">Forms</a>
+            <a href="FAQ.html">FAQ</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="pro-footer-col company-col">
+            <div class="pro-footer-title company-title">About FormWiz</div>
+            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+        </div>
+    </div>
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
@@ -532,353 +1339,88 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="cart.js"></script>
+    <script src="../forms.js"></script>
 
- <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-        authDomain: "formwiz-3f4fd.firebaseapp.com",
-        projectId: "formwiz-3f4fd",
-        storageBucket: "formwiz-3f4fd.firebasestorage.app",
-        messagingSenderId: "404259212529",
-        appId: "1:404259212529:web:15a33bce82383b21cfed50",
-        measurementId: "G-P07YEN0HPD"
-    };
+<div id="saving-overlay">
+    <div class="saving-modal" id="saving-modal-text">Saving...</div>
+</div>
+<div class="cart-overlay" id="cart-overlay">
+    <div class="cart-side-menu" id="cart-side-menu">
+        <div class="cart-header">
+            <h2>🛒 Cart</h2>
+            <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+        </div>
+        <div class="cart-content" id="cart-content">
+            <div class="cart-icon-large">🛒</div>
+            <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+            <div class="cart-description" id="cart-description">
+                To add forms to your cart and make purchases, you'll need to create a FormWiz account. 
+                Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+            </div>
+            <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+            <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+            <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
+        </div>
+    </div>
+</div>
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // DOM Elements
-    const welcomeMessage = document.getElementById('welcome-message');
-    const settingsButton = document.getElementById('settings-button');
-    const logoutButton = document.getElementById('logout-button');
-    const settingsModal = document.getElementById('settings-modal');
-    const userSettingsForm = document.getElementById('user-settings-form');
-    const settingsError = document.getElementById('settings-error');
-    const myFormsList = document.getElementById('my-forms-list');
-    const availableFormsList = document.getElementById('available-forms-list');
-    const noFormsMessage = document.getElementById('no-forms-message');
-    const removeSelectedButton = document.getElementById('remove-selected-button');
-
-    // Keep track of selected forms
-    const selectedForms = new Set();
-
-    // Modal Functions
-    function openSettings() {
-        settingsModal.style.display = 'block';
-    }
-
-    function closeSettings() {
-        settingsModal.style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-        if (event.target == settingsModal) {
-            closeSettings();
-        }
-    };
-
-    // Logout Function
-    logoutButton.addEventListener('click', () => {
-        auth.signOut().then(() => {
-            window.location.href = 'index.html';
-        }).catch((error) => {
-            console.error('Sign Out Error', error);
-        });
-    });
-
-    // Form Management Functions
-    function renderMyForms(forms) {
-        myFormsList.innerHTML = '';
-        if (forms.length === 0) {
-            noFormsMessage.style.display = 'block';
-            removeSelectedButton.style.display = 'none';
-        } else {
-            noFormsMessage.style.display = 'none';
-            forms.forEach((form) => {
-                const li = document.createElement('li');
-                
-                // Add checkbox for selection
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.classList.add('form-checkbox');
-                checkbox.dataset.formId = form.id;
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        selectedForms.add(form.id);
-                    } else {
-                        selectedForms.delete(form.id);
-                    }
-                    updateRemoveSelectedButton();
-                });
-                
-                const a = document.createElement('a');
-                a.href = form.url;
-                a.textContent = form.name;
-                
-                // Create Open button
-                const openButton = document.createElement('button');
-                openButton.textContent = 'Open';
-                openButton.classList.add('form-action-button');
-                openButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    window.location.href = form.url;
-                });
-
-                li.appendChild(checkbox);
-                li.appendChild(a);
-                li.appendChild(openButton);
-                myFormsList.appendChild(li);
-            });
-        }
-    }
-
-    function updateRemoveSelectedButton() {
-        if (selectedForms.size > 0) {
-            removeSelectedButton.style.display = 'block';
-        } else {
-            removeSelectedButton.style.display = 'none';
-        }
-    }
-
-    // Remove selected forms
-    removeSelectedButton.addEventListener('click', async () => {
-        if (selectedForms.size === 0) return;
-        
-        const userId = auth.currentUser.uid;
-        const batch = db.batch();
-        
-        selectedForms.forEach(formId => {
-            const formRef = db.collection('users').doc(userId).collection('forms').doc(formId);
-            batch.delete(formRef);
-        });
-        
-        try {
-            await batch.commit();
-            selectedForms.clear();
-            fetchMyForms(userId);
-        } catch (error) {
-            console.error('Error removing selected forms:', error);
-        }
-    });
-
-    function fetchMyForms(userId) {
-        db.collection('users').doc(userId).collection('forms').get()
-            .then((querySnapshot) => {
-                const forms = [];
-                querySnapshot.forEach((doc) => {
-                    forms.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                renderMyForms(forms);
-                selectedForms.clear();
-                updateRemoveSelectedButton();
-            })
-            .catch((error) => {
-                console.error('Error fetching user forms:', error);
-            });
-    }
-
-    // Update Available Forms rendering
-    function renderAvailableForms() {
-        const formItems = availableFormsList.querySelectorAll('li');
-        
-        formItems.forEach(li => {
-            const anchor = li.querySelector('a');
-            if (anchor) {
-                const formId = anchor.getAttribute('data-form-id');
-                const formUrl = anchor.getAttribute('data-form-url');
-                const formName = anchor.textContent;
-                
-                // Create Click Here button
-                const addButton = document.createElement('button');
-                addButton.textContent = 'Click Here';
-                addButton.classList.add('form-action-button');
-                addButton.dataset.formId = formId;
-                addButton.dataset.formUrl = formUrl;
-                addButton.dataset.formName = formName;
-                
-                addButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    addFormToPortfolio(formId, formUrl, formName);
-                });
-                
-                li.appendChild(addButton);
-            }
-        });
-    }
-    
-    async function addFormToPortfolio(formId, formUrl, formName) {
-        const user = auth.currentUser;
-        if (!user) {
-            // Not signed in, just go to the form
-            window.location.href = formUrl;
-            return;
-        }
-        const userId = user.uid;
-        try {
-            // Check if form exists in user's collection
-            const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
-            if (formDoc.exists) {
-                // Instead of alert, redirect to the form page
-                window.location.href = formUrl;
-            } else {
-                // Add new form to user's collection
-                await db.collection('users').doc(userId).collection('forms').doc(formId).set({
-                    name: formName,
-                    url: formUrl,
-                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                // Refresh the forms list
-                fetchMyForms(userId);
-            }
-        } catch (error) {
-            console.error('Error handling form:', error);
-        }
-    }
-
-    // Available Forms Click Handler - Keep existing functionality
-    availableFormsList.addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (e.target.tagName === 'A') {
-            const formId = e.target.getAttribute('data-form-id');
-            const formUrl = e.target.getAttribute('data-form-url');
-            const formName = e.target.textContent;
-            
-            addFormToPortfolio(formId, formUrl, formName);
-        }
-    });
-
-    // User Settings Form Handler
-    userSettingsForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        settingsError.textContent = '';
-        
-        const userId = auth.currentUser.uid;
-        const updatedData = {
-            firstName: document.getElementById('settings-first-name').value.trim(),
-            lastName: document.getElementById('settings-last-name').value.trim(),
-            email: document.getElementById('settings-email').value.trim(),
-            phone: document.getElementById('settings-phone').value.trim(),
-            address: {
-                street: document.getElementById('settings-street').value.trim(),
-                city: document.getElementById('settings-city').value.trim(),
-                state: document.getElementById('settings-state').value,
-                zip: document.getElementById('settings-zip').value.trim()
-            },
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        try {
-            // Update user document (create if doesn't exist)
-            await db.collection('users').doc(userId).set(updatedData, { merge: true });
-            
-            // Update welcome message
-            welcomeMessage.textContent = `Welcome ${updatedData.firstName} ${updatedData.lastName}`;
-            
-            // Update auth email if changed
-            if (auth.currentUser.email !== updatedData.email) {
-                await auth.currentUser.updateEmail(updatedData.email);
-            }
-            
-            closeSettings();
-        } catch (error) {
-            settingsError.textContent = error.message;
-            console.error('Error updating profile:', error);
-        }
-    });
-
-    // Update the auth state listener in forms.html
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            // Show protected sections
-            document.querySelectorAll('.protected-section').forEach(el => el.style.display = '');
-            try {
-                // Get user document from Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    welcomeMessage.textContent = `${userData.firstName} ${userData.lastName}`;
-                    document.getElementById('portfolio-welcome-message').textContent = `Welcome, ${userData.firstName} ${userData.lastName}`;
-                    document.getElementById('settings-first-name').value = userData.firstName || '';
-                    document.getElementById('settings-last-name').value = userData.lastName || '';
-                    document.getElementById('settings-email').value = userData.email || user.email || '';
-                    document.getElementById('settings-phone').value = userData.phone || '';
-                    document.getElementById('settings-street').value = userData.address?.street || '';
-                    document.getElementById('settings-city').value = userData.address?.city || '';
-                    document.getElementById('settings-state').value = userData.address?.state || '';
-                    document.getElementById('settings-zip').value = userData.address?.zip || '';
-                    fetchMyForms(user.uid);
-                    renderAvailableForms();
+    <!-- Add logic to show/hide Log Out button and handle logout -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signInBtn = document.getElementById('sign-in-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    if (signInBtn) signInBtn.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
                 } else {
-                    const newUserData = {
-                        firstName: '',
-                        lastName: '',
-                        email: user.email,
-                        phone: '',
-                        address: {
-                            street: '',
-                            city: '',
-                            state: '',
-                            zip: ''
-                        },
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    await db.collection('users').doc(user.uid).set(newUserData);
-                    welcomeMessage.textContent = `Welcome User`;
-                    renderAvailableForms();
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                welcomeMessage.textContent = 'Welcome User';
-            }
-            settingsButton.addEventListener('click', openSettings);
-        } else {
-            // Hide protected sections
-            document.querySelectorAll('.protected-section').forEach(el => el.style.display = 'none');
-            // DO NOT redirect to account.html here anymore
-            // Only handle available forms section and click handlers
-            const availableSection = document.querySelectorAll('.forms-section')[1];
-            availableSection.querySelector('h1').textContent = 'Available Forms';
-            let desc = availableSection.querySelector('.available-desc');
-            if (!desc) {
-                desc = document.createElement('div');
-                desc.className = 'available-desc';
-                availableSection.insertBefore(desc, availableSection.querySelector('ul'));
-            }
-            desc.textContent = 'Browse through a wide variety of the forms we offer.';
-            // Remove all add buttons if present, then re-render with click handler
-            const availableFormsList = document.getElementById('available-forms-list');
-            availableFormsList.querySelectorAll('button.form-action-button').forEach(btn => btn.remove());
-            const formItems = availableFormsList.querySelectorAll('li');
-            formItems.forEach(li => {
-                const anchor = li.querySelector('a');
-                if (anchor) {
-                    // Remove any existing button
-                    const oldBtn = li.querySelector('button.form-action-button');
-                    if (oldBtn) oldBtn.remove();
-                    // Add Click Here button
-                    const addButton = document.createElement('button');
-                    addButton.textContent = 'Click Here';
-                    addButton.classList.add('form-action-button');
-                    addButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        window.location.href = 'account.html';
-                    });
-                    li.appendChild(addButton);
-                    // Also, clicking the form name should redirect
-                    anchor.onclick = (e) => {
-                        e.preventDefault();
-                        window.location.href = 'account.html';
-                    };
+                    if (signInBtn) signInBtn.style.display = 'inline-block';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
                 }
             });
-        }
-    });
-</script>
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.href = '../index.html';
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
+        });
+    </script>
+
+    <!-- County Selection Modal -->
+    <div id="county-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="county-modal-close">&times;</span>
+            <h2 id="county-modal-title">Which county are you filing in?</h2>
+            <p id="county-modal-message" style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Enter your zip code below to determine your county.</p>
+            <input type="text" id="county-zip-input" placeholder="Enter zip code" maxlength="5" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px; text-align: center;">
+            <div id="county-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div id="county-modal-buttons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
+
+    <!-- Defendant Name Modal -->
+    <div id="defendant-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="defendant-modal-close">&times;</span>
+            <h2>Defendant Information</h2>
+            <p style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Who are you suing?</p>
+            <input type="text" id="defendant-name-input" placeholder="Enter defendant's name" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px;">
+            <div id="defendant-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
 </body>
 </html>

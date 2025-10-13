@@ -69,9 +69,9 @@
     <!-- Sliding Cart Menu -->
     <div class="cart-overlay" id="cart-overlay">
         <div class="cart-side-menu" id="cart-side-menu">
-            <div class="cart-header">
-                <h2>🛒 Cart</h2>
-                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+            <div class="cart-header" style="background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;">
+                <h2 style="margin:0;font-size:1.5em;font-weight:700;">🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>
             </div>
             <div class="cart-content" id="cart-content">
                 <div class="cart-icon-large">🛒</div>
@@ -231,12 +231,54 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Test</h3></label>
+            <div class="text-input-container">
+              <textarea id="test" name="test" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('test', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  
+                  hiddenInput.value = lineText;
+                }
+                
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -362,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'SC-100';
+window.formId = 'sc100';
 
 (function injectAddressHelpersOnce() {
   if (window.__addressHelpersInjected) return;
@@ -488,11 +530,11 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry"};
-var questionNameIds = {"1":"hungry"};
+    var questionSlugMap       = {"1":"test"};
+var questionNameIds = {"1":"test"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103.pdf","pdfDisplayName":"sc103","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"characterLimit":10}],"isBigParagraph":true}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
@@ -618,9 +660,9 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "SC-100";
+var pdfFileName = "sc100";
 var pdfOutputFileName = "sc100.pdf";
-var stripePriceId = "123234";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["sc100", ];
 var hiddenCheckboxCalculations = [];
@@ -752,18 +794,19 @@ function showValidationPopup() {
     showAlert(validationMessage);
 }
 
-// Helper function to deduplicate PDFs based on pdfName
+// Helper function to deduplicate PDFs based on comprehensive unique key
 function deduplicatePdfs(pdfArray) {
   const seen = new Set();
   const deduplicated = [];
   
   for (const pdf of pdfArray) {
-    const key = pdf.pdfName || pdf.formId || pdf.title;
+    // Create a comprehensive unique key using formId + priceId + portfolioId
+    const key = (pdf.formId || pdf.pdfName || pdf.title) + '_' + pdf.priceId + '_' + (pdf.portfolioId || 'default');
     if (!seen.has(key)) {
       seen.add(key);
       deduplicated.push(pdf);
     } else {
-      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key);
+      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key, 'Original:', pdf.title);
     }
   }
   
@@ -954,6 +997,7 @@ window.addFormToCart = function (priceId) {
 
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
+  let deduplicatedPdfLogicItems = []; // Declare outside try-catch to ensure it's always defined
   console.log('🛒 [CART DEBUG] Computing PDF logic items...');
   
   try {
@@ -994,6 +1038,40 @@ window.addFormToCart = function (priceId) {
             }
           } else {
             console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
+          }
+        } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+          // For number questions with trigger conditions, check if the number meets the condition
+          const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                     document.getElementById('answer' + pdfLogic.questionId);
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+          console.log('  - Number Value:', pdfLogic.numberValue);
+          console.log('  - Element found:', el);
+          
+          if (el) {
+            const val = parseFloat(el.value) || 0;
+            const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+            console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+            
+            let conditionMet = false;
+            if (pdfLogic.numberTrigger === '=') {
+              conditionMet = val === triggerValue;
+            } else if (pdfLogic.numberTrigger === '>') {
+              conditionMet = val > triggerValue;
+            } else if (pdfLogic.numberTrigger === '<') {
+              conditionMet = val < triggerValue;
+            }
+            
+            if (conditionMet) {
+              matched = true;
+              console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number question:', pdfLogic.pdfDisplayName);
+            } else {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'condition:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+            }
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
           }
         } else {
           // For regular conditions, check previous question logic
@@ -1061,12 +1139,14 @@ window.addFormToCart = function (priceId) {
     
     // Deduplicate PDF logic items to prevent multiple requests for the same PDF
     const originalPdfLogicCount = pdfLogicItems.length;
-    const deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
+    deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
     console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
     
     console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
+    // Ensure deduplicatedPdfLogicItems is always an array even if there's an error
+    deduplicatedPdfLogicItems = [];
   }
 
   // 5) Preferred path: site cart manager
@@ -1153,7 +1233,7 @@ window.addFormToCart = function (priceId) {
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
   console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
   
-  const cart = [];
+  let cart = [];
   const mainCartItem = {
     formId: originalFormId, title: formTitle, priceId,
     pdfName: (window.pdfFileName || ''),
@@ -1166,6 +1246,11 @@ window.addFormToCart = function (priceId) {
     cart.push(item);
     console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
   }
+
+  // Final deduplication of the entire cart to prevent any duplicates
+  const originalCartCount = cart.length;
+  cart = deduplicatePdfs(cart);
+  console.log('🛒 [CART DEBUG] Final cart deduplication: Original count:', originalCartCount, 'After deduplication:', cart.length);
 
   console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
@@ -2794,6 +2879,41 @@ async function processAllPdfs() {
                     } else {
                         console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
+                } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+                    // For number questions with trigger conditions, check if the number meets the condition
+                    const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                          document.getElementById('answer' + pdfLogic.questionId);
+                    
+                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking number trigger:');
+                    console.log('  - Question ID:', pdfLogic.questionId);
+                    console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+                    console.log('  - Number Value:', pdfLogic.numberValue);
+                    console.log('  - Question Element:', questionElement);
+                    
+                    if (questionElement) {
+                        const selectedValue = parseFloat(questionElement.value) || 0;
+                        const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+                        console.log('  - Selected Value:', selectedValue);
+                        console.log('  - Trigger Value:', triggerValue);
+                        
+                        let conditionMet = false;
+                        if (pdfLogic.numberTrigger === '=') {
+                            conditionMet = selectedValue === triggerValue;
+                        } else if (pdfLogic.numberTrigger === '>') {
+                            conditionMet = selectedValue > triggerValue;
+                        } else if (pdfLogic.numberTrigger === '<') {
+                            conditionMet = selectedValue < triggerValue;
+                        }
+                        
+                        if (conditionMet) {
+                            shouldDownload = true;
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Number trigger matched - will download PDF');
+                        } else {
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Number trigger NOT matched');
+                        }
+                    } else {
+                        console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
+                    }
                 } else {
                         // For regular conditions, check previous question logic
                 pdfLogic.conditions.forEach(condition => {
@@ -3760,9 +3880,9 @@ if (typeof handleNext === 'function') {
                     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
                     }
-                    
-                    // Trigger line splitting for autofilled textareas
-                    triggerLineSplittingForAutofilledTextareas();
+                
+                // Trigger line splitting for autofilled textareas
+                triggerLineSplittingForAutofilledTextareas();
                 
                 // Trigger paragraph limit checking for autofilled textareas
                 triggerParagraphLimitCheckForAutofilledTextareas();
@@ -4526,6 +4646,7 @@ if (typeof handleNext === 'function') {
             const cartCloseBtn = document.getElementById('cart-close-btn');
 
             function openCart() {
+                console.log('🛒 [CART MENU DEBUG] openCart called');
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
@@ -4543,6 +4664,7 @@ if (typeof handleNext === 'function') {
             if (cartIconLink) {
                 cartIconLink.addEventListener('click', function(e) {
                     e.preventDefault();
+                    console.log('🛒 [CART MENU DEBUG] Cart icon clicked');
                     openCart();
                 });
             }
@@ -4560,6 +4682,7 @@ if (typeof handleNext === 'function') {
 
             // Update cart content based on authentication state
             function updateCartContent() {
+                console.log('🛒 [CART MENU DEBUG] updateCartContent called');
                 const cartMessage = document.getElementById('cart-message');
                 const cartDescription = document.getElementById('cart-description');
                 const cartSignupBtn = document.getElementById('cart-signup-btn');
@@ -4567,8 +4690,11 @@ if (typeof handleNext === 'function') {
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 const cartIconLarge = document.querySelector('.cart-icon-large');
                 
+                console.log('🛒 [CART MENU DEBUG] auth.currentUser:', auth.currentUser);
+                
                 if (auth.currentUser) {
                     // User is signed in - show cart items
+                    console.log('🛒 [CART MENU DEBUG] User is signed in, loading cart items');
                     if (cartMessage) cartMessage.textContent = 'Your Cart';
                     if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'none';
@@ -4578,6 +4704,7 @@ if (typeof handleNext === 'function') {
                     loadCartItems();
                 } else {
                     // User is not signed in - show signup message
+                    console.log('🛒 [CART MENU DEBUG] User is not signed in, showing signup message');
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
                     if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
@@ -4589,10 +4716,14 @@ if (typeof handleNext === 'function') {
             
             // Load cart items for logged-in users
             async function loadCartItems() {
+                console.log('🛒 [CART MENU DEBUG] loadCartItems called');
                 const cartItemsList = document.getElementById('cart-items-list');
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 
-                if (!cartItemsList || !auth.currentUser) return;
+                if (!cartItemsList || !auth.currentUser) {
+                    console.log('🛒 [CART MENU DEBUG] Missing cartItemsList or user not authenticated');
+                    return;
+                }
                 
                 try {
                     // Get cart data from cookies or localStorage
@@ -4604,17 +4735,26 @@ if (typeof handleNext === 'function') {
                     }
                     
                     const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
+                    console.log('🛒 [CART MENU DEBUG] Raw cart data:', cartData);
                     let cart = [];
                     
                     if (cartData) {
                         try {
-                            cart = JSON.parse(cartData);
+                            // Decode URL-encoded cart data if it comes from cookie
+                            let decodedCartData = cartData;
+                            if (cartData.startsWith('%')) {
+                                decodedCartData = decodeURIComponent(cartData);
+                                console.log('🛒 [CART MENU DEBUG] Decoded cart data:', decodedCartData);
+                            }
+                            cart = JSON.parse(decodedCartData);
+                            console.log('🛒 [CART MENU DEBUG] Parsed cart:', cart);
                         } catch (e) {
                             console.error('Error parsing cart data:', e);
                         }
                     }
                     
                     if (cart.length === 0) {
+                        console.log('🛒 [CART MENU DEBUG] Cart is empty, showing empty message');
                         cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
                         cartItemsList.style.display = 'block';
                         if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
@@ -4671,7 +4811,7 @@ if (typeof handleNext === 'function') {
          defendantHtml +
          countyHtml +
        '</div>' +
-       '<div class="cart-item-price">$' + itemPrice.toFixed(2) + '</div>' +
+       '<div class="cart-item-price" style="margin-right: 12px;">$' + itemPrice.toFixed(2) + '</div>' +
        '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
          '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
        '</button>' +
@@ -5801,6 +5941,43 @@ document.addEventListener('DOMContentLoaded', function() {
       // Also trigger update after autofill completes (additional safety)
       setTimeout(updateAddress, 2000);
   }
+
+  // Set up number input listeners for PDF logic after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all number input fields and add PDF logic listeners
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+      input.addEventListener('input', function() {
+        // Trigger PDF logic check when number input changes
+        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
+          // Find the question ID for this input
+          const questionId = input.id.replace(/^answer/, '');
+          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
+          
+          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
+            // Trigger cart update to check PDF logic
+            if (typeof updateCartCountBadge === 'function') {
+              updateCartCountBadge();
+            }
+          }
+        }
+      });
+      
+      input.addEventListener('change', function() {
+        // Also trigger on change event
+        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
+          const questionId = input.id.replace(/^answer/, '');
+          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
+          
+          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
+            if (typeof updateCartCountBadge === 'function') {
+              updateCartCountBadge();
+            }
+          }
+        }
+      });
+    });
+  });
 
   // Set up address listeners for multipleTextboxes questions after DOM loads
   document.addEventListener('DOMContentLoaded', function() {

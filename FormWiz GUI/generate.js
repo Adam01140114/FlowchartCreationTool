@@ -429,10 +429,10 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     "    <!-- Sliding Cart Menu -->",
     '    <div class="cart-overlay" id="cart-overlay">',
     '        <div class="cart-side-menu" id="cart-side-menu">',
-    "            <div class=\"cart-header\">",
-    "                <h2>🛒 Cart</h2>",
-    '                <button class="cart-close-btn" id="cart-close-btn">&times;</button>',
-    "            </div>",
+            "            <div class=\"cart-header\" style=\"background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;\">",
+            "                <h2 style=\"margin:0;font-size:1.5em;font-weight:700;\">🛒 Cart</h2>",
+            '                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>',
+            "            </div>",
                 '            <div class="cart-content" id="cart-content">',
             '                <div class="cart-icon-large">🛒</div>',
             '                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>',
@@ -2716,18 +2716,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Always add cart functions (they're needed for the Continue button)
   formHTML += `
-// Helper function to deduplicate PDFs based on pdfName
+// Helper function to deduplicate PDFs based on comprehensive unique key
 function deduplicatePdfs(pdfArray) {
   const seen = new Set();
   const deduplicated = [];
   
   for (const pdf of pdfArray) {
-    const key = pdf.pdfName || pdf.formId || pdf.title;
+    // Create a comprehensive unique key using formId + priceId + portfolioId
+    const key = (pdf.formId || pdf.pdfName || pdf.title) + '_' + pdf.priceId + '_' + (pdf.portfolioId || 'default');
     if (!seen.has(key)) {
       seen.add(key);
       deduplicated.push(pdf);
     } else {
-      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key);
+      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key, 'Original:', pdf.title);
     }
   }
   
@@ -2918,6 +2919,7 @@ window.addFormToCart = function (priceId) {
 
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
+  let deduplicatedPdfLogicItems = []; // Declare outside try-catch to ensure it's always defined
   console.log('🛒 [CART DEBUG] Computing PDF logic items...');
   
   try {
@@ -3059,12 +3061,14 @@ window.addFormToCart = function (priceId) {
     
     // Deduplicate PDF logic items to prevent multiple requests for the same PDF
     const originalPdfLogicCount = pdfLogicItems.length;
-    const deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
+    deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
     console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
     
     console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
+    // Ensure deduplicatedPdfLogicItems is always an array even if there's an error
+    deduplicatedPdfLogicItems = [];
   }
 
   // 5) Preferred path: site cart manager
@@ -3151,7 +3155,7 @@ window.addFormToCart = function (priceId) {
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
   console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
   
-  const cart = [];
+  let cart = [];
   const mainCartItem = {
     formId: originalFormId, title: formTitle, priceId,
     pdfName: (window.pdfFileName || ''),
@@ -3164,6 +3168,11 @@ window.addFormToCart = function (priceId) {
     cart.push(item);
     console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
   }
+
+  // Final deduplication of the entire cart to prevent any duplicates
+  const originalCartCount = cart.length;
+  cart = deduplicatePdfs(cart);
+  console.log('🛒 [CART DEBUG] Final cart deduplication: Original count:', originalCartCount, 'After deduplication:', cart.length);
 
   console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
@@ -6656,6 +6665,7 @@ if (typeof handleNext === 'function') {
             const cartCloseBtn = document.getElementById('cart-close-btn');
 
             function openCart() {
+                console.log('🛒 [CART MENU DEBUG] openCart called');
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
@@ -6673,6 +6683,7 @@ if (typeof handleNext === 'function') {
             if (cartIconLink) {
                 cartIconLink.addEventListener('click', function(e) {
                     e.preventDefault();
+                    console.log('🛒 [CART MENU DEBUG] Cart icon clicked');
                     openCart();
                 });
             }
@@ -6690,6 +6701,7 @@ if (typeof handleNext === 'function') {
 
             // Update cart content based on authentication state
             function updateCartContent() {
+                console.log('🛒 [CART MENU DEBUG] updateCartContent called');
                 const cartMessage = document.getElementById('cart-message');
                 const cartDescription = document.getElementById('cart-description');
                 const cartSignupBtn = document.getElementById('cart-signup-btn');
@@ -6697,8 +6709,11 @@ if (typeof handleNext === 'function') {
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 const cartIconLarge = document.querySelector('.cart-icon-large');
                 
+                console.log('🛒 [CART MENU DEBUG] auth.currentUser:', auth.currentUser);
+                
                 if (auth.currentUser) {
                     // User is signed in - show cart items
+                    console.log('🛒 [CART MENU DEBUG] User is signed in, loading cart items');
                     if (cartMessage) cartMessage.textContent = 'Your Cart';
                     if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'none';
@@ -6708,6 +6723,7 @@ if (typeof handleNext === 'function') {
                     loadCartItems();
                 } else {
                     // User is not signed in - show signup message
+                    console.log('🛒 [CART MENU DEBUG] User is not signed in, showing signup message');
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
                     if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
@@ -6719,10 +6735,14 @@ if (typeof handleNext === 'function') {
             
             // Load cart items for logged-in users
             async function loadCartItems() {
+                console.log('🛒 [CART MENU DEBUG] loadCartItems called');
                 const cartItemsList = document.getElementById('cart-items-list');
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 
-                if (!cartItemsList || !auth.currentUser) return;
+                if (!cartItemsList || !auth.currentUser) {
+                    console.log('🛒 [CART MENU DEBUG] Missing cartItemsList or user not authenticated');
+                    return;
+                }
                 
                 try {
                     // Get cart data from cookies or localStorage
@@ -6734,17 +6754,26 @@ if (typeof handleNext === 'function') {
                     }
                     
                     const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
+                    console.log('🛒 [CART MENU DEBUG] Raw cart data:', cartData);
                     let cart = [];
                     
                     if (cartData) {
                         try {
-                            cart = JSON.parse(cartData);
+                            // Decode URL-encoded cart data if it comes from cookie
+                            let decodedCartData = cartData;
+                            if (cartData.startsWith('%')) {
+                                decodedCartData = decodeURIComponent(cartData);
+                                console.log('🛒 [CART MENU DEBUG] Decoded cart data:', decodedCartData);
+                            }
+                            cart = JSON.parse(decodedCartData);
+                            console.log('🛒 [CART MENU DEBUG] Parsed cart:', cart);
                         } catch (e) {
                             console.error('Error parsing cart data:', e);
                         }
                     }
                     
                     if (cart.length === 0) {
+                        console.log('🛒 [CART MENU DEBUG] Cart is empty, showing empty message');
                         cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
                         cartItemsList.style.display = 'block';
                         if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
@@ -6801,7 +6830,7 @@ if (typeof handleNext === 'function') {
          defendantHtml +
          countyHtml +
        '</div>' +
-       '<div class="cart-item-price">$' + itemPrice.toFixed(2) + '</div>' +
+       '<div class="cart-item-price" style="margin-right: 12px;">$' + itemPrice.toFixed(2) + '</div>' +
        '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
          '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
        '</button>' +
