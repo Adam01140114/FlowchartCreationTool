@@ -954,6 +954,18 @@ function loadFormData(formData) {
                                     triggerOptionSelect.value = pdf.triggerOption;
                                 }
                                 
+                                // Load number trigger fields for number questions
+                                if (question.type === 'number') {
+                                    const numberTriggerSelect = questionBlock.querySelector(`#pdfLogicNumberTrigger${question.questionId}`);
+                                    const numberValueInput = questionBlock.querySelector(`#pdfLogicNumberValue${question.questionId}`);
+                                    if (numberTriggerSelect && pdf.numberTrigger) {
+                                        numberTriggerSelect.value = pdf.numberTrigger;
+                                    }
+                                    if (numberValueInput && pdf.numberValue) {
+                                        numberValueInput.value = pdf.numberValue;
+                                    }
+                                }
+                                
                                 // Load extra PDFs for this PDF group
                                 // Note: We'll need to handle this differently since extra PDFs are added dynamically
                                 // For now, we'll store them and add them after the main PDF is loaded
@@ -978,6 +990,18 @@ function loadFormData(formData) {
                                         const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}_${pdfIndexNum}`);
                                         if (triggerOptionSelect && pdf.triggerOption) {
                                             triggerOptionSelect.value = pdf.triggerOption;
+                                        }
+                                        
+                                        // Load number trigger fields for number questions (additional PDFs)
+                                        if (question.type === 'number') {
+                                            const numberTriggerSelect = questionBlock.querySelector(`#pdfLogicNumberTrigger${question.questionId}`);
+                                            const numberValueInput = questionBlock.querySelector(`#pdfLogicNumberValue${question.questionId}`);
+                                            if (numberTriggerSelect && pdf.numberTrigger) {
+                                                numberTriggerSelect.value = pdf.numberTrigger;
+                                            }
+                                            if (numberValueInput && pdf.numberValue) {
+                                                numberValueInput.value = pdf.numberValue;
+                                            }
                                         }
                                     }, 100);
                                 }
@@ -1494,13 +1518,31 @@ function exportForm() {
                             console.log(`  - Trigger Select Parent Display: ${triggerSelect.parentElement.style.display}`);
                         }
                         
-                        if (pdfLogicPdfName) {
-                            pdfLogicPdfs.push({
+                        // Get number trigger fields for number questions
+                        let numberTrigger = "";
+                        let numberValue = "";
+                        if (questionType === 'number') {
+                            const numberTriggerSelect = questionBlock.querySelector(`#pdfLogicNumberTrigger${questionId}`);
+                            const numberValueInput = questionBlock.querySelector(`#pdfLogicNumberValue${questionId}`);
+                            numberTrigger = numberTriggerSelect?.value || "";
+                            numberValue = numberValueInput?.value || "";
+                        }
+                        
+                        if (pdfLogicPdfName || numberTrigger || numberValue) {
+                            const pdfData = {
                                 pdfName: pdfLogicPdfName,
                                 pdfDisplayName: pdfLogicPdfDisplayName,
                                 stripePriceId: pdfLogicStripePriceId,
                                 triggerOption: triggerOption
-                            });
+                            };
+                            
+                            // Add number trigger fields for number questions
+                            if (questionType === 'number') {
+                                pdfData.numberTrigger = numberTrigger;
+                                pdfData.numberValue = numberValue;
+                            }
+                            
+                            pdfLogicPdfs.push(pdfData);
                         }
                         
                         // Collect extra PDFs for this PDF group

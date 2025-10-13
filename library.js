@@ -1407,6 +1407,8 @@ window.exportBothJson = function() {
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+      if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
+      if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
       
       // calculation node properties
       if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
@@ -1588,7 +1590,7 @@ window.saveFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
@@ -1719,7 +1721,7 @@ window.saveAsFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,

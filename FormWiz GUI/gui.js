@@ -753,6 +753,21 @@ function addQuestion(sectionId, questionId = null) {
                 <br><br>
             </div>
             
+            <!-- Trigger Option for Number Questions -->
+            <div id="numberTriggerBlock${currentQuestionId}" style="display: none;">
+                <label>Trigger:</label>
+                <select id="pdfLogicNumberTrigger${currentQuestionId}">
+                    <option value="">Select trigger</option>
+                    <option value="=">=</option>
+                    <option value=">">></option>
+                    <option value="<"><</option>
+                </select>
+                <br><br>
+                <label>Number:</label>
+                <input type="number" id="pdfLogicNumberValue${currentQuestionId}" placeholder="Enter number">
+                <br><br>
+            </div>
+            
                 <!-- PDF Details Container -->
                 <div id="pdfDetailsContainer${currentQuestionId}">
                     <div class="pdf-detail-group" data-pdf-index="1" style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
@@ -1111,6 +1126,12 @@ function toggleOptions(questionId) {
             // Update existing jump conditions to use simplified format for textbox questions
             updateJumpConditionsForTextbox(questionId);
             break;
+            
+        case 'number':
+            textboxOptionsBlock.style.display = 'block';
+            // Update existing jump conditions to use simplified format for textbox questions
+            updateJumpConditionsForTextbox(questionId);
+            break;
     }
 
     // Handle conditional PDF visibility
@@ -1152,6 +1173,26 @@ function toggleOptions(questionId) {
                 pdfLogicConditionsDiv.innerHTML = '';
                 // Add a default character limit condition for Big Paragraph
                 addPdfLogicCondition(questionId);
+            }
+        }
+    }
+    
+    // Handle number trigger block visibility for PDF Logic
+    const numberTriggerBlock = document.getElementById(`numberTriggerBlock${questionId}`);
+    const triggerOptionBlock = document.getElementById(`triggerOptionBlock${questionId}`);
+    if (numberTriggerBlock && triggerOptionBlock) {
+        // Reset both blocks
+        numberTriggerBlock.style.display = 'none';
+        triggerOptionBlock.style.display = 'none';
+        
+        // Show appropriate block based on question type and PDF Logic status
+        const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
+        if (pdfLogicEnabled) {
+            if (questionType === 'number') {
+                numberTriggerBlock.style.display = 'block';
+            } else if (questionType === 'numberedDropdown') {
+                triggerOptionBlock.style.display = 'block';
+                updatePdfLogicTriggerOptions(questionId);
             }
         }
     }
@@ -2021,12 +2062,18 @@ function togglePdfLogic(questionId) {
     const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
     const questionType = questionTypeSelect ? questionTypeSelect.value : '';
     const triggerOptionBlock = document.getElementById(`triggerOptionBlock${questionId}`);
+    const numberTriggerBlock = document.getElementById(`numberTriggerBlock${questionId}`);
     
     if (pdfLogicEnabled && questionType === 'numberedDropdown') {
         triggerOptionBlock.style.display = 'block';
         updatePdfLogicTriggerOptions(questionId);
+        if (numberTriggerBlock) numberTriggerBlock.style.display = 'none';
+    } else if (pdfLogicEnabled && questionType === 'number') {
+        if (numberTriggerBlock) numberTriggerBlock.style.display = 'block';
+        triggerOptionBlock.style.display = 'none';
     } else {
         triggerOptionBlock.style.display = 'none';
+        if (numberTriggerBlock) numberTriggerBlock.style.display = 'none';
     }
     
     // If enabling PDF logic for a Big Paragraph question, clear any existing conditions

@@ -4217,6 +4217,8 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+      if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
+      if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
       
       // Notes node properties
       if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
@@ -4703,7 +4705,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice'
       ];
       
       safeProperties.forEach(prop => {
@@ -4889,7 +4891,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -5027,7 +5029,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section

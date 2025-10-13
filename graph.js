@@ -930,6 +930,80 @@ function showPropertiesPopup(cell) {
         });
       }
     });
+    
+    // Add Enable PDF Logic button for Big Paragraph nodes
+    properties.push({
+      label: 'Enable PDF Logic',
+      value: '',
+      id: 'propEnablePdfLogic',
+      editable: false,
+      isButton: true,
+      buttonText: 'Enable PDF Logic',
+      buttonAction: () => {
+        // Toggle PDF Logic enabled state
+        cell._pdfLogicEnabled = !cell._pdfLogicEnabled;
+        // Close the current popup and reopen it to refresh the fields
+        window.__propertiesPopupOpen = false;
+        setTimeout(() => {
+          window.showPropertiesPopup(cell);
+        }, 100);
+      }
+    });
+    
+    // Add PDF Logic fields (only shown when enabled)
+    if (cell._pdfLogicEnabled) {
+      // Debug logging for PDF Logic values
+      console.log('🔍 [PDF LOGIC LOAD] Loading PDF Logic values:');
+      console.log('cell._pdfTriggerLimit:', cell._pdfTriggerLimit);
+      console.log('cell._bigParagraphPdfName:', cell._bigParagraphPdfName);
+      console.log('cell._bigParagraphPdfFile:', cell._bigParagraphPdfFile);
+      console.log('cell._bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
+      
+      properties.push({
+        label: 'PDF Trigger Limit',
+        value: cell._pdfTriggerLimit || '',
+        id: 'propPdfTriggerLimit',
+        editable: true,
+        inputType: 'number'
+      });
+      
+      properties.push({
+        label: 'PDF Name',
+        value: cell._bigParagraphPdfName || '',
+        id: 'propBigParagraphPdfName',
+        editable: true,
+        inputType: 'text'
+      });
+      
+      properties.push({
+        label: 'PDF Filename',
+        value: cell._bigParagraphPdfFile || '',
+        id: 'propBigParagraphPdfFile',
+        editable: true,
+        inputType: 'text'
+      });
+      
+      properties.push({
+        label: 'PDF Price',
+        value: cell._bigParagraphPdfPrice || '',
+        id: 'propBigParagraphPdfPrice',
+        editable: true,
+        inputType: 'text'
+      });
+      
+      // Add Save button for PDF Logic
+      properties.push({
+        label: 'Save PDF Logic',
+        value: '',
+        id: 'propSavePdfLogic',
+        editable: false,
+        isButton: true,
+        buttonText: 'Save PDF Logic',
+        buttonAction: () => {
+          window.saveBigParagraphPdfLogic(cell);
+        }
+      });
+    }
   }
   
   // PDF Name field will be added later in the unified section
@@ -1995,6 +2069,10 @@ function showPropertiesPopup(cell) {
             input.type = prop.inputType || 'text';
           }
           input.value = prop.value;
+          input.id = prop.id + '_input'; // Set a unique ID on the input element
+          
+          // Debug logging for input creation
+          console.log('🔍 [INPUT CREATION] Created input element with ID:', input.id, 'Value:', prop.value);
           
           if (isNodeText) {
             input.style.cssText = `
@@ -2030,8 +2108,9 @@ function showPropertiesPopup(cell) {
             valueSpan.textContent = newValue;
             valueSpan.style.display = 'block';
             
-            // Safely remove input element if it still exists
-            if (input && input.parentNode) {
+            // For PDF Logic fields, keep the input element so it can be found by the save function
+            const isPdfLogicField = prop.id && prop.id.startsWith('propPdf');
+            if (!isPdfLogicField && input && input.parentNode) {
               input.remove();
             }
             
@@ -2110,53 +2189,31 @@ function showPropertiesPopup(cell) {
                   }
                 }
                 break;
-              case 'propPdfName':
-                // Update the PDF name property
-                const oldPdfName = cell._pdfName;
-                cell._pdfName = newValue;
-                
-                // Update all Node IDs that use this PDF name
-                if (oldPdfName && oldPdfName !== newValue && typeof window.updateAllNodeIdsForPdfChange === 'function') {
-                  window.updateAllNodeIdsForPdfChange(oldPdfName, newValue);
-                }
-                
-                // Apply PDF naming convention to the current Node ID
-                if (typeof window.setNodeId === 'function') {
-                  // Get the current Node ID without PDF prefix
-                  const currentNodeId = document.getElementById('propNodeId');
-                  const baseNodeId = currentNodeId ? currentNodeId.textContent.trim() : cell._nameId || cell.id;
-                  
-                  // Remove any existing PDF prefix from the base Node ID
-                  const cleanNodeId = baseNodeId.replace(/^[^_]+_/, '');
-                  
-                  // Apply the PDF naming convention
-                  window.setNodeId(cell, cleanNodeId);
-                  
-                  // Update the Node ID field in the popup to show the new ID with PDF prefix
-                  if (currentNodeId) {
-                    const nodeIdSpan = currentNodeId.querySelector('span');
-                    if (nodeIdSpan) {
-                      const newNodeId = window.getNodeId ? window.getNodeId(cell) : cleanNodeId;
-                      nodeIdSpan.textContent = newNodeId;
-                    }
-                  }
+              case 'propBigParagraphPdfName':
+                // Update the Big Paragraph PDF name property
+                if (newValue !== '') {
+                  cell._bigParagraphPdfName = newValue;
                 }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
                 break;
-              case 'propPdfFile':
-                // Update the PDF file property
-                cell._pdfFile = newValue;
+              case 'propBigParagraphPdfFile':
+                // Update the Big Paragraph PDF file property
+                if (newValue !== '') {
+                  cell._bigParagraphPdfFile = newValue;
+                }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
                 break;
-              case 'propPdfPrice':
-                // Update the PDF price property
-                cell._pdfPrice = newValue;
+              case 'propBigParagraphPdfPrice':
+                // Update the Big Paragraph PDF price property
+                if (newValue !== '') {
+                  cell._bigParagraphPdfPrice = newValue;
+                }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
@@ -2437,6 +2494,11 @@ function showPropertiesPopup(cell) {
   // Clean up event listeners when popup closes
   const originalClosePopup = closePopup;
   const newClosePopup = () => {
+    // Auto-save Big Paragraph PDF Logic if enabled
+    if (cell._pdfLogicEnabled && typeof window.saveBigParagraphPdfLogic === 'function') {
+      window.saveBigParagraphPdfLogic(cell);
+    }
+    
     if (outsideClickHandler) {
       document.removeEventListener('click', outsideClickHandler, true);
       outsideClickHandler = null;
@@ -3198,6 +3260,102 @@ window.setupPanningAndZooming = setupPanningAndZooming;
 window.showQuestionTextPopup = showQuestionTextPopup;
 window.showPropertiesPopup = showPropertiesPopup;
 window.zoomIntoNode = zoomIntoNode;
+
+// Save Big Paragraph PDF Logic function
+window.saveBigParagraphPdfLogic = function(cell) {
+  // Try multiple approaches to find the input elements
+  let triggerLimitInput = document.getElementById('propPdfTriggerLimit_input');
+  let pdfNameInput = document.getElementById('propBigParagraphPdfName_input');
+  let pdfFileInput = document.getElementById('propBigParagraphPdfFile_input');
+  let pdfPriceInput = document.getElementById('propBigParagraphPdfPrice_input');
+  
+  // If not found by ID, try to find by looking for input elements near the spans
+  if (!triggerLimitInput) {
+    const triggerLimitSpan = document.getElementById('propPdfTriggerLimit');
+    if (triggerLimitSpan) {
+      triggerLimitInput = triggerLimitSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  if (!pdfNameInput) {
+    const pdfNameSpan = document.getElementById('propBigParagraphPdfName');
+    if (pdfNameSpan) {
+      pdfNameInput = pdfNameSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  if (!pdfFileInput) {
+    const pdfFileSpan = document.getElementById('propBigParagraphPdfFile');
+    if (pdfFileSpan) {
+      pdfFileInput = pdfFileSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  if (!pdfPriceInput) {
+    const pdfPriceSpan = document.getElementById('propBigParagraphPdfPrice');
+    if (pdfPriceSpan) {
+      pdfPriceInput = pdfPriceSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  // Debug logging - check if elements exist
+  console.log('🔍 [PDF LOGIC SAVE] Saving PDF Logic values:');
+  console.log('Trigger Limit Element:', triggerLimitInput);
+  console.log('PDF Name Element:', pdfNameInput);
+  console.log('PDF File Element:', pdfFileInput);
+  console.log('PDF Price Element:', pdfPriceInput);
+  
+  // Debug logging - check values
+  console.log('Trigger Limit Input Value:', triggerLimitInput?.value);
+  console.log('PDF Name Input Value:', pdfNameInput?.value);
+  console.log('PDF File Input Value:', pdfFileInput?.value);
+  console.log('PDF Price Input Value:', pdfPriceInput?.value);
+  
+  // Also check if there are any input elements with these IDs in the DOM
+  console.log('All elements with propPdfTriggerLimit ID:', document.querySelectorAll('#propPdfTriggerLimit'));
+  console.log('All elements with propBigParagraphPdfName ID:', document.querySelectorAll('#propBigParagraphPdfName'));
+  console.log('All elements with propBigParagraphPdfFile ID:', document.querySelectorAll('#propBigParagraphPdfFile'));
+  console.log('All elements with propBigParagraphPdfPrice ID:', document.querySelectorAll('#propBigParagraphPdfPrice'));
+  
+  // Check for input elements with the new IDs
+  console.log('All input elements with _input suffix:', document.querySelectorAll('[id$="_input"]'));
+  console.log('All input elements in the document:', document.querySelectorAll('input'));
+  
+  // Save values to cell properties
+  if (triggerLimitInput) {
+    cell._pdfTriggerLimit = triggerLimitInput.value;
+    console.log('Saved _pdfTriggerLimit:', cell._pdfTriggerLimit);
+  }
+  if (pdfNameInput) {
+    cell._bigParagraphPdfName = pdfNameInput.value;
+    console.log('Saved _bigParagraphPdfName:', cell._bigParagraphPdfName);
+  }
+  if (pdfFileInput) {
+    cell._bigParagraphPdfFile = pdfFileInput.value;
+    console.log('Saved _bigParagraphPdfFile:', cell._bigParagraphPdfFile);
+  }
+  if (pdfPriceInput) {
+    cell._bigParagraphPdfPrice = pdfPriceInput.value;
+    console.log('Saved _bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
+  }
+  
+  // Show success message
+  const saveButton = document.getElementById('propSavePdfLogic');
+  if (saveButton) {
+    const originalText = saveButton.textContent;
+    saveButton.textContent = 'Saved!';
+    saveButton.style.backgroundColor = '#4CAF50';
+    setTimeout(() => {
+      saveButton.textContent = originalText;
+      saveButton.style.backgroundColor = '#1976d2';
+    }, 1000);
+  }
+  
+  // Trigger autosave
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
+};
 
 // Test function for debugging properties popup
 window.testPropertiesPopup = function() {

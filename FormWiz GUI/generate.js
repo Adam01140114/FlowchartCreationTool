@@ -1801,9 +1801,19 @@ formHTML += `</div><br></div>`;
             console.log('  - Trigger Option Element:', triggerOptionEl);
             console.log('  - Trigger Option Value:', triggerOption);
             
-            if (pdfLogicPdfName) {
+            // Get number trigger fields for number questions
+            let numberTrigger = "";
+            let numberValue = "";
+            if (questionType === 'number') {
+                const numberTriggerEl = qBlock.querySelector("#pdfLogicNumberTrigger" + questionId);
+                const numberValueEl = qBlock.querySelector("#pdfLogicNumberValue" + questionId);
+                numberTrigger = numberTriggerEl ? numberTriggerEl.value.trim() : "";
+                numberValue = numberValueEl ? numberValueEl.value.trim() : "";
+            }
+            
+            if (pdfLogicPdfName || numberTrigger || numberValue) {
           // Add to PDF Logic array for later processing
-          pdfLogicPDFs.push({
+          const pdfData = {
             questionId: questionId,
             pdfName: pdfLogicPdfName,
             pdfDisplayName: pdfLogicPdfDisplayName || pdfLogicPdfName.replace(/\.pdf$/i, ''),
@@ -1811,7 +1821,15 @@ formHTML += `</div><br></div>`;
                 triggerOption: triggerOption, // Add trigger option for numbered dropdown
             conditions: [],
             isBigParagraph: questionType === "bigParagraph"
-          });
+          };
+          
+          // Add number trigger fields for number questions
+          if (questionType === 'number') {
+              pdfData.numberTrigger = numberTrigger;
+              pdfData.numberValue = numberValue;
+          }
+          
+          pdfLogicPDFs.push(pdfData);
           
           // Process conditions
           for (let lr = 0; lr < pdfLogicRows.length; lr++) {
@@ -2940,6 +2958,40 @@ window.addFormToCart = function (priceId) {
             }
           } else {
             console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
+          }
+        } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+          // For number questions with trigger conditions, check if the number meets the condition
+          const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                     document.getElementById('answer' + pdfLogic.questionId);
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+          console.log('  - Number Value:', pdfLogic.numberValue);
+          console.log('  - Element found:', el);
+          
+          if (el) {
+            const val = parseFloat(el.value) || 0;
+            const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+            console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+            
+            let conditionMet = false;
+            if (pdfLogic.numberTrigger === '=') {
+              conditionMet = val === triggerValue;
+            } else if (pdfLogic.numberTrigger === '>') {
+              conditionMet = val > triggerValue;
+            } else if (pdfLogic.numberTrigger === '<') {
+              conditionMet = val < triggerValue;
+            }
+            
+            if (conditionMet) {
+              matched = true;
+              console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number question:', pdfLogic.pdfDisplayName);
+            } else {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'condition:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+            }
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
           }
         } else {
           // For regular conditions, check previous question logic
@@ -4833,6 +4885,41 @@ async function processAllPdfs() {
                             console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger option matched - will download PDF');
                         } else {
                             console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Trigger option NOT matched');
+                        }
+                    } else {
+                        console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
+                    }
+                } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+                    // For number questions with trigger conditions, check if the number meets the condition
+                    const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                          document.getElementById('answer' + pdfLogic.questionId);
+                    
+                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking number trigger:');
+                    console.log('  - Question ID:', pdfLogic.questionId);
+                    console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+                    console.log('  - Number Value:', pdfLogic.numberValue);
+                    console.log('  - Question Element:', questionElement);
+                    
+                    if (questionElement) {
+                        const selectedValue = parseFloat(questionElement.value) || 0;
+                        const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+                        console.log('  - Selected Value:', selectedValue);
+                        console.log('  - Trigger Value:', triggerValue);
+                        
+                        let conditionMet = false;
+                        if (pdfLogic.numberTrigger === '=') {
+                            conditionMet = selectedValue === triggerValue;
+                        } else if (pdfLogic.numberTrigger === '>') {
+                            conditionMet = selectedValue > triggerValue;
+                        } else if (pdfLogic.numberTrigger === '<') {
+                            conditionMet = selectedValue < triggerValue;
+                        }
+                        
+                        if (conditionMet) {
+                            shouldDownload = true;
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Number trigger matched - will download PDF');
+                        } else {
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Number trigger NOT matched');
                         }
                     } else {
                         console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
@@ -7847,6 +7934,43 @@ document.addEventListener('DOMContentLoaded', function() {
       // Also trigger update after autofill completes (additional safety)
       setTimeout(updateAddress, 2000);
   }
+
+  // Set up number input listeners for PDF logic after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all number input fields and add PDF logic listeners
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+      input.addEventListener('input', function() {
+        // Trigger PDF logic check when number input changes
+        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
+          // Find the question ID for this input
+          const questionId = input.id.replace(/^answer/, '');
+          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
+          
+          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
+            // Trigger cart update to check PDF logic
+            if (typeof updateCartCountBadge === 'function') {
+              updateCartCountBadge();
+            }
+          }
+        }
+      });
+      
+      input.addEventListener('change', function() {
+        // Also trigger on change event
+        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
+          const questionId = input.id.replace(/^answer/, '');
+          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
+          
+          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
+            if (typeof updateCartCountBadge === 'function') {
+              updateCartCountBadge();
+            }
+          }
+        }
+      });
+    });
+  });
 
   // Set up address listeners for multipleTextboxes questions after DOM loads
   document.addEventListener('DOMContentLoaded', function() {
