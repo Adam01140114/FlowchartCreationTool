@@ -3383,12 +3383,8 @@ window.addFormToCart = function (priceId) {
           }).join('\\n');
           console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
           
-          // Show debugging alert with cart data
-          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n\\n' + itemList;
-          alert(debugInfo);
-          
-          // Show cart page requested alert
-          alert('Cart page requested');
+          // Navigate to cart page
+          window.location.href = '../Pages/cart.html';
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -3433,12 +3429,8 @@ window.addFormToCart = function (priceId) {
   }).join('\\n');
   console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
   
-  // Show debugging alert with cart data
-  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\\n\\n' + itemList;
-  alert(debugInfo);
-  
-  // Show cart page requested alert
-  alert('Cart page requested');
+  // Navigate to cart page
+  window.location.href = '../Pages/cart.html';
 };
 
 
