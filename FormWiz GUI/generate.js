@@ -1214,46 +1214,6 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           });
         }
 
-        // handle Hidden Logic for numbered dropdown
-        console.log('🔧 [FORM GENERATION DEBUG] About to check hidden logic for numbered dropdown question:', questionId);
-        console.log('🔧 [FORM GENERATION DEBUG] Checking hidden logic for numbered dropdown question:', questionId);
-        const numberedHiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
-        const numberedHiddenLogicEnabled = numberedHiddenLogicEnabledEl && numberedHiddenLogicEnabledEl.checked;
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown hidden logic enabled:', numberedHiddenLogicEnabled);
-        if (numberedHiddenLogicEnabled) {
-          console.log('🔧 [HIDDEN LOGIC DEBUG] Processing numbered dropdown hidden logic for question:', questionId);
-          // Get all hidden logic configurations
-          const configElements = qBlock.querySelectorAll('.hidden-logic-config');
-          console.log('🔧 [HIDDEN LOGIC DEBUG] Found', configElements.length, 'numbered dropdown config elements');
-          configElements.forEach((configElement, index) => {
-            const hiddenLogicTriggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
-            const hiddenLogicTypeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
-            const hiddenLogicNodeIdEl = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`);
-            const hiddenLogicTextboxTextEl = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`);
-            
-            const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
-            const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
-            const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
-            const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
-            
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown config', index, 'trigger:', hiddenLogicTrigger, 'type:', hiddenLogicType, 'nodeId:', hiddenLogicNodeId);
-            
-            if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
-              console.log('🔧 [HIDDEN LOGIC DEBUG] Adding numbered dropdown config to hiddenLogicConfigs array');
-              hiddenLogicConfigs.push({
-                questionId: questionId,
-                questionNameId: dropdownId,
-                trigger: hiddenLogicTrigger,
-                type: hiddenLogicType,
-                nodeId: hiddenLogicNodeId,
-                textboxText: hiddenLogicTextboxText
-              });
-            } else {
-              console.log('🔧 [HIDDEN LOGIC DEBUG] Skipping numbered dropdown config - missing required fields');
-            }
-          });
-        }
-        console.log('🔧 [FORM GENERATION DEBUG] Completed numbered dropdown processing for question:', questionId);
       } else if (questionType === "checkbox") {
        /* ---------- CHECKBOX QUESTION ---------- */
 const cOptsDivs = qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
@@ -2495,7 +2455,7 @@ if (document.readyState === 'loading') {
 formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
 formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
 formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Main PDF name
-formHTML += `var pdfOutputFileName = "${escapedPdfFormName}";\n`; // Use default PDF name instead of output name
+formHTML += `var pdfOutputFileName = "${escapedPdfOutputName}";\n`; // Use PDF output name
 formHTML += `var stripePriceId = "${escapedStripePriceId}";\n`; // Stripe Price ID
 formHTML += `var additionalPdfFileNames = ${JSON.stringify(escapedAdditionalPdfNames)};\n`;  // Additional PDF names
 formHTML += `var allPdfFileNames = ["${escapedPdfOutputName.replace(/\.pdf$/i, '')}", ${escapedAdditionalPdfNames.map(name => `"${name.replace(/\.pdf$/i, '')}"`).join(", ")}];\n`;  // All PDF names in an array (without .pdf extension)

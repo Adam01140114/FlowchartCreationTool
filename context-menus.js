@@ -17,7 +17,7 @@ let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, su
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
 let newSectionButton, untangleEdge, changeEdgeStyle, deleteEdge, edgeStyleCurved, edgeStyleDirect;
-let placeQuestionNode, placeOptionNode, placeSampleQuestionNode, placeCalcNode, placeNotesNode, placeChecklistNode, placeSubtitleNode, placeInfoNode, placeImageNode, placePdfNode, placeAmountNode, placeEndNode, placeHiddenCheckboxNode, placeHiddenTextboxNode, placeLinkedLogicNode;
+let placeQuestionNode, placeOptionNode, placeSampleQuestionNode, placeMiscellaneousNode;
 
 
 // Initialize DOM element references
@@ -66,18 +66,7 @@ function initializeContextMenuElements() {
   placeQuestionNode = document.getElementById('placeQuestionNode');
   placeOptionNode = document.getElementById('placeOptionNode');
   placeSampleQuestionNode = document.getElementById('placeSampleQuestionNode');
-  placeCalcNode = document.getElementById('placeCalcNode');
-  placeNotesNode = document.getElementById('placeNotesNode');
-  placeChecklistNode = document.getElementById('placeChecklistNode');
-  placeSubtitleNode = document.getElementById('placeSubtitleNode');
-  placeInfoNode = document.getElementById('placeInfoNode');
-  placeImageNode = document.getElementById('placeImageNode');
-  placePdfNode = document.getElementById('placePdfNode');
-  placeAmountNode = document.getElementById('placeAmountNode');
-  placeEndNode = document.getElementById('placeEndNode');
-  placeHiddenCheckboxNode = document.getElementById('placeHiddenCheckboxNode');
-  placeHiddenTextboxNode = document.getElementById('placeHiddenTextboxNode');
-  placeLinkedLogicNode = document.getElementById('placeLinkedLogicNode');
+  placeMiscellaneousNode = document.getElementById('placeMiscellaneousNode');
 }
 
 // Determine the type of a node (question, options, etc.)
@@ -1151,89 +1140,13 @@ function setupContextMenuEventListeners(graph) {
     });
   }
   
-  if (placeCalcNode) {
-    placeCalcNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'calculation');
+  if (placeMiscellaneousNode) {
+    placeMiscellaneousNode.addEventListener('click', function() {
+      placeMiscellaneousNodeAtClickLocation(graph);
       hideContextMenu();
     });
   }
   
-  if (placeNotesNode) {
-    placeNotesNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'notesNode');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeChecklistNode) {
-    placeChecklistNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'checklistNode');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeSubtitleNode) {
-    placeSubtitleNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'subtitle');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeInfoNode) {
-    placeInfoNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'info');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeImageNode) {
-    placeImageNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'imageOption');
-      hideContextMenu();
-    });
-  }
-  
-  if (placePdfNode) {
-    placePdfNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'pdfNode');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeAmountNode) {
-    placeAmountNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'amountOption');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeEndNode) {
-    placeEndNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'end');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeHiddenCheckboxNode) {
-    placeHiddenCheckboxNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'hiddenCheckbox');
-      hideContextMenu();
-    });
-  }
-  
-  if (placeHiddenTextboxNode) {
-    placeHiddenTextboxNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'hiddenTextbox');
-      hideContextMenu();
-    });
-  }
-
-  if (placeLinkedLogicNode) {
-    placeLinkedLogicNode.addEventListener('click', function() {
-      placeNodeAtClickLocation(graph, 'linkedLogic');
-      hideContextMenu();
-    });
-  }
 
   // Global click listener for hiding menus
   document.addEventListener("click", e => {
@@ -1635,6 +1548,278 @@ function placeNodeAtClickLocation(graph, nodeType) {
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
+  }
+}
+
+// Place Miscellaneous Node at click location
+function placeMiscellaneousNodeAtClickLocation(graph) {
+  if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
+  
+  // Use the global graph variable if the parameter is not available
+  const graphToUse = graph || window.graph;
+  if (!graphToUse) {
+    console.error('Graph not available for miscellaneous node placement');
+    return;
+  }
+  
+  const parent = graphToUse.getDefaultParent();
+  graphToUse.getModel().beginUpdate();
+  let cell;
+  try {
+    // Create a question-style node with a dropdown for node type selection
+    const style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;nodeId=Miscellaneous_node;section=1;spacing=12;fontSize=16;";
+    const label = `<div style="text-align: center; padding: 4px 10px 10px 10px; height: 100%; display: flex; align-items: flex-start; justify-content: center;">
+      <select id="miscNodeTypeSelect" style="width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 4px; font-size: 17px; background-color: white; color: #333; height: 48px;" onchange="convertMiscellaneousNode(this)">
+        <option value="">-- Choose Node Type --</option>
+        <option value="calculation">Calc Node</option>
+        <option value="notesNode">Notes Node</option>
+        <option value="checklistNode">Checklist Node</option>
+        <option value="subtitle">Subtitle Node</option>
+        <option value="info">Info Node</option>
+        <option value="imageOption">Image Node</option>
+        <option value="pdfNode">PDF Node</option>
+        <option value="amountOption">Amount Option Node</option>
+        <option value="end">End Node</option>
+        <option value="hiddenCheckbox">Hidden Checkbox Node</option>
+        <option value="hiddenTextbox">Hidden Textbox Node</option>
+        <option value="linkedLogic">Linked Logic Node</option>
+      </select>
+    </div>`;
+    
+    cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, style);
+    
+    // Mark this as a miscellaneous node
+    cell._isMiscellaneousNode = true;
+    
+    // Clear the click position
+    window.emptySpaceClickX = undefined;
+    window.emptySpaceClickY = undefined;
+    
+  } finally {
+    graphToUse.getModel().endUpdate();
+  }
+  
+  // Select the new cell and finalize
+  if (cell) {
+    graphToUse.setSelectionCell(cell);
+    
+    // Call refreshAllCells to ensure proper display
+    if (typeof window.refreshAllCells === 'function') {
+      window.refreshAllCells();
+    }
+    
+    // Request autosave
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  }
+}
+
+// Convert Miscellaneous Node to selected type
+window.convertMiscellaneousNode = function(selectElement) {
+  const selectedType = selectElement.value;
+  if (!selectedType) return;
+  
+  // Find the cell that contains this select element
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const cells = graph.getChildCells(graph.getDefaultParent(), true, true);
+  let targetCell = null;
+  
+  // Find the cell that contains this select element
+  for (const cell of cells) {
+    if (cell._isMiscellaneousNode && cell.value && cell.value.includes(selectElement.id)) {
+      targetCell = cell;
+      break;
+    }
+  }
+  
+  if (!targetCell) return;
+  
+  // Get current position and size
+  const geometry = targetCell.geometry;
+  const x = geometry.x;
+  const y = geometry.y;
+  
+  // Use the exact same logic as placeNodeAtClickLocation
+  graph.getModel().beginUpdate();
+  try {
+    // Remove the miscellaneous node marker
+    delete targetCell._isMiscellaneousNode;
+    
+    let style = "";
+    let label = "";
+    let width = 160;
+    let height = 80;
+    
+    // Use exact same logic as placeNodeAtClickLocation
+    if (selectedType === 'calculation') {
+      // Calculation node style and label now handled by calc.js
+      if (typeof window.getCalculationNodeStyle === 'function') {
+        const calcStyle = window.getCalculationNodeStyle();
+        style = calcStyle.style;
+        label = calcStyle.label;
+      } else {
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
+        label = "Calculation node";
+      }
+      // Set fixed dimensions for calculation nodes
+      width = 400;
+      height = 450;
+    } else if (selectedType === 'notesNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=notesNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "Notes text";
+      width = 200;
+      height = 100;
+    } else if (selectedType === 'checklistNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=checklistNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "Checklist text";
+      width = 200;
+      height = 100;
+    } else if (selectedType === 'subtitle') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=subtitle;spacing=12;fontSize=18;align=center;verticalAlign=middle;";
+      label = "Subtitle text";
+      width = 200;
+      height = 60;
+    } else if (selectedType === 'info') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=info;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "Information text";
+      width = 200;
+      height = 100;
+    } else if (selectedType === 'imageOption') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=imageOption;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "Image option";
+      width = 200;
+      height = 120;
+    } else if (selectedType === 'pdfNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "PDF document";
+      width = 200;
+      height = 100;
+    } else if (selectedType === 'amountOption') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=amountOption;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "Amount option";
+      width = 200;
+      height = 100;
+    } else if (selectedType === 'end') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
+      label = "End";
+      width = 120;
+      height = 60;
+    } else if (selectedType === 'hiddenCheckbox') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenCheckbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;";
+      label = "Hidden Checkbox";
+      width = 150;
+      height = 80;
+    } else if (selectedType === 'hiddenTextbox') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenTextbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;";
+      label = "Hidden Textbox";
+      width = 150;
+      height = 80;
+    } else if (selectedType === 'linkedLogic') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;section=1;fillColor=#DDA0DD;strokeColor=#9370DB;";
+      label = "Linked Logic";
+      width = 150;
+      height = 80;
+    }
+    
+    // Update the cell with new style, label, and dimensions
+    targetCell.style = style;
+    targetCell.value = label;
+    
+    // Update geometry with new dimensions
+    const newGeometry = geometry.clone();
+    newGeometry.width = width;
+    newGeometry.height = height;
+    graph.getModel().setGeometry(targetCell, newGeometry);
+    
+    // Initialize specific node types - use exact same logic as placeNodeAtClickLocation
+    if (selectedType === 'calculation') {
+      // Use same logic as drag-and-drop for calculation nodes
+      if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(targetCell)) {
+        if (typeof window.initializeCalculationNode === 'function') {
+          window.initializeCalculationNode(targetCell);
+        }
+      }
+    } else if (selectedType === 'notesNode') {
+      targetCell._notesText = "Notes text";
+      targetCell._notesBold = false;
+      targetCell._notesFontSize = 14;
+      if (typeof window.updateNotesNodeCell === 'function') {
+        window.updateNotesNodeCell(targetCell);
+      }
+    } else if (selectedType === 'checklistNode') {
+      targetCell._checklistText = "Checklist text";
+      targetCell._checklistItems = ["Item 1", "Item 2", "Item 3"];
+      if (typeof window.updateChecklistNodeCell === 'function') {
+        window.updateChecklistNodeCell(targetCell);
+      }
+    } else if (selectedType === 'subtitle') {
+      targetCell._subtitleText = "Subtitle text";
+      if (typeof window.updateSubtitleNodeCell === 'function') {
+        window.updateSubtitleNodeCell(targetCell);
+      }
+    } else if (selectedType === 'info') {
+      targetCell._infoText = "Information text";
+      if (typeof window.updateInfoNodeCell === 'function') {
+        window.updateInfoNodeCell(targetCell);
+      }
+    } else if (selectedType === 'imageOption') {
+      targetCell._imageText = "Image option";
+      targetCell._imageUrl = "";
+      if (typeof window.updateImageOptionCell === 'function') {
+        window.updateImageOptionCell(targetCell);
+      }
+    } else if (selectedType === 'pdfNode') {
+      targetCell._pdfText = "PDF document";
+      targetCell._pdfUrl = "";
+      if (typeof window.updatePdfNodeCell === 'function') {
+        window.updatePdfNodeCell(targetCell);
+      }
+    } else if (selectedType === 'amountOption') {
+      targetCell._amountText = "Amount option";
+      targetCell._amountName = "";
+      targetCell._amountPlaceholder = "";
+      if (typeof window.updateAmountOptionCell === 'function') {
+        window.updateAmountOptionCell(targetCell);
+      }
+    } else if (selectedType === 'end') {
+      targetCell._endText = "End";
+      if (typeof window.updateEndNodeCell === 'function') {
+        window.updateEndNodeCell(targetCell);
+      }
+    } else if (selectedType === 'hiddenCheckbox') {
+      targetCell._hiddenNodeId = "hidden_checkbox";
+      if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+        window.updateHiddenCheckboxNodeCell(targetCell);
+      }
+    } else if (selectedType === 'hiddenTextbox') {
+      targetCell._hiddenNodeId = "hidden_textbox";
+      targetCell._defaultText = "";
+      if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+        window.updateHiddenTextboxNodeCell(targetCell);
+      }
+    } else if (selectedType === 'linkedLogic') {
+      targetCell._linkedLogicNodeId = "linked_logic";
+      targetCell._linkedFields = [];
+      if (typeof window.updateLinkedLogicNodeCell === 'function') {
+        window.updateLinkedLogicNodeCell(targetCell);
+      }
+    }
+    
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  // Refresh the cell display
+  if (typeof window.refreshAllCells === 'function') {
+    window.refreshAllCells();
+  }
+  
+  // Request autosave
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
   }
 }
 

@@ -323,25 +323,25 @@ window.exportGuiJson = function(download = true) {
       const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
       
       // Process each textbox in order
-      cell._textboxes.forEach((tb, index) => {
-        const labelName = tb.nameId || "";
-        const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-        
-        allFieldsInOrder.push({
-          type: "label",
-          label: labelName,
-          nodeId: fieldNodeId,
-          order: index + 1
+      if (cell._textboxes && cell._textboxes.length > 0) {
+        cell._textboxes.forEach((tb, index) => {
+          const labelName = tb.nameId || "";
+          const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+          
+          allFieldsInOrder.push({
+            type: "label",
+            label: labelName,
+            nodeId: fieldNodeId,
+            order: index + 1
+          });
         });
-      });
+      }
       
-      // Insert location fields at the correct position if locationIndex is set AND location fields actually exist
-      // Check if location fields are actually present in the current UI state
-      const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
-        ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
-      );
+      // Insert location fields at the correct position if locationIndex is set
+      // For multiple textbox questions, location data is indicated by _locationIndex property
+      const shouldIncludeLocationFields = locationIndex >= 0;
       
-      if (locationIndex >= 0 && locationIndex <= cell._textboxes.length && hasLocationFieldsInUI) {
+      if (shouldIncludeLocationFields) {
         const locationFields = [
           { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
           { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
@@ -349,20 +349,32 @@ window.exportGuiJson = function(download = true) {
           { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
         ];
         
-        // Insert location fields at the specified position
-        locationFields.forEach((field, fieldIndex) => {
-          allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
-            type: field.label === "Zip" ? "amount" : "label",
-            label: field.label,
-            nodeId: field.nodeId,
-            order: locationIndex + fieldIndex + 1
+        // If there are no existing fields, just add location fields directly
+        if (allFieldsInOrder.length === 0) {
+          locationFields.forEach((field, fieldIndex) => {
+            allFieldsInOrder.push({
+              type: field.label === "Zip" ? "amount" : "label",
+              label: field.label,
+              nodeId: field.nodeId,
+              order: fieldIndex + 1
+            });
           });
-        });
-        
-        // Update order numbers for all fields after insertion
-        allFieldsInOrder.forEach((field, index) => {
-          field.order = index + 1;
-        });
+        } else {
+          // Insert location fields at the specified position
+          locationFields.forEach((field, fieldIndex) => {
+            allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+              type: field.label === "Zip" ? "amount" : "label",
+              label: field.label,
+              nodeId: field.nodeId,
+              order: locationIndex + fieldIndex + 1
+            });
+          });
+          
+          // Update order numbers for all fields after insertion
+          allFieldsInOrder.forEach((field, index) => {
+            field.order = index + 1;
+          });
+        }
       }
       
       // Set the allFieldsInOrder array
@@ -790,13 +802,19 @@ window.exportGuiJson = function(download = true) {
           });
         });
         
-        // Insert location fields at the correct position if locationIndex is set AND location fields actually exist
-        // Check if location fields are actually present in the current UI state
+        // Insert location fields at the correct position if locationIndex is set
+        // For multiple dropdown questions, location data is indicated by _locationIndex property
+        // For multiple textbox questions, we check if location fields exist in _textboxes
         const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
           ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
         );
         
-        if (locationIndex >= 0 && locationIndex <= cell._textboxes.length && hasLocationFieldsInUI) {
+        // For multiple dropdown questions, if _locationIndex is set, we should include location fields
+        // For multiple textbox questions, we need both _locationIndex and actual location fields in UI
+        const shouldIncludeLocationFields = (exportType === "multipleDropdownType" && locationIndex >= 0) || 
+                                          (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
+        
+        if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
           const locationFields = [
             { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
             { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
@@ -1529,6 +1547,7 @@ window.saveFlowchart = function() {
     if (!flowchartName || !flowchartName.trim()) return;
     }
     currentFlowchartName = flowchartName;
+    window.currentFlowchartName = flowchartName;
   }
   // Gather data and save
   const data = { cells: [] };
@@ -1659,6 +1678,7 @@ window.saveAsFlowchart = function() {
   
   // Update the current flowchart name to the new name
   currentFlowchartName = flowchartName;
+  window.currentFlowchartName = flowchartName;
   
   // Gather data and save (same logic as saveFlowchart)
   const data = { cells: [] };
@@ -1818,6 +1838,7 @@ window.openSavedFlowchart = function(name) {
       
       console.log('📚 [LIBRARY LOAD] Flowchart data retrieved, calling loadFlowchartData');
       currentFlowchartName = name;
+      window.currentFlowchartName = name;
       loadFlowchartData(docSnap.data().flowchart, name);
       
       // Update last used timestamp
@@ -1842,7 +1863,10 @@ window.renameFlowchart = function(oldName, element) {
         .then(()=>{ 
           docRef.delete(); 
           element.textContent=newName; 
-          if(currentFlowchartName===oldName) currentFlowchartName=newName; 
+          if(currentFlowchartName===oldName) {
+            currentFlowchartName=newName;
+            window.currentFlowchartName=newName;
+          } 
           alert("Renamed to: " + newName);
           // Trigger autosave to update the library flowchart name
           if (typeof autosaveFlowchartToLocalStorage === 'function') {
@@ -1858,7 +1882,10 @@ window.deleteSavedFlowchart = function(name) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to delete flowcharts. Guest users cannot delete."); return; }
   if (!confirm("Delete '"+name+"'?")) return;
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name).delete()
-    .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) currentFlowchartName=null; window.viewSavedFlowcharts(); })
+    .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) {
+      currentFlowchartName=null;
+      window.currentFlowchartName=null;
+    } window.viewSavedFlowcharts(); })
     .catch(err=>alert("Error deleting: " + err));
 };
 

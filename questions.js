@@ -181,8 +181,8 @@ function updateSimpleQuestionCell(cell) {
   // If the cell doesn't have a question type yet, show the dropdown
   if (!cell._questionType || cell._questionType === '') {
     const html = `
-      <div style="display: flex; justify-content: center; align-items: center; height:100%;">
-        <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
+      <div style="display: flex; justify-content: center; align-items: flex-start; height:100%; padding-top: 4px;">
+        <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.2em; padding: 12px 20px; border-radius: 8px; border: 1px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 240px; height: 44px; cursor:pointer;"
           onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
           onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
           onmouseover="this.style.borderColor='#4a90e2';"
