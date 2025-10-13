@@ -544,11 +544,12 @@ Always end responses with a reminder to consult with a qualified attorney for sp
 
 /* ————— helper ————— */
 function shouldCheck(v) {
-  // treat ANY present, non‑false value as "checked"
-  if (v === undefined)               return false;
+  // Only check if explicitly set to "on" or "true" or "yes" or "1" or "checked"
+  if (v === undefined || v === null || v === '')  return false;
   if (Array.isArray(v))              return v.length > 0;
   const s = String(v).trim().toLowerCase();
-  return s !== '' && s !== 'false' && s !== 'off' && s !== 'no';
+  // Only check for explicitly truthy values
+  return s === 'on' || s === 'true' || s === 'yes' || s === '1' || s === 'checked';
 }
 
 /**

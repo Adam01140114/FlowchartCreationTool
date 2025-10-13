@@ -2869,7 +2869,16 @@ window.addFormToCart = function (priceId) {
       if (!el.name || el.disabled) continue;
       if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
       if (['hidden','button','submit','reset'].includes(el.type)) continue;
-      formData[el.name] = (el.type === 'checkbox' || el.type === 'radio') ? !!el.checked : el.value;
+      
+      // For checkboxes and radios, only include if checked
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) {
+          formData[el.name] = 'on'; // Send 'on' for checked checkboxes (standard HTML form behavior)
+        }
+        // Skip unchecked checkboxes entirely - don't send them to server
+      } else {
+        formData[el.name] = el.value;
+      }
     }
   }
 
@@ -4896,14 +4905,22 @@ async function editAndDownloadPDF (pdfName) {
         const formElements = form.querySelectorAll('input, textarea, select');
         formElements.forEach(element => {
             if (element.name && !element.disabled) {
-                let value = element.value;
-                
-                // Format date inputs to mm/dd/yyyy
-                if (element.type === 'date' && value) {
-                    value = formatDateForServer(value);
+                // For checkboxes and radios, only include if checked
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                    if (element.checked) {
+                        fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+                    }
+                    // Skip unchecked checkboxes entirely - don't send them to server
+                } else {
+                    let value = element.value;
+                    
+                    // Format date inputs to mm/dd/yyyy
+                    if (element.type === 'date' && value) {
+                        value = formatDateForServer(value);
+                    }
+                    
+                    fd.append(element.name, value);
                 }
-                
-                fd.append(element.name, value);
             }
         });
 
@@ -5023,6 +5040,23 @@ function runSingleHiddenCheckboxCalculation(calcObj){
     // Set the hidden checkbox state
     cbox.checked = finalState;
     console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
+    
+    // Handle mutually exclusive checkboxes for suing amount
+    if(calcObj.hiddenFieldName === 'suing_over_2500' && finalState) {
+        // If suing_over_2500 is checked, ensure suing_under_2500 is unchecked
+        var underCheckbox = document.getElementById('suing_under_2500');
+        if(underCheckbox) {
+            underCheckbox.checked = false;
+            console.log('🔧 [CALC DEBUG] Unchecked suing_under_2500 because suing_over_2500 is checked');
+        }
+    } else if(calcObj.hiddenFieldName === 'suing_under_2500' && finalState) {
+        // If suing_under_2500 is checked, ensure suing_over_2500 is unchecked
+        var overCheckbox = document.getElementById('suing_over_2500');
+        if(overCheckbox) {
+            overCheckbox.checked = false;
+            console.log('🔧 [CALC DEBUG] Unchecked suing_over_2500 because suing_under_2500 is checked');
+        }
+    }
 }
 
 

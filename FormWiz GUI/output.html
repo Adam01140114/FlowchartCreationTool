@@ -687,8 +687,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<div style="display:none;"><input type="checkbox" id="suing_over_2500" name="suing_over_2500" checked></div>
-<div style="display:none;"><input type="checkbox" id="suing_under_2500" name="suing_under_2500" checked></div>
+<div style="display:none;"><input type="checkbox" id="suing_over_2500" name="suing_over_2500" ></div>
+<div style="display:none;"><input type="checkbox" id="suing_under_2500" name="suing_under_2500" ></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
@@ -945,8 +945,8 @@ var amountMap = {"15":["Zip"],"21":["Zip"],"length":0};
 var labelNodeIdsMap = {"15":["sc100_how_many_people_are_suing_with_you_name","sc100_how_many_people_are_suing_with_you_phone_number","sc100_how_many_people_are_suing_with_you_street","sc100_how_many_people_are_suing_with_you_city","sc100_how_many_people_are_suing_with_you_state"],"21":["sc100_how_many_people_are_you_suing_name","sc100_how_many_people_are_you_suing_phone_number","sc100_how_many_people_are_you_suing_street","sc100_how_many_people_are_you_suing_city","sc100_how_many_people_are_you_suing_state"]};
 var unifiedFieldsMap = {"9":[{"type":"label","label":"Name","nodeId":"sc103_please_enter_your_business_details_name","order":1},{"type":"label","label":"Street","nodeId":"sc103_please_enter_your_business_details_street","order":2},{"type":"label","label":"City","nodeId":"sc103_please_enter_your_business_details_city","order":3},{"type":"label","label":"State","nodeId":"sc103_please_enter_your_business_details_state","order":4},{"type":"amount","label":"Zip","nodeId":"sc103_please_enter_your_business_details_zip","order":5}],"15":[{"type":"label","label":"Name","nodeId":"sc100_how_many_people_are_suing_with_you_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_how_many_people_are_suing_with_you_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_how_many_people_are_suing_with_you_street","order":3},{"type":"label","label":"City","nodeId":"sc100_how_many_people_are_suing_with_you_city","order":4},{"type":"label","label":"State","nodeId":"sc100_how_many_people_are_suing_with_you_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_how_many_people_are_suing_with_you_zip","order":6}],"21":[{"type":"label","label":"Name","nodeId":"sc100_how_many_people_are_you_suing_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_how_many_people_are_you_suing_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_how_many_people_are_you_suing_street","order":3},{"type":"label","label":"City","nodeId":"sc100_how_many_people_are_you_suing_city","order":4},{"type":"label","label":"State","nodeId":"sc100_how_many_people_are_you_suing_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_how_many_people_are_you_suing_zip","order":6}],"25":[{"type":"label","label":"Name","nodeId":"sc100_who_are_you_suing_on_military_duty_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_who_are_you_suing_on_military_duty_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_who_are_you_suing_on_military_duty_street","order":3},{"type":"label","label":"City","nodeId":"sc100_who_are_you_suing_on_military_duty_city","order":4},{"type":"label","label":"State","nodeId":"sc100_who_are_you_suing_on_military_duty_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_who_are_you_suing_on_military_duty_zip","order":6}],"26":[{"type":"label","label":"Name","nodeId":"sc100_who_are_you_suing_name","order":1},{"type":"label","label":"Phone Number","nodeId":"sc100_who_are_you_suing_phone_number","order":2},{"type":"label","label":"Street","nodeId":"sc100_who_are_you_suing_street","order":3},{"type":"label","label":"City","nodeId":"sc100_who_are_you_suing_city","order":4},{"type":"label","label":"State","nodeId":"sc100_who_are_you_suing_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_who_are_you_suing_zip","order":6}],"29":[{"type":"label","label":"Name","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_name","order":1},{"type":"label","label":"Job","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_job","order":2},{"type":"label","label":"Street","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_street","order":3},{"type":"label","label":"City","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_city","order":4},{"type":"label","label":"State","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_state","order":5},{"type":"amount","label":"Zip","nodeId":"sc100_list_the_person_or_agent_authorized_for_service_zip","order":6}]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [{"questionId":"3","questionNameId":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","trigger":"Yes","type":"checkbox","nodeId":"personal_claim","textboxText":""},{"questionId":"4","questionNameId":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","trigger":"Yes","type":"checkbox","nodeId":"retail_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"No","type":"checkbox","nodeId":"regular_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"Yes","type":"checkbox","nodeId":"vehicle_claim","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"sc100","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"Yes","type":"checkbox","nodeId":"sc100","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"4","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"5","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_2_d","textboxText":""}];
-var linkedFields = [{"linkedFieldId":"defendant_phone","fields":["sc100_who_are_you_suing_phone_number","sc100_who_are_you_suing_on_military_duty_phone_number","sc100a_how_many_people_are_you_suing_phone_number_1"]},{"linkedFieldId":"defendant_name","fields":["sc100_who_are_you_suing_name","sc100_who_are_you_suing_on_military_duty_name","sc100a_how_many_people_are_you_suing_name_1"]},{"linkedFieldId":"defendant_street","fields":["sc100_who_are_you_suing_street","sc100_who_are_you_suing_on_military_duty_street","sc100a_how_many_people_are_you_suing_street_1"]},{"linkedFieldId":"defendant_city","fields":["sc100_who_are_you_suing_city","sc100_who_are_you_suing_on_military_duty_city","sc100a_how_many_people_are_you_suing_city_1"]},{"linkedFieldId":"defendant_state","fields":["sc100_who_are_you_suing_state_short","sc100_who_are_you_suing_on_military_duty_state_short","sc100a_how_many_people_are_you_suing_state_short_1"]},{"linkedFieldId":"defendant_zip","fields":["sc100_who_are_you_suing_zip","sc100_who_are_you_suing_on_military_duty_zip","sc100a_how_many_people_are_you_suing_zip_1"]}];
+var hiddenLogicConfigs = [{"questionId":"3","questionNameId":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","trigger":"Yes","type":"checkbox","nodeId":"personal_claim","textboxText":""},{"questionId":"4","questionNameId":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","trigger":"Yes","type":"checkbox","nodeId":"retail_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"No","type":"checkbox","nodeId":"regular_claim","textboxText":""},{"questionId":"5","questionNameId":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","trigger":"Yes","type":"checkbox","nodeId":"vehicle_claim","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"sc100_form","textboxText":""},{"questionId":"13","questionNameId":"sc100_are_you_suing_by_yourself","trigger":"Yes","type":"checkbox","nodeId":"sc100_form","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"4","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_suing_with_you","trigger":"5","type":"checkbox","nodeId":"4_or_5_p","textboxText":""},{"questionNameId":"sc100_how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_2_d","textboxText":""}];
+var linkedFields = [{"linkedFieldId":"defendant_phone","fields":["sc100_who_are_you_suing_phone_number","sc100_who_are_you_suing_on_military_duty_phone_number","sc100a_how_many_people_are_you_suing_phone_number_1"]},{"linkedFieldId":"military_name","fields":["sc100_what_is_the_name_of_the_person_on_military_duty","sc100_who_are_you_suing_on_military_duty_name"]},{"linkedFieldId":"defendant_name","fields":["sc100_who_are_you_suing_name","sc100_who_are_you_suing_on_military_duty_name","sc100a_how_many_people_are_you_suing_name_1"]},{"linkedFieldId":"defendant_street","fields":["sc100_who_are_you_suing_street","sc100_who_are_you_suing_on_military_duty_street","sc100a_how_many_people_are_you_suing_street_1"]},{"linkedFieldId":"defendant_city","fields":["sc100_who_are_you_suing_city","sc100_who_are_you_suing_on_military_duty_city","sc100a_how_many_people_are_you_suing_city_1"]},{"linkedFieldId":"defendant_state","fields":["sc100_who_are_you_suing_state_short","sc100_who_are_you_suing_on_military_duty_state_short","sc100a_how_many_people_are_you_suing_state_short_1"]},{"linkedFieldId":"defendant_zip","fields":["sc100_who_are_you_suing_zip","sc100_who_are_you_suing_on_military_duty_zip","sc100a_how_many_people_are_you_suing_zip_1"]}];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
@@ -1066,7 +1066,7 @@ var pdfOutputFileName = "sc100.pdf";
 var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["sc100", ];
-var hiddenCheckboxCalculations = [];
+var hiddenCheckboxCalculations = [{"hiddenFieldName":"suing_over_2500","calculations":[{"terms":[{"operator":"","questionNameId":"sc100_how_much_are_you_suing_for"}],"compareOperator":">","threshold":"2500","result":"checked"}]},{"hiddenFieldName":"suing_under_2500","calculations":[{"terms":[{"operator":"","questionNameId":"sc100_how_much_are_you_suing_for"}],"compareOperator":"<","threshold":"2500","result":"checked"}]}];
 var hiddenTextCalculations = [];
 
 
@@ -3136,7 +3136,16 @@ window.addFormToCart = function (priceId) {
       if (!el.name || el.disabled) continue;
       if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
       if (['hidden','button','submit','reset'].includes(el.type)) continue;
-      formData[el.name] = (el.type === 'checkbox' || el.type === 'radio') ? !!el.checked : el.value;
+      
+      // For checkboxes and radios, only include if checked
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) {
+          formData[el.name] = 'on'; // Send 'on' for checked checkboxes (standard HTML form behavior)
+        }
+        // Skip unchecked checkboxes entirely - don't send them to server
+      } else {
+        formData[el.name] = el.value;
+      }
     }
   }
 
@@ -4759,10 +4768,25 @@ function goBack(){
 /*──────────────── helpers ───────────────*/
 function setCurrentDate () {
     const t = new Date();
-    document.getElementById('current_date').value =
-        t.getFullYear() + '-' +
-        String(t.getMonth() + 1).padStart(2, '0') + '-' +
-        String(t.getDate()).padStart(2, '0');
+    const month = String(t.getMonth() + 1).padStart(2, '0');
+    const day = String(t.getDate()).padStart(2, '0');
+    const year = t.getFullYear();
+    const currentDateElement = document.getElementById('current_date');
+    if (currentDateElement) {
+        currentDateElement.value = month + '/' + day + '/' + year;
+        // Mark this field as protected from autofill
+        currentDateElement.setAttribute('data-protected', 'true');
+    }
+}
+
+// Helper function to format date from yyyy-mm-dd to mm/dd/yyyy
+function formatDateForServer(dateString) {
+    if (!dateString) return '';
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+        return parts[1] + '/' + parts[2] + '/' + parts[0];
+    }
+    return dateString;
 }
 
 
@@ -5044,7 +5068,31 @@ async function editAndDownloadPDF (pdfName) {
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
-        const fd = new FormData(document.getElementById('customForm'));
+        const form = document.getElementById('customForm');
+        const fd = new FormData();
+        
+        // Manually collect form data to format dates
+        const formElements = form.querySelectorAll('input, textarea, select');
+        formElements.forEach(element => {
+            if (element.name && !element.disabled) {
+                // For checkboxes and radios, only include if checked
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                    if (element.checked) {
+                        fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+                    }
+                    // Skip unchecked checkboxes entirely - don't send them to server
+                } else {
+                    let value = element.value;
+                    
+                    // Format date inputs to mm/dd/yyyy
+                    if (element.type === 'date' && value) {
+                        value = formatDateForServer(value);
+                    }
+                    
+                    fd.append(element.name, value);
+                }
+            }
+        });
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
@@ -5162,6 +5210,23 @@ function runSingleHiddenCheckboxCalculation(calcObj){
     // Set the hidden checkbox state
     cbox.checked = finalState;
     console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
+    
+    // Handle mutually exclusive checkboxes for suing amount
+    if(calcObj.hiddenFieldName === 'suing_over_2500' && finalState) {
+        // If suing_over_2500 is checked, ensure suing_under_2500 is unchecked
+        var underCheckbox = document.getElementById('suing_under_2500');
+        if(underCheckbox) {
+            underCheckbox.checked = false;
+            console.log('🔧 [CALC DEBUG] Unchecked suing_under_2500 because suing_over_2500 is checked');
+        }
+    } else if(calcObj.hiddenFieldName === 'suing_under_2500' && finalState) {
+        // If suing_under_2500 is checked, ensure suing_over_2500 is unchecked
+        var overCheckbox = document.getElementById('suing_over_2500');
+        if(overCheckbox) {
+            overCheckbox.checked = false;
+            console.log('🔧 [CALC DEBUG] Unchecked suing_over_2500 because suing_under_2500 is checked');
+        }
+    }
 }
 
 
@@ -5859,9 +5924,9 @@ if (typeof handleNext === 'function') {
                     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
                     }
-                    
-                    // Trigger line splitting for autofilled textareas
-                    triggerLineSplittingForAutofilledTextareas();
+                
+                // Trigger line splitting for autofilled textareas
+                triggerLineSplittingForAutofilledTextareas();
                 
                 // Trigger paragraph limit checking for autofilled textareas
                 triggerParagraphLimitCheckForAutofilledTextareas();
@@ -6259,11 +6324,14 @@ if (typeof handleNext === 'function') {
                                 // For radio buttons, set the value and check the matching radio button
                                 if (data[el.name] && el.value === data[el.name]) {
                                     el.checked = true;
-                                } else {
+                            } else {
                                     el.checked = false;
                                 }
                             } else {
+                                // Skip current_date field - it should be set dynamically
+                                if (el.id !== 'current_date') {
                                 el.value = data[el.name];
+                                }
                             }
                         }
                     });
@@ -6272,6 +6340,10 @@ if (typeof handleNext === 'function') {
                     setTimeout(() => {
                         if (typeof updateUserFullName === 'function') {
                             updateUserFullName();
+                        }
+                        // Always set current_date to today's date after autofill
+                        if (typeof setCurrentDate === 'function') {
+                            setCurrentDate();
                         }
                     }, 2000);
                     
@@ -6359,7 +6431,10 @@ if (typeof handleNext === 'function') {
                                     if (el.type === 'checkbox' || el.type === 'radio') {
                                         el.checked = !!data[el.name];
                                     } else {
+                                        // Skip current_date field - it should be set dynamically
+                                        if (el.id !== 'current_date') {
                                         el.value = data[el.name];
+                                        }
                                     }
                                 }
                             });
@@ -6393,6 +6468,11 @@ if (typeof handleNext === 'function') {
                                     }
                                 }
                             });
+                            
+                            // Always set current_date to today's date after second autofill pass
+                            if (typeof setCurrentDate === 'function') {
+                                setCurrentDate();
+                            }
                         }, 1500);
                     }, 2000);
                 }
