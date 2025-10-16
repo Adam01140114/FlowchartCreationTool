@@ -4113,6 +4113,11 @@ document.addEventListener("DOMContentLoaded", function() {
         resetSquareCreationState();
         console.log('🔧 [CANVAS DEBUG] Square creation ended by left-click on canvas or node');
         
+        // Prevent the event from propagating to graph handlers to avoid clearing selection
+        e.stopPropagation();
+        e.preventDefault();
+        console.log('🔧 [CANVAS DEBUG] Event propagation stopped to prevent graph from clearing selection');
+        
         // Restore the selection after ending square creation
         if (currentSelection.length > 0) {
           setTimeout(() => {
@@ -4149,6 +4154,11 @@ document.addEventListener("DOMContentLoaded", function() {
       if (typeof resetSquareCreationState === 'function') {
         resetSquareCreationState();
         console.log('🔧 [CANVAS DEBUG] Global: Square creation ended by left-click on canvas or node');
+        
+        // Prevent the event from propagating to graph handlers to avoid clearing selection
+        e.stopPropagation();
+        e.preventDefault();
+        console.log('🔧 [CANVAS DEBUG] Global: Event propagation stopped to prevent graph from clearing selection');
         
         // Restore the selection after ending square creation
         if (currentSelection.length > 0) {
