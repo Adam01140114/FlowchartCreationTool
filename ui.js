@@ -27,22 +27,14 @@ window.showContextMenu = function(x, y, cell) {
 };
 
 /**
- * Hide the context menu
+ * Hide the context menu - now handled by context-menus.js
+ * This function is kept for backward compatibility but delegates to the main function
  */
 window.hideContextMenu = function() {
-  const contextMenu = document.getElementById('contextMenu');
-  if (contextMenu) {
-    contextMenu.style.display = 'none';
-    contextMenuVisible = false;
+  // Delegate to the main hideContextMenu function in context-menus.js
+  if (typeof window.hideContextMenuMain === 'function') {
+    window.hideContextMenuMain();
   }
-  
-  // Hide other menus too
-  hideNotesContextMenu();
-  hideEdgeContextMenu();
-  hideEmptySpaceMenu();
-  hidePropertiesMenu();
-  
-  window.contextMenuTarget = null;
 };
 
 /**
@@ -142,8 +134,16 @@ window.showSettingsMenu = function() {
   menu.style.display = 'block';
   settingsMenuVisible = true;
   
+  // Set current edge style value
+  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
+  if (edgeStyleToggle && typeof currentEdgeStyle !== 'undefined') {
+    edgeStyleToggle.value = currentEdgeStyle;
+  }
+  
   // Load current settings
-  loadSettingsFromLocalStorage();
+  if (typeof loadSettingsFromLocalStorage === 'function') {
+    loadSettingsFromLocalStorage();
+  }
   
   // The slider should work with the oninput attribute in HTML
   

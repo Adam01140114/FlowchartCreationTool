@@ -415,6 +415,45 @@ function zoomIntoNode(cell) {
 }
 
 /**
+ * Test function to verify node ID copying behavior and Enter key functionality
+ * Can be called from console: testNodeIdCopying()
+ */
+window.testNodeIdCopying = function() {
+  console.log('🧪 [NODE ID COPY TEST] Testing node ID copying behavior and Enter key functionality...');
+  
+  // Find a node to test with
+  const graph = window.graph;
+  if (!graph) {
+    console.error('🧪 [NODE ID COPY TEST] ERROR: Graph not available');
+    return;
+  }
+  
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  
+  if (vertices.length === 0) {
+    console.log('🧪 [NODE ID COPY TEST] No nodes found to test with');
+    return;
+  }
+  
+  const testNode = vertices[0];
+  console.log('🧪 [NODE ID COPY TEST] Testing with node:', testNode.id);
+  
+  // Open properties popup
+  if (typeof window.showPropertiesPopup === 'function') {
+    window.showPropertiesPopup(testNode);
+    console.log('🧪 [NODE ID COPY TEST] Properties popup opened');
+    console.log('🧪 [NODE ID COPY TEST] Node ID should NOT be automatically copied');
+    console.log('🧪 [NODE ID COPY TEST] Test 1: Click on the Node ID field to copy it manually');
+    console.log('🧪 [NODE ID COPY TEST] Test 2: Double-click on the Node ID field for green border effect');
+    console.log('🧪 [NODE ID COPY TEST] Test 3: Press Enter key to close the popup');
+    console.log('🧪 [NODE ID COPY TEST] Test 4: Press Escape key to close the popup');
+  } else {
+    console.error('🧪 [NODE ID COPY TEST] ERROR: showPropertiesPopup function not available');
+  }
+};
+
+/**
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
@@ -1890,25 +1929,37 @@ function showPropertiesPopup(cell) {
         // Make it contenteditable for editing
         valueSpan.contentEditable = 'true';
         valueSpan.style.cursor = 'text';
-        valueSpan.title = 'Click to edit, double-click to copy to clipboard';
+        valueSpan.title = 'Click to copy to clipboard, double-click for green border effect, then click again to edit';
         
-        // Handle double-click to copy
+        // Handle double-click for green border effect and copy
         valueSpan.addEventListener('dblclick', async (e) => {
           e.preventDefault();
+          // Don't show copy feedback during auto-focus
+          if (window._autoFocusingNodeText) return;
           try {
             await navigator.clipboard.writeText(prop.value);
             
-            // Show visual feedback
+            // Show green border effect
+            const originalBorder = valueSpan.style.border;
             const originalText = valueSpan.textContent;
+            const originalBg = valueSpan.style.backgroundColor;
+            const originalColor = valueSpan.style.color;
+            
+            valueSpan.style.border = '3px solid #4CAF50';
+            valueSpan.style.borderRadius = '4px';
             valueSpan.textContent = 'Copied!';
             valueSpan.style.backgroundColor = '#e8f5e8';
             valueSpan.style.color = '#2e7d32';
+            valueSpan.style.fontWeight = 'bold';
             
             setTimeout(() => {
+              valueSpan.style.border = originalBorder;
+              valueSpan.style.borderRadius = '';
               valueSpan.textContent = originalText;
-              valueSpan.style.backgroundColor = '#f9f9f9';
-              valueSpan.style.color = '#333';
-            }, 1000);
+              valueSpan.style.backgroundColor = originalBg;
+              valueSpan.style.color = originalColor;
+              valueSpan.style.fontWeight = 'normal';
+            }, 1500);
           } catch (err) {
             console.error('Failed to copy to clipboard:', err);
             // Fallback for older browsers
@@ -1919,17 +1970,82 @@ function showPropertiesPopup(cell) {
             document.execCommand('copy');
             document.body.removeChild(textArea);
             
-            // Show visual feedback
+            // Show green border effect for fallback
+            const originalBorder = valueSpan.style.border;
             const originalText = valueSpan.textContent;
+            const originalBg = valueSpan.style.backgroundColor;
+            const originalColor = valueSpan.style.color;
+            
+            valueSpan.style.border = '3px solid #4CAF50';
+            valueSpan.style.borderRadius = '4px';
             valueSpan.textContent = 'Copied!';
             valueSpan.style.backgroundColor = '#e8f5e8';
             valueSpan.style.color = '#2e7d32';
+            valueSpan.style.fontWeight = 'bold';
             
             setTimeout(() => {
+              valueSpan.style.border = originalBorder;
+              valueSpan.style.borderRadius = '';
               valueSpan.textContent = originalText;
-              valueSpan.style.backgroundColor = '#f9f9f9';
-              valueSpan.style.color = '#333';
-            }, 1000);
+              valueSpan.style.backgroundColor = originalBg;
+              valueSpan.style.color = originalColor;
+              valueSpan.style.fontWeight = 'normal';
+            }, 1500);
+          }
+        });
+        
+        // Handle click to copy
+        valueSpan.addEventListener('click', async (e) => {
+          // Only copy if the field is not already focused for editing
+          // and we're not in the middle of auto-focusing the node text field
+          if (document.activeElement !== valueSpan && !window._autoFocusingNodeText) {
+            e.preventDefault();
+            try {
+              await navigator.clipboard.writeText(prop.value);
+              
+              // Show visual feedback
+              const originalText = valueSpan.textContent;
+              const originalBg = valueSpan.style.backgroundColor;
+              const originalColor = valueSpan.style.color;
+              
+              valueSpan.textContent = 'Copied!';
+              valueSpan.style.backgroundColor = '#e8f5e8';
+              valueSpan.style.color = '#2e7d32';
+              valueSpan.style.fontWeight = 'bold';
+              
+              setTimeout(() => {
+                valueSpan.textContent = originalText;
+                valueSpan.style.backgroundColor = originalBg;
+                valueSpan.style.color = originalColor;
+                valueSpan.style.fontWeight = 'normal';
+              }, 1500);
+            } catch (err) {
+              console.error('Failed to copy to clipboard:', err);
+              // Fallback for older browsers
+              const textArea = document.createElement('textarea');
+              textArea.value = prop.value;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              // Show visual feedback for fallback
+              const originalText = valueSpan.textContent;
+              const originalBg = valueSpan.style.backgroundColor;
+              const originalColor = valueSpan.style.color;
+              
+              valueSpan.textContent = 'Copied!';
+              valueSpan.style.backgroundColor = '#e8f5e8';
+              valueSpan.style.color = '#2e7d32';
+              valueSpan.style.fontWeight = 'bold';
+              
+              setTimeout(() => {
+                valueSpan.textContent = originalText;
+                valueSpan.style.backgroundColor = originalBg;
+                valueSpan.style.color = originalColor;
+                valueSpan.style.fontWeight = 'normal';
+              }, 1500);
+            }
           }
         });
         
@@ -1977,6 +2093,7 @@ function showPropertiesPopup(cell) {
         resetButton.textContent = 'Reset';
         resetButton.title = 'Reset Node ID to match naming convention';
         resetButton.style.cssText = `
+          display: none;
           background-color: #f8f9fa;
           border: 1px solid #dee2e6;
           border-radius: 3px;
@@ -2367,6 +2484,44 @@ function showPropertiesPopup(cell) {
   popup.appendChild(buttonContainer);
   document.body.appendChild(popup);
   
+  // Auto-focus on the node text input field
+  setTimeout(() => {
+    const nodeTextField = content.querySelector('[data-property="propNodeText"] .editable-field');
+    if (nodeTextField) {
+      // Set a flag to prevent copy feedback during auto-focus
+      window._autoFocusingNodeText = true;
+      // Simulate a click on the node text field to open the input
+      nodeTextField.click();
+      // Clear the flag after a short delay
+      setTimeout(() => {
+        window._autoFocusingNodeText = false;
+      }, 200);
+    }
+  }, 100); // Small delay to ensure the popup is fully rendered
+  
+  // Add Enter key handler to close the popup
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      // Only close if not editing a text field
+      const activeElement = document.activeElement;
+      const isEditing = activeElement && (
+        activeElement.contentEditable === 'true' || 
+        activeElement.tagName === 'INPUT' || 
+        activeElement.tagName === 'TEXTAREA'
+      );
+      
+      if (!isEditing) {
+        e.preventDefault();
+        newClosePopup();
+      }
+    }
+  };
+  
+  document.addEventListener('keydown', handleKeyDown);
+  
+  // Store the handler so we can remove it when closing
+  popup._keyDownHandler = handleKeyDown;
+  
   // Verify popup is actually in the DOM
   const popupInDOM = document.querySelector('.properties-modal');
   
@@ -2410,14 +2565,7 @@ function showPropertiesPopup(cell) {
     }
   }, 100);
   
-  // Auto-copy node ID to clipboard when popup opens
-  if (nodeId && nodeId.trim()) {
-    navigator.clipboard.writeText(nodeId).then(() => {
-      console.log('Node ID copied to clipboard:', nodeId);
-    }).catch(err => {
-      // Clipboard access failed, ignore
-    });
-  }
+  // Node ID copying is now handled by clicking on the input field
   
   // Focus management
   let focusTimeout = null;
@@ -2508,6 +2656,13 @@ function showPropertiesPopup(cell) {
       outsideClickHandler = null;
     }
     document.removeEventListener('keydown', handleEscape);
+    
+    // Remove the Enter key handler if it exists
+    if (popup._keyDownHandler) {
+      document.removeEventListener('keydown', popup._keyDownHandler);
+      popup._keyDownHandler = null;
+    }
+    
     originalClosePopup();
   };
   

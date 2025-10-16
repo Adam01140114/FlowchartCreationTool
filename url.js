@@ -236,7 +236,11 @@ window.exportFlowchartJson = function(download = true) {
     }
 
     // Custom fields
-    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+    if (cell._textboxes) {
+      console.log('🔧 [EXPORT DEBUG] Exporting _textboxes for cell', cell.id, ':', cell._textboxes);
+      cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+      console.log('🔧 [EXPORT DEBUG] Exported _textboxes data:', cellData._textboxes);
+    }
     if (cell._questionText) cellData._questionText = cell._questionText;
     if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
     if (cell._nameId) cellData._nameId = cell._nameId;
@@ -312,7 +316,8 @@ window.exportFlowchartJson = function(download = true) {
     sectionPrefs: JSON.parse(JSON.stringify(currentSectionPrefs)),
     groups: JSON.parse(JSON.stringify(groups)),
     defaultPdfProperties: defaultPdfProps,
-    formName: formName
+    formName: formName,
+    edgeStyle: currentEdgeStyle
   };
 
   const jsonStr = JSON.stringify(output, null, 2);

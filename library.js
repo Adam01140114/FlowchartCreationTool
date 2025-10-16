@@ -340,8 +340,11 @@ window.exportGuiJson = function(download = true) {
           const labelName = tb.nameId || "";
           const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
           
+          // Check if this textbox is marked as an amount option
+          const fieldType = tb.isAmountOption ? "amount" : "label";
+          
           allFieldsInOrder.push({
-            type: "label",
+            type: fieldType,
             label: labelName,
             nodeId: fieldNodeId,
             order: index + 1
@@ -633,35 +636,8 @@ window.exportGuiJson = function(download = true) {
       }
     }
     
-    // Set hidden logic if any hidden nodes are connected to options
-    if (hiddenLogicConfigs.length > 0) {
-      question.hiddenLogic = {
-        enabled: true,
-        configs: hiddenLogicConfigs
-      };
-    } else {
-      question.hiddenLogic = {
-        enabled: false,
-        configs: []
-      };
-    }
-    
-    // Set jump logic if any options lead to end nodes or section jumps
-    if (jumpConditions.length > 0) {
-      question.jump.enabled = true;
-      question.jump.conditions = jumpConditions;
-    }
-    
-    // Set conditionalPDF answer to the option that leads to end (if any)
-    if (endOption) {
-      question.conditionalPDF.answer = endOption;
-    }
-    
-    // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
-    if (exportType === "dropdown") {
-      let imageData = null;
-      
-      // Sort options by their position (X coordinate, then Y coordinate)
+    // Sort options by their position (X coordinate, then Y coordinate) for both checkbox and dropdown
+    if (exportType === "checkbox" || exportType === "dropdown") {
       question.options.sort((a, b) => {
         // Find the option cells to get their positions
         const optionCells = [];
@@ -702,6 +678,35 @@ window.exportGuiJson = function(download = true) {
         }
         return 0;
       });
+    }
+    
+    // Set hidden logic if any hidden nodes are connected to options
+    if (hiddenLogicConfigs.length > 0) {
+      question.hiddenLogic = {
+        enabled: true,
+        configs: hiddenLogicConfigs
+      };
+    } else {
+      question.hiddenLogic = {
+        enabled: false,
+        configs: []
+      };
+    }
+    
+    // Set jump logic if any options lead to end nodes or section jumps
+    if (jumpConditions.length > 0) {
+      question.jump.enabled = true;
+      question.jump.conditions = jumpConditions;
+    }
+    
+    // Set conditionalPDF answer to the option that leads to end (if any)
+    if (endOption) {
+      question.conditionalPDF.answer = endOption;
+    }
+    
+    // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
+    if (exportType === "dropdown") {
+      let imageData = null;
       
       // Convert options to array of strings, and extract image node if present
       question.options = question.options.map(opt => {
@@ -1403,7 +1408,11 @@ window.exportBothJson = function() {
       }
 
       // Custom fields for specific nodes
-      if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+      if (cell._textboxes) {
+        console.log('🔧 [LIBRARY EXPORT DEBUG] Exporting _textboxes for cell', cell.id, ':', cell._textboxes);
+        cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+        console.log('🔧 [LIBRARY EXPORT DEBUG] Exported _textboxes data:', cellData._textboxes);
+      }
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
       if (cell._nameId) cellData._nameId = cell._nameId;
@@ -1485,7 +1494,8 @@ window.exportBothJson = function() {
       sectionPrefs: sectionPrefs,
       groups: getGroupsData(),
       defaultPdfProperties: defaultPdfProps,
-      formName: formName
+      formName: formName,
+      edgeStyle: currentEdgeStyle
     };
 
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
@@ -1644,12 +1654,18 @@ window.saveFlowchart = function() {
   // Get form name
   const formName = document.getElementById('formNameInput')?.value || '';
   data.formName = formName;
+  
+  // Get current edge style
+  data.edgeStyle = currentEdgeStyle;
+  
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
     lastUsed: Date.now()
   })
     .then(()=>{
       alert("Flowchart saved as: " + flowchartName);
+      // Set the library flowchart name for autosave protocol
+      window.currentFlowchartName = flowchartName;
       // Trigger autosave to update the library flowchart name
       if (typeof autosaveFlowchartToLocalStorage === 'function') {
         autosaveFlowchartToLocalStorage();
@@ -1776,12 +1792,17 @@ window.saveAsFlowchart = function() {
   const formName = document.getElementById('formNameInput')?.value || '';
   data.formName = formName;
   
+  // Get current edge style
+  data.edgeStyle = currentEdgeStyle;
+  
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
     lastUsed: Date.now()
   })
     .then(()=>{
       alert("Flowchart saved as: " + flowchartName);
+      // Set the library flowchart name for autosave protocol
+      window.currentFlowchartName = flowchartName;
       // Trigger autosave to update the library flowchart name
       if (typeof autosaveFlowchartToLocalStorage === 'function') {
         autosaveFlowchartToLocalStorage();
@@ -2568,6 +2589,84 @@ window.validateAllNodeIds = function() {
 }
 
 /**
+ * Test function to verify edge style saving and loading functionality
+ * Can be called from console: testEdgeStylePersistence()
+ */
+window.testEdgeStylePersistence = function() {
+  console.log('🧪 [EDGE STYLE TEST] Testing edge style persistence...');
+  
+  // Test 1: Check current edge style
+  console.log('🧪 [EDGE STYLE TEST] Current edge style:', currentEdgeStyle);
+  
+  // Test 2: Create a simple test flowchart with edges
+  if (!window.graph) {
+    console.error('🧪 [EDGE STYLE TEST] ERROR: Graph not available');
+    return;
+  }
+  
+  const parent = window.graph.getDefaultParent();
+  
+  // Clear existing content
+  const existingCells = window.graph.getChildCells(parent, true, true);
+  window.graph.removeCells(existingCells);
+  
+  // Create test nodes
+  const node1 = window.graph.insertVertex(parent, null, 'Test Node 1', 100, 100, 100, 50);
+  const node2 = window.graph.insertVertex(parent, null, 'Test Node 2', 300, 100, 100, 50);
+  
+  // Create test edge
+  const edge = window.graph.insertEdge(parent, null, '', node1, node2);
+  
+  console.log('🧪 [EDGE STYLE TEST] Created test flowchart with edge');
+  console.log('🧪 [EDGE STYLE TEST] Edge style:', edge.style);
+  
+  // Test 3: Export the flowchart and check if edgeStyle is included
+  const exportData = window.exportFlowchartJson(false);
+  const parsedData = JSON.parse(exportData);
+  
+  if (parsedData.edgeStyle) {
+    console.log('✅ [EDGE STYLE TEST] PASS: Edge style is included in export:', parsedData.edgeStyle);
+  } else {
+    console.error('❌ [EDGE STYLE TEST] FAIL: Edge style is missing from export');
+  }
+  
+  // Test 4: Change edge style and test again
+  const originalStyle = currentEdgeStyle;
+  currentEdgeStyle = 'straight';
+  if (typeof updateEdgeStyle === 'function') {
+    updateEdgeStyle();
+  }
+  
+  const exportData2 = window.exportFlowchartJson(false);
+  const parsedData2 = JSON.parse(exportData2);
+  
+  if (parsedData2.edgeStyle === 'straight') {
+    console.log('✅ [EDGE STYLE TEST] PASS: Edge style change is saved:', parsedData2.edgeStyle);
+  } else {
+    console.error('❌ [EDGE STYLE TEST] FAIL: Edge style change not saved');
+  }
+  
+  // Test 5: Load the data back and check if edge style is restored
+  window.loadFlowchartData(parsedData2);
+  
+  setTimeout(() => {
+    if (currentEdgeStyle === 'straight') {
+      console.log('✅ [EDGE STYLE TEST] PASS: Edge style restored correctly:', currentEdgeStyle);
+    } else {
+      console.error('❌ [EDGE STYLE TEST] FAIL: Edge style not restored correctly. Expected: straight, Got:', currentEdgeStyle);
+    }
+    
+    // Restore original style
+    currentEdgeStyle = originalStyle;
+    if (typeof updateEdgeStyle === 'function') {
+      updateEdgeStyle();
+    }
+    
+    console.log('🧪 [EDGE STYLE TEST] Test completed. Original style restored:', currentEdgeStyle);
+  }, 1000);
+}
+
+/**
  * Load a flowchart from JSON data.
  */
 window.loadFlowchartData = function(data, libraryFlowchartName) {
@@ -3003,6 +3102,23 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
     if (formNameInput) {
       formNameInput.value = data.formName;
     }
+  }
+  
+  // Load edge style if present
+  if (data.edgeStyle) {
+    console.log('loadFlowchartData: loading edge style:', data.edgeStyle);
+    currentEdgeStyle = data.edgeStyle;
+    // Update the settings UI if it exists
+    const edgeStyleToggle = document.getElementById('edgeStyleToggle');
+    if (edgeStyleToggle) {
+      edgeStyleToggle.value = data.edgeStyle;
+    }
+    // Apply the edge style to the graph
+    if (typeof updateEdgeStyle === 'function') {
+      updateEdgeStyle();
+    }
+  } else {
+    console.log('loadFlowchartData: no edge style found, using default');
   }
   
   // Propagate PDF properties through the flowchart after all cells and edges are loaded

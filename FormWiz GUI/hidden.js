@@ -157,10 +157,17 @@ function addSectionToGroup(groupId, sectionName = '') {
         }
     });
     
+    // Get currently selected sections to filter them out
+    var selectedSections = getSelectedSections();
+    
     var dropdownOptions = '<option value="">-- Select a section --</option>';
     allSections.forEach(function(section) {
-        var selected = (section === sectionName) ? 'selected' : '';
-        dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+        // Only include sections that are not already selected in other groups
+        // or if this is the section we're pre-selecting
+        if (!selectedSections.has(section) || section === sectionName) {
+            var selected = (section === sectionName) ? 'selected' : '';
+            dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+        }
     });
 
     sectionItem.innerHTML = `
@@ -252,6 +259,31 @@ function updateGroupLabels() {
 /**
  * Handles changes to group section dropdowns
  */
+/**
+ * Gets all currently selected sections across all groups
+ */
+function getSelectedSections() {
+    var selectedSections = new Set();
+    var groupBlocks = document.querySelectorAll('.group-block');
+    
+    groupBlocks.forEach(function(groupBlock) {
+        var groupId = groupBlock.id.replace('groupBlock', '');
+        var groupSectionsDiv = document.getElementById('groupSections' + groupId);
+        
+        if (groupSectionsDiv) {
+            var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+            sectionItems.forEach(function(sectionItem) {
+                var select = sectionItem.querySelector('select');
+                if (select && select.value.trim()) {
+                    selectedSections.add(select.value.trim());
+                }
+            });
+        }
+    });
+    
+    return selectedSections;
+}
+
 function handleGroupSectionChange() {
     // Get the current dropdown that changed
     var changedSelect = event.target;

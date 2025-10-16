@@ -116,17 +116,36 @@ function autoSelectConnectingEdges() {
   if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
 }
 
-// Core Context Menu Functions
-function hideContextMenu() {
+/**
+ * Hide all context menus and submenus
+ * This is the single source of truth for hiding context menus
+ */
+function hideContextMenuMain() {
+  // Hide main context menus
   if (contextMenu) contextMenu.style.display = 'none';
   if (notesContextMenu) notesContextMenu.style.display = 'none';
   if (edgeContextMenu) edgeContextMenu.style.display = 'none';
-  if (edgeStyleSubmenu) edgeStyleSubmenu.style.display = 'none';
+  if (emptySpaceMenu) emptySpaceMenu.style.display = 'none';
+  if (propertiesMenu) propertiesMenu.style.display = 'none';
+  
+  // Hide all submenus
   if (typeSubmenu) typeSubmenu.style.display = 'none';
   if (calcSubmenu) calcSubmenu.style.display = 'none';
   if (optionTypeSubmenu) optionTypeSubmenu.style.display = 'none';
-  if (emptySpaceMenu) emptySpaceMenu.style.display = 'none';
-  if (propertiesMenu) propertiesMenu.style.display = 'none';
+  if (edgeStyleSubmenu) edgeStyleSubmenu.style.display = 'none';
+  
+  // Update UI state
+  if (typeof window.contextMenuVisible !== 'undefined') {
+    window.contextMenuVisible = false;
+  }
+  if (typeof window.contextMenuTarget !== 'undefined') {
+    window.contextMenuTarget = null;
+  }
+}
+
+// Keep the old function name for backward compatibility
+function hideContextMenu() {
+  hideContextMenuMain();
 }
 
 // Context Menu Setup
@@ -230,14 +249,14 @@ function setupContextMenus(graph) {
               if (yesNoNode) yesNoNode.style.display = 'block';
               if (changeType) {
                 changeType.style.display = 'block';
-                changeType.textContent = 'Change Type &raquo;';
+                changeType.textContent = 'Change Type';
               }
             } else if (getNodeType(cell) === 'options') {
               if (yesNoNode) yesNoNode.style.display = 'none';
               if (changeType) {
                 changeType.style.display = 'block';
                 // Change the text to indicate it's for option types
-                changeType.textContent = 'Change Option Type &raquo;';
+                changeType.textContent = 'Change Option Type';
               }
             } else {
               if (yesNoNode) yesNoNode.style.display = 'none';
@@ -1155,12 +1174,14 @@ function setupContextMenuEventListeners(graph) {
       return;
     }
     
+    // Hide menus if clicking outside of them
     if (
       !(contextMenu && contextMenu.contains(e.target)) &&
       !(notesContextMenu && notesContextMenu.contains(e.target)) &&
       !(edgeContextMenu && edgeContextMenu.contains(e.target)) &&
       !(edgeStyleSubmenu && edgeStyleSubmenu.contains(e.target)) &&
       !(typeSubmenu && typeSubmenu.contains(e.target)) &&
+      !(calcSubmenu && calcSubmenu.contains(e.target)) &&
       !(optionTypeSubmenu && optionTypeSubmenu.contains(e.target)) &&
       !e.target.closest('.question-type-dropdown')
     ) {
@@ -1921,6 +1942,7 @@ window.contextMenus = {
 // Also export individual functions for backward compatibility
 Object.assign(window, {
   hideContextMenu,
+  hideContextMenuMain,
   getNodeType,
   isEndNode,
   showPropertiesMenu,

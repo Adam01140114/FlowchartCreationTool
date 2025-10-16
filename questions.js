@@ -223,7 +223,7 @@ function updateSimpleQuestionCell(cell) {
 // Multiple Textboxes Functions
 function renderTextboxes(cell) {
   if (!cell._textboxes) {
-    cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
 
   let html = "";
@@ -231,12 +231,17 @@ function renderTextboxes(cell) {
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph  = tb.placeholder || "Enter value";
+    const isAmountOption = tb.isAmountOption || false;
 
     html += `
-      <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
-        <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" />
+      <div class="textbox-entry" style="margin-bottom:8px;text-align:center; display: flex; align-items: center; gap: 4px;">
+        <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" style="flex: 1;" />
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleTextboxId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
+        <label>
+          <input type="checkbox" ${isAmountOption ? 'checked' : ''} onclick="window.toggleMultipleTextboxAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
       </div>`;
   });
 
@@ -1087,7 +1092,7 @@ function setupQuestionTypeEventListeners() {
           window.selectedCell._questionText = "Enter question text";
         }
         if (!window.selectedCell._textboxes) {
-          window.selectedCell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+          window.selectedCell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
         }
         let st = window.selectedCell.style || "";
         if (!st.includes("pointerEvents=")) {
@@ -1196,10 +1201,10 @@ window.addMultipleTextboxHandler = function(cellId) {
       // If there's a location indicator, add the new option after it
       if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
         // Location is at the end, just add normally
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value" });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
       } else {
         // Add the new option
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value" });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
         
         // If there's a location indicator before the end, shift it down
         if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
@@ -1263,6 +1268,39 @@ window.removeMultipleTextboxLocationHandler = function(cellId) {
       getGraph().getModel().endUpdate();
     }
     updateMultipleTextboxesCell(cell);
+  }
+};
+
+// Toggle amount option for multiple textboxes
+window.toggleMultipleTextboxAmount = function(cellId, index, checked) {
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] toggleMultipleTextboxAmount called');
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] cellId:', cellId);
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] index:', index);
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] checked:', checked);
+  
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleTextboxes" && cell._textboxes) {
+    console.log('🔧 [TEXTBOX AMOUNT DEBUG] Cell found, updating _textboxes');
+    console.log('🔧 [TEXTBOX AMOUNT DEBUG] Current _textboxes:', cell._textboxes);
+    
+    getGraph().getModel().beginUpdate();
+    try {
+      cell._textboxes[index].isAmountOption = checked;
+      console.log('🔧 [TEXTBOX AMOUNT DEBUG] Updated _textboxes:', cell._textboxes);
+    } finally {
+      getGraph().getModel().endUpdate();
+    }
+    updateMultipleTextboxesCell(cell);
+    
+    // Trigger autosave to ensure the change is persisted
+    if (typeof window.requestAutosave === 'function') {
+      console.log('🔧 [TEXTBOX AMOUNT DEBUG] Triggering autosave');
+      window.requestAutosave();
+    } else {
+      console.log('🔧 [TEXTBOX AMOUNT DEBUG] ERROR: requestAutosave function not found!');
+    }
+  } else {
+    console.log('🔧 [TEXTBOX AMOUNT DEBUG] ERROR: Cell not found or invalid type');
   }
 };
 
@@ -1379,6 +1417,11 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
       getGraph().getModel().endUpdate();
     }
     updatemultipleDropdownTypeCell(cell);
+    
+    // Trigger autosave to ensure the change is persisted
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
   }
 };
 
@@ -1689,7 +1732,7 @@ window.pickTypeForCell = function(cellId, val) {
     // Only handle special cases for multi types
     if (val === "multipleTextboxes") {
       c._questionText = "Enter question text";
-      c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
       updateMultipleTextboxesCell(c);
     } else if (val === "multipleDropdownType") {
       c._questionText = "Enter question text";

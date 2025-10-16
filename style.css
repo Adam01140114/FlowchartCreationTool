@@ -779,6 +779,11 @@ body.ctrl-pressed::after {
   display: flex;
 }
 
+/* When display is set to block, use flex for proper centering */
+.settings-menu[style*="display: block"] {
+  display: flex !important;
+}
+
 .settings-menu .settings-container {
   background: #fff;
   border-radius: 8px;
@@ -890,7 +895,7 @@ body.ctrl-pressed::after {
 
 .settings-menu .settings-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
   margin-top: 20px;
   padding-top: 20px;

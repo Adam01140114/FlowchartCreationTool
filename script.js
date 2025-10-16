@@ -1165,52 +1165,95 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       window.setupCalculationNodeEventListeners();
     }
   
-  document.getElementById('placeNotesNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('notesNode');
-    hideContextMenu();
-  });
+  const placeNotesNode = document.getElementById('placeNotesNode');
+  if (placeNotesNode) {
+    placeNotesNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('notesNode');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placeChecklistNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('checklistNode');
-    hideContextMenu();
-  });
+  const placeChecklistNode = document.getElementById('placeChecklistNode');
+  if (placeChecklistNode) {
+    placeChecklistNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('checklistNode');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placeSubtitleNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('subtitle');
-    hideContextMenu();
-  });
+  const placeSubtitleNode = document.getElementById('placeSubtitleNode');
+  if (placeSubtitleNode) {
+    placeSubtitleNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('subtitle');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placeInfoNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('info');
-    hideContextMenu();
-  });
+  const placeInfoNode = document.getElementById('placeInfoNode');
+  if (placeInfoNode) {
+    placeInfoNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('info');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placeImageNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('imageOption');
-    hideContextMenu();
-  });
+  const placeImageNode = document.getElementById('placeImageNode');
+  if (placeImageNode) {
+    placeImageNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('imageOption');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placePdfNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('pdfNode');
-    hideContextMenu();
-  });
+  const placePdfNode = document.getElementById('placePdfNode');
+  if (placePdfNode) {
+    placePdfNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('pdfNode');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placeAmountNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('amountOption');
-    hideContextMenu();
-  });
+  const placeAmountNode = document.getElementById('placeAmountNode');
+  if (placeAmountNode) {
+    placeAmountNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('amountOption');
+      hideContextMenu();
+    });
+  }
   
-  document.getElementById('placeEndNode').addEventListener('click', function() {
-    placeNodeAtClickLocation('end');
-    hideContextMenu();
-  });
+  const placeEndNode = document.getElementById('placeEndNode');
+  if (placeEndNode) {
+    placeEndNode.addEventListener('click', function() {
+      placeNodeAtClickLocation('end');
+      hideContextMenu();
+    });
+  }
   
   // Settings menu event listeners
-  document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsMenu);
-  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-  document.getElementById('cancelSettingsBtn').addEventListener('click', hideSettingsMenu);
-  document.getElementById('resetAllNodeIdsBtn').addEventListener('click', resetAllNodeIds);
-  document.getElementById('resetAllPdfBtn').addEventListener('click', window.resetAllPdfInheritance);
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  if (closeSettingsBtn) {
+    closeSettingsBtn.addEventListener('click', hideSettingsMenu);
+  }
+  
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  if (saveSettingsBtn) {
+    saveSettingsBtn.addEventListener('click', saveSettings);
+  }
+  
+  const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+  if (cancelSettingsBtn) {
+    cancelSettingsBtn.addEventListener('click', hideSettingsMenu);
+  }
+  
+  const resetAllNodeIdsBtn = document.getElementById('resetAllNodeIdsBtn');
+  if (resetAllNodeIdsBtn) {
+    resetAllNodeIdsBtn.addEventListener('click', resetAllNodeIds);
+  }
+  
+  const resetAllPdfBtn = document.getElementById('resetAllPdfBtn');
+  if (resetAllPdfBtn) {
+    resetAllPdfBtn.addEventListener('click', window.resetAllPdfInheritance);
+  }
   
   // Load settings on startup
   function loadSettingsWhenReady() {
@@ -1466,7 +1509,7 @@ function escapeAttr(str) {
 // Helper function to render textboxes for multiple textboxes question
 function renderTextboxes(cell) {
   if (!cell._textboxes) {
-    cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
   
   let html = '';
@@ -1474,11 +1517,16 @@ function renderTextboxes(cell) {
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph = tb.placeholder || "Enter value";
+    const isAmountOption = tb.isAmountOption || false;
     html += 
-      `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
-        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
+      `<div class="textbox-entry" style="margin-bottom:8px; text-align:center; display: flex; align-items: center; gap: 4px;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleTextboxId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
+        <label>
+          <input type="checkbox" ${isAmountOption ? 'checked' : ''} onclick="window.toggleMultipleTextboxAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
       </div>`;
   });
   
@@ -1524,7 +1572,7 @@ function updatemultipleDropdownTypeCell(cell) {
     
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
-        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
+        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">Field:</div>
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
@@ -1677,16 +1725,98 @@ window.deletemultipleDropdownTypeHandler = function(cellId, index) {
 };
 
 window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
+  console.log('🔧 [AMOUNT DEBUG] toggleMultipleDropdownAmount called');
+  console.log('🔧 [AMOUNT DEBUG] cellId:', cellId);
+  console.log('🔧 [AMOUNT DEBUG] index:', index);
+  console.log('🔧 [AMOUNT DEBUG] checked:', checked);
+  
   const cell = graph.getModel().getCell(cellId);
+  console.log('🔧 [AMOUNT DEBUG] cell found:', !!cell);
+  console.log('🔧 [AMOUNT DEBUG] cell:', cell);
+  
+  if (cell) {
+    const questionType = getQuestionType(cell);
+    console.log('🔧 [AMOUNT DEBUG] questionType:', questionType);
+    console.log('🔧 [AMOUNT DEBUG] is multipleDropdownType:', questionType === "multipleDropdownType");
+    console.log('🔧 [AMOUNT DEBUG] has _textboxes:', !!cell._textboxes);
+    console.log('🔧 [AMOUNT DEBUG] _textboxes:', cell._textboxes);
+    
+    if (cell._textboxes && cell._textboxes[index]) {
+      console.log('🔧 [AMOUNT DEBUG] textbox at index', index, ':', cell._textboxes[index]);
+      console.log('🔧 [AMOUNT DEBUG] current isAmountOption:', cell._textboxes[index].isAmountOption);
+    }
+  }
+  
   if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
+    console.log('🔧 [AMOUNT DEBUG] All conditions met, updating data...');
+    
+    graph.getModel().beginUpdate();
+    try {
+      const oldValue = cell._textboxes[index].isAmountOption;
+      cell._textboxes[index].isAmountOption = checked;
+      console.log('🔧 [AMOUNT DEBUG] Updated isAmountOption from', oldValue, 'to', checked);
+      console.log('🔧 [AMOUNT DEBUG] Updated _textboxes:', cell._textboxes);
+    } finally {
+      graph.getModel().endUpdate();
+      console.log('🔧 [AMOUNT DEBUG] Graph model update completed');
+    }
+    
+    console.log('🔧 [AMOUNT DEBUG] Calling updatemultipleDropdownTypeCell...');
+    updatemultipleDropdownTypeCell(cell);
+    console.log('🔧 [AMOUNT DEBUG] updatemultipleDropdownTypeCell completed');
+    
+    // Trigger autosave to ensure the change is persisted
+    console.log('🔧 [AMOUNT DEBUG] Checking for requestAutosave function...');
+    console.log('🔧 [AMOUNT DEBUG] requestAutosave available:', typeof window.requestAutosave === 'function');
+    if (typeof window.requestAutosave === 'function') {
+      console.log('🔧 [AMOUNT DEBUG] Triggering autosave...');
+      window.requestAutosave();
+      console.log('🔧 [AMOUNT DEBUG] Autosave triggered');
+    } else {
+      console.log('🔧 [AMOUNT DEBUG] ERROR: requestAutosave function not available!');
+    }
+  } else {
+    console.log('🔧 [AMOUNT DEBUG] ERROR: Conditions not met for update');
+    console.log('🔧 [AMOUNT DEBUG] cell exists:', !!cell);
+    console.log('🔧 [AMOUNT DEBUG] is multipleDropdownType:', cell ? getQuestionType(cell) === "multipleDropdownType" : false);
+    console.log('🔧 [AMOUNT DEBUG] has _textboxes:', cell ? !!cell._textboxes : false);
+  }
+  
+  console.log('🔧 [AMOUNT DEBUG] toggleMultipleDropdownAmount completed');
+};
+
+// Toggle amount option for multiple textboxes
+window.toggleMultipleTextboxAmount = function(cellId, index, checked) {
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] toggleMultipleTextboxAmount called');
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] cellId:', cellId);
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] index:', index);
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] checked:', checked);
+  
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleTextboxes" && cell._textboxes) {
+    console.log('🔧 [TEXTBOX AMOUNT DEBUG] Cell found, updating _textboxes');
+    console.log('🔧 [TEXTBOX AMOUNT DEBUG] Current _textboxes:', cell._textboxes);
+    
     graph.getModel().beginUpdate();
     try {
       cell._textboxes[index].isAmountOption = checked;
+      console.log('🔧 [TEXTBOX AMOUNT DEBUG] Updated _textboxes:', cell._textboxes);
     } finally {
       graph.getModel().endUpdate();
     }
-    updatemultipleDropdownTypeCell(cell);
+    updateMultipleTextboxesCell(cell);
+    
+    // Trigger autosave to ensure the change is persisted
+    if (typeof window.requestAutosave === 'function') {
+      console.log('🔧 [TEXTBOX AMOUNT DEBUG] Triggering autosave');
+      window.requestAutosave();
+    } else {
+      console.log('🔧 [TEXTBOX AMOUNT DEBUG] ERROR: requestAutosave function not found!');
+    }
+  } else {
+    console.log('🔧 [TEXTBOX AMOUNT DEBUG] ERROR: Cell not found or invalid type');
   }
+  console.log('🔧 [TEXTBOX AMOUNT DEBUG] toggleMultipleTextboxAmount completed');
 };
 
 window.addMultipleDropdownLocationHandler = function(cellId) {
@@ -2165,7 +2295,7 @@ window.handleTitleInputKeydown = function (evt) {
  ******************************************************************/
 function renderTextboxes(cell) {
   if (!cell._textboxes) {
-    cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
 
   let html = "";
@@ -2174,6 +2304,7 @@ function renderTextboxes(cell) {
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph  = tb.placeholder || "Enter value";
+    const isAmountOption = tb.isAmountOption || false;
 
     // Add location indicator before this option if it's at the location index
     if (index === locationIndex) {
@@ -2185,10 +2316,14 @@ function renderTextboxes(cell) {
     }
 
     html += `
-      <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
-        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" />
+      <div class="textbox-entry" style="margin-bottom:8px;text-align:center; display: flex; align-items: center; gap: 4px;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" style="flex: 1;" />
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleTextboxId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
+        <label>
+          <input type="checkbox" ${isAmountOption ? 'checked' : ''} onclick="window.toggleMultipleTextboxAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
       </div>`;
   });
 
@@ -2412,7 +2547,7 @@ window.showReorderModal = function(cellId, questionType) {
     `;
     
     const dragHandle = document.createElement('div');
-    dragHandle.innerHTML = 'â‹®â‹®';
+    dragHandle.innerHTML = 'Field:';
     dragHandle.style.cssText = `
       color: #999;
       font-size: 16px;
@@ -3172,7 +3307,7 @@ window.importFlowchartJsonDirectly = function(jsonString) {
 // Add a UI element to import JSON directly
 document.addEventListener('DOMContentLoaded', function() {
   // Create keyboard navigation help tooltip
-  createKeyboardNavigationHelp();
+  // createKeyboardNavigationHelp(); // Disabled keyboard navigation popup
 });
 
 /**
@@ -3890,7 +4025,7 @@ function updatemultipleDropdownTypeCell(cell) {
     
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
-        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
+        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">Field:</div>
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
@@ -4140,10 +4275,15 @@ function previewForm() {
   // lastAutosaveData and autosaveDataHash moved to config.js module
 
 function autosaveFlowchartToLocalStorage() {
+  console.log('🔧 [AUTOSAVE DEBUG] autosaveFlowchartToLocalStorage called');
   try {
-    if (!graph) return;
+    if (!graph) {
+      console.log('🔧 [AUTOSAVE DEBUG] No graph available, returning');
+      return;
+    }
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
+    console.log('🔧 [AUTOSAVE DEBUG] Found', cells.length, 'cells to process');
     
     // Quick check if data has actually changed
     const currentHash = JSON.stringify({
@@ -4198,7 +4338,11 @@ function autosaveFlowchartToLocalStorage() {
       }
 
       // Custom fields for specific nodes
-      if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+      if (cell._textboxes) {
+        console.log('🔧 [AUTOSAVE DEBUG] Saving _textboxes for cell', cell.id, ':', cell._textboxes);
+        cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+        console.log('🔧 [AUTOSAVE DEBUG] Saved _textboxes data:', cellData._textboxes);
+      }
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
       if (cell._nameId) cellData._nameId = cell._nameId;
@@ -4307,7 +4451,8 @@ function autosaveFlowchartToLocalStorage() {
       groups: groupsArray,
       defaultPdfProperties: defaultPdfProps,
       formName: formName,
-      libraryFlowchartName: libraryFlowchartName
+      libraryFlowchartName: libraryFlowchartName,
+      edgeStyle: currentEdgeStyle
     };
     
     // Cache the data and hash for next comparison
@@ -4350,13 +4495,177 @@ function getAutosaveFlowchartFromLocalStorage() {
 // --- AUTOSAVE HOOKS ---
   // autosaveTimeout, autosaveThrottleDelay, lastAutosaveTime, and autosaveMinInterval moved to config.js module
 
+// Test function to check current cell state
+window.testCellState = function(cellId) {
+  console.log('🔧 [TEST DEBUG] Testing cell state for cellId:', cellId);
+  const cell = graph.getModel().getCell(cellId);
+  if (cell) {
+    console.log('🔧 [TEST DEBUG] Cell found:', cell);
+    console.log('🔧 [TEST DEBUG] Cell _textboxes:', cell._textboxes);
+    if (cell._textboxes && cell._textboxes[0]) {
+      console.log('🔧 [TEST DEBUG] First textbox isAmountOption:', cell._textboxes[0].isAmountOption);
+    }
+  } else {
+    console.log('🔧 [TEST DEBUG] Cell not found!');
+  }
+};
+
+// Test function to manually toggle amount option
+window.testToggleAmount = function(cellId, index, checked) {
+  console.log('🔧 [TEST DEBUG] Manually toggling amount for cellId:', cellId, 'index:', index, 'checked:', checked);
+  if (typeof window.toggleMultipleDropdownAmount === 'function') {
+    window.toggleMultipleDropdownAmount(cellId, index, checked);
+  } else {
+    console.log('🔧 [TEST DEBUG] ERROR: toggleMultipleDropdownAmount function not found!');
+  }
+};
+
+window.testToggleTextboxAmount = function(cellId, index, checked) {
+  console.log('🔧 [TEST DEBUG] Manually toggling textbox amount for cellId:', cellId, 'index:', index, 'checked:', checked);
+  if (typeof window.toggleMultipleTextboxAmount === 'function') {
+    window.toggleMultipleTextboxAmount(cellId, index, checked);
+  } else {
+    console.log('🔧 [TEST DEBUG] ERROR: toggleMultipleTextboxAmount function not found!');
+  }
+};
+
+// Test function to check if functions are available
+window.testFunctionAvailability = function() {
+  console.log('🔧 [FUNCTION TEST] Testing function availability:');
+  console.log('🔧 [FUNCTION TEST] toggleMultipleDropdownAmount:', typeof window.toggleMultipleDropdownAmount);
+  console.log('🔧 [FUNCTION TEST] toggleMultipleTextboxAmount:', typeof window.toggleMultipleTextboxAmount);
+  console.log('🔧 [FUNCTION TEST] requestAutosave:', typeof window.requestAutosave);
+  console.log('🔧 [FUNCTION TEST] updatemultipleDropdownTypeCell:', typeof window.updatemultipleDropdownTypeCell);
+  console.log('🔧 [FUNCTION TEST] updateMultipleTextboxesCell:', typeof window.updateMultipleTextboxesCell);
+  console.log('🔧 [FUNCTION TEST] getQuestionType:', typeof window.getQuestionType);
+};
+
+// Global click handler to debug checkbox clicks
+document.addEventListener('click', function(e) {
+  console.log('🔧 [CLICK DEBUG] Any click detected on:', e.target);
+  console.log('🔧 [CLICK DEBUG] Target type:', e.target.type);
+  console.log('🔧 [CLICK DEBUG] Target tagName:', e.target.tagName);
+  
+  if (e.target.type === 'checkbox') {
+    console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox clicked:', e.target);
+    console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox checked:', e.target.checked);
+    console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox onclick:', e.target.getAttribute('onclick'));
+    
+    if (e.target.closest('.textbox-entry')) {
+      console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox is in textbox-entry');
+      
+      // Try to extract cell ID and index from the onclick attribute
+      const onclick = e.target.getAttribute('onclick');
+      console.log('🔧 [CHECKBOX CLICK DEBUG] onclick attribute:', onclick);
+      
+      if (onclick && onclick.includes('toggleMultipleDropdownAmount')) {
+        console.log('🔧 [CHECKBOX CLICK DEBUG] Found toggleMultipleDropdownAmount in onclick');
+        // Extract cell ID and index using regex
+        const match = onclick.match(/toggleMultipleDropdownAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
+        if (match) {
+          const cellId = match[1];
+          const index = parseInt(match[2]);
+          console.log('🔧 [CHECKBOX CLICK DEBUG] Extracted cellId:', cellId, 'index:', index);
+          
+          // Check current state before toggling
+          console.log('🔧 [CHECKBOX CLICK DEBUG] Checking current state...');
+          window.testCellState(cellId);
+          
+          // Manually call the function
+          console.log('🔧 [CHECKBOX CLICK DEBUG] Manually calling toggleMultipleDropdownAmount...');
+          if (typeof window.toggleMultipleDropdownAmount === 'function') {
+            window.toggleMultipleDropdownAmount(cellId, index, e.target.checked);
+          } else {
+            console.log('🔧 [CHECKBOX CLICK DEBUG] ERROR: toggleMultipleDropdownAmount function not found!');
+          }
+          
+          // Check state after toggling
+          setTimeout(() => {
+            console.log('🔧 [CHECKBOX CLICK DEBUG] Checking state after toggle...');
+            window.testCellState(cellId);
+          }, 100);
+        } else {
+          console.log('🔧 [CHECKBOX CLICK DEBUG] Could not extract cellId and index from onclick');
+        }
+      } else {
+        console.log('🔧 [CHECKBOX CLICK DEBUG] No toggleMultipleDropdownAmount found in onclick');
+      }
+    } else {
+      console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox is NOT in textbox-entry');
+    }
+  }
+});
+
+// Also add a mousedown listener to catch checkbox interactions earlier
+document.addEventListener('mousedown', function(e) {
+  if (e.target.type === 'checkbox') {
+    console.log('🔧 [MOUSEDOWN DEBUG] Checkbox mousedown:', e.target);
+    console.log('🔧 [MOUSEDOWN DEBUG] Checkbox checked before:', e.target.checked);
+  }
+});
+
+// Add a change listener to catch checkbox state changes
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'checkbox') {
+    console.log('🔧 [CHANGE DEBUG] Checkbox changed:', e.target);
+    console.log('🔧 [CHANGE DEBUG] Checkbox checked after:', e.target.checked);
+    console.log('🔧 [CHANGE DEBUG] Checkbox onclick:', e.target.getAttribute('onclick'));
+    
+    // If this is an amount checkbox, manually call the function
+    if (e.target.closest('.textbox-entry')) {
+      const onclick = e.target.getAttribute('onclick');
+      if (onclick && onclick.includes('toggleMultipleDropdownAmount')) {
+        console.log('🔧 [CHANGE DEBUG] Manually executing onclick for dropdown amount checkbox');
+        try {
+          // Extract and call the function manually
+          const match = onclick.match(/toggleMultipleDropdownAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
+          if (match) {
+            const cellId = match[1];
+            const index = parseInt(match[2]);
+            console.log('🔧 [CHANGE DEBUG] Manually calling toggleMultipleDropdownAmount with cellId:', cellId, 'index:', index, 'checked:', e.target.checked);
+            
+            if (typeof window.toggleMultipleDropdownAmount === 'function') {
+              window.toggleMultipleDropdownAmount(cellId, index, e.target.checked);
+            } else {
+              console.log('🔧 [CHANGE DEBUG] ERROR: toggleMultipleDropdownAmount function not found!');
+            }
+          }
+        } catch (error) {
+          console.log('🔧 [CHANGE DEBUG] Error executing onclick:', error);
+        }
+      } else if (onclick && onclick.includes('toggleMultipleTextboxAmount')) {
+        console.log('🔧 [CHANGE DEBUG] Manually executing onclick for textbox amount checkbox');
+        try {
+          // Extract and call the function manually
+          const match = onclick.match(/toggleMultipleTextboxAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
+          if (match) {
+            const cellId = match[1];
+            const index = parseInt(match[2]);
+            console.log('🔧 [CHANGE DEBUG] Manually calling toggleMultipleTextboxAmount with cellId:', cellId, 'index:', index, 'checked:', e.target.checked);
+            
+            if (typeof window.toggleMultipleTextboxAmount === 'function') {
+              window.toggleMultipleTextboxAmount(cellId, index, e.target.checked);
+            } else {
+              console.log('🔧 [CHANGE DEBUG] ERROR: toggleMultipleTextboxAmount function not found!');
+            }
+          }
+        } catch (error) {
+          console.log('🔧 [CHANGE DEBUG] Error executing onclick:', error);
+        }
+      }
+    }
+  }
+});
+
 // Global helper to request a throttled autosave from anywhere (including Groups UI)
 function requestAutosave() {
+  console.log('🔧 [AUTOSAVE REQUEST DEBUG] requestAutosave called');
   try {
     const now = Date.now();
     
     // Prevent too frequent autosaves
     if (now - lastAutosaveTime < autosaveMinInterval) {
+      console.log('🔧 [AUTOSAVE REQUEST DEBUG] Autosave skipped - too frequent');
       return;
     }
     
@@ -5575,23 +5884,7 @@ window.updateAlertNodeField = function(cellId, value) {
  */
   // currentEdgeStyle moved to config.js module
 
-// Show settings menu
-window.showSettingsMenu = function() {
-  const settingsMenu = document.getElementById('settingsMenu');
-  const edgeStyleToggle = document.getElementById('edgeStyleToggle');
-  
-  // Set current value
-  edgeStyleToggle.value = currentEdgeStyle;
-  
-  // Show menu
-  settingsMenu.classList.add('show');
-};
-
-// Hide settings menu
-function hideSettingsMenu() {
-  const settingsMenu = document.getElementById('settingsMenu');
-  settingsMenu.classList.remove('show');
-}
+// Settings menu functions are now handled by ui.js module
 
 // Save settings
 function saveSettings() {

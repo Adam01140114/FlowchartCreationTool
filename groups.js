@@ -104,10 +104,17 @@ function addSectionToGroup(groupId, sectionName = '') {
     }
   });
   
+  // Get currently selected sections to filter them out
+  const selectedSections = getSelectedSections();
+  
   let dropdownOptions = '<option value="">-- Select a section --</option>';
   allSections.forEach(section => {
-    const selected = (section === sectionName) ? 'selected' : '';
-    dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+    // Only include sections that are not already selected in other groups
+    // or if this is the section we're pre-selecting
+    if (!selectedSections.has(section) || section === sectionName) {
+      const selected = (section === sectionName) ? 'selected' : '';
+      dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+    }
   });
 
   sectionItem.innerHTML = `
@@ -150,6 +157,9 @@ function removeSectionFromGroup(groupId, sectionNumber) {
     updateGroupSectionNumbers(groupId);
     updateGroupsObject();
     
+    // Refresh all group dropdowns to make removed section available again
+    updateGroupDropdowns();
+    
     const requestAutosave = getRequestAutosave();
     if (requestAutosave) {
       requestAutosave();
@@ -182,11 +192,39 @@ function updateGroupSectionNumbers(groupId) {
 }
 
 /**
+ * Gets all currently selected sections across all groups
+ */
+function getSelectedSections() {
+  const selectedSections = new Set();
+  const groupBlocks = document.querySelectorAll('.group-block');
+  
+  groupBlocks.forEach(groupBlock => {
+    const groupId = groupBlock.id.replace('groupBlock', '');
+    const groupSectionsDiv = document.getElementById('groupSections' + groupId);
+    
+    if (groupSectionsDiv) {
+      const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
+      sectionItems.forEach(sectionItem => {
+        const select = sectionItem.querySelector('select');
+        if (select && select.value.trim()) {
+          selectedSections.add(select.value.trim());
+        }
+      });
+    }
+  });
+  
+  return selectedSections;
+}
+
+/**
  * Handles changes to group section dropdowns
  */
 function handleGroupSectionChange() {
   // Update groups object with current selections
   updateGroupsObject();
+  
+  // Refresh all group dropdowns to update available options
+  updateGroupDropdowns();
   
   const requestAutosave = getRequestAutosave();
   if (requestAutosave) {
@@ -333,7 +371,7 @@ function updateGroupDropdowns() {
         if (select) {
           const currentValue = select.value;
           
-            // Get updated section names
+          // Get updated section names
           const sectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs);
           const allSections = [];
           const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -344,11 +382,18 @@ function updateGroupDropdowns() {
             }
           });
           
+          // Get currently selected sections to filter them out
+          const selectedSections = getSelectedSections();
+          
           // Update dropdown options
           let dropdownOptions = '<option value="">-- Select a section --</option>';
           allSections.forEach(section => {
-            const selected = (section === currentValue) ? 'selected' : '';
-            dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+            // Only include sections that are not already selected in other groups
+            // or if this is the currently selected section for this dropdown
+            if (!selectedSections.has(section) || section === currentValue) {
+              const selected = (section === currentValue) ? 'selected' : '';
+              dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
+            }
           });
           
           select.innerHTML = dropdownOptions;
