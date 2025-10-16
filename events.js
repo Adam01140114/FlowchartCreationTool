@@ -141,23 +141,25 @@ function setupMouseEventListeners(graph) {
   
   // Add global event listeners to prevent graph interference with dropdowns
   document.addEventListener('mousedown', function(e) {
-    // If clicking on a dropdown or form element, prevent graph from handling it
+    // If clicking on a dropdown, form element, or blue selection square, prevent graph from handling it
     if (e.target.closest('.question-type-dropdown') || 
         e.target.closest('select') || 
         e.target.closest('input') || 
         e.target.closest('textarea') ||
-        e.target.closest('[contenteditable="true"]')) {
+        e.target.closest('[contenteditable="true"]') ||
+        e.target.closest('.blue-selection-square')) {
       e.stopPropagation();
     }
   }, true); // Use capture phase to intercept before graph handlers
   
   document.addEventListener('click', function(e) {
-    // If clicking on a dropdown or form element, prevent graph from handling it
+    // If clicking on a dropdown, form element, or blue selection square, prevent graph from handling it
     if (e.target.closest('.question-type-dropdown') || 
         e.target.closest('select') || 
         e.target.closest('input') || 
         e.target.closest('textarea') ||
-        e.target.closest('[contenteditable="true"]')) {
+        e.target.closest('[contenteditable="true"]') ||
+        e.target.closest('.blue-selection-square')) {
       e.stopPropagation();
     }
   }, true); // Use capture phase to intercept before graph handlers
@@ -411,13 +413,14 @@ function setupCustomClickHandlers(graph) {
     
     // Check if the click is on a dropdown or other interactive element
     if (evt && evt.target) {
-      // Don't process clicks on dropdowns, inputs, or other form elements
+      // Don't process clicks on dropdowns, inputs, other form elements, or blue selection squares
       if (evt.target.closest('.question-type-dropdown') || 
           evt.target.closest('select') || 
           evt.target.closest('input') || 
           evt.target.closest('textarea') ||
-          evt.target.closest('[contenteditable="true"]')) {
-        return; // Let the dropdown handle its own events
+          evt.target.closest('[contenteditable="true"]') ||
+          evt.target.closest('.blue-selection-square')) {
+        return; // Let the element handle its own events
       }
     }
     

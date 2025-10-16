@@ -3200,8 +3200,8 @@ function setupPanningAndZooming(graph) {
       
       const scale = graph.view.scale * delta;
       
-      // Limit zoom range
-      if (scale >= 0.1 && scale <= 3.0) {
+      // Limit zoom range - maximum range for better usability
+      if (scale >= 0.01 && scale <= 20.0) {
         // Get mouse position relative to the container
         const rect = container.getBoundingClientRect();
         const mouseX = evt.clientX - rect.left;
