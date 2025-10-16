@@ -973,3 +973,125 @@ body.ctrl-pressed::after {
   text-decoration: none;
   cursor: pointer;
 }
+
+/* Location IDs Popup Styles */
+.location-ids-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 2px solid #17a2b8;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  min-width: 500px;
+  max-width: 600px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.location-ids-header {
+  background: #17a2b8;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location-ids-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.location-ids-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(70vh - 80px); /* Account for header height */
+}
+
+.location-id-item {
+  display: block; /* Changed from flex to block for vertical layout */
+  padding: 16px 20px; /* Increased padding for more space */
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+  margin: 0 -4px; /* Extend slightly beyond padding for better hover effect */
+  min-height: 60px; /* Increased minimum height for vertical layout */
+  width: 100%; /* Ensure full width */
+}
+
+.location-id-item:last-child {
+  border-bottom: none;
+}
+
+.location-id-item:hover {
+  background-color: #f8f9fa;
+}
+
+.location-id-item.copied {
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+  padding-left: 8px;
+}
+
+.location-id-text {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #333 !important;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: visible; /* Show all text */
+  text-overflow: clip; /* Don't show ellipsis */
+  display: block; /* Changed to block for vertical layout */
+  padding: 4px 0; /* Add vertical padding */
+  margin-bottom: 8px; /* Add space below text */
+}
+
+.copy-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px; /* Increased padding */
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  flex-shrink: 0; /* Prevent button from shrinking */
+  min-width: 60px; /* Ensure minimum button width */
+}
+
+.copy-btn:hover {
+  background-color: #0056b3;
+}
+
+.copy-btn.copied {
+  background-color: #28a745;
+}
+
+.copy-btn.copied::after {
+  content: " ✓";
+}

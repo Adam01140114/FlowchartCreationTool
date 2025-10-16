@@ -7,7 +7,7 @@
   // Colors moved to config.js module
 
 // TEST: Script.js is loading!
-console.log('🚀 SCRIPT.JS IS LOADING!');
+// Script loading
 
 
 /**************************************************
@@ -123,6 +123,14 @@ document.addEventListener("DOMContentLoaded", function() {
   const edgeContextMenu = document.getElementById("edgeContextMenu");
   const edgeStyleSubmenu = document.getElementById("edgeStyleSubmenu");
   const deleteNodeButton = document.getElementById("deleteNode");
+  
+  // Add event listener for location IDs popup close button
+  const closeLocationIdsPopupBtn = document.getElementById("closeLocationIdsPopup");
+  if (closeLocationIdsPopupBtn) {
+    closeLocationIdsPopupBtn.addEventListener("click", function() {
+      window.closeLocationIdsPopup();
+    });
+  }
   const jumpNodeButton = document.getElementById("jumpNode");
   const changeTypeButton = document.getElementById("changeType");
   const propertiesButton = document.getElementById("propertiesButton");
@@ -1567,6 +1575,7 @@ function updatemultipleDropdownTypeCell(cell) {
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
           <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+          <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
     
@@ -1589,6 +1598,7 @@ function updatemultipleDropdownTypeCell(cell) {
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
         <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
   
@@ -2312,6 +2322,7 @@ function renderTextboxes(cell) {
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
           <button onclick="window.removeMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+          <button onclick="window.showLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
 
@@ -2333,6 +2344,7 @@ function renderTextboxes(cell) {
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
         <button onclick="window.removeMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        <button onclick="window.showLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
 
@@ -2345,6 +2357,199 @@ function renderTextboxes(cell) {
 
   return html;
 }
+
+// Location IDs Popup Functions
+window.showLocationIdsPopup = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  
+  // Get the question text and convert it to a valid prefix
+  const questionText = cell._questionText || 'enter_info';
+  const prefix = questionText.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .trim();
+  
+  // Generate dynamic entries based on the prefix
+  const locationIds = [
+    `${prefix}_street`,
+    `${prefix}_city`,
+    `${prefix}_state`,
+    `${prefix}_state_short`,
+    `${prefix}_zip`
+  ];
+  
+  // Update the popup content
+  const popup = document.getElementById('locationIdsPopup');
+  if (popup) {
+    // Add a class to identify this popup
+    popup.classList.add('popup');
+    const content = popup.querySelector('.location-ids-content');
+    if (content) {
+      content.innerHTML = '';
+      locationIds.forEach(locationId => {
+        const item = document.createElement('div');
+        item.className = 'location-id-item';
+        item.setAttribute('data-id', locationId);
+        item.innerHTML = `
+          <span class="location-id-text">${locationId}</span>
+          <br><br>
+          <button class="copy-btn" onclick="copyLocationId('${locationId}')">Copy</button>
+        `;
+        content.appendChild(item);
+      });
+    }
+    
+    popup.style.display = 'block';
+    
+    // Add click outside to close functionality
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the popup and not on any other popup/modal
+      if (!popup.contains(event.target) && 
+          !event.target.closest('.context-menu') &&
+          !event.target.closest('.modal') &&
+          !event.target.closest('.popup')) {
+        popup.style.display = 'none';
+        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener('mousedown', handleClickOutside);
+      }
+    };
+    
+    // Add both click and mousedown listeners for better coverage
+    // Add the event listeners after a short delay to prevent immediate closing
+    setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+  }
+};
+
+window.copyLocationId = function(locationId) {
+  // Copy the location ID to clipboard
+  navigator.clipboard.writeText(locationId).then(() => {
+    // Remove any existing copied indicators
+    const allItems = document.querySelectorAll('.location-id-item');
+    allItems.forEach(item => {
+      item.classList.remove('copied');
+      const btn = item.querySelector('.copy-btn');
+      if (btn) {
+        btn.classList.remove('copied');
+        btn.textContent = 'Copy';
+      }
+    });
+    
+    // Add copied indicator to the clicked item
+    const clickedItem = document.querySelector(`[data-id="${locationId}"]`);
+    if (clickedItem) {
+      clickedItem.classList.add('copied');
+      const btn = clickedItem.querySelector('.copy-btn');
+      if (btn) {
+        btn.classList.add('copied');
+        btn.textContent = 'Copied!';
+      }
+    }
+    
+    // Remove the copied indicator after 2 seconds
+    setTimeout(() => {
+      if (clickedItem) {
+        clickedItem.classList.remove('copied');
+        const btn = clickedItem.querySelector('.copy-btn');
+        if (btn) {
+          btn.classList.remove('copied');
+          btn.textContent = 'Copy';
+        }
+      }
+    }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy location ID:', err);
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = locationId;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  });
+};
+
+// Close popup function
+window.closeLocationIdsPopup = function() {
+  const popup = document.getElementById('locationIdsPopup');
+  if (popup) {
+    popup.style.display = 'none';
+  }
+};
+
+// Dropdown Location IDs Popup Functions
+window.showDropdownLocationIdsPopup = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  
+  const twoNums = cell._twoNumbers || { first: '0', second: '0' };
+  const firstNum = parseInt(twoNums.first) || 1;
+  const secondNum = parseInt(twoNums.second) || 1;
+  
+  // Get the question text and convert it to a valid prefix
+  const questionText = cell._questionText || 'how_many';
+  const prefix = questionText.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .trim();
+  
+  // Generate dynamic entries based on range
+  const locationIds = [];
+  const locationFields = ['street', 'city', 'state', 'state_short', 'zip'];
+  
+  for (let i = firstNum; i <= secondNum; i++) {
+    locationFields.forEach(field => {
+      locationIds.push(`${prefix}_${field}_${i}`);
+    });
+  }
+  
+  // Update the popup content
+  const popup = document.getElementById('locationIdsPopup');
+  if (popup) {
+    // Add a class to identify this popup
+    popup.classList.add('popup');
+    const content = popup.querySelector('.location-ids-content');
+    if (content) {
+      content.innerHTML = '';
+      locationIds.forEach(locationId => {
+        const item = document.createElement('div');
+        item.className = 'location-id-item';
+        item.setAttribute('data-id', locationId);
+        item.innerHTML = `
+          <span class="location-id-text">${locationId}</span>
+          <br><br>
+          <button class="copy-btn" onclick="copyLocationId('${locationId}')">Copy</button>
+        `;
+        content.appendChild(item);
+      });
+    }
+    
+    popup.style.display = 'block';
+    
+    // Add click outside to close functionality
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the popup and not on any other popup/modal
+      if (!popup.contains(event.target) && 
+          !event.target.closest('.context-menu') &&
+          !event.target.closest('.modal') &&
+          !event.target.closest('.popup')) {
+        popup.style.display = 'none';
+        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener('mousedown', handleClickOutside);
+      }
+    };
+    
+    // Add both click and mousedown listeners for better coverage
+    // Add the event listeners after a short delay to prevent immediate closing
+    setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+  }
+};
 
 // Copy ID function for multiple textboxes
 window.copyMultipleTextboxId = function(cellId, index) {
@@ -2779,6 +2984,7 @@ function updatemultipleDropdownTypeCell(cell) {
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
           <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+          <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
 
@@ -2800,6 +3006,7 @@ function updatemultipleDropdownTypeCell(cell) {
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
         <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
 
@@ -4020,6 +4227,7 @@ function updatemultipleDropdownTypeCell(cell) {
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
           <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+          <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
     
@@ -4042,6 +4250,7 @@ function updatemultipleDropdownTypeCell(cell) {
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
         <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
   
@@ -4128,194 +4337,107 @@ document.addEventListener("DOMContentLoaded", function() {
   }, true); // Use capture phase
 
   // Experimental feature: Right-click drag detection for "square initiated" alert
-  console.log('🔧 [SQUARE DEBUG] Setting up right-click drag detection');
-  console.log('🔧 [SQUARE DEBUG] Container element:', container);
-  console.log('🔧 [SQUARE DEBUG] Container ID:', container ? container.id : 'NOT FOUND');
+  // Setting up right-click drag detection
   
   let rightClickDragging = false;
   let rightClickStartPos = null;
   
-  console.log('🔧 [SQUARE DEBUG] Adding mousedown event listener with capture');
   container.addEventListener("mousedown", function(e) {
-    console.log('🔧 [SQUARE DEBUG] mousedown event detected');
-    console.log('🔧 [SQUARE DEBUG] Mouse button:', e.button);
-    console.log('🔧 [SQUARE DEBUG] Target element:', e.target);
-    console.log('🔧 [SQUARE DEBUG] Target tagName:', e.target.tagName);
-    console.log('🔧 [SQUARE DEBUG] Target ID:', e.target.id);
-    console.log('🔧 [SQUARE DEBUG] Target classList:', e.target.classList);
-    
     // Check if it's a right-click (button 2)
     if (e.button === 2) {
-      console.log('🔧 [SQUARE DEBUG] Right-click detected! Starting drag detection');
       rightClickDragging = true;
       rightClickStartPos = { x: e.clientX, y: e.clientY };
-      console.log('🔧 [SQUARE DEBUG] Start position:', rightClickStartPos);
-    } else {
-      console.log('🔧 [SQUARE DEBUG] Not a right-click, ignoring');
     }
   }, true); // Use capture phase to intercept events before other handlers
   
-  console.log('🔧 [SQUARE DEBUG] Adding mousemove event listener');
   container.addEventListener("mousemove", function(e) {
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] Right-click dragging detected, checking distance');
-      console.log('🔧 [SQUARE DEBUG] Current position:', { x: e.clientX, y: e.clientY });
-      console.log('🔧 [SQUARE DEBUG] Start position:', rightClickStartPos);
-      
       // Check if mouse has moved a significant distance (threshold of 10 pixels)
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
       
-      console.log('🔧 [SQUARE DEBUG] Distance moved:', distance);
-      
       if (distance > 10) {
-        console.log('🔧 [SQUARE DEBUG] Distance threshold exceeded! Square initiated');
-        console.log('🔧 [SQUARE DEBUG] Distance moved:', distance);
+        // Distance threshold exceeded - square creation initiated
         // Don't reset state yet - we need to track until mouseup to determine final size
-      } else {
-        console.log('🔧 [SQUARE DEBUG] Distance not enough, continuing to track');
       }
     }
   });
   
-  console.log('🔧 [SQUARE DEBUG] Adding mouseup event listener');
   container.addEventListener("mouseup", function(e) {
-    console.log('🔧 [SQUARE DEBUG] mouseup event detected');
-    console.log('🔧 [SQUARE DEBUG] Mouse button:', e.button);
     if (e.button === 2) {
-      console.log('🔧 [SQUARE DEBUG] Right-click released, resetting state');
       rightClickDragging = false;
       rightClickStartPos = null;
     }
   });
   
   // Also handle mouse leave to reset state (but be less aggressive)
-  console.log('🔧 [SQUARE DEBUG] Adding mouseleave event listener');
   container.addEventListener("mouseleave", function(e) {
-    console.log('🔧 [SQUARE DEBUG] Mouse left container, but NOT resetting state to allow drag completion');
     // Don't reset state immediately - let the timeout or mouseup handle it
-    // rightClickDragging = false;
-    // rightClickStartPos = null;
   });
   
-  console.log('🔧 [SQUARE DEBUG] All event listeners added successfully');
+  // All event listeners added successfully
   
-  // Add a global document-level backup listener
-  console.log('🔧 [SQUARE DEBUG] Adding global document mousedown listener as backup');
-  // Global mousedown listener removed - using double right-click detection instead
-  console.log('🔧 [SQUARE DEBUG] Global mousedown listener removed - using double right-click detection');
-  
-  console.log('🔧 [SQUARE DEBUG] Adding global document mousemove listener as backup');
   document.addEventListener("mousemove", function(e) {
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] GLOBAL Right-click dragging detected, checking distance');
-      console.log('🔧 [SQUARE DEBUG] GLOBAL Current position:', { x: e.clientX, y: e.clientY });
-      console.log('🔧 [SQUARE DEBUG] GLOBAL Start position:', rightClickStartPos);
-      
       // Check if mouse has moved a significant distance (threshold of 10 pixels)
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
       
-      console.log('🔧 [SQUARE DEBUG] GLOBAL Distance moved:', distance);
-      
       if (distance > 10) {
-        console.log('🔧 [SQUARE DEBUG] GLOBAL Distance threshold exceeded! Square initiated');
-        console.log('🔧 [SQUARE DEBUG] GLOBAL Distance moved:', distance);
+        // Distance threshold exceeded - square creation initiated
         // Don't reset state yet - we need to track until mouseup to determine final size
-      } else {
-        console.log('🔧 [SQUARE DEBUG] GLOBAL Distance not enough, continuing to track');
       }
     }
   }, true);
   
-  console.log('🔧 [SQUARE DEBUG] Adding global document mouseup listener as backup');
   document.addEventListener("mouseup", function(e) {
-    console.log('🔧 [SQUARE DEBUG] GLOBAL mouseup event detected');
-    console.log('🔧 [SQUARE DEBUG] GLOBAL Mouse button:', e.button);
     if (e.button === 2) {
-      console.log('🔧 [SQUARE DEBUG] GLOBAL Right-click released, resetting state');
       rightClickDragging = false;
       rightClickStartPos = null;
     }
   }, true);
   
-  console.log('🔧 [SQUARE DEBUG] All global backup listeners added successfully');
+  // All global backup listeners added successfully
   
   // Add window-level listeners as ultimate backup
-  console.log('🔧 [SQUARE DEBUG] Adding window-level listeners as ultimate backup');
   window.addEventListener("mousedown", function(e) {
-    console.log('🔧 [SQUARE DEBUG] WINDOW mousedown event detected');
-    console.log('🔧 [SQUARE DEBUG] WINDOW Mouse button:', e.button);
-    console.log('🔧 [SQUARE DEBUG] WINDOW Target element:', e.target);
-    console.log('🔧 [SQUARE DEBUG] WINDOW Target tagName:', e.target.tagName);
-    console.log('🔧 [SQUARE DEBUG] WINDOW Target ID:', e.target.id);
-    console.log('🔧 [SQUARE DEBUG] WINDOW Is inside container:', container.contains(e.target));
-    console.log('🔧 [SQUARE DEBUG] WINDOW Event defaultPrevented:', e.defaultPrevented);
-    console.log('🔧 [SQUARE DEBUG] WINDOW Event stopPropagation called:', e.cancelBubble);
-    
     // Only process if it's inside our container and a right-click
     if (container.contains(e.target) && e.button === 2) {
-      console.log('🔧 [SQUARE DEBUG] WINDOW Right-click in container detected! Starting drag detection');
       rightClickDragging = true;
       rightClickStartPos = { x: e.clientX, y: e.clientY };
-      console.log('🔧 [SQUARE DEBUG] WINDOW Start position:', rightClickStartPos);
     }
   }, true);
   
   window.addEventListener("mousemove", function(e) {
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] WINDOW Right-click dragging detected, checking distance');
-      console.log('🔧 [SQUARE DEBUG] WINDOW Current position:', { x: e.clientX, y: e.clientY });
-      console.log('🔧 [SQUARE DEBUG] WINDOW Start position:', rightClickStartPos);
-      
       // Check if mouse has moved a significant distance (threshold of 10 pixels)
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
       
-      console.log('🔧 [SQUARE DEBUG] WINDOW Distance moved:', distance);
-      
       if (distance > 10) {
-        console.log('🔧 [SQUARE DEBUG] WINDOW Distance threshold exceeded! Square initiated');
-        console.log('🔧 [SQUARE DEBUG] WINDOW Distance moved:', distance);
+        // Distance threshold exceeded - square creation initiated
         // Don't reset state yet - we need to track until mouseup to determine final size
-      } else {
-        console.log('🔧 [SQUARE DEBUG] WINDOW Distance not enough, continuing to track');
       }
     }
   }, true);
   
   window.addEventListener("mouseup", function(e) {
-    console.log('🔧 [SQUARE DEBUG] WINDOW mouseup event detected');
-    console.log('🔧 [SQUARE DEBUG] WINDOW Mouse button:', e.button);
     if (e.button === 2) {
-      console.log('🔧 [SQUARE DEBUG] WINDOW Right-click released, resetting state');
       rightClickDragging = false;
       rightClickStartPos = null;
     }
   }, true);
   
-  console.log('🔧 [SQUARE DEBUG] All window-level listeners added successfully');
+  // All window-level listeners added successfully
+  // Test listeners removed
   
-  // Also add a simple test to see if ANY mouse events are working
-  console.log('🔧 [SQUARE DEBUG] Adding simple test listener for ANY mouse event');
-  document.addEventListener("click", function(e) {
-    console.log('🔧 [SQUARE DEBUG] TEST: Any click detected on:', e.target);
-  });
-  
-  document.addEventListener("mousedown", function(e) {
-    console.log('🔧 [SQUARE DEBUG] TEST: Any mousedown detected on:', e.target, 'button:', e.button);
-  });
-  
-  console.log('🔧 [SQUARE DEBUG] Test listeners added - try clicking anywhere to see if basic mouse events work');
-  
-  // Add the most basic possible test - direct inline event handler
-  console.log('🔧 [SQUARE DEBUG] Adding inline onclick test to container');
+  // Test listeners added
   container.onclick = function(e) {
     console.log('🔧 [SQUARE DEBUG] INLINE ONCLICK: Click detected!', e.target);
   };
