@@ -4099,34 +4099,11 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Handle left-clicks (button 0) on the canvas or nodes to end square creation
     if (e.button === 0 && container.contains(e.target)) {
-      console.log('🔧 [CANVAS DEBUG] Left-click detected on canvas or node - ending square creation');
-      console.log('🔧 [CANVAS DEBUG] Click target:', e.target);
-      console.log('🔧 [CANVAS DEBUG] Is canvas click:', e.target === container);
-      console.log('🔧 [CANVAS DEBUG] Is node click:', e.target.tagName === 'g' || e.target.closest('g'));
-      
-      // Preserve current selection before ending square creation
-      const currentSelection = graph.getSelectionCells();
-      console.log('🔧 [CANVAS DEBUG] Preserving selection of', currentSelection.length, 'nodes before ending square creation');
-      
+      console.log('🔧 [CANVAS DEBUG] Left-click detected on canvas/node - ending square creation');
       // End any ongoing square creation process
       if (typeof resetSquareCreationState === 'function') {
         resetSquareCreationState();
-        console.log('🔧 [CANVAS DEBUG] Square creation ended by left-click on canvas or node');
-        
-        // Prevent the event from propagating to graph handlers to avoid clearing selection
-        e.stopPropagation();
-        e.preventDefault();
-        console.log('🔧 [CANVAS DEBUG] Event propagation stopped to prevent graph from clearing selection');
-        
-        // Restore the selection after ending square creation
-        if (currentSelection.length > 0) {
-          setTimeout(() => {
-            console.log('🔧 [CANVAS DEBUG] Restoring selection of', currentSelection.length, 'nodes after ending square creation');
-            graph.clearSelection();
-            graph.addSelectionCells(currentSelection);
-            console.log('🔧 [CANVAS DEBUG] Selection restored after left-click');
-          }, 10);
-        }
+        console.log('🔧 [CANVAS DEBUG] Square creation ended by left-click on canvas/node');
       }
     }
   }, true); // Use capture phase to intercept before graph handlers
@@ -4141,34 +4118,11 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Check if this is a left-click anywhere in the container (canvas or nodes)
     if (e.button === 0 && container.contains(e.target)) {
-      console.log('🔧 [CANVAS DEBUG] Global: Left-click detected in container - ending square creation');
-      console.log('🔧 [CANVAS DEBUG] Global: Click target:', e.target);
-      console.log('🔧 [CANVAS DEBUG] Global: Is canvas click:', e.target.tagName === 'svg' || e.target === container);
-      console.log('🔧 [CANVAS DEBUG] Global: Is node click:', e.target.tagName === 'g' || e.target.closest('g'));
-      
-      // Preserve current selection before ending square creation
-      const currentSelection = graph.getSelectionCells();
-      console.log('🔧 [CANVAS DEBUG] Global: Preserving selection of', currentSelection.length, 'nodes before ending square creation');
-      
+      console.log('🔧 [CANVAS DEBUG] Global: Left-click detected on canvas/node - ending square creation');
       // End any ongoing square creation process
       if (typeof resetSquareCreationState === 'function') {
         resetSquareCreationState();
-        console.log('🔧 [CANVAS DEBUG] Global: Square creation ended by left-click on canvas or node');
-        
-        // Prevent the event from propagating to graph handlers to avoid clearing selection
-        e.stopPropagation();
-        e.preventDefault();
-        console.log('🔧 [CANVAS DEBUG] Global: Event propagation stopped to prevent graph from clearing selection');
-        
-        // Restore the selection after ending square creation
-        if (currentSelection.length > 0) {
-          setTimeout(() => {
-            console.log('🔧 [CANVAS DEBUG] Global: Restoring selection of', currentSelection.length, 'nodes after ending square creation');
-            graph.clearSelection();
-            graph.addSelectionCells(currentSelection);
-            console.log('🔧 [CANVAS DEBUG] Global: Selection restored after left-click');
-          }, 10);
-        }
+        console.log('🔧 [CANVAS DEBUG] Global: Square creation ended by left-click on canvas/node');
       }
     }
   }, true); // Use capture phase
@@ -4382,20 +4336,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log('🔧 [SQUARE DEBUG] BODY ONMOUSEDOWN: Mouse down detected!', e.target, 'button:', e.button);
   };
   
-  // Test if the issue is with our specific container
-  console.log('🔧 [SQUARE DEBUG] Testing if container is the issue by adding to a different element');
-  const testDiv = document.createElement('div');
-  testDiv.style.cssText = 'position: fixed; top: 10px; left: 10px; width: 100px; height: 100px; background: red; z-index: 9999;';
-  testDiv.textContent = 'TEST';
-  testDiv.onclick = function(e) {
-    console.log('🔧 [SQUARE DEBUG] TEST DIV CLICKED!', e.target);
-  };
-  testDiv.onmousedown = function(e) {
-    console.log('🔧 [SQUARE DEBUG] TEST DIV MOUSE DOWN!', e.target, 'button:', e.button);
-  };
-  document.body.appendChild(testDiv);
-  
-  console.log('🔧 [SQUARE DEBUG] Added red test div in top-left corner - try clicking it');
+  // Test div removed - no longer needed
   console.log('🔧 [SQUARE DEBUG] All inline handlers added successfully');
   
   // Add a more aggressive mousemove detection that works independently
@@ -5038,41 +4979,12 @@ document.addEventListener("DOMContentLoaded", function() {
     createBlueSquare(100, 100, 100, 100);
   };
   
-  // Add a simple test to create a square immediately when the page loads
-  window.testCreateBlueSquareImmediate = function() {
-    console.log('🔧 [SQUARE DEBUG] IMMEDIATE TEST: Creating test square immediately');
-    const testSquare = document.createElement('div');
-    testSquare.id = 'immediateTestSquare';
-    testSquare.style.cssText = `
-      position: fixed;
-      left: 50px;
-      top: 50px;
-      width: 50px;
-      height: 50px;
-      background-color: red;
-      border: 2px solid darkred;
-      z-index: 9999;
-      pointer-events: auto;
-      cursor: pointer;
-    `;
-    testSquare.textContent = 'TEST';
-    testSquare.title = 'Immediate test square - click to remove';
-    testSquare.addEventListener('click', function() {
-      console.log('🔧 [SQUARE DEBUG] IMMEDIATE TEST: Test square clicked, removing');
-      this.remove();
-    });
-    document.body.appendChild(testSquare);
-    console.log('🔧 [SQUARE DEBUG] IMMEDIATE TEST: Test square added to DOM');
-  };
+  // Test square function removed - no longer needed
   
   console.log('🔧 [SQUARE DEBUG] Blue square creation system ready');
   console.log('🔧 [SQUARE DEBUG] Test function available: window.testCreateBlueSquare()');
   
-  // Create an immediate test square to verify basic functionality
-  setTimeout(() => {
-    console.log('🔧 [SQUARE DEBUG] Creating immediate test square in 2 seconds...');
-    window.testCreateBlueSquareImmediate();
-  }, 2000);
+  // Immediate test square creation removed - no longer needed
 
   // ... existing code ...
 });
