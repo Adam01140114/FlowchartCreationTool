@@ -1,6 +1,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow public read access to the forms collection (for available forms)
+    match /forms/{formId} {
+      allow read: if true; // Public read access for available forms
+      allow write: if false; // Only allow writes through Admin Console or server
+    }
+    
+    // Allow authenticated users to read and write their own user data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow access to user's forms subcollection
+      match /forms/{formId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Allow access to user's documents subcollection
+      match /documents/{documentId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Allow access to user's formAnswers subcollection
+      match /formAnswers/{answerId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
     // Allow authenticated users to read and write their own user settings
     match /userSettings/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -8,12 +34,6 @@ service cloud.firestore {
     
     // Allow authenticated users to read and write their own flowcharts
     match /flowcharts/{flowchartId} {
-      allow read, write: if request.auth != null && 
-        (resource == null || resource.data.userId == request.auth.uid);
-    }
-    
-    // Allow authenticated users to read and write their own forms
-    match /forms/{formId} {
       allow read, write: if request.auth != null && 
         (resource == null || resource.data.userId == request.auth.uid);
     }

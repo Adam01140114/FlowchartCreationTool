@@ -2365,10 +2365,22 @@ window.showLocationIdsPopup = function(cellId) {
   
   // Get the question text and convert it to a valid prefix
   const questionText = cell._questionText || 'enter_info';
-  const prefix = questionText.toLowerCase()
+  const sanitizedQuestion = questionText.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .trim();
+  
+  // Check if this question has a PDF property
+  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  
+  // Build the prefix with PDF name if available
+  let prefix;
+  if (sanitizedPdfName) {
+    prefix = `${sanitizedPdfName}_${sanitizedQuestion}`;
+  } else {
+    prefix = sanitizedQuestion;
+  }
   
   // Generate dynamic entries based on the prefix
   const locationIds = [
@@ -2491,10 +2503,22 @@ window.showDropdownLocationIdsPopup = function(cellId) {
   
   // Get the question text and convert it to a valid prefix
   const questionText = cell._questionText || 'how_many';
-  const prefix = questionText.toLowerCase()
+  const sanitizedQuestion = questionText.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .trim();
+  
+  // Check if this question has a PDF property
+  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  
+  // Build the prefix with PDF name if available
+  let prefix;
+  if (sanitizedPdfName) {
+    prefix = `${sanitizedPdfName}_${sanitizedQuestion}`;
+  } else {
+    prefix = sanitizedQuestion;
+  }
   
   // Generate dynamic entries based on range
   const locationIds = [];
@@ -7320,10 +7344,10 @@ function findPdfNameForQuestion(cell) {
   // Use the same logic as getPdfName function in nodes.js for consistency
   const findPdfProperties = (startCell) => {
     // Check if this node has direct PDF properties
-    if (startCell._pdfName || startCell._pdfFilename || startCell._pdfUrl) {
+    if (startCell._pdfName || startCell._pdfFile || startCell._pdfUrl) {
       return {
         nodeId: startCell.id,
-        filename: startCell._pdfUrl || startCell._pdfFilename || startCell._pdfName || "",
+        filename: startCell._pdfFile || startCell._pdfUrl || startCell._pdfName || "",
         pdfUrl: startCell._pdfUrl || "",
         priceId: startCell._priceId || ""
       };
@@ -7362,10 +7386,10 @@ function findPdfNameForQuestion(cell) {
       const sourceCell = edge.source;
       if (sourceCell) {
         // Check if the source node has PDF properties
-        if (sourceCell._pdfName || sourceCell._pdfFilename || sourceCell._pdfUrl) {
+        if (sourceCell._pdfName || sourceCell._pdfFile || sourceCell._pdfUrl) {
           return {
             nodeId: sourceCell.id,
-            filename: sourceCell._pdfUrl || sourceCell._pdfFilename || sourceCell._pdfName || "",
+            filename: sourceCell._pdfFile || sourceCell._pdfUrl || sourceCell._pdfName || "",
             pdfUrl: sourceCell._pdfUrl || "",
             priceId: sourceCell._priceId || ""
           };

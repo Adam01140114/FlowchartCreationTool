@@ -749,10 +749,10 @@ function findPdfNameForQuestion(cell) {
   // Use the same logic as getPdfName function in nodes.js for consistency
   const findPdfProperties = (startCell) => {
     // Check if this node has direct PDF properties
-    if (startCell._pdfName || startCell._pdfFilename || startCell._pdfUrl) {
+    if (startCell._pdfName || startCell._pdfFile || startCell._pdfUrl) {
       return {
         nodeId: startCell.id,
-        filename: startCell._pdfUrl || startCell._pdfFilename || startCell._pdfName || "",
+        filename: startCell._pdfFile || startCell._pdfUrl || startCell._pdfName || "",
         pdfUrl: startCell._pdfUrl || "",
         priceId: startCell._priceId || ""
       };
@@ -791,10 +791,10 @@ function findPdfNameForQuestion(cell) {
       const sourceCell = edge.source;
       if (sourceCell) {
         // Check if the source node has PDF properties
-        if (sourceCell._pdfName || sourceCell._pdfFilename || sourceCell._pdfUrl) {
+        if (sourceCell._pdfName || sourceCell._pdfFile || sourceCell._pdfUrl) {
           return {
             nodeId: sourceCell.id,
-            filename: sourceCell._pdfUrl || sourceCell._pdfFilename || sourceCell._pdfName || "",
+            filename: sourceCell._pdfFile || sourceCell._pdfUrl || sourceCell._pdfName || "",
             pdfUrl: sourceCell._pdfUrl || "",
             priceId: sourceCell._priceId || ""
           };
