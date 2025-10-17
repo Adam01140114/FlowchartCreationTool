@@ -2459,6 +2459,10 @@ window.showLocationIdsPopup = function(cellId) {
     }
     
     popup.style.display = 'block';
+    console.log('🔍 [LOCATION DEBUG] Popup display set to block, current style:', popup.style.display);
+    
+    // Make popup draggable
+    makePopupDraggable(popup);
     
     // Add click outside to close functionality
     const handleClickOutside = (event) => {
@@ -2538,8 +2542,68 @@ window.closeLocationIdsPopup = function() {
   }
 };
 
+// Function to make popup draggable
+function makePopupDraggable(popup) {
+  let isDragging = false;
+  let startX;
+  let startY;
+  let initialX;
+  let initialY;
+
+  const header = popup.querySelector('.location-ids-header');
+  if (!header) return;
+
+  // Remove the initial centering transform and set absolute positioning
+  popup.style.top = '50%';
+  popup.style.left = '50%';
+  popup.style.transform = 'translate(-50%, -50%)';
+
+  header.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  function dragStart(e) {
+    if (e.target.classList.contains('close-btn')) return; // Don't drag when clicking close button
+    
+    isDragging = true;
+    header.style.cursor = 'grabbing';
+    
+    // Get the current position of the popup
+    const rect = popup.getBoundingClientRect();
+    initialX = rect.left;
+    initialY = rect.top;
+    
+    // Get the mouse position relative to the popup
+    startX = e.clientX - initialX;
+    startY = e.clientY - initialY;
+    
+    // Remove the centering transform and set absolute positioning
+    popup.style.top = initialY + 'px';
+    popup.style.left = initialX + 'px';
+    popup.style.transform = 'none';
+  }
+
+  function drag(e) {
+    if (isDragging) {
+      e.preventDefault();
+      
+      const newX = e.clientX - startX;
+      const newY = e.clientY - startY;
+      
+      popup.style.left = newX + 'px';
+      popup.style.top = newY + 'px';
+    }
+  }
+
+  function dragEnd(e) {
+    isDragging = false;
+    header.style.cursor = 'move';
+  }
+}
+
 // Dropdown Location IDs Popup Functions
 window.showDropdownLocationIdsPopup = function(cellId) {
+  const graph = getGraph();
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
   
@@ -2568,7 +2632,7 @@ window.showDropdownLocationIdsPopup = function(cellId) {
   
   // Generate dynamic entries based on range
   const locationIds = [];
-  const locationFields = ['street', 'city', 'state', 'state_short', 'zip'];
+  const locationFields = ['street', 'city', 'state', 'state_short', 'zip', 'address'];
   
   for (let i = firstNum; i <= secondNum; i++) {
     locationFields.forEach(field => {
@@ -2578,10 +2642,13 @@ window.showDropdownLocationIdsPopup = function(cellId) {
   
   // Update the popup content
   const popup = document.getElementById('locationIdsPopup');
+  console.log('🔍 [LOCATION DEBUG] Popup element found:', !!popup);
   if (popup) {
+    console.log('🔍 [LOCATION DEBUG] Popup element details:', popup);
     // Add a class to identify this popup
     popup.classList.add('popup');
     const content = popup.querySelector('.location-ids-content');
+    console.log('🔍 [LOCATION DEBUG] Content element found:', !!content);
     if (content) {
       content.innerHTML = '';
       
@@ -2646,6 +2713,10 @@ window.showDropdownLocationIdsPopup = function(cellId) {
     }
     
     popup.style.display = 'block';
+    console.log('🔍 [LOCATION DEBUG] Popup display set to block, current style:', popup.style.display);
+    
+    // Make popup draggable
+    makePopupDraggable(popup);
     
     // Add click outside to close functionality
     const handleClickOutside = (event) => {

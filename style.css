@@ -981,25 +981,29 @@ body.ctrl-pressed::after {
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  border: 2px solid #17a2b8;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
+  border: 2px solid #b8dcff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
   min-width: 500px;
   max-width: 600px;
   max-height: 70vh;
   display: flex;
   flex-direction: column;
+  cursor: move;
 }
 
 .location-ids-header {
-  background: #17a2b8;
-  color: white;
+  background: linear-gradient(135deg, #b8dcff 0%, #a8d0ff 100%);
+  color: #070665;
   padding: 15px 20px;
-  border-radius: 6px 6px 0 0;
+  border-radius: 10px 10px 0 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 600;
+  font-size: 18px;
+  border-bottom: 1px solid #b8dcff;
 }
 
 .location-ids-header h3 {
@@ -1011,7 +1015,7 @@ body.ctrl-pressed::after {
 .close-btn {
   background: none;
   border: none;
-  color: white;
+  color: #070665;
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -1021,11 +1025,12 @@ body.ctrl-pressed::after {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(7, 6, 101, 0.1);
+  transform: scale(1.1);
 }
 
 .location-ids-content {
@@ -1072,24 +1077,29 @@ body.ctrl-pressed::after {
 }
 
 .copy-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 16px; /* Increased padding */
-  border-radius: 4px;
+  background: linear-gradient(135deg, #b8dcff 0%, #a8d0ff 100%);
+  color: #070665;
+  border: 1px solid #b8dcff;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
-  transition: background-color 0.2s;
-  flex-shrink: 0; /* Prevent button from shrinking */
-  min-width: 60px; /* Ensure minimum button width */
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  min-width: 60px;
 }
 
 .copy-btn:hover {
-  background-color: #0056b3;
+  background: linear-gradient(135deg, #a8d0ff 0%, #98c8ff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(184, 220, 255, 0.3);
 }
 
 .copy-btn.copied {
-  background-color: #28a745;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  transform: scale(1.05);
 }
 
 .copy-btn.copied::after {

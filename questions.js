@@ -2008,6 +2008,34 @@ function createLocationIndicator(cell, parentContainer) {
   const locationText = document.createElement('span');
   locationText.textContent = '📍 Location Date Inserted';
   
+  // Copy Location IDs button
+  const copyLocationIdsBtn = document.createElement('button');
+  copyLocationIdsBtn.textContent = 'Copy ID\'s';
+  copyLocationIdsBtn.style.cssText = `
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    cursor: pointer;
+    margin-left: 4px;
+  `;
+  copyLocationIdsBtn.onclick = () => {
+    console.log('🔍 [LOCATION DEBUG] Copy ID button clicked for cell:', cell.id);
+    if (typeof window.showDropdownLocationIdsPopup === 'function') {
+      console.log('🔍 [LOCATION DEBUG] Calling showDropdownLocationIdsPopup');
+      try {
+        window.showDropdownLocationIdsPopup(cell.id);
+        console.log('🔍 [LOCATION DEBUG] showDropdownLocationIdsPopup called successfully');
+      } catch (error) {
+        console.error('🔍 [LOCATION DEBUG] Error calling showDropdownLocationIdsPopup:', error);
+      }
+    } else {
+      console.log('🔍 [LOCATION DEBUG] showDropdownLocationIdsPopup function not found');
+    }
+  };
+  
   const removeBtn = document.createElement('button');
   removeBtn.textContent = 'Remove';
   removeBtn.style.cssText = `
@@ -2018,6 +2046,7 @@ function createLocationIndicator(cell, parentContainer) {
     border-radius: 3px;
     font-size: 10px;
     cursor: pointer;
+    margin-left: 4px;
   `;
   removeBtn.onclick = () => {
     delete cell._locationIndex;
@@ -2031,6 +2060,7 @@ function createLocationIndicator(cell, parentContainer) {
   
   locationIndicator.appendChild(dragHandle);
   locationIndicator.appendChild(locationText);
+  locationIndicator.appendChild(copyLocationIdsBtn);
   locationIndicator.appendChild(removeBtn);
   
   return locationIndicator;
@@ -2395,6 +2425,39 @@ function createTimeField(time, index, cell, parentContainer) {
     padding: 2px;
   `;
 
+  // Function to generate Time Node ID from time text
+  const generateTimeNodeId = (timeText) => {
+    const sanitizedTimeText = (timeText || '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    return sanitizedTimeText || `time_${index}`;
+  };
+
+  // Function to update Time Node ID and save
+  const updateTimeNodeId = () => {
+    const timeText = timeTextInput.value || '';
+    const generatedTimeId = generateTimeNodeId(timeText);
+    
+    time.timeId = generatedTimeId;
+    timeIdInput.value = generatedTimeId;
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Explicitly set the cell properties
+        graph.getModel().setValue(cell, cell.value);
+        // Also ensure the properties are marked as changed
+        cell._times = cell._times; // Force property update
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+
   // Time Text input
   const timeTextInput = document.createElement('input');
   timeTextInput.type = 'text';
@@ -2408,50 +2471,56 @@ function createTimeField(time, index, cell, parentContainer) {
   `;
   timeTextInput.onblur = () => {
     time.timeText = timeTextInput.value;
-    // Force save the cell properties to the graph model
-    const graph = getGraph();
-    if (graph) {
-      graph.getModel().beginUpdate();
-      try {
-        graph.getModel().setValue(cell, cell.value);
-        cell._times = cell._times;
-      } finally {
-        graph.getModel().endUpdate();
-      }
-    }
+    updateTimeNodeId();
   };
 
-  // Time ID input
+  // Time ID display (non-editable, auto-generated)
   const timeIdInput = document.createElement('input');
   timeIdInput.type = 'text';
-  timeIdInput.placeholder = 'Time ID:';
-  timeIdInput.value = time.timeId || '';
+  timeIdInput.readOnly = true;
   timeIdInput.style.cssText = `
     flex: 1;
     padding: 6px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: pointer;
   `;
-  timeIdInput.onblur = () => {
-    time.timeId = timeIdInput.value;
-    // Force save the cell properties to the graph model
-    const graph = getGraph();
-    if (graph) {
-      graph.getModel().beginUpdate();
-      try {
-        graph.getModel().setValue(cell, cell.value);
-        cell._times = cell._times;
-      } finally {
-        graph.getModel().endUpdate();
-      }
+  
+  // Double-click to copy functionality with visual indicator
+  let copyIndicatorTimeout = null;
+  timeIdInput.ondblclick = () => {
+    // Clear any existing indicator
+    if (copyIndicatorTimeout) {
+      clearTimeout(copyIndicatorTimeout);
     }
+    
+    // Copy to clipboard
+    timeIdInput.select();
+    document.execCommand('copy');
+    
+    // Show visual indicator
+    timeIdInput.style.backgroundColor = '#d4edda';
+    timeIdInput.style.borderColor = '#28a745';
+    timeIdInput.style.color = '#155724';
+    
+    // Hide indicator after 1 second
+    copyIndicatorTimeout = setTimeout(() => {
+      timeIdInput.style.backgroundColor = '#f8f9fa';
+      timeIdInput.style.borderColor = '#ddd';
+      timeIdInput.style.color = '#6c757d';
+    }, 1000);
   };
+  
+  // Initialize Time Node ID
+  updateTimeNodeId();
 
-  // Copy ID button
+  // Copy ID with number button
   const copyBtn = document.createElement('button');
   copyBtn.textContent = 'Copy ID';
   copyBtn.style.cssText = `
-    background: #4CAF50;
+    background: #17a2b8;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -2460,9 +2529,46 @@ function createTimeField(time, index, cell, parentContainer) {
     font-size: 12px;
   `;
   copyBtn.onclick = () => {
-    const timeId = time.timeId || `time_${index}`;
-    navigator.clipboard.writeText(timeId);
-    alert(`Time ID copied: ${timeId}`);
+    const number = prompt('What number for this time entry?');
+    if (number !== null && number.trim() !== '') {
+      const baseTimeId = timeIdInput.value;
+      const numberedTimeId = `${baseTimeId}_${number.trim()}`;
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(numberedTimeId).then(() => {
+        // Show visual indicator on the button
+        const originalBg = copyBtn.style.backgroundColor;
+        const originalText = copyBtn.textContent;
+        
+        copyBtn.style.backgroundColor = '#28a745';
+        copyBtn.textContent = 'Copied!';
+        
+        setTimeout(() => {
+          copyBtn.style.backgroundColor = originalBg;
+          copyBtn.textContent = originalText;
+        }, 1000);
+      }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = numberedTimeId;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        // Show visual indicator
+        const originalBg = copyBtn.style.backgroundColor;
+        const originalText = copyBtn.textContent;
+        
+        copyBtn.style.backgroundColor = '#28a745';
+        copyBtn.textContent = 'Copied!';
+        
+        setTimeout(() => {
+          copyBtn.style.backgroundColor = originalBg;
+          copyBtn.textContent = originalText;
+        }, 1000);
+      });
+    }
   };
 
   // Delete button

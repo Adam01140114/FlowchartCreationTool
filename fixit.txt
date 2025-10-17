@@ -708,3 +708,175 @@ ID GENERATION PRIORITY:
 3. `_pdfName` (PDF Name field) - final fallback for display names
 
 =====================================
+
+INCIDENT: Draggable Popup Teleporting Issue
+DATE: [Current Date]
+ISSUE ID: DRAGGABLE_POPUP_TELEPORT_001
+
+PROBLEM DESCRIPTION:
+===================
+When trying to drag a popup (specifically the Location IDs popup), the popup would "teleport" or jump to an unexpected position when the user started dragging. The popup would move to a location that was offset from where the user's mouse cursor was, making dragging feel broken and unpredictable.
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make the Location IDs popup draggable by clicking and dragging the header
+- Ensure smooth, predictable dragging behavior that follows the mouse cursor
+- Allow users to move the popup to any position on screen
+
+ISSUES ENCOUNTERED:
+==================
+1. TRANSFORM CONFLICTS:
+   - The popup was initially centered using `transform: translate(-50%, -50%)`
+   - When dragging started, we were applying a new transform that conflicted with the original centering
+   - This caused the popup to "teleport" to an unexpected position
+
+2. POSITIONING CALCULATION ERRORS:
+   - The drag logic was trying to calculate positions relative to the original centered position
+   - But the mouse position was relative to the current screen position
+   - This mismatch caused the teleporting behavior
+
+3. INCONSISTENT POSITIONING METHODS:
+   - Initial positioning used `transform: translate(-50%, -50%)`
+   - Dragging used `transform: translate(x, y)` 
+   - These two transform methods conflicted with each other
+
+TECHNICAL DETAILS:
+==================
+- File: script.js
+- Function: `makePopupDraggable(popup)`
+- The popup was initially positioned with CSS: `top: 50%; left: 50%; transform: translate(-50%, -50%)`
+- When dragging started, we were applying: `popup.style.transform = 'translate(${currentX}px, ${currentY}px)'`
+- This created a conflict between the centering transform and the dragging transform
+
+SOLUTION THAT WORKED:
+====================
+1. CLEAN TRANSITION FROM CENTERING TO DRAGGING:
+   ```javascript
+   function dragStart(e) {
+     // Get the current actual position of the popup
+     const rect = popup.getBoundingClientRect();
+     initialX = rect.left;
+     initialY = rect.top;
+     
+     // Get the mouse position relative to the popup
+     startX = e.clientX - initialX;
+     startY = e.clientY - initialY;
+     
+     // Remove the centering transform and set absolute positioning
+     popup.style.top = initialY + 'px';
+     popup.style.left = initialX + 'px';
+     popup.style.transform = 'none';
+   }
+   ```
+
+2. USE ABSOLUTE POSITIONING FOR DRAGGING:
+   ```javascript
+   function drag(e) {
+     if (isDragging) {
+       e.preventDefault();
+       
+       const newX = e.clientX - startX;
+       const newY = e.clientY - startY;
+       
+       popup.style.left = newX + 'px';
+       popup.style.top = newY + 'px';
+     }
+   }
+   ```
+
+3. PROPER INITIAL POSITIONING:
+   ```javascript
+   // Set initial centered position
+   popup.style.top = '50%';
+   popup.style.left = '50%';
+   popup.style.transform = 'translate(-50%, -50%)';
+   ```
+
+CODE CHANGES:
+=============
+1. Modified `makePopupDraggable()` function in script.js:
+   - Added proper initial positioning setup
+   - Fixed `dragStart()` to get actual popup position using `getBoundingClientRect()`
+   - Calculate mouse offset relative to popup position
+   - Remove centering transform and switch to absolute positioning
+   - Use `top` and `left` properties instead of `transform` for dragging
+
+2. Key improvements:
+   - Get actual popup position before dragging starts
+   - Calculate mouse offset relative to popup, not screen
+   - Clean transition from centering transform to absolute positioning
+   - Use consistent positioning method throughout dragging
+
+KEY LEARNINGS:
+==============
+1. Don't mix `transform` and `top/left` positioning methods for draggable elements
+2. Always get the actual element position using `getBoundingClientRect()` before starting drag
+3. Calculate mouse offset relative to the element, not the screen
+4. Make a clean transition from initial positioning to dragging positioning
+5. Use absolute positioning (`top`/`left`) for dragging instead of `transform`
+
+PREVENTION:
+===========
+- When making elements draggable, always get their actual position first
+- Don't mix positioning methods (transform vs top/left)
+- Calculate mouse offset relative to the element being dragged
+- Make a clean transition from initial positioning to dragging positioning
+- Test dragging behavior thoroughly to ensure smooth, predictable movement
+
+RELATED FILES:
+=============
+- script.js (main file with draggable popup logic)
+
+FUTURE REFERENCE:
+================
+When implementing draggable popups:
+1. Set initial position with CSS (centered or fixed position)
+2. In dragStart: Get actual position using `getBoundingClientRect()`
+3. Calculate mouse offset relative to the popup position
+4. Remove initial positioning transform and switch to absolute positioning
+5. Use `top` and `left` properties for dragging, not `transform`
+6. Test dragging behavior to ensure smooth, predictable movement
+
+DRAGGABLE POPUP PATTERN:
+========================
+```javascript
+function makePopupDraggable(popup) {
+  let isDragging = false;
+  let startX, startY, initialX, initialY;
+
+  // Set initial centered position
+  popup.style.top = '50%';
+  popup.style.left = '50%';
+  popup.style.transform = 'translate(-50%, -50%)';
+
+  function dragStart(e) {
+    isDragging = true;
+    
+    // Get actual position
+    const rect = popup.getBoundingClientRect();
+    initialX = rect.left;
+    initialY = rect.top;
+    
+    // Calculate mouse offset
+    startX = e.clientX - initialX;
+    startY = e.clientY - initialY;
+    
+    // Switch to absolute positioning
+    popup.style.top = initialY + 'px';
+    popup.style.left = initialX + 'px';
+    popup.style.transform = 'none';
+  }
+
+  function drag(e) {
+    if (isDragging) {
+      e.preventDefault();
+      const newX = e.clientX - startX;
+      const newY = e.clientY - startY;
+      popup.style.left = newX + 'px';
+      popup.style.top = newY + 'px';
+    }
+  }
+}
+```
+
+=====================================
