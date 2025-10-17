@@ -2397,6 +2397,27 @@ window.showLocationIdsPopup = function(cellId) {
     const content = popup.querySelector('.location-ids-content');
     if (content) {
       content.innerHTML = '';
+      
+      // Add search bar
+      const searchBar = document.createElement('input');
+      searchBar.type = 'text';
+      searchBar.placeholder = 'Search location IDs...';
+      searchBar.className = 'location-id-search';
+      searchBar.style.cssText = `
+        width: calc(100% - 20px);
+        padding: 8px 10px;
+        margin-bottom: 12px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+      `;
+      content.appendChild(searchBar);
+      
+      // Create container for location items
+      const itemsContainer = document.createElement('div');
+      itemsContainer.className = 'location-items-container';
+      
       locationIds.forEach(locationId => {
         const item = document.createElement('div');
         item.className = 'location-id-item';
@@ -2406,7 +2427,34 @@ window.showLocationIdsPopup = function(cellId) {
           <br><br>
           <button class="copy-btn" onclick="copyLocationId('${locationId}')">Copy</button>
         `;
-        content.appendChild(item);
+        itemsContainer.appendChild(item);
+      });
+      
+      content.appendChild(itemsContainer);
+      
+      // Add search functionality
+      searchBar.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const items = itemsContainer.querySelectorAll('.location-id-item');
+        
+        items.forEach(item => {
+          const locationId = item.getAttribute('data-id');
+          
+          // Normalize both the search text and the location ID for comparison
+          // Replace underscores with spaces in location ID for matching
+          const normalizedLocationId = locationId.toLowerCase().replace(/_/g, ' ');
+          const normalizedSearchText = searchText.replace(/_/g, ' ');
+          
+          // Check if either version matches
+          const matchesWithSpaces = normalizedLocationId.includes(normalizedSearchText);
+          const matchesWithUnderscores = locationId.toLowerCase().includes(searchText);
+          
+          if (matchesWithSpaces || matchesWithUnderscores) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
       });
     }
     
@@ -2536,6 +2584,27 @@ window.showDropdownLocationIdsPopup = function(cellId) {
     const content = popup.querySelector('.location-ids-content');
     if (content) {
       content.innerHTML = '';
+      
+      // Add search bar
+      const searchBar = document.createElement('input');
+      searchBar.type = 'text';
+      searchBar.placeholder = 'Search location IDs...';
+      searchBar.className = 'location-id-search';
+      searchBar.style.cssText = `
+        width: calc(100% - 20px);
+        padding: 8px 10px;
+        margin-bottom: 12px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+      `;
+      content.appendChild(searchBar);
+      
+      // Create container for location items
+      const itemsContainer = document.createElement('div');
+      itemsContainer.className = 'location-items-container';
+      
       locationIds.forEach(locationId => {
         const item = document.createElement('div');
         item.className = 'location-id-item';
@@ -2545,7 +2614,34 @@ window.showDropdownLocationIdsPopup = function(cellId) {
           <br><br>
           <button class="copy-btn" onclick="copyLocationId('${locationId}')">Copy</button>
         `;
-        content.appendChild(item);
+        itemsContainer.appendChild(item);
+      });
+      
+      content.appendChild(itemsContainer);
+      
+      // Add search functionality
+      searchBar.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const items = itemsContainer.querySelectorAll('.location-id-item');
+        
+        items.forEach(item => {
+          const locationId = item.getAttribute('data-id');
+          
+          // Normalize both the search text and the location ID for comparison
+          // Replace underscores with spaces in location ID for matching
+          const normalizedLocationId = locationId.toLowerCase().replace(/_/g, ' ');
+          const normalizedSearchText = searchText.replace(/_/g, ' ');
+          
+          // Check if either version matches
+          const matchesWithSpaces = normalizedLocationId.includes(normalizedSearchText);
+          const matchesWithUnderscores = locationId.toLowerCase().includes(searchText);
+          
+          if (matchesWithSpaces || matchesWithUnderscores) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
       });
     }
     
