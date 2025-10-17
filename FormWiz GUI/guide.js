@@ -203,10 +203,10 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
         const stateShortField = document.getElementById(stateShortFieldId);
         
         // Debug: Log what fields we're looking for and what we found
-        console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
-        console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
-        console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
-        console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+        // console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+        // console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+        // console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+        // console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
         
         const street = streetField ? streetField.value.trim() : '';
         const city = cityField ? cityField.value.trim() : '';
@@ -234,7 +234,6 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
             field.addEventListener('input', updateAddress);
             field.addEventListener('change', updateAddress);
         } else {
-            console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
         }
     });
     
@@ -247,14 +246,12 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
 
 // Global function to update all hidden address fields after autofill
 function updateAllHiddenAddressFields() {
-    console.log('🔧 [HIDDEN ADDRESS] Updating all hidden address fields after autofill');
     
     // Find all hidden address textboxes
     const hiddenAddressFields = document.querySelectorAll('input[type="text"][id*="_address_"][style*="display: none"]');
     
     hiddenAddressFields.forEach(addressField => {
         const addressId = addressField.id;
-        console.log('🔧 [HIDDEN ADDRESS] Found hidden address field:', addressId);
         
         // Extract base field name and entry number from ID
         // Handle both numbered (_address_1) and single-entry (_address) patterns
@@ -271,11 +268,9 @@ function updateAllHiddenAddressFields() {
             entryNumber = '1';
             isSingleEntry = true;
         } else {
-            console.log('🔧 [HIDDEN ADDRESS] Could not parse address ID:', addressId);
             return;
         }
         
-        console.log('🔧 [HIDDEN ADDRESS] Extracted baseFieldName:', baseFieldName, 'entryNumber:', entryNumber, 'isSingleEntry:', isSingleEntry);
         
         // Manually update this address field
         const streetFieldId = isSingleEntry ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
@@ -290,12 +285,6 @@ function updateAllHiddenAddressFields() {
             const zipField = document.getElementById(zipFieldId);
             const stateShortField = document.getElementById(stateShortFieldId);
             
-            console.log('🔧 [HIDDEN ADDRESS] Manual update - Looking for fields:');
-            console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
-            console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
-            console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
-            console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
-            console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
             
             const street = streetField ? streetField.value.trim() : '';
             const city = cityField ? cityField.value.trim() : '';
@@ -307,12 +296,10 @@ function updateAllHiddenAddressFields() {
             const fullAddress = addressParts.join(', ');
             
             addressField.value = fullAddress;
-            console.log('🔧 [HIDDEN ADDRESS] Manual update - Updated address for', addressId, ':', fullAddress);
     });
 }
 
 function getFormHTML() {
-	console.log('🔧 [FORM GENERATION DEBUG] getFormHTML() function called');
 	
 	try {
 	// RESET all globals before building
@@ -332,7 +319,6 @@ hiddenLogicConfigs.length = 0;
 linkedFields.length = 0;
 logicScriptBuffer = "";
 
-console.log('🔧 [HIDDEN LOGIC DEBUG] Starting form generation - hiddenLogicConfigs cleared');
 
 // Check if test mode is enabled
 const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
@@ -1177,29 +1163,23 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         // handle Hidden Logic
         const hiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
         const hiddenLogicEnabled = hiddenLogicEnabledEl && hiddenLogicEnabledEl.checked;
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Question', questionId, 'hiddenLogicEnabled:', hiddenLogicEnabled);
         if (hiddenLogicEnabled) {
           // Get all hidden logic configurations
           const configElements = qBlock.querySelectorAll('.hidden-logic-config');
-          console.log('🔧 [HIDDEN LOGIC DEBUG] Found', configElements.length, 'config elements for question', questionId);
           configElements.forEach((configElement, index) => {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Processing config element', index, ':', configElement);
             const hiddenLogicTriggerEl = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`);
             const hiddenLogicTypeEl = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`);
             const hiddenLogicNodeIdEl = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`);
             const hiddenLogicTextboxTextEl = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`);
             
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Found elements - trigger:', !!hiddenLogicTriggerEl, 'type:', !!hiddenLogicTypeEl, 'nodeId:', !!hiddenLogicNodeIdEl);
             
             const hiddenLogicTrigger = hiddenLogicTriggerEl ? hiddenLogicTriggerEl.value : "";
             const hiddenLogicType = hiddenLogicTypeEl ? hiddenLogicTypeEl.value : "";
             const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value : "";
             const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value : "";
             
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Config', index, 'trigger:', hiddenLogicTrigger, 'type:', hiddenLogicType, 'nodeId:', hiddenLogicNodeId);
             
             if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
-              console.log('🔧 [HIDDEN LOGIC DEBUG] Adding config to hiddenLogicConfigs array');
               hiddenLogicConfigs.push({
                 questionId: questionId,
                 questionNameId: ddNm,
@@ -1209,7 +1189,6 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                 textboxText: hiddenLogicTextboxText
               });
             } else {
-              console.log('🔧 [HIDDEN LOGIC DEBUG] Skipping config - missing required fields');
             }
           });
         }
@@ -1374,18 +1353,54 @@ formHTML += `</div><br></div>`;
           unifiedFields.forEach((el) => {
             const fieldType = el.getAttribute('data-type');
             const fieldOrder = parseInt(el.getAttribute('data-order'));
-            const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
-            const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
             
-            
-            if (labelTextEl && nodeIdTextEl) {
-              const fieldData = {
-                type: fieldType,
-                label: labelTextEl.textContent.trim(),
-                nodeId: nodeIdTextEl.textContent.trim(),
-                order: fieldOrder
-              };
-              allFieldsInOrder.push(fieldData);
+            if (fieldType === 'checkbox') {
+              // Handle checkbox fields
+              const fieldNameEl = el.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+              const selectionTypeEl = el.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+              const optionsContainer = el.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
+              
+              if (fieldNameEl) {
+                const checkboxOptions = [];
+                if (optionsContainer) {
+                  const optionElements = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
+                  optionElements.forEach((optionEl, optionIndex) => {
+                    const textEl = optionEl.querySelector('#checkboxText' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                    const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                    
+                    if (textEl && nodeIdEl) {
+                      checkboxOptions.push({
+                        text: textEl.value.trim(),
+                        nodeId: nodeIdEl.value.trim()
+                      });
+                    }
+                  });
+                }
+                
+                const fieldData = {
+                  type: fieldType,
+                  label: fieldNameEl.value.trim(),
+                  nodeId: '', // Checkbox fields don't have a single nodeId, they use option nodeIds
+                  selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                  options: checkboxOptions,
+                  order: fieldOrder
+                };
+                allFieldsInOrder.push(fieldData);
+              }
+            } else {
+              // Handle regular fields (label, amount, date, etc.)
+              const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+              const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+              
+              if (labelTextEl && nodeIdTextEl) {
+                const fieldData = {
+                  type: fieldType,
+                  label: labelTextEl.textContent.trim(),
+                  nodeId: nodeIdTextEl.textContent.trim(),
+                  order: fieldOrder
+                };
+                allFieldsInOrder.push(fieldData);
+              }
             }
           });
           
@@ -1496,17 +1511,14 @@ formHTML += `</div><br></div>`;
           }
         }
       } else if (questionType === "numberedDropdown") {
-        console.log('🔧 [FORM GENERATION DEBUG] Processing numbered dropdown question:', questionId);
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
         const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
         const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
         const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
         const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
         const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
-          console.log('🔧 [FORM GENERATION DEBUG] Numbered dropdown params - ddMin:', ddMin, 'ddMax:', ddMax, 'nodeId:', nodeId);
 
         // gather unified field data from the new unified container
-        console.log('🔧 [FORM GENERATION DEBUG] About to gather unified field data for question:', questionId);
         const unifiedFields = qBlock.querySelectorAll("#unifiedFields" + questionId + " .unified-field");
         const labelVals = [];
         const labelNodeIds = [];
@@ -1588,19 +1600,6 @@ formHTML += `</div><br></div>`;
                 order: parseInt(fieldOrder)
               });
             }
-          } else if (fieldType === 'date') {
-            // Handle date fields
-            const fieldNameEl = field.querySelector('#dateFieldName' + questionId + '_' + fieldOrder);
-            const nodeIdEl = field.querySelector('#dateNodeId' + questionId + '_' + fieldOrder);
-            
-            if (fieldNameEl && nodeIdEl) {
-              allElements.push({
-                type: fieldType,
-                label: fieldNameEl.value.trim(),
-                nodeId: nodeIdEl.value.trim(),
-                order: parseInt(fieldOrder)
-              });
-            }
           } else if (labelTextEl && nodeIdTextEl) {
             const labelText = labelTextEl.textContent.trim();
             const nodeIdText = nodeIdTextEl.textContent.trim();
@@ -1625,7 +1624,6 @@ formHTML += `</div><br></div>`;
         // Sort by data-order attribute (creation order)
         allElements.sort((a, b) => a.order - b.order);
         allFieldsInOrder = allElements;
-        console.log('🔧 [FORM GENERATION DEBUG] Processed unified fields, allFieldsInOrder:', allFieldsInOrder);
         
         }
         
@@ -1638,38 +1636,29 @@ formHTML += `</div><br></div>`;
         // Store unified field data for use in showTextboxLabels function
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
         window.unifiedFieldsMap[questionId] = allFieldsInOrder;
-        console.log('🔧 [FORM GENERATION DEBUG] Stored unified field data, about to continue numbered dropdown processing');
         
         // Add unifiedFieldsMap to the generated HTML
-        console.log('🔧 [FORM GENERATION DEBUG] About to add unifiedFieldsMap to generated HTML');
         if (!window.unifiedFieldsMapDeclared) {
             window.unifiedFieldsMapDeclared = true;
             // This will be added to the HTML output
         }
-        console.log('🔧 [FORM GENERATION DEBUG] Completed unifiedFieldsMap addition, about to continue numbered dropdown processing');
 
         // Then build the dropdown - use nodeId if provided, otherwise fallback to answer + questionId
         const dropdownId = nodeId || "answer" + questionId;
         questionNameIds[questionId] = dropdownId;
-        console.log('🔧 [FORM GENERATION DEBUG] About to build dropdown HTML for question:', questionId, 'dropdownId:', dropdownId);
         formHTML += `<select id="${dropdownId}" name="${dropdownId}" data-question-id="${questionId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value); updateHiddenLogic('${dropdownId}', this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         for (let rnum = ddMin; rnum <= ddMax; rnum++) {
           formHTML += `<option value="${rnum}">${rnum}</option>`;
         }
         formHTML += `</select><br><div id="labelContainer${questionId}"></div>`;
-        console.log('🔧 [FORM GENERATION DEBUG] Completed dropdown HTML building for question:', questionId);
         
         // Handle Hidden Logic for numbered dropdown
-        console.log('🔧 [FORM GENERATION DEBUG] About to check hidden logic for numbered dropdown question:', questionId);
         const numberedHiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
         const numberedHiddenLogicEnabled = numberedHiddenLogicEnabledEl && numberedHiddenLogicEnabledEl.checked;
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown hidden logic enabled:', numberedHiddenLogicEnabled);
         
         if (numberedHiddenLogicEnabled) {
-          console.log('🔧 [HIDDEN LOGIC DEBUG] Processing numbered dropdown hidden logic for question:', questionId);
           const configElements = qBlock.querySelectorAll(`#hiddenLogicConfigs${questionId} .hidden-logic-config`);
-          console.log('🔧 [HIDDEN LOGIC DEBUG] Found', configElements.length, 'numbered dropdown config elements');
           
           configElements.forEach((configElement, index) => {
             const hiddenLogicTriggerEl = configElement.querySelector(`select[id^="hiddenLogicTrigger${questionId}"]`);
@@ -1682,10 +1671,8 @@ formHTML += `</div><br></div>`;
             const hiddenLogicNodeId = hiddenLogicNodeIdEl ? hiddenLogicNodeIdEl.value.trim() : '';
             const hiddenLogicTextboxText = hiddenLogicTextboxTextEl ? hiddenLogicTextboxTextEl.value.trim() : '';
             
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Numbered dropdown config', index, 'trigger:', hiddenLogicTrigger, 'type:', hiddenLogicType, 'nodeId:', hiddenLogicNodeId);
             
             if (hiddenLogicTrigger && hiddenLogicType && hiddenLogicNodeId) {
-              console.log('🔧 [HIDDEN LOGIC DEBUG] Adding numbered dropdown config to hiddenLogicConfigs array');
               hiddenLogicConfigs.push({
                 questionNameId: dropdownId,
                 trigger: hiddenLogicTrigger,
@@ -1694,12 +1681,11 @@ formHTML += `</div><br></div>`;
                 textboxText: hiddenLogicTextboxText
               });
             } else {
-              console.log('🔧 [HIDDEN LOGIC DEBUG] Skipping numbered dropdown config - missing required fields');
             }
           });
         }
         
-        console.log('🔧 [FORM GENERATION DEBUG] Completed numbered dropdown processing for question:', questionId);
+        // console.log('🔧 [FORM GENERATION DEBUG] Completed numbered dropdown processing for question:', questionId);
       }
 
       // end question container
@@ -1739,11 +1725,11 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `      var questionContainer = document.getElementById('question-container-' + cPrevQNum);\n`;
             logicScriptBuffer += `      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes\n`;
             logicScriptBuffer += `      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];\n`;
-            logicScriptBuffer += `      console.log('🔧 [CONDITIONAL DEBUG] Question ` + pqVal + `: Found', cbs.length, 'inputs in container, looking for:', cPrevAns);\n`;
+            logicScriptBuffer += `      // console.log('🔧 [CONDITIONAL DEBUG] Question ` + pqVal + `: Found', cbs.length, 'inputs in container, looking for:', cPrevAns);\n`;
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
-            logicScriptBuffer += `      console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);\n`;
-            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');}\n`;
+            logicScriptBuffer += `      // console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);\n`;
+            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; // console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');}\n`;
             logicScriptBuffer += `    } else {\n`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
@@ -1840,10 +1826,10 @@ formHTML += `</div><br></div>`;
             const triggerOption = triggerOptionEl ? triggerOptionEl.value.trim() : "";
             
             // Debug logging for PDF logic generation
-            console.log('🔧 [PDF LOGIC GENERATION] Question', questionId, 'PDF', pdfIndexNum);
-            console.log('  - PDF Name:', pdfLogicPdfName);
-            console.log('  - Trigger Option Element:', triggerOptionEl);
-            console.log('  - Trigger Option Value:', triggerOption);
+            // console.log('🔧 [PDF LOGIC GENERATION] Question', questionId, 'PDF', pdfIndexNum);
+            // console.log('  - PDF Name:', pdfLogicPdfName);
+            // console.log('  - Trigger Option Element:', triggerOptionEl);
+            // console.log('  - Trigger Option Value:', triggerOption);
             
             // Get number trigger fields for number questions
             let numberTrigger = "";
@@ -2599,7 +2585,7 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+    // console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -2609,7 +2595,7 @@ function removeHiddenCheckbox(radioId) {
     const hiddenCheckbox = document.getElementById(radioId);
     if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
         hiddenCheckbox.remove();
-        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+        // console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
 }
 `;
@@ -2772,7 +2758,7 @@ function deduplicatePdfs(pdfArray) {
       seen.add(key);
       deduplicated.push(pdf);
     } else {
-      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key, 'Original:', pdf.title);
+      // console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key, 'Original:', pdf.title);
     }
   }
   
@@ -2781,7 +2767,7 @@ function deduplicatePdfs(pdfArray) {
 
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  console.log('🛒 [CART DEBUG] showCartModal called');
+  // console.log('🛒 [CART DEBUG] showCartModal called');
   
   // Calculate all PDFs that will be added to cart
   const allPdfsToAdd = [];
@@ -2797,21 +2783,21 @@ window.showCartModal = function () {
   
   // Add conditional PDFs based on current form state
   if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
-    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
+    // console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
     
     for (const pdfLogic of window.pdfLogicPDFs) {
       if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
       
-      console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
-      console.log('🛒 [CART DEBUG] PDF Logic details:', {
-        questionId: pdfLogic.questionId,
-        pdfName: pdfLogic.pdfName,
-        isBigParagraph: pdfLogic.isBigParagraph,
-        conditions: pdfLogic.conditions,
-        triggerOption: pdfLogic.triggerOption,
-        numberTrigger: pdfLogic.numberTrigger,
-        numberValue: pdfLogic.numberValue
-      });
+      // console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+      // console.log('🛒 [CART DEBUG] PDF Logic details:', {
+      //   questionId: pdfLogic.questionId,
+      //   pdfName: pdfLogic.pdfName,
+      //   isBigParagraph: pdfLogic.isBigParagraph,
+      //   conditions: pdfLogic.conditions,
+      //   triggerOption: pdfLogic.triggerOption,
+      //   numberTrigger: pdfLogic.numberTrigger,
+      //   numberValue: pdfLogic.numberValue
+      // });
 
       let matched = false;
       
@@ -2821,72 +2807,72 @@ window.showCartModal = function () {
         const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                    document.getElementById('answer' + pdfLogic.questionId);
         
-        console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
-        console.log('  - Question ID:', pdfLogic.questionId);
-        console.log('  - Element found:', el);
-        console.log('  - Conditions:', pdfLogic.conditions);
+        // console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
+        // console.log('  - Question ID:', pdfLogic.questionId);
+        // console.log('  - Element found:', el);
+        // console.log('  - Conditions:', pdfLogic.conditions);
         
         if (el) {
           const questionValue = el.value || '';
-          console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
+          // console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
           
           // Check each character limit condition
           for (const condition of pdfLogic.conditions) {
             if (condition.characterLimit) {
-              console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
+              // console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
               if (questionValue.length > condition.characterLimit) {
                 matched = true;
-                console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
+                // console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
                 break; // Exit the loop once we find a match
               }
             }
           }
           
           if (!matched) {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
+            // console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
           }
         } else {
-          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
+          // console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
         }
       } else if (pdfLogic.triggerOption) {
         // For numbered dropdown with trigger option, check if the selected value matches the trigger
         const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                    document.getElementById('answer' + pdfLogic.questionId);
         
-        console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
-        console.log('  - Question ID:', pdfLogic.questionId);
-        console.log('  - Trigger Option:', pdfLogic.triggerOption);
-        console.log('  - Element found:', el);
-        console.log('  - Question Name IDs:', window.questionNameIds);
+        // console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+        // console.log('  - Question ID:', pdfLogic.questionId);
+        // console.log('  - Trigger Option:', pdfLogic.triggerOption);
+        // console.log('  - Element found:', el);
+        // console.log('  - Question Name IDs:', window.questionNameIds);
         
         if (el) {
           const val = el.value || '';
-          console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
+          // console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
           
           if (val === pdfLogic.triggerOption) {
             matched = true;
-            console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
+            // console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
           } else {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
+            // console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
           }
         } else {
-          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
+          // console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
         }
       } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
         // For number questions with trigger conditions, check if the number meets the condition
         const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                    document.getElementById('answer' + pdfLogic.questionId);
         
-        console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
-        console.log('  - Question ID:', pdfLogic.questionId);
-        console.log('  - Number Trigger:', pdfLogic.numberTrigger);
-        console.log('  - Number Value:', pdfLogic.numberValue);
-        console.log('  - Element found:', el);
+        // console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
+        // console.log('  - Question ID:', pdfLogic.questionId);
+        // console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+        // console.log('  - Number Value:', pdfLogic.numberValue);
+        // console.log('  - Element found:', el);
         
         if (el) {
           const val = parseFloat(el.value) || 0;
           const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
-          console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+          // console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
           
           let conditionMet = false;
           if (pdfLogic.numberTrigger === '=') {
@@ -2899,12 +2885,12 @@ window.showCartModal = function () {
           
           if (conditionMet) {
             matched = true;
-            console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number trigger:', pdfLogic.pdfDisplayName);
+            // console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number trigger:', pdfLogic.pdfDisplayName);
           } else {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - number condition not met');
+            // console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - number condition not met');
           }
         } else {
-          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
+          // console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
         }
       } else {
         // For regular conditions, check previous question logic
@@ -2917,7 +2903,7 @@ window.showCartModal = function () {
           const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
                      document.getElementById('answer' + prevId);
           if (!el) {
-            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            // console.log('🛒 [CART DEBUG] Element not found for question', prevId);
             continue;
           }
 
@@ -2925,11 +2911,11 @@ window.showCartModal = function () {
           if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
           else                        { val = el.value || ''; }
 
-          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+          // console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
           if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
-            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            // console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
           }
         }
@@ -2950,9 +2936,9 @@ window.showCartModal = function () {
           priceId: pdfLogic.stripePriceId,
           pdfName: pdfLogic.pdfName
         });
-        console.log('🛒 [CART DEBUG] Added PDF logic item to showCartModal:', displayTitle);
+        // console.log('🛒 [CART DEBUG] Added PDF logic item to showCartModal:', displayTitle);
       } else {
-        console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+        // console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
       }
     }
   }
@@ -2960,9 +2946,9 @@ window.showCartModal = function () {
   // Deduplicate PDFs to prevent multiple requests for the same PDF
   const originalCount = allPdfsToAdd.length;
   const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
-  console.log('🛒 [CART DEBUG] Deduplication: Original count:', originalCount, 'After deduplication:', deduplicatedPdfs.length);
+  // console.log('🛒 [CART DEBUG] Deduplication: Original count:', originalCount, 'After deduplication:', deduplicatedPdfs.length);
   
-  console.log('🛒 [CART DEBUG] Total PDFs to add:', deduplicatedPdfs.length, deduplicatedPdfs);
+  // console.log('🛒 [CART DEBUG] Total PDFs to add:', deduplicatedPdfs.length, deduplicatedPdfs);
 
   // Fetch prices for all PDFs
   async function fetchAllPrices() {
@@ -2974,7 +2960,7 @@ window.showCartModal = function () {
           const data = await r.json();
           const price = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : '0.00';
           prices.push(parseFloat(price));
-          console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
+          // console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
         } else {
           prices.push(0);
         }
@@ -2990,7 +2976,7 @@ window.showCartModal = function () {
     const totalPrice = prices.reduce((sum, price) => sum + price, 0);
     const priceDisplay = totalPrice > 0 ? '$' + totalPrice.toFixed(2) : '...';
     
-    console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
+    // console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
     
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
@@ -3018,7 +3004,7 @@ window.showCartModal = function () {
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
     document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
-      console.log('🛒 [CART DEBUG] Add to cart button clicked');
+      // console.log('🛒 [CART DEBUG] Add to cart button clicked');
       window.addFormToCart(mainFormPriceId);
       modal.remove();
     };
@@ -3043,40 +3029,28 @@ function getUrlParam(name) {
 
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
-  console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
+  // console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
   
   // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
   clearCartState();
 
   // 2) Collect form data
-  console.log('🔍 [CART DEBUG] Starting form data collection...');
   
   // First, ensure all dynamic fields are up-to-date
-  console.log('🔍 [CART DEBUG] Updating dynamic fields...');
   if (typeof updateUserFullName === 'function') {
-    console.log('🔍 [CART DEBUG] Calling updateUserFullName()...');
     updateUserFullName();
     
     // Check if user_fullname was updated
     const fullNameField = document.getElementById('user_fullname');
     if (fullNameField) {
-      console.log('🔍 [CART DEBUG] user_fullname field value after updateUserFullName():', fullNameField.value);
-    } else {
-      console.log('🔍 [CART DEBUG] user_fullname field not found in DOM');
     }
-  } else {
-    console.log('🔍 [CART DEBUG] updateUserFullName function not available');
   }
   
   if (typeof updateUserAddressFields === 'function') {
-    console.log('🔍 [CART DEBUG] Calling updateUserAddressFields()...');
     updateUserAddressFields();
-  } else {
-    console.log('🔍 [CART DEBUG] updateUserAddressFields function not available');
   }
   
   const form = document.getElementById('customForm');
-  console.log('🔍 [CART DEBUG] Form element found:', !!form);
   
   const formData = {};
   if (form) {
@@ -3085,28 +3059,15 @@ window.addFormToCart = function (priceId) {
     const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
     const allFormElements = [...formElements, ...externalFormElements];
     
-    console.log('🔍 [CART DEBUG] Form elements found:');
-    console.log('  - Elements inside form:', formElements.length);
-    console.log('  - External elements with form="customForm":', externalFormElements.length);
-    console.log('  - Total elements to process:', allFormElements.length);
-    
-    // Log all elements we're about to process
-    console.log('🔍 [CART DEBUG] All form elements:');
-    allFormElements.forEach((el, index) => {
-      console.log('  ' + (index + 1) + '. ' + el.tagName + ' - id: "' + el.id + '" - name: "' + el.name + '" - type: "' + el.type + '" - value: "' + el.value + '" - disabled: ' + el.disabled);
-    });
     
     for (const el of allFormElements) {
       if (!el.name || el.disabled) {
-        console.log('🔍 [CART DEBUG] Skipping element - id: "' + el.id + '" - name: "' + el.name + '" - disabled: ' + el.disabled);
         continue;
       }
       if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) {
-        console.log('🔍 [CART DEBUG] Skipping non-form element - tagName: "' + el.tagName + '"');
         continue;
       }
       if (['button','submit','reset'].includes(el.type)) {
-        console.log('🔍 [CART DEBUG] Skipping ' + el.type + ' element - id: "' + el.id + '"');
         continue;
       }
       
@@ -3114,9 +3075,6 @@ window.addFormToCart = function (priceId) {
       if (el.type === 'hidden') {
         if (el.value && el.value.trim() !== '') {
           formData[el.name] = el.value;
-          console.log('🔍 [CART DEBUG] Added hidden field - name: "' + el.name + '" - value: "' + el.value + '"');
-        } else {
-          console.log('🔍 [CART DEBUG] Skipping empty hidden field - name: "' + el.name + '" - value: "' + el.value + '"');
         }
         continue;
       }
@@ -3125,9 +3083,6 @@ window.addFormToCart = function (priceId) {
       if (el.type === 'checkbox' || el.type === 'radio') {
         if (el.checked) {
           formData[el.name] = 'on'; // Send 'on' for checked checkboxes (standard HTML form behavior)
-          console.log('🔍 [CART DEBUG] Added checked ' + el.type + ' - name: "' + el.name + '" - value: "on"');
-        } else {
-          console.log('🔍 [CART DEBUG] Skipping unchecked ' + el.type + ' - name: "' + el.name + '"');
         }
         // Skip unchecked checkboxes entirely - don't send them to server
       } else {
@@ -3137,22 +3092,22 @@ window.addFormToCart = function (priceId) {
         if (el.type === 'date' && value) {
           const originalValue = value;
           value = formatDateForServer(value);
-          console.log('🔍 [CART DEBUG] Formatted date - name: "' + el.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
+          // console.log('🔍 [CART DEBUG] Formatted date - name: "' + el.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
         }
         
         formData[el.name] = value;
-        console.log('🔍 [CART DEBUG] Added field - name: "' + el.name + '" - value: "' + value + '"');
+        // console.log('🔍 [CART DEBUG] Added field - name: "' + el.name + '" - value: "' + value + '"');
       }
     }
   }
   
-  console.log('🔍 [CART DEBUG] Final form data collected:');
-  console.log('🔍 [CART DEBUG] Total fields:', Object.keys(formData).length);
+  // console.log('🔍 [CART DEBUG] Final form data collected:');
+  // console.log('🔍 [CART DEBUG] Total fields:', Object.keys(formData).length);
   Object.keys(formData).forEach(key => {
-    console.log('🔍 [CART DEBUG]   ' + key + ': "' + formData[key] + '"');
+    // console.log('🔍 [CART DEBUG]   ' + key + ': "' + formData[key] + '"');
   });
 
-  console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
+  // console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
 
   // 3) Uniform metadata for every cart line
   const originalFormId = (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase();
@@ -3165,28 +3120,28 @@ window.addFormToCart = function (priceId) {
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
   let deduplicatedPdfLogicItems = []; // Declare outside try-catch to ensure it's always defined
-  console.log('🛒 [CART DEBUG] Computing PDF logic items...');
+  // console.log('🛒 [CART DEBUG] Computing PDF logic items...');
   
   try {
     if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
-      console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
+      // console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
       
       for (const pdfLogic of window.pdfLogicPDFs) {
         if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) {
-          console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
+          // console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
           continue;
         }
         
-        console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
-        console.log('🛒 [CART DEBUG] PDF Logic details:', {
-          questionId: pdfLogic.questionId,
-          pdfName: pdfLogic.pdfName,
-          isBigParagraph: pdfLogic.isBigParagraph,
-          conditions: pdfLogic.conditions,
-          triggerOption: pdfLogic.triggerOption,
-          numberTrigger: pdfLogic.numberTrigger,
-          numberValue: pdfLogic.numberValue
-        });
+        // console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+        // console.log('🛒 [CART DEBUG] PDF Logic details:', {
+        //   questionId: pdfLogic.questionId,
+        //   pdfName: pdfLogic.pdfName,
+        //   isBigParagraph: pdfLogic.isBigParagraph,
+        //   conditions: pdfLogic.conditions,
+        //   triggerOption: pdfLogic.triggerOption,
+        //   numberTrigger: pdfLogic.numberTrigger,
+        //   numberValue: pdfLogic.numberValue
+        // });
 
         let matched = false;
         
@@ -3196,72 +3151,72 @@ window.addFormToCart = function (priceId) {
           const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                      document.getElementById('answer' + pdfLogic.questionId);
           
-          console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
-          console.log('  - Question ID:', pdfLogic.questionId);
-          console.log('  - Element found:', el);
-          console.log('  - Conditions:', pdfLogic.conditions);
+          // console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
+          // console.log('  - Question ID:', pdfLogic.questionId);
+          // console.log('  - Element found:', el);
+          // console.log('  - Conditions:', pdfLogic.conditions);
           
           if (el) {
             const questionValue = el.value || '';
-            console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
+            // console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
             
             // Check each character limit condition
             for (const condition of pdfLogic.conditions) {
               if (condition.characterLimit) {
-                console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
+                // console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
                 if (questionValue.length > condition.characterLimit) {
                   matched = true;
-                  console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
+                  // console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
                   break; // Exit the loop once we find a match
                 }
               }
             }
             
             if (!matched) {
-              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
+              // console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
             }
           } else {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
+            // console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
           }
         } else if (pdfLogic.triggerOption) {
           // For numbered dropdown with trigger option, check if the selected value matches the trigger
           const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                      document.getElementById('answer' + pdfLogic.questionId);
           
-          console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
-          console.log('  - Question ID:', pdfLogic.questionId);
-          console.log('  - Trigger Option:', pdfLogic.triggerOption);
-          console.log('  - Element found:', el);
-          console.log('  - Question Name IDs:', window.questionNameIds);
+          // console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+          // console.log('  - Question ID:', pdfLogic.questionId);
+          // console.log('  - Trigger Option:', pdfLogic.triggerOption);
+          // console.log('  - Element found:', el);
+          // console.log('  - Question Name IDs:', window.questionNameIds);
           
           if (el) {
             const val = el.value || '';
-            console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
+            // console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
             
             if (val === pdfLogic.triggerOption) {
               matched = true;
-              console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
+              // console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
             } else {
-              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
+              // console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
             }
           } else {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
+            // console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
           }
         } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
           // For number questions with trigger conditions, check if the number meets the condition
           const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                      document.getElementById('answer' + pdfLogic.questionId);
           
-          console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
-          console.log('  - Question ID:', pdfLogic.questionId);
-          console.log('  - Number Trigger:', pdfLogic.numberTrigger);
-          console.log('  - Number Value:', pdfLogic.numberValue);
-          console.log('  - Element found:', el);
+          // console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
+          // console.log('  - Question ID:', pdfLogic.questionId);
+          // console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+          // console.log('  - Number Value:', pdfLogic.numberValue);
+          // console.log('  - Element found:', el);
           
           if (el) {
             const val = parseFloat(el.value) || 0;
             const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
-            console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+            // console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
             
             let conditionMet = false;
             if (pdfLogic.numberTrigger === '=') {
@@ -3274,12 +3229,12 @@ window.addFormToCart = function (priceId) {
             
             if (conditionMet) {
               matched = true;
-              console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number question:', pdfLogic.pdfDisplayName);
+              // console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number question:', pdfLogic.pdfDisplayName);
             } else {
-              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'condition:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+              // console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'condition:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
             }
           } else {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
+            // console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
           }
         } else {
           // For regular conditions, check previous question logic
@@ -3292,7 +3247,7 @@ window.addFormToCart = function (priceId) {
           const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
                      document.getElementById('answer' + prevId);
           if (!el) {
-            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            // console.log('🛒 [CART DEBUG] Element not found for question', prevId);
             continue;
           }
 
@@ -3300,11 +3255,11 @@ window.addFormToCart = function (priceId) {
           if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
           else                        { val = el.value || ''; }
 
-          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+          // console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
           if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
-            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            // console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
           }
         }
@@ -3339,21 +3294,21 @@ window.addFormToCart = function (priceId) {
             timestamp: nowTs
           };
           pdfLogicItems.push(item);
-          console.log('🛒 [CART DEBUG] Added PDF logic item to cart:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
+          // console.log('🛒 [CART DEBUG] Added PDF logic item to cart:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
         } else {
-          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+          // console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
         }
       }
     } else {
-      console.log('🛒 [CART DEBUG] No PDF logic items found');
+      // console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
     
     // Deduplicate PDF logic items to prevent multiple requests for the same PDF
     const originalPdfLogicCount = pdfLogicItems.length;
     deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
-    console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
+    // console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
     
-    console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
+    // console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
     // Ensure deduplicatedPdfLogicItems is always an array even if there's an error
@@ -3362,7 +3317,7 @@ window.addFormToCart = function (priceId) {
 
   // 5) Preferred path: site cart manager
   if (typeof window.addToCart === 'function') {
-    console.log('🛒 [CART DEBUG] Firebase addToCart function available');
+    // console.log('🛒 [CART DEBUG] Firebase addToCart function available');
     
     // Create a batch of all items to add
     const allItems = [];
@@ -3377,7 +3332,7 @@ window.addFormToCart = function (priceId) {
       defendantName: defendantName
     };
     allItems.push(mainItem);
-    console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
+    // console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
     
     // Add all matched PDF logic items
     for (const item of deduplicatedPdfLogicItems) {
@@ -3390,16 +3345,16 @@ window.addFormToCart = function (priceId) {
         defendantName: item.defendantName
       };
       allItems.push(pdfItem);
-      console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
+      // console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
     }
     
-    console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
+    // console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
     
     // Add all items to cart with a small delay between each to prevent race conditions
     let addedCount = 0;
     allItems.forEach((item, index) => {
       setTimeout(() => {
-        console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        // console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
         
         // Ensure formData includes portfolio ID for proper grouping
         const enhancedFormData = {
@@ -3417,7 +3372,7 @@ window.addFormToCart = function (priceId) {
         
         // Check if all items have been added
         if (addedCount === allItems.length) {
-          console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
+          // console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
           const itemList = allItems.map(item => {
             let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
             if (item.defendantName && item.defendantName.trim() !== '') {
@@ -3425,7 +3380,7 @@ window.addFormToCart = function (priceId) {
             }
             return itemInfo;
           }).join('\\n');
-          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
+          // console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
           
           // Navigate to cart page
           window.location.href = '../Pages/cart.html';
@@ -3438,7 +3393,7 @@ window.addFormToCart = function (priceId) {
   }
 
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
-  console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
+  // console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
   
   let cart = [];
   const mainCartItem = {
@@ -3447,19 +3402,19 @@ window.addFormToCart = function (priceId) {
     originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
   };
   cart.push(mainCartItem);
-  console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
+  // console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
   
   for (const item of deduplicatedPdfLogicItems) {
     cart.push(item);
-    console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
+    // console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
   }
 
   // Final deduplication of the entire cart to prevent any duplicates
   const originalCartCount = cart.length;
   cart = deduplicatePdfs(cart);
-  console.log('🛒 [CART DEBUG] Final cart deduplication: Original count:', originalCartCount, 'After deduplication:', cart.length);
+  // console.log('🛒 [CART DEBUG] Final cart deduplication: Original count:', originalCartCount, 'After deduplication:', cart.length);
 
-  console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
+  // console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
@@ -3471,7 +3426,7 @@ window.addFormToCart = function (priceId) {
     }
     return itemInfo;
   }).join('\\n');
-  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
+  // console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
   
   // Navigate to cart page
   window.location.href = '../Pages/cart.html';
@@ -3718,7 +3673,7 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+    // console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -3728,7 +3683,7 @@ function removeHiddenCheckbox(radioId) {
     const hiddenCheckbox = document.getElementById(radioId);
     if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
         hiddenCheckbox.remove();
-        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+        // console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
 }
 
@@ -4062,9 +4017,11 @@ document.addEventListener('DOMContentLoaded', function() {
 let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
+    console.log('🔧 [SHOW TEXTBOX LABELS DEBUG] Function called with questionId:', questionId, 'count:', count);
     
     // 🔧 NEW: Check if we're already creating fields
     if (isCreatingFields) {
+        console.log('🔧 [SHOW TEXTBOX LABELS DEBUG] Already creating fields, returning early');
         return;
     }
     
@@ -4188,6 +4145,7 @@ function showTextboxLabels(questionId, count){
 
     // Define location field names for visual separation
     const locationFields = ['Street', 'City', 'State', 'Zip'];
+    
 
     for(let j = 1; j <= count; j++){
         let lastWasLocation = false;
@@ -4199,9 +4157,14 @@ function showTextboxLabels(questionId, count){
         entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
         
         // Process all fields in creation order
+        console.log('🔧 [FIELD PROCESSING DEBUG] Processing', allFieldsInOrder.length, 'fields');
+        console.log('🔧 [FIELD PROCESSING DEBUG] All fields:', allFieldsInOrder);
+        
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
             const isLocationField = locationFields.includes(field.label);
+            
+            console.log('🔧 [FIELD PROCESSING DEBUG] Processing field', fieldIndex, ':', field);
             
             // Add <br> before first location field in each count
             if (isLocationField && !lastWasLocation && !firstField) {
@@ -4235,6 +4198,11 @@ function showTextboxLabels(questionId, count){
                   entryContainer.appendChild(brElement);
                 }
             } else if (field.type === 'checkbox') {
+                console.log('🔧 [CHECKBOX FIELD DEBUG] Processing checkbox field:', field);
+                console.log('🔧 [CHECKBOX FIELD DEBUG] Field label:', field.label);
+                console.log('🔧 [CHECKBOX FIELD DEBUG] Field selectionType:', field.selectionType);
+                console.log('🔧 [CHECKBOX FIELD DEBUG] Field options:', field.options);
+                
                 // Add line break above checkbox section
                 const brBeforeCheckbox = document.createElement('br');
                 entryContainer.appendChild(brBeforeCheckbox);
@@ -4270,46 +4238,113 @@ function showTextboxLabels(questionId, count){
                     
                     const input = document.createElement('input');
                     input.type = selectionType === 'single' ? 'radio' : 'checkbox';
-                    input.id = selectionType === 'single' ? option.nodeId + "_" + j + "_radio" : option.nodeId + "_" + j;
+                    input.id = option.nodeId + "_" + j;
                     input.name = selectionType === 'single' ? 'radio_group_' + (questionId || 'unknown') + '_' + j : option.nodeId + "_" + j; // Radio buttons share the same name
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     
+                    // Debug radio button creation
+                    if (selectionType === 'single') {
+                        console.log('🔧 [RADIO CREATION DEBUG] Created radio button:');
+                        console.log('🔧 [RADIO CREATION DEBUG] - ID:', input.id);
+                        console.log('🔧 [RADIO CREATION DEBUG] - Name:', input.name);
+                        console.log('🔧 [RADIO CREATION DEBUG] - Value:', input.value);
+                        console.log('🔧 [RADIO CREATION DEBUG] - Type:', input.type);
+                        console.log('🔧 [RADIO CREATION DEBUG] - Question ID:', questionId);
+                        console.log('🔧 [RADIO CREATION DEBUG] - Option nodeId:', option.nodeId);
+                        console.log('🔧 [RADIO CREATION DEBUG] - Selection type:', selectionType);
+                    }
+                    
                     // Add event listener for radio buttons to create hidden checkboxes
                     if (selectionType === 'single') {
                         input.addEventListener('change', function() {
+                            console.log('🔧 [RADIO DEBUG] Radio button change event triggered');
+                            console.log('🔧 [RADIO DEBUG] Radio button ID:', this.id);
+                            console.log('🔧 [RADIO DEBUG] Radio button name:', this.name);
+                            console.log('🔧 [RADIO DEBUG] Radio button checked:', this.checked);
+                            
                             if (this.checked) {
+                                console.log('🔧 [RADIO DEBUG] Radio button is checked, processing...');
+                                
                                 // Uncheck all other radio buttons in this group and remove their hidden checkboxes
                                 const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
-                                radioGroup.forEach(radio => {
+                                console.log('🔧 [RADIO DEBUG] Found radio group with', radioGroup.length, 'buttons');
+                                
+                                radioGroup.forEach((radio, index) => {
+                                    console.log('🔧 [RADIO DEBUG] Processing radio button', index, ':', radio.id, 'checked:', radio.checked);
+                                    
                                     if (radio !== this) {
+                                        console.log('🔧 [RADIO DEBUG] Unchecking radio button:', radio.id);
                                         radio.checked = false;
                                         
                                         // Remove hidden checkbox for unchecked radio
-                                        // The hidden checkbox ID should be the original nodeId (without _radio suffix)
-                                        const originalNodeId = radio.id.replace('_radio', '');
-                                        const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                                        const hiddenCheckboxId = radio.id + '_hidden';
+                                        const existingHiddenCheckbox = document.getElementById(hiddenCheckboxId);
+                                        console.log('🔧 [RADIO DEBUG] Looking for hidden checkbox with ID:', hiddenCheckboxId);
+                                        console.log('🔧 [RADIO DEBUG] Found element:', existingHiddenCheckbox);
                                         
                                         if (existingHiddenCheckbox) {
+                                            console.log('🔧 [RADIO DEBUG] Element type:', existingHiddenCheckbox.type);
+                                            console.log('🔧 [RADIO DEBUG] Element display:', existingHiddenCheckbox.style.display);
+                                            
                                             if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
+                                                console.log('🔧 [RADIO DEBUG] Removing hidden checkbox:', hiddenCheckboxId);
                                                 existingHiddenCheckbox.remove();
+                                                console.log('🔧 [RADIO DEBUG] Hidden checkbox removed successfully');
+                                            } else {
+                                                console.log('🔧 [RADIO DEBUG] Element is not a hidden checkbox, skipping removal');
                                             }
+                                        } else {
+                                            console.log('🔧 [RADIO DEBUG] No hidden checkbox found with ID:', hiddenCheckboxId);
                                         }
+                                    } else {
+                                        console.log('🔧 [RADIO DEBUG] Skipping current radio button (this one)');
                                     }
                                 });
                                 
-                                // Create hidden checkbox for the selected radio
-                                // Use the original nodeId (without _radio suffix) for the hidden checkbox
-                                const originalNodeId = this.id.replace('_radio', '');
-                                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                                // Create hidden checkbox with a different ID to avoid conflicts
+                                const hiddenCheckboxId = this.id + '_hidden';
+                                console.log('🔧 [RADIO DEBUG] Creating/updating hidden checkbox for:', this.id, 'with ID:', hiddenCheckboxId);
+                                
+                                // Remove any existing hidden checkbox for this radio button
+                                const existingHiddenCheckbox = document.getElementById(hiddenCheckboxId);
+                                if (existingHiddenCheckbox) {
+                                    console.log('🔧 [RADIO DEBUG] Removing existing hidden checkbox');
+                                    existingHiddenCheckbox.remove();
+                                }
+                                
+                                // Create new hidden checkbox
+                                console.log('🔧 [RADIO DEBUG] Creating new hidden checkbox');
+                                const hiddenCheckbox = document.createElement('input');
+                                hiddenCheckbox.type = 'checkbox';
+                                hiddenCheckbox.id = hiddenCheckboxId;
+                                hiddenCheckbox.name = this.id; // Use the radio button's ID as the name
+                                hiddenCheckbox.style.display = 'none';
+                                hiddenCheckbox.checked = true;
+                                document.body.appendChild(hiddenCheckbox);
+                                console.log('🔧 [RADIO DEBUG] New hidden checkbox created and appended to body');
+                                
+                                // Verify the hidden checkbox was created/updated
+                                const verifyElement = document.getElementById(hiddenCheckboxId);
+                                console.log('🔧 [RADIO DEBUG] Verification - hidden checkbox exists:', !!verifyElement);
+                                if (verifyElement) {
+                                    console.log('🔧 [RADIO DEBUG] Verification - hidden checkbox type:', verifyElement.type);
+                                    console.log('🔧 [RADIO DEBUG] Verification - hidden checkbox checked:', verifyElement.checked);
+                                    console.log('🔧 [RADIO DEBUG] Verification - hidden checkbox display:', verifyElement.style.display);
+                                    console.log('🔧 [RADIO DEBUG] Verification - hidden checkbox ID:', verifyElement.id);
+                                } else {
+                                    console.log('🔧 [RADIO DEBUG] ERROR: Hidden checkbox was not created!');
+                                }
+                            } else {
+                                console.log('🔧 [RADIO DEBUG] Radio button is unchecked, no action needed');
                             }
                         });
                     }
                     
                     const label = document.createElement('label');
+                    label.htmlFor = option.nodeId + "_" + j;
                     label.textContent = option.text;
-                    label.style.cssText = 'flex: 1; cursor: pointer; color: #2c3e50; font-size: 15px; font-weight: 500; margin: 0;';
-                    label.setAttribute('for', input.id);
+                    label.style.cssText = 'color: #2c3e50; cursor: pointer; font-size: 15px; font-weight: 500; flex: 1;';
                     
                     optionDiv.appendChild(input);
                     optionDiv.appendChild(label);
@@ -4378,8 +4413,8 @@ function showTextboxLabels(questionId, count){
     // Update linked fields after creating new textboxes
     updateLinkedFields();
     
-    // Attach autosave listeners to newly generated textbox inputs
-    const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
+            // Attach autosave listeners to newly generated inputs (text, number, date, checkbox, radio)
+            const newInputs = container.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], input[type="radio"]');
     newInputs.forEach(input => {
         input.addEventListener('input', function() {
             // Add a small delay to ensure the value is properly set before saving
@@ -4409,10 +4444,279 @@ function showTextboxLabels(questionId, count){
                 }
             }, 100); // 100ms delay to ensure value is set
         });
+        
+                // For checkboxes and radio buttons, also listen to click events
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    input.addEventListener('click', function() {
+                        setTimeout(() => {
+                            if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                                if (typeof saveAnswers === 'function') {
+                                    saveAnswers();
+                                }
+                            } else {
+                                if (typeof saveAnswersToLocalStorage === 'function') {
+                                    saveAnswersToLocalStorage();
+                                }
+                            }
+                        }, 100);
+                    });
+                }
+                
+                // For radio buttons, also create hidden checkboxes when autofilled
+                if (input.type === 'radio' && input.checked) {
+                    console.log('🔧 [AUTOFILL DEBUG] Found autofilled radio button:', input.id);
+                    console.log('🔧 [AUTOFILL DEBUG] Radio button name:', input.name);
+                    
+                    // Check if this is a radio button from a "Mark only one" checkbox field
+                    const isFromCheckboxField = input.name && input.name.startsWith('radio_group_');
+                    console.log('🔧 [AUTOFILL DEBUG] Is from checkbox field:', isFromCheckboxField);
+                    
+                    if (isFromCheckboxField) {
+                        console.log('🔧 [AUTOFILL DEBUG] Creating hidden checkbox for autofilled radio button');
+                        // Create hidden checkbox for autofilled radio button
+                        const hiddenCheckboxId = input.id + '_hidden';
+                        let existingElement = document.getElementById(hiddenCheckboxId);
+                        console.log('🔧 [AUTOFILL DEBUG] Existing element:', existingElement);
+                        
+                        if (!existingElement || existingElement.type !== 'checkbox' || existingElement.style.display !== 'none') {
+                            console.log('🔧 [AUTOFILL DEBUG] Creating new hidden checkbox');
+                            const hiddenCheckbox = document.createElement('input');
+                            hiddenCheckbox.type = 'checkbox';
+                            hiddenCheckbox.id = hiddenCheckboxId;
+                            hiddenCheckbox.name = input.id;
+                            hiddenCheckbox.style.display = 'none';
+                            hiddenCheckbox.checked = true;
+                            document.body.appendChild(hiddenCheckbox);
+                            console.log('🔧 [AUTOFILL DEBUG] Hidden checkbox created and appended');
+                        } else {
+                            console.log('🔧 [AUTOFILL DEBUG] Hidden checkbox already exists, skipping creation');
+                        }
+                    }
+                }
     });
     
     // 🔧 NEW: Clear flag after function completes
     isCreatingFields = false;
+    
+    // 🔧 NEW: Check for autofilled radio buttons and create hidden checkboxes
+    setTimeout(() => {
+        console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Starting autofill check for radio buttons');
+        const allRadioButtons = container.querySelectorAll('input[type="radio"]');
+        console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Found', allRadioButtons.length, 'radio buttons total');
+        
+        // Debug: Show all radio buttons and their states
+        allRadioButtons.forEach((radio, index) => {
+            console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Radio button', index, 'details:');
+            console.log('  - ID:', radio.id);
+            console.log('  - Name:', radio.name);
+            console.log('  - Checked:', radio.checked);
+            console.log('  - Value:', radio.value);
+        });
+        
+        allRadioButtons.forEach((radio, index) => {
+            console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Checking radio button', index, ':', radio.id, 'checked:', radio.checked);
+            
+            if (radio.checked) {
+                console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Radio button is checked, processing...');
+                // Check if this is a radio button from a "Mark only one" checkbox field
+                const isFromCheckboxField = radio.name && radio.name.startsWith('radio_group_');
+                console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Is from checkbox field:', isFromCheckboxField);
+                console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Radio button name:', radio.name);
+                
+                if (isFromCheckboxField) {
+                    console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Creating hidden checkbox for autofilled radio button');
+                    // Create hidden checkbox for autofilled radio button
+                    const hiddenCheckboxId = radio.id + '_hidden';
+                    let existingElement = document.getElementById(hiddenCheckboxId);
+                    console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Existing element:', existingElement);
+                    
+                    if (!existingElement || existingElement.type !== 'checkbox' || existingElement.style.display !== 'none') {
+                        console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Creating new hidden checkbox');
+                        const hiddenCheckbox = document.createElement('input');
+                        hiddenCheckbox.type = 'checkbox';
+                        hiddenCheckbox.id = hiddenCheckboxId;
+                        hiddenCheckbox.name = radio.id;
+                        hiddenCheckbox.style.display = 'none';
+                        hiddenCheckbox.checked = true;
+                        document.body.appendChild(hiddenCheckbox);
+                        console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Hidden checkbox created and appended');
+                    } else {
+                        console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Hidden checkbox already exists, skipping creation');
+                    }
+                } else {
+                    console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Not from checkbox field, skipping');
+                }
+            } else {
+                console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Radio button is not checked, skipping');
+            }
+        });
+        
+        console.log('🔧 [AUTOFILL TIMEOUT DEBUG] Autofill check completed');
+        
+        // Debug: Show all hidden checkboxes in the DOM
+        const allHiddenCheckboxes = document.querySelectorAll('input[type="checkbox"][style*="display: none"]');
+        console.log('🔧 [DOM DEBUG] All hidden checkboxes in DOM:', allHiddenCheckboxes.length);
+        allHiddenCheckboxes.forEach((checkbox, index) => {
+            console.log('🔧 [DOM DEBUG] Hidden checkbox', index, ':', checkbox.id, 'checked:', checkbox.checked);
+        });
+    }, 100);
+    
+    // 🔧 NEW: Add a longer timeout to catch Firebase autofill
+    setTimeout(() => {
+        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Checking for Firebase autofilled radio buttons (500ms delay)');
+        const allRadioButtons = container.querySelectorAll('input[type="radio"]');
+        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Found', allRadioButtons.length, 'radio buttons total');
+        
+        allRadioButtons.forEach((radio, index) => {
+            console.log('🔧 [FIREBASE AUTOFILL DEBUG] Radio button', index, ':', radio.id, 'checked:', radio.checked);
+            
+            if (radio.checked) {
+                console.log('🔧 [FIREBASE AUTOFILL DEBUG] Found checked radio button, creating hidden checkbox');
+                // Check if this is a radio button from a "Mark only one" checkbox field
+                const isFromCheckboxField = radio.name && radio.name.startsWith('radio_group_');
+                console.log('🔧 [FIREBASE AUTOFILL DEBUG] Is from checkbox field:', isFromCheckboxField);
+                
+                if (isFromCheckboxField) {
+                    console.log('🔧 [FIREBASE AUTOFILL DEBUG] Creating hidden checkbox for Firebase autofilled radio button');
+                    const hiddenCheckboxId = radio.id + '_hidden';
+                    let existingElement = document.getElementById(hiddenCheckboxId);
+                    
+                    if (!existingElement || existingElement.type !== 'checkbox' || existingElement.style.display !== 'none') {
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Creating new hidden checkbox');
+                        const hiddenCheckbox = document.createElement('input');
+                        hiddenCheckbox.type = 'checkbox';
+                        hiddenCheckbox.id = hiddenCheckboxId;
+                        hiddenCheckbox.name = radio.id;
+                        hiddenCheckbox.style.display = 'none';
+                        hiddenCheckbox.checked = true;
+                        document.body.appendChild(hiddenCheckbox);
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Hidden checkbox created and appended');
+                    } else {
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Hidden checkbox already exists, skipping creation');
+                    }
+                }
+            }
+        });
+    }, 500);
+    
+    // 🔧 NEW: Add even longer timeouts to catch Firebase autofill at different stages
+    setTimeout(() => {
+        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Checking for Firebase autofilled radio buttons (1000ms delay)');
+        const allRadioButtons = container.querySelectorAll('input[type="radio"]');
+        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Found', allRadioButtons.length, 'radio buttons total');
+        
+        allRadioButtons.forEach((radio, index) => {
+            console.log('🔧 [FIREBASE AUTOFILL DEBUG] Radio button', index, ':', radio.id, 'checked:', radio.checked);
+            
+            if (radio.checked) {
+                console.log('🔧 [FIREBASE AUTOFILL DEBUG] Found checked radio button, creating hidden checkbox');
+                // Check if this is a radio button from a "Mark only one" checkbox field
+                const isFromCheckboxField = radio.name && radio.name.startsWith('radio_group_');
+                console.log('🔧 [FIREBASE AUTOFILL DEBUG] Is from checkbox field:', isFromCheckboxField);
+                
+                if (isFromCheckboxField) {
+                    console.log('🔧 [FIREBASE AUTOFILL DEBUG] Creating hidden checkbox for Firebase autofilled radio button');
+                    const hiddenCheckboxId = radio.id + '_hidden';
+                    let existingElement = document.getElementById(hiddenCheckboxId);
+                    
+                    if (!existingElement || existingElement.type !== 'checkbox' || existingElement.style.display !== 'none') {
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Creating new hidden checkbox');
+                        const hiddenCheckbox = document.createElement('input');
+                        hiddenCheckbox.type = 'checkbox';
+                        hiddenCheckbox.id = hiddenCheckboxId;
+                        hiddenCheckbox.name = radio.id;
+                        hiddenCheckbox.style.display = 'none';
+                        hiddenCheckbox.checked = true;
+                        document.body.appendChild(hiddenCheckbox);
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Hidden checkbox created and appended');
+                    } else {
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Hidden checkbox already exists, skipping creation');
+                    }
+                }
+            }
+        });
+    }, 1000);
+    
+    setTimeout(() => {
+        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Checking for Firebase autofilled radio buttons (2000ms delay)');
+        const allRadioButtons = container.querySelectorAll('input[type="radio"]');
+        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Found', allRadioButtons.length, 'radio buttons total');
+        
+        allRadioButtons.forEach((radio, index) => {
+            console.log('🔧 [FIREBASE AUTOFILL DEBUG] Radio button', index, ':', radio.id, 'checked:', radio.checked);
+            
+            if (radio.checked) {
+                console.log('🔧 [FIREBASE AUTOFILL DEBUG] Found checked radio button, creating hidden checkbox');
+                // Check if this is a radio button from a "Mark only one" checkbox field
+                const isFromCheckboxField = radio.name && radio.name.startsWith('radio_group_');
+                console.log('🔧 [FIREBASE AUTOFILL DEBUG] Is from checkbox field:', isFromCheckboxField);
+                
+                if (isFromCheckboxField) {
+                    console.log('🔧 [FIREBASE AUTOFILL DEBUG] Creating hidden checkbox for Firebase autofilled radio button');
+                    const hiddenCheckboxId = radio.id + '_hidden';
+                    let existingElement = document.getElementById(hiddenCheckboxId);
+                    
+                    if (!existingElement || existingElement.type !== 'checkbox' || existingElement.style.display !== 'none') {
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Creating new hidden checkbox');
+                        const hiddenCheckbox = document.createElement('input');
+                        hiddenCheckbox.type = 'checkbox';
+                        hiddenCheckbox.id = hiddenCheckboxId;
+                        hiddenCheckbox.name = radio.id;
+                        hiddenCheckbox.style.display = 'none';
+                        hiddenCheckbox.checked = true;
+                        document.body.appendChild(hiddenCheckbox);
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Hidden checkbox created and appended');
+                    } else {
+                        console.log('🔧 [FIREBASE AUTOFILL DEBUG] Hidden checkbox already exists, skipping creation');
+                    }
+                }
+            }
+        });
+    }, 2000);
+    
+    // 🔧 NEW: Add MutationObserver to watch for Firebase autofill changes
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'checked') {
+                const target = mutation.target;
+                if (target.type === 'radio' && target.checked) {
+                    console.log('🔧 [MUTATION OBSERVER DEBUG] Radio button checked via autofill:', target.id);
+                    console.log('🔧 [MUTATION OBSERVER DEBUG] Radio button name:', target.name);
+                    
+                    // Check if this is a radio button from a "Mark only one" checkbox field
+                    const isFromCheckboxField = target.name && target.name.startsWith('radio_group_');
+                    console.log('🔧 [MUTATION OBSERVER DEBUG] Is from checkbox field:', isFromCheckboxField);
+                    
+                    if (isFromCheckboxField) {
+                        console.log('🔧 [MUTATION OBSERVER DEBUG] Creating hidden checkbox for autofilled radio button');
+                        const hiddenCheckboxId = target.id + '_hidden';
+                        let existingElement = document.getElementById(hiddenCheckboxId);
+                        
+                        if (!existingElement || existingElement.type !== 'checkbox' || existingElement.style.display !== 'none') {
+                            console.log('🔧 [MUTATION OBSERVER DEBUG] Creating new hidden checkbox');
+                            const hiddenCheckbox = document.createElement('input');
+                            hiddenCheckbox.type = 'checkbox';
+                            hiddenCheckbox.id = hiddenCheckboxId;
+                            hiddenCheckbox.name = target.id;
+                            hiddenCheckbox.style.display = 'none';
+                            hiddenCheckbox.checked = true;
+                            document.body.appendChild(hiddenCheckbox);
+                            console.log('🔧 [MUTATION OBSERVER DEBUG] Hidden checkbox created and appended');
+                        } else {
+                            console.log('🔧 [MUTATION OBSERVER DEBUG] Hidden checkbox already exists, skipping creation');
+                        }
+                    }
+                }
+            }
+        });
+    });
+    
+    // Start observing radio buttons for changes
+    const allRadioButtons = container.querySelectorAll('input[type="radio"]');
+    allRadioButtons.forEach(radio => {
+        observer.observe(radio, { attributes: true, attributeFilter: ['checked'] });
+        console.log('🔧 [MUTATION OBSERVER DEBUG] Started observing radio button:', radio.id);
+    });
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -4664,15 +4968,11 @@ function dropdownMirror(selectEl, baseName){
 
 // Function to handle hidden logic for dropdowns
 function updateHiddenLogic(dropdownName, selectedValue) {
-    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogic called with dropdownName:', dropdownName, 'selectedValue:', selectedValue);
-    console.log('🔧 [HIDDEN LOGIC DEBUG] hiddenLogicConfigs:', hiddenLogicConfigs);
     
     // Find ALL hidden logic configurations for this dropdown
     const matchingConfigs = hiddenLogicConfigs.filter(c => c.questionNameId === dropdownName);
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Found matching configs:', matchingConfigs);
     
     if (matchingConfigs.length === 0) {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] No matching configs found for dropdown:', dropdownName);
         return;
     }
     
@@ -4685,25 +4985,20 @@ function updateHiddenLogic(dropdownName, selectedValue) {
         configsByNodeId[config.nodeId].push(config);
     });
     
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Configs grouped by nodeId:', configsByNodeId);
     
     // Process each nodeId
     Object.keys(configsByNodeId).forEach(nodeId => {
         const configsForNode = configsByNodeId[nodeId];
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing nodeId:', nodeId, 'with configs:', configsForNode);
         
         // Check if ANY config for this nodeId matches the selected value
         const matchingConfig = configsForNode.find(config => config.trigger === selectedValue);
         
         if (matchingConfig) {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Found matching config for nodeId:', nodeId, 'config:', matchingConfig);
     
             // Check if the hidden element already exists
             let hiddenElement = document.getElementById(nodeId);
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists for', nodeId, ':', !!hiddenElement);
             
             if (!hiddenElement) {
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', matchingConfig.type, 'with nodeId:', nodeId);
                 // Create the hidden element based on type
                 if (matchingConfig.type === 'checkbox') {
                     hiddenElement = document.createElement('input');
@@ -4712,7 +5007,6 @@ function updateHiddenLogic(dropdownName, selectedValue) {
                     hiddenElement.name = nodeId;
                     hiddenElement.checked = true;
                     hiddenElement.style.display = 'none';
-                    console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
                 } else if (matchingConfig.type === 'textbox') {
                     hiddenElement = document.createElement('input');
                     hiddenElement.type = 'text';
@@ -4720,20 +5014,16 @@ function updateHiddenLogic(dropdownName, selectedValue) {
                     hiddenElement.name = nodeId;
                     hiddenElement.value = matchingConfig.textboxText || '';
                     hiddenElement.style.display = 'none';
-                    console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
                 }
                 
                 // Add the hidden element to the form
                 const form = document.getElementById('customForm');
                 if (form) {
                     form.appendChild(hiddenElement);
-                    console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
                 } else {
                     document.body.appendChild(hiddenElement);
-                    console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
                 }
             } else {
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element for', nodeId);
                 // Update existing element
                 if (matchingConfig.type === 'checkbox') {
                     hiddenElement.checked = true;
@@ -4742,11 +5032,9 @@ function updateHiddenLogic(dropdownName, selectedValue) {
                 }
             }
         } else {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config found for nodeId:', nodeId, 'with selectedValue:', selectedValue);
             // No matching config found, uncheck/clear the existing element
             const existingElement = document.getElementById(nodeId);
             if (existingElement) {
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Unchecking/clearing existing hidden element:', nodeId);
                 if (configsForNode[0].type === 'checkbox') {
                     existingElement.checked = false;
                 } else if (configsForNode[0].type === 'textbox') {
@@ -4989,7 +5277,7 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
     // Get the current section
     const currentSection = document.getElementById('section' + sectionNumber);
     if (!currentSection) {
-        console.log('Reset function: Section not found for section', sectionNumber);
+        // console.log('Reset function: Section not found for section', sectionNumber);
         return;
     }
     
@@ -4997,11 +5285,11 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
     const hiddenQuestions = currentSection.querySelectorAll('.question-container.hidden');
     
     if (hiddenQuestions.length === 0) {
-        console.log('Reset function: No hidden questions found in section', sectionNumber);
+        // console.log('Reset function: No hidden questions found in section', sectionNumber);
         return;
     }
     
-    console.log('Reset function: Found', hiddenQuestions.length, 'hidden questions in section', sectionNumber);
+    // console.log('Reset function: Found', hiddenQuestions.length, 'hidden questions in section', sectionNumber);
     
     hiddenQuestions.forEach((questionContainer, index) => {
         // Get all form elements within this hidden question
@@ -5019,16 +5307,16 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
                 if (defaultOption) {
                     defaultOption.selected = true;
                 }
-                console.log('Reset function: Reset dropdown', elementName, 'from', oldValue, 'to default');
+                // console.log('Reset function: Reset dropdown', elementName, 'from', oldValue, 'to default');
             } else if (element.type === 'checkbox' || element.type === 'radio') {
                 // Reset checkboxes and radio buttons to unchecked
                 element.checked = false;
-                console.log('Reset function: Reset', element.type, elementName, 'from', oldValue, 'to false');
+                // console.log('Reset function: Reset', element.type, elementName, 'from', oldValue, 'to false');
             } else if (element.type === 'text' || element.type === 'email' || element.type === 'tel' || 
                       element.type === 'number' || element.type === 'date' || element.tagName === 'TEXTAREA') {
                 // Reset text inputs to empty
                 element.value = '';
-                console.log('Reset function: Reset', element.type || 'textarea', elementName, 'from', oldValue, 'to empty');
+                // console.log('Reset function: Reset', element.type || 'textarea', elementName, 'from', oldValue, 'to empty');
             }
         });
     });
@@ -5251,10 +5539,10 @@ async function processAllPdfs() {
     }
     
     // Process PDF Logic PDFs
-    console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic PDFs:', pdfLogicPDFs);
+    // console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic PDFs:', pdfLogicPDFs);
     if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
         for (const pdfLogic of pdfLogicPDFs) {
-            console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic:', pdfLogic);
+            // console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic:', pdfLogic);
             if (pdfLogic.pdfName) {
                 // Check if conditions are met
                 let shouldDownload = false;
@@ -5285,42 +5573,42 @@ async function processAllPdfs() {
                     const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                           document.getElementById('answer' + pdfLogic.questionId);
                     
-                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking trigger option:');
-                    console.log('  - Question ID:', pdfLogic.questionId);
-                    console.log('  - Trigger Option:', pdfLogic.triggerOption);
-                    console.log('  - Question Element:', questionElement);
-                    console.log('  - Question Name IDs:', questionNameIds);
+                    // console.log('🔧 [PDF DOWNLOAD DEBUG] Checking trigger option:');
+                    // console.log('  - Question ID:', pdfLogic.questionId);
+                    // console.log('  - Trigger Option:', pdfLogic.triggerOption);
+                    // console.log('  - Question Element:', questionElement);
+                    // console.log('  - Question Name IDs:', questionNameIds);
                     
                     if (questionElement) {
                         const selectedValue = questionElement.value;
-                        console.log('  - Selected Value:', selectedValue);
+                        // console.log('  - Selected Value:', selectedValue);
                         
                         // Check if the selected value matches the trigger option
                         if (selectedValue === pdfLogic.triggerOption) {
                             shouldDownload = true;
-                            console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger option matched - will download PDF');
+                            // console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger option matched - will download PDF');
                         } else {
-                            console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Trigger option NOT matched');
+                            // console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Trigger option NOT matched');
                         }
                     } else {
-                        console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
+                        // console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
                 } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
                     // For number questions with trigger conditions, check if the number meets the condition
                     const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                           document.getElementById('answer' + pdfLogic.questionId);
                     
-                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking number trigger:');
-                    console.log('  - Question ID:', pdfLogic.questionId);
-                    console.log('  - Number Trigger:', pdfLogic.numberTrigger);
-                    console.log('  - Number Value:', pdfLogic.numberValue);
-                    console.log('  - Question Element:', questionElement);
+                    // console.log('🔧 [PDF DOWNLOAD DEBUG] Checking number trigger:');
+                    // console.log('  - Question ID:', pdfLogic.questionId);
+                    // console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+                    // console.log('  - Number Value:', pdfLogic.numberValue);
+                    // console.log('  - Question Element:', questionElement);
                     
                     if (questionElement) {
                         const selectedValue = parseFloat(questionElement.value) || 0;
                         const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
-                        console.log('  - Selected Value:', selectedValue);
-                        console.log('  - Trigger Value:', triggerValue);
+                        // console.log('  - Selected Value:', selectedValue);
+                        // console.log('  - Trigger Value:', triggerValue);
                         
                         let conditionMet = false;
                         if (pdfLogic.numberTrigger === '=') {
@@ -5333,12 +5621,12 @@ async function processAllPdfs() {
                         
                         if (conditionMet) {
                             shouldDownload = true;
-                            console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Number trigger matched - will download PDF');
+                            // console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Number trigger matched - will download PDF');
                         } else {
-                            console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Number trigger NOT matched');
+                            // console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Number trigger NOT matched');
                         }
                     } else {
-                        console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
+                        // console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
                 } else {
                         // For regular conditions, check previous question logic
@@ -5432,14 +5720,14 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
-        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Starting manual PDF download for:', pdfName);
+        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Starting manual PDF download for:', pdfName);
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const form = document.getElementById('customForm');
         const fd = new FormData();
         
-        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form element found:', !!form);
+        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form element found:', !!form);
         
         // Manually collect form data to format dates
         // Include both elements inside the form AND elements with form="customForm" attribute
@@ -5447,15 +5735,15 @@ async function editAndDownloadPDF (pdfName) {
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
         
-        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form elements found:');
-        console.log('  - Elements inside form:', formElements.length);
-        console.log('  - External elements with form="customForm":', externalFormElements.length);
-        console.log('  - Total elements to process:', allFormElements.length);
+        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form elements found:');
+        // console.log('  - Elements inside form:', formElements.length);
+        // console.log('  - External elements with form="customForm":', externalFormElements.length);
+        // console.log('  - Total elements to process:', allFormElements.length);
         
         // Log all elements we're about to process
-        console.log('🔍 [MANUAL DOWNLOAD DEBUG] All form elements:');
+        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] All form elements:');
         allFormElements.forEach((element, index) => {
-            console.log('  ' + (index + 1) + '. ' + element.tagName + ' - id: "' + element.id + '" - name: "' + element.name + '" - type: "' + element.type + '" - value: "' + element.value + '" - disabled: ' + element.disabled);
+            // console.log('  ' + (index + 1) + '. ' + element.tagName + ' - id: "' + element.id + '" - name: "' + element.name + '" - type: "' + element.type + '" - value: "' + element.value + '" - disabled: ' + element.disabled);
         });
         
         allFormElements.forEach(element => {
@@ -5464,9 +5752,9 @@ async function editAndDownloadPDF (pdfName) {
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     if (element.checked) {
                         fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
-                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added checked ' + element.type + ' - name: "' + element.name + '" - value: "on"');
+                        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added checked ' + element.type + ' - name: "' + element.name + '" - value: "on"');
                     } else {
-                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping unchecked ' + element.type + ' - name: "' + element.name + '"');
+                        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping unchecked ' + element.type + ' - name: "' + element.name + '"');
                     }
                     // Skip unchecked checkboxes entirely - don't send them to server
                 } else {
@@ -5476,23 +5764,23 @@ async function editAndDownloadPDF (pdfName) {
                     if (element.type === 'date' && value) {
                         const originalValue = value;
                         value = formatDateForServer(value);
-                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Formatted date - name: "' + element.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
+                        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Formatted date - name: "' + element.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
                     }
                     
                     // Include ALL fields with values, including hidden ones
                     if (value && value.trim() !== '') {
                         fd.append(element.name, value);
-                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
+                        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
                     } else {
-                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping empty field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
+                        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping empty field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
                     }
                 }
             } else {
-                console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping element - id: "' + element.id + '" - name: "' + element.name + '" - disabled: ' + element.disabled);
+                // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping element - id: "' + element.id + '" - name: "' + element.name + '" - disabled: ' + element.disabled);
             }
         });
         
-        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Manual download form data collection complete');
+        // console.log('🔍 [MANUAL DOWNLOAD DEBUG] Manual download form data collection complete');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
@@ -5542,7 +5830,7 @@ async function editAndDownloadPDF (pdfName) {
             preview.style.display = 'none';
         }
         
-        console.log("Successfully processed PDF: " + pdfName);
+        // console.log("Successfully processed PDF: " + pdfName);
     } catch (error) {
         console.error("Error processing PDF " + pdfName + ":", error);
         throw error; // Re-throw to be handled by the caller
@@ -5565,7 +5853,7 @@ function runSingleHiddenCheckboxCalculation(calcObj){
     if(!cbox) return;  // hidden field not found
 
     var finalState = false;  // start with unchecked, only check if calculation conditions are met
-    console.log('🔧 [CALC DEBUG] Running calculation for checkbox:', calcObj.hiddenFieldName);
+    // console.log('🔧 [CALC DEBUG] Running calculation for checkbox:', calcObj.hiddenFieldName);
 
     // Evaluate each multi-term condition in 'calculations'
     for(var c=0; c<calcObj.calculations.length; c++){
@@ -5575,7 +5863,7 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         // Sum up the terms
         if(oneCalc.terms && oneCalc.terms.length>0){
             val = parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId) )||0;
-            console.log('🔧 [CALC DEBUG] First term value for', oneCalc.terms[0].questionNameId, ':', val);
+            // console.log('🔧 [CALC DEBUG] First term value for', oneCalc.terms[0].questionNameId, ':', val);
             for(var t=1; t<oneCalc.terms.length; t++){
                 var term = oneCalc.terms[t];
                 var op   = term.operator||'';
@@ -5598,18 +5886,18 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         else if(oneCalc.compareOperator==='<') matched = (val<thr);
         else if(oneCalc.compareOperator==='>') matched = (val>thr);
 
-        console.log('🔧 [CALC DEBUG] Comparison:', val, oneCalc.compareOperator, thr, '=', matched);
+        // console.log('🔧 [CALC DEBUG] Comparison:', val, oneCalc.compareOperator, thr, '=', matched);
 
         // If matched, set final state
         if(matched){
             finalState = (oneCalc.result==='checked');
-            console.log('🔧 [CALC DEBUG] Condition matched, setting finalState to:', finalState);
+            // console.log('🔧 [CALC DEBUG] Condition matched, setting finalState to:', finalState);
         }
     }
 
     // Set the hidden checkbox state
     cbox.checked = finalState;
-    console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
+    // console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
     
     // Handle mutually exclusive checkboxes for suing amount
     if(calcObj.hiddenFieldName === 'suing_over_2500' && finalState) {
@@ -5617,14 +5905,14 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         var underCheckbox = document.getElementById('suing_under_2500');
         if(underCheckbox) {
             underCheckbox.checked = false;
-            console.log('🔧 [CALC DEBUG] Unchecked suing_under_2500 because suing_over_2500 is checked');
+            // console.log('🔧 [CALC DEBUG] Unchecked suing_under_2500 because suing_over_2500 is checked');
         }
     } else if(calcObj.hiddenFieldName === 'suing_under_2500' && finalState) {
         // If suing_under_2500 is checked, ensure suing_over_2500 is unchecked
         var overCheckbox = document.getElementById('suing_over_2500');
         if(overCheckbox) {
             overCheckbox.checked = false;
-            console.log('🔧 [CALC DEBUG] Unchecked suing_over_2500 because suing_under_2500 is checked');
+            // console.log('🔧 [CALC DEBUG] Unchecked suing_over_2500 because suing_under_2500 is checked');
         }
     }
 }
@@ -6226,14 +6514,14 @@ if (typeof handleNext === 'function') {
                     if (autofillValue !== null) {
                             // Skip current_date field - it should be set dynamically
                             if (el.id === 'current_date' || el.name === 'current_date') {
-                                console.log('Skipping autofill for current_date - should be set dynamically');
+                                // console.log('Skipping autofill for current_date - should be set dynamically');
                                 return;
                             }
                             
                             // Check if this answer would trigger a jump to the end
                         if (wouldTriggerJumpToEnd(el, autofillValue)) {
                                 // Don't autofill this answer - keep it as default
-                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
+                                // console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
                             
@@ -6583,20 +6871,10 @@ if (typeof handleNext === 'function') {
             if (typeof updateAllHiddenAddressFields === 'function') {
                 updateAllHiddenAddressFields();
             }
-            
-            // 🔧 NEW: Create hidden checkboxes for any autofilled radio buttons in numbered dropdowns
-            const autofilledRadioButtons = document.querySelectorAll('input[type="radio"][id*="_radio"]:checked');
-            autofilledRadioButtons.forEach(radio => {
-                // Create hidden checkbox for the selected radio button
-                const originalNodeId = radio.id.replace('_radio', '');
-                if (typeof createHiddenCheckboxForRadio === 'function') {
-                    createHiddenCheckboxForRadio(originalNodeId, radio.name, radio.value);
-                }
-            });
         }, 2000); // 2 second delay to ensure fallback autofill completes
                 
             } catch (e) {
-                console.log('Error loading answers:', e);
+                // console.log('Error loading answers:', e);
             }
         }
         
@@ -6750,7 +7028,7 @@ if (typeof handleNext === 'function') {
                 
                 localStorage.setItem('formData_' + formId, JSON.stringify(answers));
             } catch (e) {
-                console.log('Error saving to localStorage:', e);
+                // console.log('Error saving to localStorage:', e);
             }
         }
 
@@ -6925,7 +7203,7 @@ if (typeof handleNext === 'function') {
                     }, 2000);
                 }
             } catch (e) {
-                console.log('No localStorage data found or error loading:', e);
+                // console.log('No localStorage data found or error loading:', e);
             }
         }
 
@@ -6936,7 +7214,7 @@ if (typeof handleNext === 'function') {
             if (isUserLoggedIn) {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('payment') === 'success') {
-                    console.log('Payment successful! Processing PDF...');
+                    // console.log('Payment successful! Processing PDF...');
                     loadAnswers().then(() => {
                         processAllPdfs().then(() => {
                             wipeAnswers();
@@ -7111,7 +7389,7 @@ if (typeof handleNext === 'function') {
             const cartCloseBtn = document.getElementById('cart-close-btn');
 
             function openCart() {
-                console.log('🛒 [CART MENU DEBUG] openCart called');
+                // console.log('🛒 [CART MENU DEBUG] openCart called');
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
@@ -7129,7 +7407,7 @@ if (typeof handleNext === 'function') {
             if (cartIconLink) {
                 cartIconLink.addEventListener('click', function(e) {
                     e.preventDefault();
-                    console.log('🛒 [CART MENU DEBUG] Cart icon clicked');
+                    // console.log('🛒 [CART MENU DEBUG] Cart icon clicked');
                     openCart();
                 });
             }
@@ -7147,7 +7425,7 @@ if (typeof handleNext === 'function') {
 
             // Update cart content based on authentication state
             function updateCartContent() {
-                console.log('🛒 [CART MENU DEBUG] updateCartContent called');
+                // console.log('🛒 [CART MENU DEBUG] updateCartContent called');
                 const cartMessage = document.getElementById('cart-message');
                 const cartDescription = document.getElementById('cart-description');
                 const cartSignupBtn = document.getElementById('cart-signup-btn');
@@ -7155,11 +7433,11 @@ if (typeof handleNext === 'function') {
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 const cartIconLarge = document.querySelector('.cart-icon-large');
                 
-                console.log('🛒 [CART MENU DEBUG] auth.currentUser:', auth.currentUser);
+                // console.log('🛒 [CART MENU DEBUG] auth.currentUser:', auth.currentUser);
                 
                 if (auth.currentUser) {
                     // User is signed in - show cart items
-                    console.log('🛒 [CART MENU DEBUG] User is signed in, loading cart items');
+                    // console.log('🛒 [CART MENU DEBUG] User is signed in, loading cart items');
                     if (cartMessage) cartMessage.textContent = 'Your Cart';
                     if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'none';
@@ -7169,7 +7447,7 @@ if (typeof handleNext === 'function') {
                     loadCartItems();
                 } else {
                     // User is not signed in - show signup message
-                    console.log('🛒 [CART MENU DEBUG] User is not signed in, showing signup message');
+                    // console.log('🛒 [CART MENU DEBUG] User is not signed in, showing signup message');
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
                     if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
@@ -7181,12 +7459,12 @@ if (typeof handleNext === 'function') {
             
             // Load cart items for logged-in users
             async function loadCartItems() {
-                console.log('🛒 [CART MENU DEBUG] loadCartItems called');
+                // console.log('🛒 [CART MENU DEBUG] loadCartItems called');
                 const cartItemsList = document.getElementById('cart-items-list');
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 
                 if (!cartItemsList || !auth.currentUser) {
-                    console.log('🛒 [CART MENU DEBUG] Missing cartItemsList or user not authenticated');
+                    // console.log('🛒 [CART MENU DEBUG] Missing cartItemsList or user not authenticated');
                     return;
                 }
                 
@@ -7200,7 +7478,7 @@ if (typeof handleNext === 'function') {
                     }
                     
                     const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
-                    console.log('🛒 [CART MENU DEBUG] Raw cart data:', cartData);
+                    // console.log('🛒 [CART MENU DEBUG] Raw cart data:', cartData);
                     let cart = [];
                     
                     if (cartData) {
@@ -7209,17 +7487,17 @@ if (typeof handleNext === 'function') {
                             let decodedCartData = cartData;
                             if (cartData.startsWith('%')) {
                                 decodedCartData = decodeURIComponent(cartData);
-                                console.log('🛒 [CART MENU DEBUG] Decoded cart data:', decodedCartData);
+                                // console.log('🛒 [CART MENU DEBUG] Decoded cart data:', decodedCartData);
                             }
                             cart = JSON.parse(decodedCartData);
-                            console.log('🛒 [CART MENU DEBUG] Parsed cart:', cart);
+                            // console.log('🛒 [CART MENU DEBUG] Parsed cart:', cart);
                         } catch (e) {
                             console.error('Error parsing cart data:', e);
                         }
                     }
                     
                     if (cart.length === 0) {
-                        console.log('🛒 [CART MENU DEBUG] Cart is empty, showing empty message');
+                        // console.log('🛒 [CART MENU DEBUG] Cart is empty, showing empty message');
                         cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
                         cartItemsList.style.display = 'block';
                         if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
@@ -8004,7 +8282,7 @@ function copyToClipboard(text, element) {
   if (navigator.clipboard && window.isSecureContext) {
     // Use modern clipboard API
     navigator.clipboard.writeText(text).then(() => {
-      console.log('Copied to clipboard:', text);
+      // console.log('Copied to clipboard:', text);
     }).catch(err => {
       console.error('Failed to copy: ', err);
       fallbackCopyToClipboard(text);
@@ -8039,7 +8317,7 @@ function fallbackCopyToClipboard(text) {
   
   try {
     document.execCommand('copy');
-    console.log('Copied to clipboard (fallback):', text);
+    // console.log('Copied to clipboard (fallback):', text);
   } catch (err) {
     console.error('Fallback copy failed: ', err);
   }
@@ -8205,34 +8483,23 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
 
 // Function to update user full name
 function updateUserFullName() {
-  console.log('🔍 [UPDATE FULL NAME DEBUG] updateUserFullName() called');
   
   const firstNameField = document.getElementById('user_firstname');
   const lastNameField = document.getElementById('user_lastname');
   const fullNameField = document.getElementById('user_fullname');
   
-  console.log('🔍 [UPDATE FULL NAME DEBUG] Field elements found:');
-  console.log('  - firstNameField:', !!firstNameField, firstNameField ? 'value: "' + firstNameField.value + '"' : 'not found');
-  console.log('  - lastNameField:', !!lastNameField, lastNameField ? 'value: "' + lastNameField.value + '"' : 'not found');
-  console.log('  - fullNameField:', !!fullNameField, fullNameField ? 'current value: "' + fullNameField.value + '"' : 'not found');
   
   const firstName = firstNameField?.value || '';
   const lastName = lastNameField?.value || '';
   
-  console.log('🔍 [UPDATE FULL NAME DEBUG] Extracted values:');
-  console.log('  - firstName:', '"' + firstName + '"');
-  console.log('  - lastName:', '"' + lastName + '"');
   
   if (fullNameField) {
     // Simply combine first and last name with a space
     const fullName = (firstName + ' ' + lastName).trim();
-    console.log('🔍 [UPDATE FULL NAME DEBUG] Setting fullName to:', '"' + fullName + '"');
     fullNameField.value = fullName;
     
     // Verify the value was set
-    console.log('🔍 [UPDATE FULL NAME DEBUG] fullNameField.value after setting:', '"' + fullNameField.value + '"');
   } else {
-    console.log('🔍 [UPDATE FULL NAME DEBUG] fullNameField not found - cannot update');
   }
 }
 
@@ -8313,18 +8580,14 @@ document.addEventListener('DOMContentLoaded', function() {
   <script>
   // Include the generateHiddenAddressTextboxes function and helpers in the runtime
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] generateHiddenAddressTextboxes called with questionId:', questionId, 'count:', count);
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] allFieldsInOrder:', allFieldsInOrder);
       
       // Check if this question has location fields (Street, City, State, Zip)
       const hasLocationFields = allFieldsInOrder.some(field => 
           ['Street', 'City', 'State', 'Zip'].includes(field.label)
       );
       
-      console.log('🔧 [HIDDEN ADDRESS DEBUG] hasLocationFields:', hasLocationFields);
       
       if (!hasLocationFields) {
-          console.log('🔧 [HIDDEN ADDRESS] No location fields found for question', questionId);
           return;
       }
       
@@ -8386,12 +8649,11 @@ document.addEventListener('DOMContentLoaded', function() {
           const stateShortField = document.getElementById(stateShortFieldId);
           
           // Debug: Log what fields we're looking for and what we found
-          console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
-          console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
-          console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
-          console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
-          console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
-          console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+          // console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+          // console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+          // console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+          // console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+          // console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
           
           const street = streetField ? streetField.value.trim() : '';
           const city = cityField ? cityField.value.trim() : '';
@@ -8419,7 +8681,6 @@ document.addEventListener('DOMContentLoaded', function() {
               field.addEventListener('input', updateAddress);
               field.addEventListener('change', updateAddress);
           } else {
-              console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
           }
       });
       
@@ -8477,7 +8738,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const addressField = document.getElementById(baseFieldName + '_address');
       
       if (addressField) {
-        console.log('🔧 [HIDDEN ADDRESS] Setting up listeners for multipleTextboxes question:', questionId);
         
         // Set up listeners for location fields
         const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
@@ -8493,12 +8753,11 @@ document.addEventListener('DOMContentLoaded', function() {
               const zipField = document.getElementById(baseFieldName + '_zip');
               const stateShortField = document.getElementById(baseFieldName + '_state_short');
               
-              console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
-              console.log('  - Street field ID:', baseFieldName + '_street', 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
-              console.log('  - City field ID:', baseFieldName + '_city', 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
-              console.log('  - State field ID:', baseFieldName + '_state', 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
-              console.log('  - Zip field ID:', baseFieldName + '_zip', 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
-              console.log('  - State Short field ID:', baseFieldName + '_state_short', 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+              // console.log('  - Street field ID:', baseFieldName + '_street', 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+              // console.log('  - City field ID:', baseFieldName + '_city', 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+              // console.log('  - State field ID:', baseFieldName + '_state', 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+              // console.log('  - Zip field ID:', baseFieldName + '_zip', 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+              // console.log('  - State Short field ID:', baseFieldName + '_state_short', 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
               
               const street = streetField ? streetField.value.trim() : '';
               const city = cityField ? cityField.value.trim() : '';
@@ -8509,13 +8768,11 @@ document.addEventListener('DOMContentLoaded', function() {
               const fullAddress = addressParts.join(', ');
               
               addressField.value = fullAddress;
-              console.log('🔧 [HIDDEN ADDRESS] Updated address for', baseFieldName + '_address', ':', fullAddress);
             };
             
             field.addEventListener('input', updateAddress);
             field.addEventListener('change', updateAddress);
           } else {
-            console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
           }
         });
         
@@ -8536,7 +8793,6 @@ document.addEventListener('DOMContentLoaded', function() {
           const fullAddress = addressParts.join(', ');
           
           addressField.value = fullAddress;
-          console.log('🔧 [HIDDEN ADDRESS] Initial address update for', baseFieldName + '_address', ':', fullAddress);
         }, 1000);
       }
     });
@@ -8544,7 +8800,6 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>`;
 
   // Finally, return the assembled HTML
-  console.log('🔧 [HIDDEN LOGIC DEBUG] Final hiddenLogicConfigs array:', hiddenLogicConfigs);
   return formHTML;
   
   } catch (error) {
@@ -8724,8 +8979,6 @@ function generateHiddenPDFFields(formName) {
     hiddenFieldsHTML += "\n</div>";
     return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
-
-
 
 
 

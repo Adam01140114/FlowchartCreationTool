@@ -595,19 +595,6 @@ function loadFormData(formData) {
                                             });
                                         }
                                     }
-                                } else if (field.type === 'date') {
-                                    // Add a date field
-                                    addDateField(question.questionId);
-                                    
-                                    // Set the field values
-                                    const lastField = unifiedFieldsDiv.lastElementChild;
-                                    if (lastField) {
-                                        const fieldOrder = lastField.getAttribute('data-order');
-                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
-                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
-                                        if (labelTextEl) labelTextEl.textContent = field.label;
-                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
-                                    }
                                 }
                             });
                             
@@ -769,19 +756,6 @@ function loadFormData(formData) {
                                             if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
                                         });
                                     }
-                                }
-                            } else if (field.type === 'date') {
-                                // Add a date field
-                                addDateField(question.questionId);
-                                
-                                // Set the field values
-                                const lastField = unifiedFieldsDiv.lastElementChild;
-                                if (lastField) {
-                                    const fieldOrder = lastField.getAttribute('data-order');
-                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
-                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
-                                    if (labelTextEl) labelTextEl.textContent = field.label;
-                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
                                 }
                             }
                         });
@@ -1913,39 +1887,39 @@ function exportForm() {
                         nodeIdText: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A'
                     });
                     
-            if (fieldType === 'checkbox') {
-                // Handle checkbox fields
-                const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
-                const selectionTypeEl = field.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
-                const optionsContainer = field.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
-                
-                if (fieldNameEl) {
-                    const checkboxOptions = [];
-                    if (optionsContainer) {
-                        const optionElements = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
-                        optionElements.forEach((optionEl, optionIndex) => {
-                            const textEl = optionEl.querySelector('#checkboxText' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
-                            const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
-                            
-                            if (textEl && nodeIdEl) {
-                                checkboxOptions.push({
-                                    text: textEl.value.trim(),
-                                    nodeId: nodeIdEl.value.trim()
+                    if (fieldType === 'checkbox') {
+                        // Handle checkbox fields
+                        const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+                        const selectionTypeEl = field.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+                        const optionsContainer = field.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
+                        
+                        if (fieldNameEl) {
+                            const checkboxOptions = [];
+                            if (optionsContainer) {
+                                const optionElements = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
+                                optionElements.forEach((optionEl, optionIndex) => {
+                                    const textEl = optionEl.querySelector('#checkboxText' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                    const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                    
+                                    if (textEl && nodeIdEl) {
+                                        checkboxOptions.push({
+                                            text: textEl.value.trim(),
+                                            nodeId: nodeIdEl.value.trim()
+                                        });
+                                    }
                                 });
                             }
-                        });
-                    }
-                    
-                    allFieldsInOrder.push({
-                        type: fieldType,
-                        fieldName: fieldNameEl.value.trim(),
-                        selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
-                        options: checkboxOptions,
-                        order: parseInt(fieldOrder)
-                    });
-                }
+                            
+                            allFieldsInOrder.push({
+                                type: fieldType,
+                                fieldName: fieldNameEl.value.trim(),
+                                selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                                options: checkboxOptions,
+                                order: parseInt(fieldOrder)
+                            });
+                        }
                     } else if (labelTextEl && nodeIdTextEl) {
-                        // Handle regular fields (label, amount, date, etc.)
+                        // Handle regular fields (label, amount, etc.)
                         const labelText = labelTextEl.textContent.trim();
                         const nodeIdText = nodeIdTextEl.textContent.trim();
                         
@@ -2043,7 +2017,6 @@ function exportForm() {
                         if (fieldType === 'checkbox') {
                             // Handle checkbox fields
                             const fieldNameEl = el.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
-                            const selectionTypeEl = el.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
                             const optionsContainer = el.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
                             
                             if (fieldNameEl) {
@@ -2066,7 +2039,6 @@ function exportForm() {
                                 const fieldData = {
                                     type: fieldType,
                                     fieldName: fieldNameEl.value.trim(),
-                                    selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
                                     options: checkboxOptions,
                                     order: fieldOrder
                                 };
@@ -2074,7 +2046,7 @@ function exportForm() {
                                 allFieldsInOrder.push(fieldData);
                             }
                         } else if (labelTextEl && nodeIdTextEl) {
-                            // Handle regular fields (label, amount, date, etc.)
+                            // Handle regular fields (label, amount, etc.)
                             const fieldData = {
                                 type: fieldType,
                                 label: labelTextEl.textContent.trim(),

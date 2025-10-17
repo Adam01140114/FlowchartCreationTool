@@ -634,7 +634,6 @@ function addQuestion(sectionId, questionId = null) {
                 <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
                 <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
                 <button type="button" onclick="addCheckboxField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Checkbox</button>
-                <button type="button" onclick="addDateField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #FF9800; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Date</button>
             </div>
             
             <!-- Hidden containers for backward compatibility -->
@@ -2620,21 +2619,21 @@ function addCheckboxField(questionId) {
     fieldDiv.setAttribute('data-type', 'checkbox');
     fieldDiv.setAttribute('data-order', fieldCount);
     fieldDiv.innerHTML = `
-                <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Field Name:</div>
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <input type="text" id="checkboxFieldName${questionId}_${fieldCount}" placeholder="Enter field name" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" onchange="updateCheckboxFieldName(${questionId}, ${fieldCount})">
-                    </div>
-                    <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Selection Type:</div>
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <select id="checkboxSelectionType${questionId}_${fieldCount}" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin: 0 auto; display: block;" onchange="updateCheckboxSelectionType(${questionId}, ${fieldCount})">
-                            <option value="multiple">Mark all that apply</option>
-                            <option value="single">Mark only one</option>
-                        </select>
-                    </div>
-                    <div style="text-align: center; margin-top: 10px;">
-                        <button type="button" onclick="addCheckboxOption(${questionId}, ${fieldCount})" style="margin: 5px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add checkbox option</button>
-                    </div>
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Field Name:</div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <input type="text" id="checkboxFieldName${questionId}_${fieldCount}" placeholder="Enter field name" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" onchange="updateCheckboxFieldName(${questionId}, ${fieldCount})">
+            </div>
+            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Selection Type:</div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <select id="checkboxSelectionType${questionId}_${fieldCount}" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin: 0 auto; display: block;" onchange="updateCheckboxSelectionType(${questionId}, ${fieldCount})">
+                    <option value="multiple">Mark all that apply</option>
+                    <option value="single">Select only one</option>
+                </select>
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+                <button type="button" onclick="addCheckboxOption(${questionId}, ${fieldCount})" style="margin: 5px auto; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: block;">Add checkbox option</button>
+            </div>
             <div id="checkboxOptions${questionId}_${fieldCount}" style="margin-top: 10px;">
                 <!-- Checkbox options will be added here -->
             </div>
@@ -2718,6 +2717,13 @@ function updateCheckboxFieldName(questionId, fieldCount) {
     }
 }
 
+function updateCheckboxSelectionType(questionId, fieldCount) {
+    const selectionTypeSelect = document.getElementById(`checkboxSelectionType${questionId}_${fieldCount}`);
+    if (selectionTypeSelect) {
+        console.log('🔧 [CHECKBOX SELECTION TYPE] Updated selection type:', selectionTypeSelect.value);
+    }
+}
+
 function updateCheckboxOptionText(questionId, fieldCount, optionCount) {
     const textInput = document.getElementById(`checkboxText${questionId}_${fieldCount}_${optionCount}`);
     if (textInput) {
@@ -2729,80 +2735,6 @@ function updateCheckboxOptionNodeId(questionId, fieldCount, optionCount) {
     const nodeIdInput = document.getElementById(`checkboxNodeId${questionId}_${fieldCount}_${optionCount}`);
     if (nodeIdInput) {
         console.log('🔧 [CHECKBOX OPTION NODE ID] Updated option node ID:', nodeIdInput.value);
-    }
-}
-
-function updateCheckboxSelectionType(questionId, fieldCount) {
-    const selectionTypeEl = document.getElementById('checkboxSelectionType' + questionId + '_' + fieldCount);
-    if (selectionTypeEl) {
-        console.log('🔧 [CHECKBOX DEBUG] Selection type updated:', selectionTypeEl.value);
-    }
-}
-
-function addDateField(questionId) {
-    const unifiedDiv = getUnifiedContainer(questionId);
-    console.log('🔧 [ADD DATE DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
-    console.log('🔧 [ADD DATE DEBUG] Found unified container:', !!unifiedDiv);
-    
-    if (!unifiedDiv) {
-        console.error('🔧 [ADD DATE DEBUG] Unified container not found!');
-        return;
-    }
-    
-    // Ensure the unified container is visible
-    if (unifiedDiv.style.display === 'none') {
-        console.log('🔧 [ADD DATE DEBUG] Unified container was hidden, making it visible');
-        unifiedDiv.style.display = 'block';
-    }
-    
-    // Remove placeholder if it exists
-    const placeholder = unifiedDiv.querySelector('div[style*="font-style: italic"]');
-    if (placeholder) {
-        placeholder.remove();
-    }
-    
-    const fieldCount = unifiedDiv.children.length + 1;
-    console.log('🔧 [ADD DATE DEBUG] Current field count:', fieldCount);
-
-    const fieldDiv = document.createElement('div');
-    fieldDiv.className = `unified-field field-${fieldCount}`;
-    fieldDiv.setAttribute('data-type', 'date');
-    fieldDiv.setAttribute('data-order', fieldCount);
-    fieldDiv.innerHTML = `
-        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <div style="font-weight: bold; color: #333;">Date: <span id="labelText${questionId}_${fieldCount}">Date ${fieldCount}</span></div>
-            <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${questionId}_${fieldCount}">date_${fieldCount}</span></div>
-            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${questionId}_${fieldCount}">Date</span> | Order: ${fieldCount}</div>
-            <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
-        </div>
-    `;
-    unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD DATE DEBUG] Added date field to unified container. New count:', unifiedDiv.children.length);
-    
-    // Force the container to be visible and have dimensions
-    unifiedDiv.style.minHeight = '50px';
-    unifiedDiv.style.border = '1px solid #e0e0e0';
-    unifiedDiv.style.borderRadius = '5px';
-    unifiedDiv.style.padding = '10px';
-    unifiedDiv.style.backgroundColor = '#fafafa';
-    unifiedDiv.style.margin = '10px 0';
-    unifiedDiv.style.width = '100%';
-    unifiedDiv.style.display = 'block';
-    unifiedDiv.style.position = 'relative';
-    
-    // Add double-click event listener as backup
-    const displayDiv = fieldDiv.querySelector('div');
-    if (displayDiv) {
-        // Remove any existing event listeners to prevent duplicates
-        if (displayDiv._dblclickHandler) {
-            displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
-        }
-        
-        // Add event listener for double-click editing
-        displayDiv._dblclickHandler = function() {
-            editUnifiedField(questionId, fieldCount);
-        };
-        displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
     }
 }
 
@@ -3376,7 +3308,6 @@ function editUnifiedField(questionId, fieldOrder) {
             <select id="editType${questionId}_${fieldOrder}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
                 <option value="label" ${currentType === 'label' ? 'selected' : ''}>Label</option>
                 <option value="amount" ${currentType === 'amount' ? 'selected' : ''}>Amount</option>
-                <option value="date" ${currentType === 'date' ? 'selected' : ''}>Date</option>
             </select>
         </div>
         <div style="text-align: center; margin-top: 15px;">
@@ -3422,10 +3353,8 @@ function saveUnifiedField(questionId, fieldOrder) {
     const displayDiv = fieldDiv.querySelector('div');
     if (newType === 'label') {
         displayDiv.querySelector('div:first-child').innerHTML = 'Label: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
-    } else if (newType === 'amount') {
+    } else {
         displayDiv.querySelector('div:first-child').innerHTML = 'Amount: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
-    } else if (newType === 'date') {
-        displayDiv.querySelector('div:first-child').innerHTML = 'Date: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
     }
     
     // Remove any existing event listeners to prevent duplicates
@@ -3475,21 +3404,8 @@ function updateHiddenContainers(questionId) {
     fields.forEach(field => {
         const fieldType = field.getAttribute('data-type');
         const fieldOrder = field.getAttribute('data-order');
-        
-        let labelText, nodeIdText;
-        if (fieldType === 'checkbox') {
-            // Handle checkbox fields
-            const fieldNameEl = document.getElementById('checkboxFieldName' + questionId + '_' + fieldOrder);
-            const selectionTypeEl = document.getElementById('checkboxSelectionType' + questionId + '_' + fieldOrder);
-            labelText = fieldNameEl ? fieldNameEl.value : '';
-            nodeIdText = selectionTypeEl ? selectionTypeEl.value : '';
-        } else {
-            // Handle regular fields
-            const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
-            const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
-            labelText = labelTextEl ? labelTextEl.textContent : '';
-            nodeIdText = nodeIdTextEl ? nodeIdTextEl.textContent : '';
-        }
+        const labelText = document.getElementById('labelText' + questionId + '_' + fieldOrder).textContent;
+        const nodeIdText = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder).textContent;
         
         if (fieldType === 'label') {
             const hiddenLabelDiv = document.createElement('div');
