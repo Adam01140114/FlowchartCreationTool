@@ -1069,6 +1069,22 @@ window.showNumberedDropdownProperties = function(cell) {
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
   
+  // Close on Enter key press (auto-save)
+  modal.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.target.matches('input, textarea, button')) {
+      e.preventDefault();
+      // Auto-save before closing
+      if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+        window.updatemultipleDropdownTypeCell(cell);
+      }
+      document.body.removeChild(modal);
+    }
+  });
+  
+  // Make modal focusable for keyboard events
+  modal.setAttribute('tabindex', '0');
+  modal.focus();
+  
   // Close on outside click (auto-save)
   modal.onclick = (e) => {
     if (e.target === modal) {
@@ -1274,28 +1290,41 @@ function createOptionsContainer(cell) {
     }
     
     if (draggedType === 'option' && dropType === 'option') {
-      // Reorder options
+      // Reorder options using unified item order
       const options = cell._textboxes || [];
-      const draggedOption = options[draggedIndex];
-      options.splice(draggedIndex, 1);
-      options.splice(dropIndex, 0, draggedOption);
       
-      // Update location index if needed
-      if (cell._locationIndex !== undefined) {
-        const oldLocationIndex = cell._locationIndex;
-        if (draggedIndex < cell._locationIndex && dropIndex >= cell._locationIndex) {
-          cell._locationIndex--;
-        } else if (draggedIndex > cell._locationIndex && dropIndex <= cell._locationIndex) {
-          cell._locationIndex++;
-        }
+      // Find the dragged option in the item order
+      const draggedOptionIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'option' && item.index === draggedIndex
+      );
+      
+      // Find the target option in the item order
+      const targetOptionIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'option' && item.index === dropIndex
+      );
+      
+      if (draggedOptionIndex !== -1 && targetOptionIndex !== -1) {
+        // Remove the option from its current position
+        const draggedOption = cell._itemOrder.splice(draggedOptionIndex, 1)[0];
         
-        console.log('🔍 [LOCATION ORDER DEBUG] Location index updated during option reorder:', {
-          oldIndex: oldLocationIndex,
-          newIndex: cell._locationIndex,
-          draggedIndex: draggedIndex,
-          dropIndex: dropIndex
+        // Insert it at the target position
+        cell._itemOrder.splice(targetOptionIndex, 0, draggedOption);
+        
+        // Update the option indices to match their new positions
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'option') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'option'
+            ).length - 1;
+          }
         });
       }
+      
+      console.log('🔍 [LOCATION ORDER DEBUG] Option reordered using unified ordering:', {
+        draggedIndex: draggedIndex,
+        dropIndex: dropIndex,
+        itemOrder: cell._itemOrder
+      });
     } else if (draggedType === 'checkbox' && dropType === 'checkbox') {
       // Reorder checkboxes
       const checkboxes = cell._checkboxes || [];
@@ -1363,15 +1392,33 @@ function createOptionsContainer(cell) {
         optionsCount: options.length
       });
     } else if (draggedType === 'location' && dropType === 'option') {
-      // Move location to position of option
+      // Move location to position of option using unified item order
       console.log('🔍 [LOCATION ORDER DEBUG] Moving location to position:', dropIndex);
       console.log('🔍 [PROPERTIES MENU DEBUG] Before location index update:', cell._locationIndex);
       
-      // When dropping location on an option, we need to determine the intended position
-      // If dropping on the first option (index 0), location should be at index 0 (top)
-      // If dropping on the second option (index 1), location should be at index 1 (middle)
-      // The current logic is correct, but we need better visual feedback
-      cell._locationIndex = dropIndex;
+      // Find the dragged location in the item order
+      const draggedLocationIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'location'
+      );
+      
+      // Find the target option in the item order
+      const targetOptionIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'option' && item.index === dropIndex
+      );
+      
+      if (draggedLocationIndex !== -1 && targetOptionIndex !== -1) {
+        // Remove the location from its current position
+        const draggedLocation = cell._itemOrder.splice(draggedLocationIndex, 1)[0];
+        
+        // Insert it at the target position
+        cell._itemOrder.splice(targetOptionIndex, 0, draggedLocation);
+        
+        // Update the location index to match its new position
+        const newLocationIndex = cell._itemOrder.findIndex(item => 
+          item.type === 'location'
+        );
+        cell._locationIndex = newLocationIndex;
+      }
       
       console.log('🔍 [LOCATION ORDER DEBUG] New location index:', cell._locationIndex);
       console.log('🔍 [PROPERTIES MENU DEBUG] After location index update:', cell._locationIndex);
@@ -1381,22 +1428,40 @@ function createOptionsContainer(cell) {
         'AFTER options');
       console.log('🔍 [PROPERTIES MENU DEBUG] This will place the location BEFORE the option at index:', cell._locationIndex);
     } else if (draggedType === 'option' && dropType === 'location') {
-      // Move option to position of location
+      // Move option to position of location using unified item order
       const options = cell._textboxes || [];
-      const draggedOption = options[draggedIndex];
-      options.splice(draggedIndex, 1);
-      options.splice(cell._locationIndex, 0, draggedOption);
       
-      // Update location index
-      const oldLocationIndex = cell._locationIndex;
-      if (draggedIndex < cell._locationIndex) {
-        cell._locationIndex--;
+      // Find the dragged option in the item order
+      const draggedOptionIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'option' && item.index === draggedIndex
+      );
+      
+      // Find the location in the item order
+      const locationIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'location'
+      );
+      
+      if (draggedOptionIndex !== -1 && locationIndex !== -1) {
+        // Remove the option from its current position
+        const draggedOption = cell._itemOrder.splice(draggedOptionIndex, 1)[0];
+        
+        // Insert it at the location position
+        cell._itemOrder.splice(locationIndex, 0, draggedOption);
+        
+        // Update the option indices to match their new positions
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'option') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'option'
+            ).length - 1;
+          }
+        });
       }
       
-      console.log('🔍 [LOCATION ORDER DEBUG] Location index updated during option-to-location drag:', {
-        oldIndex: oldLocationIndex,
-        newIndex: cell._locationIndex,
-        draggedIndex: draggedIndex
+      console.log('🔍 [LOCATION ORDER DEBUG] Option moved to location position using unified ordering:', {
+        draggedIndex: draggedIndex,
+        locationIndex: locationIndex,
+        itemOrder: cell._itemOrder
       });
     }
     
@@ -1417,9 +1482,10 @@ function createOptionsContainer(cell) {
     }
   });
   
-  // Add existing options, checkboxes, and location indicator in correct order
+  // Add existing options, checkboxes, times, and location indicator in correct order
   const options = cell._textboxes || [];
   const checkboxes = cell._checkboxes || [];
+  const times = cell._times || [];
   const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
   
   console.log('🔍 [PROPERTIES MENU DEBUG] createOptionsContainer called for cell:', cell.id);
@@ -1453,23 +1519,39 @@ function createOptionsContainer(cell) {
         });
         
         container.appendChild(optionContainer);
-      } else if (item.type === 'checkbox' && checkboxes[item.index]) {
-        const checkboxContainer = createCheckboxField(checkboxes[item.index], item.index, cell, container);
-        
-        // Add drag event listeners
-        checkboxContainer.addEventListener('dragstart', (e) => {
-          draggedElement = checkboxContainer;
-          e.dataTransfer.effectAllowed = 'move';
-          checkboxContainer.style.opacity = '0.5';
-        });
-        
-        checkboxContainer.addEventListener('dragend', (e) => {
-          checkboxContainer.style.opacity = '1';
-          draggedElement = null;
-        });
-        
-        container.appendChild(checkboxContainer);
-      } else if (item.type === 'location') {
+        } else if (item.type === 'checkbox' && checkboxes[item.index]) {
+          const checkboxContainer = createCheckboxField(checkboxes[item.index], item.index, cell, container);
+          
+          // Add drag event listeners
+          checkboxContainer.addEventListener('dragstart', (e) => {
+            draggedElement = checkboxContainer;
+            e.dataTransfer.effectAllowed = 'move';
+            checkboxContainer.style.opacity = '0.5';
+          });
+          
+          checkboxContainer.addEventListener('dragend', (e) => {
+            checkboxContainer.style.opacity = '1';
+            draggedElement = null;
+          });
+          
+          container.appendChild(checkboxContainer);
+        } else if (item.type === 'time' && times[item.index]) {
+          const timeContainer = createTimeField(times[item.index], item.index, cell, container);
+          
+          // Add drag event listeners
+          timeContainer.addEventListener('dragstart', (e) => {
+            draggedElement = timeContainer;
+            e.dataTransfer.effectAllowed = 'move';
+            timeContainer.style.opacity = '0.5';
+          });
+          
+          timeContainer.addEventListener('dragend', (e) => {
+            timeContainer.style.opacity = '1';
+            draggedElement = null;
+          });
+          
+          container.appendChild(timeContainer);
+        } else if (item.type === 'location') {
         const locationIndicator = createLocationIndicator(cell, container);
         
         // Add drag event listeners to location indicator
@@ -1651,13 +1733,82 @@ function createOptionsContainer(cell) {
     if (!cell._checkboxes) cell._checkboxes = [];
     cell._checkboxes.push(newCheckbox);
     
+    // Initialize item order if it doesn't exist, preserving current visual order
+    if (!cell._itemOrder) {
+      cell._itemOrder = [];
+      const options = cell._textboxes || [];
+      const locationIndex = cell._locationIndex;
+      
+      // Replicate the exact same logic as the default order display
+      // This matches the createOptionsContainer default order logic
+      options.forEach((option, index) => {
+        // Add location indicator BEFORE this option if it's at the location index
+        if (index === locationIndex) {
+          cell._itemOrder.push({ type: 'location', index: locationIndex });
+        }
+        // Add the option
+        cell._itemOrder.push({ type: 'option', index: index });
+      });
+      
+      // Add any existing checkboxes at the end (they weren't in the original display)
+      const existingCheckboxes = cell._checkboxes.slice(0, -1); // Exclude the one we just added
+      existingCheckboxes.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'checkbox', index: index });
+      });
+    }
+    
+    // Add the new checkbox to the end of the item order
+    cell._itemOrder.push({ type: 'checkbox', index: cell._checkboxes.length - 1 });
+    
     console.log('🔍 [PROPERTIES MENU DEBUG] After adding checkbox:', {
-      checkboxesCount: cell._checkboxes.length
+      checkboxesCount: cell._checkboxes.length,
+      itemOrder: cell._itemOrder
     });
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Debug: Log the cell properties before saving
+        console.log('🔍 [CHECKBOX DEBUG] Cell properties before saving:', {
+          cellId: cell.id,
+          hasCheckboxes: !!cell._checkboxes,
+          checkboxesCount: cell._checkboxes?.length || 0,
+          checkboxes: cell._checkboxes,
+          hasItemOrder: !!cell._itemOrder,
+          itemOrder: cell._itemOrder
+        });
+        
+        // Explicitly set the cell properties
+        graph.getModel().setValue(cell, cell.value);
+        // Also ensure the properties are marked as changed
+        cell._checkboxes = cell._checkboxes; // Force property update
+        
+        // Debug: Log the cell properties after saving
+        console.log('🔍 [CHECKBOX DEBUG] Cell properties after saving:', {
+          cellId: cell.id,
+          hasCheckboxes: !!cell._checkboxes,
+          checkboxesCount: cell._checkboxes?.length || 0,
+          checkboxes: cell._checkboxes,
+          hasItemOrder: !!cell._itemOrder,
+          itemOrder: cell._itemOrder
+        });
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
     
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
+    
+    // Refresh the canvas display to show the checkbox
+    if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+      console.log('🔍 [CHECKBOX DEBUG] Refreshing canvas display to show checkbox');
+      window.updatemultipleDropdownTypeCell(cell);
+    }
+    
     // Refresh the entire container to show the new checkbox entry
     console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
     const newContainer = createOptionsContainer(cell);
@@ -1708,6 +1859,101 @@ function createOptionsContainer(cell) {
   };
   
   container.appendChild(addLocationIndicatorBtn);
+  
+  // Add time button
+  const addTimeBtn = document.createElement('button');
+  addTimeBtn.textContent = '+ Add Time';
+  addTimeBtn.style.cssText = `
+    background: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+  `;
+  addTimeBtn.onclick = () => {
+    console.log('🔍 [PROPERTIES MENU DEBUG] Add Time button clicked for cell:', cell.id);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Before adding time:', {
+      timesCount: (cell._times || []).length
+    });
+    
+    // Create new time entry
+    const newTime = { timeText: '', timeId: '' };
+    if (!cell._times) cell._times = [];
+    cell._times.push(newTime);
+    
+    // Initialize item order if it doesn't exist, preserving current visual order
+    if (!cell._itemOrder) {
+      cell._itemOrder = [];
+      const options = cell._textboxes || [];
+      const locationIndex = cell._locationIndex;
+      
+      // Replicate the exact same logic as the default order display
+      // This matches the createOptionsContainer default order logic
+      options.forEach((option, index) => {
+        // Add location indicator BEFORE this option if it's at the location index
+        if (index === locationIndex) {
+          cell._itemOrder.push({ type: 'location', index: locationIndex });
+        }
+        // Add the option
+        cell._itemOrder.push({ type: 'option', index: index });
+      });
+      
+      // Add any existing checkboxes at the end
+      const existingCheckboxes = cell._checkboxes || [];
+      existingCheckboxes.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'checkbox', index: index });
+      });
+      
+      // Add any existing times at the end
+      const existingTimes = cell._times.slice(0, -1); // Exclude the one we just added
+      existingTimes.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'time', index: index });
+      });
+    }
+    
+    // Add the new time to the end of the item order
+    cell._itemOrder.push({ type: 'time', index: cell._times.length - 1 });
+    
+    console.log('🔍 [PROPERTIES MENU DEBUG] After adding time:', {
+      timesCount: cell._times.length,
+      itemOrder: cell._itemOrder
+    });
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        graph.getModel().setValue(cell, cell.value);
+        cell._times = cell._times;
+        cell._itemOrder = cell._itemOrder;
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    
+    // Refresh the canvas display to show the time
+    if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+      console.log('🔍 [TIME DEBUG] Refreshing canvas display to show time');
+      window.updatemultipleDropdownTypeCell(cell);
+    }
+    
+    // Refresh the entire container to show the new time entry
+    console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
+    const newContainer = createOptionsContainer(cell);
+    container.parentNode.replaceChild(newContainer, container);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
+  };
+  
+  container.appendChild(addTimeBtn);
   
   return container;
 }
@@ -1948,6 +2194,21 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   `;
   checkboxTextInput.onblur = () => {
     option.checkboxText = checkboxTextInput.value;
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Explicitly set the cell properties
+        graph.getModel().setValue(cell, cell.value);
+        // Also ensure the properties are marked as changed
+        cell._checkboxes = cell._checkboxes; // Force property update
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+    
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
@@ -1967,6 +2228,21 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   `;
   nodeIdInput.onblur = () => {
     option.nodeId = nodeIdInput.value;
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Explicitly set the cell properties
+        graph.getModel().setValue(cell, cell.value);
+        // Also ensure the properties are marked as changed
+        cell._checkboxes = cell._checkboxes; // Force property update
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+    
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
@@ -2004,6 +2280,137 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   miniOptionEntry.appendChild(deleteMiniBtn);
   
   return miniOptionEntry;
+}
+
+// Helper function to create time field
+function createTimeField(time, index, cell, parentContainer) {
+  const timeContainer = document.createElement('div');
+  timeContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: move;
+    transition: 0.2s;
+  `;
+  timeContainer.draggable = true;
+  timeContainer.dataset.index = index;
+  timeContainer.dataset.type = 'time';
+
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.textContent = '⋮⋮';
+  dragHandle.style.cssText = `
+    cursor: move;
+    color: #666;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+  `;
+
+  // Time Text input
+  const timeTextInput = document.createElement('input');
+  timeTextInput.type = 'text';
+  timeTextInput.placeholder = 'Time Text:';
+  timeTextInput.value = time.timeText || '';
+  timeTextInput.style.cssText = `
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  `;
+  timeTextInput.onblur = () => {
+    time.timeText = timeTextInput.value;
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        graph.getModel().setValue(cell, cell.value);
+        cell._times = cell._times;
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+  };
+
+  // Time ID input
+  const timeIdInput = document.createElement('input');
+  timeIdInput.type = 'text';
+  timeIdInput.placeholder = 'Time ID:';
+  timeIdInput.value = time.timeId || '';
+  timeIdInput.style.cssText = `
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  `;
+  timeIdInput.onblur = () => {
+    time.timeId = timeIdInput.value;
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        graph.getModel().setValue(cell, cell.value);
+        cell._times = cell._times;
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+  };
+
+  // Copy ID button
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Copy ID';
+  copyBtn.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  copyBtn.onclick = () => {
+    const timeId = time.timeId || `time_${index}`;
+    navigator.clipboard.writeText(timeId);
+    alert(`Time ID copied: ${timeId}`);
+  };
+
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.style.cssText = `
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  deleteBtn.onclick = () => {
+    if (!cell._times) cell._times = [];
+    cell._times.splice(index, 1);
+    // Refresh the entire container to maintain proper order
+    const newContainer = createOptionsContainer(cell);
+    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+
+  timeContainer.appendChild(dragHandle);
+  timeContainer.appendChild(timeTextInput);
+  timeContainer.appendChild(timeIdInput);
+  timeContainer.appendChild(copyBtn);
+  timeContainer.appendChild(deleteBtn);
+
+  return timeContainer;
 }
 
 // Helper function to create checkbox field
@@ -2068,6 +2475,21 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
   `;
   fieldNameInput.onblur = () => {
     checkbox.fieldName = fieldNameInput.value;
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Explicitly set the cell properties
+        graph.getModel().setValue(cell, cell.value);
+        // Also ensure the properties are marked as changed
+        cell._checkboxes = cell._checkboxes; // Force property update
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+    
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
@@ -2145,6 +2567,20 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
     } else {
       // If button doesn't exist, just append to the end
       checkboxContainer.appendChild(miniOptionEntry);
+    }
+    
+    // Force save the cell properties to the graph model
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Explicitly set the cell properties
+        graph.getModel().setValue(cell, cell.value);
+        // Also ensure the properties are marked as changed
+        cell._checkboxes = cell._checkboxes; // Force property update
+      } finally {
+        graph.getModel().endUpdate();
+      }
     }
     
     if (typeof window.requestAutosave === 'function') {
@@ -2627,6 +3063,7 @@ function updatemultipleDropdownTypeCell(cell) {
   const twoNums = cell._twoNumbers || { first: '0', second: '0' };
   const options = cell._textboxes || [];
   const checkboxes = cell._checkboxes || [];
+  const times = cell._times || [];
   const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
   
   console.log('🔍 [CANVAS DISPLAY DEBUG] Cell data received:', {
@@ -2666,6 +3103,13 @@ function updatemultipleDropdownTypeCell(cell) {
           text: checkboxes[item.index].fieldName || 'Checkbox ' + (item.index + 1),
           options: checkboxes[item.index].options || []
         });
+      } else if (item.type === 'time' && times[item.index]) {
+        allItems.push({
+          type: 'time',
+          index: item.index,
+          text: times[item.index].timeText || 'Time ' + (item.index + 1),
+          timeId: times[item.index].timeId || ''
+        });
       } else if (item.type === 'location') {
         allItems.push({
           type: 'location',
@@ -2694,6 +3138,16 @@ function updatemultipleDropdownTypeCell(cell) {
         index: index,
         text: checkbox.fieldName || 'Checkbox ' + (index + 1),
         options: checkbox.options || []
+      });
+    });
+    
+    // Add all times to the combined array
+    times.forEach((time, index) => {
+      allItems.push({
+        type: 'time',
+        index: index,
+        text: time.timeText || 'Time ' + (index + 1),
+        timeId: time.timeId || ''
       });
     });
     
@@ -2735,19 +3189,27 @@ function updatemultipleDropdownTypeCell(cell) {
     } else if (item.type === 'checkbox') {
       console.log('🔍 [CANVAS DISPLAY DEBUG] Adding checkbox HTML for:', item.text);
       const checkboxOptionsHtml = item.options.map(opt => 
-        `<div style="margin: 2px 0; padding: 2px 6px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 3px; font-size: 10px; color: #1565c0;">
+        `<div style="margin: 2px 0; padding: 2px 6px; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 3px; font-size: 10px; color: #6a1b9a;">
           ☑ ${getEscapeAttr()(opt.checkboxText || '')} → ${getEscapeAttr()(opt.nodeId || '')}
         </div>`
       ).join('');
       
-      optionsHtml += `
-        <div style="margin: 4px 0; padding: 8px 12px; background: #e3f2fd; border: 2px dashed #2196f3; border-radius: 6px; font-size: 12px; color: #1565c0; font-weight: bold; text-align: center;">
-          <div style="margin-bottom: 4px;">☑ ${getEscapeAttr()(item.text)}</div>
-          ${checkboxOptionsHtml}
-        </div>
-      `;
-    }
-  });
+        optionsHtml += `
+          <div style="margin: 4px 0; padding: 8px 12px; background: #f3e5f5; border: 2px dashed #9c27b0; border-radius: 6px; font-size: 12px; color: #6a1b9a; font-weight: bold; text-align: center;">
+            <div style="margin-bottom: 4px;">☑ ${getEscapeAttr()(item.text)}</div>
+            ${checkboxOptionsHtml}
+          </div>
+        `;
+      } else if (item.type === 'time') {
+        console.log('🔍 [CANVAS DISPLAY DEBUG] Adding time HTML for:', item.text);
+        optionsHtml += `
+          <div style="margin: 4px 0; padding: 8px 12px; background: #fff3e0; border: 2px dashed #ff9800; border-radius: 6px; font-size: 12px; color: #e65100; font-weight: bold; text-align: center;">
+            <div style="margin-bottom: 4px;">🕐 ${getEscapeAttr()(item.text)}</div>
+            <div style="font-size: 10px; color: #bf360c;">ID: ${getEscapeAttr()(item.timeId || '')}</div>
+          </div>
+        `;
+      }
+    });
   
   console.log('🔍 [LOCATION ORDER DEBUG] Generated HTML length:', optionsHtml.length);
   console.log('🔍 [LOCATION ORDER DEBUG] Generated options HTML:', optionsHtml);

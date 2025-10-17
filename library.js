@@ -1619,6 +1619,9 @@ window.saveFlowchart = function() {
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
+      _checkboxes: cell._checkboxes||null,
+      _itemOrder: cell._itemOrder||null,
+      _times: cell._times||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
     };
@@ -1756,6 +1759,9 @@ window.saveAsFlowchart = function() {
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
+      _checkboxes: cell._checkboxes||null,
+      _itemOrder: cell._itemOrder||null,
+      _times: cell._times||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
     };
@@ -2804,6 +2810,21 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         
         // Transfer all custom properties
         if (item._textboxes) newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
+        if (item._checkboxes) {
+          console.log('🔧 [IMPORT DEBUG] Loading _checkboxes for cell', item.id, ':', item._checkboxes);
+          newCell._checkboxes = JSON.parse(JSON.stringify(item._checkboxes));
+          console.log('🔧 [IMPORT DEBUG] Loaded _checkboxes data:', newCell._checkboxes);
+        }
+        if (item._itemOrder) {
+          console.log('🔧 [IMPORT DEBUG] Loading _itemOrder for cell', item.id, ':', item._itemOrder);
+          newCell._itemOrder = JSON.parse(JSON.stringify(item._itemOrder));
+          console.log('🔧 [IMPORT DEBUG] Loaded _itemOrder data:', newCell._itemOrder);
+        }
+        if (item._times) {
+          console.log('🔧 [IMPORT DEBUG] Loading _times for cell', item.id, ':', item._times);
+          newCell._times = JSON.parse(JSON.stringify(item._times));
+          console.log('🔧 [IMPORT DEBUG] Loaded _times data:', newCell._times);
+        }
         if (item._questionText) {
           // Decode HTML entities in _questionText as well
           let questionText = item._questionText;

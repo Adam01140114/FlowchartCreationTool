@@ -5310,6 +5310,17 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._questionId) cellData._questionId = cell._questionId;
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       
+      // checkbox properties
+      if (cell._checkboxes) {
+        cellData._checkboxes = JSON.parse(JSON.stringify(cell._checkboxes));
+      }
+      if (cell._itemOrder) {
+        cellData._itemOrder = JSON.parse(JSON.stringify(cell._itemOrder));
+      }
+      if (cell._times) {
+        cellData._times = JSON.parse(JSON.stringify(cell._times));
+      }
+      
       // textbox properties
       if (cell._amountName) cellData._amountName = cell._amountName;
       if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
