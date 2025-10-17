@@ -4569,7 +4569,7 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
-        createBlueSquare(left, top, width, height);
+        // createBlueSquare(left, top, width, height); // DISABLED - user doesn't want solid blue squares
       }
       
       // Cancel timeout since we're handling it here
@@ -4604,7 +4604,7 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
-        createBlueSquare(left, top, width, height);
+        // createBlueSquare(left, top, width, height); // DISABLED - user doesn't want solid blue squares
       }
       
       // Cancel timeout since we're handling it here
@@ -4727,7 +4727,7 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
-        createBlueSquare(left, top, width, height);
+        // createBlueSquare(left, top, width, height); // DISABLED - user doesn't want solid blue squares
       }
       
       // Cancel timeout since we're handling it here
@@ -4998,7 +4998,7 @@ document.addEventListener("DOMContentLoaded", function() {
           // Remove the temporary selection box
           removeTemporarySelectionBox();
           
-          createBlueSquare(left, top, finalWidth, finalHeight);
+          // createBlueSquare(left, top, finalWidth, finalHeight); // DISABLED - user doesn't want solid blue squares
           
           // Reset state - but keep rightClickDragging true so user can still cancel
           // rightClickDragging = false; // REMOVED - keep dragging state active
@@ -5047,8 +5047,18 @@ document.addEventListener("DOMContentLoaded", function() {
   // Add test function to verify createBlueSquare works
   window.testCreateBlueSquare = function() {
     console.log('🔧 [SQUARE DEBUG] TEST: Testing createBlueSquare function');
-    createBlueSquare(100, 100, 100, 100);
+    // createBlueSquare(100, 100, 100, 100); // DISABLED - user doesn't want solid blue squares
   };
+  
+  // Add CTRL key listener to remove light blue square
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Control' || e.ctrlKey) {
+      console.log('🔧 [SQUARE DEBUG] CTRL: CTRL key pressed - removing light blue square');
+      removeTemporarySelectionBox();
+      // Also reset the square creation state when CTRL is pressed
+      resetSquareCreationState();
+    }
+  });
   
   // Test square function removed - no longer needed
   
