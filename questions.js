@@ -1891,16 +1891,16 @@ function createOptionsContainer(cell) {
       const options = cell._textboxes || [];
       const locationIndex = cell._locationIndex;
       
-      // Replicate the exact same logic as the default order display
-      // This matches the createOptionsContainer default order logic
+      // Build the order to match the current visual display
+      // First, add all options in order
       options.forEach((option, index) => {
-        // Add location indicator BEFORE this option if it's at the location index
-        if (index === locationIndex) {
-          cell._itemOrder.push({ type: 'location', index: locationIndex });
-        }
-        // Add the option
         cell._itemOrder.push({ type: 'option', index: index });
       });
+      
+      // Then add location indicator if it exists (at the end, not before a specific option)
+      if (locationIndex >= 0) {
+        cell._itemOrder.push({ type: 'location', index: locationIndex });
+      }
       
       // Add any existing checkboxes at the end
       const existingCheckboxes = cell._checkboxes || [];

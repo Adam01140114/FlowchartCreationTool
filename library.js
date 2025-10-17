@@ -330,64 +330,152 @@ window.exportGuiJson = function(download = true) {
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
       
-      // Create allFieldsInOrder array to maintain proper field ordering
+      // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
       const allFieldsInOrder = [];
-      const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
       
-      // Process each textbox in order
-      if (cell._textboxes && cell._textboxes.length > 0) {
-        cell._textboxes.forEach((tb, index) => {
-          const labelName = tb.nameId || "";
-          const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-          
-          // Check if this textbox is marked as an amount option
-          const fieldType = tb.isAmountOption ? "amount" : "label";
-          
-          allFieldsInOrder.push({
-            type: fieldType,
-            label: labelName,
-            nodeId: fieldNodeId,
-            order: index + 1
-          });
-        });
-      }
-      
-      // Insert location fields at the correct position if locationIndex is set
-      // For multiple textbox questions, location data is indicated by _locationIndex property
-      const shouldIncludeLocationFields = locationIndex >= 0;
-      
-      if (shouldIncludeLocationFields) {
-        const locationFields = [
-          { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
-          { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
-          { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
-          { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
-        ];
+      // If _itemOrder exists, use it to determine the correct order
+      if (cell._itemOrder && cell._itemOrder.length > 0) {
+        console.log('🔧 [GUI EXPORT DEBUG] Using _itemOrder for field ordering:', cell._itemOrder);
         
-        // If there are no existing fields, just add location fields directly
-        if (allFieldsInOrder.length === 0) {
-          locationFields.forEach((field, fieldIndex) => {
+        cell._itemOrder.forEach((item, orderIndex) => {
+          if (item.type === 'option' && cell._textboxes && cell._textboxes[item.index]) {
+            const tb = cell._textboxes[item.index];
+            const labelName = tb.nameId || "";
+            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+            const fieldType = tb.isAmountOption ? "amount" : "label";
+            
             allFieldsInOrder.push({
-              type: field.label === "Zip" ? "amount" : "label",
-              label: field.label,
-              nodeId: field.nodeId,
-              order: fieldIndex + 1
+              type: fieldType,
+              label: labelName,
+              nodeId: fieldNodeId,
+              order: orderIndex + 1
+            });
+          } else if (item.type === 'location' && cell._locationIndex >= 0) {
+            const locationFields = [
+              { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+              { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+              { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+              { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+            ];
+            
+            locationFields.forEach((field, fieldIndex) => {
+              allFieldsInOrder.push({
+                type: field.label === "Zip" ? "amount" : "label",
+                label: field.label,
+                nodeId: field.nodeId,
+                order: orderIndex + 1 + fieldIndex
+              });
+            });
+          } else if (item.type === 'time' && cell._times && cell._times[item.index]) {
+            const time = cell._times[item.index];
+            allFieldsInOrder.push({
+              type: "date", // Use "date" type as expected in GUI JSON
+              label: time.timeText || "",
+              nodeId: time.timeId || "",
+              order: orderIndex + 1
+            });
+          } else if (item.type === 'checkbox' && cell._checkboxes && cell._checkboxes[item.index]) {
+            const checkbox = cell._checkboxes[item.index];
+            const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+              text: option.checkboxText || option.text || "",
+              nodeId: option.nodeId || ""
+            })) : [];
+            
+            allFieldsInOrder.push({
+              type: "checkbox",
+              fieldName: checkbox.fieldName || "",
+              selectionType: "multiple",
+              options: checkboxOptions,
+              order: orderIndex + 1
+            });
+          }
+        });
+      } else {
+        // Fallback to old logic if _itemOrder doesn't exist
+        console.log('🔧 [GUI EXPORT DEBUG] No _itemOrder found, using fallback logic');
+        const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+        
+        // Process each textbox in order
+        if (cell._textboxes && cell._textboxes.length > 0) {
+          cell._textboxes.forEach((tb, index) => {
+            const labelName = tb.nameId || "";
+            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+            
+            // Check if this textbox is marked as an amount option
+            const fieldType = tb.isAmountOption ? "amount" : "label";
+            
+            allFieldsInOrder.push({
+              type: fieldType,
+              label: labelName,
+              nodeId: fieldNodeId,
+              order: index + 1
             });
           });
-        } else {
-          // Insert location fields at the specified position
-          locationFields.forEach((field, fieldIndex) => {
-            allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
-              type: field.label === "Zip" ? "amount" : "label",
-              label: field.label,
-              nodeId: field.nodeId,
-              order: locationIndex + fieldIndex + 1
-            });
-          });
+        }
+        
+        // Insert location fields at the correct position if locationIndex is set
+        const shouldIncludeLocationFields = locationIndex >= 0;
+        
+        if (shouldIncludeLocationFields) {
+          const locationFields = [
+            { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+            { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+            { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+            { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+          ];
           
-          // Update order numbers for all fields after insertion
-          allFieldsInOrder.forEach((field, index) => {
-            field.order = index + 1;
+          if (allFieldsInOrder.length === 0) {
+            locationFields.forEach((field, fieldIndex) => {
+              allFieldsInOrder.push({
+                type: field.label === "Zip" ? "amount" : "label",
+                label: field.label,
+                nodeId: field.nodeId,
+                order: fieldIndex + 1
+              });
+            });
+          } else {
+            locationFields.forEach((field, fieldIndex) => {
+              allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+                type: field.label === "Zip" ? "amount" : "label",
+                label: field.label,
+                nodeId: field.nodeId,
+                order: locationIndex + fieldIndex + 1
+              });
+            });
+            
+            allFieldsInOrder.forEach((field, index) => {
+              field.order = index + 1;
+            });
+          }
+        }
+        
+        // Add checkbox fields if they exist
+        if (cell._checkboxes && cell._checkboxes.length > 0) {
+          cell._checkboxes.forEach((checkbox, checkboxIndex) => {
+            const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+              text: option.checkboxText || option.text || "",
+              nodeId: option.nodeId || ""
+            })) : [];
+            
+            allFieldsInOrder.push({
+              type: "checkbox",
+              fieldName: checkbox.fieldName || "",
+              selectionType: "multiple",
+              options: checkboxOptions,
+              order: allFieldsInOrder.length + 1
+            });
+          });
+        }
+        
+        // Add time fields if they exist
+        if (cell._times && cell._times.length > 0) {
+          cell._times.forEach((time, timeIndex) => {
+            allFieldsInOrder.push({
+              type: "date", // Use "date" type as expected in GUI JSON
+              label: time.timeText || "",
+              nodeId: time.timeId || "",
+              order: allFieldsInOrder.length + 1
+            });
           });
         }
       }
@@ -801,58 +889,144 @@ window.exportGuiJson = function(download = true) {
       
       // Extract labels and amounts from textboxes with location data support
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
-        // Create allFieldsInOrder array to maintain proper field ordering
+        // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
         const allFieldsInOrder = [];
-        const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
         
-        // Process each textbox in order
-        cell._textboxes.forEach((tb, index) => {
-          const labelName = tb.nameId || tb.placeholder || "";
-          const fieldType = tb.isAmountOption === true ? "amount" : "label";
-          const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+        // If _itemOrder exists, use it to determine the correct order
+        if (cell._itemOrder && cell._itemOrder.length > 0) {
+          console.log('🔧 [GUI EXPORT DEBUG] NumberedDropdown using _itemOrder for field ordering:', cell._itemOrder);
           
-          allFieldsInOrder.push({
-            type: fieldType,
-            label: labelName,
-            nodeId: fieldNodeId,
-            order: index + 1
+          cell._itemOrder.forEach((item, orderIndex) => {
+            if (item.type === 'option' && cell._textboxes && cell._textboxes[item.index]) {
+              const tb = cell._textboxes[item.index];
+              const labelName = tb.nameId || tb.placeholder || "";
+              const fieldType = tb.isAmountOption === true ? "amount" : "label";
+              const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+              
+              allFieldsInOrder.push({
+                type: fieldType,
+                label: labelName,
+                nodeId: fieldNodeId,
+                order: orderIndex + 1
+              });
+            } else if (item.type === 'location' && cell._locationIndex >= 0) {
+              const locationFields = [
+                { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+                { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+                { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+                { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+              ];
+              
+              locationFields.forEach((field, fieldIndex) => {
+                allFieldsInOrder.push({
+                  type: field.label === "Zip" ? "amount" : "label",
+                  label: field.label,
+                  nodeId: field.nodeId,
+                  order: orderIndex + 1 + fieldIndex
+                });
+              });
+            } else if (item.type === 'time' && cell._times && cell._times[item.index]) {
+              const time = cell._times[item.index];
+              allFieldsInOrder.push({
+                type: "date", // Use "date" type as expected in GUI JSON
+                label: time.timeText || "",
+                nodeId: time.timeId || "",
+                order: orderIndex + 1
+              });
+            } else if (item.type === 'checkbox' && cell._checkboxes && cell._checkboxes[item.index]) {
+              const checkbox = cell._checkboxes[item.index];
+              const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                text: option.checkboxText || option.text || "",
+                nodeId: option.nodeId || ""
+              })) : [];
+              
+              allFieldsInOrder.push({
+                type: "checkbox",
+                fieldName: checkbox.fieldName || "",
+                selectionType: "multiple",
+                options: checkboxOptions,
+                order: orderIndex + 1
+              });
+            }
           });
-        });
-        
-        // Insert location fields at the correct position if locationIndex is set
-        // For multiple dropdown questions, location data is indicated by _locationIndex property
-        // For multiple textbox questions, we check if location fields exist in _textboxes
-        const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
-          ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
-        );
-        
-        // For multiple dropdown questions, if _locationIndex is set, we should include location fields
-        // For multiple textbox questions, we need both _locationIndex and actual location fields in UI
-        const shouldIncludeLocationFields = (exportType === "multipleDropdownType" && locationIndex >= 0) || 
-                                          (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
-        
-        if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
-          const locationFields = [
-            { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
-            { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
-            { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
-            { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
-          ];
+        } else {
+          // Fallback to old logic if _itemOrder doesn't exist
+          console.log('🔧 [GUI EXPORT DEBUG] NumberedDropdown no _itemOrder found, using fallback logic');
+          const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
           
-          // Insert location fields at the specified position
-          locationFields.forEach((field, fieldIndex) => {
-            allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
-              type: field.label === "Zip" ? "amount" : "label",
-              label: field.label,
-              nodeId: field.nodeId,
-              order: locationIndex + fieldIndex + 1
+          // Process each textbox in order
+          cell._textboxes.forEach((tb, index) => {
+            const labelName = tb.nameId || tb.placeholder || "";
+            const fieldType = tb.isAmountOption === true ? "amount" : "label";
+            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+            
+            allFieldsInOrder.push({
+              type: fieldType,
+              label: labelName,
+              nodeId: fieldNodeId,
+              order: index + 1
             });
           });
           
-          // Update order numbers for all fields after insertion
-          allFieldsInOrder.forEach((field, index) => {
-            field.order = index + 1;
-          });
+          // Insert location fields at the correct position if locationIndex is set
+          const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
+            ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
+          );
+          
+          const shouldIncludeLocationFields = (exportType === "multipleDropdownType" && locationIndex >= 0) || 
+                                            (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
+          
+          if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
+            const locationFields = [
+              { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+              { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+              { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+              { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+            ];
+            
+            locationFields.forEach((field, fieldIndex) => {
+              allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+                type: field.label === "Zip" ? "amount" : "label",
+                label: field.label,
+                nodeId: field.nodeId,
+                order: locationIndex + fieldIndex + 1
+              });
+            });
+            
+            allFieldsInOrder.forEach((field, index) => {
+              field.order = index + 1;
+            });
+          }
+          
+          // Add checkbox fields if they exist
+          if (cell._checkboxes && cell._checkboxes.length > 0) {
+            cell._checkboxes.forEach((checkbox, checkboxIndex) => {
+              const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                text: option.checkboxText || option.text || "",
+                nodeId: option.nodeId || ""
+              })) : [];
+              
+              allFieldsInOrder.push({
+                type: "checkbox",
+                fieldName: checkbox.fieldName || "",
+                selectionType: "multiple",
+                options: checkboxOptions,
+                order: allFieldsInOrder.length + 1
+              });
+            });
+          }
+          
+          // Add time fields if they exist
+          if (cell._times && cell._times.length > 0) {
+            cell._times.forEach((time, timeIndex) => {
+              allFieldsInOrder.push({
+                type: "date", // Use "date" type as expected in GUI JSON
+                label: time.timeText || "",
+                nodeId: time.timeId || "",
+                order: allFieldsInOrder.length + 1
+              });
+            });
+          }
         }
         
         // Set the allFieldsInOrder array

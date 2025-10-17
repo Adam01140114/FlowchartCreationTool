@@ -595,6 +595,32 @@ function loadFormData(formData) {
                                             });
                                         }
                                     }
+                                } else if (field.type === 'date') {
+                                    // Add a date field
+                                    addDateField(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
+                                } else if (field.type === 'time') {
+                                    // Add a time field
+                                    addTimeField(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
                                 }
                             });
                             
@@ -756,6 +782,32 @@ function loadFormData(formData) {
                                             if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
                                         });
                                     }
+                                }
+                            } else if (field.type === 'date') {
+                                // Add a date field
+                                addDateField(question.questionId);
+                                
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                }
+                            } else if (field.type === 'time') {
+                                // Add a time field
+                                addTimeField(question.questionId);
+                                
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
                                 }
                             }
                         });
@@ -1918,18 +1970,31 @@ function exportForm() {
                                 order: parseInt(fieldOrder)
                             });
                         }
-                    } else if (labelTextEl && nodeIdTextEl) {
-                        // Handle regular fields (label, amount, etc.)
-                        const labelText = labelTextEl.textContent.trim();
-                        const nodeIdText = nodeIdTextEl.textContent.trim();
-                        
-                        allFieldsInOrder.push({
-                            type: fieldType,
-                            label: labelText,
-                            nodeId: nodeIdText,
-                            order: parseInt(fieldOrder)
-                        });
-                    }
+                        } else if (fieldType === 'time') {
+                            // Handle time fields - use same structure as label fields
+                            if (labelTextEl && nodeIdTextEl) {
+                                const labelText = labelTextEl.textContent.trim();
+                                const nodeIdText = nodeIdTextEl.textContent.trim();
+                                
+                                allFieldsInOrder.push({
+                                    type: fieldType,
+                                    label: labelText,
+                                    nodeId: nodeIdText,
+                                    order: parseInt(fieldOrder)
+                                });
+                            }
+                        } else if (labelTextEl && nodeIdTextEl) {
+                            // Handle regular fields (label, amount, etc.)
+                            const labelText = labelTextEl.textContent.trim();
+                            const nodeIdText = nodeIdTextEl.textContent.trim();
+                            
+                            allFieldsInOrder.push({
+                                type: fieldType,
+                                label: labelText,
+                                nodeId: nodeIdText,
+                                order: parseInt(fieldOrder)
+                            });
+                        }
                 });
                 
                 // Sort by order to ensure correct sequence
@@ -2043,6 +2108,18 @@ function exportForm() {
                                     order: fieldOrder
                                 };
                                 console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Checkbox field data:', fieldData);
+                                allFieldsInOrder.push(fieldData);
+                            }
+                        } else if (fieldType === 'time') {
+                            // Handle time fields - use same structure as label fields
+                            if (labelTextEl && nodeIdTextEl) {
+                                const fieldData = {
+                                    type: fieldType,
+                                    label: labelTextEl.textContent.trim(),
+                                    nodeId: nodeIdTextEl.textContent.trim(),
+                                    order: fieldOrder
+                                };
+                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Time field data:', fieldData);
                                 allFieldsInOrder.push(fieldData);
                             }
                         } else if (labelTextEl && nodeIdTextEl) {

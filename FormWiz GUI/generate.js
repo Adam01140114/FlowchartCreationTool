@@ -1589,15 +1589,28 @@ formHTML += `</div><br></div>`;
               });
             }
           } else if (fieldType === 'date') {
-            // Handle date fields
-            const fieldNameEl = field.querySelector('#dateFieldName' + questionId + '_' + fieldOrder);
-            const nodeIdEl = field.querySelector('#dateNodeId' + questionId + '_' + fieldOrder);
-            
-            if (fieldNameEl && nodeIdEl) {
+            // Handle date fields - use same structure as label fields
+            if (labelTextEl && nodeIdTextEl) {
+              const labelText = labelTextEl.textContent.trim();
+              const nodeIdText = nodeIdTextEl.textContent.trim();
+              
               allElements.push({
                 type: fieldType,
-                label: fieldNameEl.value.trim(),
-                nodeId: nodeIdEl.value.trim(),
+                label: labelText,
+                nodeId: nodeIdText,
+                order: parseInt(fieldOrder)
+              });
+            }
+          } else if (fieldType === 'time') {
+            // Handle time fields - use same structure as label fields
+            if (labelTextEl && nodeIdTextEl) {
+              const labelText = labelTextEl.textContent.trim();
+              const nodeIdText = nodeIdTextEl.textContent.trim();
+              
+              allElements.push({
+                type: fieldType,
+                label: labelText,
+                nodeId: nodeIdText,
                 order: parseInt(fieldOrder)
               });
             }
