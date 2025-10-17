@@ -562,6 +562,52 @@ function loadFormData(formData) {
                                         if (labelTextEl) labelTextEl.textContent = field.label;
                                         if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
                                     }
+                                } else if (field.type === 'checkbox') {
+                                    // Add a checkbox field
+                                    addCheckboxField(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const fieldNameEl = lastField.querySelector('#checkboxFieldName' + question.questionId + '_' + fieldOrder);
+                                        const selectionTypeEl = lastField.querySelector('#checkboxSelectionType' + question.questionId + '_' + fieldOrder);
+                                        
+                                        if (fieldNameEl && field.fieldName) {
+                                            fieldNameEl.value = field.fieldName;
+                                        }
+                                        
+                                        if (selectionTypeEl && field.selectionType) {
+                                            selectionTypeEl.value = field.selectionType;
+                                        }
+                                        
+                                        // Add checkbox options
+                                        if (field.options && field.options.length > 0) {
+                                            field.options.forEach((option, optionIndex) => {
+                                                addCheckboxOption(question.questionId, fieldOrder);
+                                                
+                                                // Set the option values
+                                                const optionTextEl = document.getElementById('checkboxText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                                const optionNodeIdEl = document.getElementById('checkboxNodeId' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                                
+                                                if (optionTextEl) optionTextEl.value = option.text;
+                                                if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
+                                            });
+                                        }
+                                    }
+                                } else if (field.type === 'date') {
+                                    // Add a date field
+                                    addDateField(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
                                 }
                             });
                             
@@ -665,36 +711,78 @@ function loadFormData(formData) {
                         
                         // Rebuild fields in the unified container
                         allFields.forEach((field, index) => {
-                            const fieldOrder = field.order || (index + 1);
-                            const fieldDiv = document.createElement('div');
-                            fieldDiv.className = `unified-field field-${fieldOrder}`;
-                            fieldDiv.setAttribute('data-type', field.type);
-                            fieldDiv.setAttribute('data-order', fieldOrder);
-                            
-                            const fieldTypeLabel = field.type === 'label' ? 'Label' : 'Amount';
-                            fieldDiv.innerHTML = `
-                                <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                    <div style="font-weight: bold; color: #333;">${fieldTypeLabel}: <span id="labelText${question.questionId}_${fieldOrder}">${field.label}</span></div>
-                                    <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${question.questionId}_${fieldOrder}">${field.nodeId}</span></div>
-                                    <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${question.questionId}_${fieldOrder}">${fieldTypeLabel}</span> | Order: ${fieldOrder}</div>
-                                    <button type="button" onclick="removeUnifiedField(${question.questionId}, ${fieldOrder})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
-                                </div>
-                            `;
-                            unifiedFieldsDiv.appendChild(fieldDiv);
-                            
-                            // Add double-click event listener as backup
-                            const displayDiv = fieldDiv.querySelector('div');
-                            if (displayDiv) {
-                                // Remove any existing event listeners to prevent duplicates
-                                if (displayDiv._dblclickHandler) {
-                                    displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
-                                }
+                            if (field.type === 'label') {
+                                // Add a label field
+                                addTextboxLabel(question.questionId);
                                 
-                                // Add event listener for double-click editing
-                                displayDiv._dblclickHandler = function() {
-                                    editUnifiedField(question.questionId, fieldOrder);
-                                };
-                                displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                }
+                            } else if (field.type === 'amount') {
+                                // Add an amount field
+                                addTextboxAmount(question.questionId);
+                                
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                }
+                            } else if (field.type === 'checkbox') {
+                                // Add a checkbox field
+                                addCheckboxField(question.questionId);
+                                
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const fieldNameEl = lastField.querySelector('#checkboxFieldName' + question.questionId + '_' + fieldOrder);
+                                    const selectionTypeEl = lastField.querySelector('#checkboxSelectionType' + question.questionId + '_' + fieldOrder);
+                                    
+                                    if (fieldNameEl && field.fieldName) {
+                                        fieldNameEl.value = field.fieldName;
+                                    }
+                                    
+                                    if (selectionTypeEl && field.selectionType) {
+                                        selectionTypeEl.value = field.selectionType;
+                                    }
+                                    
+                                    // Add checkbox options
+                                    if (field.options && field.options.length > 0) {
+                                        field.options.forEach((option, optionIndex) => {
+                                            addCheckboxOption(question.questionId, fieldOrder);
+                                            
+                                            // Set the option values
+                                            const optionTextEl = document.getElementById('checkboxText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                            const optionNodeIdEl = document.getElementById('checkboxNodeId' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                            
+                                            if (optionTextEl) optionTextEl.value = option.text;
+                                            if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
+                                        });
+                                    }
+                                }
+                            } else if (field.type === 'date') {
+                                // Add a date field
+                                addDateField(question.questionId);
+                                
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                }
                             }
                         });
                         
@@ -1825,7 +1913,39 @@ function exportForm() {
                         nodeIdText: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A'
                     });
                     
-                    if (labelTextEl && nodeIdTextEl) {
+            if (fieldType === 'checkbox') {
+                // Handle checkbox fields
+                const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+                const selectionTypeEl = field.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+                const optionsContainer = field.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
+                
+                if (fieldNameEl) {
+                    const checkboxOptions = [];
+                    if (optionsContainer) {
+                        const optionElements = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
+                        optionElements.forEach((optionEl, optionIndex) => {
+                            const textEl = optionEl.querySelector('#checkboxText' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                            const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                            
+                            if (textEl && nodeIdEl) {
+                                checkboxOptions.push({
+                                    text: textEl.value.trim(),
+                                    nodeId: nodeIdEl.value.trim()
+                                });
+                            }
+                        });
+                    }
+                    
+                    allFieldsInOrder.push({
+                        type: fieldType,
+                        fieldName: fieldNameEl.value.trim(),
+                        selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                        options: checkboxOptions,
+                        order: parseInt(fieldOrder)
+                    });
+                }
+                    } else if (labelTextEl && nodeIdTextEl) {
+                        // Handle regular fields (label, amount, date, etc.)
                         const labelText = labelTextEl.textContent.trim();
                         const nodeIdText = nodeIdTextEl.textContent.trim();
                         
@@ -1920,7 +2040,41 @@ function exportForm() {
                         
                         console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Processing field:', {fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl});
                         
-                        if (labelTextEl && nodeIdTextEl) {
+                        if (fieldType === 'checkbox') {
+                            // Handle checkbox fields
+                            const fieldNameEl = el.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+                            const selectionTypeEl = el.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+                            const optionsContainer = el.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
+                            
+                            if (fieldNameEl) {
+                                const checkboxOptions = [];
+                                if (optionsContainer) {
+                                    const optionElements = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
+                                    optionElements.forEach((optionEl, optionIndex) => {
+                                        const textEl = optionEl.querySelector('#checkboxText' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                        const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                        
+                                        if (textEl && nodeIdEl) {
+                                            checkboxOptions.push({
+                                                text: textEl.value.trim(),
+                                                nodeId: nodeIdEl.value.trim()
+                                            });
+                                        }
+                                    });
+                                }
+                                
+                                const fieldData = {
+                                    type: fieldType,
+                                    fieldName: fieldNameEl.value.trim(),
+                                    selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                                    options: checkboxOptions,
+                                    order: fieldOrder
+                                };
+                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Checkbox field data:', fieldData);
+                                allFieldsInOrder.push(fieldData);
+                            }
+                        } else if (labelTextEl && nodeIdTextEl) {
+                            // Handle regular fields (label, amount, date, etc.)
                             const fieldData = {
                                 type: fieldType,
                                 label: labelTextEl.textContent.trim(),

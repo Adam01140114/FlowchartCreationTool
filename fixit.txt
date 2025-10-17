@@ -574,3 +574,137 @@ PATTERN FOR NEW NODE TYPES:
   }
 }
 ```
+
+=====================================
+
+INCIDENT: PDF ID Generation Using Wrong Property Field
+DATE: [Current Date]
+ISSUE ID: PDF_ID_GENERATION_001
+
+PROBLEM DESCRIPTION:
+===================
+Copy ID buttons for form fields and location IDs were generating incorrect IDs that used the PDF Name field ("Test") instead of the PDF File field ("example.pdf"). This resulted in IDs like "test_q1_name_1" instead of the expected "example_q1_name_1".
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make Copy ID buttons use the PDF File field value (e.g., "example.pdf") instead of PDF Name field value (e.g., "Test")
+- Ensure location ID generation also uses the PDF File field
+- Sanitize the PDF filename by removing the .pdf extension before using it in IDs
+
+ISSUES ENCOUNTERED:
+==================
+1. PROPERTY FIELD MISMATCH:
+   - The PDF Node Properties dialog stores the filename in `_pdfFile` property
+   - The ID generation functions were looking for `_pdfFilename` property (which doesn't exist)
+   - This caused a fallback to `_pdfName` property ("Test") instead of using `_pdfFile` ("example.pdf")
+
+2. INCONSISTENT PROPERTY NAMES:
+   - Dialog field "PDF File" maps to `_pdfFile` property
+   - ID generation was looking for `_pdfFilename` property
+   - No `_pdfFilename` property was being set anywhere in the code
+
+3. MULTIPLE FUNCTIONS AFFECTED:
+   - `copyMultipleTextboxId` function in script.js
+   - `copyMultipleDropdownId` function in questions.js
+   - `showLocationIdsPopup` function in script.js
+   - `showDropdownLocationIdsPopup` function in script.js
+
+TECHNICAL DETAILS:
+==================
+- Files: script.js, questions.js
+- Function: `findPdfNameForQuestion()` in both files
+- The function was checking: `startCell._pdfFilename || startCell._pdfUrl || startCell._pdfName`
+- But the actual property being set was: `startCell._pdfFile`
+- This caused the function to skip `_pdfFilename` (doesn't exist) and `_pdfUrl` (empty) and use `_pdfName` ("Test")
+
+SOLUTION THAT WORKED:
+====================
+1. FIXED PROPERTY FIELD NAMES:
+   ```javascript
+   // Before (incorrect):
+   if (startCell._pdfName || startCell._pdfFilename || startCell._pdfUrl) {
+     return {
+       filename: startCell._pdfFilename || startCell._pdfUrl || startCell._pdfName || "",
+       // ...
+     };
+   }
+   
+   // After (correct):
+   if (startCell._pdfName || startCell._pdfFile || startCell._pdfUrl) {
+     return {
+       filename: startCell._pdfFile || startCell._pdfUrl || startCell._pdfName || "",
+       // ...
+     };
+   }
+   ```
+
+2. UPDATED ALL OCCURRENCES:
+   - Fixed `findPdfNameForQuestion()` function in script.js (2 locations)
+   - Fixed `findPdfNameForQuestion()` function in questions.js (2 locations)
+   - Updated location ID generation functions to use PDF filename
+
+3. MAINTAINED PROPER PRIORITY:
+   - `_pdfFile` (PDF File field) - highest priority
+   - `_pdfUrl` (PDF URL field) - second priority  
+   - `_pdfName` (PDF Name field) - fallback
+
+CODE CHANGES:
+=============
+1. In script.js `findPdfNameForQuestion()` function:
+   - Changed `startCell._pdfFilename` to `startCell._pdfFile` (2 locations)
+   - Updated property checks and filename assignment
+
+2. In questions.js `findPdfNameForQuestion()` function:
+   - Changed `startCell._pdfFilename` to `startCell._pdfFile` (2 locations)
+   - Updated property checks and filename assignment
+
+3. In location ID generation functions:
+   - Added PDF filename detection using updated `findPdfNameForQuestion()`
+   - Added PDF filename sanitization using `sanitizePdfName()`
+   - Updated prefix generation to include PDF filename
+
+KEY LEARNINGS:
+==============
+1. Always verify that property names match between dialog fields and ID generation functions
+2. Check the actual property names being set in the dialog, not assumed names
+3. When multiple functions use the same logic, update all of them consistently
+4. Test with actual data to ensure the correct property is being used
+5. Property field names in dialogs may not match the internal property names
+
+PREVENTION:
+===========
+- When adding new dialog fields, verify the property name mapping
+- Check that ID generation functions use the correct property names
+- Test Copy ID functionality with actual data to ensure correct values are used
+- Document property name mappings between dialogs and internal functions
+- Use consistent property naming conventions across the codebase
+
+RELATED FILES:
+=============
+- script.js (main ID generation functions)
+- questions.js (dropdown ID generation functions)
+- PDF Node Properties dialog (sets _pdfFile property)
+
+FUTURE REFERENCE:
+================
+When working with PDF properties and ID generation:
+1. Verify the actual property name being set in the dialog
+2. Check that ID generation functions use the same property name
+3. Test with actual data to ensure correct values are being used
+4. Update all related functions consistently
+5. Maintain proper priority order: _pdfFile > _pdfUrl > _pdfName
+
+PROPERTY MAPPING REFERENCE:
+===========================
+- PDF Name field → `_pdfName` property
+- PDF File field → `_pdfFile` property  
+- PDF Price field → `_pdfPrice` property
+- PDF URL field → `_pdfUrl` property (if exists)
+
+ID GENERATION PRIORITY:
+======================
+1. `_pdfFile` (PDF File field) - preferred for filenames
+2. `_pdfUrl` (PDF URL field) - fallback for URLs
+3. `_pdfName` (PDF Name field) - final fallback for display names
+
+=====================================

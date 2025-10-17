@@ -1,0 +1,114 @@
+{
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Introduction",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "How many of them are a business?",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_of_them_are_a_business",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Business Name",
+              "nodeId": "how_many_of_them_are_a_business_business_name",
+              "order": 1
+            },
+            {
+              "type": "label",
+              "label": "Business Name Statement Number",
+              "nodeId": "how_many_of_them_are_a_business_business_name_statement_number",
+              "order": 2
+            },
+            {
+              "type": "checkbox",
+              "fieldName": "Test",
+              "selectionType": "single",
+              "options": [
+                {
+                  "text": "An individual",
+                  "nodeId": "an_individual"
+                },
+                {
+                  "text": "An association",
+                  "nodeId": "an_association"
+                }
+              ],
+              "order": 3
+            },
+            {
+              "type": "date",
+              "label": "When did it happen",
+              "nodeId": "when_did_it_happen",
+              "order": 4
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "groups": [],
+  "hiddenFields": [],
+  "sectionCounter": 2,
+  "questionCounter": 2,
+  "hiddenFieldCounter": 1,
+  "groupCounter": 1,
+  "formName": "Example Form",
+  "defaultPDFName": "",
+  "pdfOutputName": "",
+  "stripePriceId": "",
+  "additionalPDFs": [],
+  "checklistItems": [],
+  "linkedFields": []
+}

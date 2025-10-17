@@ -454,6 +454,24 @@ function setupCustomClickHandlers(graph) {
   // Proper double-click handler that handles all cases
   const baseDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
+    // a1) Multiple textbox node double-click = show multiple textbox properties (check this FIRST)
+    if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleTextboxes') {
+      if (typeof window.showMultipleTextboxProperties === 'function') {
+        window.showMultipleTextboxProperties(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // a2) Numbered dropdown node double-click = show numbered dropdown properties
+    if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleDropdownType') {
+      if (typeof window.showNumberedDropdownProperties === 'function') {
+        window.showNumberedDropdownProperties(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
     // a) Question double-click = show properties popup
     if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {

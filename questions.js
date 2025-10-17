@@ -856,17 +856,1131 @@ window.addOptionInReorderModal = addOptionInReorderModal;
 window.findPdfNameForQuestion = findPdfNameForQuestion;
 window.sanitizePdfName = sanitizePdfName;
 
+// Numbered Dropdown Properties Popup
+window.showNumberedDropdownProperties = function(cell) {
+  if (!cell) return;
+  
+  // Create modal overlay
+  const modal = document.createElement('div');
+  modal.className = 'numbered-dropdown-properties-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `;
+  
+  // Create modal content
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+  `;
+  
+  // Header
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e7ef;
+  `;
+  
+  const title = document.createElement('h2');
+  title.textContent = 'Numbered Dropdown Properties';
+  title.style.cssText = `
+    margin: 0;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+  `;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.style.cssText = `
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #aaa;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  closeBtn.onclick = () => document.body.removeChild(modal);
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  modalContent.appendChild(header);
+  
+  // Question Text Section
+  const questionSection = createFieldSection('Question Text', [
+    createTextField('Question', cell._questionText || '', (value) => {
+      cell._questionText = value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    })
+  ]);
+  modalContent.appendChild(questionSection);
+  
+  // Number Range Section
+  const rangeSection = createFieldSection('Number Range', [
+    createNumberField('From', cell._twoNumbers?.first || '0', (value) => {
+      if (!cell._twoNumbers) cell._twoNumbers = { first: '0', second: '0' };
+      cell._twoNumbers.first = value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    }),
+    createNumberField('To', cell._twoNumbers?.second || '0', (value) => {
+      if (!cell._twoNumbers) cell._twoNumbers = { first: '0', second: '0' };
+      cell._twoNumbers.second = value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    })
+  ]);
+  modalContent.appendChild(rangeSection);
+  
+  // Options Section (now includes location functionality)
+  const optionsSection = createFieldSection('Dropdown Options', [
+    createOptionsContainer(cell)
+  ]);
+  modalContent.appendChild(optionsSection);
+  
+  // Footer buttons
+  const footer = document.createElement('div');
+  footer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e7ef;
+  `;
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save & Close';
+  saveBtn.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    width: 200px;
+  `;
+  saveBtn.onclick = () => {
+    // Refresh the cell display
+    if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+      window.updatemultipleDropdownTypeCell(cell);
+    }
+    document.body.removeChild(modal);
+  };
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = `
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    width: 200px;
+  `;
+  cancelBtn.onclick = () => {
+    // Auto-save before closing
+    if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+      window.updatemultipleDropdownTypeCell(cell);
+    }
+    document.body.removeChild(modal);
+  };
+  
+  footer.appendChild(saveBtn);
+  footer.appendChild(cancelBtn);
+  modalContent.appendChild(footer);
+  
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+  
+  // Close on outside click (auto-save)
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      // Auto-save before closing
+      if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+        window.updatemultipleDropdownTypeCell(cell);
+      }
+      document.body.removeChild(modal);
+    }
+  };
+  
+  // Close on X button click (auto-save)
+  closeBtn.onclick = () => {
+    // Auto-save before closing
+    if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+      window.updatemultipleDropdownTypeCell(cell);
+    }
+    document.body.removeChild(modal);
+  };
+};
+
+// Helper function to create field sections
+function createFieldSection(title, fields) {
+  const section = document.createElement('div');
+  section.style.cssText = `
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e7ef;
+  `;
+  
+  const sectionTitle = document.createElement('h3');
+  sectionTitle.textContent = title;
+  sectionTitle.style.cssText = `
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 18px;
+    font-weight: 600;
+  `;
+  
+  section.appendChild(sectionTitle);
+  fields.forEach(field => section.appendChild(field));
+  
+  return section;
+}
+
+// Helper function to create text field
+function createTextField(label, value, onChange) {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  `;
+  
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label;
+  labelEl.style.cssText = `
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 14px;
+  `;
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = value;
+  input.style.cssText = `
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  `;
+  input.onblur = () => onChange(input.value);
+  
+  container.appendChild(labelEl);
+  container.appendChild(input);
+  
+  return container;
+}
+
+// Helper function to create number field
+function createNumberField(label, value, onChange) {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  `;
+  
+  const labelEl = document.createElement('label');
+  labelEl.textContent = label;
+  labelEl.style.cssText = `
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 14px;
+  `;
+  
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.value = value;
+  input.style.cssText = `
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  `;
+  input.onblur = () => onChange(input.value);
+  
+  container.appendChild(labelEl);
+  container.appendChild(input);
+  
+  return container;
+}
+
+// Helper function to create options container
+function createOptionsContainer(cell) {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  `;
+  
+  // Add drag and drop event listeners
+  let draggedElement = null;
+  
+  container.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  });
+  
+  container.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+  });
+  
+  container.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (!draggedElement) return;
+    
+    const dropTarget = e.target.closest('[data-index]');
+    if (!dropTarget || dropTarget === draggedElement) return;
+    
+    const draggedType = draggedElement.dataset.type;
+    const dropType = dropTarget.dataset.type;
+    const draggedIndex = parseInt(draggedElement.dataset.index);
+    const dropIndex = parseInt(dropTarget.dataset.index);
+    
+    if (draggedType === 'location' && dropType === 'location') {
+      // Can't drop location on location
+      return;
+    }
+    
+    if (draggedType === 'option' && dropType === 'option') {
+      // Reorder options
+      const options = cell._textboxes || [];
+      const draggedOption = options[draggedIndex];
+      options.splice(draggedIndex, 1);
+      options.splice(dropIndex, 0, draggedOption);
+      
+      // Update location index if needed
+      if (cell._locationIndex !== undefined) {
+        if (draggedIndex < cell._locationIndex && dropIndex >= cell._locationIndex) {
+          cell._locationIndex--;
+        } else if (draggedIndex > cell._locationIndex && dropIndex <= cell._locationIndex) {
+          cell._locationIndex++;
+        }
+      }
+    } else if (draggedType === 'location' && dropType === 'option') {
+      // Move location to position of option
+      cell._locationIndex = dropIndex;
+    } else if (draggedType === 'option' && dropType === 'location') {
+      // Move option to position of location
+      const options = cell._textboxes || [];
+      const draggedOption = options[draggedIndex];
+      options.splice(draggedIndex, 1);
+      options.splice(cell._locationIndex, 0, draggedOption);
+      
+      // Update location index
+      if (draggedIndex < cell._locationIndex) {
+        cell._locationIndex--;
+      }
+    }
+    
+    // Refresh the entire container
+    const newContainer = createOptionsContainer(cell);
+    container.parentNode.replaceChild(newContainer, container);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  });
+  
+  // Add existing options and location indicator in correct order
+  const options = cell._textboxes || [];
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  
+  options.forEach((option, index) => {
+    const optionContainer = createOptionField(option, index, cell, container);
+    
+    // Add drag event listeners
+    optionContainer.addEventListener('dragstart', (e) => {
+      draggedElement = optionContainer;
+      e.dataTransfer.effectAllowed = 'move';
+      optionContainer.style.opacity = '0.5';
+    });
+    
+    optionContainer.addEventListener('dragend', (e) => {
+      optionContainer.style.opacity = '1';
+      draggedElement = null;
+    });
+    
+    container.appendChild(optionContainer);
+    
+    // Add location indicator after this option if it's at the location index
+    if (index === locationIndex) {
+      const locationIndicator = createLocationIndicator(cell, container);
+      
+      // Add drag event listeners to location indicator
+      locationIndicator.addEventListener('dragstart', (e) => {
+        draggedElement = locationIndicator;
+        e.dataTransfer.effectAllowed = 'move';
+        locationIndicator.style.opacity = '0.5';
+      });
+      
+      locationIndicator.addEventListener('dragend', (e) => {
+        locationIndicator.style.opacity = '1';
+        draggedElement = null;
+      });
+      
+      container.appendChild(locationIndicator);
+    }
+  });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= options.length) {
+    const locationIndicator = createLocationIndicator(cell, container);
+    
+    // Add drag event listeners to location indicator
+    locationIndicator.addEventListener('dragstart', (e) => {
+      draggedElement = locationIndicator;
+      e.dataTransfer.effectAllowed = 'move';
+      locationIndicator.style.opacity = '0.5';
+    });
+    
+    locationIndicator.addEventListener('dragend', (e) => {
+      locationIndicator.style.opacity = '1';
+      draggedElement = null;
+    });
+    
+    container.appendChild(locationIndicator);
+  }
+  
+  // Add new option button
+  const addBtn = document.createElement('button');
+  addBtn.textContent = '+ Add Option';
+  addBtn.style.cssText = `
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 10px;
+  `;
+  addBtn.onclick = () => {
+    const newOption = { nameId: '', placeholder: 'Enter value', isAmountOption: false };
+    if (!cell._textboxes) cell._textboxes = [];
+    cell._textboxes.push(newOption);
+    
+    const optionContainer = createOptionField(newOption, cell._textboxes.length - 1, cell, container);
+    container.insertBefore(optionContainer, addBtn);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Add location button
+  const addLocationBtn = document.createElement('button');
+  addLocationBtn.textContent = '+ Add Location';
+  addLocationBtn.style.cssText = `
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+  `;
+  addLocationBtn.onclick = () => {
+    cell._locationIndex = (cell._textboxes || []).length;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    // Refresh the entire container to show the location indicator
+    const newContainer = createOptionsContainer(cell);
+    container.parentNode.replaceChild(newContainer, container);
+  };
+  
+  container.appendChild(addBtn);
+  container.appendChild(addLocationBtn);
+  
+  return container;
+}
+
+// Helper function to create location indicator
+function createLocationIndicator(cell, parentContainer) {
+  const locationIndicator = document.createElement('div');
+  locationIndicator.style.cssText = `
+    margin: 8px 0;
+    padding: 8px;
+    background-color: #e8f5e8;
+    border: 2px dashed #28a745;
+    border-radius: 4px;
+    text-align: center;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: move;
+    transition: all 0.2s ease;
+  `;
+  locationIndicator.draggable = true;
+  locationIndicator.dataset.type = 'location';
+  locationIndicator.dataset.index = cell._locationIndex;
+  
+  // Add hover effect
+  locationIndicator.addEventListener('mouseenter', () => {
+    locationIndicator.style.backgroundColor = '#d4edda';
+    locationIndicator.style.borderColor = '#1e7e34';
+  });
+  locationIndicator.addEventListener('mouseleave', () => {
+    locationIndicator.style.backgroundColor = '#e8f5e8';
+    locationIndicator.style.borderColor = '#28a745';
+  });
+  
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.innerHTML = '⋮⋮';
+  dragHandle.style.cssText = `
+    cursor: move;
+    color: #28a745;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+    margin-right: 5px;
+  `;
+  
+  const locationText = document.createElement('span');
+  locationText.textContent = '📍 Location Date Inserted';
+  
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.style.cssText = `
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    cursor: pointer;
+  `;
+  removeBtn.onclick = () => {
+    delete cell._locationIndex;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    // Refresh the entire container to remove the location indicator
+    const newContainer = createOptionsContainer(cell);
+    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+  };
+  
+  locationIndicator.appendChild(dragHandle);
+  locationIndicator.appendChild(locationText);
+  locationIndicator.appendChild(removeBtn);
+  
+  return locationIndicator;
+}
+
+// Helper function to create individual option field
+function createOptionField(option, index, cell, parentContainer) {
+  const optionContainer = document.createElement('div');
+  optionContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: move;
+    transition: all 0.2s ease;
+  `;
+  optionContainer.draggable = true;
+  optionContainer.dataset.index = index;
+  optionContainer.dataset.type = 'option';
+  
+  // Add hover effect
+  optionContainer.addEventListener('mouseenter', () => {
+    optionContainer.style.backgroundColor = '#f8f9fa';
+    optionContainer.style.borderColor = '#007bff';
+  });
+  optionContainer.addEventListener('mouseleave', () => {
+    optionContainer.style.backgroundColor = 'white';
+    optionContainer.style.borderColor = '#ddd';
+  });
+  
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.innerHTML = '⋮⋮';
+  dragHandle.style.cssText = `
+    cursor: move;
+    color: #666;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+    margin-right: 5px;
+  `;
+  
+  // Option text input
+  const textInput = document.createElement('input');
+  textInput.type = 'text';
+  textInput.value = option.nameId || '';
+  textInput.placeholder = 'Option text';
+  textInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  textInput.onblur = () => {
+    option.nameId = textInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Amount checkbox
+  const amountCheckbox = document.createElement('input');
+  amountCheckbox.type = 'checkbox';
+  amountCheckbox.checked = option.isAmountOption || false;
+  amountCheckbox.onchange = () => {
+    option.isAmountOption = amountCheckbox.checked;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  const amountLabel = document.createElement('label');
+  amountLabel.textContent = 'Amount?';
+  amountLabel.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #2c3e50;
+  `;
+  amountLabel.insertBefore(amountCheckbox, amountLabel.firstChild);
+  
+  // Copy ID button
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Copy ID';
+  copyBtn.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  copyBtn.onclick = () => {
+    if (typeof window.copyMultipleDropdownId === 'function') {
+      window.copyMultipleDropdownId(cell.id, index);
+    }
+  };
+  
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.style.cssText = `
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  deleteBtn.onclick = () => {
+    cell._textboxes.splice(index, 1);
+    // Refresh the entire container to maintain proper order
+    const newContainer = createOptionsContainer(cell);
+    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  optionContainer.appendChild(dragHandle);
+  optionContainer.appendChild(textInput);
+  optionContainer.appendChild(amountLabel);
+  optionContainer.appendChild(copyBtn);
+  optionContainer.appendChild(deleteBtn);
+  
+  return optionContainer;
+}
+
+
+// Multiple Textbox Properties Popup
+window.showMultipleTextboxProperties = function(cell) {
+  if (!cell) return;
+  
+  // Create modal overlay
+  const modal = document.createElement('div');
+  modal.className = 'multiple-textbox-properties-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `;
+  
+  // Create modal content
+  const modalContent = document.createElement('div');
+  modalContent.style.cssText = `
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+  `;
+  
+  // Header
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e7ef;
+  `;
+  
+  const title = document.createElement('h2');
+  title.textContent = 'Multiple Textbox Properties';
+  title.style.cssText = `
+    margin: 0;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+  `;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.style.cssText = `
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #aaa;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  closeBtn.onclick = () => document.body.removeChild(modal);
+  
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  modalContent.appendChild(header);
+  
+  // Question Text Section
+  const questionSection = createFieldSection('Question Text', [
+    createTextField('Question', cell._questionText || '', (value) => {
+      cell._questionText = value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    })
+  ]);
+  modalContent.appendChild(questionSection);
+  
+  // Textbox Options Section
+  const optionsSection = createFieldSection('Textbox Options', [
+    createTextboxOptionsContainer(cell)
+  ]);
+  modalContent.appendChild(optionsSection);
+  
+  // Location Section
+  const locationSection = createFieldSection('Location Settings', [
+    createTextboxLocationContainer(cell)
+  ]);
+  modalContent.appendChild(locationSection);
+  
+  // Footer buttons
+  const footer = document.createElement('div');
+  footer.style.cssText = `
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e7ef;
+  `;
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save & Close';
+  saveBtn.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+  `;
+  saveBtn.onclick = () => {
+    // Refresh the cell display
+    if (typeof window.updateMultipleTextboxesCell === 'function') {
+      window.updateMultipleTextboxesCell(cell);
+    }
+    document.body.removeChild(modal);
+  };
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = `
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+  `;
+  cancelBtn.onclick = () => document.body.removeChild(modal);
+  
+  footer.appendChild(cancelBtn);
+  footer.appendChild(saveBtn);
+  modalContent.appendChild(footer);
+  
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+  
+  // Close on outside click
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      document.body.removeChild(modal);
+    }
+  };
+};
+
+// Helper function to create textbox options container
+function createTextboxOptionsContainer(cell) {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  `;
+  
+  // Add existing textboxes
+  const textboxes = cell._textboxes || [];
+  textboxes.forEach((textbox, index) => {
+    const textboxContainer = createTextboxField(textbox, index, cell, container);
+    container.appendChild(textboxContainer);
+  });
+  
+  // Add new textbox button
+  const addBtn = document.createElement('button');
+  addBtn.textContent = '+ Add Textbox';
+  addBtn.style.cssText = `
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 10px;
+  `;
+  addBtn.onclick = () => {
+    const newTextbox = { nameId: '', placeholder: 'Enter value', isAmountOption: false };
+    if (!cell._textboxes) cell._textboxes = [];
+    cell._textboxes.push(newTextbox);
+    
+    const textboxContainer = createTextboxField(newTextbox, cell._textboxes.length - 1, cell, container);
+    container.insertBefore(textboxContainer, addBtn);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  container.appendChild(addBtn);
+  
+  return container;
+}
+
+// Helper function to create individual textbox field
+function createTextboxField(textbox, index, cell, parentContainer) {
+  const textboxContainer = document.createElement('div');
+  textboxContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  `;
+  
+  // Textbox name input
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.value = textbox.nameId || '';
+  nameInput.placeholder = 'Textbox name';
+  nameInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  nameInput.onblur = () => {
+    textbox.nameId = nameInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Placeholder input
+  const placeholderInput = document.createElement('input');
+  placeholderInput.type = 'text';
+  placeholderInput.value = textbox.placeholder || '';
+  placeholderInput.placeholder = 'Placeholder text';
+  placeholderInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  placeholderInput.onblur = () => {
+    textbox.placeholder = placeholderInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Amount checkbox
+  const amountCheckbox = document.createElement('input');
+  amountCheckbox.type = 'checkbox';
+  amountCheckbox.checked = textbox.isAmountOption || false;
+  amountCheckbox.onchange = () => {
+    textbox.isAmountOption = amountCheckbox.checked;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  const amountLabel = document.createElement('label');
+  amountLabel.textContent = 'Amount?';
+  amountLabel.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #2c3e50;
+  `;
+  amountLabel.insertBefore(amountCheckbox, amountLabel.firstChild);
+  
+  // Copy ID button
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Copy ID';
+  copyBtn.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  copyBtn.onclick = () => {
+    if (typeof window.copyMultipleTextboxId === 'function') {
+      window.copyMultipleTextboxId(cell.id, index);
+    }
+  };
+  
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.style.cssText = `
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  deleteBtn.onclick = () => {
+    cell._textboxes.splice(index, 1);
+    parentContainer.removeChild(textboxContainer);
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  textboxContainer.appendChild(nameInput);
+  textboxContainer.appendChild(placeholderInput);
+  textboxContainer.appendChild(amountLabel);
+  textboxContainer.appendChild(copyBtn);
+  textboxContainer.appendChild(deleteBtn);
+  
+  return textboxContainer;
+}
+
+// Helper function to create textbox location container
+function createTextboxLocationContainer(cell) {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  `;
+  
+  // Location status
+  const hasLocation = cell._locationIndex !== undefined && cell._locationIndex >= 0;
+  
+  if (hasLocation) {
+    const locationInfo = document.createElement('div');
+    locationInfo.style.cssText = `
+      padding: 15px;
+      background: #e8f5e8;
+      border: 2px dashed #28a745;
+      border-radius: 6px;
+      text-align: center;
+      color: #28a745;
+      font-weight: bold;
+    `;
+    locationInfo.textContent = '📍 Location Date Inserted';
+    container.appendChild(locationInfo);
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'Remove Location';
+    removeBtn.style.cssText = `
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    `;
+    removeBtn.onclick = () => {
+      delete cell._locationIndex;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+      // Refresh the container
+      const newContainer = createTextboxLocationContainer(cell);
+      container.parentNode.replaceChild(newContainer, container);
+    };
+    container.appendChild(removeBtn);
+  } else {
+    const addLocationBtn = document.createElement('button');
+    addLocationBtn.textContent = 'Add Location';
+    addLocationBtn.style.cssText = `
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+    `;
+    addLocationBtn.onclick = () => {
+      cell._locationIndex = (cell._textboxes || []).length;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+      // Refresh the container
+      const newContainer = createTextboxLocationContainer(cell);
+      container.parentNode.replaceChild(newContainer, container);
+    };
+    container.appendChild(addLocationBtn);
+  }
+  
+  return container;
+}
+
 function updateMultipleTextboxesCell(cell) {
   const graph = getGraph();
   if (!graph) return;
   
+  const qText = cell._questionText || 'Multiple Textbox Question';
+  const textboxes = cell._textboxes || [];
+  const hasLocation = cell._locationIndex !== undefined && cell._locationIndex >= 0;
+  
+  // Create simple display with essential information
+  const html = `
+    <div style="padding: 20px; font-family: Arial, sans-serif; text-align: center;">
+      <div style="font-weight: bold; color: #2196F3; margin-bottom: 10px; font-size: 16px;">${getEscapeAttr()(qText)}</div>
+      <div style="margin-bottom: 8px; color: #666; font-size: 14px;">
+        <strong>Textboxes:</strong> ${textboxes.length} configured
+      </div>
+      ${hasLocation ? '<div style="margin-bottom: 8px; color: #28a745; font-size: 14px;"><strong>📍 Location:</strong> Enabled</div>' : ''}
+      <div style="font-style: italic; color: #999; font-size: 12px; margin-top: 15px;">Double-click to configure</div>
+    </div>
+  `;
+  
   graph.getModel().beginUpdate();
   try {
-    let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-      <input class="question-title-input" type="text" value="${getEscapeAttr()(cell._questionText || "")}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
-      <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
-    </div>`;
-    cell.value = html;
+    graph.getModel().setValue(cell, html);
+    let st = cell.style || '';
+    if (!st.includes('verticalAlign=middle')) {
+      st += 'verticalAlign=middle;';
+    }
+    graph.getModel().setStyle(cell, st);
   } finally {
     graph.getModel().endUpdate();
   }
@@ -878,66 +1992,26 @@ function updatemultipleDropdownTypeCell(cell) {
   const graph = getGraph();
   if (!graph) return;
   
-  const qText = cell._questionText || '';
+  const qText = cell._questionText || 'Numbered Dropdown Question';
   const twoNums = cell._twoNumbers || { first: '0', second: '0' };
-  if (!cell._textboxes) {
-    cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
-  }
-  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <input class="question-title-input" type="text" value="${getEscapeAttr()(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
-    <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
-      <input type="number" value="${getEscapeAttr()(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
-      <input type="number" value="${getEscapeAttr()(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
-    </div>
-    <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
-  // Check if there's a location indicator position
-  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  const options = cell._textboxes || [];
+  const hasLocation = cell._locationIndex !== undefined && cell._locationIndex >= 0;
   
-  cell._textboxes.forEach((tb, index) => {
-    const val = tb.nameId || '';
-    const ph = tb.placeholder || 'Enter value';
-    const checked = tb.isAmountOption ? 'checked' : '';
-    
-    // Add location indicator before this option if it's at the location index
-    if (index === locationIndex) {
-      html += `
-        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
-          📍 Location Date Inserted
-          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
-        </div>`;
-    }
-    
-    html += `
-      <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
-        <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">⋮⋮</div>
-        <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" style="flex: 1;"/>
-        <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
-        <button onclick="window.copyMultipleDropdownId('${cell.id}', ${index})" style="margin-left: 4px; background-color: #4CAF50; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Copy ID</button>
-        <label>
-          <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
-          Amount?
-        </label>
-      </div>`;
-  });
-  
-  // Add location indicator at the end if location index is beyond the current options
-  if (locationIndex >= cell._textboxes.length) {
-    html += `
-      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
-        📍 Location Date Inserted
-        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
-      </div>`;
-  }
-  html += `<div style="text-align:center; margin-top:8px;">
-      <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
-      <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
-      <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
+  // Create simple display with essential information
+  const html = `
+    <div style="padding: 20px; font-family: Arial, sans-serif; text-align: center;">
+      <div style="font-weight: bold; color: #2196F3; margin-bottom: 10px; font-size: 16px;">${getEscapeAttr()(qText)}</div>
+      <div style="margin-bottom: 8px; color: #666; font-size: 14px;">
+        <strong>Range:</strong> ${twoNums.first} to ${twoNums.second}
     </div>
+      <div style="margin-bottom: 8px; color: #666; font-size: 14px;">
+        <strong>Options:</strong> ${options.length} configured
     </div>
-  </div>`;
+      ${hasLocation ? '<div style="margin-bottom: 8px; color: #28a745; font-size: 14px;"><strong>📍 Location:</strong> Enabled</div>' : ''}
+      <div style="font-style: italic; color: #999; font-size: 12px; margin-top: 15px;">Double-click to configure</div>
+    </div>
+  `;
   
-  // Add drop zone event listeners
-  html = html.replace('class="multiple-textboxes-container"', 'class="multiple-textboxes-container" ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, \'' + cell.id + '\')"');
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
@@ -945,17 +2019,11 @@ function updatemultipleDropdownTypeCell(cell) {
     if (!st.includes('verticalAlign=middle')) {
       st += 'verticalAlign=middle;';
     }
+    graph.getModel().setStyle(cell, st);
   } finally {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
-  
-  // Force a refresh to ensure the new HTML is rendered
-  setTimeout(() => {
-    if (graph.getModel().getCell(cell.id)) {
-      graph.refresh(cell);
-    }
-  }, 10);
 }
 
 // Question Type Event Handlers
