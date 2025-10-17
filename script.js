@@ -1,4 +1,4 @@
-﻿/**************************************************
+/**************************************************
  ************ Firebase Config & Basic Auth ********
  **************************************************/
 // Firebase configuration moved to config.js module
@@ -805,12 +805,10 @@ graph.isCellEditable = function (cell) {
  **************************************************/
 // Use document event listener instead of mxKeyHandler to avoid duplicate bindings
 if (!window.flowchartKeyboardInitialized) {
-  console.log('🔍 [KEYHANDLER DEBUG] Setting up keyboard shortcuts');
   
   document.addEventListener('keydown', function(event) {
     // Handle Ctrl+C
     if ((event.key === 'c' || event.key === 'C') && (event.ctrlKey || event.metaKey)) {
-      console.log('🔍 [KEY DEBUG] Ctrl+C document listener triggered');
       if (isUserTyping(event)) return;
       event.preventDefault();
       copySelectedNodeAsJson();
@@ -4325,40 +4323,76 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Add left-click handler for canvas with capture phase to intercept before graph handlers
   container.addEventListener("click", function(e) {
-    console.log('🔧 [CANVAS DEBUG] Click event detected on container');
-    console.log('🔧 [CANVAS DEBUG] Event target:', e.target);
-    console.log('🔧 [CANVAS DEBUG] Event button:', e.button);
-    console.log('🔧 [CANVAS DEBUG] Target === container:', e.target === container);
     
-    // Handle left-clicks (button 0) on the canvas or nodes to end square creation
+    // Handle left-clicks (button 0) on the canvas or nodes
     if (e.button === 0 && container.contains(e.target)) {
-      console.log('🔧 [CANVAS DEBUG] Left-click detected on canvas/node - ending square creation');
-      // End any ongoing square creation process
-      if (typeof resetSquareCreationState === 'function') {
-        resetSquareCreationState();
-        console.log('🔧 [CANVAS DEBUG] Square creation ended by left-click on canvas/node');
+      // Check if this is on empty canvas (not on a node)
+      const cell = graph.getCellAt(e.clientX, e.clientY);
+      if (!cell) {
+        // Additional check: make sure we're not clicking on any interactive elements
+        const interactiveElement = e.target.closest('input, button, select, textarea, [contenteditable], [draggable="true"]');
+        if (interactiveElement) {
+          console.log('🔧 [SQUARE DEBUG] Left-click on interactive element - ignoring for square creation');
+          return;
+        }
+        
+        // This is a click on empty canvas - check for double left-click
+        console.log('🔧 [SQUARE DEBUG] Left-click detected on empty canvas at:', e.clientX, e.clientY);
+        const currentTime = Date.now();
+        const timeSinceLastClick = currentTime - lastLeftClickTime;
+        
+        // If we're currently in square creation mode, cancel it
+        if (rightClickDragging) {
+          resetSquareCreationState();
+          return;
+        }
+        
+        // Check if this is a double left-click (within 500ms)
+        if (timeSinceLastClick < 500) {
+          leftClickCount++;
+          console.log('🔧 [SQUARE DEBUG] Double left-click detected on empty canvas - initiating square creation');
+          
+          // Clear any existing timeout
+          if (leftClickTimeout) {
+            clearTimeout(leftClickTimeout);
+            leftClickTimeout = null;
+          }
+          
+          // Start square creation
+          rightClickDragging = true;
+          rightClickStartPos = { x: e.clientX, y: e.clientY };
+          startSquareCreationTimeout();
+          
+          // Reset the counter
+          leftClickCount = 0;
+          lastLeftClickTime = 0;
+          
+          // Prevent default behavior
+          e.preventDefault();
+          return false;
+        } else {
+          // Single left-click - start counting
+          console.log('🔧 [SQUARE DEBUG] Single left-click on empty canvas - starting double-click detection');
+          leftClickCount = 1;
+          lastLeftClickTime = currentTime;
+          
+          // Set a timeout to reset the counter if no second click comes
+          leftClickTimeout = setTimeout(() => {
+            leftClickCount = 0;
+            lastLeftClickTime = 0;
+          }, 500);
+        }
+      } else {
+        // Click is on a node - end any ongoing square creation process
+        console.log('🔧 [SQUARE DEBUG] Left-click detected on node - resetting square creation state');
+        if (typeof resetSquareCreationState === 'function') {
+          resetSquareCreationState();
+        }
       }
     }
   }, true); // Use capture phase to intercept before graph handlers
   
-  // Also add a global click handler as backup to catch canvas clicks
-  document.addEventListener("click", function(e) {
-    console.log('🔧 [CANVAS DEBUG] Global click event detected');
-    console.log('🔧 [CANVAS DEBUG] Global event target:', e.target);
-    console.log('🔧 [CANVAS DEBUG] Global event button:', e.button);
-    console.log('🔧 [CANVAS DEBUG] Is target in container:', container.contains(e.target));
-    console.log('🔧 [CANVAS DEBUG] Target tagName:', e.target.tagName);
-    
-    // Check if this is a left-click anywhere in the container (canvas or nodes)
-    if (e.button === 0 && container.contains(e.target)) {
-      console.log('🔧 [CANVAS DEBUG] Global: Left-click detected on canvas/node - ending square creation');
-      // End any ongoing square creation process
-      if (typeof resetSquareCreationState === 'function') {
-        resetSquareCreationState();
-        console.log('🔧 [CANVAS DEBUG] Global: Square creation ended by left-click on canvas/node');
-      }
-    }
-  }, true); // Use capture phase
+  // Global click handler removed - now handled by container click handler above
 
   // Experimental feature: Right-click drag detection for "square initiated" alert
   // Setting up right-click drag detection
@@ -4463,30 +4497,23 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Test listeners added
   container.onclick = function(e) {
-    console.log('🔧 [SQUARE DEBUG] INLINE ONCLICK: Click detected!', e.target);
   };
   
   container.onmousedown = function(e) {
-    console.log('🔧 [SQUARE DEBUG] INLINE ONMOUSEDOWN: Mouse down detected!', e.target, 'button:', e.button);
   };
   
   // First contextmenu handler removed - using the one with timeout below
   
   // Also try adding to the body element
-  console.log('🔧 [SQUARE DEBUG] Adding inline handlers to body element');
   document.body.onclick = function(e) {
-    console.log('🔧 [SQUARE DEBUG] BODY ONCLICK: Click detected!', e.target);
   };
   
   document.body.onmousedown = function(e) {
-    console.log('🔧 [SQUARE DEBUG] BODY ONMOUSEDOWN: Mouse down detected!', e.target, 'button:', e.button);
   };
   
   // Test div removed - no longer needed
-  console.log('🔧 [SQUARE DEBUG] All inline handlers added successfully');
   
   // Add a more aggressive mousemove detection that works independently
-  console.log('🔧 [SQUARE DEBUG] Adding aggressive mousemove detection');
   let lastMousePos = null;
   let rightClickActive = false;
   
@@ -4498,22 +4525,14 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // If we're in right-click drag mode, check distance
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Right-click dragging detected, checking distance');
-      console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Current position:', lastMousePos);
-      console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Start position:', rightClickStartPos);
       
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
       
-      console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Distance moved:', distance);
       
       if (distance > 10) {
-        console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Distance threshold exceeded! Square initiated');
-        console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Square creation started at:', rightClickStartPos);
-        console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Current mouse position:', lastMousePos);
-        console.log('🔧 [SQUARE DEBUG] AGGRESSIVE: Distance moved:', distance);
         
         // Create or update the temporary selection box
         updateTemporarySelectionBox(rightClickStartPos, lastMousePos);
@@ -4524,33 +4543,19 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Also try to detect right-click by monitoring contextmenu events
   // Global context menu listener removed - using double right-click detection instead
-  console.log('🔧 [SQUARE DEBUG] Global context menu listener removed - using double right-click detection');
   
-  console.log('🔧 [SQUARE DEBUG] Aggressive detection methods added');
   
   // Add mouseup detection to complete the square creation
-  console.log('🔧 [SQUARE DEBUG] Adding mouseup detection for square completion');
   document.addEventListener("mouseup", function(e) {
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Mouse up detected');
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Mouse button:', e.button);
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Current position:', { x: e.clientX, y: e.clientY });
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Right-click dragging state:', rightClickDragging);
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Start position:', rightClickStartPos);
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Event target:', e.target);
-    console.log('🔧 [SQUARE DEBUG] MOUSEUP: Event currentTarget:', e.currentTarget);
     
     // Check if this is a left-click - end any ongoing square creation
     if (e.button === 0 && rightClickDragging) {
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: Left-click detected, ending square creation');
       resetSquareCreationState();
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: Square creation cancelled');
       return;
     }
     
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: Completing square creation');
       const endPos = { x: e.clientX, y: e.clientY };
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: End position:', endPos);
       
       // Calculate square dimensions
       const width = Math.abs(endPos.x - rightClickStartPos.x);
@@ -4558,18 +4563,13 @@ document.addEventListener("DOMContentLoaded", function() {
       const left = Math.min(rightClickStartPos.x, endPos.x);
       const top = Math.min(rightClickStartPos.y, endPos.y);
       
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: Square dimensions - width:', width, 'height:', height);
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: Square position - left:', left, 'top:', top);
       
       // Remove the temporary selection box
       removeTemporarySelectionBox();
       
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
-        console.log('🔧 [SQUARE DEBUG] MOUSEUP: Creating blue square with meaningful size');
         createBlueSquare(left, top, width, height);
-      } else {
-        console.log('🔧 [SQUARE DEBUG] MOUSEUP: Square too small, not creating');
       }
       
       // Cancel timeout since we're handling it here
@@ -4577,32 +4577,20 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // Reset state
       resetSquareCreationState();
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: State reset, square creation complete');
-    } else {
-      console.log('🔧 [SQUARE DEBUG] MOUSEUP: Not in right-click drag state, ignoring');
     }
   }, true);
   
   // Add window-level mouseup listener as backup
   window.addEventListener("mouseup", function(e) {
-    console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Mouse up detected on window');
-    console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Mouse button:', e.button);
-    console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Current position:', { x: e.clientX, y: e.clientY });
-    console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Right-click dragging state:', rightClickDragging);
-    console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Start position:', rightClickStartPos);
     
     // Check if this is a left-click - end any ongoing square creation
     if (e.button === 0 && rightClickDragging) {
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Left-click detected, ending square creation');
       resetSquareCreationState();
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Square creation cancelled');
       return;
     }
     
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Completing square creation');
       const endPos = { x: e.clientX, y: e.clientY };
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: End position:', endPos);
       
       // Calculate square dimensions
       const width = Math.abs(endPos.x - rightClickStartPos.x);
@@ -4610,18 +4598,13 @@ document.addEventListener("DOMContentLoaded", function() {
       const left = Math.min(rightClickStartPos.x, endPos.x);
       const top = Math.min(rightClickStartPos.y, endPos.y);
       
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Square dimensions - width:', width, 'height:', height);
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Square position - left:', left, 'top:', top);
       
       // Remove the temporary selection box
       removeTemporarySelectionBox();
       
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
-        console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Creating blue square with meaningful size');
         createBlueSquare(left, top, width, height);
-      } else {
-        console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: Square too small, not creating');
       }
       
       // Cancel timeout since we're handling it here
@@ -4629,21 +4612,15 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // Reset state
       resetSquareCreationState();
-      console.log('🔧 [SQUARE DEBUG] WINDOW MOUSEUP: State reset, square creation complete');
     }
   }, true);
   
   // Add inline mousedown handler to body to detect left-clicks (for cancellation)
   document.body.onmousedown = function(e) {
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEDOWN: Mouse down detected on body');
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEDOWN: Mouse button:', e.button);
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEDOWN: Target:', e.target);
     
     // Check if this is a left-click - end any ongoing square creation
     if (e.button === 0 && rightClickDragging) {
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEDOWN: Left-click detected, ending square creation');
       resetSquareCreationState();
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEDOWN: Square creation cancelled');
       return;
     }
   };
@@ -4653,32 +4630,29 @@ document.addEventListener("DOMContentLoaded", function() {
   let rightClickTimeout = null;
   let lastRightClickTime = 0;
   
+  // Add double left-click detection system
+  let leftClickCount = 0;
+  let leftClickTimeout = null;
+  let lastLeftClickTime = 0;
+  
   // Add inline contextmenu handler to body to detect double right-clicks
   document.body.oncontextmenu = function(e) {
-    console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Right-click context menu detected on body');
-    console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Target:', e.target);
     
     // Check if this is a right-click on the canvas
     if (container.contains(e.target)) {
       const currentTime = Date.now();
       const timeSinceLastClick = currentTime - lastRightClickTime;
       
-      console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Right-click detected on canvas');
-      console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Time since last click:', timeSinceLastClick);
-      console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Currently dragging:', rightClickDragging);
       
        // If we're currently in square creation mode, cancel it
        if (rightClickDragging) {
-         console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Right-click detected during square creation, cancelling');
          resetSquareCreationState();
-         console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Square creation cancelled');
          return;
        }
       
       // Check if this is a double right-click (within 500ms)
       if (timeSinceLastClick < 500) {
         rightClickCount++;
-        console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Double right-click detected! Starting square creation');
         
         // Clear any existing timeout
         if (rightClickTimeout) {
@@ -4689,7 +4663,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Start square creation
         rightClickDragging = true;
         rightClickStartPos = { x: e.clientX, y: e.clientY };
-        console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Start position:', rightClickStartPos);
         startSquareCreationTimeout();
         
         // Reset the counter
@@ -4703,11 +4676,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Single right-click - start counting
         rightClickCount = 1;
         lastRightClickTime = currentTime;
-        console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Single right-click detected, waiting for potential double-click');
         
         // Set a timeout to reset the counter if no second click comes
         rightClickTimeout = setTimeout(() => {
-          console.log('🔧 [SQUARE DEBUG] BODY CONTEXTMENU: Timeout reached, single right-click confirmed');
           rightClickCount = 0;
           lastRightClickTime = 0;
         }, 500);
@@ -4723,19 +4694,14 @@ document.addEventListener("DOMContentLoaded", function() {
     lastMouseMoveTime = Date.now();
     
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEMOVE: Right-click dragging detected');
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEMOVE: Current position:', lastMousePos);
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEMOVE: Start position:', rightClickStartPos);
       
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
       
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEMOVE: Distance moved:', distance);
       
       if (distance > 10) {
-        console.log('🔧 [SQUARE DEBUG] BODY MOUSEMOVE: Square initiated');
         
         // Create or update the temporary selection box
         updateTemporarySelectionBox(rightClickStartPos, lastMousePos);
@@ -4745,16 +4711,9 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Add inline mouseup handler to body as ultimate backup
   document.body.onmouseup = function(e) {
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Mouse up detected on body');
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Mouse button:', e.button);
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Current position:', { x: e.clientX, y: e.clientY });
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Right-click dragging state:', rightClickDragging);
-    console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Start position:', rightClickStartPos);
     
     if (rightClickDragging && rightClickStartPos) {
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Completing square creation');
       const endPos = { x: e.clientX, y: e.clientY };
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: End position:', endPos);
       
       // Calculate square dimensions
       const width = Math.abs(endPos.x - rightClickStartPos.x);
@@ -4762,18 +4721,13 @@ document.addEventListener("DOMContentLoaded", function() {
       const left = Math.min(rightClickStartPos.x, endPos.x);
       const top = Math.min(rightClickStartPos.y, endPos.y);
       
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Square dimensions - width:', width, 'height:', height);
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Square position - left:', left, 'top:', top);
       
       // Remove the temporary selection box
       removeTemporarySelectionBox();
       
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
-        console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Creating blue square with meaningful size');
         createBlueSquare(left, top, width, height);
-      } else {
-        console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: Square too small, not creating');
       }
       
       // Cancel timeout since we're handling it here
@@ -4781,7 +4735,6 @@ document.addEventListener("DOMContentLoaded", function() {
       
       // Reset state
       resetSquareCreationState();
-      console.log('🔧 [SQUARE DEBUG] BODY MOUSEUP: State reset, square creation complete');
     }
   };
   
@@ -4790,9 +4743,6 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Function to create or update the temporary selection box during drag
   function updateTemporarySelectionBox(startPos, currentPos) {
-    console.log('🔧 [SQUARE DEBUG] TEMP: Updating temporary selection box');
-    console.log('🔧 [SQUARE DEBUG] TEMP: Start position:', startPos);
-    console.log('🔧 [SQUARE DEBUG] TEMP: Current position:', currentPos);
     
     // Calculate dimensions
     const width = Math.abs(currentPos.x - startPos.x);
@@ -4800,8 +4750,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const left = Math.min(startPos.x, currentPos.x);
     const top = Math.min(startPos.y, currentPos.y);
     
-    console.log('🔧 [SQUARE DEBUG] TEMP: Calculated dimensions - width:', width, 'height:', height);
-    console.log('🔧 [SQUARE DEBUG] TEMP: Calculated position - left:', left, 'top:', top);
     
     // Remove existing temporary selection box if it exists
     if (temporarySelectionBox) {
@@ -4826,11 +4774,9 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     
     document.body.appendChild(temporarySelectionBox);
-    console.log('🔧 [SQUARE DEBUG] TEMP: Temporary selection box created and added to DOM');
     
     // Update selection in real-time during drag (only if we have a meaningful size)
     if (width > 10 && height > 10) {
-      console.log('🔧 [SQUARE DEBUG] TEMP: Updating live selection during drag');
       selectNodesInSquareArea(left, top, width, height);
     }
   }
@@ -4838,7 +4784,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Function to remove the temporary selection box
   function removeTemporarySelectionBox() {
     if (temporarySelectionBox) {
-      console.log('🔧 [SQUARE DEBUG] TEMP: Removing temporary selection box');
       temporarySelectionBox.remove();
       temporarySelectionBox = null;
     }
@@ -4846,13 +4791,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Function to select nodes that overlap with the square area
   function selectNodesInSquareArea(left, top, width, height) {
-    console.log('🔧 [SQUARE DEBUG] SELECT: Selecting nodes in square area');
-    console.log('🔧 [SQUARE DEBUG] SELECT: Square bounds - left:', left, 'top:', top, 'width:', width, 'height:', height);
     
     // Get the graph container to convert screen coordinates to graph coordinates
     const container = document.getElementById('graphContainer');
     if (!container) {
-      console.log('🔧 [SQUARE DEBUG] SELECT: Graph container not found');
       return [];
     }
     
@@ -4861,7 +4803,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const scale = view.getScale();
     const translate = view.getTranslate();
     
-    console.log('🔧 [SQUARE DEBUG] SELECT: Graph scale:', scale, 'translate:', translate);
     
     // Convert screen coordinates to graph coordinates
     const containerRect = container.getBoundingClientRect();
@@ -4870,7 +4811,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const graphWidth = width / scale;
     const graphHeight = height / scale;
     
-    console.log('🔧 [SQUARE DEBUG] SELECT: Converted to graph coordinates - left:', graphLeft, 'top:', graphTop, 'width:', graphWidth, 'height:', graphHeight);
     
     // Get all vertex cells (nodes) from the graph
     const vertices = graph.getChildVertices(graph.getDefaultParent());
@@ -4886,7 +4826,6 @@ document.addEventListener("DOMContentLoaded", function() {
       const cellWidth = geometry.width || 100; // Default width if not specified
       const cellHeight = geometry.height || 50; // Default height if not specified
       
-      console.log('🔧 [SQUARE DEBUG] SELECT: Checking cell', cell.id, 'at', cellLeft, cellTop, 'size', cellWidth, 'x', cellHeight);
       
       // Check if the cell overlaps with the square area (using graph coordinates)
       const overlaps = !(cellLeft + cellWidth < graphLeft || 
@@ -4895,12 +4834,10 @@ document.addEventListener("DOMContentLoaded", function() {
                         cellTop > graphTop + graphHeight);
       
       if (overlaps) {
-        console.log('🔧 [SQUARE DEBUG] SELECT: Cell', cell.id, 'overlaps with square area');
         selectedNodes.push(cell);
       }
     });
     
-    console.log('🔧 [SQUARE DEBUG] SELECT: Found', selectedNodes.length, 'overlapping nodes');
     
     // Select the overlapping nodes using the same method as section selection
     if (selectedNodes.length > 0) {
@@ -4910,9 +4847,6 @@ document.addEventListener("DOMContentLoaded", function() {
       // Select all overlapping nodes at once (like section selection does)
       graph.addSelectionCells(selectedNodes);
       
-      console.log('🔧 [SQUARE DEBUG] SELECT: Selection complete,', selectedNodes.length, 'nodes selected');
-    } else {
-      console.log('🔧 [SQUARE DEBUG] SELECT: No nodes overlap with square area');
     }
     
     return selectedNodes;
@@ -4920,9 +4854,6 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Function to create the blue square
   function createBlueSquare(left, top, width, height) {
-    console.log('🔧 [SQUARE DEBUG] CREATE: Creating blue square');
-    console.log('🔧 [SQUARE DEBUG] CREATE: Position - left:', left, 'top:', top);
-    console.log('🔧 [SQUARE DEBUG] CREATE: Size - width:', width, 'height:', height);
     
     // Create the square element
     const square = document.createElement('div');
@@ -4947,18 +4878,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Add a class to identify this as a blue square for event handling
     square.classList.add('blue-selection-square');
     
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square element created with ID:', squareId);
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square styles applied');
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square element:', square);
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square computed styles:', window.getComputedStyle(square));
     
     // Add to document
     document.body.appendChild(square);
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square added to document body');
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square parent:', square.parentElement);
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square in DOM:', document.body.contains(square));
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square offset:', square.offsetLeft, square.offsetTop, square.offsetWidth, square.offsetHeight);
-    console.log('🔧 [SQUARE DEBUG] CREATE: Square client rect:', square.getBoundingClientRect());
     
     // Add click handler to remove the square
     square.style.pointerEvents = 'auto';
@@ -5096,7 +5018,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (squareCreationTimeout) {
       clearTimeout(squareCreationTimeout);
       squareCreationTimeout = null;
-      console.log('🔧 [SQUARE DEBUG] TIMEOUT: Cancelled timeout-based square creation');
     }
   }
   
@@ -5106,18 +5027,22 @@ document.addEventListener("DOMContentLoaded", function() {
     rightClickStartPos = null;
     rightClickCount = 0;
     lastRightClickTime = 0;
+    leftClickCount = 0;
+    lastLeftClickTime = 0;
     if (rightClickTimeout) {
       clearTimeout(rightClickTimeout);
       rightClickTimeout = null;
     }
+    if (leftClickTimeout) {
+      clearTimeout(leftClickTimeout);
+      leftClickTimeout = null;
+    }
     cancelSquareCreationTimeout();
     removeTemporarySelectionBox();
-    console.log('🔧 [SQUARE DEBUG] STATE: Square creation state fully reset');
   }
   
   // Modify the contextmenu handler to start the timeout
   // Container context menu handler removed - using double right-click detection instead
-  console.log('🔧 [SQUARE DEBUG] Container context menu handler removed - using double right-click detection');
   
   // Add test function to verify createBlueSquare works
   window.testCreateBlueSquare = function() {
@@ -5127,8 +5052,6 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Test square function removed - no longer needed
   
-  console.log('🔧 [SQUARE DEBUG] Blue square creation system ready');
-  console.log('🔧 [SQUARE DEBUG] Test function available: window.testCreateBlueSquare()');
   
   // Immediate test square creation removed - no longer needed
 
@@ -5317,15 +5240,12 @@ function previewForm() {
   // lastAutosaveData and autosaveDataHash moved to config.js module
 
 function autosaveFlowchartToLocalStorage() {
-  console.log('🔧 [AUTOSAVE DEBUG] autosaveFlowchartToLocalStorage called');
   try {
     if (!graph) {
-      console.log('🔧 [AUTOSAVE DEBUG] No graph available, returning');
       return;
     }
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
-    console.log('🔧 [AUTOSAVE DEBUG] Found', cells.length, 'cells to process');
     
     // Quick check if data has actually changed
     const currentHash = JSON.stringify({
@@ -5381,9 +5301,7 @@ function autosaveFlowchartToLocalStorage() {
 
       // Custom fields for specific nodes
       if (cell._textboxes) {
-        console.log('🔧 [AUTOSAVE DEBUG] Saving _textboxes for cell', cell.id, ':', cell._textboxes);
         cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
-        console.log('🔧 [AUTOSAVE DEBUG] Saved _textboxes data:', cellData._textboxes);
       }
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
@@ -5433,7 +5351,6 @@ function autosaveFlowchartToLocalStorage() {
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
         // Always save _defaultText for hidden textbox nodes, even if undefined or empty
         cellData._defaultText = cell._defaultText !== undefined ? cell._defaultText : "";
-        console.log('🔍 [AUTOSAVE DEBUG] Saving hidden textbox _defaultText:', cellData._defaultText);
       }
       
       // calculation node properties
@@ -5479,13 +5396,6 @@ function autosaveFlowchartToLocalStorage() {
     
     // Get current library flowchart name (if any)
     const libraryFlowchartName = window.currentFlowchartName || null;
-    
-    // Debug logging for library flowchart name
-    if (libraryFlowchartName) {
-      console.log('🔍 [AUTOSAVE DEBUG] Saving library flowchart name:', libraryFlowchartName);
-    } else {
-      console.log('🔍 [AUTOSAVE DEBUG] No library flowchart name to save');
-    }
     
     const data = {
       cells: simplifiedCells,
@@ -5584,56 +5494,35 @@ window.testFunctionAvailability = function() {
 
 // Global click handler to debug checkbox clicks
 document.addEventListener('click', function(e) {
-  console.log('🔧 [CLICK DEBUG] Any click detected on:', e.target);
-  console.log('🔧 [CLICK DEBUG] Target type:', e.target.type);
-  console.log('🔧 [CLICK DEBUG] Target tagName:', e.target.tagName);
   
   if (e.target.type === 'checkbox') {
-    console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox clicked:', e.target);
-    console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox checked:', e.target.checked);
-    console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox onclick:', e.target.getAttribute('onclick'));
     
     if (e.target.closest('.textbox-entry')) {
-      console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox is in textbox-entry');
       
       // Try to extract cell ID and index from the onclick attribute
       const onclick = e.target.getAttribute('onclick');
-      console.log('🔧 [CHECKBOX CLICK DEBUG] onclick attribute:', onclick);
       
       if (onclick && onclick.includes('toggleMultipleDropdownAmount')) {
-        console.log('🔧 [CHECKBOX CLICK DEBUG] Found toggleMultipleDropdownAmount in onclick');
         // Extract cell ID and index using regex
         const match = onclick.match(/toggleMultipleDropdownAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
         if (match) {
           const cellId = match[1];
           const index = parseInt(match[2]);
-          console.log('🔧 [CHECKBOX CLICK DEBUG] Extracted cellId:', cellId, 'index:', index);
           
           // Check current state before toggling
-          console.log('🔧 [CHECKBOX CLICK DEBUG] Checking current state...');
           window.testCellState(cellId);
           
           // Manually call the function
-          console.log('🔧 [CHECKBOX CLICK DEBUG] Manually calling toggleMultipleDropdownAmount...');
           if (typeof window.toggleMultipleDropdownAmount === 'function') {
             window.toggleMultipleDropdownAmount(cellId, index, e.target.checked);
-          } else {
-            console.log('🔧 [CHECKBOX CLICK DEBUG] ERROR: toggleMultipleDropdownAmount function not found!');
           }
           
           // Check state after toggling
           setTimeout(() => {
-            console.log('🔧 [CHECKBOX CLICK DEBUG] Checking state after toggle...');
             window.testCellState(cellId);
           }, 100);
-        } else {
-          console.log('🔧 [CHECKBOX CLICK DEBUG] Could not extract cellId and index from onclick');
         }
-      } else {
-        console.log('🔧 [CHECKBOX CLICK DEBUG] No toggleMultipleDropdownAmount found in onclick');
       }
-    } else {
-      console.log('🔧 [CHECKBOX CLICK DEBUG] Checkbox is NOT in textbox-entry');
     }
   }
 });
@@ -5701,13 +5590,11 @@ document.addEventListener('change', function(e) {
 
 // Global helper to request a throttled autosave from anywhere (including Groups UI)
 function requestAutosave() {
-  console.log('🔧 [AUTOSAVE REQUEST DEBUG] requestAutosave called');
   try {
     const now = Date.now();
     
     // Prevent too frequent autosaves
     if (now - lastAutosaveTime < autosaveMinInterval) {
-      console.log('🔧 [AUTOSAVE REQUEST DEBUG] Autosave skipped - too frequent');
       return;
     }
     
@@ -5812,11 +5699,9 @@ function setupAutosaveHooks() {
       console.log('Autosaving after loadFlowchartData, current groups:', groups);
       // Get library flowchart name from global variable (set by loadFlowchartData)
       const libraryName = window._loadingLibraryFlowchartName;
-      console.log('🔍 [AUTOSAVE DEBUG] Library name from global variable:', libraryName);
       // Set currentFlowchartName before autosave if we're loading from library
       if (libraryName) {
         window.currentFlowchartName = libraryName;
-        console.log('🔍 [AUTOSAVE DEBUG] Set currentFlowchartName to:', libraryName);
       }
       autosaveFlowchartToLocalStorage();
       // Clear the global variable after autosave
@@ -5881,14 +5766,9 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
-      // Debug logging for autosave restore
-      console.log('🔍 [AUTOSAVE RESTORE DEBUG] Autosave data:', data);
-      console.log('🔍 [AUTOSAVE RESTORE DEBUG] Library flowchart name:', data.libraryFlowchartName);
-      console.log('🔍 [AUTOSAVE RESTORE DEBUG] openSavedFlowchart function available:', typeof window.openSavedFlowchart === 'function');
       
       // Check if this was a library flowchart and handle it specially
       if (data.libraryFlowchartName && typeof window.openSavedFlowchart === 'function') {
-        console.log('🔄 [AUTOSAVE RESTORE] Detected library flowchart:', data.libraryFlowchartName);
         
         // Show alert to user
         alert(`Opening ${data.libraryFlowchartName} from library`);
@@ -5903,8 +5783,6 @@ function showAutosaveRestorePrompt() {
         setTimeout(safeSetupAutosaveHooks, 1000);
       } else {
         // Handle regular autosave restore (non-library flowchart)
-        console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
-        console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
         window.loadFlowchartData(data);
         
         // Restore form name if it exists

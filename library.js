@@ -1409,9 +1409,7 @@ window.exportBothJson = function() {
 
       // Custom fields for specific nodes
       if (cell._textboxes) {
-        console.log('🔧 [LIBRARY EXPORT DEBUG] Exporting _textboxes for cell', cell.id, ':', cell._textboxes);
         cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
-        console.log('🔧 [LIBRARY EXPORT DEBUG] Exported _textboxes data:', cellData._textboxes);
       }
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
@@ -1877,13 +1875,11 @@ function displayFlowcharts(flowcharts) {
 window.openSavedFlowchart = function(name) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
   
-  console.log('📚 [LIBRARY LOAD] Loading flowchart from library:', name);
   
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
     .get().then(docSnap=>{
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
       
-      console.log('📚 [LIBRARY LOAD] Flowchart data retrieved, calling loadFlowchartData');
       currentFlowchartName = name;
       window.currentFlowchartName = name;
       loadFlowchartData(docSnap.data().flowchart, name);
@@ -1895,7 +1891,6 @@ window.openSavedFlowchart = function(name) {
       
       document.getElementById("flowchartListOverlay").style.display = "none";
       
-      console.log('📚 [LIBRARY LOAD] Flowchart loaded, Node ID validation will run in 1 second');
     }).catch(err=>alert("Error loading: " + err));
 };
 
@@ -2670,8 +2665,6 @@ window.testEdgeStylePersistence = function() {
  * Load a flowchart from JSON data.
  */
 window.loadFlowchartData = function(data, libraryFlowchartName) {
-  console.log('📥 [LOAD FLOWCHART] Starting to load flowchart data');
-  console.log('📥 [LOAD FLOWCHART] Library flowchart name:', libraryFlowchartName || 'None (regular import)');
   
   // Store library flowchart name in a global variable for autosave to access
   window._loadingLibraryFlowchartName = libraryFlowchartName || null;
@@ -2722,12 +2715,11 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         if (typeof updateSectionLegend === 'function') {
           updateSectionLegend();
         } else {
-          console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
+          console.error('updateSectionLegend function not available!');
         }
       }, 50);
     } else {
       // No section preferences in import data, but we need to check if cells have sections
-      console.log('🔍 [IMPORT DEBUG] No sectionPrefs in import data, checking cells for sections');
     }
     
     // After creating cells, check for missing section preferences and create them
@@ -2745,14 +2737,11 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         }
       });
       
-      console.log('🔍 [IMPORT DEBUG] Sections found in imported cells:', Array.from(usedSections));
-      console.log('🔍 [IMPORT DEBUG] Current section preferences:', Object.keys(currentSectionPrefs));
       
       // Create missing section preferences
       let needsUpdate = false;
       usedSections.forEach(sectionNum => {
         if (!currentSectionPrefs[sectionNum]) {
-          console.log(`🔍 [IMPORT DEBUG] Creating missing section preference for section ${sectionNum}`);
           currentSectionPrefs[sectionNum] = {
             borderColor: window.getDefaultSectionColor ? window.getDefaultSectionColor(parseInt(sectionNum)) : "#cccccc",
             name: `Section ${sectionNum}`
@@ -2762,7 +2751,6 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
       });
       
       if (needsUpdate) {
-        console.log('🔍 [IMPORT DEBUG] Updated section preferences:', currentSectionPrefs);
         
         // Update the section preferences
         if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {

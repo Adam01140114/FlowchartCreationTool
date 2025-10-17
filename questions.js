@@ -15,6 +15,10 @@ function isQuestion(cell) {
 }
 
 function getQuestionType(cell) {
+  if (!cell) {
+    console.log('🔍 [LOCATION ORDER DEBUG] getQuestionType called with undefined cell');
+    return "";
+  }
   const style = cell.style || "";
   const m = style.match(/questionType=([^;]+)/);
   return m ? m[1] : "";
@@ -992,10 +996,48 @@ window.showNumberedDropdownProperties = function(cell) {
     width: 200px;
   `;
   saveBtn.onclick = () => {
+    console.log('🔍 [LOCATION ORDER DEBUG] Save button clicked for cell:', cell.id);
+    console.log('🔍 [LOCATION ORDER DEBUG] Cell state before save:', {
+      locationIndex: cell._locationIndex,
+      textboxes: cell._textboxes?.map((tb, idx) => ({ index: idx, nameId: tb.nameId }))
+    });
+    
+    // Force a model update to ensure data is saved
+    const graph = getGraph();
+    if (graph) {
+      graph.getModel().beginUpdate();
+      try {
+        // Force the cell to be marked as changed
+        graph.getModel().setValue(cell, cell.value);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+    
     // Refresh the cell display
     if (typeof window.updatemultipleDropdownTypeCell === 'function') {
+      console.log('🔍 [LOCATION ORDER DEBUG] Calling updatemultipleDropdownTypeCell...');
       window.updatemultipleDropdownTypeCell(cell);
+      console.log('🔍 [LOCATION ORDER DEBUG] updatemultipleDropdownTypeCell completed');
+    } else {
+      console.log('🔍 [LOCATION ORDER DEBUG] updatemultipleDropdownTypeCell function not found!');
     }
+    
+    console.log('🔍 [LOCATION ORDER DEBUG] Cell state after save:', {
+      locationIndex: cell._locationIndex,
+      textboxes: cell._textboxes?.map((tb, idx) => ({ index: idx, nameId: tb.nameId }))
+    });
+    
+    // Verify the cell data is properly stored
+    console.log('🔍 [PROPERTIES MENU DEBUG] Final cell verification:', {
+      cellId: cell.id,
+      locationIndex: cell._locationIndex,
+      hasLocationIndex: cell._locationIndex !== undefined,
+      locationIndexType: typeof cell._locationIndex,
+      textboxesLength: cell._textboxes?.length
+    });
+    
+    console.log('🔍 [LOCATION ORDER DEBUG] Cell display updated, closing modal');
     document.body.removeChild(modal);
   };
   
@@ -1164,10 +1206,32 @@ function createOptionsContainer(cell) {
   container.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    
+    // Add visual feedback for where the location will be dropped
+    const dropTarget = e.target.closest('[data-index]');
+    if (dropTarget && dropTarget.dataset.type === 'option') {
+      const dropIndex = parseInt(dropTarget.dataset.index);
+      console.log('🔍 [PROPERTIES MENU DEBUG] Dragging over option at index:', dropIndex, 
+        'Location will be inserted at position:', dropIndex, 
+        dropIndex === 0 ? '(TOP)' : dropIndex === 1 ? '(MIDDLE)' : '(AFTER)');
+      
+      // Add visual indicator
+      dropTarget.style.borderColor = '#007bff';
+      dropTarget.style.borderWidth = '2px';
+    }
   });
   
   container.addEventListener('dragenter', (e) => {
     e.preventDefault();
+  });
+  
+  container.addEventListener('dragleave', (e) => {
+    // Remove visual feedback when leaving drop targets
+    const dropTarget = e.target.closest('[data-index]');
+    if (dropTarget && dropTarget.dataset.type === 'option') {
+      dropTarget.style.borderColor = '#ddd';
+      dropTarget.style.borderWidth = '1px';
+    }
   });
   
   container.addEventListener('drop', (e) => {
@@ -1177,10 +1241,32 @@ function createOptionsContainer(cell) {
     const dropTarget = e.target.closest('[data-index]');
     if (!dropTarget || dropTarget === draggedElement) return;
     
-    const draggedType = draggedElement.dataset.type;
+    console.log('🔍 [PROPERTIES MENU DEBUG] Drop target element:', dropTarget);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Drop target dataset:', dropTarget.dataset);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Dragged element:', draggedElement);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Dragged element dataset:', draggedElement.dataset);
+    
+    // Try to get drag data from dataTransfer first, fallback to dataset
+    let draggedType, draggedIndex;
+    try {
+      const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+      draggedType = dragData.type || draggedElement.dataset.type;
+      draggedIndex = dragData.index !== undefined ? dragData.index : parseInt(draggedElement.dataset.index);
+    } catch (error) {
+      // Fallback to dataset if dataTransfer parsing fails
+      draggedType = draggedElement.dataset.type;
+      draggedIndex = parseInt(draggedElement.dataset.index);
+    }
+    
     const dropType = dropTarget.dataset.type;
-    const draggedIndex = parseInt(draggedElement.dataset.index);
     const dropIndex = parseInt(dropTarget.dataset.index);
+    
+    console.log('🔍 [LOCATION ORDER DEBUG] Drop event details:', {
+      draggedType: draggedType,
+      draggedIndex: draggedIndex,
+      dropType: dropType,
+      dropIndex: dropIndex
+    });
     
     if (draggedType === 'location' && dropType === 'location') {
       // Can't drop location on location
@@ -1196,15 +1282,104 @@ function createOptionsContainer(cell) {
       
       // Update location index if needed
       if (cell._locationIndex !== undefined) {
+        const oldLocationIndex = cell._locationIndex;
         if (draggedIndex < cell._locationIndex && dropIndex >= cell._locationIndex) {
           cell._locationIndex--;
         } else if (draggedIndex > cell._locationIndex && dropIndex <= cell._locationIndex) {
           cell._locationIndex++;
         }
+        
+        console.log('🔍 [LOCATION ORDER DEBUG] Location index updated during option reorder:', {
+          oldIndex: oldLocationIndex,
+          newIndex: cell._locationIndex,
+          draggedIndex: draggedIndex,
+          dropIndex: dropIndex
+        });
       }
+    } else if (draggedType === 'checkbox' && dropType === 'checkbox') {
+      // Reorder checkboxes
+      const checkboxes = cell._checkboxes || [];
+      const draggedCheckbox = checkboxes[draggedIndex];
+      checkboxes.splice(draggedIndex, 1);
+      checkboxes.splice(dropIndex, 0, draggedCheckbox);
+      
+      console.log('🔍 [CHECKBOX ORDER DEBUG] Checkbox reordered:', {
+        draggedIndex: draggedIndex,
+        dropIndex: dropIndex,
+        checkboxesCount: checkboxes.length
+      });
+    } else if (draggedType === 'checkbox' && dropType === 'option') {
+      // Move checkbox to position of option using unified ordering
+      const checkboxes = cell._checkboxes || [];
+      const options = cell._textboxes || [];
+      const draggedCheckbox = checkboxes[draggedIndex];
+      
+      // Initialize item order if it doesn't exist
+      if (!cell._itemOrder) {
+        cell._itemOrder = [];
+        // Add all options first
+        options.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'option', index: index });
+        });
+        // Add all checkboxes second
+        checkboxes.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'checkbox', index: index });
+        });
+        // Add location if it exists
+        if (cell._locationIndex >= 0) {
+          cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
+        }
+      }
+      
+      // Find the dragged checkbox in the item order
+      const draggedItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'checkbox' && item.index === draggedIndex
+      );
+      
+      // Find the target option in the item order
+      const targetItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'option' && item.index === dropIndex
+      );
+      
+      if (draggedItemIndex !== -1 && targetItemIndex !== -1) {
+        // Remove the dragged item from its current position
+        const draggedItem = cell._itemOrder.splice(draggedItemIndex, 1)[0];
+        
+        // Insert it at the target position
+        cell._itemOrder.splice(targetItemIndex, 0, draggedItem);
+        
+        // Update the checkbox index to match its new position in the item order
+        const newCheckboxIndex = cell._itemOrder.findIndex(item => 
+          item.type === 'checkbox' && item === draggedItem
+        );
+        draggedItem.index = newCheckboxIndex;
+      }
+      
+      console.log('🔍 [CHECKBOX ORDER DEBUG] Checkbox moved to option position using unified ordering:', {
+        draggedIndex: draggedIndex,
+        dropIndex: dropIndex,
+        itemOrder: cell._itemOrder,
+        checkboxesCount: checkboxes.length,
+        optionsCount: options.length
+      });
     } else if (draggedType === 'location' && dropType === 'option') {
       // Move location to position of option
+      console.log('🔍 [LOCATION ORDER DEBUG] Moving location to position:', dropIndex);
+      console.log('🔍 [PROPERTIES MENU DEBUG] Before location index update:', cell._locationIndex);
+      
+      // When dropping location on an option, we need to determine the intended position
+      // If dropping on the first option (index 0), location should be at index 0 (top)
+      // If dropping on the second option (index 1), location should be at index 1 (middle)
+      // The current logic is correct, but we need better visual feedback
       cell._locationIndex = dropIndex;
+      
+      console.log('🔍 [LOCATION ORDER DEBUG] New location index:', cell._locationIndex);
+      console.log('🔍 [PROPERTIES MENU DEBUG] After location index update:', cell._locationIndex);
+      console.log('🔍 [PROPERTIES MENU DEBUG] Location will be inserted at position:', cell._locationIndex, 'which means:', 
+        cell._locationIndex === 0 ? 'TOP (before first option)' : 
+        cell._locationIndex === 1 ? 'MIDDLE (between first and second option)' : 
+        'AFTER options');
+      console.log('🔍 [PROPERTIES MENU DEBUG] This will place the location BEFORE the option at index:', cell._locationIndex);
     } else if (draggedType === 'option' && dropType === 'location') {
       // Move option to position of location
       const options = cell._textboxes || [];
@@ -1213,50 +1388,206 @@ function createOptionsContainer(cell) {
       options.splice(cell._locationIndex, 0, draggedOption);
       
       // Update location index
+      const oldLocationIndex = cell._locationIndex;
       if (draggedIndex < cell._locationIndex) {
         cell._locationIndex--;
       }
+      
+      console.log('🔍 [LOCATION ORDER DEBUG] Location index updated during option-to-location drag:', {
+        oldIndex: oldLocationIndex,
+        newIndex: cell._locationIndex,
+        draggedIndex: draggedIndex
+      });
     }
     
+    // Clean up visual feedback
+    container.querySelectorAll('[data-index]').forEach(element => {
+      element.style.borderColor = '#ddd';
+      element.style.borderWidth = '1px';
+    });
+    
     // Refresh the entire container
+    console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing container after drag operation');
     const newContainer = createOptionsContainer(cell);
     container.parentNode.replaceChild(newContainer, container);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Container refreshed after drag operation');
     
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
   });
   
-  // Add existing options and location indicator in correct order
+  // Add existing options, checkboxes, and location indicator in correct order
   const options = cell._textboxes || [];
+  const checkboxes = cell._checkboxes || [];
   const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
   
-  options.forEach((option, index) => {
-    const optionContainer = createOptionField(option, index, cell, container);
+  console.log('🔍 [PROPERTIES MENU DEBUG] createOptionsContainer called for cell:', cell.id);
+  console.log('🔍 [PROPERTIES MENU DEBUG] Cell data:', {
+    cellId: cell.id,
+    locationIndex: locationIndex,
+    optionsCount: options.length,
+    checkboxesCount: checkboxes.length,
+    options: options.map((opt, idx) => ({ index: idx, nameId: opt.nameId })),
+    checkboxes: checkboxes.map((cb, idx) => ({ index: idx, fieldName: cb.fieldName }))
+  });
+  
+  // Use unified item order if it exists, otherwise use default order
+  if (cell._itemOrder && cell._itemOrder.length > 0) {
+    console.log('🔍 [PROPERTIES MENU DEBUG] Using unified item order for display:', cell._itemOrder);
     
-    // Add drag event listeners
-    optionContainer.addEventListener('dragstart', (e) => {
-      draggedElement = optionContainer;
-      e.dataTransfer.effectAllowed = 'move';
-      optionContainer.style.opacity = '0.5';
+    cell._itemOrder.forEach((item, displayIndex) => {
+      if (item.type === 'option' && options[item.index]) {
+        const optionContainer = createOptionField(options[item.index], item.index, cell, container);
+        
+        // Add drag event listeners
+        optionContainer.addEventListener('dragstart', (e) => {
+          draggedElement = optionContainer;
+          e.dataTransfer.effectAllowed = 'move';
+          optionContainer.style.opacity = '0.5';
+        });
+        
+        optionContainer.addEventListener('dragend', (e) => {
+          optionContainer.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(optionContainer);
+      } else if (item.type === 'checkbox' && checkboxes[item.index]) {
+        const checkboxContainer = createCheckboxField(checkboxes[item.index], item.index, cell, container);
+        
+        // Add drag event listeners
+        checkboxContainer.addEventListener('dragstart', (e) => {
+          draggedElement = checkboxContainer;
+          e.dataTransfer.effectAllowed = 'move';
+          checkboxContainer.style.opacity = '0.5';
+        });
+        
+        checkboxContainer.addEventListener('dragend', (e) => {
+          checkboxContainer.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(checkboxContainer);
+      } else if (item.type === 'location') {
+        const locationIndicator = createLocationIndicator(cell, container);
+        
+        // Add drag event listeners to location indicator
+        locationIndicator.addEventListener('dragstart', (e) => {
+          draggedElement = locationIndicator;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', JSON.stringify({ 
+            cellId: cell.id, 
+            index: locationIndex, 
+            type: 'location' 
+          }));
+          locationIndicator.style.opacity = '0.5';
+          console.log('🔍 [LOCATION ORDER DEBUG] Location drag started:', {
+            cellId: cell.id,
+            locationIndex: locationIndex,
+            type: 'location'
+          });
+        });
+        
+        locationIndicator.addEventListener('dragend', (e) => {
+          locationIndicator.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(locationIndicator);
+      }
+    });
+  } else {
+    // Fallback to default order (options first, then checkboxes, then location)
+    console.log('🔍 [PROPERTIES MENU DEBUG] Using default order (no unified item order)');
+    
+    options.forEach((option, index) => {
+      const optionContainer = createOptionField(option, index, cell, container);
+      
+      // Add drag event listeners
+      optionContainer.addEventListener('dragstart', (e) => {
+        draggedElement = optionContainer;
+        e.dataTransfer.effectAllowed = 'move';
+        optionContainer.style.opacity = '0.5';
+      });
+      
+      optionContainer.addEventListener('dragend', (e) => {
+        optionContainer.style.opacity = '1';
+        draggedElement = null;
+      });
+      
+      // Add location indicator BEFORE this option if it's at the location index
+      if (index === locationIndex) {
+        console.log('🔍 [PROPERTIES MENU DEBUG] Adding location indicator before option index:', index);
+        const locationIndicator = createLocationIndicator(cell, container);
+        
+        // Add drag event listeners to location indicator
+        locationIndicator.addEventListener('dragstart', (e) => {
+          draggedElement = locationIndicator;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', JSON.stringify({ 
+            cellId: cell.id, 
+            index: locationIndex, 
+            type: 'location' 
+          }));
+          locationIndicator.style.opacity = '0.5';
+          console.log('🔍 [LOCATION ORDER DEBUG] Location drag started:', {
+            cellId: cell.id,
+            locationIndex: locationIndex,
+            type: 'location'
+          });
+        });
+        
+        locationIndicator.addEventListener('dragend', (e) => {
+          locationIndicator.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(locationIndicator);
+      }
+      
+      container.appendChild(optionContainer);
     });
     
-    optionContainer.addEventListener('dragend', (e) => {
-      optionContainer.style.opacity = '1';
-      draggedElement = null;
+    // Add checkbox entries
+    checkboxes.forEach((checkbox, index) => {
+      const checkboxContainer = createCheckboxField(checkbox, index, cell, container);
+      
+      // Add drag event listeners
+      checkboxContainer.addEventListener('dragstart', (e) => {
+        draggedElement = checkboxContainer;
+        e.dataTransfer.effectAllowed = 'move';
+        checkboxContainer.style.opacity = '0.5';
+      });
+      
+      checkboxContainer.addEventListener('dragend', (e) => {
+        checkboxContainer.style.opacity = '1';
+        draggedElement = null;
+      });
+      
+      container.appendChild(checkboxContainer);
     });
     
-    container.appendChild(optionContainer);
-    
-    // Add location indicator after this option if it's at the location index
-    if (index === locationIndex) {
+    // Add location indicator at the end if location index is beyond the current options
+    if (locationIndex >= options.length) {
+      console.log('🔍 [PROPERTIES MENU DEBUG] Adding location indicator at end (beyond options)');
       const locationIndicator = createLocationIndicator(cell, container);
       
       // Add drag event listeners to location indicator
       locationIndicator.addEventListener('dragstart', (e) => {
         draggedElement = locationIndicator;
         e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', JSON.stringify({ 
+          cellId: cell.id, 
+          index: locationIndex, 
+          type: 'location' 
+        }));
         locationIndicator.style.opacity = '0.5';
+        console.log('🔍 [LOCATION ORDER DEBUG] Location drag started (end position):', {
+          cellId: cell.id,
+          locationIndex: locationIndex,
+          type: 'location'
+        });
       });
       
       locationIndicator.addEventListener('dragend', (e) => {
@@ -1266,25 +1597,6 @@ function createOptionsContainer(cell) {
       
       container.appendChild(locationIndicator);
     }
-  });
-  
-  // Add location indicator at the end if location index is beyond the current options
-  if (locationIndex >= options.length) {
-    const locationIndicator = createLocationIndicator(cell, container);
-    
-    // Add drag event listeners to location indicator
-    locationIndicator.addEventListener('dragstart', (e) => {
-      draggedElement = locationIndicator;
-      e.dataTransfer.effectAllowed = 'move';
-      locationIndicator.style.opacity = '0.5';
-    });
-    
-    locationIndicator.addEventListener('dragend', (e) => {
-      locationIndicator.style.opacity = '1';
-      draggedElement = null;
-    });
-    
-    container.appendChild(locationIndicator);
   }
   
   // Add new option button
@@ -1316,7 +1628,7 @@ function createOptionsContainer(cell) {
   
   // Add location button
   const addLocationBtn = document.createElement('button');
-  addLocationBtn.textContent = '+ Add Location';
+  addLocationBtn.textContent = '+ Add Checkbox';
   addLocationBtn.style.cssText = `
     background: #28a745;
     color: white;
@@ -1329,23 +1641,80 @@ function createOptionsContainer(cell) {
     margin-top: 5px;
   `;
   addLocationBtn.onclick = () => {
-    cell._locationIndex = (cell._textboxes || []).length;
+    console.log('🔍 [PROPERTIES MENU DEBUG] Add Location button clicked for cell:', cell.id);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Before adding checkbox:', {
+      checkboxesCount: (cell._checkboxes || []).length
+    });
+    
+    // Create new checkbox entry
+    const newCheckbox = { fieldName: '', options: [] };
+    if (!cell._checkboxes) cell._checkboxes = [];
+    cell._checkboxes.push(newCheckbox);
+    
+    console.log('🔍 [PROPERTIES MENU DEBUG] After adding checkbox:', {
+      checkboxesCount: cell._checkboxes.length
+    });
+    
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
-    // Refresh the entire container to show the location indicator
+    // Refresh the entire container to show the new checkbox entry
+    console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
     const newContainer = createOptionsContainer(cell);
     container.parentNode.replaceChild(newContainer, container);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
   };
   
   container.appendChild(addBtn);
   container.appendChild(addLocationBtn);
+  
+  // Add location button (for location indicators)
+  const addLocationIndicatorBtn = document.createElement('button');
+  addLocationIndicatorBtn.textContent = '+ Add Location';
+  addLocationIndicatorBtn.style.cssText = `
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+  `;
+  addLocationIndicatorBtn.onclick = () => {
+    console.log('🔍 [LOCATION ORDER DEBUG] Add Location button clicked for cell:', cell.id);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Before adding location:', {
+      locationIndex: cell._locationIndex,
+      textboxesCount: (cell._textboxes || []).length
+    });
+    
+    cell._locationIndex = (cell._textboxes || []).length;
+    
+    console.log('🔍 [LOCATION ORDER DEBUG] After adding location:', {
+      locationIndex: cell._locationIndex,
+      textboxesCount: (cell._textboxes || []).length
+    });
+    console.log('🔍 [PROPERTIES MENU DEBUG] Location index set to:', cell._locationIndex);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    // Refresh the entire container to show the location indicator
+    console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
+    const newContainer = createOptionsContainer(cell);
+    container.parentNode.replaceChild(newContainer, container);
+    console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
+  };
+  
+  container.appendChild(addLocationIndicatorBtn);
   
   return container;
 }
 
 // Helper function to create location indicator
 function createLocationIndicator(cell, parentContainer) {
+  console.log('🔍 [PROPERTIES MENU DEBUG] createLocationIndicator called for cell:', cell.id, 'with locationIndex:', cell._locationIndex);
   const locationIndicator = document.createElement('div');
   locationIndicator.style.cssText = `
     margin: 8px 0;
@@ -1549,6 +1918,265 @@ function createOptionField(option, index, cell, parentContainer) {
   optionContainer.appendChild(deleteBtn);
   
   return optionContainer;
+}
+
+// Helper function to create mini checkbox option entry
+function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContainer, addButton) {
+  const miniOptionEntry = document.createElement('div');
+  miniOptionEntry.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  `;
+  
+  // Checkbox text input
+  const checkboxTextInput = document.createElement('input');
+  checkboxTextInput.type = 'text';
+  checkboxTextInput.value = option.checkboxText || '';
+  checkboxTextInput.placeholder = 'Checkbox text';
+  checkboxTextInput.style.cssText = `
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+  `;
+  checkboxTextInput.onblur = () => {
+    option.checkboxText = checkboxTextInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Node ID input
+  const nodeIdInput = document.createElement('input');
+  nodeIdInput.type = 'text';
+  nodeIdInput.value = option.nodeId || '';
+  nodeIdInput.placeholder = 'Node ID';
+  nodeIdInput.style.cssText = `
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+  `;
+  nodeIdInput.onblur = () => {
+    option.nodeId = nodeIdInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Delete button for mini option
+  const deleteMiniBtn = document.createElement('button');
+  deleteMiniBtn.textContent = '×';
+  deleteMiniBtn.style.cssText = `
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 24px;
+  `;
+  deleteMiniBtn.onclick = () => {
+    // Remove the option from the checkbox options array
+    checkbox.options.splice(optionIndex, 1);
+    
+    // Remove the mini option entry from the DOM
+    checkboxContainer.removeChild(miniOptionEntry);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Assemble mini option entry
+  miniOptionEntry.appendChild(checkboxTextInput);
+  miniOptionEntry.appendChild(nodeIdInput);
+  miniOptionEntry.appendChild(deleteMiniBtn);
+  
+  return miniOptionEntry;
+}
+
+// Helper function to create checkbox field
+function createCheckboxField(checkbox, index, cell, parentContainer) {
+  const checkboxContainer = document.createElement('div');
+  checkboxContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: move;
+    transition: all 0.2s ease;
+  `;
+  checkboxContainer.draggable = true;
+  checkboxContainer.dataset.index = index;
+  checkboxContainer.dataset.type = 'checkbox';
+  
+  // Add hover effect
+  checkboxContainer.addEventListener('mouseenter', () => {
+    checkboxContainer.style.backgroundColor = '#f8f9fa';
+    checkboxContainer.style.borderColor = '#007bff';
+  });
+  checkboxContainer.addEventListener('mouseleave', () => {
+    checkboxContainer.style.backgroundColor = 'white';
+    checkboxContainer.style.borderColor = '#ddd';
+  });
+  
+  // Top row with drag handle, field name input, and action buttons
+  const topRow = document.createElement('div');
+  topRow.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  `;
+  
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.innerHTML = '⋮⋮';
+  dragHandle.style.cssText = `
+    cursor: move;
+    color: #666;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+    margin-right: 5px;
+  `;
+  
+  // Field name input
+  const fieldNameInput = document.createElement('input');
+  fieldNameInput.type = 'text';
+  fieldNameInput.value = checkbox.fieldName || '';
+  fieldNameInput.placeholder = 'Field Name';
+  fieldNameInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  fieldNameInput.onblur = () => {
+    checkbox.fieldName = fieldNameInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Copy ID button
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Copy ID';
+  copyBtn.style.cssText = `
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  copyBtn.onclick = () => {
+    if (typeof window.copyMultipleDropdownId === 'function') {
+      window.copyMultipleDropdownId(cell.id, index);
+    }
+  };
+  
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.style.cssText = `
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  deleteBtn.onclick = () => {
+    if (!cell._checkboxes) cell._checkboxes = [];
+    cell._checkboxes.splice(index, 1);
+    // Refresh the entire container to maintain proper order
+    const newContainer = createOptionsContainer(cell);
+    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Add checkbox option button
+  const addCheckboxOptionBtn = document.createElement('button');
+  addCheckboxOptionBtn.textContent = 'Add checkbox option';
+  addCheckboxOptionBtn.style.cssText = `
+    background: #6f42c1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px;
+  `;
+  addCheckboxOptionBtn.onclick = () => {
+    console.log('🔍 [PROPERTIES MENU DEBUG] Add checkbox option clicked for checkbox:', index);
+    
+    // Create new checkbox option
+    const newOption = { checkboxText: '', nodeId: '' };
+    if (!checkbox.options) checkbox.options = [];
+    checkbox.options.push(newOption);
+    
+    // Create mini checkbox option entry
+    const miniOptionEntry = createMiniCheckboxOption(newOption, checkbox.options.length - 1, checkbox, checkboxContainer, addCheckboxOptionBtn);
+    
+    // Insert the mini option above the "Add checkbox option" button
+    // Check if the button still exists in the container before inserting
+    if (checkboxContainer.contains(addCheckboxOptionBtn)) {
+      checkboxContainer.insertBefore(miniOptionEntry, addCheckboxOptionBtn);
+    } else {
+      // If button doesn't exist, just append to the end
+      checkboxContainer.appendChild(miniOptionEntry);
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Assemble top row
+  topRow.appendChild(dragHandle);
+  topRow.appendChild(fieldNameInput);
+  topRow.appendChild(copyBtn);
+  topRow.appendChild(deleteBtn);
+  
+  // Add existing mini checkbox options
+  if (checkbox.options && checkbox.options.length > 0) {
+    checkbox.options.forEach((option, optionIndex) => {
+      const miniOptionEntry = createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContainer, addCheckboxOptionBtn);
+      // Check if the button still exists in the container before inserting
+      if (checkboxContainer.contains(addCheckboxOptionBtn)) {
+        checkboxContainer.insertBefore(miniOptionEntry, addCheckboxOptionBtn);
+      } else {
+        // If button doesn't exist, just append to the end
+        checkboxContainer.appendChild(miniOptionEntry);
+      }
+    });
+  }
+  
+  // Assemble checkbox container
+  checkboxContainer.appendChild(topRow);
+  checkboxContainer.appendChild(addCheckboxOptionBtn);
+  
+  return checkboxContainer;
 }
 
 
@@ -1989,29 +2617,159 @@ function updateMultipleTextboxesCell(cell) {
 
 // Multiple Dropdown Type Functions
 function updatemultipleDropdownTypeCell(cell) {
+  console.log('🔍 [CANVAS DISPLAY DEBUG] updatemultipleDropdownTypeCell called for cell:', cell.id);
+  console.log('🔍 [CANVAS DISPLAY DEBUG] Function called from:', new Error().stack?.split('\n')[2]?.trim());
+  
   const graph = getGraph();
   if (!graph) return;
   
   const qText = cell._questionText || 'Numbered Dropdown Question';
   const twoNums = cell._twoNumbers || { first: '0', second: '0' };
   const options = cell._textboxes || [];
-  const hasLocation = cell._locationIndex !== undefined && cell._locationIndex >= 0;
+  const checkboxes = cell._checkboxes || [];
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
   
-  // Create simple display with essential information
+  console.log('🔍 [CANVAS DISPLAY DEBUG] Cell data received:', {
+    cellId: cell.id,
+    questionText: qText,
+    twoNumbers: twoNums,
+    optionsCount: options.length,
+    checkboxesCount: checkboxes.length,
+    locationIndex: locationIndex,
+    rawLocationIndex: cell._locationIndex,
+    locationIndexType: typeof cell._locationIndex,
+    options: options.map((opt, idx) => ({ index: idx, nameId: opt.nameId, placeholder: opt.placeholder })),
+    checkboxes: checkboxes.map((cb, idx) => ({ index: idx, fieldName: cb.fieldName, optionsCount: cb.options?.length || 0 }))
+  });
+  
+  // Create display showing the actual order of options and location
+  let optionsHtml = '';
+  
+  // Create a combined array that includes all items in the correct order
+  const allItems = [];
+  
+  // Use unified item order if it exists, otherwise create default order
+  if (cell._itemOrder && cell._itemOrder.length > 0) {
+    console.log('🔍 [CANVAS DISPLAY DEBUG] Using unified item order:', cell._itemOrder);
+    
+    cell._itemOrder.forEach((item, displayIndex) => {
+      if (item.type === 'option' && options[item.index]) {
+        allItems.push({
+          type: 'option',
+          index: item.index,
+          text: options[item.index].nameId || 'Option ' + (item.index + 1)
+        });
+      } else if (item.type === 'checkbox' && checkboxes[item.index]) {
+        allItems.push({
+          type: 'checkbox',
+          index: item.index,
+          text: checkboxes[item.index].fieldName || 'Checkbox ' + (item.index + 1),
+          options: checkboxes[item.index].options || []
+        });
+      } else if (item.type === 'location') {
+        allItems.push({
+          type: 'location',
+          index: item.index,
+          text: 'Location Date Inserted'
+        });
+      }
+    });
+  } else {
+    // Fallback to default order (options first, then checkboxes, then location)
+    console.log('🔍 [CANVAS DISPLAY DEBUG] Using default order (no unified item order)');
+    
+    // Add all options to the combined array
+    options.forEach((option, index) => {
+      allItems.push({
+        type: 'option',
+        index: index,
+        text: option.nameId || 'Option ' + (index + 1)
+      });
+    });
+    
+    // Add all checkboxes to the combined array
+    checkboxes.forEach((checkbox, index) => {
+      allItems.push({
+        type: 'checkbox',
+        index: index,
+        text: checkbox.fieldName || 'Checkbox ' + (index + 1),
+        options: checkbox.options || []
+      });
+    });
+    
+    // Insert location indicator at the correct position
+    if (locationIndex >= 0) {
+      console.log('🔍 [CANVAS DISPLAY DEBUG] Inserting location at index:', locationIndex);
+      console.log('🔍 [CANVAS DISPLAY DEBUG] All items before location insertion:', allItems);
+      allItems.splice(locationIndex, 0, {
+        type: 'location',
+        index: locationIndex,
+        text: 'Location Date Inserted'
+      });
+      console.log('🔍 [CANVAS DISPLAY DEBUG] All items after location insertion:', allItems);
+    } else {
+      console.log('🔍 [CANVAS DISPLAY DEBUG] No location to insert (locationIndex < 0)');
+    }
+  }
+  
+  console.log('🔍 [LOCATION ORDER DEBUG] Combined items array:', allItems);
+  console.log('🔍 [LOCATION ORDER DEBUG] About to generate HTML for', allItems.length, 'items');
+  
+  // Generate HTML for all items in the correct order
+  allItems.forEach((item, displayIndex) => {
+    console.log('🔍 [CANVAS DISPLAY DEBUG] Processing item', displayIndex, ':', item);
+    if (item.type === 'option') {
+      console.log('🔍 [CANVAS DISPLAY DEBUG] Adding option HTML for:', item.text);
+      optionsHtml += `
+        <div style="margin: 4px 0; padding: 6px 10px; background: #f8f9fa; border: 1px solid #e0e7ef; border-radius: 4px; font-size: 12px; color: #2c3e50;">
+          ${getEscapeAttr()(item.text)}
+        </div>
+      `;
+    } else if (item.type === 'location') {
+      console.log('🔍 [CANVAS DISPLAY DEBUG] Adding location HTML for:', item.text);
+      optionsHtml += `
+        <div style="margin: 4px 0; padding: 6px 10px; background: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; font-size: 12px; color: #28a745; font-weight: bold; text-align: center;">
+          📍 ${getEscapeAttr()(item.text)}
+        </div>
+      `;
+    } else if (item.type === 'checkbox') {
+      console.log('🔍 [CANVAS DISPLAY DEBUG] Adding checkbox HTML for:', item.text);
+      const checkboxOptionsHtml = item.options.map(opt => 
+        `<div style="margin: 2px 0; padding: 2px 6px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 3px; font-size: 10px; color: #1565c0;">
+          ☑ ${getEscapeAttr()(opt.checkboxText || '')} → ${getEscapeAttr()(opt.nodeId || '')}
+        </div>`
+      ).join('');
+      
+      optionsHtml += `
+        <div style="margin: 4px 0; padding: 8px 12px; background: #e3f2fd; border: 2px dashed #2196f3; border-radius: 6px; font-size: 12px; color: #1565c0; font-weight: bold; text-align: center;">
+          <div style="margin-bottom: 4px;">☑ ${getEscapeAttr()(item.text)}</div>
+          ${checkboxOptionsHtml}
+        </div>
+      `;
+    }
+  });
+  
+  console.log('🔍 [LOCATION ORDER DEBUG] Generated HTML length:', optionsHtml.length);
+  console.log('🔍 [LOCATION ORDER DEBUG] Generated options HTML:', optionsHtml);
+  
   const html = `
-    <div style="padding: 20px; font-family: Arial, sans-serif; text-align: center;">
-      <div style="font-weight: bold; color: #2196F3; margin-bottom: 10px; font-size: 16px;">${getEscapeAttr()(qText)}</div>
-      <div style="margin-bottom: 8px; color: #666; font-size: 14px;">
+    <div style="padding: 15px; font-family: Arial, sans-serif; text-align: center;">
+      <div style="font-weight: bold; color: #2196F3; margin-bottom: 8px; font-size: 14px;">${getEscapeAttr()(qText)}</div>
+      <div style="margin-bottom: 8px; color: #666; font-size: 12px;">
         <strong>Range:</strong> ${twoNums.first} to ${twoNums.second}
-    </div>
-      <div style="margin-bottom: 8px; color: #666; font-size: 14px;">
-        <strong>Options:</strong> ${options.length} configured
-    </div>
-      ${hasLocation ? '<div style="margin-bottom: 8px; color: #28a745; font-size: 14px;"><strong>📍 Location:</strong> Enabled</div>' : ''}
-      <div style="font-style: italic; color: #999; font-size: 12px; margin-top: 15px;">Double-click to configure</div>
+      </div>
+      <div style="margin-bottom: 8px; color: #666; font-size: 12px;">
+        <strong>Order:</strong>
+      </div>
+      <div style="max-height: 200px; overflow-y: auto; margin-bottom: 8px;">
+        ${optionsHtml}
+      </div>
+      <div style="font-style: italic; color: #999; font-size: 10px;">Double-click to configure</div>
     </div>
   `;
   
+  console.log('🔍 [CANVAS DISPLAY DEBUG] About to update cell with HTML');
+  console.log('🔍 [CANVAS DISPLAY DEBUG] Final HTML length:', html.length);
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
@@ -2020,10 +2778,12 @@ function updatemultipleDropdownTypeCell(cell) {
       st += 'verticalAlign=middle;';
     }
     graph.getModel().setStyle(cell, st);
+    console.log('🔍 [CANVAS DISPLAY DEBUG] Cell value and style updated');
   } finally {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
+  console.log('🔍 [CANVAS DISPLAY DEBUG] Cell size updated, function complete');
 }
 
 // Question Type Event Handlers
@@ -2756,10 +3516,22 @@ window.handleDrop = function(event, cellId) {
 };
 
 function reorderMultipleDropdownEntries(cellId, sourceIndex, targetIndex) {
+  console.log('🔍 [LOCATION ORDER DEBUG] reorderMultipleDropdownEntries called:', {
+    cellId: cellId,
+    sourceIndex: sourceIndex,
+    targetIndex: targetIndex
+  });
+  
   const cell = getGraph()?.getModel().getCell(cellId);
   if (!cell || getQuestionType(cell) !== "multipleDropdownType" || !cell._textboxes) {
+    console.log('🔍 [LOCATION ORDER DEBUG] Invalid cell or not multipleDropdownType, returning');
     return;
   }
+  
+  console.log('🔍 [LOCATION ORDER DEBUG] Before reorder:', {
+    locationIndex: cell._locationIndex,
+    textboxes: cell._textboxes.map((tb, idx) => ({ index: idx, nameId: tb.nameId }))
+  });
   
   getGraph().getModel().beginUpdate();
   try {
@@ -2768,6 +3540,11 @@ function reorderMultipleDropdownEntries(cellId, sourceIndex, targetIndex) {
     
     // Insert it at target position
     cell._textboxes.splice(targetIndex, 0, movedItem);
+    
+    console.log('🔍 [LOCATION ORDER DEBUG] After reorder:', {
+      locationIndex: cell._locationIndex,
+      textboxes: cell._textboxes.map((tb, idx) => ({ index: idx, nameId: tb.nameId }))
+    });
     
     // Re-render the cell to reflect the new order
     updatemultipleDropdownTypeCell(cell);
