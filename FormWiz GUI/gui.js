@@ -3542,17 +3542,8 @@ function updateHiddenContainers(questionId) {
     fields.forEach(field => {
         const fieldType = field.getAttribute('data-type');
         const fieldOrder = field.getAttribute('data-order');
-        const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
-        const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
-        
-        // Skip if elements don't exist (e.g., duplicate order numbers)
-        if (!labelTextEl || !nodeIdTextEl) {
-            console.warn(`Skipping field with order ${fieldOrder} - elements not found`);
-            return;
-        }
-        
-        const labelText = labelTextEl.textContent;
-        const nodeIdText = nodeIdTextEl.textContent;
+        const labelText = document.getElementById('labelText' + questionId + '_' + fieldOrder).textContent;
+        const nodeIdText = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder).textContent;
         
         if (fieldType === 'label') {
             const hiddenLabelDiv = document.createElement('div');
