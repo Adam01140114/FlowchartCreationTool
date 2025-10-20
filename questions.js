@@ -1501,8 +1501,23 @@ function createOptionsContainer(cell) {
   // Use unified item order if it exists, otherwise use default order
   if (cell._itemOrder && cell._itemOrder.length > 0) {
     console.log('🔍 [PROPERTIES MENU DEBUG] Using unified item order for display:', cell._itemOrder);
+  console.log('🔍 [LOCATION DEBUG] Item order details:', cell._itemOrder.map((item, idx) => ({
+    index: idx,
+    type: item.type,
+    itemIndex: item.index,
+    isLocation: item.type === 'location'
+  })));
     
     cell._itemOrder.forEach((item, displayIndex) => {
+      console.log('🔍 [LOCATION DEBUG] Processing item order entry:', {
+        displayIndex,
+        type: item.type,
+        itemIndex: item.index,
+        isLocation: item.type === 'location',
+        locationIndex: cell._locationIndex,
+        locationIndexCheck: cell._locationIndex >= 0
+      });
+      
       if (item.type === 'option' && options[item.index]) {
         const optionContainer = createOptionField(options[item.index], item.index, cell, container);
     
@@ -1552,6 +1567,12 @@ function createOptionsContainer(cell) {
           
           container.appendChild(timeContainer);
         } else if (item.type === 'location' && cell._locationIndex >= 0) {
+        console.log('🔍 [LOCATION DEBUG] Creating location indicator in createOptionsContainer:', {
+          cellId: cell.id,
+          locationIndex: cell._locationIndex,
+          itemType: item.type,
+          itemIndex: item.index
+        });
         const locationIndicator = createLocationIndicator(cell, container);
         
         // Add drag event listeners to location indicator
@@ -1742,13 +1763,14 @@ function createOptionsContainer(cell) {
       // Replicate the exact same logic as the default order display
       // This matches the createOptionsContainer default order logic
       options.forEach((option, index) => {
-        // Add location indicator BEFORE this option if it's at the location index
-        if (index === locationIndex) {
-          cell._itemOrder.push({ type: 'location', index: locationIndex });
-        }
         // Add the option
         cell._itemOrder.push({ type: 'option', index: index });
       });
+      
+      // Add location indicator if it exists (at the end, not before a specific option)
+      if (locationIndex >= 0) {
+        cell._itemOrder.push({ type: 'location', index: locationIndex });
+      }
       
       // Add any existing checkboxes at the end (they weren't in the original display)
       const existingCheckboxes = cell._checkboxes.slice(0, -1); // Exclude the one we just added
@@ -1811,6 +1833,13 @@ function createOptionsContainer(cell) {
     
     // Refresh the entire container to show the new checkbox entry
     console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
+    console.log('🔍 [LOCATION DEBUG] Cell data before container refresh:', {
+      cellId: cell.id,
+      locationIndex: cell._locationIndex,
+      hasLocationIndex: cell._locationIndex !== undefined,
+      locationIndexType: typeof cell._locationIndex,
+      itemOrder: cell._itemOrder
+    });
     const newContainer = createOptionsContainer(cell);
     container.parentNode.replaceChild(newContainer, container);
     console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
@@ -1875,10 +1904,20 @@ function createOptionsContainer(cell) {
     margin-top: 5px;
   `;
   addTimeBtn.onclick = () => {
+    // Prevent multiple rapid clicks
+    if (addTimeBtn.disabled) {
+      console.log('🔍 [TIME DEBUG] Add Time button is disabled - preventing duplicate click');
+      return;
+    }
+    
     console.log('🔍 [PROPERTIES MENU DEBUG] Add Time button clicked for cell:', cell.id);
     console.log('🔍 [PROPERTIES MENU DEBUG] Before adding time:', {
       timesCount: (cell._times || []).length
     });
+    
+    // Disable button to prevent multiple clicks
+    addTimeBtn.disabled = true;
+    addTimeBtn.textContent = 'Adding...';
     
     // Create new time entry
     const newTime = { timeText: '', timeId: '' };
@@ -1951,6 +1990,12 @@ function createOptionsContainer(cell) {
     const newContainer = createOptionsContainer(cell);
     container.parentNode.replaceChild(newContainer, container);
     console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
+    
+    // Re-enable button after a short delay
+    setTimeout(() => {
+      addTimeBtn.disabled = false;
+      addTimeBtn.textContent = '+ Add Time';
+    }, 500);
   };
   
   container.appendChild(addTimeBtn);
@@ -2058,10 +2103,72 @@ function createLocationIndicator(cell, parentContainer) {
     parentContainer.parentNode.replaceChild(newContainer, parentContainer);
   };
   
-  locationIndicator.appendChild(dragHandle);
-  locationIndicator.appendChild(locationText);
-  locationIndicator.appendChild(copyLocationIdsBtn);
-  locationIndicator.appendChild(removeBtn);
+  // Create a container for the buttons to stack them vertically under the text
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    width: 100%;
+  `;
+  
+  // Update button styles to make them bigger and remove margins
+  copyLocationIdsBtn.style.cssText = `
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+    max-width: 200px;
+  `;
+  
+  removeBtn.style.cssText = `
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+    max-width: 200px;
+  `;
+  
+  // Add buttons to the container
+  buttonContainer.appendChild(copyLocationIdsBtn);
+  buttonContainer.appendChild(removeBtn);
+  
+  // Create a text container to hold the location text
+  const textContainer = document.createElement('div');
+  textContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    width: 100%;
+  `;
+  textContainer.appendChild(dragHandle);
+  textContainer.appendChild(locationText);
+  
+  // Create main container for the entire location indicator
+  const mainContainer = document.createElement('div');
+  mainContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  `;
+  
+  mainContainer.appendChild(textContainer);
+  mainContainer.appendChild(buttonContainer);
+  
+  locationIndicator.appendChild(mainContainer);
   
   return locationIndicator;
 }
@@ -2212,9 +2319,25 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   
   // Function to generate Node ID from field name and checkbox text
   const generateNodeId = (fieldName, checkboxText) => {
+    const questionText = cell._questionText || '';
+    const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
     const sanitizedFieldName = (fieldName || '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
     const sanitizedCheckboxText = (checkboxText || '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-    return `${sanitizedFieldName}_${sanitizedCheckboxText}`;
+    
+    // Check if this question has a PDF property
+    const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+    const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+    
+    // Build the final ID with PDF name and question text prefix
+    let idToCopy;
+    if (sanitizedPdfName && sanitizedQuestion) {
+      idToCopy = `${sanitizedPdfName}_${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
+    } else if (sanitizedQuestion) {
+      idToCopy = `${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
+    } else {
+      idToCopy = `${sanitizedFieldName}_${sanitizedCheckboxText}`;
+    }
+    return idToCopy;
   };
 
   // Function to update Node ID and save
@@ -2319,7 +2442,7 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     margin-left: 4px;
   `;
   copyIdBtn.onclick = () => {
-    const number = prompt('What number for this mini checkbox entry?');
+    const number = prompt('What number for this mini checkbox entry?', '1');
     if (number !== null && number.trim() !== '') {
       const baseNodeId = nodeIdInput.value;
       const numberedNodeId = `${baseNodeId}_${number.trim()}`;
@@ -2427,8 +2550,24 @@ function createTimeField(time, index, cell, parentContainer) {
 
   // Function to generate Time Node ID from time text
   const generateTimeNodeId = (timeText) => {
+    const questionText = cell._questionText || '';
+    const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
     const sanitizedTimeText = (timeText || '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-    return sanitizedTimeText || `time_${index}`;
+    
+    // Check if this question has a PDF property
+    const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+    const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+    
+    // Build the final ID with PDF name and question text prefix
+    let idToCopy;
+    if (sanitizedPdfName && sanitizedQuestion) {
+      idToCopy = `${sanitizedPdfName}_${sanitizedQuestion}_${sanitizedTimeText}`;
+    } else if (sanitizedQuestion) {
+      idToCopy = `${sanitizedQuestion}_${sanitizedTimeText}`;
+    } else {
+      idToCopy = sanitizedTimeText || `time_${index}`;
+    }
+    return idToCopy;
   };
 
   // Function to update Time Node ID and save
@@ -2584,8 +2723,19 @@ function createTimeField(time, index, cell, parentContainer) {
     font-size: 12px;
   `;
   deleteBtn.onclick = () => {
+    // Prevent multiple rapid clicks
+    if (deleteBtn.disabled) {
+      console.log('🔍 [TIME DEBUG] Delete button is disabled - preventing duplicate click');
+      return;
+    }
+    
+    // Disable button to prevent multiple clicks
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting...';
+    
     if (!cell._times) cell._times = [];
     cell._times.splice(index, 1);
+    
     // Refresh the entire container to maintain proper order
     const newContainer = createOptionsContainer(cell);
     parentContainer.parentNode.replaceChild(newContainer, parentContainer);
@@ -2668,12 +2818,29 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
     
     // Update all mini option Node IDs when field name changes
     if (checkbox.options && checkbox.options.length > 0) {
+      const questionText = cell._questionText || '';
+      const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+      
+      // Check if this question has a PDF property
+      const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+      const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+      
       checkbox.options.forEach((option, optionIndex) => {
         const fieldName = checkbox.fieldName || '';
         const checkboxText = option.checkboxText || '';
         const sanitizedFieldName = fieldName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
         const sanitizedCheckboxText = checkboxText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-        option.nodeId = `${sanitizedFieldName}_${sanitizedCheckboxText}`;
+        
+        // Build the final ID with PDF name and question text prefix
+        let nodeId;
+        if (sanitizedPdfName && sanitizedQuestion) {
+          nodeId = `${sanitizedPdfName}_${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
+        } else if (sanitizedQuestion) {
+          nodeId = `${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
+        } else {
+          nodeId = `${sanitizedFieldName}_${sanitizedCheckboxText}`;
+        }
+        option.nodeId = nodeId;
       });
     }
     
@@ -2727,8 +2894,19 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
     font-size: 12px;
   `;
   deleteBtn.onclick = () => {
+    // Prevent multiple rapid clicks
+    if (deleteBtn.disabled) {
+      console.log('🔍 [CHECKBOX DEBUG] Delete button is disabled - preventing duplicate click');
+      return;
+    }
+    
+    // Disable button to prevent multiple clicks
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting...';
+    
     if (!cell._checkboxes) cell._checkboxes = [];
     cell._checkboxes.splice(index, 1);
+    
     // Refresh the entire container to maintain proper order
     const newContainer = createOptionsContainer(cell);
     parentContainer.parentNode.replaceChild(newContainer, parentContainer);
@@ -4025,8 +4203,64 @@ function fallbackCopyToClipboard(text) {
   document.body.removeChild(textArea);
 }
 
+// Track if user is currently interacting with input fields
+let isUserInteractingWithInput = false;
+
+// Add global listeners to track input interaction
+document.addEventListener('mousedown', function(e) {
+  const target = e.target;
+  isUserInteractingWithInput = target.matches('input, textarea, select') || 
+                              target.closest('input, textarea, select');
+});
+
+document.addEventListener('focusin', function(e) {
+  const target = e.target;
+  isUserInteractingWithInput = target.matches('input, textarea, select');
+});
+
+document.addEventListener('focusout', function(e) {
+  // Small delay to allow for focus changes
+  setTimeout(() => {
+    const activeElement = document.activeElement;
+    isUserInteractingWithInput = activeElement && activeElement.matches('input, textarea, select');
+  }, 10);
+});
+
 // Drag and Drop functionality for reordering entries
 window.handleDragStart = function(event, cellId, index) {
+  // Prevent dragging if user is interacting with input elements
+  const target = event.target;
+  const isInputElement = target.matches('input, textarea, select, button') || 
+                        target.closest('input, textarea, select, button');
+  
+  // Also check if user is selecting text in any input field
+  const isTextSelection = window.getSelection && window.getSelection().toString().length > 0;
+  
+  // Check if focus is on an input element (user is actively typing)
+  const activeElement = document.activeElement;
+  const isFocusedOnInput = activeElement && activeElement.matches('input, textarea, select');
+  
+  // Check if the drag is starting from within an input field (even if not the direct target)
+  const isWithinInputField = target.closest('.textbox-entry input, .checkbox-entry input, .time-entry input');
+  
+  // Check if any input field in the document has focus
+  const anyInputFocused = document.querySelector('input:focus, textarea:focus, select:focus');
+  
+  if (isInputElement || isTextSelection || isFocusedOnInput || isWithinInputField || anyInputFocused || isUserInteractingWithInput) {
+    console.log('🔍 [DRAG DEBUG] Drag prevented - user interacting with input:', {
+      isInputElement,
+      isTextSelection,
+      isFocusedOnInput,
+      isWithinInputField,
+      anyInputFocused: !!anyInputFocused,
+      isUserInteractingWithInput,
+      target: target.tagName,
+      activeElement: activeElement?.tagName
+    });
+    event.preventDefault();
+    return false;
+  }
+  
   // Prevent the event from bubbling up to the cell's drag handlers
   event.stopPropagation();
   event.stopImmediatePropagation();
@@ -4076,6 +4310,16 @@ window.handleDragEnd = function(event) {
 };
 
 window.handleDragOver = function(event) {
+  // Prevent drop operations if user is interacting with input elements
+  const target = event.target;
+  const isInputElement = target.matches('input, textarea, select, button') || 
+                        target.closest('input, textarea, select, button');
+  
+  if (isInputElement) {
+    event.preventDefault();
+    return false;
+  }
+  
   event.preventDefault();
   event.stopPropagation();
   event.dataTransfer.dropEffect = 'move';
@@ -4121,6 +4365,16 @@ window.handleDragOver = function(event) {
 };
 
 window.handleDrop = function(event, cellId) {
+  // Prevent drop operations if user is interacting with input elements
+  const target = event.target;
+  const isInputElement = target.matches('input, textarea, select, button') || 
+                        target.closest('input, textarea, select, button');
+  
+  if (isInputElement) {
+    event.preventDefault();
+    return false;
+  }
+  
   event.preventDefault();
   event.stopPropagation();
   
