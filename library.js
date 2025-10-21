@@ -1796,6 +1796,7 @@ window.saveFlowchart = function() {
       _checkboxes: cell._checkboxes||null,
       _itemOrder: cell._itemOrder||null,
       _times: cell._times||null,
+      _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
     };
@@ -1936,6 +1937,7 @@ window.saveAsFlowchart = function() {
       _checkboxes: cell._checkboxes||null,
       _itemOrder: cell._itemOrder||null,
       _times: cell._times||null,
+      _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
     };
@@ -2998,6 +3000,11 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
           console.log('🔧 [IMPORT DEBUG] Loading _times for cell', item.id, ':', item._times);
           newCell._times = JSON.parse(JSON.stringify(item._times));
           console.log('🔧 [IMPORT DEBUG] Loaded _times data:', newCell._times);
+        }
+        if (item._dropdowns) {
+          console.log('🔧 [IMPORT DEBUG] Loading _dropdowns for cell', item.id, ':', item._dropdowns);
+          newCell._dropdowns = JSON.parse(JSON.stringify(item._dropdowns));
+          console.log('🔧 [IMPORT DEBUG] Loaded _dropdowns data:', newCell._dropdowns);
         }
         if (item._questionText) {
           // Decode HTML entities in _questionText as well

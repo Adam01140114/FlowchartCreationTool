@@ -264,6 +264,11 @@ window.exportFlowchartJson = function(download = true) {
           cellData._times = JSON.parse(JSON.stringify(cell._times));
           console.log('🔧 [EXPORT DEBUG] Exported _times data:', cellData._times);
         }
+        if (cell._dropdowns) {
+          console.log('🔧 [EXPORT DEBUG] Exporting _dropdowns for cell', cell.id, ':', cell._dropdowns);
+          cellData._dropdowns = JSON.parse(JSON.stringify(cell._dropdowns));
+          console.log('🔧 [EXPORT DEBUG] Exported _dropdowns data:', cellData._dropdowns);
+        }
     
     if (cell._amountName) cellData._amountName = cell._amountName;
     if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;

@@ -1269,6 +1269,7 @@ function createNumberField(label, value, onChange) {
 // Helper function to create options container
 function createOptionsContainer(cell) {
   const container = document.createElement('div');
+  container.className = 'dropdown-options-container';
   container.style.cssText = `
     display: flex;
     flex-direction: column;
@@ -1657,6 +1658,22 @@ function createOptionsContainer(cell) {
         });
         
         container.appendChild(locationIndicator);
+      } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
+        const dropdownContainer = createDropdownField(cell._dropdowns[item.index], item.index, cell, container);
+        
+        // Add drag event listeners
+        dropdownContainer.addEventListener('dragstart', (e) => {
+          draggedElement = dropdownContainer;
+          e.dataTransfer.effectAllowed = 'move';
+          dropdownContainer.style.opacity = '0.5';
+        });
+        
+        dropdownContainer.addEventListener('dragend', (e) => {
+          dropdownContainer.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(dropdownContainer);
       }
     });
   } else {
@@ -2059,7 +2076,1215 @@ function createOptionsContainer(cell) {
   
   container.appendChild(addTimeBtn);
   
+  // Add Dropdown button
+  const addDropdownBtn = document.createElement('button');
+  addDropdownBtn.textContent = '+ Add Dropdown';
+  addDropdownBtn.style.cssText = `
+    background: #9c27b0;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+  `;
+  addDropdownBtn.onclick = () => {
+    console.log('🔍 [PROPERTIES MENU DEBUG] Add Dropdown button clicked for cell:', cell.id);
+    
+    // Initialize dropdowns array if it doesn't exist
+    if (!cell._dropdowns) {
+      cell._dropdowns = [];
+    }
+    
+    // Create new dropdown entry
+    const newDropdown = {
+      id: 'dropdown_' + Date.now(),
+      name: 'New Dropdown',
+      options: [],
+      triggerSequences: []
+    };
+    
+    cell._dropdowns.push(newDropdown);
+    
+    // Add to item order
+    if (!cell._itemOrder) {
+      cell._itemOrder = [];
+    }
+    
+    cell._itemOrder.push({
+      type: 'dropdown',
+      index: cell._dropdowns.length - 1
+    });
+    
+    // Instead of refreshing the entire modal, just add the new dropdown to the container
+    const container = document.querySelector('.dropdown-options-container');
+    if (container) {
+      const dropdownContainer = createDropdownField(newDropdown, cell._dropdowns.length - 1, cell, container);
+      container.appendChild(dropdownContainer);
+    }
+    
+    // Trigger autosave
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  container.appendChild(addDropdownBtn);
+  
   return container;
+}
+
+// Helper function to create dropdown field
+function createDropdownField(dropdown, index, cell, parentContainer) {
+  const dropdownContainer = document.createElement('div');
+  dropdownContainer.style.cssText = `
+    margin: 8px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 2px solid #9c27b0;
+    border-radius: 8px;
+    position: relative;
+  `;
+  dropdownContainer.draggable = true;
+  dropdownContainer.dataset.index = index;
+  dropdownContainer.dataset.type = 'dropdown';
+  dropdownContainer.dataset.dropdownIndex = index;
+
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.textContent = '⋮⋮';
+  dragHandle.style.cssText = `
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: move;
+    color: #666;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+  `;
+  dropdownContainer.appendChild(dragHandle);
+
+  // Dropdown name input
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.value = dropdown.name || 'New Dropdown';
+  nameInput.placeholder = 'Dropdown Name';
+  nameInput.style.cssText = `
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 10px;
+  `;
+  nameInput.onblur = () => {
+    dropdown.name = nameInput.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  dropdownContainer.appendChild(nameInput);
+
+  // Add Options Section
+  const optionsSection = document.createElement('div');
+  optionsSection.style.cssText = `
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #e3f2fd;
+    border-radius: 6px;
+  `;
+  
+  const optionsTitle = document.createElement('h4');
+  optionsTitle.textContent = 'Add Options';
+  optionsTitle.style.cssText = `
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #1976d2;
+  `;
+  optionsSection.appendChild(optionsTitle);
+
+  const addOptionBtn = document.createElement('button');
+  addOptionBtn.textContent = '+ Add Option';
+  addOptionBtn.style.cssText = `
+    background: #1976d2;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  addOptionBtn.onclick = () => {
+    // Create new option with blank text
+    const newOption = {
+      id: 'option_' + Date.now(),
+      text: '',
+      value: ''
+    };
+    
+    dropdown.options.push(newOption);
+    
+    // Update the options list for this specific dropdown
+    const dropdownContainer = document.querySelector(`[data-dropdown-index="${index}"]`);
+    if (dropdownContainer) {
+      const optionsList = dropdownContainer.querySelector('.options-list');
+      if (optionsList) {
+        // Add the new option to the list with an input field
+        const optionDiv = document.createElement('div');
+        optionDiv.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 8px;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          margin-bottom: 4px;
+        `;
+        
+        const optionInput = document.createElement('input');
+        optionInput.type = 'text';
+        optionInput.placeholder = 'Enter option text...';
+        optionInput.style.cssText = `
+          flex: 1;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+        `;
+        optionInput.onblur = () => {
+          newOption.text = optionInput.value.trim();
+          newOption.value = optionInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const deleteOptionBtn = document.createElement('button');
+        deleteOptionBtn.textContent = '×';
+        deleteOptionBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteOptionBtn.onclick = () => {
+          const optionIndex = dropdown.options.findIndex(opt => opt.id === newOption.id);
+          if (optionIndex !== -1) {
+            dropdown.options.splice(optionIndex, 1);
+          }
+          optionDiv.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        optionDiv.appendChild(optionInput);
+        optionDiv.appendChild(deleteOptionBtn);
+        optionsList.appendChild(optionDiv);
+        optionInput.focus(); // Focus the input for immediate typing
+      }
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  optionsSection.appendChild(addOptionBtn);
+
+  // Display existing options
+  const optionsList = document.createElement('div');
+  optionsList.className = 'options-list';
+  optionsList.style.cssText = `
+    margin-top: 10px;
+  `;
+  
+  dropdown.options.forEach((option, optionIndex) => {
+    const optionDiv = document.createElement('div');
+    optionDiv.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    `;
+    
+    const optionInput = document.createElement('input');
+    optionInput.type = 'text';
+    optionInput.value = option.text;
+    optionInput.placeholder = 'Enter option text...';
+    optionInput.style.cssText = `
+      flex: 1;
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 12px;
+    `;
+    optionInput.onblur = () => {
+      option.text = optionInput.value.trim();
+      option.value = optionInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    const deleteOptionBtn = document.createElement('button');
+    deleteOptionBtn.textContent = '×';
+    deleteOptionBtn.style.cssText = `
+      background: #f44336;
+      color: white;
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+    `;
+    deleteOptionBtn.onclick = () => {
+      dropdown.options.splice(optionIndex, 1);
+      if (typeof window.showNumberedDropdownProperties === 'function') {
+        window.showNumberedDropdownProperties(cell);
+      }
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    optionDiv.appendChild(optionInput);
+    optionDiv.appendChild(deleteOptionBtn);
+    optionsList.appendChild(optionDiv);
+  });
+  
+  optionsSection.appendChild(optionsList);
+  dropdownContainer.appendChild(optionsSection);
+
+  // Conditional Logic Section
+  const conditionalSection = document.createElement('div');
+  conditionalSection.style.cssText = `
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #fff3e0;
+    border-radius: 6px;
+  `;
+  
+  const conditionalTitle = document.createElement('h4');
+  conditionalTitle.textContent = 'Conditional Logic';
+  conditionalTitle.style.cssText = `
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #f57c00;
+  `;
+  conditionalSection.appendChild(conditionalTitle);
+
+  const addTriggerBtn = document.createElement('button');
+  addTriggerBtn.textContent = '+ Add Trigger';
+  addTriggerBtn.style.cssText = `
+    background: #f57c00;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  addTriggerBtn.onclick = () => {
+    const triggerSequence = {
+      id: 'trigger_' + Date.now(),
+      triggerOption: '',
+      actions: []
+    };
+    
+    dropdown.triggerSequences.push(triggerSequence);
+    
+    // Update the trigger sequences list for this specific dropdown
+    const dropdownContainer = document.querySelector(`[data-dropdown-index="${index}"]`);
+    if (dropdownContainer) {
+      const triggerSequencesList = dropdownContainer.querySelector('.trigger-sequences-list');
+      if (triggerSequencesList) {
+        // Add the new trigger sequence to the list
+        const triggerDiv = document.createElement('div');
+        triggerDiv.className = 'trigger-sequence';
+        triggerDiv.style.cssText = `
+          margin-bottom: 10px;
+          padding: 10px;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+        `;
+        
+        // Create trigger dropdown
+        const triggerLabel = document.createElement('label');
+        triggerLabel.textContent = 'When option is selected:';
+        triggerLabel.style.cssText = `
+          display: block;
+          font-size: 12px;
+          margin-bottom: 5px;
+          color: #666;
+        `;
+        triggerDiv.appendChild(triggerLabel);
+        
+        const triggerSelect = document.createElement('select');
+        triggerSelect.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 12px;
+          margin-bottom: 10px;
+        `;
+        
+        // Function to update options in the dropdown
+        const updateTriggerOptions = () => {
+          // Clear existing options
+          triggerSelect.innerHTML = '';
+          
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Select an option...';
+          triggerSelect.appendChild(defaultOption);
+          
+          dropdown.options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.text;
+            triggerSelect.appendChild(optionElement);
+          });
+        };
+        
+        // Initial population
+        updateTriggerOptions();
+        
+        // Update options when dropdown is clicked/focused
+        triggerSelect.onfocus = updateTriggerOptions;
+        
+        triggerSelect.onchange = () => {
+          triggerSequence.triggerOption = triggerSelect.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        triggerDiv.appendChild(triggerSelect);
+        
+        // Add delete trigger button
+        const deleteTriggerBtn = document.createElement('button');
+        deleteTriggerBtn.textContent = 'Delete Trigger';
+        deleteTriggerBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+          margin-bottom: 10px;
+        `;
+        deleteTriggerBtn.onclick = () => {
+          const triggerIndex = dropdown.triggerSequences.findIndex(trigger => trigger.id === triggerSequence.id);
+          if (triggerIndex !== -1) {
+            dropdown.triggerSequences.splice(triggerIndex, 1);
+          }
+          triggerDiv.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        triggerDiv.appendChild(deleteTriggerBtn);
+        
+        // Add action buttons section
+        const actionButtons = document.createElement('div');
+        actionButtons.style.cssText = `
+          display: flex;
+          gap: 8px;
+          margin-top: 10px;
+          flex-wrap: wrap;
+        `;
+        
+        const addLabelBtn = document.createElement('button');
+        addLabelBtn.textContent = '+ Label';
+        addLabelBtn.style.cssText = `
+          background: #4caf50;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        addLabelBtn.onclick = () => {
+          // Create new action with blank text
+          const newAction = {
+            type: 'label',
+            text: ''
+          };
+          
+          triggerSequence.actions.push(newAction);
+          
+          // Update the actions list for this trigger sequence
+          const triggerDiv = addLabelBtn.closest('.trigger-sequence');
+          if (triggerDiv) {
+            const actionsList = triggerDiv.querySelector('.actions-list');
+            if (actionsList) {
+              const actionDiv = document.createElement('div');
+              actionDiv.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 2px 6px;
+                background: #f5f5f5;
+                border-radius: 3px;
+                margin-bottom: 2px;
+                font-size: 11px;
+              `;
+              
+              const actionInput = document.createElement('input');
+              actionInput.type = 'text';
+              actionInput.placeholder = 'Enter label text...';
+              actionInput.style.cssText = `
+                flex: 1;
+                padding: 2px 4px;
+                border: 1px solid #ddd;
+                border-radius: 2px;
+                font-size: 11px;
+              `;
+              actionInput.onblur = () => {
+                newAction.text = actionInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              const deleteActionBtn = document.createElement('button');
+              deleteActionBtn.textContent = '×';
+              deleteActionBtn.style.cssText = `
+                background: #f44336;
+                color: white;
+                border: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 10px;
+              `;
+              deleteActionBtn.onclick = () => {
+                const actionIndex = triggerSequence.actions.findIndex(action => action === newAction);
+                if (actionIndex !== -1) {
+                  triggerSequence.actions.splice(actionIndex, 1);
+                }
+                actionDiv.remove();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              actionDiv.appendChild(actionInput);
+              actionDiv.appendChild(deleteActionBtn);
+              actionsList.appendChild(actionDiv);
+              actionInput.focus(); // Focus the input for immediate typing
+            }
+          }
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const addCheckboxBtn = document.createElement('button');
+        addCheckboxBtn.textContent = '+ Checkbox';
+        addCheckboxBtn.style.cssText = `
+          background: #9c27b0;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        addCheckboxBtn.onclick = () => {
+          // Create new action with blank text
+          const newAction = {
+            type: 'checkbox',
+            text: ''
+          };
+          
+          triggerSequence.actions.push(newAction);
+          
+          // Update the actions list for this trigger sequence
+          const triggerDiv = addCheckboxBtn.closest('.trigger-sequence');
+          if (triggerDiv) {
+            const actionsList = triggerDiv.querySelector('.actions-list');
+            if (actionsList) {
+              const actionDiv = document.createElement('div');
+              actionDiv.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 2px 6px;
+                background: #f5f5f5;
+                border-radius: 3px;
+                margin-bottom: 2px;
+                font-size: 11px;
+              `;
+              
+              const actionInput = document.createElement('input');
+              actionInput.type = 'text';
+              actionInput.placeholder = 'Enter checkbox text...';
+              actionInput.style.cssText = `
+                flex: 1;
+                padding: 2px 4px;
+                border: 1px solid #ddd;
+                border-radius: 2px;
+                font-size: 11px;
+              `;
+              actionInput.onblur = () => {
+                newAction.text = actionInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              const deleteActionBtn = document.createElement('button');
+              deleteActionBtn.textContent = '×';
+              deleteActionBtn.style.cssText = `
+                background: #f44336;
+                color: white;
+                border: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 10px;
+              `;
+              deleteActionBtn.onclick = () => {
+                const actionIndex = triggerSequence.actions.findIndex(action => action === newAction);
+                if (actionIndex !== -1) {
+                  triggerSequence.actions.splice(actionIndex, 1);
+                }
+                actionDiv.remove();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              actionDiv.appendChild(actionInput);
+              actionDiv.appendChild(deleteActionBtn);
+              actionsList.appendChild(actionDiv);
+              actionInput.focus(); // Focus the input for immediate typing
+            }
+          }
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const addTimeBtn = document.createElement('button');
+        addTimeBtn.textContent = '+ Time';
+        addTimeBtn.style.cssText = `
+          background: #ff9800;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        addTimeBtn.onclick = () => {
+          // Create new action with blank text
+          const newAction = {
+            type: 'time',
+            text: ''
+          };
+          
+          triggerSequence.actions.push(newAction);
+          
+          // Update the actions list for this trigger sequence
+          const triggerDiv = addTimeBtn.closest('.trigger-sequence');
+          if (triggerDiv) {
+            const actionsList = triggerDiv.querySelector('.actions-list');
+            if (actionsList) {
+              const actionDiv = document.createElement('div');
+              actionDiv.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 2px 6px;
+                background: #f5f5f5;
+                border-radius: 3px;
+                margin-bottom: 2px;
+                font-size: 11px;
+              `;
+              
+              const actionInput = document.createElement('input');
+              actionInput.type = 'text';
+              actionInput.placeholder = 'Enter time text...';
+              actionInput.style.cssText = `
+                flex: 1;
+                padding: 2px 4px;
+                border: 1px solid #ddd;
+                border-radius: 2px;
+                font-size: 11px;
+              `;
+              actionInput.onblur = () => {
+                newAction.text = actionInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              const deleteActionBtn = document.createElement('button');
+              deleteActionBtn.textContent = '×';
+              deleteActionBtn.style.cssText = `
+                background: #f44336;
+                color: white;
+                border: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 10px;
+              `;
+              deleteActionBtn.onclick = () => {
+                const actionIndex = triggerSequence.actions.findIndex(action => action === newAction);
+                if (actionIndex !== -1) {
+                  triggerSequence.actions.splice(actionIndex, 1);
+                }
+                actionDiv.remove();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              actionDiv.appendChild(actionInput);
+              actionDiv.appendChild(deleteActionBtn);
+              actionsList.appendChild(actionDiv);
+              actionInput.focus(); // Focus the input for immediate typing
+            }
+          }
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        actionButtons.appendChild(addLabelBtn);
+        actionButtons.appendChild(addCheckboxBtn);
+        actionButtons.appendChild(addTimeBtn);
+        triggerDiv.appendChild(actionButtons);
+        
+        // Add actions list container
+        const actionsList = document.createElement('div');
+        actionsList.className = 'actions-list';
+        actionsList.style.cssText = `
+          margin-top: 5px;
+        `;
+        triggerDiv.appendChild(actionsList);
+        
+        triggerSequencesList.appendChild(triggerDiv);
+      }
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  conditionalSection.appendChild(addTriggerBtn);
+
+  // Display existing trigger sequences
+  const triggerSequencesList = document.createElement('div');
+  triggerSequencesList.className = 'trigger-sequences-list';
+  triggerSequencesList.style.cssText = `
+    margin-top: 10px;
+  `;
+  
+  dropdown.triggerSequences.forEach((trigger, triggerIndex) => {
+    const triggerDiv = document.createElement('div');
+    triggerDiv.className = 'trigger-sequence';
+    triggerDiv.style.cssText = `
+      margin-bottom: 10px;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    `;
+    
+    // Trigger dropdown
+    const triggerLabel = document.createElement('label');
+    triggerLabel.textContent = 'When option is selected:';
+    triggerLabel.style.cssText = `
+      display: block;
+      font-size: 12px;
+      margin-bottom: 5px;
+      color: #666;
+    `;
+    triggerDiv.appendChild(triggerLabel);
+    
+    const triggerSelect = document.createElement('select');
+    triggerSelect.style.cssText = `
+      width: 100%;
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    `;
+    
+    // Function to update options in the dropdown
+    const updateTriggerOptions = () => {
+      // Clear existing options
+      triggerSelect.innerHTML = '';
+      
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select an option...';
+      triggerSelect.appendChild(defaultOption);
+      
+      dropdown.options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        if (option.value === trigger.triggerOption) {
+          optionElement.selected = true;
+        }
+        triggerSelect.appendChild(optionElement);
+      });
+    };
+    
+    // Initial population
+    updateTriggerOptions();
+    
+    // Update options when dropdown is clicked/focused
+    triggerSelect.onfocus = updateTriggerOptions;
+    
+    triggerSelect.onchange = () => {
+      trigger.triggerOption = triggerSelect.value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    triggerDiv.appendChild(triggerSelect);
+    
+    // Add delete trigger button
+    const deleteTriggerBtn = document.createElement('button');
+    deleteTriggerBtn.textContent = 'Delete Trigger';
+    deleteTriggerBtn.style.cssText = `
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      margin-bottom: 10px;
+    `;
+    deleteTriggerBtn.onclick = () => {
+      dropdown.triggerSequences.splice(triggerIndex, 1);
+      if (typeof window.showNumberedDropdownProperties === 'function') {
+        window.showNumberedDropdownProperties(cell);
+      }
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    triggerDiv.appendChild(deleteTriggerBtn);
+
+    // Action buttons
+    const actionButtons = document.createElement('div');
+    actionButtons.style.cssText = `
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+    `;
+    
+    const addLabelBtn = document.createElement('button');
+    addLabelBtn.textContent = '+ Label';
+    addLabelBtn.style.cssText = `
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    `;
+    addLabelBtn.onclick = () => {
+      // Create new action with blank text
+      const newAction = {
+        type: 'label',
+        text: ''
+      };
+      
+      trigger.actions.push(newAction);
+      
+      // Update the actions list for this trigger sequence
+      const triggerDiv = addLabelBtn.closest('.trigger-sequence');
+      if (triggerDiv) {
+        const actionsList = triggerDiv.querySelector('.actions-list');
+        if (actionsList) {
+          const actionDiv = document.createElement('div');
+          actionDiv.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 6px;
+            background: #f5f5f5;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            font-size: 11px;
+          `;
+          
+          const actionInput = document.createElement('input');
+          actionInput.type = 'text';
+          actionInput.placeholder = 'Enter label text...';
+          actionInput.style.cssText = `
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 11px;
+          `;
+          actionInput.onblur = () => {
+            newAction.text = actionInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const deleteActionBtn = document.createElement('button');
+          deleteActionBtn.textContent = '×';
+          deleteActionBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 10px;
+          `;
+          deleteActionBtn.onclick = () => {
+            const actionIndex = trigger.actions.findIndex(action => action === newAction);
+            if (actionIndex !== -1) {
+              trigger.actions.splice(actionIndex, 1);
+            }
+            actionDiv.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          actionDiv.appendChild(actionInput);
+          actionDiv.appendChild(deleteActionBtn);
+          actionsList.appendChild(actionDiv);
+          actionInput.focus(); // Focus the input for immediate typing
+        }
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    const addCheckboxBtn = document.createElement('button');
+    addCheckboxBtn.textContent = '+ Checkbox';
+    addCheckboxBtn.style.cssText = `
+      background: #9c27b0;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    `;
+    addCheckboxBtn.onclick = () => {
+      // Create new action with blank text
+      const newAction = {
+        type: 'checkbox',
+        text: ''
+      };
+      
+      trigger.actions.push(newAction);
+      
+      // Update the actions list for this trigger sequence
+      const triggerDiv = addCheckboxBtn.closest('.trigger-sequence');
+      if (triggerDiv) {
+        const actionsList = triggerDiv.querySelector('.actions-list');
+        if (actionsList) {
+          const actionDiv = document.createElement('div');
+          actionDiv.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 6px;
+            background: #f5f5f5;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            font-size: 11px;
+          `;
+          
+          const actionInput = document.createElement('input');
+          actionInput.type = 'text';
+          actionInput.placeholder = 'Enter checkbox text...';
+          actionInput.style.cssText = `
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 11px;
+          `;
+          actionInput.onblur = () => {
+            newAction.text = actionInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const deleteActionBtn = document.createElement('button');
+          deleteActionBtn.textContent = '×';
+          deleteActionBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 10px;
+          `;
+          deleteActionBtn.onclick = () => {
+            const actionIndex = trigger.actions.findIndex(action => action === newAction);
+            if (actionIndex !== -1) {
+              trigger.actions.splice(actionIndex, 1);
+            }
+            actionDiv.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          actionDiv.appendChild(actionInput);
+          actionDiv.appendChild(deleteActionBtn);
+          actionsList.appendChild(actionDiv);
+          actionInput.focus(); // Focus the input for immediate typing
+        }
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    const addTimeBtn = document.createElement('button');
+    addTimeBtn.textContent = '+ Time';
+    addTimeBtn.style.cssText = `
+      background: #ff9800;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    `;
+    addTimeBtn.onclick = () => {
+      // Create new action with blank text
+      const newAction = {
+        type: 'time',
+        text: ''
+      };
+      
+      trigger.actions.push(newAction);
+      
+      // Update the actions list for this trigger sequence
+      const triggerDiv = addTimeBtn.closest('.trigger-sequence');
+      if (triggerDiv) {
+        const actionsList = triggerDiv.querySelector('.actions-list');
+        if (actionsList) {
+          const actionDiv = document.createElement('div');
+          actionDiv.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 6px;
+            background: #f5f5f5;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            font-size: 11px;
+          `;
+          
+          const actionInput = document.createElement('input');
+          actionInput.type = 'text';
+          actionInput.placeholder = 'Enter time text...';
+          actionInput.style.cssText = `
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 11px;
+          `;
+          actionInput.onblur = () => {
+            newAction.text = actionInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const deleteActionBtn = document.createElement('button');
+          deleteActionBtn.textContent = '×';
+          deleteActionBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 10px;
+          `;
+          deleteActionBtn.onclick = () => {
+            const actionIndex = trigger.actions.findIndex(action => action === newAction);
+            if (actionIndex !== -1) {
+              trigger.actions.splice(actionIndex, 1);
+            }
+            actionDiv.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          actionDiv.appendChild(actionInput);
+          actionDiv.appendChild(deleteActionBtn);
+          actionsList.appendChild(actionDiv);
+          actionInput.focus(); // Focus the input for immediate typing
+        }
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    actionButtons.appendChild(addLabelBtn);
+    actionButtons.appendChild(addCheckboxBtn);
+    actionButtons.appendChild(addTimeBtn);
+    triggerDiv.appendChild(actionButtons);
+
+    // Display existing actions
+    const actionsList = document.createElement('div');
+    actionsList.className = 'actions-list';
+    actionsList.style.cssText = `
+      margin-top: 5px;
+    `;
+    
+    trigger.actions.forEach((action, actionIndex) => {
+      const actionDiv = document.createElement('div');
+      actionDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 2px 6px;
+        background: #f5f5f5;
+        border-radius: 3px;
+        margin-bottom: 2px;
+        font-size: 11px;
+      `;
+      
+      const actionInput = document.createElement('input');
+      actionInput.type = 'text';
+      actionInput.value = action.text;
+      actionInput.placeholder = `Enter ${action.type} text...`;
+      actionInput.style.cssText = `
+        flex: 1;
+        padding: 2px 4px;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        font-size: 11px;
+      `;
+      actionInput.onblur = () => {
+        action.text = actionInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      
+      const deleteActionBtn = document.createElement('button');
+      deleteActionBtn.textContent = '×';
+      deleteActionBtn.style.cssText = `
+        background: #f44336;
+        color: white;
+        border: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 10px;
+      `;
+      deleteActionBtn.onclick = () => {
+        trigger.actions.splice(actionIndex, 1);
+        if (typeof window.showNumberedDropdownProperties === 'function') {
+          window.showNumberedDropdownProperties(cell);
+        }
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      
+      actionDiv.appendChild(actionInput);
+      actionDiv.appendChild(deleteActionBtn);
+      actionsList.appendChild(actionDiv);
+    });
+    
+    triggerDiv.appendChild(actionsList);
+    triggerSequencesList.appendChild(triggerDiv);
+  });
+  
+  conditionalSection.appendChild(triggerSequencesList);
+  dropdownContainer.appendChild(conditionalSection);
+
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Dropdown';
+  deleteBtn.style.cssText = `
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    width: 100%;
+  `;
+  deleteBtn.onclick = () => {
+    if (confirm('Are you sure you want to delete this dropdown?')) {
+      cell._dropdowns.splice(index, 1);
+      
+      // Update item order to remove this dropdown
+      if (cell._itemOrder) {
+        cell._itemOrder = cell._itemOrder.filter(item => 
+          !(item.type === 'dropdown' && item.index === index)
+        );
+      }
+      
+      if (typeof window.showNumberedDropdownProperties === 'function') {
+        window.showNumberedDropdownProperties(cell);
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    }
+  };
+  dropdownContainer.appendChild(deleteBtn);
+
+  return dropdownContainer;
 }
 
 // Helper function to create location indicator
