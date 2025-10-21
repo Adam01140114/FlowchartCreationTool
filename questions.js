@@ -69,6 +69,230 @@ function createUneditableNodeIdInput(placeholder, value, onDoubleClick) {
   return input;
 }
 
+// Helper function to create unified dropdown entry that looks like other entries
+function createUnifiedDropdownEntry(dropdown, index, cell) {
+  const entryContainer = document.createElement('div');
+  entryContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #9c27b0;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: move;
+    transition: all 0.2s ease;
+  `;
+  entryContainer.draggable = true;
+  entryContainer.dataset.index = index;
+  entryContainer.dataset.type = 'dropdown';
+  
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.textContent = '⋮⋮';
+  dragHandle.style.cssText = `
+    cursor: move;
+    color: #666;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+    margin-right: 8px;
+  `;
+  entryContainer.appendChild(dragHandle);
+  
+  // Dropdown name input
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.value = dropdown.name || '';
+  nameInput.placeholder = 'Dropdown Name';
+  nameInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  nameInput.onblur = () => {
+    dropdown.name = nameInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  entryContainer.appendChild(nameInput);
+  
+  // Summary display
+  const summaryDiv = document.createElement('div');
+  summaryDiv.style.cssText = `
+    font-size: 11px;
+    color: #666;
+    margin-left: 8px;
+    flex-shrink: 0;
+  `;
+  
+  const updateSummary = () => {
+    const optionsCount = dropdown.options ? dropdown.options.length : 0;
+    const triggersCount = dropdown.triggerSequences ? dropdown.triggerSequences.length : 0;
+    summaryDiv.textContent = `${optionsCount} options, ${triggersCount} triggers`;
+  };
+  updateSummary();
+  entryContainer.appendChild(summaryDiv);
+  
+  // Copy ID button
+  const copyIdBtn = document.createElement('button');
+  copyIdBtn.textContent = 'Copy ID';
+  copyIdBtn.style.cssText = `
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-left: 4px;
+  `;
+  copyIdBtn.onclick = () => {
+    const nodeId = dropdown.name || 'dropdown';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(nodeId).then(() => {
+        copyIdBtn.textContent = 'Copied!';
+        copyIdBtn.style.background = '#28a745';
+        setTimeout(() => {
+          copyIdBtn.textContent = 'Copy ID';
+          copyIdBtn.style.background = '#17a2b8';
+        }, 1500);
+      });
+    } else {
+      const textArea = document.createElement('textarea');
+      textArea.value = nodeId;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      copyIdBtn.textContent = 'Copied!';
+      copyIdBtn.style.background = '#28a745';
+      setTimeout(() => {
+        copyIdBtn.textContent = 'Copy ID';
+        copyIdBtn.style.background = '#17a2b8';
+      }, 1500);
+    }
+  };
+  entryContainer.appendChild(copyIdBtn);
+  
+  // Configure button to open full dropdown configuration
+  const configureBtn = document.createElement('button');
+  configureBtn.textContent = 'Configure';
+  configureBtn.style.cssText = `
+    background: #9c27b0;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-left: 4px;
+  `;
+  configureBtn.onclick = () => {
+    // Create and show the full dropdown configuration
+    const dropdownConfigModal = document.createElement('div');
+    dropdownConfigModal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    `;
+    
+    // Create the full dropdown field configuration
+    const dropdownContainer = createDropdownField(dropdown, index, cell, modalContent);
+    modalContent.appendChild(dropdownContainer);
+    
+    // Add close button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.cssText = `
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+      width: 100%;
+    `;
+    closeBtn.onclick = () => {
+      document.body.removeChild(dropdownConfigModal);
+      updateSummary(); // Refresh the summary display
+    };
+    modalContent.appendChild(closeBtn);
+    
+    dropdownConfigModal.appendChild(modalContent);
+    document.body.appendChild(dropdownConfigModal);
+    
+    // Close on background click
+    dropdownConfigModal.onclick = (e) => {
+      if (e.target === dropdownConfigModal) {
+        document.body.removeChild(dropdownConfigModal);
+        updateSummary(); // Refresh the summary display
+      }
+    };
+  };
+  entryContainer.appendChild(configureBtn);
+  
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.style.cssText = `
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+  `;
+  deleteBtn.onclick = () => {
+    // Remove from data
+    const dropdownIndex = cell._dropdowns.findIndex(d => d.id === dropdown.id);
+    if (dropdownIndex !== -1) {
+      cell._dropdowns.splice(dropdownIndex, 1);
+    }
+    
+    // Remove from item order
+    const itemOrderIndex = cell._itemOrder.findIndex(item => item.type === 'dropdown' && item.index === dropdownIndex);
+    if (itemOrderIndex !== -1) {
+      cell._itemOrder.splice(itemOrderIndex, 1);
+    }
+    
+    // Remove from DOM
+    entryContainer.remove();
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  entryContainer.appendChild(deleteBtn);
+  
+  return entryContainer;
+}
+
 function getQuestionType(cell) {
   if (!cell) {
     console.log('🔍 [LOCATION ORDER DEBUG] getQuestionType called with undefined cell');
@@ -1324,7 +1548,7 @@ function createNumberField(label, value, onChange) {
 // Helper function to create options container
 function createOptionsContainer(cell) {
   const container = document.createElement('div');
-  container.className = 'dropdown-options-container';
+  container.className = 'unified-fields-container';
   container.style.cssText = `
     display: flex;
     flex-direction: column;
@@ -1713,23 +1937,23 @@ function createOptionsContainer(cell) {
         });
         
         container.appendChild(locationIndicator);
-      } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
-        const dropdownContainer = createDropdownField(cell._dropdowns[item.index], item.index, cell, container);
-        
-        // Add drag event listeners
-        dropdownContainer.addEventListener('dragstart', (e) => {
-          draggedElement = dropdownContainer;
-          e.dataTransfer.effectAllowed = 'move';
-          dropdownContainer.style.opacity = '0.5';
-        });
-        
-        dropdownContainer.addEventListener('dragend', (e) => {
-          dropdownContainer.style.opacity = '1';
-          draggedElement = null;
-        });
-        
-        container.appendChild(dropdownContainer);
-      }
+        } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
+          const unifiedDropdownEntry = createUnifiedDropdownEntry(cell._dropdowns[item.index], item.index, cell);
+          
+          // Add drag event listeners
+          unifiedDropdownEntry.addEventListener('dragstart', (e) => {
+            draggedElement = unifiedDropdownEntry;
+            e.dataTransfer.effectAllowed = 'move';
+            unifiedDropdownEntry.style.opacity = '0.5';
+          });
+          
+          unifiedDropdownEntry.addEventListener('dragend', (e) => {
+            unifiedDropdownEntry.style.opacity = '1';
+            draggedElement = null;
+          });
+          
+          container.appendChild(unifiedDropdownEntry);
+        }
     });
   } else {
     // Fallback to default order (options first, then checkboxes, then location)
@@ -2173,12 +2397,13 @@ function createOptionsContainer(cell) {
       index: cell._dropdowns.length - 1
     });
     
-    // Instead of refreshing the entire modal, just add the new dropdown to the container
-    const container = document.querySelector('.dropdown-options-container');
-    if (container) {
-      const dropdownContainer = createDropdownField(newDropdown, cell._dropdowns.length - 1, cell, container);
-      container.appendChild(dropdownContainer);
-    }
+      // Add to the main unified container instead of the separate dropdown container
+      const mainContainer = document.querySelector('.unified-fields-container');
+      if (mainContainer) {
+        // Create a unified dropdown entry that looks like other entries
+        const unifiedDropdownEntry = createUnifiedDropdownEntry(newDropdown, cell._dropdowns.length - 1, cell);
+        mainContainer.appendChild(unifiedDropdownEntry);
+      }
     
     // Trigger autosave
     if (typeof window.requestAutosave === 'function') {
@@ -2673,7 +2898,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 newLabel.fieldName = fieldNameInput.value.trim();
                 
                 // Update the node ID when field name changes
-                const updatedNodeId = generateNodeIdForDropdownField(newLabel.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                const updatedNodeId = generateNodeIdForDropdownField(newLabel.fieldName || '', dropdown.name || '', cell, triggerSequence.triggerOption || '');
                 newLabel.nodeId = updatedNodeId;
                 labelIdInput.value = updatedNodeId;
                 
@@ -2684,7 +2909,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               
               // Label ID input (uneditable and autofilled)
               // Auto-fix incorrect node IDs when creating new fields
-              const correctLabelId = generateNodeIdForDropdownField(newLabel.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+              const correctLabelId = generateNodeIdForDropdownField(newLabel.fieldName || '', dropdown.name || '', cell, triggerSequence.triggerOption || '');
               const labelIdValue = (newLabel.nodeId && newLabel.nodeId === correctLabelId) ? newLabel.nodeId : correctLabelId;
               newLabel.nodeId = labelIdValue; // Set the nodeId in the data
               const labelIdInput = createUneditableNodeIdInput('Label ID...', labelIdValue, (input) => {
@@ -2741,6 +2966,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               labelContainer.appendChild(fieldNameInput);
               labelContainer.appendChild(labelIdInput);
               labelContainer.appendChild(deleteLabelBtn);
+              
+              // Copy ID button for label (positioned after delete button)
+              const copyLabelIdBtn = document.createElement('button');
+              copyLabelIdBtn.textContent = 'Copy ID';
+              copyLabelIdBtn.style.cssText = `
+                background: #17a2b8;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+                margin-bottom: 8px;
+                width: 100%;
+              `;
+              copyLabelIdBtn.onclick = () => {
+                const number = prompt('Enter number:', '1');
+                if (number !== null && number !== '') {
+                  const nodeIdWithNumber = `${labelIdInput.value}_${number}`;
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                      copyLabelIdBtn.textContent = 'Copied!';
+                      copyLabelIdBtn.style.background = '#28a745';
+                      setTimeout(() => {
+                        copyLabelIdBtn.textContent = 'Copy ID';
+                        copyLabelIdBtn.style.background = '#17a2b8';
+                      }, 1500);
+                    });
+                  } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = nodeIdWithNumber;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyLabelIdBtn.textContent = 'Copied!';
+                    copyLabelIdBtn.style.background = '#28a745';
+                    setTimeout(() => {
+                      copyLabelIdBtn.textContent = 'Copy ID';
+                      copyLabelIdBtn.style.background = '#17a2b8';
+                    }, 1500);
+                  }
+                }
+              };
+              labelContainer.appendChild(copyLabelIdBtn);
+              
               actionsList.appendChild(labelContainer);
               fieldNameInput.focus();
             }
@@ -2808,7 +3080,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 if (newCheckbox.options && newCheckbox.options.length > 0) {
                   newCheckbox.options.forEach(option => {
                     const combinedFieldName = `${newCheckbox.fieldName}_${option.checkboxText || ''}`;
-                    const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+                    const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, triggerSequence.triggerOption || '');
                     option.nodeId = updatedNodeId;
                   });
                 }
@@ -2864,7 +3136,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   
                   // Update the node ID when checkbox text changes
                   const combinedFieldName = `${newCheckbox.fieldName}_${newOption.checkboxText || ''}`;
-                  const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+                  const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, triggerSequence.triggerOption || '');
                   newOption.nodeId = updatedNodeId;
                   checkboxIdInput.value = updatedNodeId;
                   
@@ -2879,7 +3151,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 const checkboxOptionText = newOption.checkboxText || '';
                 const combinedFieldName = `${checkboxFieldName}_${checkboxOptionText}`;
                 // Auto-fix incorrect node IDs when creating new fields
-                const correctCheckboxId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+                const correctCheckboxId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, triggerSequence.triggerOption || '');
                 const checkboxIdValue = (newOption.nodeId && newOption.nodeId === correctCheckboxId) ? newOption.nodeId : correctCheckboxId;
                 newOption.nodeId = checkboxIdValue; // Set the nodeId in the data
                 const checkboxIdInput = createUneditableNodeIdInput('Checkbox ID...', checkboxIdValue, (input) => {
@@ -2941,8 +3213,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   }
                 };
                 
+                // Copy ID button for checkbox option
+                const copyCheckboxIdBtn = document.createElement('button');
+                copyCheckboxIdBtn.textContent = 'Copy ID';
+                copyCheckboxIdBtn.style.cssText = `
+                  background: #17a2b8;
+                  color: white;
+                  border: none;
+                  padding: 2px 4px;
+                  border-radius: 2px;
+                  cursor: pointer;
+                  font-size: 10px;
+                  margin-left: 4px;
+                `;
+                copyCheckboxIdBtn.onclick = () => {
+                  const number = prompt('Enter number:', '1');
+                  if (number !== null && number !== '') {
+                    const nodeIdWithNumber = `${checkboxIdInput.value}_${number}`;
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                      navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                        copyCheckboxIdBtn.textContent = 'Copied!';
+                        copyCheckboxIdBtn.style.background = '#28a745';
+                        setTimeout(() => {
+                          copyCheckboxIdBtn.textContent = 'Copy ID';
+                          copyCheckboxIdBtn.style.background = '#17a2b8';
+                        }, 1500);
+                      });
+                    } else {
+                      const textArea = document.createElement('textarea');
+                      textArea.value = nodeIdWithNumber;
+                      document.body.appendChild(textArea);
+                      textArea.select();
+                      document.execCommand('copy');
+                      document.body.removeChild(textArea);
+                      
+                      copyCheckboxIdBtn.textContent = 'Copied!';
+                      copyCheckboxIdBtn.style.background = '#28a745';
+                      setTimeout(() => {
+                        copyCheckboxIdBtn.textContent = 'Copy ID';
+                        copyCheckboxIdBtn.style.background = '#17a2b8';
+                      }, 1500);
+                    }
+                  }
+                };
+                
                 miniOptionEntry.appendChild(checkboxTextInput);
                 miniOptionEntry.appendChild(checkboxIdInput);
+                miniOptionEntry.appendChild(copyCheckboxIdBtn);
                 miniOptionEntry.appendChild(deleteOptionBtn);
                 checkboxContainer.appendChild(miniOptionEntry);
                 
@@ -3039,7 +3356,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 newTime.fieldName = fieldNameInput.value.trim();
                 
                 // Update the node ID when field name changes
-                const updatedNodeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                const updatedNodeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, triggerSequence.triggerOption || '');
                 newTime.nodeId = updatedNodeId;
                 timeIdInput.value = updatedNodeId;
                 
@@ -3050,7 +3367,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               
               // Time ID input (uneditable and autofilled)
               // Auto-fix incorrect node IDs when creating new fields
-              const correctTimeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+              const correctTimeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, triggerSequence.triggerOption || '');
               const timeIdValue = (newTime.nodeId && newTime.nodeId === correctTimeId) ? newTime.nodeId : correctTimeId;
               newTime.nodeId = timeIdValue; // Set the nodeId in the data
               const timeIdInput = createUneditableNodeIdInput('Time ID...', timeIdValue, (input) => {
@@ -3107,6 +3424,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               timeContainer.appendChild(fieldNameInput);
               timeContainer.appendChild(timeIdInput);
               timeContainer.appendChild(deleteTimeBtn);
+              
+              // Copy ID button for time (positioned after delete button)
+              const copyTimeIdBtn = document.createElement('button');
+              copyTimeIdBtn.textContent = 'Copy ID';
+              copyTimeIdBtn.style.cssText = `
+                background: #17a2b8;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+                margin-bottom: 8px;
+                width: 100%;
+              `;
+              copyTimeIdBtn.onclick = () => {
+                const number = prompt('Enter number:', '1');
+                if (number !== null && number !== '') {
+                  const nodeIdWithNumber = `${timeIdInput.value}_${number}`;
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                      copyTimeIdBtn.textContent = 'Copied!';
+                      copyTimeIdBtn.style.background = '#28a745';
+                      setTimeout(() => {
+                        copyTimeIdBtn.textContent = 'Copy ID';
+                        copyTimeIdBtn.style.background = '#17a2b8';
+                      }, 1500);
+                    });
+                  } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = nodeIdWithNumber;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyTimeIdBtn.textContent = 'Copied!';
+                    copyTimeIdBtn.style.background = '#28a745';
+                    setTimeout(() => {
+                      copyTimeIdBtn.textContent = 'Copy ID';
+                      copyTimeIdBtn.style.background = '#17a2b8';
+                    }, 1500);
+                  }
+                }
+              };
+              timeContainer.appendChild(copyTimeIdBtn);
+              
               actionsList.appendChild(timeContainer);
               fieldNameInput.focus();
             }
@@ -3744,6 +4108,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         labelContainer.appendChild(fieldNameInput);
         labelContainer.appendChild(labelIdInput);
         labelContainer.appendChild(deleteLabelBtn);
+        
+        // Copy ID button for existing label (positioned after delete button)
+        const copyLabelIdBtn = document.createElement('button');
+        copyLabelIdBtn.textContent = 'Copy ID';
+        copyLabelIdBtn.style.cssText = `
+          background: #17a2b8;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+          margin-bottom: 8px;
+          width: 100%;
+        `;
+        copyLabelIdBtn.onclick = () => {
+          const number = prompt('Enter number:', '1');
+          if (number !== null && number !== '') {
+            const nodeIdWithNumber = `${labelIdInput.value}_${number}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                copyLabelIdBtn.textContent = 'Copied!';
+                copyLabelIdBtn.style.background = '#28a745';
+                setTimeout(() => {
+                  copyLabelIdBtn.textContent = 'Copy ID';
+                  copyLabelIdBtn.style.background = '#17a2b8';
+                }, 1500);
+              });
+            } else {
+              const textArea = document.createElement('textarea');
+              textArea.value = nodeIdWithNumber;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              copyLabelIdBtn.textContent = 'Copied!';
+              copyLabelIdBtn.style.background = '#28a745';
+              setTimeout(() => {
+                copyLabelIdBtn.textContent = 'Copy ID';
+                copyLabelIdBtn.style.background = '#17a2b8';
+              }, 1500);
+            }
+          }
+        };
+        labelContainer.appendChild(copyLabelIdBtn);
+        
         actionsList.appendChild(labelContainer);
       });
     }
@@ -3877,8 +4288,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           };
           
+          // Copy ID button for existing checkbox option
+          const copyCheckboxIdBtn = document.createElement('button');
+          copyCheckboxIdBtn.textContent = 'Copy ID';
+          copyCheckboxIdBtn.style.cssText = `
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 2px 4px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 10px;
+            margin-left: 4px;
+          `;
+          copyCheckboxIdBtn.onclick = () => {
+            const number = prompt('Enter number:', '1');
+            if (number !== null && number !== '') {
+              const nodeIdWithNumber = `${checkboxIdInput.value}_${number}`;
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                  copyCheckboxIdBtn.textContent = 'Copied!';
+                  copyCheckboxIdBtn.style.background = '#28a745';
+                  setTimeout(() => {
+                    copyCheckboxIdBtn.textContent = 'Copy ID';
+                    copyCheckboxIdBtn.style.background = '#17a2b8';
+                  }, 1500);
+                });
+              } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = nodeIdWithNumber;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                copyCheckboxIdBtn.textContent = 'Copied!';
+                copyCheckboxIdBtn.style.background = '#28a745';
+                setTimeout(() => {
+                  copyCheckboxIdBtn.textContent = 'Copy ID';
+                  copyCheckboxIdBtn.style.background = '#17a2b8';
+                }, 1500);
+              }
+            }
+          };
+          
           miniOptionEntry.appendChild(checkboxTextInput);
           miniOptionEntry.appendChild(checkboxIdInput);
+          miniOptionEntry.appendChild(copyCheckboxIdBtn);
           miniOptionEntry.appendChild(deleteOptionBtn);
           checkboxContainer.appendChild(miniOptionEntry);
           
@@ -4014,8 +4470,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               }
             };
             
+            // Copy ID button for existing checkbox option
+            const copyCheckboxIdBtn = document.createElement('button');
+            copyCheckboxIdBtn.textContent = 'Copy ID';
+            copyCheckboxIdBtn.style.cssText = `
+              background: #17a2b8;
+              color: white;
+              border: none;
+              padding: 2px 4px;
+              border-radius: 2px;
+              cursor: pointer;
+              font-size: 10px;
+              margin-left: 4px;
+            `;
+            copyCheckboxIdBtn.onclick = () => {
+              const number = prompt('Enter number:', '1');
+              if (number !== null && number !== '') {
+                const nodeIdWithNumber = `${checkboxIdInput.value}_${number}`;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                    copyCheckboxIdBtn.textContent = 'Copied!';
+                    copyCheckboxIdBtn.style.background = '#28a745';
+                    setTimeout(() => {
+                      copyCheckboxIdBtn.textContent = 'Copy ID';
+                      copyCheckboxIdBtn.style.background = '#17a2b8';
+                    }, 1500);
+                  });
+                } else {
+                  const textArea = document.createElement('textarea');
+                  textArea.value = nodeIdWithNumber;
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(textArea);
+                  
+                  copyCheckboxIdBtn.textContent = 'Copied!';
+                  copyCheckboxIdBtn.style.background = '#28a745';
+                  setTimeout(() => {
+                    copyCheckboxIdBtn.textContent = 'Copy ID';
+                    copyCheckboxIdBtn.style.background = '#17a2b8';
+                  }, 1500);
+                }
+              }
+            };
+            
             optionDiv.appendChild(checkboxTextInput);
             optionDiv.appendChild(checkboxIdInput);
+            optionDiv.appendChild(copyCheckboxIdBtn);
             optionDiv.appendChild(deleteOptionBtn);
             checkboxContainer.appendChild(optionDiv);
           });
@@ -4118,6 +4619,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         timeContainer.appendChild(fieldNameInput);
         timeContainer.appendChild(timeIdInput);
         timeContainer.appendChild(deleteTimeBtn);
+        
+        // Copy ID button for existing time (positioned after delete button)
+        const copyTimeIdBtn = document.createElement('button');
+        copyTimeIdBtn.textContent = 'Copy ID';
+        copyTimeIdBtn.style.cssText = `
+          background: #17a2b8;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+          margin-bottom: 8px;
+          width: 100%;
+        `;
+        copyTimeIdBtn.onclick = () => {
+          const number = prompt('Enter number:', '1');
+          if (number !== null && number !== '') {
+            const nodeIdWithNumber = `${timeIdInput.value}_${number}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(nodeIdWithNumber).then(() => {
+                copyTimeIdBtn.textContent = 'Copied!';
+                copyTimeIdBtn.style.background = '#28a745';
+                setTimeout(() => {
+                  copyTimeIdBtn.textContent = 'Copy ID';
+                  copyTimeIdBtn.style.background = '#17a2b8';
+                }, 1500);
+              });
+            } else {
+              const textArea = document.createElement('textarea');
+              textArea.value = nodeIdWithNumber;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              copyTimeIdBtn.textContent = 'Copied!';
+              copyTimeIdBtn.style.background = '#28a745';
+              setTimeout(() => {
+                copyTimeIdBtn.textContent = 'Copy ID';
+                copyTimeIdBtn.style.background = '#17a2b8';
+              }, 1500);
+            }
+          }
+        };
+        timeContainer.appendChild(copyTimeIdBtn);
+        
         actionsList.appendChild(timeContainer);
       });
     }
