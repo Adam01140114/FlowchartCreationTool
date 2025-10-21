@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many', this.value)">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">SC-100</h1><div id="question-container-1" class="question-container"><label><h3>How many cars do you own</h3></label><select id="how_many_extra" name="how_many_extra" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_extra', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
@@ -484,8 +484,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"how_many"};
-var questionNameIds = {"1":"how_many"};
+    var questionSlugMap       = {"1":"how_many_cars_do_you_own"};
+var questionNameIds = {"1":"how_many_extra"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -493,10 +493,10 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":[],"length":0};
+var labelMap = {"1":["Label 2"],"length":0};
 var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":[]};
-var unifiedFieldsMap = {"1":[{"type":"checkbox","label":"For who","nodeId":"","selectionType":"single","options":[{"text":"You","nodeId":"you"},{"text":"Them","nodeId":"them"}],"order":1}]};
+var labelNodeIdsMap = {"1":["label_2"]};
+var unifiedFieldsMap = {"1":[{"type":"dropdown","fieldName":"Is this car a toyota?","options":[{"text":"Yes","nodeId":"is_this_car_a_toyota_yes"},{"text":"No","nodeId":"is_this_car_a_toyota_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"label","label":"Car Name","nodeId":"car_name"},{"type":"checkbox","fieldName":"Why did you buy it?","selectionType":"single","options":[{"text":"Reliability","nodeId":"reliability"},{"text":"Gas Milage","nodeId":"gas_milage"}]},{"type":"date","label":"When did you buy it?","nodeId":"when_did_you_buy_it"}]}],"order":1},{"type":"label","label":"Label 2","nodeId":"label_2","order":2}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -2251,6 +2251,114 @@ function showTextboxLabels(questionId, count){
                 dateDiv.appendChild(label);
                 dateDiv.appendChild(input);
                 entryContainer.appendChild(dateDiv);
+            } else if (field.type === 'dropdown') {
+                // Add line break above dropdown field
+                const brBeforeDropdown = document.createElement('br');
+                entryContainer.appendChild(brBeforeDropdown);
+                
+                // Handle dropdown fields
+                const dropdownFieldDiv = document.createElement('div');
+                dropdownFieldDiv.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #2196F3; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);';
+                
+                // Add field name as a label
+                const fieldNameLabel = document.createElement('h4');
+                fieldNameLabel.textContent = field.fieldName;
+                fieldNameLabel.style.cssText = 'margin: 0 0 15px 0; color: #1976D2; font-size: 18px; font-weight: 600; text-align: center;';
+                dropdownFieldDiv.appendChild(fieldNameLabel);
+                
+                // Create dropdown select element
+                const select = document.createElement('select');
+                select.id = field.fieldName.replace(/s+/g, '_').toLowerCase() + "_" + j;
+                select.name = select.id;
+                select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
+                
+                // Add placeholder option
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Select an option...';
+                placeholderOption.disabled = true;
+                placeholderOption.selected = true;
+                select.appendChild(placeholderOption);
+                
+                // Add dropdown options
+                const dropdownOptions = field.options || [];
+                dropdownOptions.forEach((option, optionIndex) => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.text;
+                    optionElement.textContent = option.text;
+                    optionElement.setAttribute('data-node-id', option.nodeId);
+                    select.appendChild(optionElement);
+                });
+                
+                // Function to handle conditional logic
+                function handleConditionalLogic() {
+                    const selectedValue = select.value;
+                    const selectedOption = select.options[select.selectedIndex];
+                    const nodeId = selectedOption ? selectedOption.getAttribute('data-node-id') : '';
+                    
+                    // Handle trigger sequences
+                    if (field.triggerSequences && field.triggerSequences.length > 0) {
+                        field.triggerSequences.forEach((sequence, sequenceIndex) => {
+                            if (sequence.condition === selectedValue) {
+                                // Show trigger fields for this condition
+                                const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
+                                if (triggerFieldsContainer) {
+                                    triggerFieldsContainer.style.display = 'block';
+                                } else {
+                                    // Create trigger fields container if it doesn't exist
+                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv);
+                                }
+                            } else {
+                                // Hide trigger fields for other conditions
+                                const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
+                                if (triggerFieldsContainer) {
+                                    triggerFieldsContainer.style.display = 'none';
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Add change event listener for conditional logic
+                select.addEventListener('change', handleConditionalLogic);
+                
+                // Also check on load in case Firebase autofills the dropdown
+                setTimeout(handleConditionalLogic, 100);
+                
+                // Additional checks for Firebase autofill with longer delays
+                setTimeout(handleConditionalLogic, 500);
+                setTimeout(handleConditionalLogic, 1000);
+                setTimeout(handleConditionalLogic, 2000);
+                
+                // Also check when the page is fully loaded
+                if (document.readyState === 'complete') {
+                    setTimeout(handleConditionalLogic, 100);
+                } else {
+                    window.addEventListener('load', () => {
+                        setTimeout(handleConditionalLogic, 100);
+                    });
+                }
+                
+                // Watch for value changes using MutationObserver (for Firebase autofill)
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                            setTimeout(handleConditionalLogic, 50);
+                        }
+                    });
+                });
+                
+                // Start observing the select element for value changes
+                observer.observe(select, { 
+                    attributes: true, 
+                    attributeFilter: ['value'] 
+                });
+                
+                // Also watch for input events that might be triggered by autofill
+                select.addEventListener('input', handleConditionalLogic);
+                
+                dropdownFieldDiv.appendChild(select);
+                entryContainer.appendChild(dropdownFieldDiv);
             }
             
             lastWasLocation = isLocationField;
@@ -4466,6 +4574,54 @@ if (typeof handleNext === 'function') {
                     });
                 }, 1000); // 1 second delay for fallback
                 
+        // 🔧 NEW: Delayed autofill for conditional fields that are created after initial autofill
+        setTimeout(() => {
+            console.log('🔍 AUTOFILL DEBUG: Running delayed autofill for conditional fields');
+            const conditionalFields = getFormFields();
+            conditionalFields.forEach(el => {
+                // Check both by name and by ID for autofill
+                let autofillValue = null;
+                if (mappedData.hasOwnProperty(el.name)) {
+                    autofillValue = mappedData[el.name];
+                } else if (el.id && mappedData.hasOwnProperty(el.id)) {
+                    autofillValue = mappedData[el.id];
+                }
+                
+                // Debug Additional Information fields specifically
+                if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
+                    console.log('🔍 AUTOFILL DEBUG: Delayed autofill - Additional Info field found:', el.name, 'ID:', el.id, 'Type:', el.type, 'AutofillValue:', autofillValue);
+                }
+                
+                if (autofillValue !== null) {
+                    // Skip current_date field - it should be set dynamically
+                    if (el.id === 'current_date' || el.name === 'current_date') {
+                        return;
+                    }
+                    
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        if (el.type === 'radio') {
+                            // For radio buttons, we need to check if this specific radio button should be selected
+                            if (el.value === autofillValue) {
+                                el.checked = true;
+                            } else {
+                                el.checked = false;
+                            }
+                        } else {
+                            // For checkboxes, use the boolean value
+                            el.checked = !!autofillValue;
+                        }
+                    } else {
+                        el.value = autofillValue;
+                    }
+                    
+                    // Debug successful autofill
+                    if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
+                        console.log('🔍 AUTOFILL DEBUG: Successfully autofilled Additional Info field:', el.name, 'with value:', autofillValue);
+                    }
+                }
+            });
+        }, 2000); // Wait 2 seconds for conditional fields to be created
+        
         // 🔧 NEW: Clear autofill flag after fallback autofill is complete
         setTimeout(() => {
             window.isInitialAutofill = false;
@@ -4814,6 +4970,54 @@ if (typeof handleNext === 'function') {
                             }
                         }, 1500);
                     }, 2000);
+                    
+                    // 🔧 NEW: Delayed autofill for conditional fields that are created after initial autofill
+                    setTimeout(() => {
+                        console.log('🔍 AUTOFILL DEBUG: Running delayed autofill for conditional fields (localStorage)');
+                        const conditionalFields = getFormFields();
+                        conditionalFields.forEach(el => {
+                            // Check both by name and by ID for autofill
+                            let autofillValue = null;
+                            if (data.hasOwnProperty(el.name)) {
+                                autofillValue = data[el.name];
+                            } else if (el.id && data.hasOwnProperty(el.id)) {
+                                autofillValue = data[el.id];
+                            }
+                            
+                            // Debug Additional Information fields specifically
+                            if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
+                                console.log('🔍 AUTOFILL DEBUG: Delayed autofill (localStorage) - Additional Info field found:', el.name, 'ID:', el.id, 'Type:', el.type, 'AutofillValue:', autofillValue);
+                            }
+                            
+                            if (autofillValue !== null) {
+                                // Skip current_date field - it should be set dynamically
+                                if (el.id === 'current_date' || el.name === 'current_date') {
+                                    return;
+                                }
+                                
+                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                    if (el.type === 'radio') {
+                                        // For radio buttons, we need to check if this specific radio button should be selected
+                                        if (el.value === autofillValue) {
+                                            el.checked = true;
+                                        } else {
+                                            el.checked = false;
+                                        }
+                                    } else {
+                                        // For checkboxes, use the boolean value
+                                        el.checked = !!autofillValue;
+                                    }
+                                } else {
+                                    el.value = autofillValue;
+                                }
+                                
+                                // Debug successful autofill
+                                if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
+                                    console.log('🔍 AUTOFILL DEBUG: Successfully autofilled Additional Info field (localStorage):', el.name, 'with value:', autofillValue);
+                                }
+                            }
+                        });
+                    }, 3000); // Wait 3 seconds for conditional fields to be created
                 }
             } catch (e) {
                 console.log('No localStorage data found or error loading:', e);
@@ -6429,4 +6633,186 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+  </script>
+  <script>
+  // Helper functions for trigger checkbox radio button behavior
+  function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+      // Create the hidden fields container if it doesn't exist
+      hiddenContainer = document.createElement('div');
+      hiddenContainer.id = 'hidden_pdf_fields';
+      hiddenContainer.style.display = 'none';
+      
+      // Find the form and append the hidden container
+      const form = document.querySelector('form') || document.body;
+      form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId;
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+  }
+
+  function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+      hiddenCheckbox.remove();
+      console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+    }
+  }
+
+  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer) {
+    const triggerContainer = document.createElement('div');
+    triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
+    triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
+    
+    const triggerTitle = document.createElement('h5');
+    triggerTitle.textContent = 'Additional Information';
+    triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
+    triggerContainer.appendChild(triggerTitle);
+    
+    fields.forEach((triggerField, fieldIndex) => {
+      if (triggerField.type === 'label') {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const label = document.createElement('label');
+        label.textContent = triggerField.label + ":";
+        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = triggerField.nodeId + "_" + entryNumber;
+        input.name = input.id;
+        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
+        
+        // Add hover effect
+        input.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        input.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+        
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        triggerContainer.appendChild(fieldDiv);
+      } else if (triggerField.type === 'checkbox') {
+        const checkboxFieldDiv = document.createElement('div');
+        checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const fieldNameLabel = document.createElement('label');
+        fieldNameLabel.textContent = triggerField.fieldName + ":";
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        checkboxFieldDiv.appendChild(fieldNameLabel);
+        
+        const checkboxOptions = triggerField.options || [];
+        const selectionType = triggerField.selectionType || 'multiple'; // Default to multiple if not specified
+        
+        checkboxOptions.forEach((option, optionIndex) => {
+          const optionDiv = document.createElement('div');
+          optionDiv.style.cssText = 'margin: 8px 0; padding: 8px; background-color: white; border-radius: 6px; border: 1px solid #87CEEB; display: flex; align-items: center;';
+          
+          const input = document.createElement('input');
+          input.type = selectionType === 'single' ? 'radio' : 'checkbox';
+          input.id = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+          input.name = selectionType === 'single' ? 'radio_group_' + entryNumber : option.nodeId + "_" + entryNumber;
+          input.value = option.text;
+          input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
+          
+          // Add event listener for radio buttons to create hidden checkboxes
+          if (selectionType === 'single') {
+            input.addEventListener('change', function() {
+              if (this.checked) {
+                // Uncheck all other radio buttons in this group and remove their hidden checkboxes
+                const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
+                radioGroup.forEach(radio => {
+                  if (radio !== this) {
+                    radio.checked = false;
+                    
+                    // Remove hidden checkbox for unchecked radio
+                    const originalNodeId = radio.id.replace('_radio', '');
+                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                    
+                    if (existingHiddenCheckbox) {
+                      if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
+                        existingHiddenCheckbox.remove();
+                      }
+                    }
+                  }
+                });
+                
+                // Create hidden checkbox for the selected radio
+                const originalNodeId = this.id.replace('_radio', '');
+                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+              }
+            });
+          }
+          
+          const label = document.createElement('label');
+          label.textContent = option.text;
+          label.style.cssText = 'flex: 1; cursor: pointer; color: #2c3e50; font-size: 15px; font-weight: 500; margin: 0;';
+          label.setAttribute('for', input.id);
+          
+          optionDiv.appendChild(input);
+          optionDiv.appendChild(label);
+          checkboxFieldDiv.appendChild(optionDiv);
+        });
+        
+        triggerContainer.appendChild(checkboxFieldDiv);
+      } else if (triggerField.type === 'date') {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const label = document.createElement('label');
+        label.textContent = triggerField.label + ":";
+        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = triggerField.nodeId + "_" + entryNumber;
+        input.name = input.id;
+        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
+        
+        // Make the entire field div clickable to show calendar
+        fieldDiv.addEventListener('click', function() {
+          input.focus();
+          input.showPicker && input.showPicker();
+        });
+        
+        // Add hover effect
+        input.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        input.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+        
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        triggerContainer.appendChild(fieldDiv);
+      }
+    });
+    
+    parentContainer.appendChild(triggerContainer);
+  }
   </script>

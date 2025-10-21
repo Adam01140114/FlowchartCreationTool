@@ -635,6 +635,7 @@ function addQuestion(sectionId, questionId = null) {
                 <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
                 <button type="button" onclick="addCheckboxField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Checkbox</button>
                 <button type="button" onclick="addDateField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #FF9800; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Date</button>
+                <button type="button" onclick="addDropdownField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #2196F3; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Dropdown</button>
             </div>
             
             <!-- Hidden containers for backward compatibility -->
@@ -2803,6 +2804,498 @@ function addDateField(questionId) {
             editUnifiedField(questionId, fieldCount);
         };
         displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+}
+
+function addDropdownField(questionId) {
+    const unifiedDiv = getUnifiedContainer(questionId);
+    console.log('🔧 [ADD DROPDOWN DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
+    console.log('🔧 [ADD DROPDOWN DEBUG] Found unified container:', !!unifiedDiv);
+    
+    if (!unifiedDiv) {
+        console.error('🔧 [ADD DROPDOWN DEBUG] Unified container not found!');
+        return;
+    }
+    
+    // Ensure the unified container is visible
+    if (unifiedDiv.style.display === 'none') {
+        console.log('🔧 [ADD DROPDOWN DEBUG] Unified container was hidden, making it visible');
+        unifiedDiv.style.display = 'block';
+    }
+    
+    // Remove placeholder if it exists
+    const placeholder = unifiedDiv.querySelector('div[style*="font-style: italic"]');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    
+    const fieldCount = unifiedDiv.children.length + 1;
+    console.log('🔧 [ADD DROPDOWN DEBUG] Current field count:', fieldCount);
+
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'dropdown');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.innerHTML = `
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Dropdown Field</div>
+            
+            <!-- Field Name Section -->
+            <div style="margin-bottom: 15px;">
+                <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Field Name:</div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <input type="text" id="dropdownFieldName${questionId}_${fieldCount}" placeholder="Enter dropdown field name" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" onchange="updateDropdownFieldName(${questionId}, ${fieldCount})">
+                </div>
+            </div>
+            
+            <!-- Add Options Section -->
+            <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f5f5f5;">
+                <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Add Options</div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button type="button" onclick="addDropdownOption(${questionId}, ${fieldCount})" style="margin: 5px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #2196F3; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add dropdown option</button>
+                </div>
+                <div id="dropdownOptions${questionId}_${fieldCount}" style="margin-top: 10px;">
+                    <!-- Dropdown options will be added here -->
+                </div>
+            </div>
+            
+            <!-- Conditional Logic Section -->
+            <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; background: #f0f8ff;">
+                <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Conditional Logic</div>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <button type="button" onclick="addTriggerSequence(${questionId}, ${fieldCount})" style="margin: 5px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add trigger</button>
+                </div>
+                <div id="triggerSequences${questionId}_${fieldCount}" style="margin-top: 10px;">
+                    <!-- Trigger sequences will be added here -->
+                </div>
+            </div>
+            
+            <div style="font-size: 0.8em; color: #999; margin-top: 10px; text-align: center;">Type: <span id="typeText${questionId}_${fieldCount}">Dropdown</span> | Order: ${fieldCount}</div>
+            <div style="text-align: center; margin-top: 10px;">
+                <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+            </div>
+        </div>
+    `;
+    unifiedDiv.appendChild(fieldDiv);
+    console.log('🔧 [ADD DROPDOWN DEBUG] Added dropdown field to unified container. New count:', unifiedDiv.children.length);
+
+    // Force the container to be visible and have dimensions
+    unifiedDiv.style.minHeight = '50px';
+    unifiedDiv.style.border = '1px solid #e0e0e0';
+    unifiedDiv.style.borderRadius = '5px';
+    unifiedDiv.style.padding = '10px';
+    unifiedDiv.style.backgroundColor = '#fafafa';
+    unifiedDiv.style.margin = '10px 0';
+    unifiedDiv.style.width = '100%';
+    unifiedDiv.style.display = 'block';
+    unifiedDiv.style.position = 'relative';
+    
+    // Add double-click event listener as backup
+    const displayDiv = fieldDiv.querySelector('div');
+    if (displayDiv) {
+        // Remove any existing event listeners to prevent duplicates
+        if (displayDiv._dblclickHandler) {
+            displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+        }
+        
+        // Add event listener for double-click editing
+        displayDiv._dblclickHandler = function() {
+            editUnifiedField(questionId, fieldCount);
+        };
+        displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+}
+
+function addDropdownOption(questionId, fieldCount) {
+    const optionsContainer = document.getElementById(`dropdownOptions${questionId}_${fieldCount}`);
+    if (!optionsContainer) {
+        console.error('🔧 [ADD DROPDOWN OPTION DEBUG] Options container not found!');
+        return;
+    }
+    
+    const optionCount = optionsContainer.children.length + 1;
+    console.log('🔧 [ADD DROPDOWN OPTION DEBUG] Adding option', optionCount, 'for field', fieldCount);
+    
+    const optionDiv = document.createElement('div');
+    optionDiv.className = `dropdown-option-${optionCount}`;
+    optionDiv.style.margin = '5px 0';
+    optionDiv.style.padding = '8px';
+    optionDiv.style.border = '1px solid #e0e0e0';
+    optionDiv.style.borderRadius = '4px';
+    optionDiv.style.backgroundColor = '#f5f5f5';
+    optionDiv.innerHTML = `
+        <div style="margin-bottom: 10px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Option text:</label>
+            <input type="text" id="dropdownOptionText${questionId}_${fieldCount}_${optionCount}" placeholder="Enter option text" style="width: 70%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateDropdownOptionText(${questionId}, ${fieldCount}, ${optionCount})">
+        </div>
+        <div style="margin-bottom: 10px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Option Node ID:</label>
+            <input type="text" id="dropdownOptionNodeId${questionId}_${fieldCount}_${optionCount}" placeholder="Enter option node ID" style="width: 70%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateDropdownOptionNodeId(${questionId}, ${fieldCount}, ${optionCount})">
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+            <button type="button" onclick="removeDropdownOption(${questionId}, ${fieldCount}, ${optionCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove Option</button>
+        </div>
+    `;
+    optionsContainer.appendChild(optionDiv);
+    console.log('🔧 [ADD DROPDOWN OPTION DEBUG] Added option to container. New count:', optionsContainer.children.length);
+    
+    // Update trigger condition options for all trigger sequences
+    const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
+    if (triggerSequencesContainer) {
+        const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+        sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+            updateTriggerConditionOptions(questionId, fieldCount, sequenceIndex + 1);
+        });
+    }
+}
+
+function updateDropdownFieldName(questionId, fieldCount) {
+    const fieldNameInput = document.getElementById(`dropdownFieldName${questionId}_${fieldCount}`);
+    if (fieldNameInput) {
+        console.log('🔧 [DROPDOWN FIELD NAME] Updated field name:', fieldNameInput.value);
+    }
+}
+
+function updateDropdownOptionText(questionId, fieldCount, optionCount) {
+    const textInput = document.getElementById(`dropdownOptionText${questionId}_${fieldCount}_${optionCount}`);
+    if (textInput) {
+        console.log('🔧 [DROPDOWN OPTION TEXT] Updated option text:', textInput.value);
+        
+        // Update trigger condition options for all trigger sequences
+        const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
+        if (triggerSequencesContainer) {
+            const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+            sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+                updateTriggerConditionOptions(questionId, fieldCount, sequenceIndex + 1);
+            });
+        }
+    }
+}
+
+function updateDropdownOptionNodeId(questionId, fieldCount, optionCount) {
+    const nodeIdInput = document.getElementById(`dropdownOptionNodeId${questionId}_${fieldCount}_${optionCount}`);
+    if (nodeIdInput) {
+        console.log('🔧 [DROPDOWN OPTION NODE ID] Updated option node ID:', nodeIdInput.value);
+    }
+}
+
+function removeDropdownOption(questionId, fieldCount, optionCount) {
+    const optionDiv = document.querySelector(`.dropdown-option-${optionCount}`);
+    if (optionDiv) {
+        optionDiv.remove();
+        console.log('🔧 [REMOVE DROPDOWN OPTION] Removed option', optionCount, 'from field', fieldCount);
+    }
+}
+
+function addTriggerSequence(questionId, fieldCount) {
+    const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
+    if (!triggerSequencesContainer) {
+        console.error('🔧 [ADD TRIGGER SEQUENCE DEBUG] Trigger sequences container not found!');
+        return;
+    }
+    
+    const sequenceCount = triggerSequencesContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER SEQUENCE DEBUG] Adding trigger sequence', sequenceCount, 'for field', fieldCount);
+    
+    const sequenceDiv = document.createElement('div');
+    sequenceDiv.className = `trigger-sequence-${sequenceCount}`;
+    sequenceDiv.style.margin = '10px 0';
+    sequenceDiv.style.padding = '12px';
+    sequenceDiv.style.border = '1px solid #4CAF50';
+    sequenceDiv.style.borderRadius = '8px';
+    sequenceDiv.style.backgroundColor = '#f0f8f0';
+    sequenceDiv.innerHTML = `
+        <div style="font-weight: bold; color: #2E7D32; margin-bottom: 10px; text-align: center;">Trigger Sequence ${sequenceCount}</div>
+        
+        <!-- Trigger Condition Dropdown -->
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 5px;">Trigger Condition:</div>
+            <div style="text-align: center;">
+                <select id="triggerCondition${questionId}_${fieldCount}_${sequenceCount}" style="width: 80%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin: 0 auto; display: block;" onchange="updateTriggerCondition(${questionId}, ${fieldCount}, ${sequenceCount})">
+                    <option value="">Select an option...</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Add Field Buttons -->
+        <div style="margin-bottom: 15px; text-align: center;">
+            <div style="font-weight: bold; color: #333; margin-bottom: 10px;">Add Fields for this trigger:</div>
+            <button type="button" onclick="addTriggerLabel(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #007bff; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Label</button>
+            <button type="button" onclick="addTriggerCheckbox(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Checkbox</button>
+            <button type="button" onclick="addTriggerDate(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #FF9800; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Date</button>
+        </div>
+        
+        <!-- Trigger Fields Container -->
+        <div id="triggerFields${questionId}_${fieldCount}_${sequenceCount}" style="margin-top: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
+            <!-- Trigger fields will be added here -->
+        </div>
+        
+        <!-- Remove Trigger Button -->
+        <div style="text-align: center; margin-top: 10px;">
+            <button type="button" onclick="removeTriggerSequence(${questionId}, ${fieldCount}, ${sequenceCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove Trigger</button>
+        </div>
+    `;
+    
+    triggerSequencesContainer.appendChild(sequenceDiv);
+    console.log('🔧 [ADD TRIGGER SEQUENCE DEBUG] Added trigger sequence to container. New count:', triggerSequencesContainer.children.length);
+    
+    // Populate the trigger condition dropdown with available options
+    updateTriggerConditionOptions(questionId, fieldCount, sequenceCount);
+}
+
+function updateTriggerConditionOptions(questionId, fieldCount, sequenceCount) {
+    const triggerSelect = document.getElementById(`triggerCondition${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerSelect) return;
+    
+    // Get all dropdown options for this field
+    const optionsContainer = document.getElementById(`dropdownOptions${questionId}_${fieldCount}`);
+    if (!optionsContainer) return;
+    
+    // Clear existing options (except the first placeholder)
+    triggerSelect.innerHTML = '<option value="">Select an option...</option>';
+    
+    // Add options from the dropdown field
+    const optionElements = optionsContainer.querySelectorAll('[class^="dropdown-option-"]');
+    optionElements.forEach((optionEl, index) => {
+        const textInput = optionEl.querySelector(`#dropdownOptionText${questionId}_${fieldCount}_${index + 1}`);
+        if (textInput && textInput.value.trim()) {
+            const option = document.createElement('option');
+            option.value = textInput.value.trim();
+            option.textContent = textInput.value.trim();
+            triggerSelect.appendChild(option);
+        }
+    });
+}
+
+function updateTriggerCondition(questionId, fieldCount, sequenceCount) {
+    const triggerSelect = document.getElementById(`triggerCondition${questionId}_${fieldCount}_${sequenceCount}`);
+    if (triggerSelect) {
+        console.log('🔧 [TRIGGER CONDITION] Updated trigger condition:', triggerSelect.value);
+    }
+}
+
+function removeTriggerSequence(questionId, fieldCount, sequenceCount) {
+    const sequenceDiv = document.querySelector(`.trigger-sequence-${sequenceCount}`);
+    if (sequenceDiv) {
+        sequenceDiv.remove();
+        console.log('🔧 [REMOVE TRIGGER SEQUENCE] Removed trigger sequence', sequenceCount, 'from field', fieldCount);
+    }
+}
+
+function addTriggerLabel(questionId, fieldCount, sequenceCount) {
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerFieldsContainer) {
+        console.error('🔧 [ADD TRIGGER LABEL DEBUG] Trigger fields container not found!');
+        return;
+    }
+    
+    const triggerFieldCount = triggerFieldsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER LABEL DEBUG] Adding trigger label', triggerFieldCount, 'for sequence', sequenceCount);
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
+    fieldDiv.style.margin = '5px 0';
+    fieldDiv.style.padding = '8px';
+    fieldDiv.style.border = '1px solid #007bff';
+    fieldDiv.style.borderRadius = '4px';
+    fieldDiv.style.backgroundColor = '#f0f8ff';
+    fieldDiv.innerHTML = `
+        <div style="font-weight: bold; color: #007bff; margin-bottom: 8px; text-align: center;">Trigger Label ${triggerFieldCount}</div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Label:</label>
+            <input type="text" id="triggerLabelText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter label text" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerLabelText(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Node ID:</label>
+            <input type="text" id="triggerLabelNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter node ID" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerLabelNodeId(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="text-align: center; margin-top: 8px;">
+            <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
+        </div>
+    `;
+    triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerFieldsContainer) {
+        console.error('🔧 [ADD TRIGGER CHECKBOX DEBUG] Trigger fields container not found!');
+        return;
+    }
+    
+    const triggerFieldCount = triggerFieldsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER CHECKBOX DEBUG] Adding trigger checkbox', triggerFieldCount, 'for sequence', sequenceCount);
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
+    fieldDiv.style.margin = '5px 0';
+    fieldDiv.style.padding = '8px';
+    fieldDiv.style.border = '1px solid #9C27B0';
+    fieldDiv.style.borderRadius = '4px';
+    fieldDiv.style.backgroundColor = '#faf0ff';
+        fieldDiv.innerHTML = `
+            <div style="font-weight: bold; color: #9C27B0; margin-bottom: 8px; text-align: center;">Trigger Checkbox ${triggerFieldCount}</div>
+            <div style="margin-bottom: 8px; text-align: center;">
+                <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Field Name:</label>
+                <input type="text" id="triggerCheckboxFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter field name" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerCheckboxFieldName(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+            </div>
+            <div style="margin-bottom: 8px; text-align: center;">
+                <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Selection Type:</label>
+                <select id="triggerCheckboxSelectionType${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin: 0 auto; display: block;" onchange="updateTriggerCheckboxSelectionType(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+                    <option value="multiple">Mark all that apply</option>
+                    <option value="single">Mark only one</option>
+                </select>
+            </div>
+            <div style="text-align: center; margin-bottom: 8px;">
+                <button type="button" onclick="addTriggerCheckboxOption(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="margin: 3px; padding: 4px 8px; border: none; border-radius: 4px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 11px; display: inline-block;">Add option</button>
+            </div>
+            <div id="triggerCheckboxOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="margin-top: 8px;">
+                <!-- Trigger checkbox options will be added here -->
+            </div>
+            <div style="text-align: center; margin-top: 8px;">
+                <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
+            </div>
+        `;
+    triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+function addTriggerDate(questionId, fieldCount, sequenceCount) {
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerFieldsContainer) {
+        console.error('🔧 [ADD TRIGGER DATE DEBUG] Trigger fields container not found!');
+        return;
+    }
+    
+    const triggerFieldCount = triggerFieldsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER DATE DEBUG] Adding trigger date', triggerFieldCount, 'for sequence', sequenceCount);
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
+    fieldDiv.style.margin = '5px 0';
+    fieldDiv.style.padding = '8px';
+    fieldDiv.style.border = '1px solid #FF9800';
+    fieldDiv.style.borderRadius = '4px';
+    fieldDiv.style.backgroundColor = '#fff8f0';
+    fieldDiv.innerHTML = `
+        <div style="font-weight: bold; color: #FF9800; margin-bottom: 8px; text-align: center;">Trigger Date ${triggerFieldCount}</div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Label:</label>
+            <input type="text" id="triggerDateLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter date label" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerDateLabel(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Node ID:</label>
+            <input type="text" id="triggerDateNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter node ID" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerDateNodeId(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="text-align: center; margin-top: 8px;">
+            <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
+        </div>
+    `;
+    triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+function addTriggerCheckboxOption(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const optionsContainer = document.getElementById(`triggerCheckboxOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!optionsContainer) {
+        console.error('🔧 [ADD TRIGGER CHECKBOX OPTION DEBUG] Options container not found!');
+        return;
+    }
+    
+    const optionCount = optionsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER CHECKBOX OPTION DEBUG] Adding option', optionCount, 'for trigger field', triggerFieldCount);
+    
+    const optionDiv = document.createElement('div');
+    optionDiv.className = `trigger-checkbox-option-${optionCount}`;
+    optionDiv.style.margin = '3px 0';
+    optionDiv.style.padding = '6px';
+    optionDiv.style.border = '1px solid #e0e0e0';
+    optionDiv.style.borderRadius = '3px';
+    optionDiv.style.backgroundColor = '#f5f5f5';
+    optionDiv.innerHTML = `
+        <div style="margin-bottom: 6px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;">Option text:</label>
+            <input type="text" id="triggerCheckboxOptionText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}" placeholder="Enter option text" style="width: 60%; max-width: 200px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" onchange="updateTriggerCheckboxOptionText(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount}, ${optionCount})">
+        </div>
+        <div style="margin-bottom: 6px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;">Node ID:</label>
+            <input type="text" id="triggerCheckboxOptionNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}" placeholder="Enter node ID" style="width: 60%; max-width: 200px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" onchange="updateTriggerCheckboxOptionNodeId(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount}, ${optionCount})">
+        </div>
+        <div style="text-align: center; margin-top: 6px;">
+            <button type="button" onclick="removeTriggerCheckboxOption(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount}, ${optionCount})" style="background: #ff4444; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-size: 10px;">Remove</button>
+        </div>
+    `;
+    optionsContainer.appendChild(optionDiv);
+}
+
+function removeTriggerField(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const fieldDiv = document.querySelector(`.trigger-field-${triggerFieldCount}`);
+    if (fieldDiv) {
+        fieldDiv.remove();
+        console.log('🔧 [REMOVE TRIGGER FIELD] Removed trigger field', triggerFieldCount, 'from sequence', sequenceCount);
+    }
+}
+
+function removeTriggerCheckboxOption(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
+    const optionDiv = document.querySelector(`.trigger-checkbox-option-${optionCount}`);
+    if (optionDiv) {
+        optionDiv.remove();
+        console.log('🔧 [REMOVE TRIGGER CHECKBOX OPTION] Removed option', optionCount, 'from trigger field', triggerFieldCount);
+    }
+}
+
+// Update functions for trigger fields
+function updateTriggerLabelText(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const textInput = document.getElementById(`triggerLabelText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (textInput) {
+        console.log('🔧 [TRIGGER LABEL TEXT] Updated:', textInput.value);
+    }
+}
+
+function updateTriggerLabelNodeId(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const nodeIdInput = document.getElementById(`triggerLabelNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (nodeIdInput) {
+        console.log('🔧 [TRIGGER LABEL NODE ID] Updated:', nodeIdInput.value);
+    }
+}
+
+function updateTriggerCheckboxFieldName(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const fieldNameInput = document.getElementById(`triggerCheckboxFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (fieldNameInput) {
+        console.log('🔧 [TRIGGER CHECKBOX FIELD NAME] Updated:', fieldNameInput.value);
+    }
+}
+
+function updateTriggerCheckboxSelectionType(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const selectionTypeSelect = document.getElementById(`triggerCheckboxSelectionType${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (selectionTypeSelect) {
+        console.log('🔧 [TRIGGER CHECKBOX SELECTION TYPE] Updated:', selectionTypeSelect.value);
+    }
+}
+
+function updateTriggerCheckboxOptionText(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
+    const textInput = document.getElementById(`triggerCheckboxOptionText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}`);
+    if (textInput) {
+        console.log('🔧 [TRIGGER CHECKBOX OPTION TEXT] Updated:', textInput.value);
+    }
+}
+
+function updateTriggerCheckboxOptionNodeId(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
+    const nodeIdInput = document.getElementById(`triggerCheckboxOptionNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}`);
+    if (nodeIdInput) {
+        console.log('🔧 [TRIGGER CHECKBOX OPTION NODE ID] Updated:', nodeIdInput.value);
+    }
+}
+
+function updateTriggerDateLabel(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const labelInput = document.getElementById(`triggerDateLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (labelInput) {
+        console.log('🔧 [TRIGGER DATE LABEL] Updated:', labelInput.value);
+    }
+}
+
+function updateTriggerDateNodeId(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const nodeIdInput = document.getElementById(`triggerDateNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (nodeIdInput) {
+        console.log('🔧 [TRIGGER DATE NODE ID] Updated:', nodeIdInput.value);
     }
 }
 

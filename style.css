@@ -1068,7 +1068,9 @@ body.ctrl-pressed::after {
   font-family: 'Courier New', monospace;
   font-size: 14px;
   color: #333 !important;
-  white-space: nowrap; /* Prevent text from wrapping */
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Break long words if needed */
+  word-break: break-all; /* Break at any character if needed */
   overflow: visible; /* Show all text */
   text-overflow: clip; /* Don't show ellipsis */
   display: block; /* Changed to block for vertical layout */

@@ -7407,82 +7407,141 @@ function findPdfNameForQuestion(cell) {
   const graph = getGraph();
   if (!graph) return null;
   
-  // Use the same logic as getPdfName function in nodes.js for consistency
-  const findPdfProperties = (startCell) => {
-    // Check if this node has direct PDF properties
+  // Use breadth-first search to find the closest PDF node
+  const findClosestPdfProperties = (startCell) => {
+    // Check if this node has direct PDF properties (distance 0)
     if (startCell._pdfName || startCell._pdfFile || startCell._pdfUrl) {
       return {
         nodeId: startCell.id,
         filename: startCell._pdfFile || startCell._pdfUrl || startCell._pdfName || "",
         pdfUrl: startCell._pdfUrl || "",
-        priceId: startCell._priceId || ""
+        priceId: startCell._priceId || "",
+        distance: 0
       };
     }
     
-    // Check if this is a PDF node
+    // Check if this is a PDF node (distance 0)
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(startCell)) {
       return {
         nodeId: startCell.id,
         filename: startCell._pdfUrl || "",
         pdfUrl: startCell._pdfUrl || "",
-        priceId: startCell._priceId || ""
+        priceId: startCell._priceId || "",
+        distance: 0
       };
     }
     
-    // Check direct outgoing connections to PDF nodes
-    const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
-    const pdfNode = outgoingEdges.find(edge => {
-      const target = edge.target;
-      return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
-    });
-    
-    if (pdfNode) {
-      const targetCell = pdfNode.target;
-      return {
-        nodeId: targetCell.id,
-        filename: targetCell._pdfUrl || "",
-        pdfUrl: targetCell._pdfUrl || "",
-        priceId: targetCell._priceId || ""
-      };
+    // Special handling for numbered dropdown questions - check connected option nodes first
+    if (typeof window.getQuestionType === 'function' && window.getQuestionType(startCell) === 'multipleDropdownType') {
+      const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+      
+      // Look for option nodes connected to this numbered dropdown question
+      for (const edge of outgoingEdges) {
+        const target = edge.target;
+        if (target && target.value && typeof target.value === 'string' && /^\d+$/.test(target.value.trim())) {
+          // This is an option node (contains only numbers)
+          // Check if this option node connects to a PDF node
+          const optionOutgoingEdges = graph.getOutgoingEdges(target) || [];
+          for (const optionEdge of optionOutgoingEdges) {
+            const pdfTarget = optionEdge.target;
+            if (pdfTarget && (pdfTarget._pdfName || pdfTarget._pdfFile || pdfTarget._pdfUrl)) {
+              // Found a PDF node connected to this option
+              return {
+                nodeId: pdfTarget.id,
+                filename: pdfTarget._pdfFile || pdfTarget._pdfUrl || pdfTarget._pdfName || "",
+                pdfUrl: pdfTarget._pdfUrl || "",
+                priceId: pdfTarget._priceId || "",
+                distance: 2 // Question -> Option -> PDF
+              };
+            }
+            // Also check if the target is a PDF node itself
+            if (pdfTarget && typeof window.isPdfNode === 'function' && window.isPdfNode(pdfTarget)) {
+              return {
+                nodeId: pdfTarget.id,
+                filename: pdfTarget._pdfUrl || "",
+                pdfUrl: pdfTarget._pdfUrl || "",
+                priceId: pdfTarget._priceId || "",
+                distance: 2 // Question -> Option -> PDF
+              };
+            }
+          }
+        }
+      }
     }
     
-    // Check incoming edges for PDF properties (nodes that point to this node)
-    const incomingEdges = graph.getIncomingEdges(startCell) || [];
-    for (const edge of incomingEdges) {
-      const sourceCell = edge.source;
-      if (sourceCell) {
-        // Check if the source node has PDF properties
-        if (sourceCell._pdfName || sourceCell._pdfFile || sourceCell._pdfUrl) {
-          return {
-            nodeId: sourceCell.id,
-            filename: sourceCell._pdfFile || sourceCell._pdfUrl || sourceCell._pdfName || "",
-            pdfUrl: sourceCell._pdfUrl || "",
-            priceId: sourceCell._priceId || ""
-          };
-        }
-        
-        // Check if the source node is a PDF node
-        if (typeof window.isPdfNode === 'function' && window.isPdfNode(sourceCell)) {
-          return {
-            nodeId: sourceCell.id,
-            filename: sourceCell._pdfUrl || "",
-            pdfUrl: sourceCell._pdfUrl || "",
-            priceId: sourceCell._priceId || ""
-          };
-        }
-        
-        // Check if the source node connects to PDF nodes
-        const sourceOutgoingEdges = graph.getOutgoingEdges(sourceCell) || [];
-        for (const sourceEdge of sourceOutgoingEdges) {
-          const sourceTarget = sourceEdge.target;
-          if (sourceTarget && typeof window.isPdfNode === 'function' && window.isPdfNode(sourceTarget)) {
+    // BFS to find closest PDF node
+    const visited = new Set();
+    const queue = [{ cell: startCell, distance: 0 }];
+    visited.add(startCell.id);
+    
+    while (queue.length > 0) {
+      const { cell: currentCell, distance } = queue.shift();
+      
+      // Check outgoing edges (distance + 1)
+      const outgoingEdges = graph.getOutgoingEdges(currentCell) || [];
+      for (const edge of outgoingEdges) {
+        const target = edge.target;
+        if (target && !visited.has(target.id)) {
+          visited.add(target.id);
+          
+          // Check if target has PDF properties
+          if (target._pdfName || target._pdfFile || target._pdfUrl) {
             return {
-              nodeId: sourceTarget.id,
-              filename: sourceTarget._pdfUrl || "",
-              pdfUrl: sourceTarget._pdfUrl || "",
-              priceId: sourceTarget._priceId || ""
+              nodeId: target.id,
+              filename: target._pdfFile || target._pdfUrl || target._pdfName || "",
+              pdfUrl: target._pdfUrl || "",
+              priceId: target._priceId || "",
+              distance: distance + 1
             };
           }
+          
+          // Check if target is a PDF node
+          if (typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
+            return {
+              nodeId: target.id,
+              filename: target._pdfUrl || "",
+              pdfUrl: target._pdfUrl || "",
+              priceId: target._priceId || "",
+              distance: distance + 1
+            };
+          }
+          
+          // Add to queue for further exploration
+          queue.push({ cell: target, distance: distance + 1 });
+        }
+      }
+      
+      // Check incoming edges (distance + 1)
+      const incomingEdges = graph.getIncomingEdges(currentCell) || [];
+      for (const edge of incomingEdges) {
+        const source = edge.source;
+        if (source && !visited.has(source.id)) {
+          visited.add(source.id);
+          
+          // Check if source has PDF properties
+          if (source._pdfName || source._pdfFile || source._pdfUrl) {
+            return {
+              nodeId: source.id,
+              filename: source._pdfFile || source._pdfUrl || source._pdfName || "",
+              pdfUrl: source._pdfUrl || "",
+              priceId: source._priceId || "",
+              distance: distance + 1
+            };
+          }
+          
+          // Check if source is a PDF node
+          if (typeof window.isPdfNode === 'function' && window.isPdfNode(source)) {
+            return {
+              nodeId: source.id,
+              filename: source._pdfUrl || "",
+              pdfUrl: source._pdfUrl || "",
+              priceId: source._priceId || "",
+              distance: distance + 1
+            };
+          }
+          
+          // Add to queue for further exploration
+          queue.push({ cell: source, distance: distance + 1 });
         }
       }
     }
@@ -7490,7 +7549,7 @@ function findPdfNameForQuestion(cell) {
     return null;
   };
   
-  const pdfProperties = findPdfProperties(cell);
+  const pdfProperties = findClosestPdfProperties(cell);
   
   // Only return the PDF name if we found actual PDF properties (same as Node Properties dialog)
   if (pdfProperties && pdfProperties.filename) {
