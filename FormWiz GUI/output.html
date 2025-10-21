@@ -504,7 +504,7 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/W+/g, '_').toLowerCase();
     }
     // Return the name part directly without adding question prefix
     return namePart;
@@ -526,7 +526,7 @@ var conditionalAlerts = [];
 var labelMap = {"1":[],"length":0};
 var amountMap = {"1":[],"length":0};
 var labelNodeIdsMap = {"1":[]};
-var unifiedFieldsMap = {"1":[{"type":"dropdown","fieldName":"test2","options":[{"text":"Yes","nodeId":"test2_yes"},{"text":"No","nodeId":"test2_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"label","label":"test3","nodeId":"test4"},{"type":"checkbox","fieldName":"test5","selectionType":"multiple","options":[{"text":"test6","nodeId":"test7"}]},{"type":"date","label":"test8","nodeId":"test9"}]}],"order":1}]};
+var unifiedFieldsMap = {"1":[{"type":"dropdown","fieldName":"test2","options":[{"text":"Yes","nodeId":"test2_yes"},{"text":"No","nodeId":"test2_no"}],"triggerSequences":[],"order":1}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -1519,7 +1519,7 @@ let staticChecklistItems = [];
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\W+/g, "_")
+        .replace(/W+/g, "_")
         .replace(/^_+|_+$/g, "");
 }
 
@@ -2298,7 +2298,7 @@ function showTextboxLabels(questionId, count){
                 
                 // Create dropdown select element
                 const select = document.createElement('select');
-                select.id = field.fieldName.replace(/s+/g, '_').toLowerCase() + "_" + j;
+                select.id = field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j;
                 select.name = select.id;
                 select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
                 
@@ -2679,7 +2679,7 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+    const idSuffix = val.replace(/W+/g, "_").toLowerCase();
     const checkboxId = baseName + "_" + idSuffix;
     
     const checkboxDiv = document.createElement("div");
@@ -4062,7 +4062,7 @@ if (typeof handleNext === 'function') {
         const portfolioId = urlParams.get('portfolioId') || '';
         // Create a unique form ID that includes county and portfolio information for autosave separation
         let formId = baseFormId;
-        if (county) formId += '_' + county.replace(/s+/g, '_');
+        if (county) formId += '_' + county.replace(/W+/g, '_');
         if (portfolioId) formId += '_' + portfolioId;
         let userId = null;
         let isUserLoggedIn = false;

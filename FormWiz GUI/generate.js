@@ -2479,7 +2479,7 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
     // Return the name part directly without adding question prefix
     return namePart;
@@ -3780,7 +3780,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\\W+/g, "_")
+        .replace(/\W+/g, "_")
         .replace(/^_+|_+$/g, "");
 }
 
@@ -4559,7 +4559,7 @@ function showTextboxLabels(questionId, count){
                 
                 // Create dropdown select element
                 const select = document.createElement('select');
-                select.id = field.fieldName.replace(/\s+/g, '_').toLowerCase() + "_" + j;
+                select.id = field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j;
                 select.name = select.id;
                 select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
                 
@@ -4940,7 +4940,7 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
+    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
     const checkboxId = baseName + "_" + idSuffix;
     
     const checkboxDiv = document.createElement("div");
@@ -6323,7 +6323,7 @@ if (typeof handleNext === 'function') {
         const portfolioId = urlParams.get('portfolioId') || '';
         // Create a unique form ID that includes county and portfolio information for autosave separation
         let formId = baseFormId;
-        if (county) formId += '_' + county.replace(/\s+/g, '_');
+        if (county) formId += '_' + county.replace(/\W+/g, '_');
         if (portfolioId) formId += '_' + portfolioId;
         let userId = null;
         let isUserLoggedIn = false;
@@ -9221,7 +9221,8 @@ function normaliseDesignerFieldRef(raw) {
     if (mShort) {
         const [, qId, idx, field] = mShort;
         const slug = questionSlugMap[qId] || ("answer" + qId);
-        return `${slug}_${idx}_${sanitizeQuestionText(field)}`;
+        // 🔧 FIX: Don't sanitize field names that are already properly formatted
+        return `${slug}_${idx}_${field}`;
     }
 
     /* ④ catch‑all fallback */
@@ -9229,7 +9230,8 @@ function normaliseDesignerFieldRef(raw) {
     if (!mGeneric) return sanitizeQuestionText(raw);
 
     const [, qText, idx, field] = mGeneric;
-    return `${sanitizeQuestionText(qText)}_${idx}_${sanitizeQuestionText(field)}`;
+    // 🔧 FIX: Don't sanitize field names that are already properly formatted
+    return `${sanitizeQuestionText(qText)}_${idx}_${field}`;
 }
 
 
