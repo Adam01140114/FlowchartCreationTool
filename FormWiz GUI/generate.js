@@ -245,6 +245,36 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
     setTimeout(updateAddress, 2000);
 }
 
+// Helper function to detect if a field is part of a trigger sequence (conditional field)
+function isFieldPartOfTriggerSequence(fieldName, fieldId) {
+    if (!window.unifiedFieldsMap) return false;
+    
+    // Check all questions in unifiedFieldsMap
+    for (const questionId in window.unifiedFieldsMap) {
+        const fields = window.unifiedFieldsMap[questionId];
+        if (Array.isArray(fields)) {
+            for (const field of fields) {
+                if (field.triggerSequences && Array.isArray(field.triggerSequences)) {
+                    for (const sequence of field.triggerSequences) {
+                        if (sequence.fields && Array.isArray(sequence.fields)) {
+                            for (const triggerField of sequence.fields) {
+                                // Check if this field matches the trigger field
+                                if (triggerField.nodeId === fieldId || 
+                                    triggerField.label === fieldName || 
+                                    triggerField.fieldName === fieldName ||
+                                    (triggerField.options && triggerField.options.some(opt => opt.nodeId === fieldId))) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 // Global function to update all hidden address fields after autofill
 function updateAllHiddenAddressFields() {
     console.log('🔧 [HIDDEN ADDRESS] Updating all hidden address fields after autofill');
@@ -2297,6 +2327,39 @@ if (s > 1){
   
   // Set window.formId to the PDF name (without .pdf extension) for cart and form identification
   formHTML += `window.formId = '${escapedPdfFormName.replace(/\.pdf$/i, '')}';\n`;
+  
+  // Add the helper function for detecting conditional fields
+  formHTML += `
+// Helper function to detect if a field is part of a trigger sequence (conditional field)
+function isFieldPartOfTriggerSequence(fieldName, fieldId) {
+    if (!window.unifiedFieldsMap) return false;
+    
+    // Check all questions in unifiedFieldsMap
+    for (const questionId in window.unifiedFieldsMap) {
+        const fields = window.unifiedFieldsMap[questionId];
+        if (Array.isArray(fields)) {
+            for (const field of fields) {
+                if (field.triggerSequences && Array.isArray(field.triggerSequences)) {
+                    for (const sequence of field.triggerSequences) {
+                        if (sequence.fields && Array.isArray(sequence.fields)) {
+                            for (const triggerField of sequence.fields) {
+                                // Check if this field matches the trigger field
+                                if (triggerField.nodeId === fieldId || 
+                                    triggerField.label === fieldName || 
+                                    triggerField.fieldName === fieldName ||
+                                    (triggerField.options && triggerField.options.some(opt => opt.nodeId === fieldId))) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+`;
   
   // --- BEGIN: one-time helper injection ---
   formHTML += `
@@ -6292,6 +6355,13 @@ if (typeof handleNext === 'function') {
         // Helper: save answers
         async function saveAnswers() {
             if (!isUserLoggedIn || !userId) return;
+            
+            // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
+            if (window.preventBlankSaves) {
+                console.log('🔍 AUTOFILL DEBUG: Preventing blank saves during initial load');
+                return;
+            }
+            
             const fields = getFormFields();
             const answers = {};
             fields.forEach(el => {
@@ -6437,8 +6507,14 @@ if (typeof handleNext === 'function') {
                 // 🔧 NEW: Debug all radio buttons in the form
                 const allRadioButtons = document.querySelectorAll('input[type="radio"]');
                 
-                // 🔧 NEW: Add flag to prevent autosave during initial load
-                window.isInitialAutofill = true;
+        // 🔧 NEW: Add flag to prevent autosave during initial load
+        window.isInitialAutofill = true;
+        
+        // 🔧 NEW: Prevent blank values from being sent to Firebase in first 3 seconds
+        window.preventBlankSaves = true;
+        setTimeout(() => {
+            window.preventBlankSaves = false;
+        }, 3000);
                 
                     const fields = getFormFields();
                     fields.forEach(el => {
@@ -6806,6 +6882,8 @@ if (typeof handleNext === 'function') {
         setTimeout(() => {
             console.log('🔍 AUTOFILL DEBUG: Running delayed autofill for conditional fields');
             const conditionalFields = getFormFields();
+            console.log('🔍 AUTOFILL DEBUG: Found', conditionalFields.length, 'total fields for delayed autofill');
+            
             conditionalFields.forEach(el => {
                 // Check both by name and by ID for autofill
                 let autofillValue = null;
@@ -6815,9 +6893,10 @@ if (typeof handleNext === 'function') {
                     autofillValue = mappedData[el.id];
                 }
                 
-                // Debug Additional Information fields specifically
-                if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
-                    console.log('🔍 AUTOFILL DEBUG: Delayed autofill - Additional Info field found:', el.name, 'ID:', el.id, 'Type:', el.type, 'AutofillValue:', autofillValue);
+                // Debug conditional fields that are part of trigger sequences
+                const isConditionalField = isFieldPartOfTriggerSequence(el.name, el.id);
+                if (el.name && isConditionalField) {
+                    console.log('🔍 AUTOFILL DEBUG: Delayed autofill - Conditional field found:', el.name, 'ID:', el.id, 'Type:', el.type, 'AutofillValue:', autofillValue);
                 }
                 
                 if (autofillValue !== null) {
@@ -6843,11 +6922,36 @@ if (typeof handleNext === 'function') {
                     }
                     
                     // Debug successful autofill
-                    if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
-                        console.log('🔍 AUTOFILL DEBUG: Successfully autofilled Additional Info field:', el.name, 'with value:', autofillValue);
+                    if (el.name && isConditionalField) {
+                        console.log('🔍 AUTOFILL DEBUG: Successfully autofilled conditional field:', el.name, 'with value:', autofillValue);
                     }
                 }
             });
+            
+            // 🔧 NEW: Additional delayed autofill with longer delay for stubborn fields
+            setTimeout(() => {
+                console.log('🔍 AUTOFILL DEBUG: Running additional delayed autofill for stubborn fields');
+                const stubbornFields = getFormFields();
+                stubbornFields.forEach(el => {
+                    // Check both by name and by ID for autofill
+                    let autofillValue = null;
+                    if (mappedData.hasOwnProperty(el.name)) {
+                        autofillValue = mappedData[el.name];
+                    } else if (el.id && mappedData.hasOwnProperty(el.id)) {
+                        autofillValue = mappedData[el.id];
+                    }
+                    
+                    // Only process fields that have autofill data but are still empty
+                    if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                        el.value = autofillValue;
+                        console.log('🔍 AUTOFILL DEBUG: Additional autofill for stubborn field:', el.name, 'with value:', autofillValue);
+                    } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
+                        el.checked = !!autofillValue;
+                        console.log('🔍 AUTOFILL DEBUG: Additional autofill for stubborn checkbox:', el.name, 'with value:', autofillValue);
+                    }
+                });
+            }, 1000); // Additional 1 second delay for stubborn fields
+            
         }, 2000); // Wait 2 seconds for conditional fields to be created
         
         // 🔧 NEW: Clear autofill flag after fallback autofill is complete
@@ -7007,6 +7111,12 @@ if (typeof handleNext === 'function') {
         // Helper: save answers to localStorage for non-logged-in users
         function saveAnswersToLocalStorage() {
             try {
+                // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
+                if (window.preventBlankSaves) {
+                    console.log('🔍 AUTOFILL DEBUG: Preventing blank localStorage saves during initial load');
+                    return;
+                }
+                
                 const fields = getFormFields();
                 const answers = {};
                 fields.forEach(el => {
@@ -7203,6 +7313,8 @@ if (typeof handleNext === 'function') {
                     setTimeout(() => {
                         console.log('🔍 AUTOFILL DEBUG: Running delayed autofill for conditional fields (localStorage)');
                         const conditionalFields = getFormFields();
+                        console.log('🔍 AUTOFILL DEBUG: Found', conditionalFields.length, 'total fields for delayed autofill (localStorage)');
+                        
                         conditionalFields.forEach(el => {
                             // Check both by name and by ID for autofill
                             let autofillValue = null;
@@ -7212,9 +7324,10 @@ if (typeof handleNext === 'function') {
                                 autofillValue = data[el.id];
                             }
                             
-                            // Debug Additional Information fields specifically
-                            if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
-                                console.log('🔍 AUTOFILL DEBUG: Delayed autofill (localStorage) - Additional Info field found:', el.name, 'ID:', el.id, 'Type:', el.type, 'AutofillValue:', autofillValue);
+                            // Debug conditional fields that are part of trigger sequences
+                            const isConditionalField = isFieldPartOfTriggerSequence(el.name, el.id);
+                            if (el.name && isConditionalField) {
+                                console.log('🔍 AUTOFILL DEBUG: Delayed autofill (localStorage) - Conditional field found:', el.name, 'ID:', el.id, 'Type:', el.type, 'AutofillValue:', autofillValue);
                             }
                             
                             if (autofillValue !== null) {
@@ -7240,11 +7353,36 @@ if (typeof handleNext === 'function') {
                                 }
                                 
                                 // Debug successful autofill
-                                if (el.name && (el.name.includes('car_name') || el.name.includes('reliability') || el.name.includes('gas_milage') || el.name.includes('when_did_you_buy_it'))) {
-                                    console.log('🔍 AUTOFILL DEBUG: Successfully autofilled Additional Info field (localStorage):', el.name, 'with value:', autofillValue);
+                                if (el.name && isConditionalField) {
+                                    console.log('🔍 AUTOFILL DEBUG: Successfully autofilled conditional field (localStorage):', el.name, 'with value:', autofillValue);
                                 }
                             }
                         });
+                        
+                        // 🔧 NEW: Additional delayed autofill with longer delay for stubborn fields
+                        setTimeout(() => {
+                            console.log('🔍 AUTOFILL DEBUG: Running additional delayed autofill for stubborn fields (localStorage)');
+                            const stubbornFields = getFormFields();
+                            stubbornFields.forEach(el => {
+                                // Check both by name and by ID for autofill
+                                let autofillValue = null;
+                                if (data.hasOwnProperty(el.name)) {
+                                    autofillValue = data[el.name];
+                                } else if (el.id && data.hasOwnProperty(el.id)) {
+                                    autofillValue = data[el.id];
+                                }
+                                
+                                // Only process fields that have autofill data but are still empty
+                                if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                                    el.value = autofillValue;
+                                    console.log('🔍 AUTOFILL DEBUG: Additional autofill for stubborn field (localStorage):', el.name, 'with value:', autofillValue);
+                                } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
+                                    el.checked = !!autofillValue;
+                                    console.log('🔍 AUTOFILL DEBUG: Additional autofill for stubborn checkbox (localStorage):', el.name, 'with value:', autofillValue);
+                                }
+                            });
+                        }, 1000); // Additional 1 second delay for stubborn fields
+                        
                     }, 3000); // Wait 3 seconds for conditional fields to be created
                 }
             } catch (e) {

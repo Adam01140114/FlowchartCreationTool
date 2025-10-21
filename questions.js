@@ -3653,7 +3653,31 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           checkboxTextInput.focus();
         };
         
-        // Display existing checkbox options
+        
+        const deleteCheckboxBtn = document.createElement('button');
+        deleteCheckboxBtn.textContent = 'Delete Checkbox';
+        deleteCheckboxBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        deleteCheckboxBtn.onclick = () => {
+          trigger.checkboxes.splice(checkboxIndex, 1);
+          checkboxContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Correct order: field name, add button, options, delete button
+        checkboxContainer.appendChild(fieldNameInput);
+        checkboxContainer.appendChild(addCheckboxOptionBtn);
+        
+        // Add existing checkbox options BEFORE the delete button
         if (checkbox.options && checkbox.options.length > 0) {
           checkbox.options.forEach((option, optionIndex) => {
             const optionDiv = document.createElement('div');
@@ -3731,28 +3755,6 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           });
         }
         
-        const deleteCheckboxBtn = document.createElement('button');
-        deleteCheckboxBtn.textContent = 'Delete Checkbox';
-        deleteCheckboxBtn.style.cssText = `
-          background: #f44336;
-          color: white;
-          border: none;
-          padding: 4px 8px;
-          border-radius: 3px;
-          cursor: pointer;
-          font-size: 11px;
-        `;
-        deleteCheckboxBtn.onclick = () => {
-          trigger.checkboxes.splice(checkboxIndex, 1);
-          checkboxContainer.remove();
-          if (typeof window.requestAutosave === 'function') {
-            window.requestAutosave();
-          }
-        };
-        
-        // Correct order: field name, add button, options, delete button
-        checkboxContainer.appendChild(fieldNameInput);
-        checkboxContainer.appendChild(addCheckboxOptionBtn);
         checkboxContainer.appendChild(deleteCheckboxBtn);
         actionsList.appendChild(checkboxContainer);
       });

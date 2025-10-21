@@ -947,6 +947,76 @@ window.exportGuiJson = function(download = true) {
                 options: checkboxOptions,
                 order: orderIndex + 1
               });
+            } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
+              const dropdown = cell._dropdowns[item.index];
+              const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
+                text: option.text || "",
+                nodeId: `${dropdown.name || ""}_${option.value || ""}`
+              })) : [];
+              
+              // Process trigger sequences
+              const triggerSequences = [];
+              if (dropdown.triggerSequences && dropdown.triggerSequences.length > 0) {
+                dropdown.triggerSequences.forEach(trigger => {
+                  const fields = [];
+                  
+                  // Add labels
+                  if (trigger.labels && trigger.labels.length > 0) {
+                    trigger.labels.forEach(label => {
+                      fields.push({
+                        type: "label",
+                        label: label.fieldName || "",
+                        nodeId: label.nodeId || ""
+                      });
+                    });
+                  }
+                  
+                  // Add checkboxes
+                  if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+                    trigger.checkboxes.forEach(checkbox => {
+                      const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                        text: option.checkboxText || "",
+                        nodeId: option.nodeId || ""
+                      })) : [];
+                      
+                      fields.push({
+                        type: "checkbox",
+                        fieldName: checkbox.fieldName || "",
+                        selectionType: "multiple",
+                        options: checkboxOptions
+                      });
+                    });
+                  }
+                  
+                  // Add times
+                  if (trigger.times && trigger.times.length > 0) {
+                    trigger.times.forEach(time => {
+                      fields.push({
+                        type: "date",
+                        label: time.fieldName || "",
+                        nodeId: time.nodeId || ""
+                      });
+                    });
+                  }
+                  
+                  // Find the matching option text for the condition
+                  const matchingOption = dropdown.options.find(option => option.value === trigger.triggerOption);
+                  const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
+                  
+                  triggerSequences.push({
+                    condition: conditionText,
+                    fields: fields
+                  });
+                });
+              }
+              
+              allFieldsInOrder.push({
+                type: "dropdown",
+                fieldName: dropdown.name || "",
+                options: dropdownOptions,
+                triggerSequences: triggerSequences,
+                order: orderIndex + 1
+              });
             }
           });
         } else {
@@ -1029,6 +1099,18 @@ window.exportGuiJson = function(download = true) {
           }
         }
         
+        // Extract min and max from _twoNumbers
+        if (cell._twoNumbers) {
+          question.min = cell._twoNumbers.first || "1";
+          question.max = cell._twoNumbers.second || "1";
+        } else {
+          question.min = "1";
+          question.max = "1";
+        }
+        
+        // Add nodeId for numberedDropdown (with PDF prefix if available)
+        question.nodeId = nodeId;
+        
         // Set the allFieldsInOrder array
         question.allFieldsInOrder = allFieldsInOrder;
         
@@ -1041,19 +1123,19 @@ window.exportGuiJson = function(download = true) {
         question.amounts = [];
         question.labelNodeIds = [];
         question.allFieldsInOrder = [];
+        
+        // Extract min and max from _twoNumbers
+        if (cell._twoNumbers) {
+          question.min = cell._twoNumbers.first || "1";
+          question.max = cell._twoNumbers.second || "1";
+        } else {
+          question.min = "1";
+          question.max = "1";
+        }
+        
+        // Add nodeId for numberedDropdown (with PDF prefix if available)
+        question.nodeId = nodeId;
       }
-      
-      // Extract min and max from _twoNumbers
-      if (cell._twoNumbers) {
-        question.min = cell._twoNumbers.first || "1";
-        question.max = cell._twoNumbers.second || "1";
-      } else {
-        question.min = "1";
-        question.max = "1";
-      }
-      
-      // Add nodeId for numberedDropdown (with PDF prefix if available)
-      question.nodeId = nodeId;
       
       // Clear options array for numberedDropdown
       question.options = [];
