@@ -454,6 +454,27 @@ function setupCustomClickHandlers(graph) {
   // Proper double-click handler that handles all cases
   const baseDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
+    // Check for Shift+double-click on numbered dropdown nodes (always show custom properties)
+    if (cell && evt && evt.shiftKey && typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleDropdownType') {
+      console.log('🔍 [DEBUG] Shift+double-click on numbered dropdown, showing custom properties');
+      console.log('🔍 [DEBUG] Cell details:', cell.id, 'Style:', cell.style);
+      if (typeof window.showNumberedDropdownProperties === 'function') {
+        window.showNumberedDropdownProperties(cell);
+      } else {
+        console.log('🔍 [DEBUG] showNumberedDropdownProperties function not found');
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // Debug: Log the cell and its type
+    if (cell) {
+      console.log('🔍 [DEBUG] Double-click on cell:', cell.id, 'Style:', cell.style);
+      if (typeof window.getQuestionType === 'function') {
+        console.log('🔍 [DEBUG] Question type:', window.getQuestionType(cell));
+      }
+    }
+    
     // a1) Multiple textbox node double-click = show multiple textbox properties (check this FIRST)
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleTextboxes') {
       if (typeof window.showMultipleTextboxProperties === 'function') {
@@ -465,8 +486,11 @@ function setupCustomClickHandlers(graph) {
     
     // a2) Numbered dropdown node double-click = show numbered dropdown properties
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleDropdownType') {
+      console.log('🔍 [DEBUG] Numbered dropdown double-click detected, showing custom properties');
       if (typeof window.showNumberedDropdownProperties === 'function') {
         window.showNumberedDropdownProperties(cell);
+      } else {
+        console.log('🔍 [DEBUG] showNumberedDropdownProperties function not found');
       }
       mxEvent.consume(evt);
       return;

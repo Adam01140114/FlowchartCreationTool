@@ -2352,9 +2352,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     `;
     deleteOptionBtn.onclick = () => {
       dropdown.options.splice(optionIndex, 1);
-      if (typeof window.showNumberedDropdownProperties === 'function') {
-        window.showNumberedDropdownProperties(cell);
-      }
+      // Remove the option div from the DOM
+      optionDiv.remove();
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
@@ -2521,75 +2520,92 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addLabelBtn.onclick = () => {
-          // Create new action with blank text
-          const newAction = {
-            type: 'label',
-            text: ''
-          };
-          
-          triggerSequence.actions.push(newAction);
+          // Create new label entry like the main button
+          const newLabel = { fieldName: '', nodeId: '' };
+          if (!triggerSequence.labels) triggerSequence.labels = [];
+          triggerSequence.labels.push(newLabel);
           
           // Update the actions list for this trigger sequence
           const triggerDiv = addLabelBtn.closest('.trigger-sequence');
           if (triggerDiv) {
             const actionsList = triggerDiv.querySelector('.actions-list');
             if (actionsList) {
-              const actionDiv = document.createElement('div');
-              actionDiv.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 2px 6px;
-                background: #f5f5f5;
-                border-radius: 3px;
-                margin-bottom: 2px;
-                font-size: 11px;
+              // Create label entry container
+              const labelContainer = document.createElement('div');
+              labelContainer.style.cssText = `
+                margin-bottom: 10px;
+                padding: 8px;
+                background: #e8f5e8;
+                border: 1px solid #4caf50;
+                border-radius: 4px;
               `;
               
-              const actionInput = document.createElement('input');
-              actionInput.type = 'text';
-              actionInput.placeholder = 'Enter label text...';
-              actionInput.style.cssText = `
-                flex: 1;
-                padding: 2px 4px;
+              // Field name input
+              const fieldNameInput = document.createElement('input');
+              fieldNameInput.type = 'text';
+              fieldNameInput.placeholder = 'Enter label field name...';
+              fieldNameInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
                 border: 1px solid #ddd;
-                border-radius: 2px;
-                font-size: 11px;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
               `;
-              actionInput.onblur = () => {
-                newAction.text = actionInput.value.trim();
+              fieldNameInput.onblur = () => {
+                newLabel.fieldName = fieldNameInput.value.trim();
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              const deleteActionBtn = document.createElement('button');
-              deleteActionBtn.textContent = '×';
-              deleteActionBtn.style.cssText = `
+              // Label ID input
+              const labelIdInput = document.createElement('input');
+              labelIdInput.type = 'text';
+              labelIdInput.placeholder = 'Label ID...';
+              labelIdInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              labelIdInput.onblur = () => {
+                newLabel.nodeId = labelIdInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Delete label button
+              const deleteLabelBtn = document.createElement('button');
+              deleteLabelBtn.textContent = 'Delete Label';
+              deleteLabelBtn.style.cssText = `
                 background: #f44336;
                 color: white;
                 border: none;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
+                padding: 4px 8px;
+                border-radius: 3px;
                 cursor: pointer;
-                font-size: 10px;
+                font-size: 11px;
               `;
-              deleteActionBtn.onclick = () => {
-                const actionIndex = triggerSequence.actions.findIndex(action => action === newAction);
-                if (actionIndex !== -1) {
-                  triggerSequence.actions.splice(actionIndex, 1);
+              deleteLabelBtn.onclick = () => {
+                const labelIndex = triggerSequence.labels.findIndex(l => l === newLabel);
+                if (labelIndex !== -1) {
+                  triggerSequence.labels.splice(labelIndex, 1);
                 }
-                actionDiv.remove();
+                labelContainer.remove();
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              actionDiv.appendChild(actionInput);
-              actionDiv.appendChild(deleteActionBtn);
-              actionsList.appendChild(actionDiv);
-              actionInput.focus(); // Focus the input for immediate typing
+              labelContainer.appendChild(fieldNameInput);
+              labelContainer.appendChild(labelIdInput);
+              labelContainer.appendChild(deleteLabelBtn);
+              actionsList.appendChild(labelContainer);
+              fieldNameInput.focus();
             }
           }
           
@@ -2610,80 +2626,186 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addCheckboxBtn.onclick = () => {
-          // Create new action with blank text
-          const newAction = {
-            type: 'checkbox',
-            text: ''
-          };
+          console.log('🔍 [DEBUG] Add Checkbox button clicked in dropdown module');
+          console.log('🔍 [DEBUG] Cell before checkbox addition:', cell.id, 'Style:', cell.style);
+          if (typeof window.getQuestionType === 'function') {
+            console.log('🔍 [DEBUG] Question type before:', window.getQuestionType(cell));
+          }
           
-          triggerSequence.actions.push(newAction);
+          // Create new checkbox entry like the main button
+          const newCheckbox = { fieldName: '', options: [] };
+          if (!triggerSequence.checkboxes) triggerSequence.checkboxes = [];
+          triggerSequence.checkboxes.push(newCheckbox);
           
           // Update the actions list for this trigger sequence
           const triggerDiv = addCheckboxBtn.closest('.trigger-sequence');
           if (triggerDiv) {
             const actionsList = triggerDiv.querySelector('.actions-list');
             if (actionsList) {
-              const actionDiv = document.createElement('div');
-              actionDiv.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 2px 6px;
-                background: #f5f5f5;
-                border-radius: 3px;
-                margin-bottom: 2px;
-                font-size: 11px;
+              // Create checkbox entry container
+              const checkboxContainer = document.createElement('div');
+              checkboxContainer.style.cssText = `
+                margin-bottom: 10px;
+                padding: 8px;
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
               `;
               
-              const actionInput = document.createElement('input');
-              actionInput.type = 'text';
-              actionInput.placeholder = 'Enter checkbox text...';
-              actionInput.style.cssText = `
-                flex: 1;
-                padding: 2px 4px;
+              // Field name input
+              const fieldNameInput = document.createElement('input');
+              fieldNameInput.type = 'text';
+              fieldNameInput.placeholder = 'Enter checkbox field name...';
+              fieldNameInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
                 border: 1px solid #ddd;
-                border-radius: 2px;
-                font-size: 11px;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
               `;
-              actionInput.onblur = () => {
-                newAction.text = actionInput.value.trim();
+              fieldNameInput.onblur = () => {
+                newCheckbox.fieldName = fieldNameInput.value.trim();
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              const deleteActionBtn = document.createElement('button');
-              deleteActionBtn.textContent = '×';
-              deleteActionBtn.style.cssText = `
+              // Add checkbox option button
+              const addCheckboxOptionBtn = document.createElement('button');
+              addCheckboxOptionBtn.textContent = 'Add checkbox option';
+              addCheckboxOptionBtn.style.cssText = `
+                background: #6f42c1;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+                margin-bottom: 8px;
+              `;
+              addCheckboxOptionBtn.onclick = () => {
+                const newOption = { checkboxText: '', nodeId: '' };
+                if (!newCheckbox.options) newCheckbox.options = [];
+                newCheckbox.options.push(newOption);
+                
+                // Create mini checkbox option entry
+                const miniOptionEntry = document.createElement('div');
+                miniOptionEntry.style.cssText = `
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  padding: 4px 8px;
+                  background: white;
+                  border: 1px solid #ddd;
+                  border-radius: 3px;
+                  margin-bottom: 4px;
+                `;
+                
+                const checkboxTextInput = document.createElement('input');
+                checkboxTextInput.type = 'text';
+                checkboxTextInput.placeholder = 'Checkbox text...';
+                checkboxTextInput.style.cssText = `
+                  flex: 1;
+                  padding: 2px 4px;
+                  border: 1px solid #ddd;
+                  border-radius: 2px;
+                  font-size: 11px;
+                `;
+                checkboxTextInput.onblur = () => {
+                  newOption.checkboxText = checkboxTextInput.value.trim();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                };
+                
+                const checkboxIdInput = document.createElement('input');
+                checkboxIdInput.type = 'text';
+                checkboxIdInput.placeholder = 'Checkbox ID...';
+                checkboxIdInput.style.cssText = `
+                  flex: 1;
+                  padding: 2px 4px;
+                  border: 1px solid #ddd;
+                  border-radius: 2px;
+                  font-size: 11px;
+                `;
+                checkboxIdInput.onblur = () => {
+                  newOption.nodeId = checkboxIdInput.value.trim();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                };
+                
+                const deleteOptionBtn = document.createElement('button');
+                deleteOptionBtn.textContent = '×';
+                deleteOptionBtn.style.cssText = `
+                  background: #f44336;
+                  color: white;
+                  border: none;
+                  width: 20px;
+                  height: 20px;
+                  border-radius: 50%;
+                  cursor: pointer;
+                  font-size: 10px;
+                `;
+                deleteOptionBtn.onclick = () => {
+                  const optionIndex = newCheckbox.options.findIndex(opt => opt === newOption);
+                  if (optionIndex !== -1) {
+                    newCheckbox.options.splice(optionIndex, 1);
+                  }
+                  miniOptionEntry.remove();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                };
+                
+                miniOptionEntry.appendChild(checkboxTextInput);
+                miniOptionEntry.appendChild(checkboxIdInput);
+                miniOptionEntry.appendChild(deleteOptionBtn);
+                checkboxContainer.appendChild(miniOptionEntry);
+                
+                checkboxTextInput.focus();
+              };
+              
+              // Delete checkbox button
+              const deleteCheckboxBtn = document.createElement('button');
+              deleteCheckboxBtn.textContent = 'Delete Checkbox';
+              deleteCheckboxBtn.style.cssText = `
                 background: #f44336;
                 color: white;
                 border: none;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
+                padding: 4px 8px;
+                border-radius: 3px;
                 cursor: pointer;
-                font-size: 10px;
+                font-size: 11px;
               `;
-              deleteActionBtn.onclick = () => {
-                const actionIndex = triggerSequence.actions.findIndex(action => action === newAction);
-                if (actionIndex !== -1) {
-                  triggerSequence.actions.splice(actionIndex, 1);
+              deleteCheckboxBtn.onclick = () => {
+                const checkboxIndex = triggerSequence.checkboxes.findIndex(cb => cb === newCheckbox);
+                if (checkboxIndex !== -1) {
+                  triggerSequence.checkboxes.splice(checkboxIndex, 1);
                 }
-                actionDiv.remove();
+                checkboxContainer.remove();
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              actionDiv.appendChild(actionInput);
-              actionDiv.appendChild(deleteActionBtn);
-              actionsList.appendChild(actionDiv);
-              actionInput.focus(); // Focus the input for immediate typing
+              checkboxContainer.appendChild(fieldNameInput);
+              checkboxContainer.appendChild(addCheckboxOptionBtn);
+              checkboxContainer.appendChild(deleteCheckboxBtn);
+              actionsList.appendChild(checkboxContainer);
+              fieldNameInput.focus();
             }
           }
           
           if (typeof window.requestAutosave === 'function') {
             window.requestAutosave();
+          }
+          
+          // Debug: Check cell state after checkbox addition
+          console.log('🔍 [DEBUG] Cell after checkbox addition:', cell.id, 'Style:', cell.style);
+          if (typeof window.getQuestionType === 'function') {
+            console.log('🔍 [DEBUG] Question type after:', window.getQuestionType(cell));
           }
         };
         
@@ -2699,75 +2821,92 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addTimeBtn.onclick = () => {
-          // Create new action with blank text
-          const newAction = {
-            type: 'time',
-            text: ''
-          };
-          
-          triggerSequence.actions.push(newAction);
+          // Create new time entry like the main button
+          const newTime = { fieldName: '', nodeId: '' };
+          if (!triggerSequence.times) triggerSequence.times = [];
+          triggerSequence.times.push(newTime);
           
           // Update the actions list for this trigger sequence
           const triggerDiv = addTimeBtn.closest('.trigger-sequence');
           if (triggerDiv) {
             const actionsList = triggerDiv.querySelector('.actions-list');
             if (actionsList) {
-              const actionDiv = document.createElement('div');
-              actionDiv.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 2px 6px;
-                background: #f5f5f5;
-                border-radius: 3px;
-                margin-bottom: 2px;
-                font-size: 11px;
+              // Create time entry container
+              const timeContainer = document.createElement('div');
+              timeContainer.style.cssText = `
+                margin-bottom: 10px;
+                padding: 8px;
+                background: #fff3e0;
+                border: 1px solid #ffcc02;
+                border-radius: 4px;
               `;
               
-              const actionInput = document.createElement('input');
-              actionInput.type = 'text';
-              actionInput.placeholder = 'Enter time text...';
-              actionInput.style.cssText = `
-                flex: 1;
-                padding: 2px 4px;
+              // Field name input
+              const fieldNameInput = document.createElement('input');
+              fieldNameInput.type = 'text';
+              fieldNameInput.placeholder = 'Enter time field name...';
+              fieldNameInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
                 border: 1px solid #ddd;
-                border-radius: 2px;
-                font-size: 11px;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
               `;
-              actionInput.onblur = () => {
-                newAction.text = actionInput.value.trim();
+              fieldNameInput.onblur = () => {
+                newTime.fieldName = fieldNameInput.value.trim();
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              const deleteActionBtn = document.createElement('button');
-              deleteActionBtn.textContent = '×';
-              deleteActionBtn.style.cssText = `
+              // Time ID input
+              const timeIdInput = document.createElement('input');
+              timeIdInput.type = 'text';
+              timeIdInput.placeholder = 'Time ID...';
+              timeIdInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              timeIdInput.onblur = () => {
+                newTime.nodeId = timeIdInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Delete time button
+              const deleteTimeBtn = document.createElement('button');
+              deleteTimeBtn.textContent = 'Delete Time';
+              deleteTimeBtn.style.cssText = `
                 background: #f44336;
                 color: white;
                 border: none;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
+                padding: 4px 8px;
+                border-radius: 3px;
                 cursor: pointer;
-                font-size: 10px;
+                font-size: 11px;
               `;
-              deleteActionBtn.onclick = () => {
-                const actionIndex = triggerSequence.actions.findIndex(action => action === newAction);
-                if (actionIndex !== -1) {
-                  triggerSequence.actions.splice(actionIndex, 1);
+              deleteTimeBtn.onclick = () => {
+                const timeIndex = triggerSequence.times.findIndex(t => t === newTime);
+                if (timeIndex !== -1) {
+                  triggerSequence.times.splice(timeIndex, 1);
                 }
-                actionDiv.remove();
+                timeContainer.remove();
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              actionDiv.appendChild(actionInput);
-              actionDiv.appendChild(deleteActionBtn);
-              actionsList.appendChild(actionDiv);
-              actionInput.focus(); // Focus the input for immediate typing
+              timeContainer.appendChild(fieldNameInput);
+              timeContainer.appendChild(timeIdInput);
+              timeContainer.appendChild(deleteTimeBtn);
+              actionsList.appendChild(timeContainer);
+              fieldNameInput.focus();
             }
           }
           
@@ -2888,9 +3027,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     `;
     deleteTriggerBtn.onclick = () => {
       dropdown.triggerSequences.splice(triggerIndex, 1);
-      if (typeof window.showNumberedDropdownProperties === 'function') {
-        window.showNumberedDropdownProperties(cell);
-      }
+      // Remove the trigger div from the DOM
+      triggerDiv.remove();
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
@@ -2917,75 +3055,92 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       font-size: 11px;
     `;
     addLabelBtn.onclick = () => {
-      // Create new action with blank text
-      const newAction = {
-        type: 'label',
-        text: ''
-      };
-      
-      trigger.actions.push(newAction);
+      // Create new label entry like the main button
+      const newLabel = { fieldName: '', nodeId: '' };
+      if (!trigger.labels) trigger.labels = [];
+      trigger.labels.push(newLabel);
       
       // Update the actions list for this trigger sequence
       const triggerDiv = addLabelBtn.closest('.trigger-sequence');
       if (triggerDiv) {
         const actionsList = triggerDiv.querySelector('.actions-list');
         if (actionsList) {
-          const actionDiv = document.createElement('div');
-          actionDiv.style.cssText = `
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 2px 6px;
-            background: #f5f5f5;
-            border-radius: 3px;
-            margin-bottom: 2px;
-            font-size: 11px;
+          // Create label entry container
+          const labelContainer = document.createElement('div');
+          labelContainer.style.cssText = `
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
           `;
           
-          const actionInput = document.createElement('input');
-          actionInput.type = 'text';
-          actionInput.placeholder = 'Enter label text...';
-          actionInput.style.cssText = `
-            flex: 1;
-            padding: 2px 4px;
+          // Field name input
+          const fieldNameInput = document.createElement('input');
+          fieldNameInput.type = 'text';
+          fieldNameInput.placeholder = 'Enter label field name...';
+          fieldNameInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
             border: 1px solid #ddd;
-            border-radius: 2px;
-            font-size: 11px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
           `;
-          actionInput.onblur = () => {
-            newAction.text = actionInput.value.trim();
+          fieldNameInput.onblur = () => {
+            newLabel.fieldName = fieldNameInput.value.trim();
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          const deleteActionBtn = document.createElement('button');
-          deleteActionBtn.textContent = '×';
-          deleteActionBtn.style.cssText = `
+          // Label ID input
+          const labelIdInput = document.createElement('input');
+          labelIdInput.type = 'text';
+          labelIdInput.placeholder = 'Label ID...';
+          labelIdInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          labelIdInput.onblur = () => {
+            newLabel.nodeId = labelIdInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Delete label button
+          const deleteLabelBtn = document.createElement('button');
+          deleteLabelBtn.textContent = 'Delete Label';
+          deleteLabelBtn.style.cssText = `
             background: #f44336;
             color: white;
             border: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
+            padding: 4px 8px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
           `;
-          deleteActionBtn.onclick = () => {
-            const actionIndex = trigger.actions.findIndex(action => action === newAction);
-            if (actionIndex !== -1) {
-              trigger.actions.splice(actionIndex, 1);
+          deleteLabelBtn.onclick = () => {
+            const labelIndex = trigger.labels.findIndex(l => l === newLabel);
+            if (labelIndex !== -1) {
+              trigger.labels.splice(labelIndex, 1);
             }
-            actionDiv.remove();
+            labelContainer.remove();
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          actionDiv.appendChild(actionInput);
-          actionDiv.appendChild(deleteActionBtn);
-          actionsList.appendChild(actionDiv);
-          actionInput.focus(); // Focus the input for immediate typing
+          labelContainer.appendChild(fieldNameInput);
+          labelContainer.appendChild(labelIdInput);
+          labelContainer.appendChild(deleteLabelBtn);
+          actionsList.appendChild(labelContainer);
+          fieldNameInput.focus();
         }
       }
       
@@ -3006,75 +3161,169 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       font-size: 11px;
     `;
     addCheckboxBtn.onclick = () => {
-      // Create new action with blank text
-      const newAction = {
-        type: 'checkbox',
-        text: ''
-      };
-      
-      trigger.actions.push(newAction);
+      // Create new checkbox entry like the main button
+      const newCheckbox = { fieldName: '', options: [] };
+      if (!trigger.checkboxes) trigger.checkboxes = [];
+      trigger.checkboxes.push(newCheckbox);
       
       // Update the actions list for this trigger sequence
       const triggerDiv = addCheckboxBtn.closest('.trigger-sequence');
       if (triggerDiv) {
         const actionsList = triggerDiv.querySelector('.actions-list');
         if (actionsList) {
-          const actionDiv = document.createElement('div');
-          actionDiv.style.cssText = `
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 2px 6px;
-            background: #f5f5f5;
-            border-radius: 3px;
-            margin-bottom: 2px;
-            font-size: 11px;
+          // Create checkbox entry container
+          const checkboxContainer = document.createElement('div');
+          checkboxContainer.style.cssText = `
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
           `;
           
-          const actionInput = document.createElement('input');
-          actionInput.type = 'text';
-          actionInput.placeholder = 'Enter checkbox text...';
-          actionInput.style.cssText = `
-            flex: 1;
-            padding: 2px 4px;
+          // Field name input
+          const fieldNameInput = document.createElement('input');
+          fieldNameInput.type = 'text';
+          fieldNameInput.placeholder = 'Enter checkbox field name...';
+          fieldNameInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
             border: 1px solid #ddd;
-            border-radius: 2px;
-            font-size: 11px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
           `;
-          actionInput.onblur = () => {
-            newAction.text = actionInput.value.trim();
+          fieldNameInput.onblur = () => {
+            newCheckbox.fieldName = fieldNameInput.value.trim();
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          const deleteActionBtn = document.createElement('button');
-          deleteActionBtn.textContent = '×';
-          deleteActionBtn.style.cssText = `
+          // Add checkbox option button
+          const addCheckboxOptionBtn = document.createElement('button');
+          addCheckboxOptionBtn.textContent = 'Add checkbox option';
+          addCheckboxOptionBtn.style.cssText = `
+            background: #6f42c1;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-bottom: 8px;
+          `;
+          addCheckboxOptionBtn.onclick = () => {
+            const newOption = { checkboxText: '', nodeId: '' };
+            if (!newCheckbox.options) newCheckbox.options = [];
+            newCheckbox.options.push(newOption);
+            
+            // Create mini checkbox option entry
+            const miniOptionEntry = document.createElement('div');
+            miniOptionEntry.style.cssText = `
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 4px 8px;
+              background: white;
+              border: 1px solid #ddd;
+              border-radius: 3px;
+              margin-bottom: 4px;
+            `;
+            
+            const checkboxTextInput = document.createElement('input');
+            checkboxTextInput.type = 'text';
+            checkboxTextInput.placeholder = 'Checkbox text...';
+            checkboxTextInput.style.cssText = `
+              flex: 1;
+              padding: 2px 4px;
+              border: 1px solid #ddd;
+              border-radius: 2px;
+              font-size: 11px;
+            `;
+            checkboxTextInput.onblur = () => {
+              newOption.checkboxText = checkboxTextInput.value.trim();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const checkboxIdInput = document.createElement('input');
+            checkboxIdInput.type = 'text';
+            checkboxIdInput.placeholder = 'Checkbox ID...';
+            checkboxIdInput.style.cssText = `
+              flex: 1;
+              padding: 2px 4px;
+              border: 1px solid #ddd;
+              border-radius: 2px;
+              font-size: 11px;
+            `;
+            checkboxIdInput.onblur = () => {
+              newOption.nodeId = checkboxIdInput.value.trim();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const deleteOptionBtn = document.createElement('button');
+            deleteOptionBtn.textContent = '×';
+            deleteOptionBtn.style.cssText = `
+              background: #f44336;
+              color: white;
+              border: none;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 10px;
+            `;
+            deleteOptionBtn.onclick = () => {
+              const optionIndex = newCheckbox.options.findIndex(opt => opt === newOption);
+              if (optionIndex !== -1) {
+                newCheckbox.options.splice(optionIndex, 1);
+              }
+              miniOptionEntry.remove();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            miniOptionEntry.appendChild(checkboxTextInput);
+            miniOptionEntry.appendChild(checkboxIdInput);
+            miniOptionEntry.appendChild(deleteOptionBtn);
+            checkboxContainer.appendChild(miniOptionEntry);
+            
+            checkboxTextInput.focus();
+          };
+          
+          // Delete checkbox button
+          const deleteCheckboxBtn = document.createElement('button');
+          deleteCheckboxBtn.textContent = 'Delete Checkbox';
+          deleteCheckboxBtn.style.cssText = `
             background: #f44336;
             color: white;
             border: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
+            padding: 4px 8px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
           `;
-          deleteActionBtn.onclick = () => {
-            const actionIndex = trigger.actions.findIndex(action => action === newAction);
-            if (actionIndex !== -1) {
-              trigger.actions.splice(actionIndex, 1);
+          deleteCheckboxBtn.onclick = () => {
+            const checkboxIndex = trigger.checkboxes.findIndex(cb => cb === newCheckbox);
+            if (checkboxIndex !== -1) {
+              trigger.checkboxes.splice(checkboxIndex, 1);
             }
-            actionDiv.remove();
+            checkboxContainer.remove();
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          actionDiv.appendChild(actionInput);
-          actionDiv.appendChild(deleteActionBtn);
-          actionsList.appendChild(actionDiv);
-          actionInput.focus(); // Focus the input for immediate typing
+          checkboxContainer.appendChild(fieldNameInput);
+          checkboxContainer.appendChild(addCheckboxOptionBtn);
+          checkboxContainer.appendChild(deleteCheckboxBtn);
+          actionsList.appendChild(checkboxContainer);
+          fieldNameInput.focus();
         }
       }
       
@@ -3095,75 +3344,92 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       font-size: 11px;
     `;
     addTimeBtn.onclick = () => {
-      // Create new action with blank text
-      const newAction = {
-        type: 'time',
-        text: ''
-      };
-      
-      trigger.actions.push(newAction);
+      // Create new time entry like the main button
+      const newTime = { fieldName: '', nodeId: '' };
+      if (!trigger.times) trigger.times = [];
+      trigger.times.push(newTime);
       
       // Update the actions list for this trigger sequence
       const triggerDiv = addTimeBtn.closest('.trigger-sequence');
       if (triggerDiv) {
         const actionsList = triggerDiv.querySelector('.actions-list');
         if (actionsList) {
-          const actionDiv = document.createElement('div');
-          actionDiv.style.cssText = `
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 2px 6px;
-            background: #f5f5f5;
-            border-radius: 3px;
-            margin-bottom: 2px;
-            font-size: 11px;
+          // Create time entry container
+          const timeContainer = document.createElement('div');
+          timeContainer.style.cssText = `
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #fff3e0;
+            border: 1px solid #ffcc02;
+            border-radius: 4px;
           `;
           
-          const actionInput = document.createElement('input');
-          actionInput.type = 'text';
-          actionInput.placeholder = 'Enter time text...';
-          actionInput.style.cssText = `
-            flex: 1;
-            padding: 2px 4px;
+          // Field name input
+          const fieldNameInput = document.createElement('input');
+          fieldNameInput.type = 'text';
+          fieldNameInput.placeholder = 'Enter time field name...';
+          fieldNameInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
             border: 1px solid #ddd;
-            border-radius: 2px;
-            font-size: 11px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
           `;
-          actionInput.onblur = () => {
-            newAction.text = actionInput.value.trim();
+          fieldNameInput.onblur = () => {
+            newTime.fieldName = fieldNameInput.value.trim();
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          const deleteActionBtn = document.createElement('button');
-          deleteActionBtn.textContent = '×';
-          deleteActionBtn.style.cssText = `
+          // Time ID input
+          const timeIdInput = document.createElement('input');
+          timeIdInput.type = 'text';
+          timeIdInput.placeholder = 'Time ID...';
+          timeIdInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          timeIdInput.onblur = () => {
+            newTime.nodeId = timeIdInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Delete time button
+          const deleteTimeBtn = document.createElement('button');
+          deleteTimeBtn.textContent = 'Delete Time';
+          deleteTimeBtn.style.cssText = `
             background: #f44336;
             color: white;
             border: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
+            padding: 4px 8px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
           `;
-          deleteActionBtn.onclick = () => {
-            const actionIndex = trigger.actions.findIndex(action => action === newAction);
-            if (actionIndex !== -1) {
-              trigger.actions.splice(actionIndex, 1);
+          deleteTimeBtn.onclick = () => {
+            const timeIndex = trigger.times.findIndex(t => t === newTime);
+            if (timeIndex !== -1) {
+              trigger.times.splice(timeIndex, 1);
             }
-            actionDiv.remove();
+            timeContainer.remove();
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          actionDiv.appendChild(actionInput);
-          actionDiv.appendChild(deleteActionBtn);
-          actionsList.appendChild(actionDiv);
-          actionInput.focus(); // Focus the input for immediate typing
+          timeContainer.appendChild(fieldNameInput);
+          timeContainer.appendChild(timeIdInput);
+          timeContainer.appendChild(deleteTimeBtn);
+          actionsList.appendChild(timeContainer);
+          fieldNameInput.focus();
         }
       }
       
@@ -3177,70 +3443,396 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     actionButtons.appendChild(addTimeBtn);
     triggerDiv.appendChild(actionButtons);
 
-    // Display existing actions
+    // Display existing actions using the new enhanced structure
     const actionsList = document.createElement('div');
     actionsList.className = 'actions-list';
     actionsList.style.cssText = `
       margin-top: 5px;
     `;
     
-    trigger.actions.forEach((action, actionIndex) => {
-      const actionDiv = document.createElement('div');
-      actionDiv.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 2px 6px;
-        background: #f5f5f5;
-        border-radius: 3px;
-        margin-bottom: 2px;
-        font-size: 11px;
-      `;
-      
-      const actionInput = document.createElement('input');
-      actionInput.type = 'text';
-      actionInput.value = action.text;
-      actionInput.placeholder = `Enter ${action.type} text...`;
-      actionInput.style.cssText = `
-        flex: 1;
-        padding: 2px 4px;
-        border: 1px solid #ddd;
-        border-radius: 2px;
-        font-size: 11px;
-      `;
-      actionInput.onblur = () => {
-        action.text = actionInput.value.trim();
-        if (typeof window.requestAutosave === 'function') {
-          window.requestAutosave();
+    // Display existing labels
+    if (trigger.labels && trigger.labels.length > 0) {
+      trigger.labels.forEach((label, labelIndex) => {
+        const labelContainer = document.createElement('div');
+        labelContainer.style.cssText = `
+          margin-bottom: 10px;
+          padding: 8px;
+          background: #e8f5e8;
+          border: 1px solid #4caf50;
+          border-radius: 4px;
+        `;
+        
+        const fieldNameInput = document.createElement('input');
+        fieldNameInput.type = 'text';
+        fieldNameInput.value = label.fieldName || '';
+        fieldNameInput.placeholder = 'Enter label field name...';
+        fieldNameInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        fieldNameInput.onblur = () => {
+          label.fieldName = fieldNameInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const labelIdInput = document.createElement('input');
+        labelIdInput.type = 'text';
+        labelIdInput.value = label.nodeId || '';
+        labelIdInput.placeholder = 'Label ID...';
+        labelIdInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        labelIdInput.onblur = () => {
+          label.nodeId = labelIdInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const deleteLabelBtn = document.createElement('button');
+        deleteLabelBtn.textContent = 'Delete Label';
+        deleteLabelBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        deleteLabelBtn.onclick = () => {
+          trigger.labels.splice(labelIndex, 1);
+          labelContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        labelContainer.appendChild(fieldNameInput);
+        labelContainer.appendChild(labelIdInput);
+        labelContainer.appendChild(deleteLabelBtn);
+        actionsList.appendChild(labelContainer);
+      });
+    }
+    
+    // Display existing checkboxes
+    if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+      trigger.checkboxes.forEach((checkbox, checkboxIndex) => {
+        const checkboxContainer = document.createElement('div');
+        checkboxContainer.style.cssText = `
+          margin-bottom: 10px;
+          padding: 8px;
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 4px;
+        `;
+        
+        const fieldNameInput = document.createElement('input');
+        fieldNameInput.type = 'text';
+        fieldNameInput.value = checkbox.fieldName || '';
+        fieldNameInput.placeholder = 'Enter checkbox field name...';
+        fieldNameInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        fieldNameInput.onblur = () => {
+          checkbox.fieldName = fieldNameInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Add checkbox option button (should be after field name, before options)
+        const addCheckboxOptionBtn = document.createElement('button');
+        addCheckboxOptionBtn.textContent = 'Add checkbox option';
+        addCheckboxOptionBtn.style.cssText = `
+          background: #6f42c1;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+          margin-bottom: 8px;
+        `;
+        addCheckboxOptionBtn.onclick = () => {
+          const newOption = { checkboxText: '', nodeId: '' };
+          if (!checkbox.options) checkbox.options = [];
+          checkbox.options.push(newOption);
+          
+          // Create mini checkbox option entry
+          const miniOptionEntry = document.createElement('div');
+          miniOptionEntry.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin-bottom: 4px;
+          `;
+          
+          const checkboxTextInput = document.createElement('input');
+          checkboxTextInput.type = 'text';
+          checkboxTextInput.placeholder = 'Checkbox text...';
+          checkboxTextInput.style.cssText = `
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 11px;
+          `;
+          checkboxTextInput.onblur = () => {
+            newOption.checkboxText = checkboxTextInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const checkboxIdInput = document.createElement('input');
+          checkboxIdInput.type = 'text';
+          checkboxIdInput.placeholder = 'Checkbox ID...';
+          checkboxIdInput.style.cssText = `
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 11px;
+          `;
+          checkboxIdInput.onblur = () => {
+            newOption.nodeId = checkboxIdInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const deleteOptionBtn = document.createElement('button');
+          deleteOptionBtn.textContent = '×';
+          deleteOptionBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 10px;
+          `;
+          deleteOptionBtn.onclick = () => {
+            const optionIndex = checkbox.options.findIndex(opt => opt === newOption);
+            if (optionIndex !== -1) {
+              checkbox.options.splice(optionIndex, 1);
+            }
+            miniOptionEntry.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          miniOptionEntry.appendChild(checkboxTextInput);
+          miniOptionEntry.appendChild(checkboxIdInput);
+          miniOptionEntry.appendChild(deleteOptionBtn);
+          checkboxContainer.appendChild(miniOptionEntry);
+          
+          checkboxTextInput.focus();
+        };
+        
+        // Display existing checkbox options
+        if (checkbox.options && checkbox.options.length > 0) {
+          checkbox.options.forEach((option, optionIndex) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.style.cssText = `
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 4px 8px;
+              background: white;
+              border: 1px solid #ddd;
+              border-radius: 3px;
+              margin-bottom: 4px;
+            `;
+            
+            const checkboxTextInput = document.createElement('input');
+            checkboxTextInput.type = 'text';
+            checkboxTextInput.value = option.checkboxText || '';
+            checkboxTextInput.placeholder = 'Checkbox text...';
+            checkboxTextInput.style.cssText = `
+              flex: 1;
+              padding: 2px 4px;
+              border: 1px solid #ddd;
+              border-radius: 2px;
+              font-size: 11px;
+            `;
+            checkboxTextInput.onblur = () => {
+              option.checkboxText = checkboxTextInput.value.trim();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const checkboxIdInput = document.createElement('input');
+            checkboxIdInput.type = 'text';
+            checkboxIdInput.value = option.nodeId || '';
+            checkboxIdInput.placeholder = 'Checkbox ID...';
+            checkboxIdInput.style.cssText = `
+              flex: 1;
+              padding: 2px 4px;
+              border: 1px solid #ddd;
+              border-radius: 2px;
+              font-size: 11px;
+            `;
+            checkboxIdInput.onblur = () => {
+              option.nodeId = checkboxIdInput.value.trim();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const deleteOptionBtn = document.createElement('button');
+            deleteOptionBtn.textContent = '×';
+            deleteOptionBtn.style.cssText = `
+              background: #f44336;
+              color: white;
+              border: none;
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 10px;
+            `;
+            deleteOptionBtn.onclick = () => {
+              checkbox.options.splice(optionIndex, 1);
+              optionDiv.remove();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            optionDiv.appendChild(checkboxTextInput);
+            optionDiv.appendChild(checkboxIdInput);
+            optionDiv.appendChild(deleteOptionBtn);
+            checkboxContainer.appendChild(optionDiv);
+          });
         }
-      };
-      
-      const deleteActionBtn = document.createElement('button');
-      deleteActionBtn.textContent = '×';
-      deleteActionBtn.style.cssText = `
-        background: #f44336;
-        color: white;
-        border: none;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        cursor: pointer;
-        font-size: 10px;
-      `;
-      deleteActionBtn.onclick = () => {
-        trigger.actions.splice(actionIndex, 1);
-        if (typeof window.showNumberedDropdownProperties === 'function') {
-          window.showNumberedDropdownProperties(cell);
-        }
-        if (typeof window.requestAutosave === 'function') {
-          window.requestAutosave();
-        }
-      };
-      
-      actionDiv.appendChild(actionInput);
-      actionDiv.appendChild(deleteActionBtn);
-      actionsList.appendChild(actionDiv);
-    });
+        
+        const deleteCheckboxBtn = document.createElement('button');
+        deleteCheckboxBtn.textContent = 'Delete Checkbox';
+        deleteCheckboxBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        deleteCheckboxBtn.onclick = () => {
+          trigger.checkboxes.splice(checkboxIndex, 1);
+          checkboxContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Correct order: field name, add button, options, delete button
+        checkboxContainer.appendChild(fieldNameInput);
+        checkboxContainer.appendChild(addCheckboxOptionBtn);
+        checkboxContainer.appendChild(deleteCheckboxBtn);
+        actionsList.appendChild(checkboxContainer);
+      });
+    }
+    
+    // Display existing times
+    if (trigger.times && trigger.times.length > 0) {
+      trigger.times.forEach((time, timeIndex) => {
+        const timeContainer = document.createElement('div');
+        timeContainer.style.cssText = `
+          margin-bottom: 10px;
+          padding: 8px;
+          background: #fff3e0;
+          border: 1px solid #ffcc02;
+          border-radius: 4px;
+        `;
+        
+        const fieldNameInput = document.createElement('input');
+        fieldNameInput.type = 'text';
+        fieldNameInput.value = time.fieldName || '';
+        fieldNameInput.placeholder = 'Enter time field name...';
+        fieldNameInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        fieldNameInput.onblur = () => {
+          time.fieldName = fieldNameInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const timeIdInput = document.createElement('input');
+        timeIdInput.type = 'text';
+        timeIdInput.value = time.nodeId || '';
+        timeIdInput.placeholder = 'Time ID...';
+        timeIdInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        timeIdInput.onblur = () => {
+          time.nodeId = timeIdInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        const deleteTimeBtn = document.createElement('button');
+        deleteTimeBtn.textContent = 'Delete Time';
+        deleteTimeBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        deleteTimeBtn.onclick = () => {
+          trigger.times.splice(timeIndex, 1);
+          timeContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        timeContainer.appendChild(fieldNameInput);
+        timeContainer.appendChild(timeIdInput);
+        timeContainer.appendChild(deleteTimeBtn);
+        actionsList.appendChild(timeContainer);
+      });
+    }
     
     triggerDiv.appendChild(actionsList);
     triggerSequencesList.appendChild(triggerDiv);
@@ -3273,9 +3865,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         );
       }
       
-      if (typeof window.showNumberedDropdownProperties === 'function') {
-        window.showNumberedDropdownProperties(cell);
-      }
+      // Remove the dropdown container from the DOM
+      dropdownContainer.remove();
       
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
@@ -3570,9 +4161,8 @@ function createOptionField(option, index, cell, parentContainer) {
   `;
   deleteBtn.onclick = () => {
     cell._textboxes.splice(index, 1);
-    // Refresh the entire container to maintain proper order
-    const newContainer = createOptionsContainer(cell);
-    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+    // Remove the textbox container from the DOM
+    optionContainer.remove();
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
@@ -4020,9 +4610,8 @@ function createTimeField(time, index, cell, parentContainer) {
     if (!cell._times) cell._times = [];
     cell._times.splice(index, 1);
     
-    // Refresh the entire container to maintain proper order
-    const newContainer = createOptionsContainer(cell);
-    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+    // Remove the time container from the DOM
+    timeContainer.remove();
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
@@ -4191,9 +4780,8 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
     if (!cell._checkboxes) cell._checkboxes = [];
     cell._checkboxes.splice(index, 1);
     
-    // Refresh the entire container to maintain proper order
-    const newContainer = createOptionsContainer(cell);
-    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+    // Remove the checkbox container from the DOM
+    checkboxContainer.remove();
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
@@ -4224,7 +4812,7 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
     const miniOptionEntry = createMiniCheckboxOption(newOption, checkbox.options.length - 1, checkbox, checkboxContainer, addCheckboxOptionBtn, cell);
     
     // Insert the mini option above the "Add checkbox option" button
-    checkboxContainer.insertBefore(miniOptionEntry, addCheckboxOptionBtn);
+    checkboxContainer.appendChild(miniOptionEntry);
     
     // Force save the cell properties to the graph model
     const graph = getGraph();
@@ -4578,7 +5166,8 @@ function createTextboxField(textbox, index, cell, parentContainer) {
   `;
   deleteBtn.onclick = () => {
     cell._textboxes.splice(index, 1);
-    parentContainer.removeChild(textboxContainer);
+    // Remove the textbox container from the DOM
+    textboxContainer.remove();
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
