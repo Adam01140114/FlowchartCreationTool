@@ -14,6 +14,61 @@ function isQuestion(cell) {
   return cell && cell.style && cell.style.includes("nodeType=question");
 }
 
+// Helper function to generate node IDs for dropdown trigger sequence fields
+function generateNodeIdForDropdownField(fieldName, dropdownName, cell, triggerOption = '') {
+  // Get PDF name if available
+  const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+  const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
+  
+  // Build base name components
+  const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
+  const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
+  
+  // Generate the field node ID - use dropdown name as the base, not the full question name
+  const sanitizedFieldName = sanitizeNameId(fieldName);
+  const sanitizedDropdownName = sanitizeNameId(dropdownName);
+  const sanitizedTriggerOption = sanitizeNameId(triggerOption);
+  
+  // Format: dropdownName_triggerOption_fieldName (or with PDF prefix if available)
+  if (sanitizedTriggerOption) {
+    return sanitizedPdfName ? 
+      `${nodeId}_${sanitizedDropdownName}_${sanitizedTriggerOption}_${sanitizedFieldName}` : 
+      `${sanitizedDropdownName}_${sanitizedTriggerOption}_${sanitizedFieldName}`;
+  } else {
+    // Fallback to old format if no trigger option
+    return sanitizedPdfName ? 
+      `${nodeId}_${sanitizedDropdownName}_${sanitizedFieldName}` : 
+      `${sanitizedDropdownName}_${sanitizedFieldName}`;
+  }
+}
+
+// Helper function to create uneditable node ID input with double-click copy
+function createUneditableNodeIdInput(placeholder, value, onDoubleClick) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = value || '';
+  input.placeholder = placeholder;
+  input.readOnly = true;
+  input.style.cssText = `
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+  `;
+  
+  // Add double-click to copy functionality
+  input.ondblclick = () => {
+    if (onDoubleClick) {
+      onDoubleClick(input);
+    }
+  };
+  
+  return input;
+}
+
 function getQuestionType(cell) {
   if (!cell) {
     console.log('🔍 [LOCATION ORDER DEBUG] getQuestionType called with undefined cell');
@@ -2338,6 +2393,67 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       }
     };
     
+    // Add Copy ID button for this option
+    const copyIdBtn = document.createElement('button');
+    copyIdBtn.textContent = 'Copy ID';
+    copyIdBtn.style.cssText = `
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      margin-right: 4px;
+    `;
+    copyIdBtn.onclick = () => {
+      const number = prompt('Enter number for this option:', '1');
+      if (number !== null && number.trim() !== '') {
+        const nodeId = `${dropdown.name || 'dropdown'}_${number}_${option.value}`;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(nodeId).then(() => {
+            // Show visual feedback
+            copyIdBtn.textContent = 'Copied!';
+            copyIdBtn.style.background = '#28a745';
+            setTimeout(() => {
+              copyIdBtn.textContent = 'Copy ID';
+              copyIdBtn.style.background = '#17a2b8';
+            }, 1500);
+          }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = nodeId;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            copyIdBtn.textContent = 'Copied!';
+            copyIdBtn.style.background = '#28a745';
+            setTimeout(() => {
+              copyIdBtn.textContent = 'Copy ID';
+              copyIdBtn.style.background = '#17a2b8';
+            }, 1500);
+          });
+        } else {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = nodeId;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          copyIdBtn.textContent = 'Copied!';
+          copyIdBtn.style.background = '#28a745';
+          setTimeout(() => {
+            copyIdBtn.textContent = 'Copy ID';
+            copyIdBtn.style.background = '#17a2b8';
+          }, 1500);
+        }
+      }
+    };
+    
     const deleteOptionBtn = document.createElement('button');
     deleteOptionBtn.textContent = '×';
     deleteOptionBtn.style.cssText = `
@@ -2360,6 +2476,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     };
     
     optionDiv.appendChild(optionInput);
+    optionDiv.appendChild(copyIdBtn);
     optionDiv.appendChild(deleteOptionBtn);
     optionsList.appendChild(optionDiv);
   });
@@ -2554,29 +2671,49 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               `;
               fieldNameInput.onblur = () => {
                 newLabel.fieldName = fieldNameInput.value.trim();
+                
+                // Update the node ID when field name changes
+                const updatedNodeId = generateNodeIdForDropdownField(newLabel.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                newLabel.nodeId = updatedNodeId;
+                labelIdInput.value = updatedNodeId;
+                
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              // Label ID input
-              const labelIdInput = document.createElement('input');
-              labelIdInput.type = 'text';
-              labelIdInput.placeholder = 'Label ID...';
-              labelIdInput.style.cssText = `
-                width: 100%;
-                padding: 4px 8px;
-                border: 1px solid #ddd;
-                border-radius: 3px;
-                font-size: 12px;
-                margin-bottom: 8px;
-              `;
-              labelIdInput.onblur = () => {
-                newLabel.nodeId = labelIdInput.value.trim();
-                if (typeof window.requestAutosave === 'function') {
-                  window.requestAutosave();
+              // Label ID input (uneditable and autofilled)
+              // Auto-fix incorrect node IDs when creating new fields
+              const correctLabelId = generateNodeIdForDropdownField(newLabel.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+              const labelIdValue = (newLabel.nodeId && newLabel.nodeId === correctLabelId) ? newLabel.nodeId : correctLabelId;
+              newLabel.nodeId = labelIdValue; // Set the nodeId in the data
+              const labelIdInput = createUneditableNodeIdInput('Label ID...', labelIdValue, (input) => {
+                // Double-click to copy functionality
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(input.value).then(() => {
+                    // Show visual feedback
+                    const originalBg = input.style.backgroundColor;
+                    input.style.backgroundColor = '#d4edda';
+                    input.style.borderColor = '#28a745';
+                    setTimeout(() => {
+                      input.style.backgroundColor = originalBg;
+                      input.style.borderColor = '#ddd';
+                    }, 1000);
+                  });
+                } else {
+                  // Fallback for older browsers
+                  input.select();
+                  document.execCommand('copy');
+                  const originalBg = input.style.backgroundColor;
+                  input.style.backgroundColor = '#d4edda';
+                  input.style.borderColor = '#28a745';
+                  setTimeout(() => {
+                    input.style.backgroundColor = originalBg;
+                    input.style.borderColor = '#ddd';
+                  }, 1000);
                 }
-              };
+              });
+              labelIdInput.style.marginBottom = '8px';
               
               // Delete label button
               const deleteLabelBtn = document.createElement('button');
@@ -2666,6 +2803,16 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               `;
               fieldNameInput.onblur = () => {
                 newCheckbox.fieldName = fieldNameInput.value.trim();
+                
+                // Update all checkbox option node IDs when field name changes
+                if (newCheckbox.options && newCheckbox.options.length > 0) {
+                  newCheckbox.options.forEach(option => {
+                    const combinedFieldName = `${newCheckbox.fieldName}_${option.checkboxText || ''}`;
+                    const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+                    option.nodeId = updatedNodeId;
+                  });
+                }
+                
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
@@ -2714,27 +2861,62 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 `;
                 checkboxTextInput.onblur = () => {
                   newOption.checkboxText = checkboxTextInput.value.trim();
+                  
+                  // Update the node ID when checkbox text changes
+                  const combinedFieldName = `${newCheckbox.fieldName}_${newOption.checkboxText || ''}`;
+                  const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+                  newOption.nodeId = updatedNodeId;
+                  checkboxIdInput.value = updatedNodeId;
+                  
                   if (typeof window.requestAutosave === 'function') {
                     window.requestAutosave();
                   }
                 };
                 
-                const checkboxIdInput = document.createElement('input');
-                checkboxIdInput.type = 'text';
-                checkboxIdInput.placeholder = 'Checkbox ID...';
+                // Checkbox ID input (uneditable and autofilled)
+                // For checkbox options, we need to include both the field name and the option text
+                const checkboxFieldName = newCheckbox.fieldName || '';
+                const checkboxOptionText = newOption.checkboxText || '';
+                const combinedFieldName = `${checkboxFieldName}_${checkboxOptionText}`;
+                // Auto-fix incorrect node IDs when creating new fields
+                const correctCheckboxId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+                const checkboxIdValue = (newOption.nodeId && newOption.nodeId === correctCheckboxId) ? newOption.nodeId : correctCheckboxId;
+                newOption.nodeId = checkboxIdValue; // Set the nodeId in the data
+                const checkboxIdInput = createUneditableNodeIdInput('Checkbox ID...', checkboxIdValue, (input) => {
+                  // Double-click to copy functionality
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(input.value).then(() => {
+                      // Show visual feedback
+                      const originalBg = input.style.backgroundColor;
+                      input.style.backgroundColor = '#d4edda';
+                      input.style.borderColor = '#28a745';
+                      setTimeout(() => {
+                        input.style.backgroundColor = originalBg;
+                        input.style.borderColor = '#ddd';
+                      }, 1000);
+                    });
+                  } else {
+                    // Fallback for older browsers
+                    input.select();
+                    document.execCommand('copy');
+                    const originalBg = input.style.backgroundColor;
+                    input.style.backgroundColor = '#d4edda';
+                    input.style.borderColor = '#28a745';
+                    setTimeout(() => {
+                      input.style.backgroundColor = originalBg;
+                      input.style.borderColor = '#ddd';
+                    }, 1000);
+                  }
+                });
                 checkboxIdInput.style.cssText = `
                   flex: 1;
                   padding: 2px 4px;
                   border: 1px solid #ddd;
                   border-radius: 2px;
                   font-size: 11px;
+                  background-color: #f8f9fa;
+                  cursor: pointer;
                 `;
-                checkboxIdInput.onblur = () => {
-                  newOption.nodeId = checkboxIdInput.value.trim();
-                  if (typeof window.requestAutosave === 'function') {
-                    window.requestAutosave();
-                  }
-                };
                 
                 const deleteOptionBtn = document.createElement('button');
                 deleteOptionBtn.textContent = '×';
@@ -2855,29 +3037,49 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               `;
               fieldNameInput.onblur = () => {
                 newTime.fieldName = fieldNameInput.value.trim();
+                
+                // Update the node ID when field name changes
+                const updatedNodeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                newTime.nodeId = updatedNodeId;
+                timeIdInput.value = updatedNodeId;
+                
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
               };
               
-              // Time ID input
-              const timeIdInput = document.createElement('input');
-              timeIdInput.type = 'text';
-              timeIdInput.placeholder = 'Time ID...';
-              timeIdInput.style.cssText = `
-                width: 100%;
-                padding: 4px 8px;
-                border: 1px solid #ddd;
-                border-radius: 3px;
-                font-size: 12px;
-                margin-bottom: 8px;
-              `;
-              timeIdInput.onblur = () => {
-                newTime.nodeId = timeIdInput.value.trim();
-                if (typeof window.requestAutosave === 'function') {
-                  window.requestAutosave();
+              // Time ID input (uneditable and autofilled)
+              // Auto-fix incorrect node IDs when creating new fields
+              const correctTimeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+              const timeIdValue = (newTime.nodeId && newTime.nodeId === correctTimeId) ? newTime.nodeId : correctTimeId;
+              newTime.nodeId = timeIdValue; // Set the nodeId in the data
+              const timeIdInput = createUneditableNodeIdInput('Time ID...', timeIdValue, (input) => {
+                // Double-click to copy functionality
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(input.value).then(() => {
+                    // Show visual feedback
+                    const originalBg = input.style.backgroundColor;
+                    input.style.backgroundColor = '#d4edda';
+                    input.style.borderColor = '#28a745';
+                    setTimeout(() => {
+                      input.style.backgroundColor = originalBg;
+                      input.style.borderColor = '#ddd';
+                    }, 1000);
+                  });
+                } else {
+                  // Fallback for older browsers
+                  input.select();
+                  document.execCommand('copy');
+                  const originalBg = input.style.backgroundColor;
+                  input.style.backgroundColor = '#d4edda';
+                  input.style.borderColor = '#28a745';
+                  setTimeout(() => {
+                    input.style.backgroundColor = originalBg;
+                    input.style.borderColor = '#ddd';
+                  }, 1000);
                 }
-              };
+              });
+              timeIdInput.style.marginBottom = '8px';
               
               // Delete time button
               const deleteTimeBtn = document.createElement('button');
@@ -3476,29 +3678,49 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         `;
         fieldNameInput.onblur = () => {
           label.fieldName = fieldNameInput.value.trim();
+          
+          // Update the node ID when field name changes
+          const updatedNodeId = generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+          label.nodeId = updatedNodeId;
+          labelIdInput.value = updatedNodeId;
+          
           if (typeof window.requestAutosave === 'function') {
             window.requestAutosave();
           }
         };
         
-        const labelIdInput = document.createElement('input');
-        labelIdInput.type = 'text';
-        labelIdInput.value = label.nodeId || '';
-        labelIdInput.placeholder = 'Label ID...';
-        labelIdInput.style.cssText = `
-          width: 100%;
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          font-size: 12px;
-          margin-bottom: 8px;
-        `;
-        labelIdInput.onblur = () => {
-          label.nodeId = labelIdInput.value.trim();
-          if (typeof window.requestAutosave === 'function') {
-            window.requestAutosave();
+        // Label ID input (uneditable and autofilled)
+        // Auto-fix incorrect node IDs when menu opens
+        const correctLabelId = generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+        const labelIdValue = (label.nodeId && label.nodeId === correctLabelId) ? label.nodeId : correctLabelId;
+        label.nodeId = labelIdValue; // Ensure the nodeId is set in the data
+        const labelIdInput = createUneditableNodeIdInput('Label ID...', labelIdValue, (input) => {
+          // Double-click to copy functionality
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value).then(() => {
+              // Show visual feedback
+              const originalBg = input.style.backgroundColor;
+              input.style.backgroundColor = '#d4edda';
+              input.style.borderColor = '#28a745';
+              setTimeout(() => {
+                input.style.backgroundColor = originalBg;
+                input.style.borderColor = '#ddd';
+              }, 1000);
+            });
+          } else {
+            // Fallback for older browsers
+            input.select();
+            document.execCommand('copy');
+            const originalBg = input.style.backgroundColor;
+            input.style.backgroundColor = '#d4edda';
+            input.style.borderColor = '#28a745';
+            setTimeout(() => {
+              input.style.backgroundColor = originalBg;
+              input.style.borderColor = '#ddd';
+            }, 1000);
           }
-        };
+        });
+        labelIdInput.style.marginBottom = '8px';
         
         const deleteLabelBtn = document.createElement('button');
         deleteLabelBtn.textContent = 'Delete Label';
@@ -3552,6 +3774,16 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         `;
         fieldNameInput.onblur = () => {
           checkbox.fieldName = fieldNameInput.value.trim();
+          
+          // Update all checkbox option node IDs when field name changes
+          if (checkbox.options && checkbox.options.length > 0) {
+            checkbox.options.forEach(option => {
+              const combinedFieldName = `${checkbox.fieldName}_${option.checkboxText || ''}`;
+              const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+              option.nodeId = updatedNodeId;
+            });
+          }
+          
           if (typeof window.requestAutosave === 'function') {
             window.requestAutosave();
           }
@@ -3705,28 +3937,62 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             `;
             checkboxTextInput.onblur = () => {
               option.checkboxText = checkboxTextInput.value.trim();
+              
+              // Update the node ID when checkbox text changes
+              const combinedFieldName = `${checkbox.fieldName}_${option.checkboxText || ''}`;
+              const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+              option.nodeId = updatedNodeId;
+              checkboxIdInput.value = updatedNodeId;
+              
               if (typeof window.requestAutosave === 'function') {
                 window.requestAutosave();
               }
             };
             
-            const checkboxIdInput = document.createElement('input');
-            checkboxIdInput.type = 'text';
-            checkboxIdInput.value = option.nodeId || '';
-            checkboxIdInput.placeholder = 'Checkbox ID...';
-            checkboxIdInput.style.cssText = `
-              flex: 1;
-              padding: 2px 4px;
-              border: 1px solid #ddd;
-              border-radius: 2px;
-              font-size: 11px;
-            `;
-            checkboxIdInput.onblur = () => {
-              option.nodeId = checkboxIdInput.value.trim();
-              if (typeof window.requestAutosave === 'function') {
-                window.requestAutosave();
-              }
-            };
+          // Checkbox ID input (uneditable and autofilled)
+          // For checkbox options, we need to include both the field name and the option text
+          const checkboxFieldName = checkbox.fieldName || '';
+          const checkboxOptionText = option.checkboxText || '';
+          const combinedFieldName = `${checkboxFieldName}_${checkboxOptionText}`;
+          // Auto-fix incorrect node IDs when menu opens
+          const correctCheckboxId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+          const checkboxIdValue = (option.nodeId && option.nodeId === correctCheckboxId) ? option.nodeId : correctCheckboxId;
+          option.nodeId = checkboxIdValue; // Ensure the nodeId is set in the data
+          const checkboxIdInput = createUneditableNodeIdInput('Checkbox ID...', checkboxIdValue, (input) => {
+            // Double-click to copy functionality
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(input.value).then(() => {
+                // Show visual feedback
+                const originalBg = input.style.backgroundColor;
+                input.style.backgroundColor = '#d4edda';
+                input.style.borderColor = '#28a745';
+                setTimeout(() => {
+                  input.style.backgroundColor = originalBg;
+                  input.style.borderColor = '#ddd';
+                }, 1000);
+              });
+            } else {
+              // Fallback for older browsers
+              input.select();
+              document.execCommand('copy');
+              const originalBg = input.style.backgroundColor;
+              input.style.backgroundColor = '#d4edda';
+              input.style.borderColor = '#28a745';
+              setTimeout(() => {
+                input.style.backgroundColor = originalBg;
+                input.style.borderColor = '#ddd';
+              }, 1000);
+            }
+          });
+          checkboxIdInput.style.cssText = `
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 11px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+          `;
             
             const deleteOptionBtn = document.createElement('button');
             deleteOptionBtn.textContent = '×';
@@ -3786,29 +4052,49 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         `;
         fieldNameInput.onblur = () => {
           time.fieldName = fieldNameInput.value.trim();
+          
+          // Update the node ID when field name changes
+          const updatedNodeId = generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+          time.nodeId = updatedNodeId;
+          timeIdInput.value = updatedNodeId;
+          
           if (typeof window.requestAutosave === 'function') {
             window.requestAutosave();
           }
         };
         
-        const timeIdInput = document.createElement('input');
-        timeIdInput.type = 'text';
-        timeIdInput.value = time.nodeId || '';
-        timeIdInput.placeholder = 'Time ID...';
-        timeIdInput.style.cssText = `
-          width: 100%;
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          font-size: 12px;
-          margin-bottom: 8px;
-        `;
-        timeIdInput.onblur = () => {
-          time.nodeId = timeIdInput.value.trim();
-          if (typeof window.requestAutosave === 'function') {
-            window.requestAutosave();
+        // Time ID input (uneditable and autofilled)
+        // Auto-fix incorrect node IDs when menu opens
+        const correctTimeId = generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+        const timeIdValue = (time.nodeId && time.nodeId === correctTimeId) ? time.nodeId : correctTimeId;
+        time.nodeId = timeIdValue; // Ensure the nodeId is set in the data
+        const timeIdInput = createUneditableNodeIdInput('Time ID...', timeIdValue, (input) => {
+          // Double-click to copy functionality
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value).then(() => {
+              // Show visual feedback
+              const originalBg = input.style.backgroundColor;
+              input.style.backgroundColor = '#d4edda';
+              input.style.borderColor = '#28a745';
+              setTimeout(() => {
+                input.style.backgroundColor = originalBg;
+                input.style.borderColor = '#ddd';
+              }, 1000);
+            });
+          } else {
+            // Fallback for older browsers
+            input.select();
+            document.execCommand('copy');
+            const originalBg = input.style.backgroundColor;
+            input.style.backgroundColor = '#d4edda';
+            input.style.borderColor = '#28a745';
+            setTimeout(() => {
+              input.style.backgroundColor = originalBg;
+              input.style.borderColor = '#ddd';
+            }, 1000);
           }
-        };
+        });
+        timeIdInput.style.marginBottom = '8px';
         
         const deleteTimeBtn = document.createElement('button');
         deleteTimeBtn.textContent = 'Delete Time';
