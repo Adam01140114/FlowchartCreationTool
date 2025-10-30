@@ -385,7 +385,7 @@ window.exportGuiJson = function(download = true) {
             allFieldsInOrder.push({
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
-              selectionType: "multiple",
+              selectionType: checkbox.selectionType || "multiple",
               options: checkboxOptions,
               order: orderIndex + 1
             });
@@ -461,7 +461,7 @@ window.exportGuiJson = function(download = true) {
             allFieldsInOrder.push({
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
-              selectionType: "multiple",
+              selectionType: checkbox.selectionType || "multiple",
               options: checkboxOptions,
               order: allFieldsInOrder.length + 1
             });
@@ -936,7 +936,7 @@ window.exportGuiJson = function(download = true) {
               allFieldsInOrder.push({
                 type: "checkbox",
                 fieldName: checkbox.fieldName || "",
-                selectionType: "multiple",
+                selectionType: checkbox.selectionType || "multiple",
                 options: checkboxOptions,
                 order: orderIndex + 1
               });
@@ -1092,7 +1092,7 @@ window.exportGuiJson = function(download = true) {
               allFieldsInOrder.push({
                 type: "checkbox",
                 fieldName: checkbox.fieldName || "",
-                selectionType: "multiple",
+                selectionType: checkbox.selectionType || "multiple",
                 options: checkboxOptions,
                 order: allFieldsInOrder.length + 1
               });

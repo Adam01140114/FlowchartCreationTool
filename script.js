@@ -5507,6 +5507,7 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
+      if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
       
       // checkbox properties
       if (cell._checkboxes) {

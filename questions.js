@@ -2114,7 +2114,7 @@ function createOptionsContainer(cell) {
     });
     
     // Create new checkbox entry
-    const newCheckbox = { fieldName: '', options: [] };
+    const newCheckbox = { fieldName: '', options: [], selectionType: 'multiple' };
     if (!cell._checkboxes) cell._checkboxes = [];
     cell._checkboxes.push(newCheckbox);
     
@@ -3149,6 +3149,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               };
               
+              // Selection type dropdown
+              const selectionTypeLabel = document.createElement('label');
+              selectionTypeLabel.textContent = 'Selection Type:';
+              selectionTypeLabel.style.cssText = `
+                display: block;
+                font-size: 12px;
+                font-weight: bold;
+                margin-bottom: 4px;
+                color: #333;
+              `;
+              
+              const selectionTypeSelect = document.createElement('select');
+              selectionTypeSelect.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+                background: white;
+              `;
+              
+              const markAllOption = document.createElement('option');
+              markAllOption.value = 'multiple';
+              markAllOption.textContent = 'Mark All That Apply';
+              markAllOption.selected = true;
+              
+              const markOneOption = document.createElement('option');
+              markOneOption.value = 'single';
+              markOneOption.textContent = 'Mark Only One';
+              
+              selectionTypeSelect.appendChild(markAllOption);
+              selectionTypeSelect.appendChild(markOneOption);
+              
+              // Initialize selection type
+              if (!newCheckbox.selectionType) {
+                newCheckbox.selectionType = 'multiple';
+              }
+              selectionTypeSelect.value = newCheckbox.selectionType;
+              
+              selectionTypeSelect.onchange = () => {
+                newCheckbox.selectionType = selectionTypeSelect.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
               // Add checkbox option button
               const addCheckboxOptionBtn = document.createElement('button');
               addCheckboxOptionBtn.textContent = 'Add checkbox option';
@@ -3349,6 +3396,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               };
               
               checkboxContainer.appendChild(fieldNameInput);
+              checkboxContainer.appendChild(selectionTypeLabel);
+              checkboxContainer.appendChild(selectionTypeSelect);
               checkboxContainer.appendChild(addCheckboxOptionBtn);
               checkboxContainer.appendChild(deleteCheckboxBtn);
               actionsList.appendChild(checkboxContainer);
@@ -3965,7 +4014,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     };
     
     const addCheckboxBtn = document.createElement('button');
-    addCheckboxBtn.textContent = '+ Checkbox';
+    addCheckboxBtn.textContent = 'Add Checkbox';
     addCheckboxBtn.style.cssText = `
       background: #9c27b0;
       color: white;
@@ -6390,8 +6439,57 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
   topRow.appendChild(copyBtn);
   topRow.appendChild(deleteBtn);
   
+  // Selection type dropdown
+  const selectionTypeLabel = document.createElement('label');
+  selectionTypeLabel.textContent = 'Selection Type:';
+  selectionTypeLabel.style.cssText = `
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    margin-top: 8px;
+    color: #333;
+  `;
+  
+  const selectionTypeSelect = document.createElement('select');
+  selectionTypeSelect.style.cssText = `
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    background: white;
+  `;
+  
+  const markAllOption = document.createElement('option');
+  markAllOption.value = 'multiple';
+  markAllOption.textContent = 'Mark All That Apply';
+  
+  const markOneOption = document.createElement('option');
+  markOneOption.value = 'single';
+  markOneOption.textContent = 'Mark Only One';
+  
+  selectionTypeSelect.appendChild(markAllOption);
+  selectionTypeSelect.appendChild(markOneOption);
+  
+  // Initialize selection type
+  if (!checkbox.selectionType) {
+    checkbox.selectionType = 'multiple';
+  }
+  selectionTypeSelect.value = checkbox.selectionType || 'multiple';
+  
+  selectionTypeSelect.onchange = () => {
+    checkbox.selectionType = selectionTypeSelect.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
   // Assemble checkbox container
   checkboxContainer.appendChild(topRow);
+  checkboxContainer.appendChild(selectionTypeLabel);
+  checkboxContainer.appendChild(selectionTypeSelect);
   
   // Add existing mini checkbox options BEFORE the "Add checkbox option" button
   if (checkbox.options && checkbox.options.length > 0) {
