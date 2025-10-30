@@ -1450,6 +1450,11 @@ function placeNodeAtClickLocation(graph, nodeType) {
       label = "Linked Logic";
       width = 150;
       height = 80;
+    } else if (nodeType === 'linkedCheckbox') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedCheckbox;section=1;fillColor=#FFB6C1;strokeColor=#FF69B4;";
+      label = "Linked Checkbox";
+      width = 150;
+      height = 80;
     }
     
     // Create the cell
@@ -1545,6 +1550,12 @@ function placeNodeAtClickLocation(graph, nodeType) {
       cell._linkedFields = [];
       if (typeof window.updateLinkedLogicNodeCell === 'function') {
         window.updateLinkedLogicNodeCell(cell);
+      }
+    } else if (nodeType === 'linkedCheckbox') {
+      cell._linkedCheckboxNodeId = "linked_checkbox";
+      cell._linkedCheckboxOptions = [];
+      if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
+        window.updateLinkedCheckboxNodeCell(cell);
       }
     }
     
@@ -1741,6 +1752,11 @@ window.convertMiscellaneousNode = function(selectElement) {
     } else if (selectedType === 'linkedLogic') {
       style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;section=1;fillColor=#DDA0DD;strokeColor=#9370DB;";
       label = "Linked Logic";
+      width = 150;
+      height = 80;
+    } else if (selectedType === 'linkedCheckbox') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedCheckbox;section=1;fillColor=#FFB6C1;strokeColor=#FF69B4;";
+      label = "Linked Checkbox";
       width = 150;
       height = 80;
     }

@@ -58,6 +58,9 @@ window.createNode = function(nodeType, x, y) {
       case 'linkedLogic':
         vertex = createLinkedLogicNode(x, y);
         break;
+      case 'linkedCheckbox':
+        vertex = createLinkedCheckboxNode(x, y);
+        break;
       default:
         console.error('Unknown node type:', nodeType);
         return null;
@@ -299,6 +302,19 @@ function createLinkedLogicNode(x, y) {
   return vertex;
 }
 
+function createLinkedCheckboxNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=linkedCheckbox;section=1;fillColor=#FFB6C1;strokeColor=#FF69B4;');
+  
+  // Set default properties
+  vertex.value = "Linked Checkbox";
+  vertex._linkedCheckboxNodeId = "linked_checkbox";
+  vertex._linkedCheckboxOptions = []; // Array to store linked checkbox option IDs
+  
+  return vertex;
+}
+
 /**
  * Generate a unique question ID
  */
@@ -356,6 +372,13 @@ window.isLinkedLogicNode = function(cell) {
 };
 
 /**
+ * Check if a cell is a linked checkbox node
+ */
+window.isLinkedCheckboxNode = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=linkedCheckbox");
+};
+
+/**
  * Update linked logic node cell display
  */
 window.updateLinkedLogicNodeCell = function(cell) {
@@ -363,6 +386,22 @@ window.updateLinkedLogicNodeCell = function(cell) {
   
   // Update the display value with the Node ID
   const nodeId = cell._linkedLogicNodeId || 'linked_logic';
+  cell.value = nodeId;
+  
+  // Update the graph display
+  if (window.graph) {
+    window.graph.refresh(cell);
+  }
+};
+
+/**
+ * Update linked checkbox node cell display
+ */
+window.updateLinkedCheckboxNodeCell = function(cell) {
+  if (!cell) return;
+  
+  // Update the display value with the Node ID
+  const nodeId = cell._linkedCheckboxNodeId || 'linked_checkbox';
   cell.value = nodeId;
   
   // Update the graph display

@@ -1824,6 +1824,18 @@ window.exportBothJson = function() {
       } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
         console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedFields is undefined for cell:', cell.id);
       }
+      if (cell._linkedCheckboxNodeId !== undefined) {
+        cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
+        console.log('💾 [LIBRARY SAVE] Saving _linkedCheckboxNodeId:', cell._linkedCheckboxNodeId, 'for cell:', cell.id);
+      } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
+        console.log('⚠️ [LIBRARY SAVE] Linked Checkbox node found but _linkedCheckboxNodeId is undefined for cell:', cell.id);
+      }
+      if (cell._linkedCheckboxOptions !== undefined) {
+        cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
+        console.log('💾 [LIBRARY SAVE] Saving _linkedCheckboxOptions:', cell._linkedCheckboxOptions, 'for cell:', cell.id);
+      } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
+        console.log('⚠️ [LIBRARY SAVE] Linked Checkbox node found but _linkedCheckboxOptions is undefined for cell:', cell.id);
+      }
       
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
@@ -1977,7 +1989,8 @@ window.saveFlowchart = function() {
       _times: cell._times||null,
       _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
-      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
+      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null
     };
     
     // Debug logging for Linked Logic properties
@@ -2122,7 +2135,8 @@ window.saveAsFlowchart = function() {
       _times: cell._times||null,
       _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
-      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
+      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null
     };
     
     // Debug logging for Linked Logic properties
@@ -3311,6 +3325,12 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         }
         if (item._linkedFields !== undefined) {
           newCell._linkedFields = item._linkedFields;
+        }
+        if (item._linkedCheckboxNodeId !== undefined) {
+          newCell._linkedCheckboxNodeId = item._linkedCheckboxNodeId;
+        }
+        if (item._linkedCheckboxOptions !== undefined) {
+          newCell._linkedCheckboxOptions = item._linkedCheckboxOptions;
         }
         
         // Calculation properties

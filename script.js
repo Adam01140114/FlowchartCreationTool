@@ -5560,6 +5560,13 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_linkedFields')) {
         cellData._linkedFields = cell._linkedFields;
       }
+      // Linked checkbox node properties - always save these if they exist on the cell
+      if (cell.hasOwnProperty('_linkedCheckboxNodeId')) {
+        cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
+      }
+      if (cell.hasOwnProperty('_linkedCheckboxOptions')) {
+        cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
+      }
       
       // Special handling for hidden textbox nodes - always save _defaultText even if empty
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
@@ -6148,7 +6155,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_checkboxes', '_itemOrder', '_times', '_dropdowns'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_linkedCheckboxNodeId', '_linkedCheckboxOptions', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_checkboxes', '_itemOrder', '_times', '_dropdowns'
       ];
       
       safeProperties.forEach(prop => {
@@ -6334,7 +6341,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -6378,6 +6385,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update linked logic node display
           if (typeof window.updateLinkedLogicNodeCell === 'function') {
             window.updateLinkedLogicNodeCell(newCell);
+          }
+        } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(newCell)) {
+          // Update linked checkbox node display
+          if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
+            window.updateLinkedCheckboxNodeCell(newCell);
           }
         }
       });
@@ -6472,7 +6484,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -6515,6 +6527,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update linked logic node display
           if (typeof window.updateLinkedLogicNodeCell === 'function') {
             window.updateLinkedLogicNodeCell(newCell);
+          }
+        } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(newCell)) {
+          // Update linked checkbox node display
+          if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
+            window.updateLinkedCheckboxNodeCell(newCell);
           }
         }
       });
