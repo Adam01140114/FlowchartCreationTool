@@ -1705,7 +1705,12 @@ window.exportGuiJson = function(download = true) {
     stripePriceId: defaultPdfProps.pdfPrice || "",
     additionalPDFs: [],
     checklistItems: [],
-    linkedFields: linkedFields
+    linkedFields: linkedFields,
+    linkedCheckboxes: (window.linkedCheckboxesConfig || []).map(c => ({
+      id: c.id,
+      linkedCheckboxId: c.linkedCheckboxId,
+      checkboxes: c.checkboxes
+    }))
   };
   
   // Convert to string and download

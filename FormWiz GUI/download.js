@@ -1612,6 +1612,18 @@ function loadFormData(formData) {
         });
     }
 
+    // Load linked checkboxes
+    if (formData.linkedCheckboxes && formData.linkedCheckboxes.length > 0) {
+        // Initialize linked checkboxes configuration
+        window.linkedCheckboxesConfig = [];
+        linkedCheckboxCounter = 0;
+        
+        formData.linkedCheckboxes.forEach(linkedCheckbox => {
+            // Create the linked checkbox display
+            createLinkedCheckboxDisplayFromImport(linkedCheckbox);
+        });
+    }
+
     // 7) Build groups from JSON
     if (formData.groups && formData.groups.length > 0) {
         console.log('Importing groups:', formData.groups); // Debug log
@@ -1714,6 +1726,17 @@ function exportForm() {
             linkedFieldId: config.linkedFieldId,
             fields: config.fields
         }));
+    }
+
+    // Collect all linked checkboxes
+    if (window.linkedCheckboxesConfig && window.linkedCheckboxesConfig.length > 0) {
+        formData.linkedCheckboxes = window.linkedCheckboxesConfig.map(config => ({
+            id: config.id,
+            linkedCheckboxId: config.linkedCheckboxId,
+            checkboxes: config.checkboxes
+        }));
+    } else {
+        formData.linkedCheckboxes = [];
     }
 
     // Create a map of questionId to question text for easy lookup

@@ -22,6 +22,7 @@ const amountMap = {}; // used for numberedDropdown with amounts
 const linkedDropdowns = []; // For storing linked dropdown pairs
 const hiddenLogicConfigs = []; // For storing hidden logic configurations
 const linkedFields = []; // For storing linked field configurations
+const linkedCheckboxes = []; // For storing linked checkbox configurations
 
 // Cart functions are now included in the generated HTML
 
@@ -349,6 +350,7 @@ labelMap.length = 0;
 amountMap.length = 0;
 hiddenLogicConfigs.length = 0;
 linkedFields.length = 0;
+linkedCheckboxes.length = 0;
 logicScriptBuffer = "";
 
 console.log('🔧 [HIDDEN LOGIC DEBUG] Starting form generation - hiddenLogicConfigs cleared');
@@ -2226,6 +2228,16 @@ if (s > 1){
     formHTML += "</div>"; // end this section
   }
 
+  // Collect linked checkboxes data from GUI (must be before generateHiddenPDFFields)
+  if (window.linkedCheckboxesConfig && window.linkedCheckboxesConfig.length > 0) {
+    window.linkedCheckboxesConfig.forEach(config => {
+      linkedCheckboxes.push({
+        linkedCheckboxId: config.linkedCheckboxId,
+        checkboxes: config.checkboxes
+      });
+    });
+  }
+
   // Insert hidden fields (including multi-term calculations)
   const genHidden = generateHiddenPDFFields(formName);
   formHTML += genHidden.hiddenFieldsHTML;
@@ -2605,6 +2617,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var hiddenLogicConfigs = ${JSON.stringify(hiddenLogicConfigs || [])};\n`;
   formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
+  formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
   // Dynamic conditional logic for business type question to show county question
@@ -7079,6 +7092,11 @@ if (typeof handleNext === 'function') {
                 updateAllHiddenAddressFields();
             }
             
+            // 🔧 NEW: Update all linked checkboxes after autofill completes
+            if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                window.updateAllLinkedCheckboxes();
+            }
+            
             // 🔧 NEW: Create hidden checkboxes for any autofilled radio buttons in numbered dropdowns
             const autofilledRadioButtons = document.querySelectorAll('input[type="radio"][id*="_radio"]:checked');
             autofilledRadioButtons.forEach(radio => {
@@ -9113,6 +9131,86 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Set up linked checkbox listeners after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!linkedCheckboxes || linkedCheckboxes.length === 0) return;
+    
+    // Function to update a linked checkbox based on its source checkboxes
+    function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
+      const linkedCheckbox = document.getElementById(linkedCheckboxId);
+      if (!linkedCheckbox) return;
+      
+      // Check if ANY of the source checkboxes are checked (OR logic)
+      let anyChecked = false;
+      checkboxIds.forEach(checkboxId => {
+        const sourceCheckbox = document.getElementById(checkboxId);
+        if (sourceCheckbox && sourceCheckbox.checked) {
+          anyChecked = true;
+        }
+      });
+      
+      // Update the linked checkbox state
+      linkedCheckbox.checked = anyChecked;
+    }
+    
+    // Set up listeners for each linked checkbox group
+    linkedCheckboxes.forEach(linkedCheckboxGroup => {
+      const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+      const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+      
+      if (!linkedCheckboxId || checkboxIds.length === 0) return;
+      
+      // Set up event listeners on each source checkbox
+      checkboxIds.forEach(checkboxId => {
+        const sourceCheckbox = document.getElementById(checkboxId);
+        if (sourceCheckbox) {
+          // Add change event listener to update linked checkbox
+          sourceCheckbox.addEventListener('change', function() {
+            updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+          });
+          
+          // Also listen for click events (some checkboxes might trigger on click)
+          sourceCheckbox.addEventListener('click', function() {
+            // Use setTimeout to ensure checked state is updated
+            setTimeout(() => {
+              updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+            }, 0);
+          });
+        }
+      });
+      
+      // Initial update to set correct state
+      setTimeout(() => {
+        updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+      }, 500);
+    });
+    
+    // Global function to update all linked checkboxes (called after autofill)
+    window.updateAllLinkedCheckboxes = function() {
+      if (!linkedCheckboxes || linkedCheckboxes.length === 0) return;
+      
+      linkedCheckboxes.forEach(linkedCheckboxGroup => {
+        const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+        const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+        
+        if (!linkedCheckboxId || checkboxIds.length === 0) return;
+        
+        const linkedCheckbox = document.getElementById(linkedCheckboxId);
+        if (!linkedCheckbox) return;
+        
+        let anyChecked = false;
+        checkboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox && sourceCheckbox.checked) {
+            anyChecked = true;
+          }
+        });
+        
+        linkedCheckbox.checked = anyChecked;
+      });
+    };
+  });
   </script>`;
 
   // Add the createTriggerFieldsContainer function before returning
@@ -9467,6 +9565,18 @@ function generateHiddenPDFFields(formName) {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">`;
+
+    /* linked checkboxes - generate hidden checkboxes for each linked checkbox group */
+    if (linkedCheckboxes && linkedCheckboxes.length > 0) {
+        linkedCheckboxes.forEach(linkedCheckboxGroup => {
+            const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+            const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+            
+            if (linkedCheckboxId && checkboxIds.length > 0) {
+                hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${linkedCheckboxId}" name="${linkedCheckboxId}"></div>`;
+            }
+        });
+    }
 
     const hiddenCheckboxCalculations = [];
     const hiddenTextCalculations     = [];
