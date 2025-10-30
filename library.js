@@ -359,21 +359,13 @@ window.exportGuiJson = function(download = true) {
               nodeId: fieldNodeId,
               order: orderIndex + 1
             });
-          } else if (item.type === 'location' && cell._locationIndex >= 0) {
-            const locationFields = [
-              { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
-              { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
-              { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
-              { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
-            ];
-            
-            locationFields.forEach((field, fieldIndex) => {
-              allFieldsInOrder.push({
-                type: field.label === "Zip" ? "amount" : "label",
-                label: field.label,
-                nodeId: field.nodeId,
-                order: orderIndex + 1 + fieldIndex
-              });
+          } else if (item.type === 'location') {
+            // Create a single location entry instead of expanding into individual fields
+            allFieldsInOrder.push({
+              type: "location",
+              fieldName: cell._locationTitle || "",
+              nodeId: "location_data",
+              order: orderIndex + 1
             });
           } else if (item.type === 'time' && cell._times && cell._times[item.index]) {
             const time = cell._times[item.index];
@@ -918,21 +910,13 @@ window.exportGuiJson = function(download = true) {
                 nodeId: fieldNodeId,
                 order: orderIndex + 1
               });
-            } else if (item.type === 'location' && cell._locationIndex >= 0) {
-              const locationFields = [
-                { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
-                { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
-                { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
-                { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
-              ];
-              
-              locationFields.forEach((field, fieldIndex) => {
-                allFieldsInOrder.push({
-                  type: field.label === "Zip" ? "amount" : "label",
-                  label: field.label,
-                  nodeId: field.nodeId,
-                  order: orderIndex + 1 + fieldIndex
-                });
+            } else if (item.type === 'location') {
+              // Create a single location entry instead of expanding into individual fields
+              allFieldsInOrder.push({
+                type: "location",
+                fieldName: cell._locationTitle || "",
+                nodeId: "location_data",
+                order: orderIndex + 1
               });
             } else if (item.type === 'time' && cell._times && cell._times[item.index]) {
               const time = cell._times[item.index];
@@ -1018,8 +1002,8 @@ window.exportGuiJson = function(download = true) {
                     trigger.locations.forEach(location => {
                       fields.push({
                         type: "location",
-                        label: location.fieldName || "",
-                        nodeId: location.nodeId || ""
+                        fieldName: location.locationTitle || "",
+                        nodeId: "location_data"
                       });
                     });
                   }
@@ -1036,19 +1020,8 @@ window.exportGuiJson = function(download = true) {
               }
               
               // Calculate the correct order for dropdown
-              // If there's a location before this dropdown, count all location fields
+              // All items (including location) are now single entries, so use orderIndex + 1
               let dropdownOrder = orderIndex + 1;
-              if (orderIndex > 0) {
-                // Count all previous items and their sub-items
-                for (let i = 0; i < orderIndex; i++) {
-                  const prevItem = cell._itemOrder[i];
-                  if (prevItem.type === 'location') {
-                    // Location adds 4 fields (Street, City, State, Zip)
-                    dropdownOrder += 3; // We already counted the location entry itself (+1), so add 3 more
-                  }
-                  // Other types (option, time, checkbox) only add 1 field each
-                }
-              }
               
               allFieldsInOrder.push({
                 type: "dropdown",
@@ -1162,7 +1135,6 @@ window.exportGuiJson = function(download = true) {
         question.labels = [];
         question.amounts = [];
         question.labelNodeIds = [];
-        question.allFieldsInOrder = [];
         
         // Extract min and max from _twoNumbers
         if (cell._twoNumbers) {
@@ -1175,6 +1147,8 @@ window.exportGuiJson = function(download = true) {
         
         // Add nodeId for numberedDropdown (with PDF prefix if available)
         question.nodeId = nodeId;
+        
+        question.allFieldsInOrder = [];
       }
       
       // Clear options array for numberedDropdown
@@ -1853,6 +1827,7 @@ window.exportBothJson = function() {
       
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
+      if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
 
       return cellData;
     });
@@ -1996,6 +1971,7 @@ window.saveFlowchart = function() {
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
+      _locationTitle: cell._locationTitle||null,
       _checkboxes: cell._checkboxes||null,
       _itemOrder: cell._itemOrder||null,
       _times: cell._times||null,
@@ -2137,6 +2113,7 @@ window.saveAsFlowchart = function() {
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
+      _locationTitle: cell._locationTitle||null,
       _checkboxes: cell._checkboxes||null,
       _itemOrder: cell._itemOrder||null,
       _times: cell._times||null,
@@ -3224,6 +3201,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         if (item._placeholder) newCell._placeholder = item._placeholder;
         if (item._questionId) newCell._questionId = item._questionId;
         if (item._locationIndex !== undefined) newCell._locationIndex = item._locationIndex;
+        if (item._locationTitle !== undefined) newCell._locationTitle = item._locationTitle;
         
         // Amount option properties
         if (item._amountName) newCell._amountName = item._amountName;

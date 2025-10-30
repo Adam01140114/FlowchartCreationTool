@@ -1572,6 +1572,7 @@ function updatemultipleDropdownTypeCell(cell) {
       html += `
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
+          <input type="text" value="${escapeAttr(cell._locationTitle || '')}" placeholder="Enter location title..." onblur="window.updateMultipleDropdownLocationTitle('${cell.id}', this.value)" style="width: 100%; max-width: 300px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 3px; font-size: 12px; margin-top: 8px; text-align: center; background: white; color: #333; display: block; margin-left: auto; margin-right: auto;"/>
           <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
           <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
@@ -1595,6 +1596,7 @@ function updatemultipleDropdownTypeCell(cell) {
     html += `
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
+        <input type="text" value="${escapeAttr(cell._locationTitle || '')}" placeholder="Enter location title..." onblur="window.updateMultipleDropdownLocationTitle('${cell.id}', this.value)" style="width: 100%; max-width: 300px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 3px; font-size: 12px; margin-top: 8px; text-align: center; background: white; color: #333; display: block; margin-left: auto; margin-right: auto;"/>
         <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
@@ -1852,6 +1854,21 @@ window.removeMultipleDropdownLocationHandler = function(cellId) {
       graph.getModel().endUpdate();
     }
     updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.updateMultipleDropdownLocationTitle = function(cellId, title) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      cell._locationTitle = title.trim();
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
   }
 };
 
@@ -3172,6 +3189,7 @@ function updatemultipleDropdownTypeCell(cell) {
       html += `
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
+          <input type="text" value="${escapeAttr(cell._locationTitle || '')}" placeholder="Enter location title..." onblur="window.updateMultipleDropdownLocationTitle('${cell.id}', this.value)" style="width: 100%; max-width: 300px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 3px; font-size: 12px; margin-top: 8px; text-align: center; background: white; color: #333; display: block; margin-left: auto; margin-right: auto;"/>
           <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
           <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
@@ -3194,6 +3212,7 @@ function updatemultipleDropdownTypeCell(cell) {
     html += `
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
+        <input type="text" value="${escapeAttr(cell._locationTitle || '')}" placeholder="Enter location title..." onblur="window.updateMultipleDropdownLocationTitle('${cell.id}', this.value)" style="width: 100%; max-width: 300px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 3px; font-size: 12px; margin-top: 8px; text-align: center; background: white; color: #333; display: block; margin-left: auto; margin-right: auto;"/>
         <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
@@ -4415,6 +4434,7 @@ function updatemultipleDropdownTypeCell(cell) {
       html += `
         <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
           📍 Location Date Inserted
+          <input type="text" value="${escapeAttr(cell._locationTitle || '')}" placeholder="Enter location title..." onblur="window.updateMultipleDropdownLocationTitle('${cell.id}', this.value)" style="width: 100%; max-width: 300px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 3px; font-size: 12px; margin-top: 8px; text-align: center; background: white; color: #333; display: block; margin-left: auto; margin-right: auto;"/>
           <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
           <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
@@ -4438,6 +4458,7 @@ function updatemultipleDropdownTypeCell(cell) {
     html += `
       <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
         📍 Location Date Inserted
+        <input type="text" value="${escapeAttr(cell._locationTitle || '')}" placeholder="Enter location title..." onblur="window.updateMultipleDropdownLocationTitle('${cell.id}', this.value)" style="width: 100%; max-width: 300px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 3px; font-size: 12px; margin-top: 8px; text-align: center; background: white; color: #333; display: block; margin-left: auto; margin-right: auto;"/>
         <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;

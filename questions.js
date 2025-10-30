@@ -2910,7 +2910,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         `;
         
         const addLabelBtn = document.createElement('button');
-        addLabelBtn.textContent = '+ Label';
+        addLabelBtn.textContent = 'Add Label';
         addLabelBtn.style.cssText = `
           background: #4caf50;
           color: white;
@@ -3083,7 +3083,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         };
         
         const addCheckboxBtn = document.createElement('button');
-        addCheckboxBtn.textContent = '+ Checkbox';
+        addCheckboxBtn.textContent = 'Add Checkbox';
         addCheckboxBtn.style.cssText = `
           background: #9c27b0;
           color: white;
@@ -3368,7 +3368,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         };
         
         const addTimeBtn = document.createElement('button');
-        addTimeBtn.textContent = '+ Time';
+        addTimeBtn.textContent = 'Add Time';
         addTimeBtn.style.cssText = `
           background: #ff9800;
           color: white;
@@ -3540,9 +3540,199 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
+        const addLocationBtn = document.createElement('button');
+        addLocationBtn.textContent = 'Add Location';
+        addLocationBtn.style.cssText = `
+          background: #ff9800;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        addLocationBtn.onclick = () => {
+          // Create new location entry (like the main location button)
+          const newLocation = { 
+            type: 'location',
+            fieldName: 'Location Data Inserted',
+            nodeId: '',
+            locationTitle: ''
+          };
+          if (!triggerSequence.locations) triggerSequence.locations = [];
+          triggerSequence.locations.push(newLocation);
+          
+          // Update the actions list for this trigger sequence
+          const triggerDiv = addLocationBtn.closest('.trigger-sequence');
+          if (triggerDiv) {
+            const actionsList = triggerDiv.querySelector('.actions-list');
+            if (actionsList) {
+              // Create location entry container (styled like main location indicator)
+              const locationContainer = document.createElement('div');
+              locationContainer.style.cssText = `
+                margin: 8px 0;
+                padding: 8px;
+                background-color: #e8f5e8;
+                border: 2px dashed #28a745;
+                border-radius: 4px;
+                text-align: center;
+                color: #28a745;
+                font-weight: bold;
+                font-size: 12px;
+              `;
+              
+              // Location indicator text
+              const locationText = document.createElement('div');
+              locationText.textContent = '📍 Location Data Inserted';
+              locationText.style.cssText = `
+                margin-bottom: 8px;
+              `;
+              
+              // Location title input field
+              const locationTitleInput = document.createElement('input');
+              locationTitleInput.type = 'text';
+              locationTitleInput.placeholder = 'Enter location title...';
+              locationTitleInput.value = newLocation.locationTitle || '';
+              locationTitleInput.style.cssText = `
+                width: 100%;
+                max-width: 300px;
+                padding: 4px 8px;
+                border: 1px solid #28a745;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-top: 8px;
+                margin-bottom: 8px;
+                text-align: center;
+                background: white;
+                color: #333;
+              `;
+              locationTitleInput.onblur = () => {
+                newLocation.locationTitle = locationTitleInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Field name input (hidden by default, shown on edit)
+              const fieldNameInput = document.createElement('input');
+              fieldNameInput.type = 'text';
+              fieldNameInput.value = newLocation.fieldName;
+              fieldNameInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+                display: none;
+              `;
+              fieldNameInput.onblur = () => {
+                newLocation.fieldName = fieldNameInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Location ID input (hidden by default, shown on edit)
+              const locationIdInput = document.createElement('input');
+              locationIdInput.type = 'text';
+              locationIdInput.placeholder = 'Location ID...';
+              locationIdInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+                display: none;
+              `;
+              locationIdInput.onblur = () => {
+                newLocation.nodeId = locationIdInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Button container
+              const buttonContainer = document.createElement('div');
+              buttonContainer.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                align-items: center;
+              `;
+              
+              // Edit button
+              const editBtn = document.createElement('button');
+              editBtn.textContent = 'Edit';
+              editBtn.style.cssText = `
+                background-color: #17a2b8;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                font-size: 10px;
+                cursor: pointer;
+              `;
+              editBtn.onclick = () => {
+                if (fieldNameInput.style.display === 'none') {
+                  fieldNameInput.style.display = 'block';
+                  locationIdInput.style.display = 'block';
+                  locationText.style.display = 'none';
+                  editBtn.textContent = 'Save';
+                } else {
+                  fieldNameInput.style.display = 'none';
+                  locationIdInput.style.display = 'none';
+                  locationText.style.display = 'block';
+                  locationText.textContent = '📍 ' + fieldNameInput.value;
+                  editBtn.textContent = 'Edit';
+                }
+              };
+              
+              // Delete location button
+              const deleteLocationBtn = document.createElement('button');
+              deleteLocationBtn.textContent = 'Remove';
+              deleteLocationBtn.style.cssText = `
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                font-size: 10px;
+                cursor: pointer;
+              `;
+              deleteLocationBtn.onclick = () => {
+                const locationIndex = triggerSequence.locations.findIndex(l => l === newLocation);
+                if (locationIndex !== -1) {
+                  triggerSequence.locations.splice(locationIndex, 1);
+                }
+                locationContainer.remove();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              buttonContainer.appendChild(editBtn);
+              buttonContainer.appendChild(deleteLocationBtn);
+              
+              locationContainer.appendChild(locationText);
+              locationContainer.appendChild(locationTitleInput);
+              locationContainer.appendChild(fieldNameInput);
+              locationContainer.appendChild(locationIdInput);
+              locationContainer.appendChild(buttonContainer);
+              actionsList.appendChild(locationContainer);
+            }
+          }
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
         actionButtons.appendChild(addLabelBtn);
         actionButtons.appendChild(addCheckboxBtn);
         actionButtons.appendChild(addTimeBtn);
+        actionButtons.appendChild(addLocationBtn);
         triggerDiv.appendChild(actionButtons);
         
         // Add actions list container
@@ -4113,7 +4303,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     };
     
     const addLocationBtn = document.createElement('button');
-    addLocationBtn.textContent = '+ Location';
+    addLocationBtn.textContent = 'Add Location';
     addLocationBtn.style.cssText = `
       background: #ff9800;
       color: white;
@@ -4158,6 +4348,31 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           locationText.style.cssText = `
             margin-bottom: 8px;
           `;
+          
+          // Location title input field
+          const locationTitleInput = document.createElement('input');
+          locationTitleInput.type = 'text';
+          locationTitleInput.placeholder = 'Enter location title...';
+          locationTitleInput.value = newLocation.locationTitle || '';
+          locationTitleInput.style.cssText = `
+            width: 100%;
+            max-width: 300px;
+            padding: 4px 8px;
+            border: 1px solid #28a745;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            text-align: center;
+            background: white;
+            color: #333;
+          `;
+          locationTitleInput.onblur = () => {
+            newLocation.locationTitle = locationTitleInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
           
           // Field name input (hidden by default, shown on edit)
           const fieldNameInput = document.createElement('input');
@@ -4262,6 +4477,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           buttonContainer.appendChild(deleteLocationBtn);
           
           locationContainer.appendChild(locationText);
+          locationContainer.appendChild(locationTitleInput);
           locationContainer.appendChild(fieldNameInput);
           locationContainer.appendChild(locationIdInput);
           locationContainer.appendChild(buttonContainer);
@@ -5009,6 +5225,31 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           margin-bottom: 8px;
         `;
         
+        // Location title input field
+        const locationTitleInput = document.createElement('input');
+        locationTitleInput.type = 'text';
+        locationTitleInput.placeholder = 'Enter location title...';
+        locationTitleInput.value = location.locationTitle || '';
+        locationTitleInput.style.cssText = `
+          width: 100%;
+          max-width: 300px;
+          padding: 4px 8px;
+          border: 1px solid #28a745;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-top: 8px;
+          margin-bottom: 8px;
+          text-align: center;
+          background: white;
+          color: #333;
+        `;
+        locationTitleInput.onblur = () => {
+          location.locationTitle = locationTitleInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
         // Field name input (hidden by default, shown on edit)
         const fieldNameInput = document.createElement('input');
         fieldNameInput.type = 'text';
@@ -5110,6 +5351,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         buttonContainer.appendChild(deleteLocationBtn);
         
         locationContainer.appendChild(locationText);
+        locationContainer.appendChild(locationTitleInput);
         locationContainer.appendChild(fieldNameInput);
         locationContainer.appendChild(locationIdInput);
         locationContainer.appendChild(buttonContainer);
@@ -5210,6 +5452,30 @@ function createLocationIndicator(cell, parentContainer) {
   
   const locationText = document.createElement('span');
   locationText.textContent = '📍 Location Date Inserted';
+  
+  // Location title input field
+  const locationTitleInput = document.createElement('input');
+  locationTitleInput.type = 'text';
+  locationTitleInput.placeholder = 'Enter location title...';
+  locationTitleInput.value = cell._locationTitle || '';
+  locationTitleInput.style.cssText = `
+    width: 100%;
+    max-width: 300px;
+    padding: 4px 8px;
+    border: 1px solid #28a745;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
+    background: white;
+    color: #333;
+  `;
+  locationTitleInput.onblur = () => {
+    cell._locationTitle = locationTitleInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
   
   // Copy Location IDs button
   const copyLocationIdsBtn = document.createElement('button');
@@ -5321,9 +5587,11 @@ function createLocationIndicator(cell, parentContainer) {
     display: flex;
     flex-direction: column;
     width: 100%;
+    align-items: center;
   `;
   
   mainContainer.appendChild(textContainer);
+  mainContainer.appendChild(locationTitleInput);
   mainContainer.appendChild(buttonContainer);
   
   locationIndicator.appendChild(mainContainer);
