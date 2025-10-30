@@ -1970,8 +1970,8 @@ window.saveFlowchart = function() {
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
-      _locationIndex: cell._locationIndex||null,
-      _locationTitle: cell._locationTitle||null,
+      _locationIndex: cell._locationIndex !== undefined ? cell._locationIndex : undefined,
+      _locationTitle: cell._locationTitle !== undefined ? cell._locationTitle : undefined,
       _checkboxes: cell._checkboxes||null,
       _itemOrder: cell._itemOrder||null,
       _times: cell._times||null,
@@ -2013,8 +2013,11 @@ window.saveFlowchart = function() {
   // Get current edge style
   data.edgeStyle = currentEdgeStyle;
   
+  // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
+  const cleanedData = removeUndefinedValues(data);
+  
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
-    flowchart: data,
+    flowchart: cleanedData,
     lastUsed: Date.now()
   })
     .then(()=>{
@@ -2112,8 +2115,8 @@ window.saveAsFlowchart = function() {
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
-      _locationIndex: cell._locationIndex||null,
-      _locationTitle: cell._locationTitle||null,
+      _locationIndex: cell._locationIndex !== undefined ? cell._locationIndex : undefined,
+      _locationTitle: cell._locationTitle !== undefined ? cell._locationTitle : undefined,
       _checkboxes: cell._checkboxes||null,
       _itemOrder: cell._itemOrder||null,
       _times: cell._times||null,
@@ -2155,8 +2158,11 @@ window.saveAsFlowchart = function() {
   // Get current edge style
   data.edgeStyle = currentEdgeStyle;
   
+  // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
+  const cleanedData = removeUndefinedValues(data);
+  
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
-    flowchart: data,
+    flowchart: cleanedData,
     lastUsed: Date.now()
   })
     .then(()=>{
@@ -2296,6 +2302,31 @@ window.deleteSavedFlowchart = function(name) {
 /**************************************************
  *            FILE I/O OPERATIONS               *
  **************************************************/
+
+/**
+ * Recursively removes undefined values from an object (Firebase doesn't accept undefined)
+ */
+function removeUndefinedValues(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeUndefinedValues(item));
+  }
+  
+  const cleaned = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key];
+      if (value !== undefined) {
+        cleaned[key] = removeUndefinedValues(value);
+      }
+      // Skip undefined values entirely
+    }
+  }
+  return cleaned;
+}
 
 /**
  * Downloads a string as a JSON file.
@@ -3200,8 +3231,8 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;
         if (item._questionId) newCell._questionId = item._questionId;
-        if (item._locationIndex !== undefined) newCell._locationIndex = item._locationIndex;
-        if (item._locationTitle !== undefined) newCell._locationTitle = item._locationTitle;
+        if (item._locationIndex !== undefined && item._locationIndex !== null) newCell._locationIndex = item._locationIndex;
+        if (item._locationTitle !== undefined && item._locationTitle !== null) newCell._locationTitle = item._locationTitle;
         
         // Amount option properties
         if (item._amountName) newCell._amountName = item._amountName;

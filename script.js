@@ -4422,7 +4422,8 @@ function updatemultipleDropdownTypeCell(cell) {
     </div>
     <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
   // Check if there's a location indicator position
-  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  // Only show location if _locationIndex is defined, not null, and >= 0
+  const locationIndex = (cell._locationIndex !== undefined && cell._locationIndex !== null && cell._locationIndex >= 0) ? cell._locationIndex : -1;
   
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || '';
