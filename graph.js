@@ -1632,7 +1632,7 @@ function showPropertiesPopup(cell) {
       
       return; // Skip the normal property creation
     } else if (prop.special === 'linkedCheckboxOptions') {
-      // Special handling for linked checkbox options (similar to linkedFields but simpler for now)
+      // Special handling for linked checkbox options (exact replica of linkedFields)
       const fieldDiv = document.createElement('div');
       fieldDiv.style.cssText = `
         margin-bottom: 16px;
@@ -1641,12 +1641,13 @@ function showPropertiesPopup(cell) {
       `;
       
       const label = document.createElement('label');
-      label.textContent = prop.label ? prop.label + ':' : '';
+      label.textContent = prop.label ? prop.label + (prop.isInherited ? ' (inherited):' : ':') : '';
       label.style.cssText = `
         font-weight: 600;
         color: #333;
         min-width: 120px;
         margin-right: 12px;
+        ${prop.isInherited ? 'color: #4caf50;' : ''}
       `;
       
       const linkedCheckboxOptionsContainer = document.createElement('div');
@@ -1663,7 +1664,6 @@ function showPropertiesPopup(cell) {
       
       for (let i = 0; i < minDropdowns; i++) {
         const dropdownContainer = document.createElement('div');
-        dropdownContainer.setAttribute('data-dropdown-container', 'true');
         dropdownContainer.style.cssText = `
           display: flex;
           flex-direction: column;
@@ -1671,25 +1671,133 @@ function showPropertiesPopup(cell) {
           margin-bottom: 8px;
         `;
         
-        const dropdown = document.createElement('select');
-        dropdown.style.cssText = `
+        // Create search bar
+        const searchBar = document.createElement('input');
+        searchBar.type = 'text';
+        searchBar.placeholder = 'Search for a checkbox option...';
+        searchBar.style.cssText = `
           width: 100%;
           padding: 6px 8px;
+          margin-bottom: 4px;
           border: 1px solid #ddd;
           border-radius: 4px;
-          font-size: 13px;
+          font-size: 12px;
+          background-color: #f9f9f9;
         `;
         
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        `;
+        
+        // Create custom dropdown container
+        const newDropdownContainer = document.createElement('div');
+        newDropdownContainer.style.cssText = `
+          flex: 1;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        `;
+        
+        // Create the visible dropdown display
+        const dropdownDisplay = document.createElement('div');
+        dropdownDisplay.style.cssText = `
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+          background-color: white;
+          cursor: pointer;
+          min-height: 20px;
+          display: flex;
+          align-items: center;
+        `;
+        dropdownDisplay.textContent = 'Select a checkbox option...';
+        
+        // Create the options container (initially hidden)
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.cssText = `
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        `;
+        
+        // Create hidden select for form compatibility
+        const hiddenSelect = document.createElement('select');
+        hiddenSelect.style.display = 'none';
+        
         // Populate options
-        populateLinkedCheckboxOptionsDropdown(dropdown, cell);
+        populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSelect, cell);
         
         // Set selected value if it exists
         if (linkedCheckboxOptions[i]) {
-          dropdown.value = linkedCheckboxOptions[i];
+          const selectedOption = optionsContainer.querySelector(`[data-value="${linkedCheckboxOptions[i]}"]`);
+          if (selectedOption) {
+            dropdownDisplay.textContent = selectedOption.textContent;
+            hiddenSelect.value = linkedCheckboxOptions[i];
+          }
         }
         
-        dropdownContainer.appendChild(dropdown);
-        linkedCheckboxOptionsContainer.appendChild(dropdownContainer);
+        newDropdownContainer.appendChild(dropdownDisplay);
+        newDropdownContainer.appendChild(hiddenSelect);
+        
+        // Setup search functionality
+        setupLinkedCheckboxOptionsCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.cssText = `
+          padding: 4px 8px;
+          background-color: #f44336;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteBtn.onclick = () => {
+          mainContainer.remove();
+          updateLinkedCheckboxOptions(cell);
+        };
+        
+        // Create the main container for this dropdown
+        const mainContainer = document.createElement('div');
+        mainContainer.setAttribute('data-dropdown-container', 'true');
+        mainContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+          position: relative;
+        `;
+        
+        // Add search bar to main container
+        mainContainer.appendChild(searchBar);
+        
+        // Add options container to main container (positioned relative to search bar)
+        mainContainer.appendChild(optionsContainer);
+        
+        // Add dropdown and delete button to controls container
+        controlsContainer.appendChild(newDropdownContainer);
+        controlsContainer.appendChild(deleteBtn);
+        
+        // Add controls container to main container
+        mainContainer.appendChild(controlsContainer);
+        
+        // Add main container to linked checkbox options container
+        linkedCheckboxOptionsContainer.appendChild(mainContainer);
       }
       
       // Add "Link Another" button
@@ -1707,7 +1815,6 @@ function showPropertiesPopup(cell) {
       `;
       linkAnotherBtn.onclick = () => {
         const linkDropdownContainer = document.createElement('div');
-        linkDropdownContainer.setAttribute('data-dropdown-container', 'true');
         linkDropdownContainer.style.cssText = `
           display: flex;
           flex-direction: column;
@@ -1715,20 +1822,125 @@ function showPropertiesPopup(cell) {
           margin-bottom: 8px;
         `;
         
-        const linkDropdown = document.createElement('select');
-        linkDropdown.style.cssText = `
+        // Create search bar
+        const searchBar = document.createElement('input');
+        searchBar.type = 'text';
+        searchBar.placeholder = 'Search for a checkbox option...';
+        searchBar.style.cssText = `
           width: 100%;
           padding: 6px 8px;
+          margin-bottom: 4px;
           border: 1px solid #ddd;
           border-radius: 4px;
-          font-size: 13px;
+          font-size: 12px;
+          background-color: #f9f9f9;
         `;
         
-        // Populate options
-        populateLinkedCheckboxOptionsDropdown(linkDropdown, cell);
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        `;
         
-        linkDropdownContainer.appendChild(linkDropdown);
-        linkedCheckboxOptionsContainer.insertBefore(linkDropdownContainer, linkAnotherBtn);
+        // Create custom dropdown container
+        const linkNewDropdownContainer = document.createElement('div');
+        linkNewDropdownContainer.style.cssText = `
+          flex: 1;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        `;
+        
+        // Create the visible dropdown display
+        const dropdownDisplay = document.createElement('div');
+        dropdownDisplay.style.cssText = `
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+          background-color: white;
+          cursor: pointer;
+          min-height: 20px;
+          display: flex;
+          align-items: center;
+        `;
+        dropdownDisplay.textContent = 'Select a checkbox option...';
+        
+        // Create the options container (initially hidden)
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.cssText = `
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        `;
+        
+        // Create hidden select for form compatibility
+        const hiddenSelect = document.createElement('select');
+        hiddenSelect.style.display = 'none';
+        
+        // Populate options
+        populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSelect, cell);
+        
+        linkNewDropdownContainer.appendChild(dropdownDisplay);
+        linkNewDropdownContainer.appendChild(hiddenSelect);
+        
+        // Setup search functionality
+        setupLinkedCheckboxOptionsCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.cssText = `
+          padding: 4px 8px;
+          background-color: #f44336;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteBtn.onclick = () => {
+          linkMainContainer.remove();
+          updateLinkedCheckboxOptions(cell);
+        };
+        
+        // Create the main container for this dropdown
+        const linkMainContainer = document.createElement('div');
+        linkMainContainer.setAttribute('data-dropdown-container', 'true');
+        linkMainContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+          position: relative;
+        `;
+        
+        // Add search bar to main container
+        linkMainContainer.appendChild(searchBar);
+        
+        // Add options container to main container (positioned relative to search bar)
+        linkMainContainer.appendChild(optionsContainer);
+        
+        // Add dropdown and delete button to controls container
+        controlsContainer.appendChild(linkNewDropdownContainer);
+        controlsContainer.appendChild(deleteBtn);
+        
+        // Add controls container to main container
+        linkMainContainer.appendChild(controlsContainer);
+        
+        // Add main container to linked checkbox options container
+        linkedCheckboxOptionsContainer.insertBefore(linkMainContainer, linkAnotherBtn);
+        updateLinkedCheckboxOptions(cell);
       };
       
       linkedCheckboxOptionsContainer.appendChild(linkAnotherBtn);
@@ -1753,10 +1965,27 @@ function showPropertiesPopup(cell) {
         const newLinkedCheckboxOptions = [];
         const dropdownContainers = linkedCheckboxOptionsContainer.querySelectorAll('[data-dropdown-container]');
         
-        dropdownContainers.forEach(container => {
-          const select = container.querySelector('select');
-          if (select && select.value) {
-            newLinkedCheckboxOptions.push(select.value);
+        console.log('🔍 [SAVE DEBUG] Found dropdown containers:', dropdownContainers.length);
+        
+        dropdownContainers.forEach((container, index) => {
+          // Try multiple selectors to find the hidden select
+          let hiddenSelect = container.querySelector('select[style*="display: none"]');
+          if (!hiddenSelect) {
+            hiddenSelect = container.querySelector('select[style*="display:none"]');
+          }
+          if (!hiddenSelect) {
+            // Fallback: find any select element in the container
+            hiddenSelect = container.querySelector('select');
+          }
+          
+          console.log(`🔍 [SAVE DEBUG] Container ${index}:`, {
+            hasHiddenSelect: !!hiddenSelect,
+            selectValue: hiddenSelect ? hiddenSelect.value : 'none',
+            selectStyle: hiddenSelect ? hiddenSelect.style.display : 'none'
+          });
+          
+          if (hiddenSelect && hiddenSelect.value) {
+            newLinkedCheckboxOptions.push(hiddenSelect.value);
           }
         });
         
@@ -1765,33 +1994,42 @@ function showPropertiesPopup(cell) {
         
         // Update the cell's linked checkbox node ID
         const nodeIdElement = document.getElementById('propLinkedCheckboxNodeId');
+        console.log('🔍 [SAVE DEBUG] Node ID element:', nodeIdElement);
         if (nodeIdElement) {
+          // Check if it's an input element or a span element
           let nodeIdValue;
           if (nodeIdElement.tagName === 'INPUT') {
             nodeIdValue = nodeIdElement.value;
           } else {
+            // It's a span element, get the text content
             nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
           }
+          console.log('🔍 [SAVE DEBUG] Node ID value:', nodeIdValue);
           cell._linkedCheckboxNodeId = nodeIdValue;
+        } else {
+          console.log('⚠️ [SAVE DEBUG] Node ID element not found!');
         }
         
         // Show success message
+        const originalText = saveBtn.textContent;
         saveBtn.textContent = 'Saved!';
-        saveBtn.style.backgroundColor = '#4CAF50';
+        saveBtn.style.backgroundColor = '#45a049';
         setTimeout(() => {
-          saveBtn.textContent = 'Save';
+          saveBtn.textContent = originalText;
           saveBtn.style.backgroundColor = '#4CAF50';
         }, 1000);
         
-        // Update the cell display
-        if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
-          window.updateLinkedCheckboxNodeCell(cell);
-        }
+        console.log('✅ [SAVE SUCCESS] Linked Checkbox Properties saved:', {
+          nodeId: cell._linkedCheckboxNodeId,
+          linkedCheckboxOptions: cell._linkedCheckboxOptions,
+          cellId: cell.id
+        });
         
-        // Trigger autosave
-        if (typeof window.requestAutosave === 'function') {
-          window.requestAutosave();
-        }
+        // Verify the properties were actually set on the cell
+        console.log('🔍 [SAVE VERIFY] Cell properties after save:', {
+          _linkedCheckboxNodeId: cell._linkedCheckboxNodeId,
+          _linkedCheckboxOptions: cell._linkedCheckboxOptions
+        });
       };
       
       linkedCheckboxOptionsContainer.appendChild(saveBtn);
@@ -1799,6 +2037,26 @@ function showPropertiesPopup(cell) {
       fieldDiv.appendChild(label);
       fieldDiv.appendChild(linkedCheckboxOptionsContainer);
       content.appendChild(fieldDiv);
+      
+      // Helper function to update linked checkbox options
+      function updateLinkedCheckboxOptions(cell) {
+        const dropdowns = linkedCheckboxOptionsContainer.querySelectorAll('select');
+        const newLinkedCheckboxOptions = Array.from(dropdowns).map(dropdown => dropdown.value).filter(value => value);
+        console.log('💾 [UPDATE LINKED CHECKBOX OPTIONS] Updating _linkedCheckboxOptions from', cell._linkedCheckboxOptions, 'to', newLinkedCheckboxOptions);
+        cell._linkedCheckboxOptions = newLinkedCheckboxOptions;
+        
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      }
+      
+      // Add change listeners to all dropdowns
+      linkedCheckboxOptionsContainer.addEventListener('change', (e) => {
+        if (e.target.tagName === 'SELECT') {
+          updateLinkedCheckboxOptions(cell);
+        }
+      });
       
       return; // Skip the normal property creation
     }
@@ -2560,6 +2818,21 @@ function showPropertiesPopup(cell) {
                 // Update the node text to match the Node ID for linked logic nodes
                 if (typeof window.updateLinkedLogicNodeCell === 'function') {
                   window.updateLinkedLogicNodeCell(cell);
+                }
+                
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propLinkedCheckboxNodeId':
+                // Update the linked checkbox node ID property
+                console.log('💾 [SAVE VALUE] Updating _linkedCheckboxNodeId from', cell._linkedCheckboxNodeId, 'to', newValue);
+                cell._linkedCheckboxNodeId = newValue;
+                
+                // Update the node text to match the Node ID for linked checkbox nodes
+                if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
+                  window.updateLinkedCheckboxNodeCell(cell);
                 }
                 
                 // Trigger autosave
@@ -4233,6 +4506,360 @@ function setupLinkedLogicSearch(dropdown, searchBar) {
     setTimeout(() => {
       dropdown.size = 1;
       dropdown.multiple = false; // Reset to single select
+    }, 200);
+  });
+}
+
+/**
+ * Populate custom dropdown with checkbox option Node IDs from flowchart (for linked checkbox nodes)
+ */
+function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSelect, cell) {
+  // Clear existing options
+  optionsContainer.innerHTML = '';
+  hiddenSelect.innerHTML = '';
+  
+  // Add default option
+  const defaultOption = document.createElement('div');
+  defaultOption.textContent = 'Select a checkbox option...';
+  defaultOption.style.cssText = `
+    padding: 8px;
+    color: #666;
+    cursor: pointer;
+  `;
+  defaultOption.setAttribute('data-value', '');
+  optionsContainer.appendChild(defaultOption);
+  
+  const defaultSelectOption = document.createElement('option');
+  defaultSelectOption.value = '';
+  defaultSelectOption.textContent = 'Select a checkbox option...';
+  hiddenSelect.appendChild(defaultSelectOption);
+  
+  // Get all cells in the graph
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const allCells = graph.getChildVertices(graph.getDefaultParent());
+  
+  // Find all checkbox question nodes
+  const checkboxNodes = allCells.filter(cell => {
+    if (cell.style && cell.style.includes('nodeType=question')) {
+      return cell.style.includes('questionType=checkbox');
+    }
+    return false;
+  });
+  
+  // Find all numbered dropdown question nodes that have checkboxes
+  const numberedDropdownNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           cell.style.includes('questionType=multipleDropdownType');
+  });
+  
+  // Add options from checkbox questions (regular checkbox questions with option nodes)
+  checkboxNodes.forEach(node => {
+    // For regular checkbox questions, find option nodes connected via edges
+    const outgoingEdges = graph.getOutgoingEdges(node);
+    if (outgoingEdges && outgoingEdges.length > 0) {
+      outgoingEdges.forEach(edge => {
+        const targetCell = edge.target;
+        if (targetCell && targetCell.style && targetCell.style.includes('nodeType=options')) {
+          let optionNodeId = null;
+          if (typeof window.getNodeId === 'function') {
+            optionNodeId = window.getNodeId(targetCell);
+          }
+          if (!optionNodeId) {
+            const nodeIdMatch = targetCell.style.match(/nodeId=([^;]+)/);
+            if (nodeIdMatch && nodeIdMatch[1]) {
+              optionNodeId = nodeIdMatch[1];
+            }
+          }
+          
+          if (optionNodeId) {
+            // Check if already added
+            const existingOption = Array.from(optionsContainer.children).find(
+              opt => opt.getAttribute('data-value') === optionNodeId
+            );
+            if (!existingOption) {
+              const option = document.createElement('div');
+              option.textContent = optionNodeId;
+              option.style.cssText = `
+                padding: 8px;
+                cursor: pointer;
+                border-bottom: 1px solid #eee;
+              `;
+              option.setAttribute('data-value', optionNodeId);
+              optionsContainer.appendChild(option);
+              
+              const selectOption = document.createElement('option');
+              selectOption.value = optionNodeId;
+              selectOption.textContent = optionNodeId;
+              hiddenSelect.appendChild(selectOption);
+            }
+          }
+        }
+      });
+    }
+    
+    // Also check for _checkboxes property (for numbered dropdown checkboxes)
+    if (node._checkboxes && Array.isArray(node._checkboxes)) {
+      node._checkboxes.forEach(checkbox => {
+        if (checkbox.options && Array.isArray(checkbox.options)) {
+          checkbox.options.forEach(option => {
+            if (option.nodeId) {
+              // Check if already added
+              const existingOption = Array.from(optionsContainer.children).find(
+                opt => opt.getAttribute('data-value') === option.nodeId
+              );
+              if (!existingOption) {
+                const optionDiv = document.createElement('div');
+                optionDiv.textContent = option.nodeId;
+                optionDiv.style.cssText = `
+                  padding: 8px;
+                  cursor: pointer;
+                  border-bottom: 1px solid #eee;
+                `;
+                optionDiv.setAttribute('data-value', option.nodeId);
+                optionsContainer.appendChild(optionDiv);
+                
+                const selectOption = document.createElement('option');
+                selectOption.value = option.nodeId;
+                selectOption.textContent = option.nodeId;
+                hiddenSelect.appendChild(selectOption);
+              }
+            }
+          });
+        }
+      });
+    }
+  });
+  
+  // Add options from numbered dropdown questions (main checkboxes and trigger sequence checkboxes)
+  numberedDropdownNodes.forEach(node => {
+    // Main checkboxes
+    if (node._checkboxes && Array.isArray(node._checkboxes)) {
+      node._checkboxes.forEach(checkbox => {
+        if (checkbox.options && Array.isArray(checkbox.options)) {
+          checkbox.options.forEach(option => {
+            if (option.nodeId) {
+              // Check if already added
+              const existingOption = Array.from(optionsContainer.children).find(
+                opt => opt.getAttribute('data-value') === option.nodeId
+              );
+              if (!existingOption) {
+                const optionDiv = document.createElement('div');
+                optionDiv.textContent = option.nodeId;
+                optionDiv.style.cssText = `
+                  padding: 8px;
+                  cursor: pointer;
+                  border-bottom: 1px solid #eee;
+                `;
+                optionDiv.setAttribute('data-value', option.nodeId);
+                optionsContainer.appendChild(optionDiv);
+                
+                const selectOption = document.createElement('option');
+                selectOption.value = option.nodeId;
+                selectOption.textContent = option.nodeId;
+                hiddenSelect.appendChild(selectOption);
+              }
+            }
+          });
+        }
+      });
+    }
+    
+    // Trigger sequence checkboxes
+    if (node._dropdowns && Array.isArray(node._dropdowns)) {
+      node._dropdowns.forEach(dropdownItem => {
+        if (dropdownItem.triggerSequences && Array.isArray(dropdownItem.triggerSequences)) {
+          dropdownItem.triggerSequences.forEach(trigger => {
+            if (trigger.checkboxes && Array.isArray(trigger.checkboxes)) {
+              trigger.checkboxes.forEach(checkbox => {
+                if (checkbox.options && Array.isArray(checkbox.options)) {
+                  checkbox.options.forEach(option => {
+                    if (option.nodeId) {
+                      // Check if already added
+                      const existingOption = Array.from(optionsContainer.children).find(
+                        opt => opt.getAttribute('data-value') === option.nodeId
+                      );
+                      if (!existingOption) {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.textContent = option.nodeId;
+                        optionDiv.style.cssText = `
+                          padding: 8px;
+                          cursor: pointer;
+                          border-bottom: 1px solid #eee;
+                        `;
+                        optionDiv.setAttribute('data-value', option.nodeId);
+                        optionsContainer.appendChild(optionDiv);
+                        
+                        const selectOption = document.createElement('option');
+                        selectOption.value = option.nodeId;
+                        selectOption.textContent = option.nodeId;
+                        hiddenSelect.appendChild(selectOption);
+                      }
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+  
+  // If no checkbox options found, add a placeholder
+  if (optionsContainer.children.length === 1) { // Only the default option
+    const noOptions = document.createElement('div');
+    noOptions.textContent = 'No checkbox options found';
+    noOptions.style.cssText = `
+      padding: 8px;
+      color: #666;
+      font-style: italic;
+    `;
+    optionsContainer.appendChild(noOptions);
+  }
+}
+
+/**
+ * Setup search functionality for linked checkbox options custom dropdown
+ */
+function setupLinkedCheckboxOptionsCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar) {
+  // Store original options for filtering
+  let originalOptions = Array.from(optionsContainer.children);
+  
+  // Function to extract keywords from search term
+  const extractKeywords = (term) => {
+    return term.toLowerCase()
+      .split(/[\s_]+/)  // Split on spaces and underscores
+      .filter(keyword => keyword.length > 0);  // Remove empty strings
+  };
+  
+  // Function to normalize option text for comparison
+  const normalizeOptionText = (text) => {
+    return text.toLowerCase().replace(/[\s_]+/g, ' ');
+  };
+  
+  // Function to check if option matches all keywords
+  const matchesAllKeywords = (optionText, keywords) => {
+    const normalizedText = normalizeOptionText(optionText);
+    return keywords.every(keyword => normalizedText.includes(keyword));
+  };
+  
+  // Function to filter and update options
+  const updateOptions = (searchTerm) => {
+    // Clear options
+    optionsContainer.innerHTML = '';
+    
+    if (searchTerm.length === 0) {
+      // Show all options when search is empty
+      originalOptions.forEach(option => {
+        const newOption = option.cloneNode(true);
+        optionsContainer.appendChild(newOption);
+      });
+    } else {
+      // Extract keywords from search term
+      const keywords = extractKeywords(searchTerm);
+      
+      // Filter and add matching options
+      const filteredOptions = originalOptions.filter(option => {
+        const text = option.textContent;
+        return matchesAllKeywords(text, keywords);
+      });
+      
+      filteredOptions.forEach(option => {
+        const newOption = option.cloneNode(true);
+        optionsContainer.appendChild(newOption);
+      });
+      
+      // If no results, show a message
+      if (filteredOptions.length === 0) {
+        const noResultsOption = document.createElement('div');
+        noResultsOption.textContent = 'No matching options found';
+        noResultsOption.style.cssText = `
+          padding: 8px;
+          color: #666;
+          font-style: italic;
+        `;
+        optionsContainer.appendChild(noResultsOption);
+      }
+    }
+  };
+  
+  // Add click handler for option selection
+  optionsContainer.addEventListener('click', function(e) {
+    const clickedOption = e.target.closest('[data-value]');
+    if (clickedOption) {
+      const value = clickedOption.getAttribute('data-value');
+      const text = clickedOption.textContent;
+      
+      if (value) {
+        hiddenSelect.value = value;
+        dropdownDisplay.textContent = text;
+        optionsContainer.style.display = 'none';
+        searchBar.value = ''; // Clear search
+        updateOptions(''); // Restore all options
+      }
+    }
+  });
+  
+  // Add hover effect for options
+  optionsContainer.addEventListener('mouseover', function(e) {
+    const option = e.target.closest('[data-value]');
+    if (option) {
+      option.style.backgroundColor = '#f0f0f0';
+    }
+  });
+  
+  optionsContainer.addEventListener('mouseout', function(e) {
+    const option = e.target.closest('[data-value]');
+    if (option) {
+      option.style.backgroundColor = '';
+    }
+  });
+  
+  // Add search functionality
+  searchBar.addEventListener('input', function() {
+    const searchTerm = this.value;
+    updateOptions(searchTerm);
+    optionsContainer.style.display = 'block'; // Show options when typing
+  });
+  
+  // Show options when search bar is focused
+  searchBar.addEventListener('focus', function() {
+    this.style.borderColor = '#2196f3';
+    this.style.backgroundColor = 'white';
+    updateOptions(this.value);
+    optionsContainer.style.display = 'block';
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!searchBar.contains(e.target) && !optionsContainer.contains(e.target) && !dropdownDisplay.contains(e.target)) {
+      optionsContainer.style.display = 'none';
+      searchBar.style.borderColor = '#ddd';
+      searchBar.style.backgroundColor = '#f9f9f9';
+    }
+  });
+  
+  // Show/hide dropdown when clicking dropdown display
+  dropdownDisplay.addEventListener('click', function() {
+    if (optionsContainer.style.display === 'none' || !optionsContainer.style.display) {
+      searchBar.focus();
+      optionsContainer.style.display = 'block';
+      updateOptions(searchBar.value);
+    } else {
+      optionsContainer.style.display = 'none';
+    }
+  });
+  
+  // Handle search bar blur - close dropdown after a delay
+  searchBar.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+    this.style.backgroundColor = '#f9f9f9';
+    
+    // Close dropdown after a short delay to allow for selection
+    setTimeout(() => {
+      optionsContainer.style.display = 'none';
     }, 200);
   });
 }

@@ -317,8 +317,13 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._linkedLogicNodeId !== undefined) cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
     if (cell._linkedFields !== undefined) cellData._linkedFields = cell._linkedFields;
     
+    // Linked checkbox node properties
+    if (cell._linkedCheckboxNodeId !== undefined) cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
+    if (cell._linkedCheckboxOptions !== undefined) cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
+    
     // mult dropdown location indicator
     if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
+    if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
 
     return cellData;
   });
