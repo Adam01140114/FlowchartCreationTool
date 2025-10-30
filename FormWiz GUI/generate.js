@@ -64,13 +64,10 @@ function sanitizeQuestionText (str){
 
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    
-    const selectedState = dropdown.value;
-    
-    const fullField = document.getElementById(hiddenFullId);
-    const shortField = document.getElementById(hiddenShortId);
-    
-    
+    const selectedState = dropdown && dropdown.value ? dropdown.value : '';
+    const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
+    const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
+
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -84,17 +81,9 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     
-    if (fullField && shortField) {
-        if (selectedState) {
-            const abbreviation = stateAbbreviations[selectedState] || '';
-            fullField.value = selectedState;
-            shortField.value = abbreviation;
-        } else {
-            fullField.value = '';
-            shortField.value = '';
-        }
-    } else {
-    }
+    const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
+    if (shortField) shortField.value = abbreviation;
+    if (fullField && fullField.tagName !== 'SELECT') fullField.value = selectedState;
 }
 
 /* slug‑aware prefix for any checkbox belonging to a question */
@@ -385,14 +374,14 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    <link rel="stylesheet" href="generate.css">',
     '    <link rel="stylesheet" href="generate2.css">',
     '    <style>',
-    '        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
-    '        .address-field { margin: 8px 0; }',
-    '        .address-input, .address-select { width: 100%; max-width: 400px; padding: 12px 16px; border: 1px solid #e1e5e9 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; }',
-    '        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1); }',
+    '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
+    '        .address-field { margin: 4px auto; }',
+    '        .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }',
+    '        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }',
     '        .address-input::placeholder { color: #6c757d; opacity: 1; }',
-    '        .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; text-align: center; }',
-    '        .address-field:first-child { margin-top: 0; }',
-    '        .address-field:last-child { margin-bottom: 0; }',
+    '        .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
+    '        .address-field:first-child { margin-top: 2px; }',
+    '        .address-field:last-child { margin-bottom: 2px; }',
     '        .hidden { display: none !important; }',
     '    </style>',
     "</head>",
@@ -4450,11 +4439,11 @@ function showTextboxLabels(questionId, count){
             if (field.type === 'location') {
                 // Render main location field block
                 const locationFieldDiv = document.createElement('div');
-                locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display:flex; flex-direction:column; align-items:center;';
+                locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; display:flex; flex-direction:column; align-items:center; box-shadow: 0 2px 6px rgba(0,0,0,0.05);';
                 const title = (field.fieldName || 'Location Data') + ':';
                 const fieldNameLabel = document.createElement('label');
                 fieldNameLabel.textContent = title;
-                fieldNameLabel.style.cssText = 'display:block;margin-bottom:8px;font-weight:bold;color:#2980b9;font-size:15px;text-align:center;';
+                fieldNameLabel.style.cssText = 'display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:15px;text-align:center;';
                 locationFieldDiv.appendChild(fieldNameLabel);
 
                 // Inputs
@@ -4464,28 +4453,58 @@ function showTextboxLabels(questionId, count){
                     { label:'State', nodeId:'state' },
                     { label:'Zip', nodeId:'zip' }
                 ];
+                let locPrefix = sanitizeQuestionText(field.fieldName || 'location');
+                locPrefix = locPrefix.replace(/ +/g, '_');
                 locs.forEach(f=>{
                     let input;
                     if (f.label === 'State'){
                         input = document.createElement('select');
-                        input.id = f.nodeId + '_' + j;
+                        input.id = locPrefix + '_' + f.nodeId + '_' + j;
                         input.name = input.id;
-                        input.style.cssText = 'width: 200px; padding: 8px; border: 1px solid #87CEEB; border-radius: 6px; font-size: 14px; background-color: white; color: #2c3e50; text-align: center; margin: 8px 0;';
+                        input.className = 'address-select';
+                        // Create hidden short code field for state abbreviation
+                        const shortHidden = document.createElement('input');
+                        shortHidden.type = 'text';
+                        shortHidden.id = locPrefix + '_state_short_' + j;
+                        shortHidden.name = shortHidden.id;
+                        shortHidden.style.display = 'none';
                         const defaultOption = document.createElement('option');
                         defaultOption.value = '';
                         defaultOption.textContent = 'Select State';
                         input.appendChild(defaultOption);
                         const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
                         states.forEach(state=>{ const o=document.createElement('option'); o.value=state; o.textContent=state; input.appendChild(o); });
+
+                        // Keep short field and hidden checkbox in sync with selection
+                        input.addEventListener('change', function(){
+                            if (typeof updateStateHiddenFields === 'function') {
+                                updateStateHiddenFields(this, input.id, shortHidden.id);
+                            }
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(this, input.id);
+                            }
+                            if (typeof updateHiddenLogic === 'function') {
+                                updateHiddenLogic(input.id, this.value);
+                            }
+                        });
+
+                        // Append hidden short field to the container
+                        const hiddenWrap = document.createElement('div');
+                        hiddenWrap.style.display = 'none';
+                        hiddenWrap.appendChild(shortHidden);
+                        locationFieldDiv.appendChild(hiddenWrap);
                     } else {
                         input = document.createElement('input');
                         input.type = f.label === 'Zip' ? 'number' : 'text';
-                        input.id = f.nodeId + '_' + j;
+                        input.id = locPrefix + '_' + f.nodeId + '_' + j;
                         input.name = input.id;
-                        input.placeholder = 'Enter ' + f.label.toLowerCase();
-                        input.style.cssText = 'width: 200px; padding: 8px; border: 1px solid #87CEEB; border-radius: 6px; font-size: 14px; background-color: white; color: #2c3e50; text-align: center; margin: 8px 0;';
+                        input.placeholder = f.label; // Street, City, Zip
+                        input.className = 'address-input';
                     }
-                    locationFieldDiv.appendChild(input);
+                    const fieldWrap = document.createElement('div');
+                    fieldWrap.className = 'address-field';
+                    fieldWrap.appendChild(input);
+                    locationFieldDiv.appendChild(fieldWrap);
                 });
                 entryContainer.appendChild(locationFieldDiv);
             } else if (field.type === 'label') {
@@ -6710,7 +6729,7 @@ if (typeof handleNext === 'function') {
                 fields.forEach(el => {
                     if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
                         // This is a state dropdown that was autofilled
-                        const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+                        const hiddenFullId = el.id; // use the select's id as the full field reference
                         const hiddenShortId = window.toShortIdFromBase(el.id);
                         if (typeof updateStateHiddenFields === 'function') {
                             updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
@@ -8113,6 +8132,12 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       const checkboxId = baseName + "_" + idSuffix;
       const checkboxName = baseName + "_" + idSuffix;
       
+      // Clear any existing hidden checkboxes for this dropdown to prevent stale checks
+      const wrap = document.getElementById("dropdowntext_" + baseName);
+      if (wrap) {
+        while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+      }
+
       // Check if this checkbox already exists
       const existingCheckbox = document.getElementById(checkboxId);
       if (!existingCheckbox) {
@@ -8728,13 +8753,10 @@ document.addEventListener('change', function() {
 
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    
-    const selectedState = dropdown.value;
-    
-    const fullField = document.getElementById(hiddenFullId);
-    const shortField = document.getElementById(hiddenShortId);
-    
-    
+    const selectedState = dropdown && dropdown.value ? dropdown.value : '';
+    const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
+    const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
+
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -8748,17 +8770,9 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     
-    if (fullField && shortField) {
-        if (selectedState) {
-            const abbreviation = stateAbbreviations[selectedState] || '';
-            fullField.value = selectedState;
-            shortField.value = abbreviation;
-        } else {
-            fullField.value = '';
-            shortField.value = '';
-        }
-    } else {
-    }
+    const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
+    if (shortField) shortField.value = abbreviation;
+    if (fullField && fullField.tagName !== 'SELECT') fullField.value = selectedState;
 }
 
 // Function to update user full name
@@ -9283,13 +9297,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Handle simplified location field format ("Location Data Added")
         // Create location field container
         const locationFieldDiv = document.createElement('div');
-        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1); display: flex; flex-direction: column; align-items: center;';
+        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;';
         
         const fieldNameLabel = document.createElement('label');
         console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
         console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
         fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
-        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px; text-align: center;';
         locationFieldDiv.appendChild(fieldNameLabel);
         
         // Create location fields (Street, City, State, Zip)
@@ -9299,15 +9313,22 @@ document.addEventListener('DOMContentLoaded', function() {
           { label: 'State', nodeId: 'state' },
           { label: 'Zip', nodeId: 'zip' }
         ];
-        
+        let locPrefix = sanitizeQuestionText(triggerField.fieldName || 'location');
+        locPrefix = locPrefix.replace(/ +/g, '_');
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
             // Create state dropdown
             input = document.createElement('select');
-            input.id = field.nodeId + "_" + entryNumber;
+            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
             input.name = input.id;
-            input.style.cssText = 'width: 200px; padding: 8px; border: 1px solid #87CEEB; border-radius: 6px; font-size: 14px; background-color: white; color: #2c3e50; text-align: center; margin: 8px 0;';
+            input.className = 'address-select';
+            // Hidden short code field
+            const shortHidden = document.createElement('input');
+            shortHidden.type = 'text';
+            shortHidden.id = locPrefix + '_state_short_' + entryNumber;
+            shortHidden.name = shortHidden.id;
+            shortHidden.style.display = 'none';
             
             // Add state options
             const states = [
@@ -9331,27 +9352,40 @@ document.addEventListener('DOMContentLoaded', function() {
               option.textContent = state;
               input.appendChild(option);
             });
+
+            // Sync abbreviation and hidden checkbox on change
+            input.addEventListener('change', function(){
+              if (typeof updateStateHiddenFields === 'function') {
+                updateStateHiddenFields(this, input.id, shortHidden.id);
+              }
+              if (typeof dropdownMirror === 'function') {
+                dropdownMirror(this, input.id);
+              }
+              if (typeof updateHiddenLogic === 'function') {
+                updateHiddenLogic(input.id, this.value);
+              }
+            });
+
+            // Append hidden short field
+            const hiddenWrap = document.createElement('div');
+            hiddenWrap.style.display = 'none';
+            hiddenWrap.appendChild(shortHidden);
+            locationFieldDiv.appendChild(hiddenWrap);
           } else {
             // Create text input for other fields
             input = document.createElement('input');
             input.type = field.label === 'Zip' ? 'number' : 'text';
-            input.id = field.nodeId + "_" + entryNumber;
+            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
             input.name = input.id;
-            input.placeholder = field.label === 'State' ? 'Select State' : 'Enter ' + field.label.toLowerCase();
-            input.style.cssText = 'width: 200px; padding: 8px; border: 1px solid #87CEEB; border-radius: 6px; font-size: 14px; background-color: white; color: #2c3e50; text-align: center; margin: 8px 0;';
+            input.placeholder = field.label; // e.g., Street, City, Zip
+            input.className = 'address-input';
           }
           
-          // Add hover effect
-          input.addEventListener('mouseenter', function() {
-            this.style.borderColor = '#5DADE2';
-            this.style.backgroundColor = '#f8f9ff';
-          });
-          input.addEventListener('mouseleave', function() {
-            this.style.borderColor = '#87CEEB';
-            this.style.backgroundColor = 'white';
-          });
-          
-          locationFieldDiv.appendChild(input);
+          // Wrap each input in an .address-field div so margins apply
+          const addrWrap = document.createElement('div');
+          addrWrap.className = 'address-field';
+          addrWrap.appendChild(input);
+          locationFieldDiv.appendChild(addrWrap);
         });
         
         triggerContainer.appendChild(locationFieldDiv);

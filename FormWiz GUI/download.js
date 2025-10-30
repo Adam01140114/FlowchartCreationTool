@@ -2424,16 +2424,16 @@ function exportForm() {
                     } else if (fieldType === 'time') {
                             // Handle time fields - use same structure as label fields
                     if (labelTextEl && nodeIdTextEl) {
-                                const labelText = labelTextEl.textContent.trim();
-                                const nodeIdText = nodeIdTextEl.textContent.trim();
-                                
-                                allFieldsInOrder.push({
-                                    type: fieldType,
-                                    label: labelText,
-                                    nodeId: nodeIdText,
-                                    order: parseInt(fieldOrder)
-                                });
-                            }
+                        const labelText = labelTextEl.textContent.trim();
+                        const nodeIdText = nodeIdTextEl.textContent.trim();
+                        
+                        allFieldsInOrder.push({
+                            type: fieldType,
+                            label: labelText,
+                            nodeId: nodeIdText,
+                            order: parseInt(fieldOrder)
+                        });
+                    }
                         } else if (fieldType === 'location') {
                             // Handle main location field
                             const titleEl = field.querySelector('#locationTitle' + questionId + '_' + fieldOrder);
