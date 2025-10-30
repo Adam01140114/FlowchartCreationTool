@@ -1407,6 +1407,15 @@ window.showNumberedDropdownProperties = function(cell) {
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
   
+  // Auto-focus and select the question text input
+  setTimeout(() => {
+    const questionInput = modal.querySelector('input[type="text"]');
+    if (questionInput) {
+      questionInput.focus();
+      questionInput.select();
+    }
+  }, 100);
+  
   // Close on Enter key press (auto-save)
   modal.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.target.matches('input, textarea, button')) {
@@ -2390,6 +2399,31 @@ function createOptionsContainer(cell) {
     // Add to item order
     if (!cell._itemOrder) {
       cell._itemOrder = [];
+      
+      // Initialize item order with existing entries if it's empty
+      const options = cell._textboxes || [];
+      const checkboxes = cell._checkboxes || [];
+      const times = cell._times || [];
+      
+      // Add all existing options
+      options.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'option', index: index });
+      });
+      
+      // Add all existing checkboxes
+      checkboxes.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'checkbox', index: index });
+      });
+      
+      // Add all existing times
+      times.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'time', index: index });
+      });
+      
+      // Add location if it exists
+      if (cell._locationIndex >= 0) {
+        cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
+      }
     }
     
     cell._itemOrder.push({
@@ -2397,12 +2431,37 @@ function createOptionsContainer(cell) {
       index: cell._dropdowns.length - 1
     });
     
-      // Add to the main unified container instead of the separate dropdown container
+      // Refresh the display to show the new dropdown in the correct position
       const mainContainer = document.querySelector('.unified-fields-container');
       if (mainContainer) {
-        // Create a unified dropdown entry that looks like other entries
-        const unifiedDropdownEntry = createUnifiedDropdownEntry(newDropdown, cell._dropdowns.length - 1, cell);
-        mainContainer.appendChild(unifiedDropdownEntry);
+        // Clear the container
+        mainContainer.innerHTML = '';
+        
+        // Re-render all entries in the correct order
+        if (cell._itemOrder && cell._itemOrder.length > 0) {
+          const options = cell._textboxes || [];
+          const checkboxes = cell._checkboxes || [];
+          const times = cell._times || [];
+          
+          cell._itemOrder.forEach((item, displayIndex) => {
+            if (item.type === 'option' && options[item.index]) {
+              const optionContainer = createOptionField(options[item.index], item.index, cell, mainContainer);
+              mainContainer.appendChild(optionContainer);
+            } else if (item.type === 'checkbox' && checkboxes[item.index]) {
+              const checkboxContainer = createCheckboxField(checkboxes[item.index], item.index, cell, mainContainer);
+              mainContainer.appendChild(checkboxContainer);
+            } else if (item.type === 'time' && times[item.index]) {
+              const timeContainer = createTimeField(times[item.index], item.index, cell, mainContainer);
+              mainContainer.appendChild(timeContainer);
+            } else if (item.type === 'location' && cell._locationIndex >= 0) {
+              const locationIndicator = createLocationIndicator(cell, mainContainer);
+              mainContainer.appendChild(locationIndicator);
+            } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
+              const unifiedDropdownEntry = createUnifiedDropdownEntry(cell._dropdowns[item.index], item.index, cell);
+              mainContainer.appendChild(unifiedDropdownEntry);
+            }
+          });
+        }
       }
     
     // Trigger autosave
@@ -3766,6 +3825,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           };
           
+          // Selection type dropdown
+          const selectionTypeLabel = document.createElement('label');
+          selectionTypeLabel.textContent = 'Selection Type:';
+          selectionTypeLabel.style.cssText = `
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #333;
+          `;
+          
+          const selectionTypeSelect = document.createElement('select');
+          selectionTypeSelect.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            background: white;
+          `;
+          
+          const markAllOption = document.createElement('option');
+          markAllOption.value = 'multiple';
+          markAllOption.textContent = 'Mark All That Apply';
+          markAllOption.selected = true;
+          
+          const markOneOption = document.createElement('option');
+          markOneOption.value = 'single';
+          markOneOption.textContent = 'Mark Only One';
+          
+          selectionTypeSelect.appendChild(markAllOption);
+          selectionTypeSelect.appendChild(markOneOption);
+          
+          // Initialize selection type
+          if (!newCheckbox.selectionType) {
+            newCheckbox.selectionType = 'multiple';
+          }
+          selectionTypeSelect.value = newCheckbox.selectionType;
+          
+          selectionTypeSelect.onchange = () => {
+            newCheckbox.selectionType = selectionTypeSelect.value;
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
           // Add checkbox option button
           const addCheckboxOptionBtn = document.createElement('button');
           addCheckboxOptionBtn.textContent = 'Add checkbox option';
@@ -3886,6 +3992,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           };
           
           checkboxContainer.appendChild(fieldNameInput);
+          checkboxContainer.appendChild(selectionTypeLabel);
+          checkboxContainer.appendChild(selectionTypeSelect);
           checkboxContainer.appendChild(addCheckboxOptionBtn);
           checkboxContainer.appendChild(deleteCheckboxBtn);
           actionsList.appendChild(checkboxContainer);
@@ -4004,9 +4112,172 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       }
     };
     
+    const addLocationBtn = document.createElement('button');
+    addLocationBtn.textContent = '+ Location';
+    addLocationBtn.style.cssText = `
+      background: #ff9800;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    `;
+    addLocationBtn.onclick = () => {
+      // Create new location entry (like the main location button)
+      const newLocation = { 
+        type: 'location',
+        fieldName: 'Location Data Inserted',
+        nodeId: ''
+      };
+      if (!trigger.locations) trigger.locations = [];
+      trigger.locations.push(newLocation);
+      
+      // Update the actions list for this trigger sequence
+      const triggerDiv = addLocationBtn.closest('.trigger-sequence');
+      if (triggerDiv) {
+        const actionsList = triggerDiv.querySelector('.actions-list');
+        if (actionsList) {
+          // Create location entry container (styled like main location indicator)
+          const locationContainer = document.createElement('div');
+          locationContainer.style.cssText = `
+            margin: 8px 0;
+            padding: 8px;
+            background-color: #e8f5e8;
+            border: 2px dashed #28a745;
+            border-radius: 4px;
+            text-align: center;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 12px;
+          `;
+          
+          // Location indicator text
+          const locationText = document.createElement('div');
+          locationText.textContent = '📍 Location Data Inserted';
+          locationText.style.cssText = `
+            margin-bottom: 8px;
+          `;
+          
+          // Field name input (hidden by default, shown on edit)
+          const fieldNameInput = document.createElement('input');
+          fieldNameInput.type = 'text';
+          fieldNameInput.value = newLocation.fieldName;
+          fieldNameInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: none;
+          `;
+          fieldNameInput.onblur = () => {
+            newLocation.fieldName = fieldNameInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Location ID input (hidden by default, shown on edit)
+          const locationIdInput = document.createElement('input');
+          locationIdInput.type = 'text';
+          locationIdInput.placeholder = 'Location ID...';
+          locationIdInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: none;
+          `;
+          locationIdInput.onblur = () => {
+            newLocation.nodeId = locationIdInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Button container
+          const buttonContainer = document.createElement('div');
+          buttonContainer.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+          `;
+          
+          // Edit button
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Edit';
+          editBtn.style.cssText = `
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+          `;
+          editBtn.onclick = () => {
+            if (fieldNameInput.style.display === 'none') {
+              fieldNameInput.style.display = 'block';
+              locationIdInput.style.display = 'block';
+              locationText.style.display = 'none';
+              editBtn.textContent = 'Save';
+            } else {
+              fieldNameInput.style.display = 'none';
+              locationIdInput.style.display = 'none';
+              locationText.style.display = 'block';
+              locationText.textContent = '📍 ' + fieldNameInput.value;
+              editBtn.textContent = 'Edit';
+            }
+          };
+          
+          // Delete location button
+          const deleteLocationBtn = document.createElement('button');
+          deleteLocationBtn.textContent = 'Remove';
+          deleteLocationBtn.style.cssText = `
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+          `;
+          deleteLocationBtn.onclick = () => {
+            const locationIndex = trigger.locations.findIndex(l => l === newLocation);
+            if (locationIndex !== -1) {
+              trigger.locations.splice(locationIndex, 1);
+            }
+            locationContainer.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          buttonContainer.appendChild(editBtn);
+          buttonContainer.appendChild(deleteLocationBtn);
+          
+          locationContainer.appendChild(locationText);
+          locationContainer.appendChild(fieldNameInput);
+          locationContainer.appendChild(locationIdInput);
+          locationContainer.appendChild(buttonContainer);
+          actionsList.appendChild(locationContainer);
+        }
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
     actionButtons.appendChild(addLabelBtn);
     actionButtons.appendChild(addCheckboxBtn);
     actionButtons.appendChild(addTimeBtn);
+    actionButtons.appendChild(addLocationBtn);
     triggerDiv.appendChild(actionButtons);
 
     // Display existing actions using the new enhanced structure
@@ -4200,6 +4471,49 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
+        // Selection type dropdown
+        const selectionTypeLabel = document.createElement('label');
+        selectionTypeLabel.textContent = 'Selection Type:';
+        selectionTypeLabel.style.cssText = `
+          display: block;
+          font-size: 12px;
+          font-weight: bold;
+          margin-bottom: 4px;
+          color: #333;
+        `;
+        
+        const selectionTypeSelect = document.createElement('select');
+        selectionTypeSelect.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+          background: white;
+        `;
+        
+        const markAllOption = document.createElement('option');
+        markAllOption.value = 'multiple';
+        markAllOption.textContent = 'Mark All That Apply';
+        
+        const markOneOption = document.createElement('option');
+        markOneOption.value = 'single';
+        markOneOption.textContent = 'Mark Only One';
+        
+        selectionTypeSelect.appendChild(markAllOption);
+        selectionTypeSelect.appendChild(markOneOption);
+        
+        // Set the current selection type
+        selectionTypeSelect.value = checkbox.selectionType || 'multiple';
+        
+        selectionTypeSelect.onchange = () => {
+          checkbox.selectionType = selectionTypeSelect.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
         // Add checkbox option button (should be after field name, before options)
         const addCheckboxOptionBtn = document.createElement('button');
         addCheckboxOptionBtn.textContent = 'Add checkbox option';
@@ -4361,8 +4675,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
-        // Correct order: field name, add button, options, delete button
+        // Correct order: field name, selection type, add button, options, delete button
         checkboxContainer.appendChild(fieldNameInput);
+        checkboxContainer.appendChild(selectionTypeLabel);
+        checkboxContainer.appendChild(selectionTypeSelect);
         checkboxContainer.appendChild(addCheckboxOptionBtn);
         
         // Add existing checkbox options BEFORE the delete button
@@ -4667,6 +4983,137 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         timeContainer.appendChild(copyTimeIdBtn);
         
         actionsList.appendChild(timeContainer);
+      });
+    }
+    
+    // Display existing locations
+    if (trigger.locations && trigger.locations.length > 0) {
+      trigger.locations.forEach((location, locationIndex) => {
+        const locationContainer = document.createElement('div');
+        locationContainer.style.cssText = `
+          margin: 8px 0;
+          padding: 8px;
+          background-color: #e8f5e8;
+          border: 2px dashed #28a745;
+          border-radius: 4px;
+          text-align: center;
+          color: #28a745;
+          font-weight: bold;
+          font-size: 12px;
+        `;
+        
+        // Location indicator text
+        const locationText = document.createElement('div');
+        locationText.textContent = '📍 ' + (location.fieldName || 'Location Data Inserted');
+        locationText.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        
+        // Field name input (hidden by default, shown on edit)
+        const fieldNameInput = document.createElement('input');
+        fieldNameInput.type = 'text';
+        fieldNameInput.value = location.fieldName || 'Location Data Inserted';
+        fieldNameInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+          display: none;
+        `;
+        fieldNameInput.onblur = () => {
+          location.fieldName = fieldNameInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Location ID input (hidden by default, shown on edit)
+        const locationIdInput = document.createElement('input');
+        locationIdInput.type = 'text';
+        locationIdInput.placeholder = 'Location ID...';
+        locationIdInput.value = location.nodeId || '';
+        locationIdInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+          display: none;
+        `;
+        locationIdInput.onblur = () => {
+          location.nodeId = locationIdInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: center;
+        `;
+        
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.style.cssText = `
+          background-color: #17a2b8;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          font-size: 10px;
+          cursor: pointer;
+        `;
+        editBtn.onclick = () => {
+          if (fieldNameInput.style.display === 'none') {
+            fieldNameInput.style.display = 'block';
+            locationIdInput.style.display = 'block';
+            locationText.style.display = 'none';
+            editBtn.textContent = 'Save';
+          } else {
+            fieldNameInput.style.display = 'none';
+            locationIdInput.style.display = 'none';
+            locationText.style.display = 'block';
+            locationText.textContent = '📍 ' + fieldNameInput.value;
+            editBtn.textContent = 'Edit';
+          }
+        };
+        
+        // Delete location button
+        const deleteLocationBtn = document.createElement('button');
+        deleteLocationBtn.textContent = 'Remove';
+        deleteLocationBtn.style.cssText = `
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          font-size: 10px;
+          cursor: pointer;
+        `;
+        deleteLocationBtn.onclick = () => {
+          trigger.locations.splice(locationIndex, 1);
+          locationContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        buttonContainer.appendChild(editBtn);
+        buttonContainer.appendChild(deleteLocationBtn);
+        
+        locationContainer.appendChild(locationText);
+        locationContainer.appendChild(fieldNameInput);
+        locationContainer.appendChild(locationIdInput);
+        locationContainer.appendChild(buttonContainer);
+        actionsList.appendChild(locationContainer);
       });
     }
     

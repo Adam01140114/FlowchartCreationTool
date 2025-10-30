@@ -256,7 +256,16 @@ window.exportGuiJson = function(download = true) {
         text: ""
       },
       options: [],
-      labels: []
+      labels: [],
+      linking: {
+        enabled: false,
+        targetId: ""
+      },
+      image: {
+        url: "",
+        width: 0,
+        height: 0
+      }
     };
     
     // Add nameId and placeholder for non-multiple textboxes questions
@@ -949,10 +958,15 @@ window.exportGuiJson = function(download = true) {
               });
             } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
               const dropdown = cell._dropdowns[item.index];
-              const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
-                text: option.text || "",
-                nodeId: `${dropdown.name || ""}_${option.value || ""}`
-              })) : [];
+              const dropdownOptions = dropdown.options ? dropdown.options.map(option => {
+                // Sanitize the dropdown name and option value for nodeId
+                const sanitizedDropdownName = (dropdown.name || "").toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
+                const sanitizedOptionValue = (option.value || "").toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
+                return {
+                  text: option.text || "",
+                  nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
+                };
+              }) : [];
               
               // Process trigger sequences
               const triggerSequences = [];
@@ -982,7 +996,7 @@ window.exportGuiJson = function(download = true) {
                       fields.push({
                         type: "checkbox",
                         fieldName: checkbox.fieldName || "",
-                        selectionType: "multiple",
+                        selectionType: checkbox.selectionType || "multiple",
                         options: checkboxOptions
                       });
                     });
@@ -999,6 +1013,17 @@ window.exportGuiJson = function(download = true) {
                     });
                   }
                   
+                  // Add locations
+                  if (trigger.locations && trigger.locations.length > 0) {
+                    trigger.locations.forEach(location => {
+                      fields.push({
+                        type: "location",
+                        label: location.fieldName || "",
+                        nodeId: location.nodeId || ""
+                      });
+                    });
+                  }
+                  
                   // Find the matching option text for the condition
                   const matchingOption = dropdown.options.find(option => option.value === trigger.triggerOption);
                   const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
@@ -1010,12 +1035,27 @@ window.exportGuiJson = function(download = true) {
                 });
               }
               
+              // Calculate the correct order for dropdown
+              // If there's a location before this dropdown, count all location fields
+              let dropdownOrder = orderIndex + 1;
+              if (orderIndex > 0) {
+                // Count all previous items and their sub-items
+                for (let i = 0; i < orderIndex; i++) {
+                  const prevItem = cell._itemOrder[i];
+                  if (prevItem.type === 'location') {
+                    // Location adds 4 fields (Street, City, State, Zip)
+                    dropdownOrder += 3; // We already counted the location entry itself (+1), so add 3 more
+                  }
+                  // Other types (option, time, checkbox) only add 1 field each
+                }
+              }
+              
               allFieldsInOrder.push({
                 type: "dropdown",
                 fieldName: dropdown.name || "",
                 options: dropdownOptions,
                 triggerSequences: triggerSequences,
-                order: orderIndex + 1
+                order: dropdownOrder
               });
             }
           });
@@ -1414,6 +1454,82 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Alert Logic PATCH ---
+    
+    // --- PATCH: Add Subtitle detection ---
+    // Check if this question is connected to a subtitle node
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        
+        // Check for direct connection to subtitle node
+        if (targetCell && typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(targetCell)) {
+          // This question is directly connected to a subtitle node
+          question.subtitle.enabled = true;
+          
+          // Extract subtitle text from the subtitle node
+          let subtitleText = "";
+          
+          // First, try the _subtitleText property (most current user-entered text)
+          if (targetCell._subtitleText) {
+            subtitleText = targetCell._subtitleText;
+          }
+          // If no _subtitleText, try to extract from the HTML content
+          else if (targetCell.value) {
+            const temp = document.createElement("div");
+            temp.innerHTML = targetCell.value;
+            subtitleText = temp.textContent || temp.innerText || targetCell.value;
+            subtitleText = subtitleText.trim();
+          }
+          
+          // Clean up the subtitle text (remove any HTML entities or extra whitespace)
+          if (subtitleText) {
+            subtitleText = subtitleText.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+          }
+          
+          question.subtitle.text = subtitleText || "Subtitle text";
+          break; // Only process the first subtitle connection
+        }
+        
+        // Check for connection through options
+        if (targetCell && isOptions(targetCell)) {
+          // Check if this option leads to a subtitle node
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const subtitleCell = optionEdge.target;
+              if (subtitleCell && typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(subtitleCell)) {
+                // This question's option leads to a subtitle node
+                question.subtitle.enabled = true;
+                
+                // Extract subtitle text from the subtitle node
+                let subtitleText = "";
+                
+                // First, try the _subtitleText property (most current user-entered text)
+                if (subtitleCell._subtitleText) {
+                  subtitleText = subtitleCell._subtitleText;
+                }
+                // If no _subtitleText, try to extract from the HTML content
+                else if (subtitleCell.value) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = subtitleCell.value;
+                  subtitleText = temp.textContent || temp.innerText || subtitleCell.value;
+                  subtitleText = subtitleText.trim();
+                }
+                
+                // Clean up the subtitle text (remove any HTML entities or extra whitespace)
+                if (subtitleText) {
+                  subtitleText = subtitleText.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                }
+                
+                question.subtitle.text = subtitleText || "Subtitle text";
+                break; // Only process the first subtitle connection
+              }
+            }
+          }
+        }
+      }
+    }
+    // --- END Subtitle PATCH ---
     
     sectionMap[section].questions.push(question);
   }

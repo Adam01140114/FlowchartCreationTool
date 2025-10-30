@@ -737,6 +737,21 @@ function loadFormData(formData) {
                                                             
                                                             if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                             if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
+                                                        } else if (triggerField.type === 'location') {
+                                                            // Handle simplified location field format ("Location Data Added")
+                                                            if (typeof addTriggerLocation !== 'function') {
+                                                                console.error('🔧 [IMPORT DEBUG] addTriggerLocation function not available!');
+                                                                return;
+                                                            }
+                                                            addTriggerLocation(question.questionId, fieldOrder, sequenceIndex + 1);
+                                                            
+                                                            // Set the location title if provided
+                                                            setTimeout(() => {
+                                                                const locationTitleEl = document.getElementById(`triggerLocationTitle${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                                if (locationTitleEl && triggerField.fieldName) {
+                                                                    locationTitleEl.value = triggerField.fieldName;
+                                                                }
+                                                            }, 100);
                                                         }
                                                     });
                                                 }
@@ -918,7 +933,7 @@ function loadFormData(formData) {
                                         });
                                     }
                                 }
-                            } else if (field.type === 'date') {
+                                } else if (field.type === 'date') {
                                 // Add a date field
                                 addDateField(question.questionId);
                                 
@@ -944,7 +959,16 @@ function loadFormData(formData) {
                                     if (labelTextEl) labelTextEl.textContent = field.label;
                                     if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
                                 }
-                            } else if (field.type === 'dropdown') {
+                                } else if (field.type === 'location') {
+                                    // Add a main location unified field and set title
+                                    addLocationFields(question.questionId, 'multipleTextboxes');
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const titleEl = lastField.querySelector('#locationTitle' + question.questionId + '_' + fieldOrder);
+                                        if (titleEl && field.fieldName) titleEl.value = field.fieldName;
+                                    }
+                                } else if (field.type === 'dropdown') {
                                 console.log('🔧 [IMPORT DEBUG] Processing dropdown field:', field);
                                 
                                 // Check if addDropdownField function is available
@@ -1079,6 +1103,21 @@ function loadFormData(formData) {
                                                         
                                                         if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                         if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
+                                                    } else if (triggerField.type === 'location') {
+                                                        // Handle simplified location field format ("Location Data Added")
+                                                        if (typeof addTriggerLocation !== 'function') {
+                                                            console.error('🔧 [IMPORT DEBUG] addTriggerLocation function not available!');
+                                                            return;
+                                                        }
+                                                        addTriggerLocation(question.questionId, fieldOrder, sequenceIndex + 1);
+                                                        
+                                                        // Set the location title if provided
+                                                        setTimeout(() => {
+                                                            const locationTitleEl = document.getElementById(`triggerLocationTitle${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                            if (locationTitleEl && triggerField.fieldName) {
+                                                                locationTitleEl.value = triggerField.fieldName;
+                                                            }
+                                                        }, 100);
                                                     }
                                                 });
                                             }
@@ -2335,6 +2374,24 @@ function exportForm() {
                                                     label: dateLabelEl.value.trim(),
                                                     nodeId: dateNodeIdEl.value.trim()
                                                 });
+                                            } else {
+                                                // Check for trigger location field (simplified "Location Data Added" format)
+                                                // Look for the "Location Data Added" text in the field
+                                                const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
+                                                if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
+                                                    // This is a trigger location field
+                                                    // Get the location title from the input field
+                                                    const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
+                                                    const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
+                                                    console.log('🔧 [EXPORT DEBUG] Location title element found:', locationTitleEl);
+                                                    console.log('🔧 [EXPORT DEBUG] Location title value:', locationTitle);
+                                                    
+                                                    triggerFields.push({
+                                                        type: 'location',
+                                                        fieldName: locationTitle || 'Location Data',
+                                                        nodeId: 'location_data'
+                                                    });
+                                                }
                                             }
                                         });
                                     }
@@ -2354,6 +2411,16 @@ function exportForm() {
                                 order: parseInt(fieldOrder)
                             });
                         }
+                    } else if (fieldType === 'location') {
+                        // Handle main location unified field
+                        const titleEl = field.querySelector('#locationTitle' + questionId + '_' + fieldOrder);
+                        const title = titleEl ? titleEl.value.trim() : 'Location Data';
+                        allFieldsInOrder.push({
+                            type: 'location',
+                            fieldName: title || 'Location Data',
+                            nodeId: 'location_data',
+                            order: parseInt(fieldOrder)
+                        });
                     } else if (fieldType === 'time') {
                             // Handle time fields - use same structure as label fields
                     if (labelTextEl && nodeIdTextEl) {
@@ -2367,6 +2434,16 @@ function exportForm() {
                                     order: parseInt(fieldOrder)
                                 });
                             }
+                        } else if (fieldType === 'location') {
+                            // Handle main location field
+                            const titleEl = field.querySelector('#locationTitle' + questionId + '_' + fieldOrder);
+                            const title = titleEl ? titleEl.value.trim() : 'Location Data';
+                            allFieldsInOrder.push({
+                                type: 'location',
+                                fieldName: title || 'Location Data',
+                                nodeId: 'location_data',
+                                order: parseInt(fieldOrder)
+                            });
                         } else if (labelTextEl && nodeIdTextEl) {
                             // Handle regular fields (label, amount, etc.)
                         const labelText = labelTextEl.textContent.trim();
@@ -2576,6 +2653,22 @@ function exportForm() {
                                                         label: dateLabelEl.value.trim(),
                                                         nodeId: dateNodeIdEl.value.trim()
                                                     });
+                                                } else {
+                                                    // Check for trigger location field (simplified "Location Data Added" format)
+                                                    // Look for the "Location Data Added" text in the field
+                                                    const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
+                                                    if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
+                                                        // This is a trigger location field
+                                                        // Get the location title from the input field
+                                                        const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
+                                                        const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
+                                                        
+                                                        triggerFields.push({
+                                                            type: 'location',
+                                                            fieldName: locationTitle || 'Location Data',
+                                                            nodeId: 'location_data'
+                                                        });
+                                                    }
                                                 }
                                             });
                                         }

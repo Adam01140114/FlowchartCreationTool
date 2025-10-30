@@ -3023,6 +3023,7 @@ function addTriggerSequence(questionId, fieldCount) {
             <button type="button" onclick="addTriggerLabel(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #007bff; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Label</button>
             <button type="button" onclick="addTriggerCheckbox(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Checkbox</button>
             <button type="button" onclick="addTriggerDate(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #FF9800; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Date</button>
+            <button type="button" onclick="addTriggerLocation(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #28a745; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Location</button>
         </div>
         
         <!-- Trigger Fields Container -->
@@ -3193,6 +3194,43 @@ function addTriggerDate(questionId, fieldCount, sequenceCount) {
     triggerFieldsContainer.appendChild(fieldDiv);
 }
 
+function addTriggerLocation(questionId, fieldCount, sequenceCount) {
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerFieldsContainer) {
+        console.error('🔧 [ADD TRIGGER LOCATION DEBUG] Trigger fields container not found!');
+        return;
+    }
+    
+    const triggerFieldCount = triggerFieldsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER LOCATION DEBUG] Adding trigger location field', triggerFieldCount, 'for sequence', sequenceCount);
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
+    fieldDiv.style.margin = '5px 0';
+    fieldDiv.style.padding = '12px';
+    fieldDiv.style.border = '1px solid #28a745';
+    fieldDiv.style.borderRadius = '6px';
+    fieldDiv.style.backgroundColor = '#f0fff0';
+    fieldDiv.innerHTML = `
+        <div style="font-weight: bold; color: #28a745; margin-bottom: 8px; text-align: center; font-size: 14px;">Location Data Added</div>
+        <div style="margin: 10px 0; text-align: center;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #28a745; font-size: 12px;">Location Title Field:</label>
+            <input type="text" id="triggerLocationTitle${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter location title (e.g., Address, Location, etc.)" style="width: 200px; padding: 6px; border: 1px solid #28a745; border-radius: 4px; font-size: 12px; text-align: center;" onchange="updateTriggerLocationTitle(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="text-align: center; margin-top: 8px;">
+            <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove</button>
+        </div>
+    `;
+    triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+function updateTriggerLocationTitle(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const titleInput = document.getElementById(`triggerLocationTitle${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (titleInput) {
+        console.log('🔧 [UPDATE TRIGGER LOCATION TITLE DEBUG] Location title updated:', titleInput.value);
+    }
+}
+
 function addTriggerCheckboxOption(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const optionsContainer = document.getElementById(`triggerCheckboxOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!optionsContainer) {
@@ -3298,6 +3336,7 @@ function updateTriggerDateNodeId(questionId, fieldCount, sequenceCount, triggerF
         console.log('🔧 [TRIGGER DATE NODE ID] Updated:', nodeIdInput.value);
     }
 }
+
 
 function addTimeField(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
@@ -3769,74 +3808,28 @@ function createPdfConfigurationModule() {
 // ===========  ADD LOCATION FIELDS  =========
 // ============================================
 function addLocationFields(questionId, questionType) {
-    const locationFields = [
-        { label: 'Street', nodeId: 'street' },
-        { label: 'City', nodeId: 'city' },
-        { label: 'State', nodeId: 'state' }
-    ];
-    
-    if (questionType === 'numberedDropdown') {
-        // Add labels to numbered dropdown
-        locationFields.forEach(field => {
-            addTextboxLabel(questionId);
-            // Set the label value in the unified container
-            const unifiedDiv = getUnifiedContainer(questionId);
-            const lastField = unifiedDiv.lastElementChild;
-            if (lastField) {
-                const fieldOrder = lastField.getAttribute('data-order');
-                const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
-                const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                if (labelTextEl) labelTextEl.textContent = field.label;
-                if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
-            }
-        });
-        
-        // Add amount field for Zip
-        addTextboxAmount(questionId);
-        const unifiedDiv = getUnifiedContainer(questionId);
-        const lastField = unifiedDiv.lastElementChild;
-        if (lastField) {
-            const fieldOrder = lastField.getAttribute('data-order');
-            const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
-            if (labelTextEl) labelTextEl.textContent = 'Zip';
-        }
-        
-        // Update hidden containers to keep them in sync
-        updateHiddenContainers(questionId);
-        
-    } else if (questionType === 'multipleTextboxes') {
-        // Use unified fields system for multiple textboxes too
-        locationFields.forEach(field => {
-            addTextboxLabel(questionId);
-            // Set the label value in the unified container
-            const unifiedDiv = getUnifiedContainer(questionId);
-            const lastField = unifiedDiv.lastElementChild;
-            if (lastField) {
-                const fieldOrder = lastField.getAttribute('data-order');
-                const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
-                const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                if (labelTextEl) labelTextEl.textContent = field.label;
-                if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
-            }
-        });
-        
-        // Add amount field for Zip
-        addTextboxAmount(questionId);
-        const unifiedDiv = getUnifiedContainer(questionId);
-        const lastField = unifiedDiv.lastElementChild;
-        if (lastField) {
-            const fieldOrder = lastField.getAttribute('data-order');
-            const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
-            const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-            if (labelTextEl) labelTextEl.textContent = 'Zip';
-            if (nodeIdTextEl) nodeIdTextEl.textContent = 'zip';
-        }
-        
-        // Update hidden containers to keep them in sync
-        updateHiddenContainers(questionId);
-    }
-    
-    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
+    // New simplified single entry with title, same as trigger location UI
+    const unifiedDiv = getUnifiedContainer(questionId);
+    if (!unifiedDiv) return;
+
+    const fieldCount = unifiedDiv.children.length + 1;
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'location');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.innerHTML = `
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #28a745; border-radius: 10px; background: #f0fff0; cursor: default; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <div style="font-weight: bold; color: #28a745; text-align: center;">Location Data Added</div>
+            <div style="margin: 10px 0; text-align: center;">
+                <label style="display:block;margin-bottom:5px;font-weight:bold;color:#28a745;font-size:12px;">Location Title Field:</label>
+                <input type="text" id="locationTitle${questionId}_${fieldCount}" placeholder="Enter location title (e.g., Address, Location, etc.)" style="width: 220px; padding: 6px; border: 1px solid #28a745; border-radius: 4px; font-size: 12px; text-align: center;">
+            </div>
+            <div style="text-align: center; margin-top: 8px;">
+                <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+            </div>
+        </div>
+    `;
+    unifiedDiv.appendChild(fieldDiv);
 }
 
 // ============================================

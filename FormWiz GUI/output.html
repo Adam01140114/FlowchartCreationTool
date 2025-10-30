@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">SC-100</h1><div id="question-container-1" class="question-container"><label><h3>test1</h3></label><select id="test1" name="test1" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('test1', this.value)">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many cars do you have</h3></label><select id="answer1" name="answer1" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('answer1', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
@@ -514,8 +514,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"test1"};
-var questionNameIds = {"1":"test1"};
+    var questionSlugMap       = {"1":"how_many_cars_do_you_have"};
+var questionNameIds = {"1":"answer1"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -526,7 +526,7 @@ var conditionalAlerts = [];
 var labelMap = {"1":[],"length":0};
 var amountMap = {"1":[],"length":0};
 var labelNodeIdsMap = {"1":[]};
-var unifiedFieldsMap = {"1":[{"type":"dropdown","fieldName":"test2","options":[{"text":"Yes","nodeId":"test2_yes"},{"text":"No","nodeId":"test2_no"}],"triggerSequences":[],"order":1}]};
+var unifiedFieldsMap = {"1":[{"type":"dropdown","fieldName":"Is it a Honda?","options":[{"text":"Yes","nodeId":"Yes"},{"text":"No","nodeId":"No"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"location","fieldName":"Location Data","nodeId":"location_data"}]}],"order":1}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -2123,6 +2123,22 @@ function showTextboxLabels(questionId, count){
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
             const isLocationField = locationFields.includes(field.label);
+            
+            // Skip location fields that should be conditional trigger fields
+            // Check if this question has a dropdown with trigger sequences that contain location fields
+            const hasLocationTriggerFields = allFieldsInOrder.some(f => 
+                f.type === 'dropdown' && 
+                f.triggerSequences && 
+                f.triggerSequences.some(seq => 
+                    seq.fields && 
+                    seq.fields.some(tf => tf.type === 'location')
+                )
+            );
+            
+            if (isLocationField && hasLocationTriggerFields) {
+                // Skip this location field as it should be handled by trigger sequences
+                continue;
+            }
             
             // Add <br> before first location field in each count
             if (isLocationField && !lastWasLocation && !firstField) {
@@ -6915,6 +6931,82 @@ document.addEventListener('DOMContentLoaded', function() {
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         triggerContainer.appendChild(fieldDiv);
+      } else if (triggerField.type === 'location') {
+        // Handle simplified location field format ("Location Data Added")
+        // Create location field container
+        const locationFieldDiv = document.createElement('div');
+        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1); display: flex; flex-direction: column; align-items: center;';
+        
+        const fieldNameLabel = document.createElement('label');
+        console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
+        console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
+        fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        locationFieldDiv.appendChild(fieldNameLabel);
+        
+        // Create location fields (Street, City, State, Zip)
+        const locationFields = [
+          { label: 'Street', nodeId: 'street' },
+          { label: 'City', nodeId: 'city' },
+          { label: 'State', nodeId: 'state' },
+          { label: 'Zip', nodeId: 'zip' }
+        ];
+        
+        locationFields.forEach((field, fieldIndex) => {
+          let input;
+          if (field.label === 'State') {
+            // Create state dropdown
+            input = document.createElement('select');
+            input.id = field.nodeId + "_" + entryNumber;
+            input.name = input.id;
+            input.style.cssText = 'width: 200px; padding: 8px; border: 1px solid #87CEEB; border-radius: 6px; font-size: 14px; background-color: white; color: #2c3e50; text-align: center; margin: 8px 0;';
+            
+            // Add state options
+            const states = [
+              'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+              'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+              'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
+              'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
+              'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+              'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
+              'Washington','West Virginia','Wisconsin','Wyoming'
+            ];
+            
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select State';
+            input.appendChild(defaultOption);
+            
+            states.forEach(state => {
+              const option = document.createElement('option');
+              option.value = state;
+              option.textContent = state;
+              input.appendChild(option);
+            });
+          } else {
+            // Create text input for other fields
+            input = document.createElement('input');
+            input.type = field.label === 'Zip' ? 'number' : 'text';
+            input.id = field.nodeId + "_" + entryNumber;
+            input.name = input.id;
+            input.placeholder = field.label === 'State' ? 'Select State' : 'Enter ' + field.label.toLowerCase();
+            input.style.cssText = 'width: 200px; padding: 8px; border: 1px solid #87CEEB; border-radius: 6px; font-size: 14px; background-color: white; color: #2c3e50; text-align: center; margin: 8px 0;';
+          }
+          
+          // Add hover effect
+          input.addEventListener('mouseenter', function() {
+            this.style.borderColor = '#5DADE2';
+            this.style.backgroundColor = '#f8f9ff';
+          });
+          input.addEventListener('mouseleave', function() {
+            this.style.borderColor = '#87CEEB';
+            this.style.backgroundColor = 'white';
+          });
+          
+          locationFieldDiv.appendChild(input);
+        });
+        
+        triggerContainer.appendChild(locationFieldDiv);
       }
     });
     
