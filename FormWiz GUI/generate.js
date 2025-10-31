@@ -379,9 +379,11 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
     '        .address-field { margin: 4px auto; }',
     '        .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }',
-    '        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }',
+    '        .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }',
     '        .address-input::placeholder { color: #6c757d; opacity: 1; }',
     '        .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
+    '        .address-select-main { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding: 12px 24px 12px 8px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
+    '        .address-select-trigger { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6,9 12,15 18,9\'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 2px center; background-size: 12px; padding: 0; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }',
     '        .address-field:first-child { margin-top: 2px; }',
     '        .address-field:last-child { margin-bottom: 2px; }',
     '        .hidden { display: none !important; }',
@@ -4474,7 +4476,7 @@ function showTextboxLabels(questionId, count){
                         input = document.createElement('select');
                         input.id = locPrefix + '_' + f.nodeId + '_' + j;
                         input.name = input.id;
-                        input.className = 'address-select';
+                        input.className = 'address-select-trigger';
                         // Create hidden short code field for state abbreviation
                         const shortHidden = document.createElement('input');
                         shortHidden.type = 'text';
@@ -9420,7 +9422,7 @@ document.addEventListener('DOMContentLoaded', function() {
             input = document.createElement('select');
             input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
             input.name = input.id;
-            input.className = 'address-select';
+            input.className = 'address-select-main';
             // Hidden short code field
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';

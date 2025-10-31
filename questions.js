@@ -2933,12 +2933,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             if (actionsList) {
               // Create label entry container
               const labelContainer = document.createElement('div');
+              labelContainer.draggable = true;
+              labelContainer.dataset.type = 'label';
+              labelContainer.dataset.triggerIndex = triggerIndex;
               labelContainer.style.cssText = `
                 margin-bottom: 10px;
                 padding: 8px;
                 background: #e8f5e8;
                 border: 1px solid #4caf50;
                 border-radius: 4px;
+                cursor: move;
+                position: relative;
+              `;
+              
+              // Add drag handle
+              const dragHandle = document.createElement('div');
+              dragHandle.innerHTML = '⋮⋮';
+              dragHandle.style.cssText = `
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: move;
+                color: #4caf50;
+                font-size: 14px;
+                user-select: none;
+                padding: 2px;
+              `;
+              labelContainer.appendChild(dragHandle);
+              
+              // Create content container to hold all other elements
+              const contentContainer = document.createElement('div');
+              contentContainer.style.cssText = `
+                margin-left: 24px;
               `;
               
               // Field name input
@@ -3022,9 +3049,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               };
               
-              labelContainer.appendChild(fieldNameInput);
-              labelContainer.appendChild(labelIdInput);
-              labelContainer.appendChild(deleteLabelBtn);
+              contentContainer.appendChild(fieldNameInput);
+              contentContainer.appendChild(labelIdInput);
+              contentContainer.appendChild(deleteLabelBtn);
               
               // Copy ID button for label (positioned after delete button)
               const copyLabelIdBtn = document.createElement('button');
@@ -3070,7 +3097,27 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   }
                 }
               };
-              labelContainer.appendChild(copyLabelIdBtn);
+              contentContainer.appendChild(copyLabelIdBtn);
+              
+              labelContainer.appendChild(contentContainer);
+              
+              // Add drag handlers
+              labelContainer.addEventListener('dragstart', (e) => {
+                labelContainer.classList.add('dragging');
+                labelContainer.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', labelContainer.outerHTML);
+                e.dataTransfer.setData('text/plain', JSON.stringify({
+                  type: 'label',
+                  triggerIndex: triggerIndex,
+                  labelIndex: triggerSequence.labels.indexOf(newLabel)
+                }));
+              });
+              
+              labelContainer.addEventListener('dragend', (e) => {
+                labelContainer.classList.remove('dragging');
+                labelContainer.style.opacity = '1';
+              });
               
               actionsList.appendChild(labelContainer);
               fieldNameInput.focus();
@@ -3112,12 +3159,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             if (actionsList) {
               // Create checkbox entry container
               const checkboxContainer = document.createElement('div');
+              checkboxContainer.draggable = true;
+              checkboxContainer.dataset.type = 'checkbox';
+              checkboxContainer.dataset.triggerIndex = triggerIndex;
               checkboxContainer.style.cssText = `
                 margin-bottom: 10px;
                 padding: 8px;
                 background: #f8f9fa;
                 border: 1px solid #dee2e6;
                 border-radius: 4px;
+                cursor: move;
+                position: relative;
+              `;
+              
+              // Add drag handle
+              const dragHandle = document.createElement('div');
+              dragHandle.innerHTML = '⋮⋮';
+              dragHandle.style.cssText = `
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: move;
+                color: #9c27b0;
+                font-size: 14px;
+                user-select: none;
+                padding: 2px;
+              `;
+              checkboxContainer.appendChild(dragHandle);
+              
+              // Create content container
+              const contentContainer = document.createElement('div');
+              contentContainer.style.cssText = `
+                margin-left: 24px;
               `;
               
               // Field name input
@@ -3395,11 +3469,25 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               };
               
-              checkboxContainer.appendChild(fieldNameInput);
-              checkboxContainer.appendChild(selectionTypeLabel);
-              checkboxContainer.appendChild(selectionTypeSelect);
-              checkboxContainer.appendChild(addCheckboxOptionBtn);
-              checkboxContainer.appendChild(deleteCheckboxBtn);
+              contentContainer.appendChild(fieldNameInput);
+              contentContainer.appendChild(selectionTypeLabel);
+              contentContainer.appendChild(selectionTypeSelect);
+              contentContainer.appendChild(addCheckboxOptionBtn);
+              contentContainer.appendChild(deleteCheckboxBtn);
+              checkboxContainer.appendChild(contentContainer);
+              
+              // Add drag handlers
+              checkboxContainer.addEventListener('dragstart', (e) => {
+                checkboxContainer.classList.add('dragging');
+                checkboxContainer.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+              });
+              
+              checkboxContainer.addEventListener('dragend', (e) => {
+                checkboxContainer.classList.remove('dragging');
+                checkboxContainer.style.opacity = '1';
+              });
+              
               actionsList.appendChild(checkboxContainer);
               fieldNameInput.focus();
             }
@@ -3440,12 +3528,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             if (actionsList) {
               // Create time entry container
               const timeContainer = document.createElement('div');
+              timeContainer.draggable = true;
+              timeContainer.dataset.type = 'time';
+              timeContainer.dataset.triggerIndex = triggerIndex;
               timeContainer.style.cssText = `
                 margin-bottom: 10px;
                 padding: 8px;
                 background: #fff3e0;
                 border: 1px solid #ffcc02;
                 border-radius: 4px;
+                cursor: move;
+                position: relative;
+              `;
+              
+              // Add drag handle
+              const dragHandle = document.createElement('div');
+              dragHandle.textContent = '⋮⋮';
+              dragHandle.style.cssText = `
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: move;
+                color: #ff9800;
+                font-size: 14px;
+                user-select: none;
+                padding: 2px;
+              `;
+              timeContainer.appendChild(dragHandle);
+              
+              // Create content container
+              const contentContainer = document.createElement('div');
+              contentContainer.style.cssText = `
+                margin-left: 24px;
               `;
               
               // Field name input
@@ -3529,9 +3644,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               };
               
-              timeContainer.appendChild(fieldNameInput);
-              timeContainer.appendChild(timeIdInput);
-              timeContainer.appendChild(deleteTimeBtn);
+              contentContainer.appendChild(fieldNameInput);
+              contentContainer.appendChild(timeIdInput);
+              contentContainer.appendChild(deleteTimeBtn);
               
               // Copy ID button for time (positioned after delete button)
               const copyTimeIdBtn = document.createElement('button');
@@ -3577,7 +3692,21 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   }
                 }
               };
-              timeContainer.appendChild(copyTimeIdBtn);
+              contentContainer.appendChild(copyTimeIdBtn);
+              
+              timeContainer.appendChild(contentContainer);
+              
+              // Add drag handlers
+              timeContainer.addEventListener('dragstart', (e) => {
+                timeContainer.classList.add('dragging');
+                timeContainer.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+              });
+              
+              timeContainer.addEventListener('dragend', (e) => {
+                timeContainer.classList.remove('dragging');
+                timeContainer.style.opacity = '1';
+              });
               
               actionsList.appendChild(timeContainer);
               fieldNameInput.focus();
@@ -3618,6 +3747,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             if (actionsList) {
               // Create location entry container (styled like main location indicator)
               const locationContainer = document.createElement('div');
+              locationContainer.draggable = true;
+              locationContainer.dataset.type = 'location';
+              locationContainer.dataset.triggerIndex = triggerIndex;
               locationContainer.style.cssText = `
                 margin: 8px 0;
                 padding: 8px;
@@ -3628,6 +3760,30 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 color: #28a745;
                 font-weight: bold;
                 font-size: 12px;
+                cursor: move;
+                position: relative;
+              `;
+              
+              // Add drag handle
+              const dragHandle = document.createElement('div');
+              dragHandle.textContent = '⋮⋮';
+              dragHandle.style.cssText = `
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: move;
+                color: #28a745;
+                font-size: 14px;
+                user-select: none;
+                padding: 2px;
+              `;
+              locationContainer.appendChild(dragHandle);
+              
+              // Create content container
+              const contentContainer = document.createElement('div');
+              contentContainer.style.cssText = `
+                margin-left: 24px;
               `;
               
               // Location indicator text
@@ -3764,11 +3920,25 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               buttonContainer.appendChild(editBtn);
               buttonContainer.appendChild(deleteLocationBtn);
               
-              locationContainer.appendChild(locationText);
-              locationContainer.appendChild(locationTitleInput);
-              locationContainer.appendChild(fieldNameInput);
-              locationContainer.appendChild(locationIdInput);
-              locationContainer.appendChild(buttonContainer);
+              contentContainer.appendChild(locationText);
+              contentContainer.appendChild(locationTitleInput);
+              contentContainer.appendChild(fieldNameInput);
+              contentContainer.appendChild(locationIdInput);
+              contentContainer.appendChild(buttonContainer);
+              locationContainer.appendChild(contentContainer);
+              
+              // Add drag handlers
+              locationContainer.addEventListener('dragstart', (e) => {
+                locationContainer.classList.add('dragging');
+                locationContainer.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+              });
+              
+              locationContainer.addEventListener('dragend', (e) => {
+                locationContainer.classList.remove('dragging');
+                locationContainer.style.opacity = '1';
+              });
+              
               actionsList.appendChild(locationContainer);
             }
           }
@@ -3790,6 +3960,48 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         actionsList.style.cssText = `
           margin-top: 5px;
         `;
+        
+        // Add drop handlers to actionsList for reordering entries
+        actionsList.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          
+          const afterElement = getDragAfterElement(actionsList, e.clientY);
+          const dragging = document.querySelector('.dragging');
+          if (afterElement == null) {
+            actionsList.appendChild(dragging);
+          } else {
+            actionsList.insertBefore(dragging, afterElement);
+          }
+        });
+        
+        actionsList.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const dragging = document.querySelector('.dragging');
+          if (dragging) {
+            dragging.classList.remove('dragging');
+            dragging.style.opacity = '1';
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          }
+        });
+        
+        function getDragAfterElement(container, y) {
+          const draggableElements = [...container.querySelectorAll(':not(.dragging)[draggable="true"]')];
+          
+          return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+              return { offset: offset, element: child };
+            } else {
+              return closest;
+            }
+          }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+        
         triggerDiv.appendChild(actionsList);
         
         triggerSequencesList.appendChild(triggerDiv);
@@ -3819,6 +4031,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       border: 1px solid #ddd;
       border-radius: 6px;
     `;
+    // Make sure trigger sequence container is NOT draggable
+    triggerDiv.draggable = false;
     
     // Trigger dropdown
     const triggerLabel = document.createElement('label');
@@ -3931,12 +4145,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         if (actionsList) {
           // Create label entry container
           const labelContainer = document.createElement('div');
+          labelContainer.draggable = true;
+          labelContainer.dataset.type = 'label';
+          labelContainer.dataset.triggerIndex = triggerIndex;
           labelContainer.style.cssText = `
             margin-bottom: 10px;
             padding: 8px;
             background: #e8f5e8;
             border: 1px solid #4caf50;
             border-radius: 4px;
+            cursor: move;
+            position: relative;
+          `;
+          
+          // Add drag handle
+          const dragHandle = document.createElement('div');
+          dragHandle.textContent = '⋮⋮';
+          dragHandle.style.cssText = `
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: move;
+            color: #4caf50;
+            font-size: 14px;
+            user-select: none;
+            padding: 2px;
+          `;
+          labelContainer.appendChild(dragHandle);
+          
+          // Create content container
+          const contentContainer = document.createElement('div');
+          contentContainer.style.cssText = `
+            margin-left: 24px;
           `;
           
           // Field name input
@@ -4000,9 +4241,23 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           };
           
-          labelContainer.appendChild(fieldNameInput);
-          labelContainer.appendChild(labelIdInput);
-          labelContainer.appendChild(deleteLabelBtn);
+          contentContainer.appendChild(fieldNameInput);
+          contentContainer.appendChild(labelIdInput);
+          contentContainer.appendChild(deleteLabelBtn);
+          labelContainer.appendChild(contentContainer);
+          
+          // Add drag handlers
+          labelContainer.addEventListener('dragstart', (e) => {
+            labelContainer.classList.add('dragging');
+            labelContainer.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+          });
+          
+          labelContainer.addEventListener('dragend', (e) => {
+            labelContainer.classList.remove('dragging');
+            labelContainer.style.opacity = '1';
+          });
+          
           actionsList.appendChild(labelContainer);
           fieldNameInput.focus();
         }
@@ -4037,12 +4292,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         if (actionsList) {
           // Create checkbox entry container
           const checkboxContainer = document.createElement('div');
+          checkboxContainer.draggable = true;
+          checkboxContainer.dataset.type = 'checkbox';
+          checkboxContainer.dataset.triggerIndex = triggerIndex;
           checkboxContainer.style.cssText = `
             margin-bottom: 10px;
             padding: 8px;
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 4px;
+            cursor: move;
+            position: relative;
+          `;
+          
+          // Add drag handle
+          const dragHandle = document.createElement('div');
+          dragHandle.textContent = '⋮⋮';
+          dragHandle.style.cssText = `
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: move;
+            color: #9c27b0;
+            font-size: 14px;
+            user-select: none;
+            padding: 2px;
+          `;
+          checkboxContainer.appendChild(dragHandle);
+          
+          // Create content container
+          const contentContainer = document.createElement('div');
+          contentContainer.style.cssText = `
+            margin-left: 24px;
           `;
           
           // Field name input
@@ -4230,11 +4512,25 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           };
           
-          checkboxContainer.appendChild(fieldNameInput);
-          checkboxContainer.appendChild(selectionTypeLabel);
-          checkboxContainer.appendChild(selectionTypeSelect);
-          checkboxContainer.appendChild(addCheckboxOptionBtn);
-          checkboxContainer.appendChild(deleteCheckboxBtn);
+          contentContainer.appendChild(fieldNameInput);
+          contentContainer.appendChild(selectionTypeLabel);
+          contentContainer.appendChild(selectionTypeSelect);
+          contentContainer.appendChild(addCheckboxOptionBtn);
+          contentContainer.appendChild(deleteCheckboxBtn);
+          checkboxContainer.appendChild(contentContainer);
+          
+          // Add drag handlers
+          checkboxContainer.addEventListener('dragstart', (e) => {
+            checkboxContainer.classList.add('dragging');
+            checkboxContainer.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+          });
+          
+          checkboxContainer.addEventListener('dragend', (e) => {
+            checkboxContainer.classList.remove('dragging');
+            checkboxContainer.style.opacity = '1';
+          });
+          
           actionsList.appendChild(checkboxContainer);
           fieldNameInput.focus();
         }
@@ -4269,12 +4565,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         if (actionsList) {
           // Create time entry container
           const timeContainer = document.createElement('div');
+          timeContainer.draggable = true;
+          timeContainer.dataset.type = 'time';
+          timeContainer.dataset.triggerIndex = triggerIndex;
           timeContainer.style.cssText = `
             margin-bottom: 10px;
             padding: 8px;
             background: #fff3e0;
             border: 1px solid #ffcc02;
             border-radius: 4px;
+            cursor: move;
+            position: relative;
+          `;
+          
+          // Add drag handle
+          const dragHandle = document.createElement('div');
+          dragHandle.textContent = '⋮⋮';
+          dragHandle.style.cssText = `
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: move;
+            color: #ff9800;
+            font-size: 14px;
+            user-select: none;
+            padding: 2px;
+          `;
+          timeContainer.appendChild(dragHandle);
+          
+          // Create content container
+          const contentContainer = document.createElement('div');
+          contentContainer.style.cssText = `
+            margin-left: 24px;
           `;
           
           // Field name input
@@ -4338,9 +4661,23 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           };
           
-          timeContainer.appendChild(fieldNameInput);
-          timeContainer.appendChild(timeIdInput);
-          timeContainer.appendChild(deleteTimeBtn);
+          contentContainer.appendChild(fieldNameInput);
+          contentContainer.appendChild(timeIdInput);
+          contentContainer.appendChild(deleteTimeBtn);
+          timeContainer.appendChild(contentContainer);
+          
+          // Add drag handlers
+          timeContainer.addEventListener('dragstart', (e) => {
+            timeContainer.classList.add('dragging');
+            timeContainer.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+          });
+          
+          timeContainer.addEventListener('dragend', (e) => {
+            timeContainer.classList.remove('dragging');
+            timeContainer.style.opacity = '1';
+          });
+          
           actionsList.appendChild(timeContainer);
           fieldNameInput.focus();
         }
@@ -4379,6 +4716,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         if (actionsList) {
           // Create location entry container (styled like main location indicator)
           const locationContainer = document.createElement('div');
+          locationContainer.draggable = true;
+          locationContainer.dataset.type = 'location';
+          locationContainer.dataset.triggerIndex = triggerIndex;
           locationContainer.style.cssText = `
             margin: 8px 0;
             padding: 8px;
@@ -4389,6 +4729,30 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             color: #28a745;
             font-weight: bold;
             font-size: 12px;
+            cursor: move;
+            position: relative;
+          `;
+          
+          // Add drag handle
+          const dragHandle = document.createElement('div');
+          dragHandle.textContent = '⋮⋮';
+          dragHandle.style.cssText = `
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: move;
+            color: #28a745;
+            font-size: 14px;
+            user-select: none;
+            padding: 2px;
+          `;
+          locationContainer.appendChild(dragHandle);
+          
+          // Create content container
+          const contentContainer = document.createElement('div');
+          contentContainer.style.cssText = `
+            margin-left: 24px;
           `;
           
           // Location indicator text
@@ -4525,11 +4889,25 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           buttonContainer.appendChild(editBtn);
           buttonContainer.appendChild(deleteLocationBtn);
           
-          locationContainer.appendChild(locationText);
-          locationContainer.appendChild(locationTitleInput);
-          locationContainer.appendChild(fieldNameInput);
-          locationContainer.appendChild(locationIdInput);
-          locationContainer.appendChild(buttonContainer);
+          contentContainer.appendChild(locationText);
+          contentContainer.appendChild(locationTitleInput);
+          contentContainer.appendChild(fieldNameInput);
+          contentContainer.appendChild(locationIdInput);
+          contentContainer.appendChild(buttonContainer);
+          locationContainer.appendChild(contentContainer);
+          
+          // Add drag handlers
+          locationContainer.addEventListener('dragstart', (e) => {
+            locationContainer.classList.add('dragging');
+            locationContainer.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+          });
+          
+          locationContainer.addEventListener('dragend', (e) => {
+            locationContainer.classList.remove('dragging');
+            locationContainer.style.opacity = '1';
+          });
+          
           actionsList.appendChild(locationContainer);
         }
       }
@@ -4552,16 +4930,84 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       margin-top: 5px;
     `;
     
+    // Add drop handlers to actionsList for reordering entries
+    actionsList.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      
+      const afterElement = getDragAfterElement(actionsList, e.clientY);
+      const dragging = document.querySelector('.dragging');
+      if (afterElement == null) {
+        actionsList.appendChild(dragging);
+      } else {
+        actionsList.insertBefore(dragging, afterElement);
+      }
+    });
+    
+    actionsList.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const dragging = document.querySelector('.dragging');
+      if (dragging) {
+        dragging.classList.remove('dragging');
+        dragging.style.opacity = '1';
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      }
+    });
+    
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(':not(.dragging)[draggable="true"]')];
+      
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
     // Display existing labels
     if (trigger.labels && trigger.labels.length > 0) {
       trigger.labels.forEach((label, labelIndex) => {
         const labelContainer = document.createElement('div');
+        labelContainer.draggable = true;
+        labelContainer.dataset.type = 'label';
+        labelContainer.dataset.triggerIndex = triggerIndex;
         labelContainer.style.cssText = `
           margin-bottom: 10px;
           padding: 8px;
           background: #e8f5e8;
           border: 1px solid #4caf50;
           border-radius: 4px;
+          cursor: move;
+          position: relative;
+        `;
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.textContent = '⋮⋮';
+        dragHandle.style.cssText = `
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: move;
+          color: #4caf50;
+          font-size: 14px;
+          user-select: none;
+          padding: 2px;
+        `;
+        labelContainer.appendChild(dragHandle);
+        
+        // Create content container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+          margin-left: 24px;
         `;
         
         const fieldNameInput = document.createElement('input');
@@ -4641,9 +5087,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
-        labelContainer.appendChild(fieldNameInput);
-        labelContainer.appendChild(labelIdInput);
-        labelContainer.appendChild(deleteLabelBtn);
+        contentContainer.appendChild(fieldNameInput);
+        contentContainer.appendChild(labelIdInput);
+        contentContainer.appendChild(deleteLabelBtn);
         
         // Copy ID button for existing label (positioned after delete button)
         const copyLabelIdBtn = document.createElement('button');
@@ -4689,7 +5135,21 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           }
         };
-        labelContainer.appendChild(copyLabelIdBtn);
+        contentContainer.appendChild(copyLabelIdBtn);
+        
+        labelContainer.appendChild(contentContainer);
+        
+        // Add drag handlers
+        labelContainer.addEventListener('dragstart', (e) => {
+          labelContainer.classList.add('dragging');
+          labelContainer.style.opacity = '0.5';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        labelContainer.addEventListener('dragend', (e) => {
+          labelContainer.classList.remove('dragging');
+          labelContainer.style.opacity = '1';
+        });
         
         actionsList.appendChild(labelContainer);
       });
@@ -4699,12 +5159,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     if (trigger.checkboxes && trigger.checkboxes.length > 0) {
       trigger.checkboxes.forEach((checkbox, checkboxIndex) => {
         const checkboxContainer = document.createElement('div');
+        checkboxContainer.draggable = true;
+        checkboxContainer.dataset.type = 'checkbox';
+        checkboxContainer.dataset.triggerIndex = triggerIndex;
         checkboxContainer.style.cssText = `
           margin-bottom: 10px;
           padding: 8px;
           background: #f8f9fa;
           border: 1px solid #dee2e6;
           border-radius: 4px;
+          cursor: move;
+          position: relative;
+        `;
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.textContent = '⋮⋮';
+        dragHandle.style.cssText = `
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: move;
+          color: #9c27b0;
+          font-size: 14px;
+          user-select: none;
+          padding: 2px;
+        `;
+        checkboxContainer.appendChild(dragHandle);
+        
+        // Create content container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+          margin-left: 24px;
         `;
         
         const fieldNameInput = document.createElement('input');
@@ -4941,10 +5428,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         };
         
         // Correct order: field name, selection type, add button, options, delete button
-        checkboxContainer.appendChild(fieldNameInput);
-        checkboxContainer.appendChild(selectionTypeLabel);
-        checkboxContainer.appendChild(selectionTypeSelect);
-        checkboxContainer.appendChild(addCheckboxOptionBtn);
+        contentContainer.appendChild(fieldNameInput);
+        contentContainer.appendChild(selectionTypeLabel);
+        contentContainer.appendChild(selectionTypeSelect);
+        contentContainer.appendChild(addCheckboxOptionBtn);
         
         // Add existing checkbox options BEFORE the delete button
         if (checkbox.options && checkbox.options.length > 0) {
@@ -5099,11 +5586,25 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             optionDiv.appendChild(checkboxIdInput);
             optionDiv.appendChild(copyCheckboxIdBtn);
             optionDiv.appendChild(deleteOptionBtn);
-            checkboxContainer.appendChild(optionDiv);
+            contentContainer.appendChild(optionDiv);
           });
         }
         
-        checkboxContainer.appendChild(deleteCheckboxBtn);
+        contentContainer.appendChild(deleteCheckboxBtn);
+        checkboxContainer.appendChild(contentContainer);
+        
+        // Add drag handlers
+        checkboxContainer.addEventListener('dragstart', (e) => {
+          checkboxContainer.classList.add('dragging');
+          checkboxContainer.style.opacity = '0.5';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        checkboxContainer.addEventListener('dragend', (e) => {
+          checkboxContainer.classList.remove('dragging');
+          checkboxContainer.style.opacity = '1';
+        });
+        
         actionsList.appendChild(checkboxContainer);
       });
     }
@@ -5112,12 +5613,39 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     if (trigger.times && trigger.times.length > 0) {
       trigger.times.forEach((time, timeIndex) => {
         const timeContainer = document.createElement('div');
+        timeContainer.draggable = true;
+        timeContainer.dataset.type = 'time';
+        timeContainer.dataset.triggerIndex = triggerIndex;
         timeContainer.style.cssText = `
           margin-bottom: 10px;
           padding: 8px;
           background: #fff3e0;
           border: 1px solid #ffcc02;
           border-radius: 4px;
+          cursor: move;
+          position: relative;
+        `;
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.textContent = '⋮⋮';
+        dragHandle.style.cssText = `
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: move;
+          color: #ff9800;
+          font-size: 14px;
+          user-select: none;
+          padding: 2px;
+        `;
+        timeContainer.appendChild(dragHandle);
+        
+        // Create content container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+          margin-left: 24px;
         `;
         
         const fieldNameInput = document.createElement('input');
@@ -5197,9 +5725,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
-        timeContainer.appendChild(fieldNameInput);
-        timeContainer.appendChild(timeIdInput);
-        timeContainer.appendChild(deleteTimeBtn);
+        contentContainer.appendChild(fieldNameInput);
+        contentContainer.appendChild(timeIdInput);
+        contentContainer.appendChild(deleteTimeBtn);
         
         // Copy ID button for existing time (positioned after delete button)
         const copyTimeIdBtn = document.createElement('button');
@@ -5245,7 +5773,21 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           }
         };
-        timeContainer.appendChild(copyTimeIdBtn);
+        contentContainer.appendChild(copyTimeIdBtn);
+        
+        timeContainer.appendChild(contentContainer);
+        
+        // Add drag handlers
+        timeContainer.addEventListener('dragstart', (e) => {
+          timeContainer.classList.add('dragging');
+          timeContainer.style.opacity = '0.5';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        timeContainer.addEventListener('dragend', (e) => {
+          timeContainer.classList.remove('dragging');
+          timeContainer.style.opacity = '1';
+        });
         
         actionsList.appendChild(timeContainer);
       });
@@ -5255,6 +5797,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     if (trigger.locations && trigger.locations.length > 0) {
       trigger.locations.forEach((location, locationIndex) => {
         const locationContainer = document.createElement('div');
+        locationContainer.draggable = true;
+        locationContainer.dataset.type = 'location';
+        locationContainer.dataset.triggerIndex = triggerIndex;
         locationContainer.style.cssText = `
           margin: 8px 0;
           padding: 8px;
@@ -5265,6 +5810,30 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           color: #28a745;
           font-weight: bold;
           font-size: 12px;
+          cursor: move;
+          position: relative;
+        `;
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.textContent = '⋮⋮';
+        dragHandle.style.cssText = `
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: move;
+          color: #28a745;
+          font-size: 14px;
+          user-select: none;
+          padding: 2px;
+        `;
+        locationContainer.appendChild(dragHandle);
+        
+        // Create content container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+          margin-left: 24px;
         `;
         
         // Location indicator text
@@ -5399,11 +5968,25 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         buttonContainer.appendChild(editBtn);
         buttonContainer.appendChild(deleteLocationBtn);
         
-        locationContainer.appendChild(locationText);
-        locationContainer.appendChild(locationTitleInput);
-        locationContainer.appendChild(fieldNameInput);
-        locationContainer.appendChild(locationIdInput);
-        locationContainer.appendChild(buttonContainer);
+        contentContainer.appendChild(locationText);
+        contentContainer.appendChild(locationTitleInput);
+        contentContainer.appendChild(fieldNameInput);
+        contentContainer.appendChild(locationIdInput);
+        contentContainer.appendChild(buttonContainer);
+        locationContainer.appendChild(contentContainer);
+        
+        // Add drag handlers
+        locationContainer.addEventListener('dragstart', (e) => {
+          locationContainer.classList.add('dragging');
+          locationContainer.style.opacity = '0.5';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        locationContainer.addEventListener('dragend', (e) => {
+          locationContainer.classList.remove('dragging');
+          locationContainer.style.opacity = '1';
+        });
+        
         actionsList.appendChild(locationContainer);
       });
     }
@@ -5466,10 +6049,6 @@ function createLocationIndicator(cell, parentContainer) {
     color: #28a745;
     font-weight: bold;
     font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
     cursor: move;
     transition: all 0.2s ease;
   `;

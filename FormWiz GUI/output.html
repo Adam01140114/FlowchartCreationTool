@@ -11,9 +11,11 @@
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
         .address-field { margin: 4px auto; }
         .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
-        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+        .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
         .address-input::placeholder { color: #6c757d; opacity: 1; }
         .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-main { width: auto; max-width: 10px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-trigger { width: auto; max-width: 10px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
         .address-field:first-child { margin-top: 2px; }
         .address-field:last-child { margin-bottom: 2px; }
         .hidden { display: none !important; }
@@ -231,21 +233,13 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
-      <span class="checkbox-inline" id="checkbox-container-example1">
-        <label class="checkbox-label">
-          <input type="checkbox" id="example1" name="example1" value="Yes" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Yes
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-example2">
-        <label class="checkbox-label">
-          <input type="checkbox" id="example2" name="example2" value="No" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          No
-        </label>
-      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
+                      onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_you_the_only_person_suing"></div>
+              <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>How many extra P's are there</h3></label><p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many_extra_p_s_are_there" name="how_many_extra_p_s_are_there" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_extra_p_s_are_there', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -527,8 +521,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry"};
-var questionNameIds = {"1":"hungry"};
+    var questionSlugMap       = {"1":"are_you_the_only_person_suing","2":"how_many_extra_p_s_are_there"};
+var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_extra_p_s_are_there"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -536,14 +530,14 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
-var unifiedFieldsMap = {};
+var labelMap = {"2":["Name","Phone Number","Street","City","State"],"length":0};
+var amountMap = {"2":["Zip"],"length":0};
+var labelNodeIdsMap = {"2":["how_many_extra_p_s_are_there_name","how_many_extra_p_s_are_there_phone_number","how_many_extra_p_s_are_there_street","how_many_extra_p_s_are_there_city","how_many_extra_p_s_are_there_state"]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_p_s_are_there_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_p_s_are_there_phone_number","order":2},{"type":"label","label":"Street","nodeId":"how_many_extra_p_s_are_there_street","order":3},{"type":"label","label":"City","nodeId":"how_many_extra_p_s_are_there_city","order":4},{"type":"label","label":"State","nodeId":"how_many_extra_p_s_are_there_state","order":5},{"type":"amount","label":"Zip","nodeId":"how_many_extra_p_s_are_there_zip","order":6},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"label","label":"Business Name","nodeId":"is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"multiple","options":[{"text":"An Individual","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"}]}],"order":7},{"type":"location","fieldName":"example","nodeId":"location_data","order":8}]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
-var linkedCheckboxes = [{"linkedCheckboxId":"test","checkboxes":["example1","example2"]}];
+var linkedCheckboxes = [];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
@@ -666,6 +660,39 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      console.log('🔧 [CONDITIONAL DEBUG] Question 1: Found', cbs.length, 'inputs in container, looking for:', cPrevAns);
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -2185,7 +2212,7 @@ function showTextboxLabels(questionId, count){
                         input = document.createElement('select');
                         input.id = locPrefix + '_' + f.nodeId + '_' + j;
                         input.name = input.id;
-                        input.className = 'address-select';
+                        input.className = 'address-select-trigger';
                         // Create hidden short code field for state abbreviation
                         const shortHidden = document.createElement('input');
                         shortHidden.type = 'text';
@@ -7125,7 +7152,7 @@ document.addEventListener('DOMContentLoaded', function() {
             input = document.createElement('select');
             input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
             input.name = input.id;
-            input.className = 'address-select';
+            input.className = 'address-select-main';
             // Hidden short code field
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';
