@@ -2371,6 +2371,260 @@ if (s > 1){
   // Set window.formId to the PDF name (without .pdf extension) for cart and form identification
   formHTML += `window.formId = '${escapedPdfFormName.replace(/\.pdf$/i, '')}';\n`;
   
+  // Define global variables early so they're available for all functions
+  formHTML += `var questionSlugMap = ${JSON.stringify(questionSlugMap || {})};\n`;
+  formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
+  formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
+  formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
+  
+  // Add createTriggerFieldsContainer function early so it's available for numbered dropdown code
+  formHTML += `
+  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName) {
+    const triggerContainer = document.createElement('div');
+    triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
+    triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
+    
+    const triggerTitle = document.createElement('h5');
+    triggerTitle.textContent = 'Additional Information';
+    triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
+    triggerContainer.appendChild(triggerTitle);
+    
+    fields.forEach((triggerField, fieldIndex) => {
+      if (triggerField.type === 'label') {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const label = document.createElement('label');
+        label.textContent = triggerField.label + ":";
+        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = triggerField.nodeId + "_" + entryNumber;
+        input.name = input.id;
+        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
+        
+        // Add hover effect
+        input.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        input.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+        
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        triggerContainer.appendChild(fieldDiv);
+      } else if (triggerField.type === 'checkbox') {
+        const checkboxFieldDiv = document.createElement('div');
+        checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const fieldNameLabel = document.createElement('label');
+        fieldNameLabel.textContent = triggerField.fieldName + ":";
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        checkboxFieldDiv.appendChild(fieldNameLabel);
+        
+        const checkboxOptions = triggerField.options || [];
+        const selectionType = triggerField.selectionType || 'multiple'; // Default to multiple if not specified
+        
+        checkboxOptions.forEach((option, optionIndex) => {
+          const optionDiv = document.createElement('div');
+          optionDiv.style.cssText = 'margin: 8px 0; padding: 8px; background-color: white; border-radius: 6px; border: 1px solid #87CEEB; display: flex; align-items: center;';
+          
+          const input = document.createElement('input');
+          input.type = selectionType === 'single' ? 'radio' : 'checkbox';
+          input.id = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+          input.name = selectionType === 'single' ? 'radio_group_' + entryNumber : option.nodeId + "_" + entryNumber;
+          input.value = option.text;
+          input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
+          
+          // Add event listener for radio buttons to create hidden checkboxes
+          if (selectionType === 'single') {
+            input.addEventListener('change', function() {
+              if (this.checked) {
+                // Uncheck all other radio buttons in this group and remove their hidden checkboxes
+                const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
+                radioGroup.forEach(radio => {
+                  if (radio !== this) {
+                    radio.checked = false;
+                    
+                    // Remove hidden checkbox for unchecked radio
+                    const originalNodeId = radio.id.replace('_radio', '');
+                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                    
+                    if (existingHiddenCheckbox) {
+                      if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
+                        existingHiddenCheckbox.remove();
+                      }
+                    }
+                  }
+                });
+                
+                // Create hidden checkbox for the selected radio
+                const originalNodeId = this.id.replace('_radio', '');
+                if (typeof createHiddenCheckboxForRadio === 'function') {
+                  createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                }
+              }
+            });
+          }
+          
+          const label = document.createElement('label');
+          label.textContent = option.text;
+          label.style.cssText = 'flex: 1; cursor: pointer; color: #2c3e50; font-size: 15px; font-weight: 500; margin: 0;';
+          label.setAttribute('for', input.id);
+          
+          optionDiv.appendChild(input);
+          optionDiv.appendChild(label);
+          checkboxFieldDiv.appendChild(optionDiv);
+        });
+        
+        triggerContainer.appendChild(checkboxFieldDiv);
+      } else if (triggerField.type === 'date') {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const label = document.createElement('label');
+        label.textContent = triggerField.label + ":";
+        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = triggerField.nodeId + "_" + entryNumber;
+        input.name = input.id;
+        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
+        
+        // Make the entire field div clickable to show calendar
+        fieldDiv.addEventListener('click', function() {
+          input.focus();
+          input.showPicker && input.showPicker();
+        });
+        
+        // Add hover effect
+        input.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        input.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+        
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        triggerContainer.appendChild(fieldDiv);
+      } else if (triggerField.type === 'location') {
+        // Handle simplified location field format ("Location Data Added")
+        // Create location field container
+        const locationFieldDiv = document.createElement('div');
+        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;';
+        
+        const fieldNameLabel = document.createElement('label');
+        console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
+        console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
+        fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px; text-align: center;';
+        locationFieldDiv.appendChild(fieldNameLabel);
+        
+        // Create location fields (Street, City, State, Zip)
+        const locationFields = [
+          { label: 'Street', nodeId: 'street' },
+          { label: 'City', nodeId: 'city' },
+          { label: 'State', nodeId: 'state' },
+          { label: 'Zip', nodeId: 'zip' }
+        ];
+        // Build locPrefix using dropdown field name + trigger (without location field name)
+        // Sanitize: convert to lowercase, replace spaces and question marks with underscores
+        let dropdownPrefix = String(dropdownFieldName || 'dropdown')
+            .toLowerCase()
+            .replace(/[?]/g, '')  // Remove question marks (using character class)
+            .replace(/\\\\s+/g, '_') // Replace spaces with underscores (double escape: \\\\ becomes \\ in output)
+            .replace(/[^\\\\w_]+/g, '_') // Replace any other non-word characters except underscores (double escape)
+            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+        let locPrefix = dropdownPrefix + '_trigger';
+        locationFields.forEach((field, fieldIndex) => {
+          let input;
+          if (field.label === 'State') {
+            // Create state dropdown
+            input = document.createElement('select');
+            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            input.name = input.id;
+            input.className = 'address-select-main';
+            // Hidden short code field
+            const shortHidden = document.createElement('input');
+            shortHidden.type = 'text';
+            shortHidden.id = locPrefix + '_state_short_' + entryNumber;
+            shortHidden.name = shortHidden.id;
+            shortHidden.style.display = 'none';
+            
+            // Add state options
+            const states = [
+              'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+              'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+              'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
+              'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
+              'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+              'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
+              'Washington','West Virginia','Wisconsin','Wyoming'
+            ];
+            
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select State';
+            input.appendChild(defaultOption);
+            
+            states.forEach(state => {
+              const option = document.createElement('option');
+              option.value = state;
+              option.textContent = state;
+              input.appendChild(option);
+            });
+
+            // Sync abbreviation and hidden checkbox on change
+            input.addEventListener('change', function(){
+              if (typeof updateStateHiddenFields === 'function') {
+                updateStateHiddenFields(this, input.id, shortHidden.id);
+              }
+              if (typeof dropdownMirror === 'function') {
+                dropdownMirror(this, input.id);
+              }
+              if (typeof updateHiddenLogic === 'function') {
+                updateHiddenLogic(input.id, this.value);
+              }
+            });
+
+            // Append hidden short field
+            const hiddenWrap = document.createElement('div');
+            hiddenWrap.style.display = 'none';
+            hiddenWrap.appendChild(shortHidden);
+            locationFieldDiv.appendChild(hiddenWrap);
+          } else {
+            // Create text input for other fields
+            input = document.createElement('input');
+            input.type = field.label === 'Zip' ? 'number' : 'text';
+            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            input.name = input.id;
+            input.placeholder = field.label; // e.g., Street, City, Zip
+            input.className = 'address-input';
+          }
+          
+          // Wrap each input in an .address-field div so margins apply
+          const addrWrap = document.createElement('div');
+          addrWrap.className = 'address-field';
+          addrWrap.appendChild(input);
+          locationFieldDiv.appendChild(addrWrap);
+        });
+        
+        triggerContainer.appendChild(locationFieldDiv);
+      }
+    });
+    
+    parentContainer.appendChild(triggerContainer);
+  }
+`;
+  
   // Add the helper function for detecting conditional fields
   formHTML += `
 // Helper function to detect if a field is part of a trigger sequence (conditional field)
@@ -2602,9 +2856,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     });
   }
 
-  // 2) Our global objects
-  formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap || {})};\n`;
-  formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
+  // 2) Our global objects (some already defined above, only define the rest here)
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
   formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs || [])};\n`;
   formHTML += `var pdfLogicPDFs = ${JSON.stringify(pdfLogicPDFs || [])};\n`;
@@ -2615,11 +2867,9 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var labelMap = ${JSON.stringify(labelMap || {})};\n`;
   formHTML += `var amountMap = ${JSON.stringify(amountMap || {})};\n`;
   formHTML += `var labelNodeIdsMap = ${JSON.stringify(window.labelNodeIdsMap || {})};\n`;
-  formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var hiddenLogicConfigs = ${JSON.stringify(hiddenLogicConfigs || [])};\n`;
   formHTML += `var linkedFields = ${JSON.stringify(linkedFields || [])};\n`;
-  formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
   // Dynamic conditional logic for business type question to show county question
@@ -4728,7 +4978,7 @@ function showTextboxLabels(questionId, count){
                                     triggerFieldsContainer.style.display = 'block';
                                 } else {
                                     // Create trigger fields container if it doesn't exist
-                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv);
+                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName);
                                 }
                             } else {
                                 // Hide trigger fields for other conditions
@@ -9215,7 +9465,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   </script>`;
 
-  // Add the createTriggerFieldsContainer function before returning
+  // Add helper functions for trigger checkbox radio button behavior before returning
   formHTML += `
   <script>
   // Helper functions for trigger checkbox radio button behavior
@@ -9258,242 +9508,8 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
   }
-
-  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer) {
-    const triggerContainer = document.createElement('div');
-    triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
-    triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
-    
-    const triggerTitle = document.createElement('h5');
-    triggerTitle.textContent = 'Additional Information';
-    triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
-    triggerContainer.appendChild(triggerTitle);
-    
-    fields.forEach((triggerField, fieldIndex) => {
-      if (triggerField.type === 'label') {
-        const fieldDiv = document.createElement('div');
-        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
-        
-        const label = document.createElement('label');
-        label.textContent = triggerField.label + ":";
-        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id = triggerField.nodeId + "_" + entryNumber;
-        input.name = input.id;
-        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
-        
-        // Add hover effect
-        input.addEventListener('mouseenter', function() {
-          this.style.borderColor = '#5DADE2';
-          this.style.backgroundColor = '#f8f9ff';
-        });
-        input.addEventListener('mouseleave', function() {
-          this.style.borderColor = '#87CEEB';
-          this.style.backgroundColor = 'white';
-        });
-        
-        fieldDiv.appendChild(label);
-        fieldDiv.appendChild(input);
-        triggerContainer.appendChild(fieldDiv);
-      } else if (triggerField.type === 'checkbox') {
-        const checkboxFieldDiv = document.createElement('div');
-        checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
-        
-        const fieldNameLabel = document.createElement('label');
-        fieldNameLabel.textContent = triggerField.fieldName + ":";
-        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
-        checkboxFieldDiv.appendChild(fieldNameLabel);
-        
-        const checkboxOptions = triggerField.options || [];
-        const selectionType = triggerField.selectionType || 'multiple'; // Default to multiple if not specified
-        
-        checkboxOptions.forEach((option, optionIndex) => {
-          const optionDiv = document.createElement('div');
-          optionDiv.style.cssText = 'margin: 8px 0; padding: 8px; background-color: white; border-radius: 6px; border: 1px solid #87CEEB; display: flex; align-items: center;';
-          
-          const input = document.createElement('input');
-          input.type = selectionType === 'single' ? 'radio' : 'checkbox';
-          input.id = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
-          input.name = selectionType === 'single' ? 'radio_group_' + entryNumber : option.nodeId + "_" + entryNumber;
-          input.value = option.text;
-          input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
-          
-          // Add event listener for radio buttons to create hidden checkboxes
-          if (selectionType === 'single') {
-            input.addEventListener('change', function() {
-              if (this.checked) {
-                // Uncheck all other radio buttons in this group and remove their hidden checkboxes
-                const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
-                radioGroup.forEach(radio => {
-                  if (radio !== this) {
-                    radio.checked = false;
-                    
-                    // Remove hidden checkbox for unchecked radio
-                    const originalNodeId = radio.id.replace('_radio', '');
-                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
-                    
-                    if (existingHiddenCheckbox) {
-                      if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
-                        existingHiddenCheckbox.remove();
-                      }
-                    }
-                  }
-                });
-                
-                // Create hidden checkbox for the selected radio
-                const originalNodeId = this.id.replace('_radio', '');
-                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
-              }
-            });
-          }
-          
-          const label = document.createElement('label');
-          label.textContent = option.text;
-          label.style.cssText = 'flex: 1; cursor: pointer; color: #2c3e50; font-size: 15px; font-weight: 500; margin: 0;';
-          label.setAttribute('for', input.id);
-          
-          optionDiv.appendChild(input);
-          optionDiv.appendChild(label);
-          checkboxFieldDiv.appendChild(optionDiv);
-        });
-        
-        triggerContainer.appendChild(checkboxFieldDiv);
-      } else if (triggerField.type === 'date') {
-        const fieldDiv = document.createElement('div');
-        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
-        
-        const label = document.createElement('label');
-        label.textContent = triggerField.label + ":";
-        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
-        
-        const input = document.createElement('input');
-        input.type = 'date';
-        input.id = triggerField.nodeId + "_" + entryNumber;
-        input.name = input.id;
-        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
-        
-        // Make the entire field div clickable to show calendar
-        fieldDiv.addEventListener('click', function() {
-          input.focus();
-          input.showPicker && input.showPicker();
-        });
-        
-        // Add hover effect
-        input.addEventListener('mouseenter', function() {
-          this.style.borderColor = '#5DADE2';
-          this.style.backgroundColor = '#f8f9ff';
-        });
-        input.addEventListener('mouseleave', function() {
-          this.style.borderColor = '#87CEEB';
-          this.style.backgroundColor = 'white';
-        });
-        
-        fieldDiv.appendChild(label);
-        fieldDiv.appendChild(input);
-        triggerContainer.appendChild(fieldDiv);
-      } else if (triggerField.type === 'location') {
-        // Handle simplified location field format ("Location Data Added")
-        // Create location field container
-        const locationFieldDiv = document.createElement('div');
-        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;';
-        
-        const fieldNameLabel = document.createElement('label');
-        console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
-        console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
-        fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
-        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px; text-align: center;';
-        locationFieldDiv.appendChild(fieldNameLabel);
-        
-        // Create location fields (Street, City, State, Zip)
-        const locationFields = [
-          { label: 'Street', nodeId: 'street' },
-          { label: 'City', nodeId: 'city' },
-          { label: 'State', nodeId: 'state' },
-          { label: 'Zip', nodeId: 'zip' }
-        ];
-        let locPrefix = sanitizeQuestionText(triggerField.fieldName || 'location');
-        locPrefix = locPrefix.replace(/ +/g, '_');
-        locationFields.forEach((field, fieldIndex) => {
-          let input;
-          if (field.label === 'State') {
-            // Create state dropdown
-            input = document.createElement('select');
-            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
-            input.name = input.id;
-            input.className = 'address-select-main';
-            // Hidden short code field
-            const shortHidden = document.createElement('input');
-            shortHidden.type = 'text';
-            shortHidden.id = locPrefix + '_state_short_' + entryNumber;
-            shortHidden.name = shortHidden.id;
-            shortHidden.style.display = 'none';
-            
-            // Add state options
-            const states = [
-              'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
-              'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
-              'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
-              'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
-              'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
-              'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
-              'Washington','West Virginia','Wisconsin','Wyoming'
-            ];
-            
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Select State';
-            input.appendChild(defaultOption);
-            
-            states.forEach(state => {
-              const option = document.createElement('option');
-              option.value = state;
-              option.textContent = state;
-              input.appendChild(option);
-            });
-
-            // Sync abbreviation and hidden checkbox on change
-            input.addEventListener('change', function(){
-              if (typeof updateStateHiddenFields === 'function') {
-                updateStateHiddenFields(this, input.id, shortHidden.id);
-              }
-              if (typeof dropdownMirror === 'function') {
-                dropdownMirror(this, input.id);
-              }
-              if (typeof updateHiddenLogic === 'function') {
-                updateHiddenLogic(input.id, this.value);
-              }
-            });
-
-            // Append hidden short field
-            const hiddenWrap = document.createElement('div');
-            hiddenWrap.style.display = 'none';
-            hiddenWrap.appendChild(shortHidden);
-            locationFieldDiv.appendChild(hiddenWrap);
-          } else {
-            // Create text input for other fields
-            input = document.createElement('input');
-            input.type = field.label === 'Zip' ? 'number' : 'text';
-            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
-            input.name = input.id;
-            input.placeholder = field.label; // e.g., Street, City, Zip
-            input.className = 'address-input';
-          }
-          
-          // Wrap each input in an .address-field div so margins apply
-          const addrWrap = document.createElement('div');
-          addrWrap.className = 'address-field';
-          addrWrap.appendChild(input);
-          locationFieldDiv.appendChild(addrWrap);
-        });
-        
-        triggerContainer.appendChild(locationFieldDiv);
-      }
-    });
-    
-    parentContainer.appendChild(triggerContainer);
-  }
+  
+  // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>`;
 
   // Finally, return the assembled HTML

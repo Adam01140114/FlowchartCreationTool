@@ -14,8 +14,8 @@
         .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
         .address-input::placeholder { color: #6c757d; opacity: 1; }
         .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
-        .address-select-main { width: auto; max-width: 10px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
-        .address-select-trigger { width: auto; max-width: 10px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-main { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding: 12px 24px 12px 8px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-trigger { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 2px center; background-size: 12px; padding: 0; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
         .address-field:first-child { margin-top: 2px; }
         .address-field:last-child { margin-bottom: 2px; }
         .hidden { display: none !important; }
@@ -366,6 +366,255 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
+var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"how_many_extra_p_s_are_there"};
+var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_extra_p_s_are_there"};
+var linkedCheckboxes = [];
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_p_s_are_there_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_p_s_are_there_phone_number","order":2},{"type":"location","fieldName":"main","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"location","fieldName":"trigger","nodeId":"location_data"}]}],"order":4}]};
+
+  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName) {
+    const triggerContainer = document.createElement('div');
+    triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
+    triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
+    
+    const triggerTitle = document.createElement('h5');
+    triggerTitle.textContent = 'Additional Information';
+    triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
+    triggerContainer.appendChild(triggerTitle);
+    
+    fields.forEach((triggerField, fieldIndex) => {
+      if (triggerField.type === 'label') {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const label = document.createElement('label');
+        label.textContent = triggerField.label + ":";
+        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = triggerField.nodeId + "_" + entryNumber;
+        input.name = input.id;
+        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
+        
+        // Add hover effect
+        input.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        input.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+        
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        triggerContainer.appendChild(fieldDiv);
+      } else if (triggerField.type === 'checkbox') {
+        const checkboxFieldDiv = document.createElement('div');
+        checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const fieldNameLabel = document.createElement('label');
+        fieldNameLabel.textContent = triggerField.fieldName + ":";
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        checkboxFieldDiv.appendChild(fieldNameLabel);
+        
+        const checkboxOptions = triggerField.options || [];
+        const selectionType = triggerField.selectionType || 'multiple'; // Default to multiple if not specified
+        
+        checkboxOptions.forEach((option, optionIndex) => {
+          const optionDiv = document.createElement('div');
+          optionDiv.style.cssText = 'margin: 8px 0; padding: 8px; background-color: white; border-radius: 6px; border: 1px solid #87CEEB; display: flex; align-items: center;';
+          
+          const input = document.createElement('input');
+          input.type = selectionType === 'single' ? 'radio' : 'checkbox';
+          input.id = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+          input.name = selectionType === 'single' ? 'radio_group_' + entryNumber : option.nodeId + "_" + entryNumber;
+          input.value = option.text;
+          input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
+          
+          // Add event listener for radio buttons to create hidden checkboxes
+          if (selectionType === 'single') {
+            input.addEventListener('change', function() {
+              if (this.checked) {
+                // Uncheck all other radio buttons in this group and remove their hidden checkboxes
+                const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
+                radioGroup.forEach(radio => {
+                  if (radio !== this) {
+                    radio.checked = false;
+                    
+                    // Remove hidden checkbox for unchecked radio
+                    const originalNodeId = radio.id.replace('_radio', '');
+                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                    
+                    if (existingHiddenCheckbox) {
+                      if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
+                        existingHiddenCheckbox.remove();
+                      }
+                    }
+                  }
+                });
+                
+                // Create hidden checkbox for the selected radio
+                const originalNodeId = this.id.replace('_radio', '');
+                if (typeof createHiddenCheckboxForRadio === 'function') {
+                  createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                }
+              }
+            });
+          }
+          
+          const label = document.createElement('label');
+          label.textContent = option.text;
+          label.style.cssText = 'flex: 1; cursor: pointer; color: #2c3e50; font-size: 15px; font-weight: 500; margin: 0;';
+          label.setAttribute('for', input.id);
+          
+          optionDiv.appendChild(input);
+          optionDiv.appendChild(label);
+          checkboxFieldDiv.appendChild(optionDiv);
+        });
+        
+        triggerContainer.appendChild(checkboxFieldDiv);
+      } else if (triggerField.type === 'date') {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        const label = document.createElement('label');
+        label.textContent = triggerField.label + ":";
+        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = triggerField.nodeId + "_" + entryNumber;
+        input.name = input.id;
+        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
+        
+        // Make the entire field div clickable to show calendar
+        fieldDiv.addEventListener('click', function() {
+          input.focus();
+          input.showPicker && input.showPicker();
+        });
+        
+        // Add hover effect
+        input.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        input.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+        
+        fieldDiv.appendChild(label);
+        fieldDiv.appendChild(input);
+        triggerContainer.appendChild(fieldDiv);
+      } else if (triggerField.type === 'location') {
+        // Handle simplified location field format ("Location Data Added")
+        // Create location field container
+        const locationFieldDiv = document.createElement('div');
+        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;';
+        
+        const fieldNameLabel = document.createElement('label');
+        console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
+        console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
+        fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px; text-align: center;';
+        locationFieldDiv.appendChild(fieldNameLabel);
+        
+        // Create location fields (Street, City, State, Zip)
+        const locationFields = [
+          { label: 'Street', nodeId: 'street' },
+          { label: 'City', nodeId: 'city' },
+          { label: 'State', nodeId: 'state' },
+          { label: 'Zip', nodeId: 'zip' }
+        ];
+        // Build locPrefix using dropdown field name + trigger (without location field name)
+        // Sanitize: convert to lowercase, replace spaces and question marks with underscores
+        let dropdownPrefix = String(dropdownFieldName || 'dropdown')
+            .toLowerCase()
+            .replace(/[?]/g, '')  // Remove question marks (using character class)
+            .replace(/\\s+/g, '_') // Replace spaces with underscores (double escape: \\ becomes \ in output)
+            .replace(/[^\\w_]+/g, '_') // Replace any other non-word characters except underscores (double escape)
+            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+        let locPrefix = dropdownPrefix + '_trigger';
+        locationFields.forEach((field, fieldIndex) => {
+          let input;
+          if (field.label === 'State') {
+            // Create state dropdown
+            input = document.createElement('select');
+            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            input.name = input.id;
+            input.className = 'address-select-main';
+            // Hidden short code field
+            const shortHidden = document.createElement('input');
+            shortHidden.type = 'text';
+            shortHidden.id = locPrefix + '_state_short_' + entryNumber;
+            shortHidden.name = shortHidden.id;
+            shortHidden.style.display = 'none';
+            
+            // Add state options
+            const states = [
+              'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+              'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+              'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
+              'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
+              'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+              'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
+              'Washington','West Virginia','Wisconsin','Wyoming'
+            ];
+            
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select State';
+            input.appendChild(defaultOption);
+            
+            states.forEach(state => {
+              const option = document.createElement('option');
+              option.value = state;
+              option.textContent = state;
+              input.appendChild(option);
+            });
+
+            // Sync abbreviation and hidden checkbox on change
+            input.addEventListener('change', function(){
+              if (typeof updateStateHiddenFields === 'function') {
+                updateStateHiddenFields(this, input.id, shortHidden.id);
+              }
+              if (typeof dropdownMirror === 'function') {
+                dropdownMirror(this, input.id);
+              }
+              if (typeof updateHiddenLogic === 'function') {
+                updateHiddenLogic(input.id, this.value);
+              }
+            });
+
+            // Append hidden short field
+            const hiddenWrap = document.createElement('div');
+            hiddenWrap.style.display = 'none';
+            hiddenWrap.appendChild(shortHidden);
+            locationFieldDiv.appendChild(hiddenWrap);
+          } else {
+            // Create text input for other fields
+            input = document.createElement('input');
+            input.type = field.label === 'Zip' ? 'number' : 'text';
+            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            input.name = input.id;
+            input.placeholder = field.label; // e.g., Street, City, Zip
+            input.className = 'address-input';
+          }
+          
+          // Wrap each input in an .address-field div so margins apply
+          const addrWrap = document.createElement('div');
+          addrWrap.className = 'address-field';
+          addrWrap.appendChild(input);
+          locationFieldDiv.appendChild(addrWrap);
+        });
+        
+        triggerContainer.appendChild(locationFieldDiv);
+      }
+    });
+    
+    parentContainer.appendChild(triggerContainer);
+  }
 
 // Helper function to detect if a field is part of a trigger sequence (conditional field)
 function isFieldPartOfTriggerSequence(fieldName, fieldId) {
@@ -521,23 +770,19 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"are_you_the_only_person_suing","2":"how_many_extra_p_s_are_there"};
-var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_extra_p_s_are_there"};
-var jumpLogics = [];
+    var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"2":["Name","Phone Number","Street","City","State"],"length":0};
-var amountMap = {"2":["Zip"],"length":0};
-var labelNodeIdsMap = {"2":["how_many_extra_p_s_are_there_name","how_many_extra_p_s_are_there_phone_number","how_many_extra_p_s_are_there_street","how_many_extra_p_s_are_there_city","how_many_extra_p_s_are_there_state"]};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_p_s_are_there_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_p_s_are_there_phone_number","order":2},{"type":"label","label":"Street","nodeId":"how_many_extra_p_s_are_there_street","order":3},{"type":"label","label":"City","nodeId":"how_many_extra_p_s_are_there_city","order":4},{"type":"label","label":"State","nodeId":"how_many_extra_p_s_are_there_state","order":5},{"type":"amount","label":"Zip","nodeId":"how_many_extra_p_s_are_there_zip","order":6},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"label","label":"Business Name","nodeId":"is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"multiple","options":[{"text":"An Individual","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"}]}],"order":7},{"type":"location","fieldName":"example","nodeId":"location_data","order":8}]};
+var labelMap = {"2":["Name","Phone Number"],"length":0};
+var amountMap = {"2":[],"length":0};
+var labelNodeIdsMap = {"2":["how_many_extra_p_s_are_there_name","how_many_extra_p_s_are_there_phone_number"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
-var linkedCheckboxes = [];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
@@ -2464,7 +2709,7 @@ function showTextboxLabels(questionId, count){
                                     triggerFieldsContainer.style.display = 'block';
                                 } else {
                                     // Create trigger fields container if it doesn't exist
-                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv);
+                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName);
                                 }
                             } else {
                                 // Hide trigger fields for other conditions
@@ -6988,240 +7233,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
   }
-
-  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer) {
-    const triggerContainer = document.createElement('div');
-    triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
-    triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
-    
-    const triggerTitle = document.createElement('h5');
-    triggerTitle.textContent = 'Additional Information';
-    triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
-    triggerContainer.appendChild(triggerTitle);
-    
-    fields.forEach((triggerField, fieldIndex) => {
-      if (triggerField.type === 'label') {
-        const fieldDiv = document.createElement('div');
-        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
-        
-        const label = document.createElement('label');
-        label.textContent = triggerField.label + ":";
-        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id = triggerField.nodeId + "_" + entryNumber;
-        input.name = input.id;
-        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
-        
-        // Add hover effect
-        input.addEventListener('mouseenter', function() {
-          this.style.borderColor = '#5DADE2';
-          this.style.backgroundColor = '#f8f9ff';
-        });
-        input.addEventListener('mouseleave', function() {
-          this.style.borderColor = '#87CEEB';
-          this.style.backgroundColor = 'white';
-        });
-        
-        fieldDiv.appendChild(label);
-        fieldDiv.appendChild(input);
-        triggerContainer.appendChild(fieldDiv);
-      } else if (triggerField.type === 'checkbox') {
-        const checkboxFieldDiv = document.createElement('div');
-        checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
-        
-        const fieldNameLabel = document.createElement('label');
-        fieldNameLabel.textContent = triggerField.fieldName + ":";
-        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
-        checkboxFieldDiv.appendChild(fieldNameLabel);
-        
-        const checkboxOptions = triggerField.options || [];
-        const selectionType = triggerField.selectionType || 'multiple'; // Default to multiple if not specified
-        
-        checkboxOptions.forEach((option, optionIndex) => {
-          const optionDiv = document.createElement('div');
-          optionDiv.style.cssText = 'margin: 8px 0; padding: 8px; background-color: white; border-radius: 6px; border: 1px solid #87CEEB; display: flex; align-items: center;';
-          
-          const input = document.createElement('input');
-          input.type = selectionType === 'single' ? 'radio' : 'checkbox';
-          input.id = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
-          input.name = selectionType === 'single' ? 'radio_group_' + entryNumber : option.nodeId + "_" + entryNumber;
-          input.value = option.text;
-          input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
-          
-          // Add event listener for radio buttons to create hidden checkboxes
-          if (selectionType === 'single') {
-            input.addEventListener('change', function() {
-              if (this.checked) {
-                // Uncheck all other radio buttons in this group and remove their hidden checkboxes
-                const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
-                radioGroup.forEach(radio => {
-                  if (radio !== this) {
-                    radio.checked = false;
-                    
-                    // Remove hidden checkbox for unchecked radio
-                    const originalNodeId = radio.id.replace('_radio', '');
-                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
-                    
-                    if (existingHiddenCheckbox) {
-                      if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
-                        existingHiddenCheckbox.remove();
-                      }
-                    }
-                  }
-                });
-                
-                // Create hidden checkbox for the selected radio
-                const originalNodeId = this.id.replace('_radio', '');
-                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
-              }
-            });
-          }
-          
-          const label = document.createElement('label');
-          label.textContent = option.text;
-          label.style.cssText = 'flex: 1; cursor: pointer; color: #2c3e50; font-size: 15px; font-weight: 500; margin: 0;';
-          label.setAttribute('for', input.id);
-          
-          optionDiv.appendChild(input);
-          optionDiv.appendChild(label);
-          checkboxFieldDiv.appendChild(optionDiv);
-        });
-        
-        triggerContainer.appendChild(checkboxFieldDiv);
-      } else if (triggerField.type === 'date') {
-        const fieldDiv = document.createElement('div');
-        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
-        
-        const label = document.createElement('label');
-        label.textContent = triggerField.label + ":";
-        label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
-        
-        const input = document.createElement('input');
-        input.type = 'date';
-        input.id = triggerField.nodeId + "_" + entryNumber;
-        input.name = input.id;
-        input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
-        
-        // Make the entire field div clickable to show calendar
-        fieldDiv.addEventListener('click', function() {
-          input.focus();
-          input.showPicker && input.showPicker();
-        });
-        
-        // Add hover effect
-        input.addEventListener('mouseenter', function() {
-          this.style.borderColor = '#5DADE2';
-          this.style.backgroundColor = '#f8f9ff';
-        });
-        input.addEventListener('mouseleave', function() {
-          this.style.borderColor = '#87CEEB';
-          this.style.backgroundColor = 'white';
-        });
-        
-        fieldDiv.appendChild(label);
-        fieldDiv.appendChild(input);
-        triggerContainer.appendChild(fieldDiv);
-      } else if (triggerField.type === 'location') {
-        // Handle simplified location field format ("Location Data Added")
-        // Create location field container
-        const locationFieldDiv = document.createElement('div');
-        locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;';
-        
-        const fieldNameLabel = document.createElement('label');
-        console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
-        console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
-        fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
-        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px; text-align: center;';
-        locationFieldDiv.appendChild(fieldNameLabel);
-        
-        // Create location fields (Street, City, State, Zip)
-        const locationFields = [
-          { label: 'Street', nodeId: 'street' },
-          { label: 'City', nodeId: 'city' },
-          { label: 'State', nodeId: 'state' },
-          { label: 'Zip', nodeId: 'zip' }
-        ];
-        let locPrefix = sanitizeQuestionText(triggerField.fieldName || 'location');
-        locPrefix = locPrefix.replace(/ +/g, '_');
-        locationFields.forEach((field, fieldIndex) => {
-          let input;
-          if (field.label === 'State') {
-            // Create state dropdown
-            input = document.createElement('select');
-            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
-            input.name = input.id;
-            input.className = 'address-select-main';
-            // Hidden short code field
-            const shortHidden = document.createElement('input');
-            shortHidden.type = 'text';
-            shortHidden.id = locPrefix + '_state_short_' + entryNumber;
-            shortHidden.name = shortHidden.id;
-            shortHidden.style.display = 'none';
-            
-            // Add state options
-            const states = [
-              'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
-              'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
-              'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
-              'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
-              'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
-              'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
-              'Washington','West Virginia','Wisconsin','Wyoming'
-            ];
-            
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Select State';
-            input.appendChild(defaultOption);
-            
-            states.forEach(state => {
-              const option = document.createElement('option');
-              option.value = state;
-              option.textContent = state;
-              input.appendChild(option);
-            });
-
-            // Sync abbreviation and hidden checkbox on change
-            input.addEventListener('change', function(){
-              if (typeof updateStateHiddenFields === 'function') {
-                updateStateHiddenFields(this, input.id, shortHidden.id);
-              }
-              if (typeof dropdownMirror === 'function') {
-                dropdownMirror(this, input.id);
-              }
-              if (typeof updateHiddenLogic === 'function') {
-                updateHiddenLogic(input.id, this.value);
-              }
-            });
-
-            // Append hidden short field
-            const hiddenWrap = document.createElement('div');
-            hiddenWrap.style.display = 'none';
-            hiddenWrap.appendChild(shortHidden);
-            locationFieldDiv.appendChild(hiddenWrap);
-          } else {
-            // Create text input for other fields
-            input = document.createElement('input');
-            input.type = field.label === 'Zip' ? 'number' : 'text';
-            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
-            input.name = input.id;
-            input.placeholder = field.label; // e.g., Street, City, Zip
-            input.className = 'address-input';
-          }
-          
-          // Wrap each input in an .address-field div so margins apply
-          const addrWrap = document.createElement('div');
-          addrWrap.className = 'address-field';
-          addrWrap.appendChild(input);
-          locationFieldDiv.appendChild(addrWrap);
-        });
-        
-        triggerContainer.appendChild(locationFieldDiv);
-      }
-    });
-    
-    parentContainer.appendChild(triggerContainer);
-  }
+  
+  // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>

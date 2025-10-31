@@ -1198,6 +1198,127 @@ window.addOptionInReorderModal = addOptionInReorderModal;
 window.findPdfNameForQuestion = findPdfNameForQuestion;
 window.sanitizePdfName = sanitizePdfName;
 
+// Function to save trigger sequence order based on DOM position
+function saveTriggerSequenceOrder(actionsList, triggerSequence) {
+  // Get all draggable entries in their current DOM order
+  const entries = Array.from(actionsList.querySelectorAll('[draggable="true"]'));
+  
+  // Separate entries by type
+  const orderedLabels = [];
+  const orderedCheckboxes = [];
+  const orderedTimes = [];
+  const orderedLocations = [];
+  
+  // Create unified order array that preserves cross-type ordering
+  const unifiedOrder = [];
+  
+  entries.forEach((entry) => {
+    const type = entry.dataset.type;
+    
+    if (type === 'label') {
+      // Find the label object by matching fieldName from the DOM
+      const fieldNameInput = entry.querySelector('input[type="text"]');
+      if (fieldNameInput) {
+        const fieldName = fieldNameInput.value.trim();
+        const label = (triggerSequence.labels || []).find(l => l.fieldName === fieldName);
+        if (label) {
+          orderedLabels.push(label);
+          unifiedOrder.push({ type: 'label', identifier: fieldName });
+        }
+      }
+    } else if (type === 'checkbox') {
+      // Find the checkbox object by matching fieldName from the DOM
+      const fieldNameInput = entry.querySelector('input[type="text"]');
+      if (fieldNameInput) {
+        const fieldName = fieldNameInput.value.trim();
+        const checkbox = (triggerSequence.checkboxes || []).find(c => c.fieldName === fieldName);
+        if (checkbox) {
+          orderedCheckboxes.push(checkbox);
+          unifiedOrder.push({ type: 'checkbox', identifier: fieldName });
+        }
+      }
+    } else if (type === 'time') {
+      // Find the time object by matching fieldName from the DOM
+      const fieldNameInput = entry.querySelector('input[type="text"]');
+      if (fieldNameInput) {
+        const fieldName = fieldNameInput.value.trim();
+        const time = (triggerSequence.times || []).find(t => t.fieldName === fieldName);
+        if (time) {
+          orderedTimes.push(time);
+          unifiedOrder.push({ type: 'time', identifier: fieldName });
+        }
+      }
+    } else if (type === 'location') {
+      // Find the location object by matching locationTitle or fieldName from the DOM
+      const locationTitleInput = entry.querySelector('input[placeholder="Enter location title..."]');
+      const fieldNameInput = entry.querySelector('input[type="text"]:not([placeholder="Enter location title..."])');
+      
+      // Try matching by locationTitle first, then fieldName
+      let location = null;
+      let identifier = null;
+      if (locationTitleInput && locationTitleInput.value.trim()) {
+        const locationTitle = locationTitleInput.value.trim();
+        location = (triggerSequence.locations || []).find(l => l.locationTitle === locationTitle);
+        if (location) {
+          identifier = location.locationTitle || location.fieldName || 'location';
+        }
+      }
+      if (!location && fieldNameInput && fieldNameInput.value.trim()) {
+        const fieldName = fieldNameInput.value.trim();
+        location = (triggerSequence.locations || []).find(l => l.fieldName === fieldName);
+        if (location) {
+          identifier = location.locationTitle || location.fieldName || 'location';
+        }
+      }
+      if (!location && triggerSequence.locations && triggerSequence.locations.length > 0) {
+        // Fallback: if only one location, use it
+        if (triggerSequence.locations.length === 1) {
+          location = triggerSequence.locations[0];
+          identifier = location.locationTitle || location.fieldName || 'location';
+        }
+      }
+      if (location) {
+        orderedLocations.push(location);
+        unifiedOrder.push({ type: 'location', identifier: identifier || 'location' });
+      }
+    }
+  });
+  
+  // Update the arrays with the new order (preserve items not found in DOM)
+  if (triggerSequence.labels) {
+    // Add any labels that weren't found (shouldn't happen, but safety check)
+    orderedLabels.forEach(label => {
+      if (!triggerSequence.labels.includes(label)) {
+        // This shouldn't happen, but handle it
+      }
+    });
+    triggerSequence.labels = orderedLabels;
+  }
+  
+  if (triggerSequence.checkboxes) {
+    triggerSequence.checkboxes = orderedCheckboxes;
+  }
+  
+  if (triggerSequence.times) {
+    triggerSequence.times = orderedTimes;
+  }
+  
+  if (triggerSequence.locations) {
+    triggerSequence.locations = orderedLocations;
+  }
+  
+  // Store the unified order array to preserve cross-type ordering
+  triggerSequence._actionOrder = unifiedOrder;
+  
+  console.log('🔍 [TRIGGER ORDER DEBUG] Saved trigger sequence order:', {
+    labels: orderedLabels.length,
+    checkboxes: orderedCheckboxes.length,
+    times: orderedTimes.length,
+    locations: orderedLocations.length,
+    unifiedOrder: unifiedOrder.length
+  });
+}
+
 // Numbered Dropdown Properties Popup
 window.showNumberedDropdownProperties = function(cell) {
   if (!cell) return;
@@ -1266,7 +1387,36 @@ window.showNumberedDropdownProperties = function(cell) {
     align-items: center;
     justify-content: center;
   `;
-  closeBtn.onclick = () => document.body.removeChild(modal);
+  closeBtn.onclick = () => {
+    // Save order for all trigger sequences before closing
+    if (cell._dropdowns) {
+      cell._dropdowns.forEach((dropdown) => {
+        if (dropdown.triggerSequences) {
+          dropdown.triggerSequences.forEach((triggerSequence) => {
+            // Find all trigger divs and match them to trigger sequences
+            const allTriggerDivs = modal.querySelectorAll('.trigger-sequence');
+            allTriggerDivs.forEach((triggerDiv) => {
+              const actionsList = triggerDiv.querySelector('.actions-list');
+              if (actionsList) {
+                // Check if this matches our trigger sequence by comparing triggerOption
+                const select = triggerDiv.querySelector('select');
+                if (select && select.value === triggerSequence.triggerOption) {
+                  saveTriggerSequenceOrder(actionsList, triggerSequence);
+                }
+              }
+            });
+          });
+        }
+      });
+    }
+    
+    // Trigger autosave before closing
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    
+    document.body.removeChild(modal);
+  };
   
   header.appendChild(title);
   header.appendChild(closeBtn);
@@ -3981,6 +4131,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           if (dragging) {
             dragging.classList.remove('dragging');
             dragging.style.opacity = '1';
+            
+            // Save the new order by reordering the underlying arrays
+            saveTriggerSequenceOrder(actionsList, triggerSequence);
+            
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
@@ -4950,6 +5104,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       if (dragging) {
         dragging.classList.remove('dragging');
         dragging.style.opacity = '1';
+        
+        // Save the new order by reordering the underlying arrays
+        saveTriggerSequenceOrder(actionsList, trigger);
+        
         if (typeof window.requestAutosave === 'function') {
           window.requestAutosave();
         }
@@ -4971,9 +5129,19 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
     
+    // Map to store entry containers by type and identifier for unified ordering
+    const entryContainersMap = new Map();
+    
+    // Helper to store a container in the map
+    const storeEntryContainer = (type, identifier, container) => {
+      const key = `${type}_${identifier}`;
+      entryContainersMap.set(key, container);
+    };
+    
+    // Display existing entries - create containers and store them for later appending
     // Display existing labels
-    if (trigger.labels && trigger.labels.length > 0) {
-      trigger.labels.forEach((label, labelIndex) => {
+      if (trigger.labels && trigger.labels.length > 0) {
+        trigger.labels.forEach((label, labelIndex) => {
         const labelContainer = document.createElement('div');
         labelContainer.draggable = true;
         labelContainer.dataset.type = 'label';
@@ -5151,7 +5319,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           labelContainer.style.opacity = '1';
         });
         
-        actionsList.appendChild(labelContainer);
+        // Store in map instead of appending directly
+        storeEntryContainer('label', label.fieldName || '', labelContainer);
       });
     }
     
@@ -5605,7 +5774,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           checkboxContainer.style.opacity = '1';
         });
         
-        actionsList.appendChild(checkboxContainer);
+        // Store in map instead of appending directly
+        storeEntryContainer('checkbox', checkbox.fieldName || '', checkboxContainer);
       });
     }
     
@@ -5789,7 +5959,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           timeContainer.style.opacity = '1';
         });
         
-        actionsList.appendChild(timeContainer);
+        // Store in map instead of appending directly
+        storeEntryContainer('time', time.fieldName || '', timeContainer);
       });
     }
     
@@ -5987,7 +6158,33 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           locationContainer.style.opacity = '1';
         });
         
-        actionsList.appendChild(locationContainer);
+        // Store in map instead of appending directly
+        const locationIdentifier = location.locationTitle || location.fieldName || 'location';
+        storeEntryContainer('location', locationIdentifier, locationContainer);
+      });
+    }
+    
+    // Append containers in unified order if available, otherwise in stored order
+    if (trigger._actionOrder && trigger._actionOrder.length > 0) {
+      // Append in unified order
+      trigger._actionOrder.forEach((orderItem) => {
+        const key = `${orderItem.type}_${orderItem.identifier}`;
+        const container = entryContainersMap.get(key);
+        if (container) {
+          actionsList.appendChild(container);
+        }
+      });
+      
+      // Append any containers not in unified order (shouldn't happen, but safety check)
+      entryContainersMap.forEach((container, key) => {
+        if (!actionsList.contains(container)) {
+          actionsList.appendChild(container);
+        }
+      });
+    } else {
+      // Fallback: Append in stored order (which is the old type-based order)
+      entryContainersMap.forEach((container) => {
+        actionsList.appendChild(container);
       });
     }
     
