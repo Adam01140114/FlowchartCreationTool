@@ -2535,21 +2535,26 @@ if (s > 1){
           { label: 'State', nodeId: 'state' },
           { label: 'Zip', nodeId: 'zip' }
         ];
-        // Build locPrefix using location field's fieldName (not dropdown field name)
-        // Use the location field's fieldName if available, otherwise fall back to dropdown field name
-        const locationFieldName = triggerField.fieldName || dropdownFieldName || 'location';
-        
-        // Sanitize: convert to lowercase, replace spaces and question marks with underscores
-        // Using character classes to avoid backslash escaping issues in template literals
-        let sanitizedName = String(locationFieldName)
+        // Build locPrefix: dropdown fieldName + location field's fieldName
+        // First sanitize the dropdown field name
+        const sanitizedDropdownName = String(dropdownFieldName || 'dropdown')
             .toLowerCase()
             .replace(/[?]/g, '')  // Remove question marks
-            .replace(/[ ]+/g, '_') // Replace spaces with underscores (using character class to avoid escaping)
+            .replace(/[ ]+/g, '_') // Replace spaces with underscores
             .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
             .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
         
-        // Use sanitizedName directly as the prefix (no '_trigger' suffix needed)
-        let locPrefix = sanitizedName || 'location';
+        // Then sanitize the location field's fieldName
+        const locationFieldName = triggerField.fieldName || 'location';
+        const sanitizedLocationName = String(locationFieldName)
+            .toLowerCase()
+            .replace(/[?]/g, '')  // Remove question marks
+            .replace(/[ ]+/g, '_') // Replace spaces with underscores
+            .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
+            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+        
+        // Combine: dropdown name + location field name
+        let locPrefix = (sanitizedDropdownName || 'dropdown') + '_' + (sanitizedLocationName || 'location');
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
@@ -4724,8 +4729,11 @@ function showTextboxLabels(questionId, count){
                     { label:'State', nodeId:'state' },
                     { label:'Zip', nodeId:'zip' }
                 ];
-                let locPrefix = sanitizeQuestionText(field.fieldName || 'location');
-                locPrefix = locPrefix.replace(/ +/g, '_');
+                // Build locPrefix: question nodeId + location fieldName
+                const questionNodeId = questionNameIds[questionId] || questionSlugMap[questionId] || 'answer' + questionId;
+                const locationFieldName = sanitizeQuestionText(field.fieldName || 'location');
+                const sanitizedLocationName = locationFieldName.replace(/ +/g, '_').toLowerCase();
+                let locPrefix = questionNodeId + '_' + sanitizedLocationName;
                 locs.forEach(f=>{
                     let input;
                     if (f.label === 'State'){
