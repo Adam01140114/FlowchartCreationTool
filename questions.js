@@ -3968,46 +3968,6 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               };
               
-              // Field name input (hidden by default, shown on edit)
-              const fieldNameInput = document.createElement('input');
-              fieldNameInput.type = 'text';
-              fieldNameInput.value = newLocation.fieldName;
-              fieldNameInput.style.cssText = `
-                width: 100%;
-                padding: 4px 8px;
-                border: 1px solid #ddd;
-                border-radius: 3px;
-                font-size: 12px;
-                margin-bottom: 8px;
-                display: none;
-              `;
-              fieldNameInput.onblur = () => {
-                newLocation.fieldName = fieldNameInput.value.trim();
-                if (typeof window.requestAutosave === 'function') {
-                  window.requestAutosave();
-                }
-              };
-              
-              // Location ID input (hidden by default, shown on edit)
-              const locationIdInput = document.createElement('input');
-              locationIdInput.type = 'text';
-              locationIdInput.placeholder = 'Location ID...';
-              locationIdInput.style.cssText = `
-                width: 100%;
-                padding: 4px 8px;
-                border: 1px solid #ddd;
-                border-radius: 3px;
-                font-size: 12px;
-                margin-bottom: 8px;
-                display: none;
-              `;
-              locationIdInput.onblur = () => {
-                newLocation.nodeId = locationIdInput.value.trim();
-                if (typeof window.requestAutosave === 'function') {
-                  window.requestAutosave();
-                }
-              };
-              
               // Button container
               const buttonContainer = document.createElement('div');
               buttonContainer.style.cssText = `
@@ -4017,30 +3977,22 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 align-items: center;
               `;
               
-              // Edit button
-              const editBtn = document.createElement('button');
-              editBtn.textContent = 'Edit';
-              editBtn.style.cssText = `
+              // Copy ID's button for trigger sequence location
+              const copyLocationIdsBtn = document.createElement('button');
+              copyLocationIdsBtn.textContent = 'Copy ID\'s';
+              copyLocationIdsBtn.style.cssText = `
                 background-color: #17a2b8;
                 color: white;
                 border: none;
-                padding: 4px 8px;
-                border-radius: 3px;
-                font-size: 10px;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
                 cursor: pointer;
               `;
-              editBtn.onclick = () => {
-                if (fieldNameInput.style.display === 'none') {
-                  fieldNameInput.style.display = 'block';
-                  locationIdInput.style.display = 'block';
-                  locationText.style.display = 'none';
-                  editBtn.textContent = 'Save';
-                } else {
-                  fieldNameInput.style.display = 'none';
-                  locationIdInput.style.display = 'none';
-                  locationText.style.display = 'block';
-                  locationText.textContent = '📍 ' + fieldNameInput.value;
-                  editBtn.textContent = 'Edit';
+              copyLocationIdsBtn.onclick = () => {
+                if (typeof window.showTriggerSequenceLocationIdsPopup === 'function') {
+                  window.showTriggerSequenceLocationIdsPopup(cell.id, dropdown.name, triggerSequence.triggerOption || '', locationTitleInput.value.trim());
                 }
               };
               
@@ -4067,13 +4019,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               };
               
-              buttonContainer.appendChild(editBtn);
+              buttonContainer.appendChild(copyLocationIdsBtn);
               buttonContainer.appendChild(deleteLocationBtn);
               
               contentContainer.appendChild(locationText);
               contentContainer.appendChild(locationTitleInput);
-              contentContainer.appendChild(fieldNameInput);
-              contentContainer.appendChild(locationIdInput);
               contentContainer.appendChild(buttonContainer);
               locationContainer.appendChild(contentContainer);
               
@@ -6039,47 +5989,6 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
-        // Field name input (hidden by default, shown on edit)
-        const fieldNameInput = document.createElement('input');
-        fieldNameInput.type = 'text';
-        fieldNameInput.value = location.fieldName || 'Location Data Inserted';
-        fieldNameInput.style.cssText = `
-          width: 100%;
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          font-size: 12px;
-          margin-bottom: 8px;
-          display: none;
-        `;
-        fieldNameInput.onblur = () => {
-          location.fieldName = fieldNameInput.value.trim();
-          if (typeof window.requestAutosave === 'function') {
-            window.requestAutosave();
-          }
-        };
-        
-        // Location ID input (hidden by default, shown on edit)
-        const locationIdInput = document.createElement('input');
-        locationIdInput.type = 'text';
-        locationIdInput.placeholder = 'Location ID...';
-        locationIdInput.value = location.nodeId || '';
-        locationIdInput.style.cssText = `
-          width: 100%;
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          font-size: 12px;
-          margin-bottom: 8px;
-          display: none;
-        `;
-        locationIdInput.onblur = () => {
-          location.nodeId = locationIdInput.value.trim();
-          if (typeof window.requestAutosave === 'function') {
-            window.requestAutosave();
-          }
-        };
-        
         // Button container
         const buttonContainer = document.createElement('div');
         buttonContainer.style.cssText = `
@@ -6089,30 +5998,22 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           align-items: center;
         `;
         
-        // Edit button
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.style.cssText = `
+        // Copy ID's button for trigger sequence location
+        const copyLocationIdsBtn = document.createElement('button');
+        copyLocationIdsBtn.textContent = 'Copy ID\'s';
+        copyLocationIdsBtn.style.cssText = `
           background-color: #17a2b8;
           color: white;
           border: none;
-          padding: 4px 8px;
-          border-radius: 3px;
-          font-size: 10px;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 500;
           cursor: pointer;
         `;
-        editBtn.onclick = () => {
-          if (fieldNameInput.style.display === 'none') {
-            fieldNameInput.style.display = 'block';
-            locationIdInput.style.display = 'block';
-            locationText.style.display = 'none';
-            editBtn.textContent = 'Save';
-          } else {
-            fieldNameInput.style.display = 'none';
-            locationIdInput.style.display = 'none';
-            locationText.style.display = 'block';
-            locationText.textContent = '📍 ' + fieldNameInput.value;
-            editBtn.textContent = 'Edit';
+        copyLocationIdsBtn.onclick = () => {
+          if (typeof window.showTriggerSequenceLocationIdsPopup === 'function') {
+            window.showTriggerSequenceLocationIdsPopup(cell.id, dropdown.name, trigger.triggerOption, location.locationTitle || '');
           }
         };
         
@@ -6136,13 +6037,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
-        buttonContainer.appendChild(editBtn);
+        buttonContainer.appendChild(copyLocationIdsBtn);
         buttonContainer.appendChild(deleteLocationBtn);
         
         contentContainer.appendChild(locationText);
         contentContainer.appendChild(locationTitleInput);
-        contentContainer.appendChild(fieldNameInput);
-        contentContainer.appendChild(locationIdInput);
         contentContainer.appendChild(buttonContainer);
         locationContainer.appendChild(contentContainer);
         

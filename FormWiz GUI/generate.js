@@ -2535,15 +2535,21 @@ if (s > 1){
           { label: 'State', nodeId: 'state' },
           { label: 'Zip', nodeId: 'zip' }
         ];
-        // Build locPrefix using dropdown field name + trigger (without location field name)
+        // Build locPrefix using location field's fieldName (not dropdown field name)
+        // Use the location field's fieldName if available, otherwise fall back to dropdown field name
+        const locationFieldName = triggerField.fieldName || dropdownFieldName || 'location';
+        
         // Sanitize: convert to lowercase, replace spaces and question marks with underscores
-        let dropdownPrefix = String(dropdownFieldName || 'dropdown')
+        // Using character classes to avoid backslash escaping issues in template literals
+        let sanitizedName = String(locationFieldName)
             .toLowerCase()
-            .replace(/[?]/g, '')  // Remove question marks (using character class)
-            .replace(/\\\\s+/g, '_') // Replace spaces with underscores (double escape: \\\\ becomes \\ in output)
-            .replace(/[^\\\\w_]+/g, '_') // Replace any other non-word characters except underscores (double escape)
+            .replace(/[?]/g, '')  // Remove question marks
+            .replace(/[ ]+/g, '_') // Replace spaces with underscores (using character class to avoid escaping)
+            .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
             .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
-        let locPrefix = dropdownPrefix + '_trigger';
+        
+        // Use sanitizedName directly as the prefix (no '_trigger' suffix needed)
+        let locPrefix = sanitizedName || 'location';
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {

@@ -2639,12 +2639,24 @@ window.showDropdownLocationIdsPopup = function(cellId) {
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
   
+  // Get location title and sanitize it
+  const locationTitle = cell._locationTitle || '';
+  const sanitizedLocationTitle = locationTitle.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .trim();
+  
   // Build the prefix with PDF name if available
   let prefix;
   if (sanitizedPdfName) {
     prefix = `${sanitizedPdfName}_${sanitizedQuestion}`;
   } else {
     prefix = sanitizedQuestion;
+  }
+  
+  // Add location title to prefix if available
+  if (sanitizedLocationTitle) {
+    prefix = `${prefix}_${sanitizedLocationTitle}`;
   }
   
   // Generate dynamic entries based on range
@@ -2750,6 +2762,164 @@ window.showDropdownLocationIdsPopup = function(cellId) {
     
     // Add both click and mousedown listeners for better coverage
     // Add the event listeners after a short delay to prevent immediate closing
+    setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+  }
+};
+
+// Show popup for trigger sequence location IDs
+window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, triggerOption, locationTitle) {
+  const graph = getGraph();
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  
+  const twoNums = cell._twoNumbers || { first: '0', second: '0' };
+  const firstNum = parseInt(twoNums.first) || 1;
+  const secondNum = parseInt(twoNums.second) || 1;
+  
+  // Get the question text and convert it to a valid prefix
+  const questionText = cell._questionText || 'how_many';
+  const sanitizedQuestion = questionText.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .trim();
+  
+  // Sanitize dropdown name
+  const sanitizedDropdownName = (dropdownName || '').toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
+  
+  // Sanitize trigger option
+  const sanitizedTriggerOption = (triggerOption || '').toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
+  
+  // Sanitize location title
+  const sanitizedLocationTitle = (locationTitle || '').toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
+  
+  // Check if this question has a PDF property
+  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  
+  // Build the prefix with PDF name if available
+  let prefix;
+  if (sanitizedPdfName) {
+    prefix = `${sanitizedPdfName}_${sanitizedQuestion}`;
+  } else {
+    prefix = sanitizedQuestion;
+  }
+  
+  // Add dropdown name, trigger option, and location title to prefix
+  if (sanitizedDropdownName) {
+    prefix = `${prefix}_${sanitizedDropdownName}`;
+  }
+  if (sanitizedTriggerOption) {
+    prefix = `${prefix}_${sanitizedTriggerOption}`;
+  }
+  if (sanitizedLocationTitle) {
+    prefix = `${prefix}_${sanitizedLocationTitle}`;
+  }
+  
+  // Generate dynamic entries based on range
+  const locationIds = [];
+  const locationFields = ['street', 'city', 'state', 'state_short', 'zip', 'address'];
+  
+  for (let i = firstNum; i <= secondNum; i++) {
+    locationFields.forEach(field => {
+      locationIds.push(`${prefix}_${field}_${i}`);
+    });
+  }
+  
+  // Update the popup content (reuse the same popup element)
+  const popup = document.getElementById('locationIdsPopup');
+  if (popup) {
+    popup.classList.add('popup');
+    const content = popup.querySelector('.location-ids-content');
+    if (content) {
+      content.innerHTML = '';
+      
+      // Add search bar
+      const searchBar = document.createElement('input');
+      searchBar.type = 'text';
+      searchBar.placeholder = 'Search location IDs...';
+      searchBar.className = 'location-id-search';
+      searchBar.style.cssText = `
+        width: calc(100% - 20px);
+        padding: 8px 10px;
+        margin-bottom: 12px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+      `;
+      content.appendChild(searchBar);
+      
+      // Create container for location items
+      const itemsContainer = document.createElement('div');
+      itemsContainer.className = 'location-items-container';
+      
+      locationIds.forEach(locationId => {
+        const item = document.createElement('div');
+        item.className = 'location-id-item';
+        item.setAttribute('data-id', locationId);
+        item.innerHTML = `
+          <span class="location-id-text">${locationId}</span>
+          <br><br>
+          <button class="copy-btn" onclick="copyLocationId('${locationId}')">Copy</button>
+        `;
+        itemsContainer.appendChild(item);
+      });
+      
+      content.appendChild(itemsContainer);
+      
+      // Add search functionality
+      searchBar.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const items = itemsContainer.querySelectorAll('.location-id-item');
+        
+        items.forEach(item => {
+          const locationId = item.getAttribute('data-id');
+          
+          // Normalize both the search text and the location ID for comparison
+          const normalizedLocationId = locationId.toLowerCase().replace(/_/g, ' ');
+          const normalizedSearchText = searchText.replace(/_/g, ' ');
+          
+          const matchesWithSpaces = normalizedLocationId.includes(normalizedSearchText);
+          const matchesWithUnderscores = locationId.toLowerCase().includes(searchText);
+          
+          if (matchesWithSpaces || matchesWithUnderscores) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    popup.style.display = 'block';
+    
+    // Make popup draggable
+    makePopupDraggable(popup);
+    
+    // Add click outside to close functionality
+    const handleClickOutside = (event) => {
+      if (!popup.contains(event.target) && 
+          !event.target.closest('.context-menu') &&
+          !event.target.closest('.modal') &&
+          !event.target.closest('.popup')) {
+        popup.style.display = 'none';
+        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener('mousedown', handleClickOutside);
+      }
+    };
+    
     setTimeout(() => {
       document.addEventListener('click', handleClickOutside);
       document.addEventListener('mousedown', handleClickOutside);
@@ -4532,7 +4702,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // If we're currently in square creation mode, cancel it
         if (rightClickDragging) {
-          resetSquareCreationState();
+        resetSquareCreationState();
           return;
         }
         
@@ -4574,10 +4744,10 @@ document.addEventListener("DOMContentLoaded", function() {
       } else {
         // Click is on a node - end any ongoing square creation process
         console.log('🔧 [SQUARE DEBUG] Left-click detected on node - resetting square creation state');
-        if (typeof resetSquareCreationState === 'function') {
-          resetSquareCreationState();
-        }
+      if (typeof resetSquareCreationState === 'function') {
+        resetSquareCreationState();
       }
+    }
     }
   }, true); // Use capture phase to intercept before graph handlers
   
@@ -7476,11 +7646,11 @@ function findPdfNameForQuestion(cell) {
     
     // Special handling for numbered dropdown questions - check connected option nodes first
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(startCell) === 'multipleDropdownType') {
-      const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+    const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
       
       // Look for option nodes connected to this numbered dropdown question
       for (const edge of outgoingEdges) {
-        const target = edge.target;
+      const target = edge.target;
         if (target && target.value && typeof target.value === 'string' && /^\d+$/.test(target.value.trim())) {
           // This is an option node (contains only numbers)
           // Check if this option node connects to a PDF node
@@ -7529,7 +7699,7 @@ function findPdfNameForQuestion(cell) {
           
           // Check if target has PDF properties
           if (target._pdfName || target._pdfFile || target._pdfUrl) {
-            return {
+      return {
               nodeId: target.id,
               filename: target._pdfFile || target._pdfUrl || target._pdfName || "",
               pdfUrl: target._pdfUrl || "",
@@ -7540,7 +7710,7 @@ function findPdfNameForQuestion(cell) {
           
           // Check if target is a PDF node
           if (typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
-            return {
+          return {
               nodeId: target.id,
               filename: target._pdfUrl || "",
               pdfUrl: target._pdfUrl || "",
@@ -7563,7 +7733,7 @@ function findPdfNameForQuestion(cell) {
           
           // Check if source has PDF properties
           if (source._pdfName || source._pdfFile || source._pdfUrl) {
-            return {
+          return {
               nodeId: source.id,
               filename: source._pdfFile || source._pdfUrl || source._pdfName || "",
               pdfUrl: source._pdfUrl || "",

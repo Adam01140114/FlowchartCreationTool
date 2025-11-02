@@ -112,3 +112,116 @@ For console.log statements in generated JavaScript:
 - Use **comma separation** (`console.log('text:', variable)`) instead of template literals
 - This avoids parsing issues with special characters and variable names
 - Provides better type handling and formatting
+
+## Regex Escaping Issue in Template Literals: "Invalid regular expression: /?/g: Nothing to repeat"
+
+### The Problem
+When generating JavaScript code that contains regular expressions inside template literals, you may encounter errors like:
+- `SyntaxError: Invalid regular expression: /?/g: Nothing to repeat`
+- `SyntaxError: Invalid regular expression: /\\s+/g` (when it matches literal backslashes instead of whitespace)
+
+This happens because backslashes in template literals get processed differently than expected, causing regex patterns to be malformed in the generated JavaScript.
+
+### The Issue
+When building JavaScript code strings using template literals in Node.js, special characters in regex patterns need careful escaping:
+
+```javascript
+// ❌ PROBLEMATIC - This generates invalid regex in output
+formHTML += `
+  let sanitizedName = String(name)
+    .replace(/\\s+/g, '_')  // This outputs /\\s+/g which matches literal \s, not whitespace
+    .replace(/[^\\w_]+/g, '_'); // Same issue with \w
+`;
+```
+
+The problem occurs because:
+1. In the template literal, `\\s` becomes `\s` in the string
+2. When that string is inserted into HTML and parsed as JavaScript, `\s` needs to be a regex escape
+3. But if the template literal processing is wrong, it might output `\\s` (two backslashes) which matches a literal backslash followed by 's', not whitespace
+4. Or worse, question marks `?` in patterns like `/?/g` cause "Nothing to repeat" errors because `?` is a quantifier in regex
+
+### The Solution
+**Use character classes instead of regex escape sequences** to avoid backslash escaping issues entirely:
+
+```javascript
+// ✅ CORRECT - Use character classes instead of \s, \w, etc.
+formHTML += `
+  let sanitizedName = String(name)
+    .toLowerCase()
+    .replace(/[?]/g, '')  // Remove question marks (character class, no escaping needed)
+    .replace(/[ ]+/g, '_') // Replace spaces (character class [ ] instead of \s)
+    .replace(/[^a-z0-9_]+/g, '_') // Non-alphanumeric (character class instead of \w)
+    .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+`;
+```
+
+### Why This Works
+1. **Character classes** `[ ]` don't require backslash escaping
+2. **`[ ]`** matches spaces directly without needing `\s`
+3. **`[^a-z0-9_]+`** matches non-alphanumeric characters without needing `\w`
+4. **`[?]`** matches literal question marks without escaping issues
+5. Avoids all backslash escaping problems in template literals
+
+### Examples of the Fix
+
+#### Before (Broken):
+```javascript
+// In generate.js template literal:
+formHTML += `
+  let dropdownPrefix = String(dropdownFieldName)
+    .toLowerCase()
+    .replace(/\\s+/g, '_')     // ❌ Outputs /\\s+/g which matches literal \s
+    .replace(/[^\\w_]+/g, '_'); // ❌ Same issue
+`;
+```
+
+Generated output in output.html would show:
+```javascript
+// Invalid regex that matches literal backslashes:
+.replace(/\\s+/g, '_')  // Matches "\s" not whitespace
+```
+
+#### After (Fixed):
+```javascript
+// In generate.js template literal:
+formHTML += `
+  let sanitizedName = String(locationFieldName)
+    .toLowerCase()
+    .replace(/[?]/g, '')        // ✅ Character class, no escaping
+    .replace(/[ ]+/g, '_')     // ✅ Character class for spaces
+    .replace(/[^a-z0-9_]+/g, '_') // ✅ Character class for non-alphanumeric
+    .replace(/^_+|_+$/g, '');  // ✅ No special escaping needed
+`;
+```
+
+Generated output in output.html:
+```javascript
+// Valid regex that correctly matches whitespace and special chars:
+.replace(/[?]/g, '')  // Matches question marks
+.replace(/[ ]+/g, '_')  // Matches one or more spaces
+.replace(/[^a-z0-9_]+/g, '_')  // Matches non-alphanumeric except underscores
+```
+
+### Real-World Case Study
+**Problem:** Generating IDs for trigger sequence location fields
+- Expected: `"hello_there_street_1"` from field name "Hello there"
+- Actual: `"_trigger_street_1"` (sanitization failing, empty string)
+
+**Root Cause:** Regex pattern `.replace(/\\s+/g, '_')` was outputting `/\\s+/g` (two backslashes) in the generated JavaScript, which matched literal `\s` instead of whitespace. This caused the sanitization to fail, leaving an empty string.
+
+**Solution:** Replaced all regex escape sequences with character classes:
+- `/\s+/g` → `/[ ]+/g` (spaces)
+- `/[^\w_]+/g` → `/[^a-z0-9_]+/g` (non-alphanumeric)
+- `/\?/g` → `/[?]/g` (question marks)
+
+**Result:** Sanitization now works correctly, converting "Hello there" → "hello_there" → IDs like `"hello_there_street_1"`
+
+### Key Takeaways
+When building regex patterns in template literals for generated JavaScript:
+1. **Avoid regex escape sequences** (`\s`, `\w`, `\d`, etc.) when possible
+2. **Use character classes** (`[ ]`, `[a-z]`, `[0-9]`, etc.) instead
+3. **Character classes don't require backslash escaping** in template literals
+4. **Test the generated output** to ensure regex patterns are correct
+5. **If you must use escape sequences**, you may need `\\\\` (four backslashes) to get `\` (one backslash) in the final JavaScript, but character classes are simpler
+
+This approach completely avoids backslash escaping issues and makes the code more readable and maintainable.
