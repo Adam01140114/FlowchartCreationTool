@@ -1103,6 +1103,33 @@ function loadFormData(formData) {
                                                         
                                                         if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                         if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
+                                                    } else if (triggerField.type === 'pdf') {
+                                                        if (typeof addTriggerPdf !== 'function') {
+                                                            console.error('🔧 [IMPORT DEBUG] addTriggerPdf function not available!');
+                                                            return;
+                                                        }
+                                                        addTriggerPdf(question.questionId, fieldOrder, sequenceIndex + 1);
+                                                        
+                                                        // Set the PDF field values
+                                                        setTimeout(() => {
+                                                            const pdfNumberEl = document.getElementById(`triggerPdfNumber${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                            const pdfTitleEl = document.getElementById(`triggerPdfTitle${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                            const pdfNameEl = document.getElementById(`triggerPdfName${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                            const pdfPriceIdEl = document.getElementById(`triggerPdfPriceId${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                            
+                                                            if (pdfNumberEl && triggerField.number) {
+                                                                pdfNumberEl.value = triggerField.number;
+                                                            }
+                                                            if (pdfTitleEl && triggerField.pdfTitle) {
+                                                                pdfTitleEl.value = triggerField.pdfTitle;
+                                                            }
+                                                            if (pdfNameEl && triggerField.pdfName) {
+                                                                pdfNameEl.value = triggerField.pdfName;
+                                                            }
+                                                            if (pdfPriceIdEl && triggerField.priceId) {
+                                                                pdfPriceIdEl.value = triggerField.priceId;
+                                                            }
+                                                        }, 100);
                                                     } else if (triggerField.type === 'location') {
                                                         // Handle simplified location field format ("Location Data Added")
                                                         if (typeof addTriggerLocation !== 'function') {
@@ -2310,9 +2337,24 @@ function exportForm() {
                         }
                     } else if (fieldType === 'dropdown') {
                         // Handle dropdown fields
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] ========== Processing DROPDOWN field ==========');
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Question ID:', questionId, 'Field Order:', fieldOrder);
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field element:', field);
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field element innerHTML length:', field.innerHTML ? field.innerHTML.length : 0);
+                        
                         const fieldNameEl = field.querySelector('#dropdownFieldName' + questionId + '_' + fieldOrder);
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field name element found:', !!fieldNameEl, fieldNameEl ? 'value: ' + fieldNameEl.value : '');
+                        
                         const optionsContainer = field.querySelector('#dropdownOptions' + questionId + '_' + fieldOrder);
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Options container found:', !!optionsContainer);
+                        
                         const triggerSequencesContainer = field.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Searching for trigger sequences container with selector: #triggerSequences' + questionId + '_' + fieldOrder);
+                        console.log('🔧 [EXPORT DEBUG - PATH 1] Trigger sequences container found:', !!triggerSequencesContainer);
+                        if (triggerSequencesContainer) {
+                            console.log('🔧 [EXPORT DEBUG - PATH 1] Container innerHTML length:', triggerSequencesContainer.innerHTML.length);
+                            console.log('🔧 [EXPORT DEBUG - PATH 1] Container innerHTML preview:', triggerSequencesContainer.innerHTML.substring(0, 1000));
+                        }
                         
                         if (fieldNameEl) {
                             const dropdownOptions = [];
@@ -2334,15 +2376,25 @@ function exportForm() {
                             // Collect trigger sequences
                             const triggerSequences = [];
                             if (triggerSequencesContainer) {
+                                console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Found trigger sequences container');
                                 const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+                                console.log('🔧 [EXPORT DEBUG - PATH 1] Found', sequenceElements.length, 'trigger sequence elements');
                                 sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ========== Processing trigger sequence', sequenceIndex + 1, '==========');
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Sequence element class:', sequenceEl.className);
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Sequence element innerHTML preview:', sequenceEl.innerHTML.substring(0, 500));
                                     const triggerConditionEl = sequenceEl.querySelector('#triggerCondition' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     
                                     const triggerFields = [];
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Processing trigger sequence', sequenceIndex + 1);
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Trigger fields container found:', !!triggerFieldsContainer);
                                     if (triggerFieldsContainer) {
                                         const fieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
+                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Found', fieldElements.length, 'trigger field elements');
                                         fieldElements.forEach((fieldEl, fieldIndex) => {
+                                            console.log('🔧 [EXPORT DEBUG - PATH 1] Processing trigger field', fieldIndex + 1);
+                                            console.log('🔧 [EXPORT DEBUG - PATH 1] Field class:', fieldEl.className);
                                             const fieldType = fieldEl.className.includes('trigger-field-') ? 'trigger-field' : 'unknown';
                                             
                                             // Check for different field types within trigger
@@ -2392,38 +2444,116 @@ function exportForm() {
                                                 });
                                             } else if (dateLabelEl && dateNodeIdEl) {
                                                 // Trigger date field
+                                                console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as DATE field');
                                                 triggerFields.push({
                                                     type: 'date',
                                                     label: dateLabelEl.value.trim(),
                                                     nodeId: dateNodeIdEl.value.trim()
                                                 });
                                             } else {
-                                                // Check for trigger location field (simplified "Location Data Added" format)
-                                                // Look for the "Location Data Added" text in the field
-                                                const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
-                                                if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
-                                                    // This is a trigger location field
-                                                    // Get the location title from the input field
-                                                    const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
-                                                    const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
-                                                    console.log('🔧 [EXPORT DEBUG] Location title element found:', locationTitleEl);
-                                                    console.log('🔧 [EXPORT DEBUG] Location title value:', locationTitle);
-                                                    
+                                                // Check for trigger PDF field by looking for "Trigger PDF" text
+                                                const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
+                                                const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
+                                                console.log('🔧 [EXPORT DEBUG - PATH 1] PDF title element found:', !!pdfTitleEl, isPdfField ? 'is PDF field!' : '');
+                                                
+                                                const pdfNumberEl = fieldEl.querySelector('input[id*="triggerPdfNumber"]');
+                                                const pdfTitleInputEl = fieldEl.querySelector('input[id*="triggerPdfTitle"]');
+                                                const pdfNameEl = fieldEl.querySelector('input[id*="triggerPdfName"]');
+                                                const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
+                                                console.log('🔧 [EXPORT DEBUG - PATH 1] PDF inputs - number:', !!pdfNumberEl, pdfNumberEl ? 'value: ' + pdfNumberEl.value : '', 'title:', !!pdfTitleInputEl, pdfTitleInputEl ? 'value: ' + pdfTitleInputEl.value : '', 'name:', !!pdfNameEl, pdfNameEl ? 'value: ' + pdfNameEl.value : '', 'priceId:', !!pdfPriceIdEl, pdfPriceIdEl ? 'value: ' + pdfPriceIdEl.value : '');
+                                                
+                                                if (isPdfField && pdfNumberEl && pdfNameEl) {
+                                                    // This is a trigger PDF field
+                                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as PDF field');
                                                     triggerFields.push({
-                                                        type: 'location',
-                                                        fieldName: locationTitle || 'Location Data',
-                                                        nodeId: 'location_data'
+                                                        type: 'pdf',
+                                                        number: pdfNumberEl.value.trim(),
+                                                        pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                        pdfName: pdfNameEl.value.trim(),
+                                                        priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
                                                     });
+                                                } else if (pdfNumberEl && pdfNameEl) {
+                                                    // Fallback: try to detect PDF even if title check failed
+                                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ⚠ Attempting fallback PDF detection');
+                                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as PDF field (via fallback)');
+                                                    triggerFields.push({
+                                                        type: 'pdf',
+                                                        number: pdfNumberEl.value.trim(),
+                                                        pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                        pdfName: pdfNameEl.value.trim(),
+                                                        priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                                                    });
+                                                } else {
+                                                    // Check for trigger location field (simplified "Location Data Added" format)
+                                                    // Look for the "Location Data Added" text in the field
+                                                    const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
+                                                    if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
+                                                        // This is a trigger location field
+                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as LOCATION field');
+                                                        // Get the location title from the input field
+                                                        const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
+                                                        const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
+                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Location title element found:', locationTitleEl);
+                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Location title value:', locationTitle);
+                                                        
+                                                        triggerFields.push({
+                                                            type: 'location',
+                                                            fieldName: locationTitle || 'Location Data',
+                                                            nodeId: 'location_data'
+                                                        });
+                                                    } else {
+                                                        // Check for trigger PDF field
+                                                        const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
+                                                        const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
+                                                        const pdfNumberEl = fieldEl.querySelector('input[id*="triggerPdfNumber"]');
+                                                        const pdfTitleInputEl = fieldEl.querySelector('input[id*="triggerPdfTitle"]');
+                                                        const pdfNameEl = fieldEl.querySelector('input[id*="triggerPdfName"]');
+                                                        const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
+                                                        
+                                                        if (isPdfField && pdfNumberEl && pdfNameEl) {
+                                                            // This is a trigger PDF field
+                                                            console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as PDF field');
+                                                            triggerFields.push({
+                                                                type: 'pdf',
+                                                                number: pdfNumberEl.value.trim(),
+                                                                pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                                pdfName: pdfNameEl.value.trim(),
+                                                                priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                                                            });
+                                                        } else if (pdfNumberEl && pdfNameEl) {
+                                                            // Fallback: try to detect PDF even if title check failed
+                                                            console.log('🔧 [EXPORT DEBUG - PATH 1] ⚠ Attempting fallback PDF detection');
+                                                            triggerFields.push({
+                                                                type: 'pdf',
+                                                                number: pdfNumberEl.value.trim(),
+                                                                pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                                pdfName: pdfNameEl.value.trim(),
+                                                                priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                                                            });
+                                                        } else {
+                                                            console.log('🔧 [EXPORT DEBUG - PATH 1] ✗ Unknown field type - fieldEl:', fieldEl);
+                                                        }
+                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field class:', fieldEl.className);
+                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field innerHTML snippet:', fieldEl.innerHTML.substring(0, 300));
+                                                    }
                                                 }
                                             }
                                         });
                                     }
                                     
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Final triggerFields for sequence', sequenceIndex + 1, ':', triggerFields.length, 'fields');
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] TriggerFields array:', JSON.stringify(triggerFields, null, 2));
+                                    
                                     triggerSequences.push({
                                         condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
                                         fields: triggerFields
                                     });
+                                    
+                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ========== End trigger sequence', sequenceIndex + 1, '==========');
                                 });
+                                console.log('🔧 [EXPORT DEBUG - PATH 1] Total triggerSequences collected:', triggerSequences.length);
+                            } else {
+                                console.log('🔧 [EXPORT DEBUG - PATH 1] ✗ Trigger sequences container NOT FOUND');
                             }
                             
                             allFieldsInOrder.push({
@@ -2596,9 +2726,29 @@ function exportForm() {
                             }
                         } else if (fieldType === 'dropdown') {
                             // Handle dropdown fields
+                            console.log('🔧 [EXPORT DEBUG] ========== Processing DROPDOWN field ==========');
+                            console.log('🔧 [EXPORT DEBUG] Question ID:', questionId, 'Field Order:', fieldOrder);
+                            console.log('🔧 [EXPORT DEBUG] Field element:', el);
+                            console.log('🔧 [EXPORT DEBUG] Field element innerHTML length:', el.innerHTML ? el.innerHTML.length : 0);
+                            console.log('🔧 [EXPORT DEBUG] Field element innerHTML preview:', el.innerHTML ? el.innerHTML.substring(0, 500) : 'N/A');
+                            
                             const fieldNameEl = el.querySelector('#dropdownFieldName' + questionId + '_' + fieldOrder);
+                            console.log('🔧 [EXPORT DEBUG] Field name element found:', !!fieldNameEl, fieldNameEl ? 'value: ' + fieldNameEl.value : '');
+                            
                             const optionsContainer = el.querySelector('#dropdownOptions' + questionId + '_' + fieldOrder);
+                            console.log('🔧 [EXPORT DEBUG] Options container found:', !!optionsContainer);
+                            
                             const triggerSequencesContainer = el.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
+                            console.log('🔧 [EXPORT DEBUG] Searching for trigger sequences container with selector: #triggerSequences' + questionId + '_' + fieldOrder);
+                            console.log('🔧 [EXPORT DEBUG] Trigger sequences container found:', !!triggerSequencesContainer);
+                            if (!triggerSequencesContainer) {
+                                console.log('🔧 [EXPORT DEBUG] ⚠ Container not found! Searching in entire document...');
+                                const allContainers = document.querySelectorAll('[id*="triggerSequences"]');
+                                console.log('🔧 [EXPORT DEBUG] Found', allContainers.length, 'elements with triggerSequences in ID');
+                                allContainers.forEach((container, idx) => {
+                                    console.log('🔧 [EXPORT DEBUG] Container', idx, '- id:', container.id, 'innerHTML length:', container.innerHTML.length);
+                                });
+                            }
                             
                             if (fieldNameEl) {
                                 const dropdownOptions = [];
@@ -2619,28 +2769,101 @@ function exportForm() {
                                 
                                 // Collect trigger sequences
                                 const triggerSequences = [];
+                                console.log('🔧 [EXPORT DEBUG] Looking for trigger sequences container for question', questionId, 'field', fieldOrder);
                                 if (triggerSequencesContainer) {
+                                    console.log('🔧 [EXPORT DEBUG] ✓ Found trigger sequences container');
+                                    console.log('🔧 [EXPORT DEBUG] Container innerHTML length:', triggerSequencesContainer.innerHTML.length);
+                                    console.log('🔧 [EXPORT DEBUG] Container innerHTML preview:', triggerSequencesContainer.innerHTML.substring(0, 500));
+                                    
                                     const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+                                    console.log('🔧 [EXPORT DEBUG] Found', sequenceElements.length, 'trigger sequence elements');
+                                    
                                     sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+                                        console.log('🔧 [EXPORT DEBUG] ========== Processing trigger sequence', sequenceIndex + 1, '==========');
+                                        console.log('🔧 [EXPORT DEBUG] Sequence element:', sequenceEl);
+                                        console.log('🔧 [EXPORT DEBUG] Sequence element class:', sequenceEl.className);
+                                        console.log('🔧 [EXPORT DEBUG] Sequence element innerHTML length:', sequenceEl.innerHTML.length);
+                                        console.log('🔧 [EXPORT DEBUG] Sequence element innerHTML preview:', sequenceEl.innerHTML.substring(0, 500));
+                                        
                                         const triggerConditionEl = sequenceEl.querySelector('#triggerCondition' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                                        console.log('🔧 [EXPORT DEBUG] Trigger condition element:', !!triggerConditionEl, triggerConditionEl ? 'value: ' + triggerConditionEl.value : '');
+                                        
                                         const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                                        console.log('🔧 [EXPORT DEBUG] Trigger fields container found:', !!triggerFieldsContainer);
+                                        if (triggerFieldsContainer) {
+                                            console.log('🔧 [EXPORT DEBUG] Trigger fields container innerHTML length:', triggerFieldsContainer.innerHTML.length);
+                                            console.log('🔧 [EXPORT DEBUG] Trigger fields container innerHTML preview:', triggerFieldsContainer.innerHTML.substring(0, 1000));
                                         
                                         const triggerFields = [];
-                                        if (triggerFieldsContainer) {
                                             const fieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
+                                            console.log('🔧 [EXPORT DEBUG] Found', fieldElements.length, 'trigger field elements for question', questionId, 'field', fieldOrder, 'sequence', sequenceIndex + 1);
+                                            
                                             fieldElements.forEach((fieldEl, fieldIndex) => {
+                                                console.log('🔧 [EXPORT DEBUG] Processing trigger field', fieldIndex + 1, '- fieldEl:', fieldEl);
+                                                console.log('🔧 [EXPORT DEBUG] Field class:', fieldEl.className);
+                                                console.log('🔧 [EXPORT DEBUG] Field innerHTML snippet:', fieldEl.innerHTML.substring(0, 200));
+                                                
                                                 // Check for different field types within trigger
                                                 const labelTextEl = fieldEl.querySelector('#triggerLabelText' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const labelNodeIdEl = fieldEl.querySelector('#triggerLabelNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                                console.log('🔧 [EXPORT DEBUG] Label elements - text:', !!labelTextEl, 'nodeId:', !!labelNodeIdEl);
                                                 
                                                 const checkboxFieldNameEl = fieldEl.querySelector('#triggerCheckboxFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const checkboxOptionsContainer = fieldEl.querySelector('#triggerCheckboxOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                                console.log('🔧 [EXPORT DEBUG] Checkbox elements - fieldName:', !!checkboxFieldNameEl, 'optionsContainer:', !!checkboxOptionsContainer);
                                                 
                                                 const dateLabelEl = fieldEl.querySelector('#triggerDateLabel' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const dateNodeIdEl = fieldEl.querySelector('#triggerDateNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                                console.log('🔧 [EXPORT DEBUG] Date elements - label:', !!dateLabelEl, 'nodeId:', !!dateNodeIdEl);
+                                                
+                                                // Check for trigger PDF field by looking for "Trigger PDF" text (similar to location detection)
+                                                const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
+                                                console.log('🔧 [EXPORT DEBUG] PDF title element found:', !!pdfTitleEl);
+                                                if (pdfTitleEl) {
+                                                    console.log('🔧 [EXPORT DEBUG] PDF title text:', pdfTitleEl.textContent);
+                                                    console.log('🔧 [EXPORT DEBUG] PDF title style:', pdfTitleEl.getAttribute('style'));
+                                                }
+                                                
+                                                const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
+                                                console.log('🔧 [EXPORT DEBUG] isPdfField:', isPdfField);
+                                                
+                                                const pdfNumberEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfNumber"]') : null;
+                                                const pdfTitleInputEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfTitle"]') : null;
+                                                const pdfNameEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfName"]') : null;
+                                                const pdfPriceIdEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfPriceId"]') : null;
+                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - number:', !!pdfNumberEl, pdfNumberEl ? 'id: ' + pdfNumberEl.id : '', pdfNumberEl ? 'value: ' + pdfNumberEl.value : '');
+                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - title:', !!pdfTitleInputEl, pdfTitleInputEl ? 'id: ' + pdfTitleInputEl.id : '', pdfTitleInputEl ? 'value: ' + pdfTitleInputEl.value : '');
+                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - name:', !!pdfNameEl, pdfNameEl ? 'id: ' + pdfNameEl.id : '', pdfNameEl ? 'value: ' + pdfNameEl.value : '');
+                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - priceId:', !!pdfPriceIdEl, pdfPriceIdEl ? 'id: ' + pdfPriceIdEl.id : '', pdfPriceIdEl ? 'value: ' + pdfPriceIdEl.value : '');
+                                                
+                                                // Also try to find PDF inputs without the isPdfField check
+                                                const allPdfNumberInputs = fieldEl.querySelectorAll('input[id*="triggerPdfNumber"]');
+                                                const allPdfTitleInputs = fieldEl.querySelectorAll('input[id*="triggerPdfTitle"]');
+                                                const allPdfNameInputs = fieldEl.querySelectorAll('input[id*="triggerPdfName"]');
+                                                const allPdfPriceIdInputs = fieldEl.querySelectorAll('input[id*="triggerPdfPriceId"]');
+                                                console.log('🔧 [EXPORT DEBUG] All PDF number inputs in field:', allPdfNumberInputs.length);
+                                                console.log('🔧 [EXPORT DEBUG] All PDF title inputs in field:', allPdfTitleInputs.length);
+                                                console.log('🔧 [EXPORT DEBUG] All PDF name inputs in field:', allPdfNameInputs.length);
+                                                console.log('🔧 [EXPORT DEBUG] All PDF priceId inputs in field:', allPdfPriceIdInputs.length);
+                                                if (allPdfNumberInputs.length > 0) {
+                                                    allPdfNumberInputs.forEach((el, idx) => {
+                                                        console.log('🔧 [EXPORT DEBUG] PDF number input', idx, '- id:', el.id, 'value:', el.value);
+                                                    });
+                                                }
+                                                if (allPdfTitleInputs.length > 0) {
+                                                    allPdfTitleInputs.forEach((el, idx) => {
+                                                        console.log('🔧 [EXPORT DEBUG] PDF title input', idx, '- id:', el.id, 'value:', el.value);
+                                                    });
+                                                }
+                                                if (allPdfNameInputs.length > 0) {
+                                                    allPdfNameInputs.forEach((el, idx) => {
+                                                        console.log('🔧 [EXPORT DEBUG] PDF name input', idx, '- id:', el.id, 'value:', el.value);
+                                                    });
+                                                }
                                                 
                                                 if (labelTextEl && labelNodeIdEl) {
                                                     // Trigger label field
+                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as LABEL field');
                                                     triggerFields.push({
                                                         type: 'label',
                                                         label: labelTextEl.value.trim(),
@@ -2648,6 +2871,7 @@ function exportForm() {
                                                     });
                                                 } else if (checkboxFieldNameEl) {
                                                     // Trigger checkbox field
+                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as CHECKBOX field');
                                                     const checkboxOptions = [];
                                                     if (checkboxOptionsContainer) {
                                                         const checkboxOptionElements = checkboxOptionsContainer.querySelectorAll('[class^="trigger-checkbox-option-"]');
@@ -2671,10 +2895,44 @@ function exportForm() {
                                                     });
                                                 } else if (dateLabelEl && dateNodeIdEl) {
                                                     // Trigger date field
+                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as DATE field');
                                                     triggerFields.push({
                                                         type: 'date',
                                                         label: dateLabelEl.value.trim(),
                                                         nodeId: dateNodeIdEl.value.trim()
+                                                    });
+                                                } else if (isPdfField && pdfNumberEl && pdfNameEl) {
+                                                    // This is a trigger PDF field
+                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as PDF field (via title check)');
+                                                    console.log('🔧 [EXPORT DEBUG] PDF number value:', pdfNumberEl.value);
+                                                    console.log('🔧 [EXPORT DEBUG] PDF title value:', pdfTitleInputEl ? pdfTitleInputEl.value : '(not found)');
+                                                    console.log('🔧 [EXPORT DEBUG] PDF name value:', pdfNameEl.value);
+                                                    console.log('🔧 [EXPORT DEBUG] PDF priceId value:', pdfPriceIdEl ? pdfPriceIdEl.value : '(not found)');
+                                                    triggerFields.push({
+                                                        type: 'pdf',
+                                                        number: pdfNumberEl.value.trim(),
+                                                        pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                        pdfName: pdfNameEl.value.trim(),
+                                                        priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                                                    });
+                                                } else if (allPdfNumberInputs.length > 0 && allPdfNameInputs.length > 0) {
+                                                    // Fallback: try to detect PDF even if title check failed
+                                                    console.log('🔧 [EXPORT DEBUG] ⚠ Attempting fallback PDF detection');
+                                                    const fallbackPdfNumber = allPdfNumberInputs[0];
+                                                    const fallbackPdfTitle = allPdfTitleInputs.length > 0 ? allPdfTitleInputs[0] : null;
+                                                    const fallbackPdfName = allPdfNameInputs[0];
+                                                    const fallbackPdfPriceId = allPdfPriceIdInputs.length > 0 ? allPdfPriceIdInputs[0] : null;
+                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF number - id:', fallbackPdfNumber.id, 'value:', fallbackPdfNumber.value);
+                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF title - found:', !!fallbackPdfTitle, fallbackPdfTitle ? 'value: ' + fallbackPdfTitle.value : '');
+                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF name - id:', fallbackPdfName.id, 'value:', fallbackPdfName.value);
+                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF priceId - found:', !!fallbackPdfPriceId, fallbackPdfPriceId ? 'value: ' + fallbackPdfPriceId.value : '');
+                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as PDF field (via fallback)');
+                                                    triggerFields.push({
+                                                        type: 'pdf',
+                                                        number: fallbackPdfNumber.value.trim(),
+                                                        pdfTitle: fallbackPdfTitle ? fallbackPdfTitle.value.trim() : '',
+                                                        pdfName: fallbackPdfName.value.trim(),
+                                                        priceId: fallbackPdfPriceId ? fallbackPdfPriceId.value.trim() : ''
                                                     });
                                                 } else {
                                                     // Check for trigger location field (simplified "Location Data Added" format)
@@ -2682,6 +2940,7 @@ function exportForm() {
                                                     const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
                                                     if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
                                                         // This is a trigger location field
+                                                        console.log('🔧 [EXPORT DEBUG] ✓ Detected as LOCATION field');
                                                         // Get the location title from the input field
                                                         const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
                                                         const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
@@ -2691,16 +2950,72 @@ function exportForm() {
                                                             fieldName: locationTitle || 'Location Data',
                                                             nodeId: 'location_data'
                                                         });
+                                                    } else {
+                                                        // Check for trigger PDF field
+                                                        const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
+                                                        const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
+                                                        const pdfNumberEl = fieldEl.querySelector('input[id*="triggerPdfNumber"]');
+                                                        const pdfTitleInputEl = fieldEl.querySelector('input[id*="triggerPdfTitle"]');
+                                                        const pdfNameEl = fieldEl.querySelector('input[id*="triggerPdfName"]');
+                                                        const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
+                                                        
+                                                        if (isPdfField && pdfNumberEl && pdfNameEl) {
+                                                            // This is a trigger PDF field
+                                                            console.log('🔧 [EXPORT DEBUG] ✓ Detected as PDF field');
+                                                            triggerFields.push({
+                                                                type: 'pdf',
+                                                                number: pdfNumberEl.value.trim(),
+                                                                pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                                pdfName: pdfNameEl.value.trim(),
+                                                                priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                                                            });
+                                                        } else if (pdfNumberEl && pdfNameEl) {
+                                                            // Fallback: try to detect PDF even if title check failed
+                                                            console.log('🔧 [EXPORT DEBUG] ⚠ Attempting fallback PDF detection');
+                                                            triggerFields.push({
+                                                                type: 'pdf',
+                                                                number: pdfNumberEl.value.trim(),
+                                                                pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                                                                pdfName: pdfNameEl.value.trim(),
+                                                                priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                                                            });
+                                                        } else {
+                                                            console.log('🔧 [EXPORT DEBUG] ✗ Unknown field type - could not detect field type');
+                                                            console.log('🔧 [EXPORT DEBUG] Field element details:');
+                                                            console.log('  - Classes:', fieldEl.className);
+                                                        }
+                                                        console.log('  - Inner HTML length:', fieldEl.innerHTML.length);
+                                                        console.log('  - Children count:', fieldEl.children.length);
+                                                        for (let i = 0; i < fieldEl.children.length; i++) {
+                                                            const child = fieldEl.children[i];
+                                                            console.log('  - Child', i, ':', child.tagName, child.textContent ? child.textContent.substring(0, 50) : '');
+                                                        }
                                                     }
                                                 }
                                             });
+                                            
+                                            console.log('🔧 [EXPORT DEBUG] Final triggerFields array:', JSON.stringify(triggerFields, null, 2));
+                                        } else {
+                                            console.log('🔧 [EXPORT DEBUG] ⚠ Trigger fields container not found for question', questionId, 'field', fieldOrder, 'sequence', sequenceIndex + 1);
                                         }
+                                        
+                                        console.log('🔧 [EXPORT DEBUG] Final triggerFields for sequence', sequenceIndex + 1, ':', triggerFields.length, 'fields');
                                         
                                         triggerSequences.push({
                                             condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
                                             fields: triggerFields
                                         });
+                                        
+                                        console.log('🔧 [EXPORT DEBUG] ========== End trigger sequence', sequenceIndex + 1, '==========');
                                     });
+                                } else {
+                                    console.log('🔧 [EXPORT DEBUG] ✗ Trigger sequences container NOT FOUND for question', questionId, 'field', fieldOrder);
+                                    console.log('🔧 [EXPORT DEBUG] Attempting to find it with selector: #triggerSequences' + questionId + '_' + fieldOrder);
+                                    const alternativeContainer = document.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
+                                    console.log('🔧 [EXPORT DEBUG] Alternative container found:', !!alternativeContainer);
+                                    if (alternativeContainer) {
+                                        console.log('🔧 [EXPORT DEBUG] Alternative container innerHTML length:', alternativeContainer.innerHTML.length);
+                                    }
                                 }
                                 
                                 const fieldData = {

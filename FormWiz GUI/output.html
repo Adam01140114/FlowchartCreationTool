@@ -233,13 +233,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
-                      onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_are_you_the_only_person_suing"></div>
-              <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>How many</h3></label><p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many" name="how_many" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -365,11 +360,11 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
-var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"how_many"};
-var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many"};
+window.formId = 'SC-100';
+var questionSlugMap = {"1":"how_many"};
+var questionNameIds = {"1":"how_many"};
 var linkedCheckboxes = [];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_phone_number","order":2},{"type":"location","fieldName":"bruh what","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"label","label":"Business Name","nodeId":"is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"multiple","options":[{"text":"An Individual","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"},{"type":"location","fieldName":"Where did they file their fictitious business name","nodeId":"location_data"}]}],"order":4}]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_phone_number","order":2},{"type":"location","fieldName":"bruh what","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"label","label":"Business Name","nodeId":"is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"multiple","options":[{"text":"An Individual","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"},{"type":"location","fieldName":"Where did they file their fictitious business name","nodeId":"location_data"},{"type":"pdf","number":"1","pdfTitle":"SC-500","pdfName":"sc500.pdf","priceId":"price_1S8afyFJeSRMFQ8XkAJHVYSv"}]}],"order":4}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName) {
     const triggerContainer = document.createElement('div');
@@ -527,21 +522,26 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_n
           { label: 'State', nodeId: 'state' },
           { label: 'Zip', nodeId: 'zip' }
         ];
-        // Build locPrefix using location field's fieldName (not dropdown field name)
-        // Use the location field's fieldName if available, otherwise fall back to dropdown field name
-        const locationFieldName = triggerField.fieldName || dropdownFieldName || 'location';
-        
-        // Sanitize: convert to lowercase, replace spaces and question marks with underscores
-        // Using character classes to avoid backslash escaping issues in template literals
-        let sanitizedName = String(locationFieldName)
+        // Build locPrefix: dropdown fieldName + location field's fieldName
+        // First sanitize the dropdown field name
+        const sanitizedDropdownName = String(dropdownFieldName || 'dropdown')
             .toLowerCase()
             .replace(/[?]/g, '')  // Remove question marks
-            .replace(/[ ]+/g, '_') // Replace spaces with underscores (using character class to avoid escaping)
+            .replace(/[ ]+/g, '_') // Replace spaces with underscores
             .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
             .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
         
-        // Use sanitizedName directly as the prefix (no '_trigger' suffix needed)
-        let locPrefix = sanitizedName || 'location';
+        // Then sanitize the location field's fieldName
+        const locationFieldName = triggerField.fieldName || 'location';
+        const sanitizedLocationName = String(locationFieldName)
+            .toLowerCase()
+            .replace(/[?]/g, '')  // Remove question marks
+            .replace(/[ ]+/g, '_') // Replace spaces with underscores
+            .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
+            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+        
+        // Combine: dropdown name + location field name
+        let locPrefix = (sanitizedDropdownName || 'dropdown') + '_' + (sanitizedLocationName || 'location');
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
@@ -616,6 +616,25 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_n
         });
         
         triggerContainer.appendChild(locationFieldDiv);
+      } else if (triggerField.type === 'pdf') {
+        // Handle PDF field
+        const pdfFieldDiv = document.createElement('div');
+        pdfFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #fff0f0; border: 1px solid #DC3545; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(220, 53, 69, 0.1);';
+        
+        const pdfTitle = document.createElement('div');
+        pdfTitle.textContent = 'PDF: ' + (triggerField.pdfName || 'Untitled PDF');
+        pdfTitle.style.cssText = 'font-weight: bold; color: #DC3545; margin-bottom: 8px; font-size: 15px; text-align: center;';
+        pdfFieldDiv.appendChild(pdfTitle);
+        
+        // PDF fields are informational only in the rendered form
+        // The actual PDF logic is handled separately
+        const pdfInfo = document.createElement('div');
+        const pdfTitleText = triggerField.pdfTitle || triggerField.pdfName || 'PDF';
+        pdfInfo.textContent = 'PDF will be added when condition is met';
+        pdfInfo.style.cssText = 'color: #666; font-size: 13px; text-align: center; font-style: italic;';
+        pdfFieldDiv.appendChild(pdfInfo);
+        
+        triggerContainer.appendChild(pdfFieldDiv);
       }
     });
     
@@ -778,14 +797,14 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const formId = urlParams.get("formId") || window.formId || 'default';
     var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500.pdf","pdfDisplayName":"SC-500","stripePriceId":"price_1S8afyFJeSRMFQ8XkAJHVYSv","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"2":["Name","Phone Number"],"length":0};
-var amountMap = {"2":[],"length":0};
-var labelNodeIdsMap = {"2":["how_many_name","how_many_phone_number"]};
+var labelMap = {"1":["Name","Phone Number"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_name","how_many_phone_number"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -903,47 +922,14 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "SC-100";
+var pdfOutputFileName = "sc100.pdf";
+var stripePriceId = "price_1S8afyFJeSRMFQ8XkAJHVYSv";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc100", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      console.log('🔧 [CONDITIONAL DEBUG] Question 1: Found', cbs.length, 'inputs in container, looking for:', cPrevAns);
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -1216,6 +1202,60 @@ window.showCartModal = function () {
         } else {
           console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
         }
+      } else if (pdfLogic.isTriggerSequencePdf) {
+        // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+        console.log('🔧 [PDF LOGIC DEBUG] Checking trigger sequence PDF:', pdfLogic.pdfDisplayName);
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Trigger Sequence Field Name:', pdfLogic.triggerSequenceFieldName);
+        console.log('  - Trigger Sequence Condition:', pdfLogic.triggerSequenceCondition);
+        console.log('  - PDF Entry Number:', pdfLogic.pdfEntryNumber);
+        
+        // First, check that the numbered dropdown has a value (entries exist)
+        const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                                    document.getElementById('answer' + pdfLogic.questionId);
+        
+        if (!numberedDropdownEl || !numberedDropdownEl.value) {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Numbered dropdown has no value');
+          // No match
+        } else {
+          const entryCount = parseInt(numberedDropdownEl.value) || 0;
+          const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Entry count:', entryCount, 'Target entry:', targetEntryNumber);
+          
+          // Check if target entry exists
+          if (targetEntryNumber > entryCount) {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Target entry number exceeds available entries');
+            // No match
+          } else {
+            // Find the trigger sequence dropdown for this entry
+            // The dropdown ID format: sanitizedFieldName_entryNumber
+            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+            const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+              .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
+              .toLowerCase();
+            
+            const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+            const triggerDropdownEl = document.getElementById(triggerDropdownId);
+            
+            console.log('🔧 [PDF LOGIC DEBUG] Looking for dropdown:', triggerDropdownId);
+            console.log('🔧 [PDF LOGIC DEBUG] Dropdown element found:', !!triggerDropdownEl);
+            
+            if (triggerDropdownEl) {
+              const selectedValue = triggerDropdownEl.value || '';
+              console.log('🔧 [PDF LOGIC DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
+              
+              if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                matched = true;
+                console.log('🔧 [PDF LOGIC DEBUG] ✅ Trigger sequence PDF matched for:', pdfLogic.pdfDisplayName);
+              } else {
+                console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence condition not met');
+              }
+            } else {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence dropdown not found');
+            }
+          }
+        }
       } else {
         // For regular conditions, check previous question logic
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -1237,7 +1277,11 @@ window.showCartModal = function () {
 
           console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
-          if (val.toString().toLowerCase() === expect) {
+          // Handle wildcard condition (*) - means any value is fine
+          if (expect === '*' && val !== '') {
+            matched = true;
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched (wildcard condition) for:', pdfLogic.pdfDisplayName);
+          } else if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
             console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
@@ -1591,6 +1635,60 @@ window.addFormToCart = function (priceId) {
           } else {
             console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
           }
+        } else if (pdfLogic.isTriggerSequencePdf) {
+          // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+          console.log('🔧 [PDF LOGIC DEBUG] Checking trigger sequence PDF:', pdfLogic.pdfDisplayName);
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Trigger Sequence Field Name:', pdfLogic.triggerSequenceFieldName);
+          console.log('  - Trigger Sequence Condition:', pdfLogic.triggerSequenceCondition);
+          console.log('  - PDF Entry Number:', pdfLogic.pdfEntryNumber);
+          
+          // First, check that the numbered dropdown has a value (entries exist)
+          const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                                      document.getElementById('answer' + pdfLogic.questionId);
+          
+          if (!numberedDropdownEl || !numberedDropdownEl.value) {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Numbered dropdown has no value');
+            // No match
+          } else {
+            const entryCount = parseInt(numberedDropdownEl.value) || 0;
+            const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+            
+            console.log('🔧 [PDF LOGIC DEBUG] Entry count:', entryCount, 'Target entry:', targetEntryNumber);
+            
+            // Check if target entry exists
+            if (targetEntryNumber > entryCount) {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ Target entry number exceeds available entries');
+              // No match
+            } else {
+              // Find the trigger sequence dropdown for this entry
+              // The dropdown ID format: sanitizedFieldName_entryNumber
+              // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+              const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+                .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
+                .toLowerCase();
+              
+              const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+              const triggerDropdownEl = document.getElementById(triggerDropdownId);
+              
+              console.log('🔧 [PDF LOGIC DEBUG] Looking for dropdown:', triggerDropdownId);
+              console.log('🔧 [PDF LOGIC DEBUG] Dropdown element found:', !!triggerDropdownEl);
+              
+              if (triggerDropdownEl) {
+                const selectedValue = triggerDropdownEl.value || '';
+                console.log('🔧 [PDF LOGIC DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
+                
+                if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                  matched = true;
+                  console.log('🔧 [PDF LOGIC DEBUG] ✅ Trigger sequence PDF matched for:', pdfLogic.pdfDisplayName);
+                } else {
+                  console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence condition not met');
+                }
+              } else {
+                console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence dropdown not found');
+              }
+            }
+          }
         } else {
           // For regular conditions, check previous question logic
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -1612,7 +1710,11 @@ window.addFormToCart = function (priceId) {
 
           console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
-          if (val.toString().toLowerCase() === expect) {
+          // Handle wildcard condition (*) - means any value is fine
+          if (expect === '*' && val !== '') {
+            matched = true;
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched (wildcard condition) for:', pdfLogic.pdfDisplayName);
+          } else if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
             console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
@@ -2455,8 +2557,11 @@ function showTextboxLabels(questionId, count){
                     { label:'State', nodeId:'state' },
                     { label:'Zip', nodeId:'zip' }
                 ];
-                let locPrefix = sanitizeQuestionText(field.fieldName || 'location');
-                locPrefix = locPrefix.replace(/ +/g, '_');
+                // Build locPrefix: question nodeId + location fieldName
+                const questionNodeId = questionNameIds[questionId] || questionSlugMap[questionId] || 'answer' + questionId;
+                const locationFieldName = sanitizeQuestionText(field.fieldName || 'location');
+                const sanitizedLocationName = locationFieldName.replace(/ +/g, '_').toLowerCase();
+                let locPrefix = questionNodeId + '_' + sanitizedLocationName;
                 locs.forEach(f=>{
                     let input;
                     if (f.label === 'State'){
@@ -3748,6 +3853,38 @@ async function processAllPdfs() {
                     } else {
                         console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
+                } else if (pdfLogic.isTriggerSequencePdf) {
+                    // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking trigger sequence PDF:', pdfLogic.pdfDisplayName);
+                    
+                    // First, check that the numbered dropdown has a value (entries exist)
+                    const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                document.getElementById('answer' + pdfLogic.questionId);
+                    
+                    if (numberedDropdownEl && numberedDropdownEl.value) {
+                        const entryCount = parseInt(numberedDropdownEl.value) || 0;
+                        const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                        
+                        // Check if target entry exists
+                        if (targetEntryNumber <= entryCount) {
+                            // Find the trigger sequence dropdown for this entry
+                            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+                            const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+                                .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
+                                .toLowerCase();
+                            
+                            const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                            const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                            
+                            if (triggerDropdownEl) {
+                                const selectedValue = triggerDropdownEl.value || '';
+                                if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                    shouldDownload = true;
+                                    console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger sequence PDF matched for:', pdfLogic.pdfDisplayName);
+                                }
+                            }
+                        }
+                    }
                 } else {
                         // For regular conditions, check previous question logic
                 pdfLogic.conditions.forEach(condition => {
@@ -3767,8 +3904,10 @@ async function processAllPdfs() {
                             prevValue = prevQuestionElement.value;
                         }
                         
-                        // Check if the condition matches
-                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                        // Handle wildcard condition (*) - means any value is fine
+                        if (prevAnswer === '*' && prevValue !== '') {
+                            shouldDownload = true;
+                        } else if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
                             shouldDownload = true;
                         }
                     }

@@ -2,11 +2,11 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "SC-100",
+      "sectionName": "Section 1",
       "questions": [
         {
           "questionId": 1,
-          "text": "How many cars do you own",
+          "text": "How many",
           "type": "numberedDropdown",
           "logic": {
             "enabled": false,
@@ -55,21 +55,39 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "how_many_extra",
+          "nodeId": "how_many",
           "min": "1",
           "max": "3",
           "allFieldsInOrder": [
             {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_name",
+              "order": 1
+            },
+            {
+              "type": "label",
+              "label": "Phone Number",
+              "nodeId": "how_many_phone_number",
+              "order": 2
+            },
+            {
+              "type": "location",
+              "fieldName": "bruh what",
+              "nodeId": "location_data",
+              "order": 3
+            },
+            {
               "type": "dropdown",
-              "fieldName": "Is this car a toyota?",
+              "fieldName": "Is this plaintiff a business?",
               "options": [
                 {
                   "text": "Yes",
-                  "nodeId": "is_this_car_a_toyota_yes"
+                  "nodeId": "is_this_plaintiff_a_business_yes"
                 },
                 {
                   "text": "No",
-                  "nodeId": "is_this_car_a_toyota_no"
+                  "nodeId": "is_this_plaintiff_a_business_no"
                 }
               ],
               "triggerSequences": [
@@ -78,39 +96,62 @@
                   "fields": [
                     {
                       "type": "label",
-                      "label": "Car Name",
-                      "nodeId": "car_name"
+                      "label": "Business Name",
+                      "nodeId": "is_this_plaintiff_a_business_yes_business_name"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Business Name Statement Number",
+                      "nodeId": "is_this_plaintiff_a_business_yes_business_name_statement_number"
                     },
                     {
                       "type": "checkbox",
-                      "fieldName": "Why did you buy it?",
-                      "selectionType": "single",
+                      "fieldName": "What do they do business as?",
+                      "selectionType": "multiple",
                       "options": [
                         {
-                          "text": "Reliability",
-                          "nodeId": "reliability"
+                          "text": "An Individual",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
                         },
                         {
-                          "text": "Gas Milage",
-                          "nodeId": "gas_milage"
+                          "text": "An Association",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"
+                        },
+                        {
+                          "text": "A Partnership",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"
+                        },
+                        {
+                          "text": "A Corporation",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"
+                        },
+                        {
+                          "text": "A Limited Liability Company",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"
                         }
                       ]
                     },
                     {
                       "type": "date",
-                      "label": "When did you buy it?",
-                      "nodeId": "when_did_you_buy_it"
+                      "label": "When does their business statement expire?",
+                      "nodeId": "is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"
+                    },
+                    {
+                      "type": "location",
+                      "fieldName": "Where did they file their fictitious business name",
+                      "nodeId": "location_data"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "1",
+                      "pdfTitle": "SC-500",
+                      "pdfName": "sc500.pdf",
+                      "priceId": "price_1S8afyFJeSRMFQ8XkAJHVYSv"
                     }
                   ]
                 }
               ],
-              "order": 1
-            },
-            {
-              "type": "label",
-              "label": "Label 2",
-              "nodeId": "label_2",
-              "order": 2
+              "order": 4
             }
           ]
         }
@@ -124,10 +165,11 @@
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
-  "defaultPDFName": "",
-  "pdfOutputName": "",
-  "stripePriceId": "",
+  "defaultPDFName": "SC-100",
+  "pdfOutputName": "sc100.pdf",
+  "stripePriceId": "price_1S8afyFJeSRMFQ8XkAJHVYSv",
   "additionalPDFs": [],
   "checklistItems": [],
-  "linkedFields": []
+  "linkedFields": [],
+  "linkedCheckboxes": []
 }

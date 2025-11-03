@@ -1715,18 +1715,46 @@ formHTML += `</div><br></div>`;
                           nodeId: dateNodeIdEl.value.trim()
                         });
                       } else {
-                        // Check for trigger location field (simplified "Location Data Added" format)
-                        const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
-                        if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
-                          // This is a trigger location field
-                          // Read custom title if present
-                          const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
-                          const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
+                        // Check for trigger PDF field
+                        const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
+                        const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
+                        const pdfNumberEl = fieldEl.querySelector('input[id*="triggerPdfNumber"]');
+                        const pdfTitleInputEl = fieldEl.querySelector('input[id*="triggerPdfTitle"]');
+                        const pdfNameEl = fieldEl.querySelector('input[id*="triggerPdfName"]');
+                        const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
+                        
+                        if (isPdfField && pdfNumberEl && pdfNameEl) {
+                          // This is a trigger PDF field
                           triggerFields.push({
-                            type: 'location',
-                            fieldName: locationTitle || 'Location Data',
-                            nodeId: 'location_data'
+                            type: 'pdf',
+                            number: pdfNumberEl.value.trim(),
+                            pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                            pdfName: pdfNameEl.value.trim(),
+                            priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
                           });
+                        } else if (pdfNumberEl && pdfNameEl) {
+                          // Fallback: try to detect PDF even if title check failed
+                          triggerFields.push({
+                            type: 'pdf',
+                            number: pdfNumberEl.value.trim(),
+                            pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
+                            pdfName: pdfNameEl.value.trim(),
+                            priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
+                          });
+                        } else {
+                          // Check for trigger location field (simplified "Location Data Added" format)
+                          const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
+                          if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
+                            // This is a trigger location field
+                            // Read custom title if present
+                            const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
+                            const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
+                            triggerFields.push({
+                              type: 'location',
+                              fieldName: locationTitle || 'Location Data',
+                              nodeId: 'location_data'
+                            });
+                          }
                         }
                       }
                     });
@@ -1821,6 +1849,44 @@ formHTML += `</div><br></div>`;
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
         window.unifiedFieldsMap[questionId] = allFieldsInOrder;
         console.log('🔧 [FORM GENERATION DEBUG] Stored unified field data, about to continue numbered dropdown processing');
+        
+        // Process trigger sequence PDFs and create PDF logic entries
+        allFieldsInOrder.forEach(field => {
+          if (field.type === 'dropdown' && field.triggerSequences && Array.isArray(field.triggerSequences)) {
+            field.triggerSequences.forEach((sequence, sequenceIndex) => {
+              if (sequence.fields && Array.isArray(sequence.fields)) {
+                sequence.fields.forEach(triggerField => {
+                  if (triggerField.type === 'pdf' && triggerField.pdfName && triggerField.priceId) {
+                    // Create PDF logic entry for this trigger sequence PDF
+                    const pdfData = {
+                      questionId: questionId,
+                      pdfName: triggerField.pdfName,
+                      pdfDisplayName: triggerField.pdfTitle || triggerField.pdfName.replace(/\.pdf$/i, ''),
+                      stripePriceId: triggerField.priceId,
+                      triggerOption: '', // Not used for trigger sequence PDFs
+                      conditions: [],
+                      isBigParagraph: false,
+                      isTriggerSequencePdf: true, // Flag to identify trigger sequence PDFs
+                      triggerSequenceFieldName: field.fieldName, // The dropdown field name
+                      triggerSequenceCondition: sequence.condition, // The condition that triggers this sequence
+                      pdfEntryNumber: triggerField.number || '1' // Which entry number this PDF is for
+                    };
+                    
+                    // Add condition: the numbered dropdown question must have a value (user has selected how many)
+                    // This ensures entries exist
+                    pdfData.conditions.push({
+                      prevQuestion: String(questionId),
+                      prevAnswer: '*' // Special wildcard - means "any value is fine, just check entry exists"
+                    });
+                    
+                    pdfLogicPDFs.push(pdfData);
+                    console.log('🔧 [PDF LOGIC GENERATION] Added trigger sequence PDF logic:', pdfData);
+                  }
+                });
+              }
+            });
+          }
+        });
         
         // Add unifiedFieldsMap to the generated HTML
         console.log('🔧 [FORM GENERATION DEBUG] About to add unifiedFieldsMap to generated HTML');
@@ -2629,6 +2695,12 @@ if (s > 1){
         });
         
         triggerContainer.appendChild(locationFieldDiv);
+      } else if (triggerField.type === 'pdf') {
+        // PDF fields are handled separately by PDF logic evaluation
+        // No need to render them in the form - they will be automatically
+        // added to cart/download when the trigger condition is met
+        // Skip rendering this field - return from forEach callback to skip to next iteration
+        return;
       }
     });
     
@@ -3393,6 +3465,60 @@ window.showCartModal = function () {
         } else {
           console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
         }
+      } else if (pdfLogic.isTriggerSequencePdf) {
+        // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+        console.log('🔧 [PDF LOGIC DEBUG] Checking trigger sequence PDF:', pdfLogic.pdfDisplayName);
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Trigger Sequence Field Name:', pdfLogic.triggerSequenceFieldName);
+        console.log('  - Trigger Sequence Condition:', pdfLogic.triggerSequenceCondition);
+        console.log('  - PDF Entry Number:', pdfLogic.pdfEntryNumber);
+        
+        // First, check that the numbered dropdown has a value (entries exist)
+        const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                                    document.getElementById('answer' + pdfLogic.questionId);
+        
+        if (!numberedDropdownEl || !numberedDropdownEl.value) {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Numbered dropdown has no value');
+          // No match
+        } else {
+          const entryCount = parseInt(numberedDropdownEl.value) || 0;
+          const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Entry count:', entryCount, 'Target entry:', targetEntryNumber);
+          
+          // Check if target entry exists
+          if (targetEntryNumber > entryCount) {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Target entry number exceeds available entries');
+            // No match
+          } else {
+            // Find the trigger sequence dropdown for this entry
+            // The dropdown ID format: sanitizedFieldName_entryNumber
+            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j
+            const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+              .replace(/\W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
+              .toLowerCase();
+            
+            const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+            const triggerDropdownEl = document.getElementById(triggerDropdownId);
+            
+            console.log('🔧 [PDF LOGIC DEBUG] Looking for dropdown:', triggerDropdownId);
+            console.log('🔧 [PDF LOGIC DEBUG] Dropdown element found:', !!triggerDropdownEl);
+            
+            if (triggerDropdownEl) {
+              const selectedValue = triggerDropdownEl.value || '';
+              console.log('🔧 [PDF LOGIC DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
+              
+              if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                matched = true;
+                console.log('🔧 [PDF LOGIC DEBUG] ✅ Trigger sequence PDF matched for:', pdfLogic.pdfDisplayName);
+              } else {
+                console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence condition not met');
+              }
+            } else {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence dropdown not found');
+            }
+          }
+        }
       } else {
         // For regular conditions, check previous question logic
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -3414,7 +3540,11 @@ window.showCartModal = function () {
 
           console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
-          if (val.toString().toLowerCase() === expect) {
+          // Handle wildcard condition (*) - means any value is fine
+          if (expect === '*' && val !== '') {
+            matched = true;
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched (wildcard condition) for:', pdfLogic.pdfDisplayName);
+          } else if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
             console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
@@ -3768,6 +3898,60 @@ window.addFormToCart = function (priceId) {
           } else {
             console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
           }
+        } else if (pdfLogic.isTriggerSequencePdf) {
+          // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+          console.log('🔧 [PDF LOGIC DEBUG] Checking trigger sequence PDF:', pdfLogic.pdfDisplayName);
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Trigger Sequence Field Name:', pdfLogic.triggerSequenceFieldName);
+          console.log('  - Trigger Sequence Condition:', pdfLogic.triggerSequenceCondition);
+          console.log('  - PDF Entry Number:', pdfLogic.pdfEntryNumber);
+          
+          // First, check that the numbered dropdown has a value (entries exist)
+          const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                                      document.getElementById('answer' + pdfLogic.questionId);
+          
+          if (!numberedDropdownEl || !numberedDropdownEl.value) {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Numbered dropdown has no value');
+            // No match
+          } else {
+            const entryCount = parseInt(numberedDropdownEl.value) || 0;
+            const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+            
+            console.log('🔧 [PDF LOGIC DEBUG] Entry count:', entryCount, 'Target entry:', targetEntryNumber);
+            
+            // Check if target entry exists
+            if (targetEntryNumber > entryCount) {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ Target entry number exceeds available entries');
+              // No match
+            } else {
+              // Find the trigger sequence dropdown for this entry
+              // The dropdown ID format: sanitizedFieldName_entryNumber
+              // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j
+              const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+                .replace(/\W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
+                .toLowerCase();
+              
+              const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+              const triggerDropdownEl = document.getElementById(triggerDropdownId);
+              
+              console.log('🔧 [PDF LOGIC DEBUG] Looking for dropdown:', triggerDropdownId);
+              console.log('🔧 [PDF LOGIC DEBUG] Dropdown element found:', !!triggerDropdownEl);
+              
+              if (triggerDropdownEl) {
+                const selectedValue = triggerDropdownEl.value || '';
+                console.log('🔧 [PDF LOGIC DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
+                
+                if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                  matched = true;
+                  console.log('🔧 [PDF LOGIC DEBUG] ✅ Trigger sequence PDF matched for:', pdfLogic.pdfDisplayName);
+                } else {
+                  console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence condition not met');
+                }
+              } else {
+                console.log('🔧 [PDF LOGIC DEBUG] ❌ Trigger sequence dropdown not found');
+              }
+            }
+          }
         } else {
           // For regular conditions, check previous question logic
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -3789,7 +3973,11 @@ window.addFormToCart = function (priceId) {
 
           console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
 
-          if (val.toString().toLowerCase() === expect) {
+          // Handle wildcard condition (*) - means any value is fine
+          if (expect === '*' && val !== '') {
+            matched = true;
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched (wildcard condition) for:', pdfLogic.pdfDisplayName);
+          } else if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
             console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
             }
@@ -6025,6 +6213,38 @@ async function processAllPdfs() {
                     } else {
                         console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
+                } else if (pdfLogic.isTriggerSequencePdf) {
+                    // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking trigger sequence PDF:', pdfLogic.pdfDisplayName);
+                    
+                    // First, check that the numbered dropdown has a value (entries exist)
+                    const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                document.getElementById('answer' + pdfLogic.questionId);
+                    
+                    if (numberedDropdownEl && numberedDropdownEl.value) {
+                        const entryCount = parseInt(numberedDropdownEl.value) || 0;
+                        const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                        
+                        // Check if target entry exists
+                        if (targetEntryNumber <= entryCount) {
+                            // Find the trigger sequence dropdown for this entry
+                            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j
+                            const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+                                .replace(/\W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
+                                .toLowerCase();
+                            
+                            const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                            const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                            
+                            if (triggerDropdownEl) {
+                                const selectedValue = triggerDropdownEl.value || '';
+                                if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                    shouldDownload = true;
+                                    console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger sequence PDF matched for:', pdfLogic.pdfDisplayName);
+                                }
+                            }
+                        }
+                    }
                 } else {
                         // For regular conditions, check previous question logic
                 pdfLogic.conditions.forEach(condition => {
@@ -6044,8 +6264,10 @@ async function processAllPdfs() {
                             prevValue = prevQuestionElement.value;
                         }
                         
-                        // Check if the condition matches
-                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                        // Handle wildcard condition (*) - means any value is fine
+                        if (prevAnswer === '*' && prevValue !== '') {
+                            shouldDownload = true;
+                        } else if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
                             shouldDownload = true;
                         }
                     }

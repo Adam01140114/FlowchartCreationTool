@@ -1,0 +1,467 @@
+================================================================================
+PDF LOGIC SYSTEM - COMPREHENSIVE DOCUMENTATION
+================================================================================
+
+This document explains how PDF Logic works in the FormWiz system, specifically 
+for dropdown questions and other question types. It covers configuration, 
+condition evaluation, cart integration, and PDF download functionality.
+
+================================================================================
+1. PDF LOGIC CONFIGURATION IN JSON
+================================================================================
+
+PDF Logic is configured in the question's JSON structure under the 
+"pdfLogic" property. Here's the structure:
+
+{
+  "pdfLogic": {
+    "enabled": true,                    // Boolean: Whether PDF logic is active
+    "conditions": [                     // Array: Conditions that trigger PDFs
+      {
+        "prevQuestion": "1",            // String: ID of the question to check
+        "prevAnswer": "Yes"             // String: Answer value that triggers PDF
+      }
+    ],
+    "pdfs": [                           // Array: PDFs to attach when conditions met
+      {
+        "pdfName": "sc500.pdf",          // String: Filename of the PDF (server-side)
+        "pdfDisplayName": "Example PDF Title",  // String: Display name shown to user
+        "stripePriceId": "1234",         // String: Stripe Price ID for payment
+        "triggerOption": ""              // String: Optional trigger for numbered dropdowns
+      }
+    ]
+  }
+}
+
+KEY PROPERTIES:
+- pdfName: The actual PDF filename that exists on the server (e.g., "sc500.pdf")
+  This is what gets sent to the server's /edit_pdf endpoint for processing.
+  
+- pdfDisplayName: The human-readable title shown in the cart and UI.
+  If not provided, the system generates one from pdfName.
+  
+- stripePriceId: The Stripe Price ID used for payment processing when adding
+  the PDF to the cart.
+  
+- triggerOption: Used specifically for numbered dropdown questions. If set,
+  the PDF is only attached when this specific option is selected in the
+  numbered dropdown (not when the condition is met in a previous question).
+
+================================================================================
+2. PDF LOGIC GENERATION (generate.js)
+================================================================================
+
+During form HTML generation (getFormHTML function in generate.js), the PDF
+logic is extracted and stored in a global JavaScript array called 
+`pdfLogicPDFs`. This happens around lines 1345-1358 in generate.js.
+
+Each PDF logic entry is added to the `pdfLogicPDFs` array with:
+- questionId: The ID of the question this PDF logic belongs to
+- pdfName: The PDF filename
+- pdfDisplayName: The display name
+- stripePriceId: The Stripe price ID
+- conditions: Array of condition objects (prevQuestion, prevAnswer)
+- triggerOption: Optional trigger option for numbered dropdowns
+- isBigParagraph: Boolean flag for Big Paragraph questions
+- numberTrigger/numberValue: Optional numeric comparison triggers
+
+This array is then embedded into the generated HTML as a JavaScript variable:
+  var pdfLogicPDFs = [{...}, {...}];
+
+This makes the PDF logic configuration available to the client-side JavaScript
+that evaluates conditions and manages the cart.
+
+================================================================================
+3. HOW PDFS ARE "ATTACHED" WHEN LOGIC IS TRIGGERED
+================================================================================
+
+PDFs are NOT actually attached or downloaded immediately when conditions are
+met. Instead, the system evaluates conditions at specific points:
+
+A. CONDITION EVALUATION (Real-time)
+------------------------------------
+PDF logic conditions are checked in real-time as the user fills out the form,
+but the PDFs are not downloaded or "attached" at this stage. The evaluation
+happens in two main contexts:
+
+1. CART EVALUATION (window.addFormToCart function)
+   Located in generate.js around lines 3652-3848.
+   
+   When the user clicks "Add to Cart" or submits the form, the system:
+   
+   a. Iterates through all entries in window.pdfLogicPDFs
+   b. For each PDF logic entry, checks if conditions are met:
+      
+      For dropdown questions (regular conditions):
+      - Gets the previous question element by ID
+      - Compares the current answer value to the expected prevAnswer
+      - Uses case-insensitive comparison
+      - If ANY condition matches (OR logic), the PDF is included
+      
+      For numbered dropdowns (triggerOption):
+      - Gets the numbered dropdown question element
+      - Compares selected value directly to triggerOption
+      - Exact match required
+      
+      For number questions (numberTrigger):
+      - Gets the number question element
+      - Performs numeric comparison (>, <, =)
+      - Compares against numberValue
+      
+      For Big Paragraph (characterLimit):
+      - Gets the Big Paragraph textarea element
+      - Checks if text length exceeds characterLimit
+   
+   c. If conditions match, the PDF is added to a temporary array
+   d. The array is deduplicated (same PDF won't appear twice)
+   e. All matched PDFs are added to the cart along with the main form
+
+2. MODAL PREVIEW (window.showCartModal function)
+   Located in generate.js around lines 1070-1240.
+   
+   Similar evaluation happens when showing the cart modal before adding
+   items. This gives users a preview of what will be added to their cart.
+
+B. CONDITION EVALUATION FOR DOWNLOADS
+-------------------------------------
+When the user clicks the "Download PDF" button, the system calls 
+processAllPdfs() which evaluates PDF logic conditions again (lines 5938-6067
+in generate.js).
+
+This function:
+1. Processes the main form PDF first
+2. Then iterates through pdfLogicPDFs
+3. For each PDF logic entry, evaluates conditions using the same logic as cart
+4. If conditions are met, calls editAndDownloadPDF(pdfName) to download the PDF
+5. Uses a Set to track processed PDFs and prevent duplicates
+
+The key difference: Cart evaluation adds PDFs to the shopping cart (for
+payment), while download evaluation actually downloads the PDFs immediately.
+
+================================================================================
+4. HOW PDFS ARE HANDLED WHEN SENT TO THE CART
+================================================================================
+
+When PDF logic conditions are met and the user adds items to the cart, the
+system creates cart items with the following structure:
+
+A. CART ITEM CREATION (generate.js, lines 3799-3828)
+----------------------------------------------------
+For each matched PDF logic entry, a cart item object is created:
+
+{
+  formId: "sc500",                    // PDF name without .pdf extension, lowercase
+  title: "EXAMPLE PDF TITLE",          // Display name (formatted)
+  priceId: "1234",                    // Stripe Price ID from pdfLogic.stripePriceId
+  pdfName: "sc500.pdf",               // Original PDF filename
+  originalFormId: "sc500",            // Main form ID (for grouping)
+  portfolioId: "...",                 // URL parameter or default
+  formData: {...},                    // Complete form data object
+  countyName: "...",                  // URL parameter or default
+  defendantName: "...",                // URL parameter or default
+  timestamp: 1234567890               // Current timestamp
+}
+
+B. DISPLAY NAME FORMATTING
+---------------------------
+The display title (shown in cart UI) is formatted as follows:
+
+1. If pdfDisplayName is provided and not empty:
+   - Trim whitespace
+   - Convert to uppercase
+   - Apply regex formatting: .replace(/([A-Z])(\d+)/g, '$1-$2')
+     Example: "sc103" becomes "SC-103"
+   - Use this formatted name as the title
+
+2. If pdfDisplayName is not provided:
+   - Fallback 1: Use pdfName without .pdf extension
+   - Fallback 2: Combine main form name + PDF name
+     Example: "Form SC500"
+
+C. ADDING TO CART (Firebase/Window.addToCart)
+----------------------------------------------
+Once all PDF logic items are matched and formatted, they are added to the
+cart via window.addToCart() function (if available). This happens in
+generate.js around lines 3850-3915.
+
+Each PDF logic item is added as a separate cart item:
+- formId: Used as the form identifier (lowercase, no extension)
+- title: Displayed to user in cart UI
+- priceId: Used to fetch price from Stripe API
+- formData: Contains all form field values (for PDF generation later)
+- pdfName: The actual PDF filename to download
+
+The system also handles:
+- Deduplication: Same PDF won't appear multiple times
+- Batching: All items added with small delays to prevent race conditions
+- Metadata: Portfolio ID, county name, defendant name preserved for grouping
+
+D. PRICE FETCHING (showCartModal function)
+------------------------------------------
+When showing the cart modal preview, the system fetches prices from Stripe
+API for each PDF:
+
+1. For each PDF in allPdfsToAdd array:
+2. Makes fetch request to: /stripe-price/{priceId}
+3. Extracts unit_amount from response (in cents)
+4. Converts to dollars: unit_amount / 100
+5. Displays price in cart modal
+
+If price fetch fails, defaults to $0.00.
+
+================================================================================
+5. HOW PDFS ARE TREATED BY THE "DOWNLOAD PDFS" BUTTON
+================================================================================
+
+The "Download PDF" button triggers the downloadAllPdfs() function, which in
+turn calls processAllPdfs().
+
+A. DOWNLOAD PROCESS (processAllPdfs function, lines 5883-6068)
+-------------------------------------------------------------
+1. Creates a Set to track processed PDFs (prevents duplicates)
+2. Downloads main form PDF first (from pdfOutputFileName)
+3. Processes Conditional PDFs (from conditionalPDFs array)
+4. Processes PDF Logic PDFs (from pdfLogicPDFs array)
+
+B. PDF LOGIC EVALUATION FOR DOWNLOADS
+--------------------------------------
+For each entry in pdfLogicPDFs (lines 5938-6067):
+
+1. Checks if pdfName exists
+2. Evaluates conditions based on question type:
+   
+   Big Paragraph:
+   - Gets textarea element by questionId
+   - Checks if value length > condition.characterLimit
+   - If yes, sets shouldDownload = true
+   
+   Numbered Dropdown (triggerOption):
+   - Gets dropdown element by questionId
+   - Compares selected value to triggerOption (exact match)
+   - If match, sets shouldDownload = true
+   
+   Number Question (numberTrigger):
+   - Gets number input element by questionId
+   - Parses values as floats
+   - Compares using operator (>, <, =)
+   - If condition met, sets shouldDownload = true
+   
+   Regular Conditions (prevQuestion/prevAnswer):
+   - Gets previous question element by prevQuestion ID
+   - Handles checkbox type specially (checks checked state)
+   - Compares answer value to prevAnswer (case-insensitive)
+   - If match, sets shouldDownload = true
+
+3. If shouldDownload is true:
+   - Removes .pdf extension from pdfName to get baseName
+   - Checks if baseName already processed (in Set)
+   - If not processed, adds to Set and calls editAndDownloadPDF(baseName)
+
+C. PDF DOWNLOAD (editAndDownloadPDF function, lines 6118-6184)
+---------------------------------------------------------------
+For each PDF that should be downloaded:
+
+1. Collects ALL form data:
+   - Gets form element (id="customForm")
+   - Includes elements inside form AND elements with form="customForm"
+   - Handles special cases:
+     * Checkboxes/radios: Only if checked, sends "on"
+     * Date inputs: Formats to mm/dd/yyyy
+     * Hidden fields: Included if they have values
+
+2. Creates FormData object with all field values
+
+3. Makes POST request to: /edit_pdf?pdf={baseName}
+   - Sends FormData as request body
+   - Server processes form data and fills PDF fields
+   - Server returns PDF as response
+
+4. Creates blob from response and triggers browser download
+   - Filename: {baseName}.pdf
+   - Content-Type: application/pdf
+
+D. KEY DIFFERENCES: DOWNLOAD vs CART
+------------------------------------
+- DOWNLOAD: Immediately downloads PDFs when button clicked, evaluates
+  conditions at that moment, uses current form state
+- CART: Adds PDFs to cart for later purchase, evaluates conditions when
+  adding to cart, can be added to cart before downloading
+
+Both use the same condition evaluation logic, but serve different purposes.
+
+================================================================================
+6. CONDITION EVALUATION LOGIC DETAILS
+================================================================================
+
+A. QUESTION ID RESOLUTION
+--------------------------
+The system uses two methods to find question elements:
+
+1. Primary: questionNameIds[questionId]
+   - Maps questionId to the actual DOM element name/ID
+   - Set during form generation based on user-defined nameIds
+
+2. Fallback: 'answer' + questionId
+   - Default naming pattern if nameId not specified
+   - Example: questionId "1" -> "answer1"
+
+B. CONDITION MATCHING (OR Logic)
+---------------------------------
+For regular conditions (prevQuestion/prevAnswer):
+
+- Multiple conditions in array: ANY match triggers PDF (OR logic)
+- Comparison is case-insensitive: .toLowerCase()
+- Checkbox handling: If checkbox, checks if checked
+- Empty values: Empty strings are compared as-is
+
+Example:
+  conditions: [
+    {prevQuestion: "1", prevAnswer: "Yes"},
+    {prevQuestion: "2", prevAnswer: "No"}
+  ]
+  PDF is attached if question 1 = "Yes" OR question 2 = "No"
+
+C. SPECIAL QUESTION TYPES
+-------------------------
+1. Checkbox:
+   - If checked: value = element.value || 'true'
+   - If unchecked: value = '' (empty string)
+   - Comparison checks checked state, not just value
+
+2. Number Input:
+   - Parsed as float: parseFloat(value) || 0
+   - Supports comparison operators: >, <, =
+   - Numeric comparison, not string
+
+3. Dropdown/Select:
+   - Direct value comparison
+   - Case-insensitive for prevAnswer matching
+   - Exact match for triggerOption
+
+4. Big Paragraph:
+   - Checks character length, not content
+   - condition.characterLimit is the threshold
+   - If length > limit, triggers PDF
+
+================================================================================
+7. EXAMPLE FLOW: DROPDOWN WITH PDF LOGIC
+================================================================================
+
+Given this JSON configuration:
+{
+  "questionId": 1,
+  "text": "hungry?",
+  "type": "dropdown",
+  "pdfLogic": {
+    "enabled": true,
+    "conditions": [
+      {"prevQuestion": "1", "prevAnswer": "Yes"}
+    ],
+    "pdfs": [
+      {
+        "pdfName": "sc500.pdf",
+        "pdfDisplayName": "Example PDF Title",
+        "stripePriceId": "1234",
+        "triggerOption": ""
+      }
+    ]
+  },
+  "options": ["Yes", "No"]
+}
+
+STEP 1: FORM GENERATION
+- generate.js extracts pdfLogic and creates entry in pdfLogicPDFs array
+- Array embedded in HTML: var pdfLogicPDFs = [{...}]
+- Question rendered as dropdown with options "Yes" and "No"
+
+STEP 2: USER SELECTS "Yes"
+- User selects "Yes" from dropdown
+- Form state updates
+- PDF logic conditions NOT evaluated yet (no immediate action)
+
+STEP 3: USER CLICKS "ADD TO CART"
+- window.addFormToCart() is called
+- System iterates pdfLogicPDFs array
+- Finds PDF logic for question 1
+- Gets question element: document.getElementById(questionNameIds["1"])
+- Reads value: "Yes"
+- Compares to condition.prevAnswer: "Yes" === "Yes" ✓
+- Condition matched! PDF will be added to cart
+
+STEP 4: CART ITEM CREATION
+- Creates cart item:
+  {
+    formId: "sc500",
+    title: "EXAMPLE PDF TITLE",  // Formatted from pdfDisplayName
+    priceId: "1234",
+    pdfName: "sc500.pdf"
+  }
+- Adds to cart via window.addToCart()
+
+STEP 5: USER CLICKS "DOWNLOAD PDF" BUTTON
+- downloadAllPdfs() called
+- processAllPdfs() executed
+- Evaluates PDF logic conditions again
+- Question 1 value is "Yes", matches condition
+- Calls editAndDownloadPDF("sc500")
+- Collects form data, sends to /edit_pdf?pdf=sc500
+- Server returns filled PDF
+- Browser downloads "sc500.pdf"
+
+STEP 6: ALTERNATIVE: USER SELECTS "No"
+- User changes answer to "No"
+- If cart already has PDF, it won't be automatically removed
+  (cart state is frozen at time of adding)
+- If clicking "Download PDF" now, condition won't match
+- PDF won't be downloaded
+
+================================================================================
+8. DEBUGGING AND CONSOLE LOGS
+================================================================================
+
+The system includes extensive console logging for debugging PDF logic:
+
+A. CART EVALUATION LOGS
+-----------------------
+- 🛒 [CART DEBUG] Found X PDF logic items
+- 🛒 [CART DEBUG] Checking PDF logic for: {pdfDisplayName}
+- 🛒 [CART DEBUG] PDF Logic details: {...}
+- 🛒 [CART DEBUG] Question X value: Y, expected: Z
+- 🛒 [CART DEBUG] ✅ PDF logic matched for: {pdfDisplayName}
+- 🛒 [CART DEBUG] ❌ PDF logic not matched for: {pdfDisplayName}
+
+B. DOWNLOAD EVALUATION LOGS
+---------------------------
+- 🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic PDFs: [...]
+- 🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic: {...}
+- 🔧 [PDF DOWNLOAD DEBUG] Checking trigger option: ...
+- 🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger option matched - will download PDF
+- 🔧 [PDF DOWNLOAD DEBUG] ❌ Trigger option NOT matched
+
+C. PDF LOGIC SPECIFIC LOGS
+---------------------------
+- 🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit: ...
+- 🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger: ...
+- 🔧 [PDF LOGIC DEBUG] Checking number trigger: ...
+
+All logs are prefixed with emojis and clear labels for easy filtering in
+browser console.
+
+================================================================================
+9. KEY TAKEAWAYS
+================================================================================
+
+1. PDF Logic is EVALUATED, not "attached" - conditions checked at runtime
+2. Cart and Download use SAME evaluation logic but different purposes
+3. Display name comes from pdfDisplayName (if provided) or generated from pdfName
+4. Price comes from Stripe API using stripePriceId
+5. PDF filename (pdfName) is what gets sent to server /edit_pdf endpoint
+6. Conditions use OR logic - ANY match triggers the PDF
+7. Question IDs are resolved via questionNameIds map or fallback pattern
+8. System prevents duplicate PDFs via Set tracking
+9. Form data is collected fresh each time (cart or download)
+10. Big Paragraph, Numbered Dropdown, and Number questions have special handling
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

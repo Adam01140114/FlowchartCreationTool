@@ -3024,6 +3024,7 @@ function addTriggerSequence(questionId, fieldCount) {
             <button type="button" onclick="addTriggerCheckbox(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Checkbox</button>
             <button type="button" onclick="addTriggerDate(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #FF9800; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Date</button>
             <button type="button" onclick="addTriggerLocation(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #28a745; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Location</button>
+            <button type="button" onclick="addTriggerPdf(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #DC3545; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add PDF</button>
         </div>
         
         <!-- Trigger Fields Container -->
@@ -3222,6 +3223,65 @@ function addTriggerLocation(questionId, fieldCount, sequenceCount) {
         </div>
     `;
     triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+function addTriggerPdf(questionId, fieldCount, sequenceCount) {
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerFieldsContainer) {
+        console.error('🔧 [ADD TRIGGER PDF DEBUG] Trigger fields container not found!');
+        return;
+    }
+    
+    const triggerFieldCount = triggerFieldsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER PDF DEBUG] Adding trigger PDF', triggerFieldCount, 'for sequence', sequenceCount);
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
+    fieldDiv.style.margin = '5px 0';
+    fieldDiv.style.padding = '8px';
+    fieldDiv.style.border = '1px solid #DC3545';
+    fieldDiv.style.borderRadius = '4px';
+    fieldDiv.style.backgroundColor = '#fff0f0';
+    fieldDiv.innerHTML = `
+        <div style="font-weight: bold; color: #DC3545; margin-bottom: 8px; text-align: center;">Trigger PDF ${triggerFieldCount}</div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Number:</label>
+            <input type="number" id="triggerPdfNumber${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter number" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerPdfNumber(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">PDF Title:</label>
+            <input type="text" id="triggerPdfTitle${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter PDF title" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerPdfTitle(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">PDF File Name:</label>
+            <input type="text" id="triggerPdfName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter PDF file name" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerPdfName(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Price ID:</label>
+            <input type="text" id="triggerPdfPriceId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter price ID" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerPdfPriceId(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="text-align: center; margin-top: 8px;">
+            <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
+        </div>
+    `;
+    triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+// Placeholder update functions for PDF fields (for future use)
+function updateTriggerPdfNumber(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    // Placeholder - can be implemented later if needed
+}
+
+function updateTriggerPdfTitle(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    // Placeholder - can be implemented later if needed
+}
+
+function updateTriggerPdfName(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    // Placeholder - can be implemented later if needed
+}
+
+function updateTriggerPdfPriceId(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    // Placeholder - can be implemented later if needed
 }
 
 function updateTriggerLocationTitle(questionId, fieldCount, sequenceCount, triggerFieldCount) {
