@@ -1208,6 +1208,7 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
   const orderedCheckboxes = [];
   const orderedTimes = [];
   const orderedLocations = [];
+  const orderedPdfs = [];
   
   // Create unified order array that preserves cross-type ordering
   const unifiedOrder = [];
@@ -1281,6 +1282,48 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
         orderedLocations.push(location);
         unifiedOrder.push({ type: 'location', identifier: identifier || 'location' });
       }
+    } else if (type === 'pdf') {
+      // Find the PDF object by matching triggerNumber, pdfTitle, or pdfFilename from the DOM
+      const triggerNumberInput = entry.querySelector('input[placeholder="Trigger number..."]');
+      const pdfTitleInput = entry.querySelector('input[placeholder="PDF title..."]');
+      const pdfFilenameInput = entry.querySelector('input[placeholder="PDF filename..."]');
+      
+      let pdf = null;
+      let identifier = null;
+      
+      // Try matching by triggerNumber first, then pdfTitle, then pdfFilename
+      if (triggerNumberInput && triggerNumberInput.value.trim()) {
+        const triggerNumber = triggerNumberInput.value.trim();
+        pdf = (triggerSequence.pdfs || []).find(p => p.triggerNumber === triggerNumber);
+        if (pdf) {
+          identifier = triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+        }
+      }
+      if (!pdf && pdfTitleInput && pdfTitleInput.value.trim()) {
+        const pdfTitle = pdfTitleInput.value.trim();
+        pdf = (triggerSequence.pdfs || []).find(p => p.pdfTitle === pdfTitle);
+        if (pdf) {
+          identifier = pdf.triggerNumber || pdfTitle || pdf.pdfFilename || 'pdf';
+        }
+      }
+      if (!pdf && pdfFilenameInput && pdfFilenameInput.value.trim()) {
+        const pdfFilename = pdfFilenameInput.value.trim();
+        pdf = (triggerSequence.pdfs || []).find(p => p.pdfFilename === pdfFilename);
+        if (pdf) {
+          identifier = pdf.triggerNumber || pdf.pdfTitle || pdfFilename || 'pdf';
+        }
+      }
+      if (!pdf && triggerSequence.pdfs && triggerSequence.pdfs.length > 0) {
+        // Fallback: if only one PDF, use it
+        if (triggerSequence.pdfs.length === 1) {
+          pdf = triggerSequence.pdfs[0];
+          identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+        }
+      }
+      if (pdf) {
+        orderedPdfs.push(pdf);
+        unifiedOrder.push({ type: 'pdf', identifier: identifier || 'pdf' });
+      }
     }
   });
   
@@ -1307,6 +1350,10 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
     triggerSequence.locations = orderedLocations;
   }
   
+  if (triggerSequence.pdfs) {
+    triggerSequence.pdfs = orderedPdfs;
+  }
+  
   // Store the unified order array to preserve cross-type ordering
   triggerSequence._actionOrder = unifiedOrder;
   
@@ -1315,6 +1362,7 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
     checkboxes: orderedCheckboxes.length,
     times: orderedTimes.length,
     locations: orderedLocations.length,
+    pdfs: orderedPdfs.length,
     unifiedOrder: unifiedOrder.length
   });
 }
@@ -4048,10 +4096,208 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
+        const addPdfBtn = document.createElement('button');
+        addPdfBtn.textContent = 'Add PDF';
+        addPdfBtn.style.cssText = `
+          background: #e91e63;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        addPdfBtn.onclick = () => {
+          // Create new PDF entry
+          const newPdf = {
+            triggerNumber: '',
+            pdfTitle: '',
+            pdfFilename: '',
+            pdfPriceId: ''
+          };
+          if (!triggerSequence.pdfs) triggerSequence.pdfs = [];
+          triggerSequence.pdfs.push(newPdf);
+          
+          // Update the actions list for this trigger sequence
+          const triggerDiv = addPdfBtn.closest('.trigger-sequence');
+          if (triggerDiv) {
+            const actionsList = triggerDiv.querySelector('.actions-list');
+            if (actionsList) {
+              // Create PDF entry container
+              const pdfContainer = document.createElement('div');
+              pdfContainer.draggable = true;
+              pdfContainer.dataset.type = 'pdf';
+              pdfContainer.dataset.triggerIndex = triggerIndex;
+              pdfContainer.style.cssText = `
+                margin-bottom: 10px;
+                padding: 8px;
+                background: #fce4ec;
+                border: 1px solid #e91e63;
+                border-radius: 4px;
+                cursor: move;
+                position: relative;
+              `;
+              
+              // Add drag handle
+              const dragHandle = document.createElement('div');
+              dragHandle.innerHTML = '⋮⋮';
+              dragHandle.style.cssText = `
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: move;
+                color: #e91e63;
+                font-size: 14px;
+                user-select: none;
+                padding: 2px;
+              `;
+              pdfContainer.appendChild(dragHandle);
+              
+              // Create content container
+              const contentContainer = document.createElement('div');
+              contentContainer.style.cssText = `
+                margin-left: 24px;
+              `;
+              
+              // Trigger number input
+              const triggerNumberInput = document.createElement('input');
+              triggerNumberInput.type = 'text';
+              triggerNumberInput.placeholder = 'Trigger number...';
+              triggerNumberInput.value = newPdf.triggerNumber || '';
+              triggerNumberInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              triggerNumberInput.onblur = () => {
+                newPdf.triggerNumber = triggerNumberInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // PDF title input
+              const pdfTitleInput = document.createElement('input');
+              pdfTitleInput.type = 'text';
+              pdfTitleInput.placeholder = 'PDF title...';
+              pdfTitleInput.value = newPdf.pdfTitle || '';
+              pdfTitleInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              pdfTitleInput.onblur = () => {
+                newPdf.pdfTitle = pdfTitleInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // PDF filename input
+              const pdfFilenameInput = document.createElement('input');
+              pdfFilenameInput.type = 'text';
+              pdfFilenameInput.placeholder = 'PDF filename...';
+              pdfFilenameInput.value = newPdf.pdfFilename || '';
+              pdfFilenameInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              pdfFilenameInput.onblur = () => {
+                newPdf.pdfFilename = pdfFilenameInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // PDF price ID input
+              const pdfPriceIdInput = document.createElement('input');
+              pdfPriceIdInput.type = 'text';
+              pdfPriceIdInput.placeholder = 'PDF price ID...';
+              pdfPriceIdInput.value = newPdf.pdfPriceId || '';
+              pdfPriceIdInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              pdfPriceIdInput.onblur = () => {
+                newPdf.pdfPriceId = pdfPriceIdInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Delete PDF button
+              const deletePdfBtn = document.createElement('button');
+              deletePdfBtn.textContent = 'Delete PDF';
+              deletePdfBtn.style.cssText = `
+                background: #f44336;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+              `;
+              deletePdfBtn.onclick = () => {
+                const pdfIndex = triggerSequence.pdfs.findIndex(p => p === newPdf);
+                if (pdfIndex !== -1) {
+                  triggerSequence.pdfs.splice(pdfIndex, 1);
+                }
+                pdfContainer.remove();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              contentContainer.appendChild(triggerNumberInput);
+              contentContainer.appendChild(pdfTitleInput);
+              contentContainer.appendChild(pdfFilenameInput);
+              contentContainer.appendChild(pdfPriceIdInput);
+              contentContainer.appendChild(deletePdfBtn);
+              
+              pdfContainer.appendChild(contentContainer);
+              
+              // Add drag handlers
+              pdfContainer.addEventListener('dragstart', (e) => {
+                pdfContainer.classList.add('dragging');
+                pdfContainer.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+              });
+              
+              pdfContainer.addEventListener('dragend', (e) => {
+                pdfContainer.classList.remove('dragging');
+                pdfContainer.style.opacity = '1';
+              });
+              
+              actionsList.appendChild(pdfContainer);
+              triggerNumberInput.focus();
+            }
+          }
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
         actionButtons.appendChild(addLabelBtn);
         actionButtons.appendChild(addCheckboxBtn);
         actionButtons.appendChild(addTimeBtn);
         actionButtons.appendChild(addLocationBtn);
+        actionButtons.appendChild(addPdfBtn);
         triggerDiv.appendChild(actionButtons);
         
         // Add actions list container
@@ -5021,10 +5267,208 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       }
     };
     
+    const addPdfBtn = document.createElement('button');
+    addPdfBtn.textContent = 'Add PDF';
+    addPdfBtn.style.cssText = `
+      background: #e91e63;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    `;
+    addPdfBtn.onclick = () => {
+      // Create new PDF entry
+      const newPdf = {
+        triggerNumber: '',
+        pdfTitle: '',
+        pdfFilename: '',
+        pdfPriceId: ''
+      };
+      if (!trigger.pdfs) trigger.pdfs = [];
+      trigger.pdfs.push(newPdf);
+      
+      // Update the actions list for this trigger sequence
+      const triggerDiv = addPdfBtn.closest('.trigger-sequence');
+      if (triggerDiv) {
+        const actionsList = triggerDiv.querySelector('.actions-list');
+        if (actionsList) {
+          // Create PDF entry container
+          const pdfContainer = document.createElement('div');
+          pdfContainer.draggable = true;
+          pdfContainer.dataset.type = 'pdf';
+          pdfContainer.dataset.triggerIndex = triggerIndex;
+          pdfContainer.style.cssText = `
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #fce4ec;
+            border: 1px solid #e91e63;
+            border-radius: 4px;
+            cursor: move;
+            position: relative;
+          `;
+          
+          // Add drag handle
+          const dragHandle = document.createElement('div');
+          dragHandle.textContent = '⋮⋮';
+          dragHandle.style.cssText = `
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: move;
+            color: #e91e63;
+            font-size: 14px;
+            user-select: none;
+            padding: 2px;
+          `;
+          pdfContainer.appendChild(dragHandle);
+          
+          // Create content container
+          const contentContainer = document.createElement('div');
+          contentContainer.style.cssText = `
+            margin-left: 24px;
+          `;
+          
+          // Trigger number input
+          const triggerNumberInput = document.createElement('input');
+          triggerNumberInput.type = 'text';
+          triggerNumberInput.placeholder = 'Trigger number...';
+          triggerNumberInput.value = newPdf.triggerNumber || '';
+          triggerNumberInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          triggerNumberInput.onblur = () => {
+            newPdf.triggerNumber = triggerNumberInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // PDF title input
+          const pdfTitleInput = document.createElement('input');
+          pdfTitleInput.type = 'text';
+          pdfTitleInput.placeholder = 'PDF title...';
+          pdfTitleInput.value = newPdf.pdfTitle || '';
+          pdfTitleInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          pdfTitleInput.onblur = () => {
+            newPdf.pdfTitle = pdfTitleInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // PDF filename input
+          const pdfFilenameInput = document.createElement('input');
+          pdfFilenameInput.type = 'text';
+          pdfFilenameInput.placeholder = 'PDF filename...';
+          pdfFilenameInput.value = newPdf.pdfFilename || '';
+          pdfFilenameInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          pdfFilenameInput.onblur = () => {
+            newPdf.pdfFilename = pdfFilenameInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // PDF price ID input
+          const pdfPriceIdInput = document.createElement('input');
+          pdfPriceIdInput.type = 'text';
+          pdfPriceIdInput.placeholder = 'PDF price ID...';
+          pdfPriceIdInput.value = newPdf.pdfPriceId || '';
+          pdfPriceIdInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          pdfPriceIdInput.onblur = () => {
+            newPdf.pdfPriceId = pdfPriceIdInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Delete PDF button
+          const deletePdfBtn = document.createElement('button');
+          deletePdfBtn.textContent = 'Delete PDF';
+          deletePdfBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+          `;
+          deletePdfBtn.onclick = () => {
+            const pdfIndex = trigger.pdfs.findIndex(p => p === newPdf);
+            if (pdfIndex !== -1) {
+              trigger.pdfs.splice(pdfIndex, 1);
+            }
+            pdfContainer.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          contentContainer.appendChild(triggerNumberInput);
+          contentContainer.appendChild(pdfTitleInput);
+          contentContainer.appendChild(pdfFilenameInput);
+          contentContainer.appendChild(pdfPriceIdInput);
+          contentContainer.appendChild(deletePdfBtn);
+          
+          pdfContainer.appendChild(contentContainer);
+          
+          // Add drag handlers
+          pdfContainer.addEventListener('dragstart', (e) => {
+            pdfContainer.classList.add('dragging');
+            pdfContainer.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+          });
+          
+          pdfContainer.addEventListener('dragend', (e) => {
+            pdfContainer.classList.remove('dragging');
+            pdfContainer.style.opacity = '1';
+          });
+          
+          actionsList.appendChild(pdfContainer);
+          triggerNumberInput.focus();
+        }
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
     actionButtons.appendChild(addLabelBtn);
     actionButtons.appendChild(addCheckboxBtn);
     actionButtons.appendChild(addTimeBtn);
     actionButtons.appendChild(addLocationBtn);
+    actionButtons.appendChild(addPdfBtn);
     triggerDiv.appendChild(actionButtons);
 
     // Display existing actions using the new enhanced structure
@@ -6060,6 +6504,171 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         // Store in map instead of appending directly
         const locationIdentifier = location.locationTitle || location.fieldName || 'location';
         storeEntryContainer('location', locationIdentifier, locationContainer);
+      });
+    }
+    
+    // Display existing PDFs
+    if (trigger.pdfs && trigger.pdfs.length > 0) {
+      trigger.pdfs.forEach((pdf, pdfIndex) => {
+        const pdfContainer = document.createElement('div');
+        pdfContainer.draggable = true;
+        pdfContainer.dataset.type = 'pdf';
+        pdfContainer.dataset.triggerIndex = triggerIndex;
+        pdfContainer.style.cssText = `
+          margin-bottom: 10px;
+          padding: 8px;
+          background: #fce4ec;
+          border: 1px solid #e91e63;
+          border-radius: 4px;
+          cursor: move;
+          position: relative;
+        `;
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.textContent = '⋮⋮';
+        dragHandle.style.cssText = `
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: move;
+          color: #e91e63;
+          font-size: 14px;
+          user-select: none;
+          padding: 2px;
+        `;
+        pdfContainer.appendChild(dragHandle);
+        
+        // Create content container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+          margin-left: 24px;
+        `;
+        
+        // Trigger number input
+        const triggerNumberInput = document.createElement('input');
+        triggerNumberInput.type = 'text';
+        triggerNumberInput.placeholder = 'Trigger number...';
+        triggerNumberInput.value = pdf.triggerNumber || '';
+        triggerNumberInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        triggerNumberInput.onblur = () => {
+          pdf.triggerNumber = triggerNumberInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // PDF title input
+        const pdfTitleInput = document.createElement('input');
+        pdfTitleInput.type = 'text';
+        pdfTitleInput.placeholder = 'PDF title...';
+        pdfTitleInput.value = pdf.pdfTitle || '';
+        pdfTitleInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        pdfTitleInput.onblur = () => {
+          pdf.pdfTitle = pdfTitleInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // PDF filename input
+        const pdfFilenameInput = document.createElement('input');
+        pdfFilenameInput.type = 'text';
+        pdfFilenameInput.placeholder = 'PDF filename...';
+        pdfFilenameInput.value = pdf.pdfFilename || '';
+        pdfFilenameInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        pdfFilenameInput.onblur = () => {
+          pdf.pdfFilename = pdfFilenameInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // PDF price ID input
+        const pdfPriceIdInput = document.createElement('input');
+        pdfPriceIdInput.type = 'text';
+        pdfPriceIdInput.placeholder = 'PDF price ID...';
+        pdfPriceIdInput.value = pdf.pdfPriceId || '';
+        pdfPriceIdInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        pdfPriceIdInput.onblur = () => {
+          pdf.pdfPriceId = pdfPriceIdInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Delete PDF button
+        const deletePdfBtn = document.createElement('button');
+        deletePdfBtn.textContent = 'Delete PDF';
+        deletePdfBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        deletePdfBtn.onclick = () => {
+          trigger.pdfs.splice(pdfIndex, 1);
+          pdfContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        contentContainer.appendChild(triggerNumberInput);
+        contentContainer.appendChild(pdfTitleInput);
+        contentContainer.appendChild(pdfFilenameInput);
+        contentContainer.appendChild(pdfPriceIdInput);
+        contentContainer.appendChild(deletePdfBtn);
+        
+        pdfContainer.appendChild(contentContainer);
+        
+        // Add drag handlers
+        pdfContainer.addEventListener('dragstart', (e) => {
+          pdfContainer.classList.add('dragging');
+          pdfContainer.style.opacity = '0.5';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        pdfContainer.addEventListener('dragend', (e) => {
+          pdfContainer.classList.remove('dragging');
+          pdfContainer.style.opacity = '1';
+        });
+        
+        // Store in map instead of appending directly
+        const pdfIdentifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+        storeEntryContainer('pdf', pdfIdentifier, pdfContainer);
       });
     }
     

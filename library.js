@@ -958,54 +958,253 @@ window.exportGuiJson = function(download = true) {
                 dropdown.triggerSequences.forEach(trigger => {
                   const fields = [];
                   
-                  // Add labels
+                  // Create maps for quick lookup by identifier
+                  const labelMap = new Map();
                   if (trigger.labels && trigger.labels.length > 0) {
                     trigger.labels.forEach(label => {
-                      fields.push({
-                        type: "label",
-                        label: label.fieldName || "",
-                        nodeId: label.nodeId || ""
-                      });
+                      labelMap.set(label.fieldName || '', label);
                     });
                   }
                   
-                  // Add checkboxes
+                  const checkboxMap = new Map();
                   if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                     trigger.checkboxes.forEach(checkbox => {
-                      const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
-                        text: option.checkboxText || "",
-                        nodeId: option.nodeId || ""
-                      })) : [];
-                      
-                      fields.push({
-                        type: "checkbox",
-                        fieldName: checkbox.fieldName || "",
-                        selectionType: checkbox.selectionType || "multiple",
-                        options: checkboxOptions
-                      });
+                      checkboxMap.set(checkbox.fieldName || '', checkbox);
                     });
                   }
                   
-                  // Add times
+                  const timeMap = new Map();
                   if (trigger.times && trigger.times.length > 0) {
                     trigger.times.forEach(time => {
-                      fields.push({
-                        type: "date",
-                        label: time.fieldName || "",
-                        nodeId: time.nodeId || ""
-                      });
+                      timeMap.set(time.fieldName || '', time);
                     });
                   }
                   
-                  // Add locations
+                  const locationMap = new Map();
                   if (trigger.locations && trigger.locations.length > 0) {
                     trigger.locations.forEach(location => {
-                      fields.push({
-                        type: "location",
-                        fieldName: location.locationTitle || "",
-                        nodeId: "location_data"
-                      });
+                      const identifier = location.locationTitle || location.fieldName || 'location';
+                      locationMap.set(identifier, location);
                     });
+                  }
+                  
+                  const pdfMap = new Map();
+                  if (trigger.pdfs && trigger.pdfs.length > 0) {
+                    trigger.pdfs.forEach(pdf => {
+                      const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+                      pdfMap.set(identifier, pdf);
+                    });
+                  }
+                  
+                  // Use unified order if available, otherwise use type-based order
+                  if (trigger._actionOrder && trigger._actionOrder.length > 0) {
+                    // Add fields in the unified order
+                    trigger._actionOrder.forEach(orderItem => {
+                      if (orderItem.type === 'label') {
+                        const label = labelMap.get(orderItem.identifier);
+                        if (label) {
+                          fields.push({
+                            type: "label",
+                            label: label.fieldName || "",
+                            nodeId: label.nodeId || ""
+                          });
+                        }
+                      } else if (orderItem.type === 'checkbox') {
+                        const checkbox = checkboxMap.get(orderItem.identifier);
+                        if (checkbox) {
+                          const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                            text: option.checkboxText || "",
+                            nodeId: option.nodeId || ""
+                          })) : [];
+                          
+                          fields.push({
+                            type: "checkbox",
+                            fieldName: checkbox.fieldName || "",
+                            selectionType: checkbox.selectionType || "multiple",
+                            options: checkboxOptions
+                          });
+                        }
+                      } else if (orderItem.type === 'time') {
+                        const time = timeMap.get(orderItem.identifier);
+                        if (time) {
+                          fields.push({
+                            type: "date",
+                            label: time.fieldName || "",
+                            nodeId: time.nodeId || ""
+                          });
+                        }
+                      } else if (orderItem.type === 'location') {
+                        const location = locationMap.get(orderItem.identifier);
+                        if (location) {
+                          fields.push({
+                            type: "location",
+                            fieldName: location.locationTitle || "",
+                            nodeId: "location_data"
+                          });
+                        }
+                      } else if (orderItem.type === 'pdf') {
+                        const pdf = pdfMap.get(orderItem.identifier);
+                        if (pdf) {
+                          fields.push({
+                            type: "pdf",
+                            number: pdf.triggerNumber || "",
+                            pdfTitle: pdf.pdfTitle || "",
+                            pdfName: pdf.pdfFilename || "",
+                            priceId: pdf.pdfPriceId || ""
+                          });
+                        }
+                      }
+                    });
+                    
+                    // Add any fields not in the unified order (safety check)
+                    if (trigger.labels && trigger.labels.length > 0) {
+                      trigger.labels.forEach(label => {
+                        if (!labelMap.has(label.fieldName || '')) {
+                          const existingField = fields.find(f => f.type === 'label' && f.label === label.fieldName);
+                          if (!existingField) {
+                            fields.push({
+                              type: "label",
+                              label: label.fieldName || "",
+                              nodeId: label.nodeId || ""
+                            });
+                          }
+                        }
+                      });
+                    }
+                    
+                    if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+                      trigger.checkboxes.forEach(checkbox => {
+                        if (!checkboxMap.has(checkbox.fieldName || '')) {
+                          const existingField = fields.find(f => f.type === 'checkbox' && f.fieldName === checkbox.fieldName);
+                          if (!existingField) {
+                            const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                              text: option.checkboxText || "",
+                              nodeId: option.nodeId || ""
+                            })) : [];
+                            
+                            fields.push({
+                              type: "checkbox",
+                              fieldName: checkbox.fieldName || "",
+                              selectionType: checkbox.selectionType || "multiple",
+                              options: checkboxOptions
+                            });
+                          }
+                        }
+                      });
+                    }
+                    
+                    if (trigger.times && trigger.times.length > 0) {
+                      trigger.times.forEach(time => {
+                        if (!timeMap.has(time.fieldName || '')) {
+                          const existingField = fields.find(f => f.type === 'date' && f.label === time.fieldName);
+                          if (!existingField) {
+                            fields.push({
+                              type: "date",
+                              label: time.fieldName || "",
+                              nodeId: time.nodeId || ""
+                            });
+                          }
+                        }
+                      });
+                    }
+                    
+                    if (trigger.locations && trigger.locations.length > 0) {
+                      trigger.locations.forEach(location => {
+                        const identifier = location.locationTitle || location.fieldName || 'location';
+                        if (!locationMap.has(identifier)) {
+                          const existingField = fields.find(f => f.type === 'location' && f.fieldName === location.locationTitle);
+                          if (!existingField) {
+                            fields.push({
+                              type: "location",
+                              fieldName: location.locationTitle || "",
+                              nodeId: "location_data"
+                            });
+                          }
+                        }
+                      });
+                    }
+                    
+                    if (trigger.pdfs && trigger.pdfs.length > 0) {
+                      trigger.pdfs.forEach(pdf => {
+                        const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+                        if (!pdfMap.has(identifier)) {
+                          const existingField = fields.find(f => f.type === 'pdf' && f.number === pdf.triggerNumber);
+                          if (!existingField) {
+                            fields.push({
+                              type: "pdf",
+                              number: pdf.triggerNumber || "",
+                              pdfTitle: pdf.pdfTitle || "",
+                              pdfName: pdf.pdfFilename || "",
+                              priceId: pdf.pdfPriceId || ""
+                            });
+                          }
+                        }
+                      });
+                    }
+                  } else {
+                    // Fallback: Add fields in type-based order (for backward compatibility)
+                    // Add labels
+                    if (trigger.labels && trigger.labels.length > 0) {
+                      trigger.labels.forEach(label => {
+                        fields.push({
+                          type: "label",
+                          label: label.fieldName || "",
+                          nodeId: label.nodeId || ""
+                        });
+                      });
+                    }
+                    
+                    // Add checkboxes
+                    if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+                      trigger.checkboxes.forEach(checkbox => {
+                        const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                          text: option.checkboxText || "",
+                          nodeId: option.nodeId || ""
+                        })) : [];
+                        
+                        fields.push({
+                          type: "checkbox",
+                          fieldName: checkbox.fieldName || "",
+                          selectionType: checkbox.selectionType || "multiple",
+                          options: checkboxOptions
+                        });
+                      });
+                    }
+                    
+                    // Add times
+                    if (trigger.times && trigger.times.length > 0) {
+                      trigger.times.forEach(time => {
+                        fields.push({
+                          type: "date",
+                          label: time.fieldName || "",
+                          nodeId: time.nodeId || ""
+                        });
+                      });
+                    }
+                    
+                    // Add locations
+                    if (trigger.locations && trigger.locations.length > 0) {
+                      trigger.locations.forEach(location => {
+                        fields.push({
+                          type: "location",
+                          fieldName: location.locationTitle || "",
+                          nodeId: "location_data"
+                        });
+                      });
+                    }
+                    
+                    // Add PDFs
+                    if (trigger.pdfs && trigger.pdfs.length > 0) {
+                      trigger.pdfs.forEach(pdf => {
+                        fields.push({
+                          type: "pdf",
+                          number: pdf.triggerNumber || "",
+                          pdfTitle: pdf.pdfTitle || "",
+                          pdfName: pdf.pdfFilename || "",
+                          priceId: pdf.pdfPriceId || ""
+                        });
+                      });
+                    }
                   }
                   
                   // Find the matching option text for the condition
