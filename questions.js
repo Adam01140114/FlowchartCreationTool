@@ -69,6 +69,27 @@ function createUneditableNodeIdInput(placeholder, value, onDoubleClick) {
   return input;
 }
 
+// Helper function to get all checkbox option node IDs from a trigger sequence
+function getCheckboxOptionNodeIdsFromTriggerSequence(triggerSequence) {
+  const nodeIds = [];
+  
+  if (!triggerSequence || !triggerSequence.checkboxes) {
+    return nodeIds;
+  }
+  
+  triggerSequence.checkboxes.forEach(checkbox => {
+    if (checkbox.options && Array.isArray(checkbox.options)) {
+      checkbox.options.forEach(option => {
+        if (option.nodeId) {
+          nodeIds.push(option.nodeId);
+        }
+      });
+    }
+  });
+  
+  return nodeIds;
+}
+
 // Helper function to create unified dropdown entry that looks like other entries
 function createUnifiedDropdownEntry(dropdown, index, cell) {
   const entryContainer = document.createElement('div');
@@ -3844,6 +3865,173 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               
               contentContainer.appendChild(fieldNameInput);
               contentContainer.appendChild(timeIdInput);
+              
+              // Initialize conditional logic if it doesn't exist
+              if (!newTime.conditionalLogic) {
+                newTime.conditionalLogic = {
+                  enabled: false,
+                  conditions: []
+                };
+              }
+              
+              // Enable Conditional Logic checkbox
+              const enableConditionalLogicCheckbox = document.createElement('input');
+              enableConditionalLogicCheckbox.type = 'checkbox';
+              enableConditionalLogicCheckbox.checked = newTime.conditionalLogic.enabled || false;
+              enableConditionalLogicCheckbox.style.cssText = `
+                margin-bottom: 8px;
+              `;
+        const enableConditionalLogicLabel = document.createElement('label');
+        enableConditionalLogicLabel.textContent = 'Enable Conditional Logic';
+        enableConditionalLogicLabel.style.cssText = `
+          font-size: 12px;
+          margin-left: 4px;
+          cursor: pointer;
+        `;
+        enableConditionalLogicLabel.htmlFor = enableConditionalLogicCheckbox.id || `enableConditionalLogic_${triggerIndex}_${triggerSequence.times.length - 1}`;
+        enableConditionalLogicCheckbox.id = enableConditionalLogicLabel.htmlFor;
+        const conditionalLogicContainer = document.createElement('div');
+        conditionalLogicContainer.style.cssText = `
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+        `;
+        conditionalLogicContainer.appendChild(enableConditionalLogicCheckbox);
+        conditionalLogicContainer.appendChild(enableConditionalLogicLabel);
+              
+              // Conditional logic UI container
+              const conditionalLogicUIContainer = document.createElement('div');
+              conditionalLogicUIContainer.id = `conditionalLogic_${triggerIndex}_${triggerSequence.times.length - 1}`;
+              conditionalLogicUIContainer.style.display = newTime.conditionalLogic.enabled ? 'block' : 'none';
+              
+              // Function to update conditional logic UI
+              const updateConditionalLogicUI = () => {
+                conditionalLogicUIContainer.innerHTML = '';
+                
+                if (!newTime.conditionalLogic.conditions || newTime.conditionalLogic.conditions.length === 0) {
+                  newTime.conditionalLogic.conditions = [''];
+                }
+                
+                const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(triggerSequence);
+                
+                newTime.conditionalLogic.conditions.forEach((condition, conditionIndex) => {
+                  const conditionRow = document.createElement('div');
+                  conditionRow.style.cssText = `
+                    margin-bottom: 8px;
+                    display: flex;
+                    gap: 4px;
+                    align-items: center;
+                  `;
+                  
+                  const conditionDropdown = document.createElement('select');
+                  conditionDropdown.style.cssText = `
+                    flex: 1;
+                    padding: 4px 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 3px;
+                    font-size: 12px;
+                  `;
+                  
+                  // Add placeholder option
+                  const placeholderOption = document.createElement('option');
+                  placeholderOption.value = '';
+                  placeholderOption.textContent = 'Select checkbox option...';
+                  conditionDropdown.appendChild(placeholderOption);
+                  
+                  // Add checkbox option node IDs
+                  checkboxNodeIds.forEach(nodeId => {
+                    const option = document.createElement('option');
+                    option.value = nodeId;
+                    option.textContent = nodeId;
+                    if (condition === nodeId) {
+                      option.selected = true;
+                    }
+                    conditionDropdown.appendChild(option);
+                  });
+                  
+                  conditionDropdown.value = condition || '';
+                  conditionDropdown.onchange = () => {
+                    newTime.conditionalLogic.conditions[conditionIndex] = conditionDropdown.value;
+                    if (typeof window.requestAutosave === 'function') {
+                      window.requestAutosave();
+                    }
+                  };
+                  
+                  const removeConditionBtn = document.createElement('button');
+                  removeConditionBtn.textContent = '×';
+                  removeConditionBtn.style.cssText = `
+                    background: #f44336;
+                    color: white;
+                    border: none;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 14px;
+                    flex-shrink: 0;
+                  `;
+                  removeConditionBtn.onclick = () => {
+                    if (newTime.conditionalLogic.conditions.length > 1) {
+                      newTime.conditionalLogic.conditions.splice(conditionIndex, 1);
+                      updateConditionalLogicUI();
+                      if (typeof window.requestAutosave === 'function') {
+                        window.requestAutosave();
+                      }
+                    }
+                  };
+                  
+                  conditionRow.appendChild(conditionDropdown);
+                  conditionRow.appendChild(removeConditionBtn);
+                  conditionalLogicUIContainer.appendChild(conditionRow);
+                });
+                
+                // Add Another Condition button
+                const addConditionBtn = document.createElement('button');
+                addConditionBtn.textContent = 'Add Another Condition';
+                addConditionBtn.style.cssText = `
+                  background: #2196F3;
+                  color: white;
+                  border: none;
+                  padding: 4px 8px;
+                  border-radius: 3px;
+                  cursor: pointer;
+                  font-size: 11px;
+                  width: 100%;
+                  margin-top: 4px;
+                `;
+                addConditionBtn.onclick = () => {
+                  if (!newTime.conditionalLogic.conditions) {
+                    newTime.conditionalLogic.conditions = [];
+                  }
+                  newTime.conditionalLogic.conditions.push('');
+                  updateConditionalLogicUI();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                };
+                conditionalLogicUIContainer.appendChild(addConditionBtn);
+              };
+              
+              enableConditionalLogicCheckbox.onchange = () => {
+                newTime.conditionalLogic.enabled = enableConditionalLogicCheckbox.checked;
+                conditionalLogicUIContainer.style.display = enableConditionalLogicCheckbox.checked ? 'block' : 'none';
+                if (enableConditionalLogicCheckbox.checked && (!newTime.conditionalLogic.conditions || newTime.conditionalLogic.conditions.length === 0)) {
+                  newTime.conditionalLogic.conditions = [''];
+                }
+                updateConditionalLogicUI();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Initialize conditional logic UI if enabled
+              if (newTime.conditionalLogic.enabled) {
+                updateConditionalLogicUI();
+              }
+              
+              contentContainer.appendChild(conditionalLogicContainer);
+              contentContainer.appendChild(conditionalLogicUIContainer);
+              
               contentContainer.appendChild(deleteTimeBtn);
               
               // Copy ID button for time (positioned after delete button)
@@ -4969,20 +5157,47 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           };
           
-          // Time ID input
-          const timeIdInput = document.createElement('input');
-          timeIdInput.type = 'text';
-          timeIdInput.placeholder = 'Time ID...';
-          timeIdInput.style.cssText = `
-            width: 100%;
-            padding: 4px 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-bottom: 8px;
-          `;
-          timeIdInput.onblur = () => {
-            newTime.nodeId = timeIdInput.value.trim();
+          // Time ID input (uneditable and autofilled)
+          // Auto-fix incorrect node IDs when creating new fields
+          const correctTimeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+          const timeIdValue = (newTime.nodeId && newTime.nodeId === correctTimeId) ? newTime.nodeId : correctTimeId;
+          newTime.nodeId = timeIdValue; // Set the nodeId in the data
+          const timeIdInput = createUneditableNodeIdInput('Time ID...', timeIdValue, (input) => {
+            // Double-click to copy functionality
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(input.value).then(() => {
+                // Show visual feedback
+                const originalBg = input.style.backgroundColor;
+                input.style.backgroundColor = '#d4edda';
+                input.style.borderColor = '#28a745';
+                setTimeout(() => {
+                  input.style.backgroundColor = originalBg;
+                  input.style.borderColor = '#ddd';
+                }, 1000);
+              });
+            } else {
+              // Fallback for older browsers
+              input.select();
+              document.execCommand('copy');
+              const originalBg = input.style.backgroundColor;
+              input.style.backgroundColor = '#d4edda';
+              input.style.borderColor = '#28a745';
+              setTimeout(() => {
+                input.style.backgroundColor = originalBg;
+                input.style.borderColor = '#ddd';
+              }, 1000);
+            }
+          });
+          timeIdInput.style.marginBottom = '8px';
+          
+          fieldNameInput.onblur = () => {
+            newTime.fieldName = fieldNameInput.value.trim();
+            
+            // Update the node ID when field name changes
+            const updatedNodeId = generateNodeIdForDropdownField(newTime.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+            newTime.nodeId = updatedNodeId;
+            timeIdInput.value = updatedNodeId;
+            
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
@@ -5013,8 +5228,179 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           
           contentContainer.appendChild(fieldNameInput);
           contentContainer.appendChild(timeIdInput);
+          
+          // Initialize conditional logic if it doesn't exist
+          if (!newTime.conditionalLogic) {
+            newTime.conditionalLogic = {
+              enabled: false,
+              conditions: []
+            };
+          }
+          
+          console.log('🔍 [CONDITIONAL LOGIC DEBUG] Creating checkbox for NEW time entry:', newTime);
+          
+          // Enable Conditional Logic checkbox
+          const enableConditionalLogicCheckbox = document.createElement('input');
+          enableConditionalLogicCheckbox.type = 'checkbox';
+          enableConditionalLogicCheckbox.checked = newTime.conditionalLogic.enabled || false;
+          enableConditionalLogicCheckbox.style.cssText = `
+            margin-bottom: 8px;
+          `;
+          const enableConditionalLogicLabel = document.createElement('label');
+          enableConditionalLogicLabel.textContent = 'Enable Conditional Logic';
+          enableConditionalLogicLabel.style.cssText = `
+            font-size: 12px;
+            margin-left: 4px;
+            cursor: pointer;
+          `;
+          enableConditionalLogicLabel.htmlFor = enableConditionalLogicCheckbox.id || `enableConditionalLogic_${triggerIndex}_${trigger.times.length - 1}`;
+          enableConditionalLogicCheckbox.id = enableConditionalLogicLabel.htmlFor;
+          const conditionalLogicContainer = document.createElement('div');
+          conditionalLogicContainer.style.cssText = `
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+          `;
+          conditionalLogicContainer.appendChild(enableConditionalLogicCheckbox);
+          conditionalLogicContainer.appendChild(enableConditionalLogicLabel);
+          
+          // Conditional logic UI container
+          const conditionalLogicUIContainer = document.createElement('div');
+          conditionalLogicUIContainer.id = `conditionalLogic_${triggerIndex}_${trigger.times.length - 1}`;
+          conditionalLogicUIContainer.style.display = newTime.conditionalLogic.enabled ? 'block' : 'none';
+          
+          // Function to update conditional logic UI
+          const updateConditionalLogicUI = () => {
+            conditionalLogicUIContainer.innerHTML = '';
+            
+            if (!newTime.conditionalLogic.conditions || newTime.conditionalLogic.conditions.length === 0) {
+              newTime.conditionalLogic.conditions = [''];
+            }
+            
+            const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(trigger);
+            
+            newTime.conditionalLogic.conditions.forEach((condition, conditionIndex) => {
+              const conditionRow = document.createElement('div');
+              conditionRow.style.cssText = `
+                margin-bottom: 8px;
+                display: flex;
+                gap: 4px;
+                align-items: center;
+              `;
+              
+              const conditionDropdown = document.createElement('select');
+              conditionDropdown.style.cssText = `
+                flex: 1;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+              `;
+              
+              // Add placeholder option
+              const placeholderOption = document.createElement('option');
+              placeholderOption.value = '';
+              placeholderOption.textContent = 'Select checkbox option...';
+              conditionDropdown.appendChild(placeholderOption);
+              
+              // Add checkbox option node IDs
+              checkboxNodeIds.forEach(nodeId => {
+                const option = document.createElement('option');
+                option.value = nodeId;
+                option.textContent = nodeId;
+                if (condition === nodeId) {
+                  option.selected = true;
+                }
+                conditionDropdown.appendChild(option);
+              });
+              
+              conditionDropdown.value = condition || '';
+              conditionDropdown.onchange = () => {
+                newTime.conditionalLogic.conditions[conditionIndex] = conditionDropdown.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              const removeConditionBtn = document.createElement('button');
+              removeConditionBtn.textContent = '×';
+              removeConditionBtn.style.cssText = `
+                background: #f44336;
+                color: white;
+                border: none;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 14px;
+                flex-shrink: 0;
+              `;
+              removeConditionBtn.onclick = () => {
+                if (newTime.conditionalLogic.conditions.length > 1) {
+                  newTime.conditionalLogic.conditions.splice(conditionIndex, 1);
+                  updateConditionalLogicUI();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                }
+              };
+              
+              conditionRow.appendChild(conditionDropdown);
+              conditionRow.appendChild(removeConditionBtn);
+              conditionalLogicUIContainer.appendChild(conditionRow);
+            });
+            
+            // Add Another Condition button
+            const addConditionBtn = document.createElement('button');
+            addConditionBtn.textContent = 'Add Another Condition';
+            addConditionBtn.style.cssText = `
+              background: #2196F3;
+              color: white;
+              border: none;
+              padding: 4px 8px;
+              border-radius: 3px;
+              cursor: pointer;
+              font-size: 11px;
+              width: 100%;
+              margin-top: 4px;
+            `;
+            addConditionBtn.onclick = () => {
+              if (!newTime.conditionalLogic.conditions) {
+                newTime.conditionalLogic.conditions = [];
+              }
+              newTime.conditionalLogic.conditions.push('');
+              updateConditionalLogicUI();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            conditionalLogicUIContainer.appendChild(addConditionBtn);
+          };
+          
+          enableConditionalLogicCheckbox.onchange = () => {
+            newTime.conditionalLogic.enabled = enableConditionalLogicCheckbox.checked;
+            conditionalLogicUIContainer.style.display = enableConditionalLogicCheckbox.checked ? 'block' : 'none';
+            if (enableConditionalLogicCheckbox.checked && (!newTime.conditionalLogic.conditions || newTime.conditionalLogic.conditions.length === 0)) {
+              newTime.conditionalLogic.conditions = [''];
+            }
+            updateConditionalLogicUI();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Initialize conditional logic UI if enabled
+          if (newTime.conditionalLogic.enabled) {
+            updateConditionalLogicUI();
+          }
+          
+          console.log('🔍 [CONDITIONAL LOGIC DEBUG] Appending conditional logic containers to contentContainer (NEW entry)');
+          contentContainer.appendChild(conditionalLogicContainer);
+          contentContainer.appendChild(conditionalLogicUIContainer);
+          
           contentContainer.appendChild(deleteTimeBtn);
           timeContainer.appendChild(contentContainer);
+          console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic UI should now be visible (NEW entry)');
           
           // Add drag handlers
           timeContainer.addEventListener('dragstart', (e) => {
@@ -6291,7 +6677,178 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         
         contentContainer.appendChild(fieldNameInput);
         contentContainer.appendChild(timeIdInput);
+        
+        // Initialize conditional logic if it doesn't exist
+        if (!time.conditionalLogic) {
+          time.conditionalLogic = {
+            enabled: false,
+            conditions: []
+          };
+        }
+        
+        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Creating checkbox for time entry:', time);
+        
+        // Enable Conditional Logic checkbox
+        const enableConditionalLogicCheckbox = document.createElement('input');
+        enableConditionalLogicCheckbox.type = 'checkbox';
+        enableConditionalLogicCheckbox.checked = time.conditionalLogic.enabled || false;
+        enableConditionalLogicCheckbox.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        const enableConditionalLogicLabel = document.createElement('label');
+        enableConditionalLogicLabel.textContent = 'Enable Conditional Logic';
+        enableConditionalLogicLabel.style.cssText = `
+          font-size: 12px;
+          margin-left: 4px;
+          cursor: pointer;
+        `;
+        enableConditionalLogicLabel.htmlFor = enableConditionalLogicCheckbox.id || `enableConditionalLogic_${triggerIndex}_${timeIndex}`;
+        enableConditionalLogicCheckbox.id = enableConditionalLogicLabel.htmlFor;
+        const conditionalLogicContainer = document.createElement('div');
+        conditionalLogicContainer.style.cssText = `
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+        `;
+        conditionalLogicContainer.appendChild(enableConditionalLogicCheckbox);
+        conditionalLogicContainer.appendChild(enableConditionalLogicLabel);
+        
+        // Conditional logic UI container
+        const conditionalLogicUIContainer = document.createElement('div');
+        conditionalLogicUIContainer.id = `conditionalLogic_existing_${triggerIndex}_${timeIndex}`;
+        conditionalLogicUIContainer.style.display = time.conditionalLogic.enabled ? 'block' : 'none';
+        
+        // Function to update conditional logic UI
+        const updateConditionalLogicUI = () => {
+          conditionalLogicUIContainer.innerHTML = '';
+          
+          if (!time.conditionalLogic.conditions || time.conditionalLogic.conditions.length === 0) {
+            time.conditionalLogic.conditions = [''];
+          }
+          
+          const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(trigger);
+          
+          time.conditionalLogic.conditions.forEach((condition, conditionIndex) => {
+            const conditionRow = document.createElement('div');
+            conditionRow.style.cssText = `
+              margin-bottom: 8px;
+              display: flex;
+              gap: 4px;
+              align-items: center;
+            `;
+            
+            const conditionDropdown = document.createElement('select');
+            conditionDropdown.style.cssText = `
+              flex: 1;
+              padding: 4px 8px;
+              border: 1px solid #ddd;
+              border-radius: 3px;
+              font-size: 12px;
+            `;
+            
+            // Add placeholder option
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Select checkbox option...';
+            conditionDropdown.appendChild(placeholderOption);
+            
+            // Add checkbox option node IDs
+            checkboxNodeIds.forEach(nodeId => {
+              const option = document.createElement('option');
+              option.value = nodeId;
+              option.textContent = nodeId;
+              if (condition === nodeId) {
+                option.selected = true;
+              }
+              conditionDropdown.appendChild(option);
+            });
+            
+            conditionDropdown.value = condition || '';
+            conditionDropdown.onchange = () => {
+              time.conditionalLogic.conditions[conditionIndex] = conditionDropdown.value;
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const removeConditionBtn = document.createElement('button');
+            removeConditionBtn.textContent = '×';
+            removeConditionBtn.style.cssText = `
+              background: #f44336;
+              color: white;
+              border: none;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 14px;
+              flex-shrink: 0;
+            `;
+            removeConditionBtn.onclick = () => {
+              if (time.conditionalLogic.conditions.length > 1) {
+                time.conditionalLogic.conditions.splice(conditionIndex, 1);
+                updateConditionalLogicUI();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              }
+            };
+            
+            conditionRow.appendChild(conditionDropdown);
+            conditionRow.appendChild(removeConditionBtn);
+            conditionalLogicUIContainer.appendChild(conditionRow);
+          });
+          
+          // Add Another Condition button
+          const addConditionBtn = document.createElement('button');
+          addConditionBtn.textContent = 'Add Another Condition';
+          addConditionBtn.style.cssText = `
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            width: 100%;
+            margin-top: 4px;
+          `;
+          addConditionBtn.onclick = () => {
+            if (!time.conditionalLogic.conditions) {
+              time.conditionalLogic.conditions = [];
+            }
+            time.conditionalLogic.conditions.push('');
+            updateConditionalLogicUI();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          conditionalLogicUIContainer.appendChild(addConditionBtn);
+        };
+        
+        enableConditionalLogicCheckbox.onchange = () => {
+          time.conditionalLogic.enabled = enableConditionalLogicCheckbox.checked;
+          conditionalLogicUIContainer.style.display = enableConditionalLogicCheckbox.checked ? 'block' : 'none';
+          if (enableConditionalLogicCheckbox.checked && (!time.conditionalLogic.conditions || time.conditionalLogic.conditions.length === 0)) {
+            time.conditionalLogic.conditions = [''];
+          }
+          updateConditionalLogicUI();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Initialize conditional logic UI if enabled
+        if (time.conditionalLogic.enabled) {
+          updateConditionalLogicUI();
+        }
+        
+        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Appending conditional logic containers to contentContainer');
+        contentContainer.appendChild(conditionalLogicContainer);
+        contentContainer.appendChild(conditionalLogicUIContainer);
+        
         contentContainer.appendChild(deleteTimeBtn);
+        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic UI should now be visible');
         
         // Copy ID button for existing time (positioned after delete button)
         const copyTimeIdBtn = document.createElement('button');

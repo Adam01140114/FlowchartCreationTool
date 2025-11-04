@@ -6,11 +6,89 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "How many",
-          "type": "numberedDropdown",
+          "text": "Are you the only person suing?",
+          "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "user_biz",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "are_you_the_only_person_suing",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "How many extra plantiffs",
+          "type": "numberedDropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              }
+            ]
           },
           "jump": {
             "enabled": false,
@@ -46,8 +124,8 @@
             "text": ""
           },
           "subtitle": {
-            "enabled": false,
-            "text": ""
+            "enabled": true,
+            "text": "Not including yourself"
           },
           "infoBox": {
             "enabled": false,
@@ -55,20 +133,20 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "how_many",
+          "nodeId": "how_many_extra_plantiffs",
           "min": "1",
           "max": "3",
           "allFieldsInOrder": [
             {
               "type": "label",
               "label": "Name",
-              "nodeId": "how_many_name",
+              "nodeId": "how_many_extra_plantiffs_name",
               "order": 1
             },
             {
               "type": "label",
               "label": "Phone Number",
-              "nodeId": "how_many_phone_number",
+              "nodeId": "how_many_extra_plantiffs_phone_number",
               "order": 2
             },
             {
@@ -95,6 +173,11 @@
                   "condition": "Yes",
                   "fields": [
                     {
+                      "type": "location",
+                      "fieldName": "Where did they file their fictitious business name",
+                      "nodeId": "location_data"
+                    },
+                    {
                       "type": "label",
                       "label": "Business Name",
                       "nodeId": "is_this_plaintiff_a_business_yes_business_name"
@@ -107,7 +190,7 @@
                     {
                       "type": "checkbox",
                       "fieldName": "What do they do business as?",
-                      "selectionType": "multiple",
+                      "selectionType": "single",
                       "options": [
                         {
                           "text": "An Individual",
@@ -134,19 +217,20 @@
                     {
                       "type": "date",
                       "label": "When does their business statement expire?",
-                      "nodeId": "is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"
-                    },
-                    {
-                      "type": "location",
-                      "fieldName": "Where did they file their fictitious business name",
-                      "nodeId": "location_data"
+                      "nodeId": "is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire",
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": [
+                          "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
+                        ]
+                      }
                     },
                     {
                       "type": "pdf",
                       "number": "1",
                       "pdfTitle": "SC-500",
                       "pdfName": "sc500.pdf",
-                      "priceId": "price_1S8afyFJeSRMFQ8XkAJHVYSv"
+                      "priceId": "1234"
                     }
                   ]
                 }
@@ -161,13 +245,13 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 2,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
-  "defaultPDFName": "SC-100",
-  "pdfOutputName": "sc100.pdf",
-  "stripePriceId": "price_1S8afyFJeSRMFQ8XkAJHVYSv",
+  "defaultPDFName": "",
+  "pdfOutputName": "",
+  "stripePriceId": "",
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],

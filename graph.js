@@ -842,10 +842,29 @@ function showPropertiesPopup(cell) {
   
   // For PDF nodes, only show the 3 required fields
   if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+    console.log('🔍 [PDF PROPERTIES DEBUG] Opening PDF properties popup for cell:', cell.id);
+    console.log('🔍 [PDF PROPERTIES DEBUG] Current cell PDF properties:', {
+      _pdfName: cell._pdfName,
+      _pdfFile: cell._pdfFile,
+      _pdfPrice: cell._pdfPrice,
+      _pdfUrl: cell._pdfUrl,
+      _priceId: cell._priceId
+    });
+    
+    const pdfNameValue = cell._pdfName || 'PDF Document';
+    const pdfFileValue = cell._pdfFile || '';
+    const pdfPriceValue = cell._pdfPrice || '';
+    
+    console.log('🔍 [PDF PROPERTIES DEBUG] Setting properties array with values:', {
+      pdfName: pdfNameValue,
+      pdfFile: pdfFileValue,
+      pdfPrice: pdfPriceValue
+    });
+    
     properties = [
-      { label: 'PDF Name', value: cell._pdfName || 'PDF Document', id: 'propPdfName', editable: true },
-      { label: 'PDF File', value: cell._pdfFile || '', id: 'propPdfFile', editable: true },
-      { label: 'PDF Price', value: cell._pdfPrice || '', id: 'propPdfPrice', editable: true }
+      { label: 'PDF Name', value: pdfNameValue, id: 'propPdfName', editable: true },
+      { label: 'PDF File', value: pdfFileValue, id: 'propPdfFile', editable: true },
+      { label: 'PDF Price', value: pdfPriceValue, id: 'propPdfPrice', editable: true }
     ];
   } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
     // For hidden checkbox nodes, only show Node ID
@@ -2643,6 +2662,17 @@ function showPropertiesPopup(cell) {
           // Debug logging for input creation
           console.log('🔍 [INPUT CREATION] Created input element with ID:', input.id, 'Value:', prop.value);
           
+          // Special debugging for PDF properties
+          if (prop.id === 'propPdfName' || prop.id === 'propPdfFile' || prop.id === 'propPdfPrice') {
+            console.log('🔍 [PDF PROPERTIES DEBUG] Creating input for', prop.id, {
+              propValue: prop.value,
+              inputValue: input.value,
+              cellProperty: prop.id === 'propPdfName' ? cell._pdfName : 
+                           prop.id === 'propPdfFile' ? cell._pdfFile : 
+                           prop.id === 'propPdfPrice' ? cell._pdfPrice : 'unknown'
+            });
+          }
+          
           if (isNodeText) {
             input.style.cssText = `
               width: 100%;
@@ -2674,8 +2704,26 @@ function showPropertiesPopup(cell) {
           
           const saveValue = () => {
             const newValue = input.value.trim();
+            console.log('🔍 [SAVE VALUE] Called for', prop.id, {
+              newValue: newValue,
+              oldPropValue: prop.value,
+              inputValue: input.value,
+              inputId: input.id
+            });
+            
             valueSpan.textContent = newValue;
             valueSpan.style.display = 'block';
+            
+            // Special debugging for PDF properties
+            if (prop.id === 'propPdfName' || prop.id === 'propPdfFile' || prop.id === 'propPdfPrice') {
+              console.log('🔍 [PDF PROPERTIES DEBUG] saveValue called for', prop.id, {
+                newValue: newValue,
+                currentCellValue: prop.id === 'propPdfName' ? cell._pdfName : 
+                                 prop.id === 'propPdfFile' ? cell._pdfFile : 
+                                 prop.id === 'propPdfPrice' ? cell._pdfPrice : 'unknown',
+                cellId: cell.id
+              });
+            }
             
             // For PDF Logic fields, keep the input element so it can be found by the save function
             const isPdfLogicField = prop.id && prop.id.startsWith('propPdf');
@@ -2847,6 +2895,60 @@ function showPropertiesPopup(cell) {
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
+                break;
+              case 'propPdfName':
+                console.log('🔍 [PDF PROPERTIES DEBUG] Saving propPdfName:', {
+                  oldValue: cell._pdfName,
+                  newValue: newValue,
+                  cellId: cell.id
+                });
+                cell._pdfName = newValue;
+                // Update PDF node display if function exists
+                if (typeof window.updatePdfNodeCell === 'function') {
+                  console.log('🔍 [PDF PROPERTIES DEBUG] Calling updatePdfNodeCell');
+                  window.updatePdfNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                console.log('🔍 [PDF PROPERTIES DEBUG] After saving propPdfName, cell._pdfName =', cell._pdfName);
+                break;
+              case 'propPdfFile':
+                console.log('🔍 [PDF PROPERTIES DEBUG] Saving propPdfFile:', {
+                  oldValue: cell._pdfFile,
+                  newValue: newValue,
+                  cellId: cell.id
+                });
+                cell._pdfFile = newValue;
+                // Update PDF node display if function exists
+                if (typeof window.updatePdfNodeCell === 'function') {
+                  console.log('🔍 [PDF PROPERTIES DEBUG] Calling updatePdfNodeCell');
+                  window.updatePdfNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                console.log('🔍 [PDF PROPERTIES DEBUG] After saving propPdfFile, cell._pdfFile =', cell._pdfFile);
+                break;
+              case 'propPdfPrice':
+                console.log('🔍 [PDF PROPERTIES DEBUG] Saving propPdfPrice:', {
+                  oldValue: cell._pdfPrice,
+                  newValue: newValue,
+                  cellId: cell.id
+                });
+                cell._pdfPrice = newValue;
+                // Update PDF node display if function exists
+                if (typeof window.updatePdfNodeCell === 'function') {
+                  console.log('🔍 [PDF PROPERTIES DEBUG] Calling updatePdfNodeCell');
+                  window.updatePdfNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                console.log('🔍 [PDF PROPERTIES DEBUG] After saving propPdfPrice, cell._pdfPrice =', cell._pdfPrice);
                 break;
             }
             
@@ -3109,6 +3211,87 @@ function showPropertiesPopup(cell) {
   // Clean up event listeners when popup closes
   const originalClosePopup = closePopup;
   const newClosePopup = () => {
+    console.log('🔍 [PDF PROPERTIES DEBUG] Closing popup for cell:', cell.id);
+    console.log('🔍 [PDF PROPERTIES DEBUG] Cell properties before close:', {
+      _pdfName: cell._pdfName,
+      _pdfFile: cell._pdfFile,
+      _pdfPrice: cell._pdfPrice
+    });
+    
+    // Save any PDF properties that might be in input fields but not yet saved
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+      console.log('🔍 [PDF PROPERTIES DEBUG] This is a PDF node, checking for unsaved values');
+      
+      // Check for PDF Name input
+      const pdfNameInput = document.getElementById('propPdfName_input');
+      if (pdfNameInput) {
+        const pdfNameValue = pdfNameInput.value.trim();
+        console.log('🔍 [PDF PROPERTIES DEBUG] Found propPdfName_input with value:', pdfNameValue);
+        if (pdfNameValue !== cell._pdfName) {
+          console.log('🔍 [PDF PROPERTIES DEBUG] Saving propPdfName on close:', {
+            oldValue: cell._pdfName,
+            newValue: pdfNameValue
+          });
+          cell._pdfName = pdfNameValue;
+          if (typeof window.updatePdfNodeCell === 'function') {
+            window.updatePdfNodeCell(cell);
+          }
+        }
+      } else {
+        console.log('🔍 [PDF PROPERTIES DEBUG] propPdfName_input not found');
+      }
+      
+      // Check for PDF File input
+      const pdfFileInput = document.getElementById('propPdfFile_input');
+      if (pdfFileInput) {
+        const pdfFileValue = pdfFileInput.value.trim();
+        console.log('🔍 [PDF PROPERTIES DEBUG] Found propPdfFile_input with value:', pdfFileValue);
+        if (pdfFileValue !== cell._pdfFile) {
+          console.log('🔍 [PDF PROPERTIES DEBUG] Saving propPdfFile on close:', {
+            oldValue: cell._pdfFile,
+            newValue: pdfFileValue
+          });
+          cell._pdfFile = pdfFileValue;
+          if (typeof window.updatePdfNodeCell === 'function') {
+            window.updatePdfNodeCell(cell);
+          }
+        }
+      } else {
+        console.log('🔍 [PDF PROPERTIES DEBUG] propPdfFile_input not found');
+      }
+      
+      // Check for PDF Price input
+      const pdfPriceInput = document.getElementById('propPdfPrice_input');
+      if (pdfPriceInput) {
+        const pdfPriceValue = pdfPriceInput.value.trim();
+        console.log('🔍 [PDF PROPERTIES DEBUG] Found propPdfPrice_input with value:', pdfPriceValue);
+        if (pdfPriceValue !== cell._pdfPrice) {
+          console.log('🔍 [PDF PROPERTIES DEBUG] Saving propPdfPrice on close:', {
+            oldValue: cell._pdfPrice,
+            newValue: pdfPriceValue
+          });
+          cell._pdfPrice = pdfPriceValue;
+          if (typeof window.updatePdfNodeCell === 'function') {
+            window.updatePdfNodeCell(cell);
+          }
+        }
+      } else {
+        console.log('🔍 [PDF PROPERTIES DEBUG] propPdfPrice_input not found');
+      }
+      
+      console.log('🔍 [PDF PROPERTIES DEBUG] Cell properties after close save:', {
+        _pdfName: cell._pdfName,
+        _pdfFile: cell._pdfFile,
+        _pdfPrice: cell._pdfPrice
+      });
+      
+      // Trigger autosave after saving PDF properties
+      if (typeof window.requestAutosave === 'function') {
+        console.log('🔍 [PDF PROPERTIES DEBUG] Triggering autosave');
+        window.requestAutosave();
+      }
+    }
+    
     // Auto-save Big Paragraph PDF Logic if enabled
     if (cell._pdfLogicEnabled && typeof window.saveBigParagraphPdfLogic === 'function') {
       window.saveBigParagraphPdfLogic(cell);

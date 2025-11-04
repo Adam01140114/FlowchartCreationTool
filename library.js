@@ -361,7 +361,7 @@ window.exportGuiJson = function(download = true) {
             });
           } else if (item.type === 'location') {
             // Create a single location entry instead of expanding into individual fields
-            allFieldsInOrder.push({
+              allFieldsInOrder.push({
               type: "location",
               fieldName: cell._locationTitle || "",
               nodeId: "location_data",
@@ -912,7 +912,7 @@ window.exportGuiJson = function(download = true) {
               });
             } else if (item.type === 'location') {
               // Create a single location entry instead of expanding into individual fields
-              allFieldsInOrder.push({
+                allFieldsInOrder.push({
                 type: "location",
                 fieldName: cell._locationTitle || "",
                 nodeId: "location_data",
@@ -1027,11 +1027,21 @@ window.exportGuiJson = function(download = true) {
                       } else if (orderItem.type === 'time') {
                         const time = timeMap.get(orderItem.identifier);
                         if (time) {
-                          fields.push({
+                          const dateField = {
                             type: "date",
                             label: time.fieldName || "",
                             nodeId: time.nodeId || ""
-                          });
+                          };
+                          
+                          // Include conditional logic if it exists
+                          if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                            dateField.conditionalLogic = {
+                              enabled: time.conditionalLogic.enabled,
+                              conditions: time.conditionalLogic.conditions || []
+                            };
+                          }
+                          
+                          fields.push(dateField);
                         }
                       } else if (orderItem.type === 'location') {
                         const location = locationMap.get(orderItem.identifier);
@@ -1098,11 +1108,21 @@ window.exportGuiJson = function(download = true) {
                         if (!timeMap.has(time.fieldName || '')) {
                           const existingField = fields.find(f => f.type === 'date' && f.label === time.fieldName);
                           if (!existingField) {
-                            fields.push({
+                            const dateField = {
                               type: "date",
                               label: time.fieldName || "",
                               nodeId: time.nodeId || ""
-                            });
+                            };
+                            
+                            // Include conditional logic if it exists
+                            if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                              dateField.conditionalLogic = {
+                                enabled: time.conditionalLogic.enabled,
+                                conditions: time.conditionalLogic.conditions || []
+                              };
+                            }
+                            
+                            fields.push(dateField);
                           }
                         }
                       });
@@ -1171,16 +1191,26 @@ window.exportGuiJson = function(download = true) {
                       });
                     }
                     
-                    // Add times
-                    if (trigger.times && trigger.times.length > 0) {
-                      trigger.times.forEach(time => {
-                        fields.push({
-                          type: "date",
-                          label: time.fieldName || "",
-                          nodeId: time.nodeId || ""
-                        });
-                      });
-                    }
+              // Add times
+              if (trigger.times && trigger.times.length > 0) {
+                trigger.times.forEach(time => {
+                  const dateField = {
+                    type: "date",
+                    label: time.fieldName || "",
+                    nodeId: time.nodeId || ""
+                  };
+                  
+                  // Include conditional logic if it exists
+                  if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                    dateField.conditionalLogic = {
+                      enabled: time.conditionalLogic.enabled,
+                      conditions: time.conditionalLogic.conditions || []
+                    };
+                  }
+                  
+                  fields.push(dateField);
+                });
+              }
                     
                     // Add locations
                     if (trigger.locations && trigger.locations.length > 0) {
@@ -1334,18 +1364,18 @@ window.exportGuiJson = function(download = true) {
         question.labels = [];
         question.amounts = [];
         question.labelNodeIds = [];
-        
-        // Extract min and max from _twoNumbers
-        if (cell._twoNumbers) {
-          question.min = cell._twoNumbers.first || "1";
-          question.max = cell._twoNumbers.second || "1";
-        } else {
-          question.min = "1";
-          question.max = "1";
-        }
-        
-        // Add nodeId for numberedDropdown (with PDF prefix if available)
-        question.nodeId = nodeId;
+      
+      // Extract min and max from _twoNumbers
+      if (cell._twoNumbers) {
+        question.min = cell._twoNumbers.first || "1";
+        question.max = cell._twoNumbers.second || "1";
+      } else {
+        question.min = "1";
+        question.max = "1";
+      }
+      
+      // Add nodeId for numberedDropdown (with PDF prefix if available)
+      question.nodeId = nodeId;
         
         question.allFieldsInOrder = [];
       }

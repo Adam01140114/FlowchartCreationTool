@@ -1709,11 +1709,35 @@ formHTML += `</div><br></div>`;
                         });
                       } else if (dateLabelEl && dateNodeIdEl) {
                         // Trigger date field
-                        triggerFields.push({
+                        const dateField = {
                           type: 'date',
                           label: dateLabelEl.value.trim(),
                           nodeId: dateNodeIdEl.value.trim()
-                        });
+                        };
+                        
+                        // Check for conditional logic from window.triggerDateConditionalLogic
+                        const triggerFieldCount = fieldIndex + 1;
+                        const conditionalLogicKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checking for conditional logic - key:', conditionalLogicKey);
+                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] window.triggerDateConditionalLogic exists:', !!window.triggerDateConditionalLogic);
+                        if (window.triggerDateConditionalLogic) {
+                          console.log('🔍 [CONDITIONAL LOGIC DEBUG] Available keys:', Object.keys(window.triggerDateConditionalLogic));
+                        }
+                        if (window.triggerDateConditionalLogic && window.triggerDateConditionalLogic[conditionalLogicKey]) {
+                          const storedLogic = window.triggerDateConditionalLogic[conditionalLogicKey];
+                          console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found conditional logic:', storedLogic);
+                          if (storedLogic.enabled && storedLogic.conditions && storedLogic.conditions.length > 0) {
+                            dateField.conditionalLogic = {
+                              enabled: storedLogic.enabled,
+                              conditions: storedLogic.conditions.filter(c => c && c.trim() !== '')
+                            };
+                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] ✅ Added conditionalLogic to dateField:', dateField.conditionalLogic);
+                          }
+                        } else {
+                          console.log('🔍 [CONDITIONAL LOGIC DEBUG] ❌ No conditional logic found for key:', conditionalLogicKey);
+                        }
+                        
+                        triggerFields.push(dateField);
                       } else {
                         // Check for trigger PDF field
                         const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
@@ -1742,18 +1766,18 @@ formHTML += `</div><br></div>`;
                             priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
                           });
                         } else {
-                          // Check for trigger location field (simplified "Location Data Added" format)
-                          const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
-                          if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
-                            // This is a trigger location field
-                            // Read custom title if present
-                            const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
-                            const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
-                            triggerFields.push({
-                              type: 'location',
-                              fieldName: locationTitle || 'Location Data',
-                              nodeId: 'location_data'
-                            });
+                        // Check for trigger location field (simplified "Location Data Added" format)
+                        const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
+                        if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
+                          // This is a trigger location field
+                          // Read custom title if present
+                          const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
+                          const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
+                          triggerFields.push({
+                            type: 'location',
+                            fieldName: locationTitle || 'Location Data',
+                            nodeId: 'location_data'
+                          });
                           }
                         }
                       }
@@ -2550,7 +2574,19 @@ if (s > 1){
         triggerContainer.appendChild(checkboxFieldDiv);
       } else if (triggerField.type === 'date') {
         const fieldDiv = document.createElement('div');
-        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        // Check if conditional logic is enabled
+        const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
+        const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+        
+        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Date field - hasConditionalLogic:', hasConditionalLogic, 'conditions:', conditionalConditions);
+        
+        // Initially hide if conditional logic is enabled
+        if (hasConditionalLogic) {
+          fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: none; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        } else {
+          fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        }
         
         const label = document.createElement('label');
         label.textContent = triggerField.label + ":";
@@ -2581,6 +2617,75 @@ if (s > 1){
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         triggerContainer.appendChild(fieldDiv);
+        
+        // Add conditional logic if enabled
+        if (hasConditionalLogic && conditionalConditions.length > 0) {
+          // CRITICAL: Ensure field is hidden immediately after appending
+          fieldDiv.style.display = 'none';
+          
+          // Function to check if any condition is met
+          const checkConditionalLogic = () => {
+            let anyMatch = false;
+            
+            conditionalConditions.forEach((conditionNodeId) => {
+              if (!conditionNodeId) return;
+              
+              // Find the checkbox with this nodeId for this entry number
+              const checkboxId = conditionNodeId + "_" + entryNumber;
+              const checkbox = document.getElementById(checkboxId);
+              
+              if (checkbox && checkbox.checked) {
+                anyMatch = true;
+              }
+            });
+            
+            // Show or hide the date field based on match
+            if (anyMatch) {
+              fieldDiv.style.display = 'flex';
+            } else {
+              fieldDiv.style.display = 'none';
+            }
+          };
+          
+          // Set up event listeners for each condition checkbox
+          conditionalConditions.forEach((conditionNodeId) => {
+            if (!conditionNodeId) return;
+            
+            const checkboxId = conditionNodeId + "_" + entryNumber;
+            
+            // Function to attach listener when checkbox is created
+            const attachListener = (attemptCount = 0) => {
+              const maxAttempts = 50; // Try for up to 5 seconds (50 * 100ms)
+              const checkbox = document.getElementById(checkboxId);
+              
+              if (checkbox) {
+                const newCheckConditionalLogic = () => {
+                  checkConditionalLogic();
+                };
+                
+                checkbox.addEventListener('change', newCheckConditionalLogic);
+                checkbox.addEventListener('click', newCheckConditionalLogic);
+                
+                // Also check initial state
+                checkConditionalLogic();
+              } else if (attemptCount < maxAttempts) {
+                // Retry after a short delay if checkbox doesn't exist yet
+                setTimeout(() => attachListener(attemptCount + 1), 100);
+              } else {
+                console.error('🔍 [CONDITIONAL LOGIC DEBUG] ❌ Failed to find checkbox after', maxAttempts, 'attempts. Checkbox ID:', checkboxId);
+              }
+            };
+            
+            // Start trying to attach listener
+            attachListener();
+          });
+          
+          // Check on initial load with delays to catch different timing scenarios
+          setTimeout(() => checkConditionalLogic(), 100);
+          setTimeout(() => checkConditionalLogic(), 500);
+          setTimeout(() => checkConditionalLogic(), 1000);
+          setTimeout(() => checkConditionalLogic(), 2000);
+        }
       } else if (triggerField.type === 'location') {
         // Handle simplified location field format ("Location Data Added")
         // Create location field container
@@ -9744,7 +9849,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
   }
-  
+
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>`;
 

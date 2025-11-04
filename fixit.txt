@@ -880,3 +880,489 @@ function makePopupDraggable(popup) {
 ```
 
 =====================================
+
+INCIDENT: Conditional Logic Implementation Documentation
+DATE: [Current Date]
+ISSUE ID: CONDITIONAL_LOGIC_DOC_001
+
+PURPOSE:
+========
+This documentation explains how conditional logic works in the FormWiz GUI system. Conditional logic allows questions to be shown or hidden based on answers to previous questions. This documentation is intended to serve as a reference when implementing conditional logic for new question types.
+
+OVERVIEW:
+=========
+Conditional logic in FormWiz uses a "show if" pattern:
+- A question can have conditional logic enabled
+- When enabled, the question is hidden by default
+- The question is shown only when specific conditions are met
+- Conditions are based on answers to previous questions
+- Multiple conditions can be combined with OR logic (if ANY condition matches, show the question)
+
+EXAMPLE SCENARIO:
+=================
+Given this JSON configuration:
+```json
+{
+  "questionId": 1,
+  "text": "Hungry?",
+  "type": "dropdown",
+  "logic": {
+    "enabled": false,
+    "conditions": []
+  },
+  "options": ["Yes", "No"]
+},
+{
+  "questionId": 2,
+  "text": "Thirsty?",
+  "type": "dropdown",
+  "logic": {
+    "enabled": true,
+    "conditions": [
+      {
+        "prevQuestion": "1",
+        "prevAnswer": "Yes"
+      }
+    ]
+  },
+  "options": ["Yes", "No"]
+},
+{
+  "questionId": 3,
+  "text": "Sleepy?",
+  "type": "dropdown",
+  "logic": {
+    "enabled": true,
+    "conditions": [
+      {
+        "prevQuestion": "1",
+        "prevAnswer": "No"
+      }
+    ]
+  },
+  "options": ["Yes", "No"]
+}
+```
+
+Result:
+- Question 1 ("Hungry?") is always visible (no conditional logic)
+- Question 2 ("Thirsty?") is hidden until user selects "Yes" in Question 1
+- Question 3 ("Sleepy?") is hidden until user selects "No" in Question 1
+
+JSON STRUCTURE:
+===============
+The conditional logic configuration is stored in the question object:
+
+```json
+{
+  "questionId": 2,
+  "logic": {
+    "enabled": true,           // Boolean: Is conditional logic enabled?
+    "conditions": [            // Array: List of conditions (OR logic)
+      {
+        "prevQuestion": "1",   // String: ID of the previous question to check
+        "prevAnswer": "Yes"    // String: Answer value that triggers this question
+      }
+    ]
+  }
+}
+```
+
+KEY PROPERTIES:
+---------------
+- `logic.enabled`: Boolean flag indicating if conditional logic is active
+- `logic.conditions`: Array of condition objects
+- `condition.prevQuestion`: Question ID (as string) of the question to check
+- `condition.prevAnswer`: Answer value (as string) that must match
+
+IMPLEMENTATION FLOW:
+====================
+
+PHASE 1: GUI CONFIGURATION (gui.js)
+------------------------------------
+Location: FormWiz GUI/gui.js
+
+1. USER INTERFACE SETUP:
+   - When user enables conditional logic checkbox, a UI is shown
+   - User can add multiple condition rows
+   - Each row has:
+     - "Previous Question" input: User enters question number (e.g., "1")
+     - "Previous Answer" dropdown: Populated based on selected question type
+
+2. QUESTION TYPE DETECTION:
+   Function: `updateLogicAnswersForRow(questionId, conditionIndex)`
+   - Reads the question number from input field
+   - Finds the target question block: `document.getElementById('questionBlock' + prevQNum)`
+   - Gets question type: `targetQuestionBlock.querySelector('#questionType' + prevQNum)?.value`
+
+3. ANSWER OPTIONS POPULATION:
+   Based on question type, different options are populated:
+   
+   - **Radio/Yes-No**: Shows "Yes" and "No" options
+   - **Dropdown**: Iterates through dropdown options from the question
+   - **Checkbox**: Shows all checkbox options + "None of the above" if enabled
+   - **Numbered Dropdown**: Shows range of numbers (min to max)
+   - **Text/Date/Money**: Hides dropdown, shows label "Will trigger when any text is entered"
+
+4. CONDITION DATA STORAGE:
+   When user saves the form, conditions are extracted:
+   ```javascript
+   const logicRows = qBlock.querySelectorAll(".logic-condition-row");
+   logicRows.forEach((row, index) => {
+     const prevQuestion = row.querySelector(`#prevQuestion${questionId}_${index+1}`).value;
+     const prevAnswer = row.querySelector(`#prevAnswer${questionId}_${index+1}`).value;
+     conditions.push({ prevQuestion, prevAnswer });
+   });
+   ```
+
+PHASE 2: HTML GENERATION (generate.js)
+---------------------------------------
+Location: FormWiz GUI/generate.js
+Lines: ~1956-2054
+
+1. HTML STRUCTURE CREATION:
+   - Each question is wrapped in a container: `<div id="question-container-{questionId}">`
+   - Questions with conditional logic get the "hidden" class initially:
+     ```html
+     <div id="question-container-2" class="question-container hidden">
+     ```
+
+2. JAVASCRIPT GENERATION:
+   For each question with conditional logic enabled, a self-executing function is generated:
+
+   ```javascript
+   (function(){
+     var thisQ = document.getElementById("question-container-2");
+     
+     function updateVisibility(){
+       var anyMatch = false;
+       
+       // For each condition, check if it matches
+       (function(){
+         var cPrevType = "dropdown";
+         var cPrevAns = "yes";
+         var cPrevQNum = "1";
+         
+         if(cPrevType === "checkbox"){
+           // Checkbox handling (see below)
+         } else {
+           // Other question types (see below)
+         }
+       })();
+       
+       // Show or hide based on match
+       if(anyMatch){
+         thisQ.classList.remove("hidden");
+       } else {
+         thisQ.classList.add("hidden");
+       }
+     }
+     
+     // Attach event listeners to trigger question
+     // Call updateVisibility() on page load
+   })();
+   ```
+
+3. CONDITION CHECKING LOGIC:
+   
+   A. CHECKBOX QUESTIONS:
+   ```javascript
+   if(cPrevType === "checkbox"){
+     var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+     var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+     var checkedVals = [];
+     for(var cc=0; cc<cbs.length; cc++){
+       if(cbs[cc].checked) {
+         checkedVals.push(cbs[cc].value.trim().toLowerCase());
+       }
+     }
+     if(checkedVals.indexOf(cPrevAns) !== -1){
+       anyMatch = true;
+     }
+   }
+   ```
+   
+   B. DROPDOWN/TEXT/OTHER QUESTIONS:
+   ```javascript
+   else {
+     var el2 = document.getElementById(questionNameIds[cPrevQNum]) || 
+               document.getElementById("answer" + cPrevQNum);
+     if(el2){
+       var val2 = el2.value.trim().toLowerCase();
+       if(val2 === cPrevAns){
+         anyMatch = true;
+       }
+     }
+   }
+   ```
+
+4. ELEMENT IDENTIFICATION:
+   The system uses a `questionNameIds` object to map question IDs to their actual DOM element IDs:
+   ```javascript
+   var questionNameIds = {"1":"hungry","2":"thristy","3":"sleepy"};
+   ```
+   
+   Element lookup priority:
+   1. `document.getElementById(questionNameIds[questionId])` - Preferred (uses nameId)
+   2. `document.getElementById("answer" + questionId)` - Fallback (uses default ID)
+
+5. EVENT LISTENER ATTACHMENT:
+   After generating the condition checking logic, event listeners are attached to the trigger question:
+   
+   ```javascript
+   // For checkbox questions
+   var questionContainer = document.getElementById('question-container-' + selectQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0; i<cbs.length; i++){
+     cbs[i].addEventListener("change", function(){ updateVisibility(); });
+   }
+   
+   // For dropdown/select questions
+   var el3 = document.getElementById(questionNameIds[selectQuestion]) || 
+             document.getElementById("answer" + selectQuestion);
+   if(el3){
+     el3.addEventListener("change", function(){ updateVisibility(); });
+   }
+   
+   // For text input questions
+   var el3 = document.getElementById(questionNameIds[textQuestion]) || 
+             document.getElementById("answer" + textQuestion);
+   if(el3){
+     el3.addEventListener("input", function(){ updateVisibility(); });
+   }
+   ```
+
+6. INITIAL VISIBILITY CHECK:
+   After all event listeners are attached, `updateVisibility()` is called immediately:
+   ```javascript
+   updateVisibility();
+   ```
+   This ensures questions are shown/hidden correctly on page load.
+
+PHASE 3: RUNTIME EXECUTION (Generated HTML)
+--------------------------------------------
+Location: Generated output.html
+
+1. PAGE LOAD:
+   - All question containers are rendered
+   - Questions with conditional logic have "hidden" class
+   - Self-executing functions run immediately
+   - `updateVisibility()` is called for each conditional question
+   - Initial visibility is set based on current form state
+
+2. USER INTERACTION:
+   When user changes an answer in a trigger question:
+   - Event listener fires (change event for dropdowns, input event for text)
+   - `updateVisibility()` function is called
+   - All conditions are checked
+   - If ANY condition matches (`anyMatch = true`), question is shown
+   - If NO conditions match (`anyMatch = false`), question is hidden
+
+3. MULTIPLE CONDITIONS (OR LOGIC):
+   If a question has multiple conditions:
+   ```json
+   "conditions": [
+     {"prevQuestion": "1", "prevAnswer": "Yes"},
+     {"prevQuestion": "2", "prevAnswer": "No"}
+   ]
+   ```
+   The question is shown if EITHER condition matches (OR logic).
+
+SPECIAL CASES:
+==============
+
+1. TEXT/INPUT QUESTIONS:
+   - For text, date, money, and dateRange questions, there are no predefined options
+   - Special condition values are used: "Any Text", "Any Amount", "Any Date"
+   - These check for presence of any value, not exact match:
+   ```javascript
+   if(paVal.toLowerCase() === "any text" || 
+      paVal.toLowerCase() === "any amount" || 
+      paVal.toLowerCase() === "any date"){
+     if(el2){
+       var val2 = el2.value.trim();
+       if(val2 !== ""){
+         anyMatch = true;
+       }
+     }
+   }
+   ```
+
+2. CHECKBOX QUESTIONS:
+   - Checkboxes can have multiple checked options
+   - The system checks if ANY checked option matches the condition
+   - Works for both regular checkboxes and "Mark Only One" (radio buttons)
+
+3. NUMBERED DROPDOWN QUESTIONS:
+   - Condition answer is compared as a string (e.g., "1", "2", "3")
+   - The actual value in the form is the selected number from the range
+
+4. CASE INSENSITIVITY:
+   - All comparisons use `.toLowerCase()` for case-insensitive matching
+   - "Yes" matches "yes", "YES", "YeS", etc.
+
+5. QUESTION NAME IDS:
+   - The `questionNameIds` object maps question IDs to their actual DOM element IDs
+   - This allows questions to have custom IDs (from `nameId` field) instead of default "answer{N}"
+   - Lookup tries `questionNameIds[questionId]` first, then falls back to `"answer" + questionId`
+
+VISIBILITY CSS:
+===============
+The "hidden" class is defined in the generated HTML:
+```css
+.hidden {
+  display: none !important;
+}
+```
+
+When a condition matches:
+- `thisQ.classList.remove("hidden")` - Shows the question
+When no conditions match:
+- `thisQ.classList.add("hidden")` - Hides the question
+
+IMPLEMENTING CONDITIONAL LOGIC FOR NEW QUESTION TYPES:
+=======================================================
+
+STEP 1: UPDATE GUI CONFIGURATION (gui.js)
+------------------------------------------
+1. In `updateLogicAnswersForRow()` function, add handling for your new question type:
+   ```javascript
+   } else if (questionType === 'yourNewType') {
+     // Populate answer options based on your question type
+     const options = getOptionsForYourNewType(prevQNum);
+     options.forEach(option => {
+       const optionEl = document.createElement('option');
+       optionEl.value = option;
+       optionEl.textContent = option;
+       answerSelect.appendChild(optionEl);
+     });
+   }
+   ```
+
+STEP 2: UPDATE HTML GENERATION (generate.js)
+---------------------------------------------
+1. In the condition checking logic (around line 1985), add handling:
+   ```javascript
+   } else if (cPrevType === "yourNewType") {
+     // Add logic to check if condition matches
+     var el2 = document.getElementById(questionNameIds[cPrevQNum]) || 
+               document.getElementById("answer" + cPrevQNum);
+     if(el2){
+       var val2 = el2.value.trim().toLowerCase();
+       if(val2 === cPrevAns){
+         anyMatch = true;
+       }
+     }
+   }
+   ```
+
+2. In the event listener attachment section (around line 2030), add handling:
+   ```javascript
+   } else if (pType2 === "yourNewType") {
+     logicScriptBuffer += ` (function(){\n`;
+     logicScriptBuffer += `   var yourNewTypeQuestion = "${pqVal2}";\n`;
+     logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[yourNewTypeQuestion]) || document.getElementById("answer"+yourNewTypeQuestion);\n`;
+     logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
+     logicScriptBuffer += ` })();\n`;
+   }
+   ```
+   
+   Note: Use "change" event for dropdowns/selects, "input" event for text fields
+
+STEP 3: ENSURE PROPER ELEMENT IDS
+-----------------------------------
+1. Make sure your question type generates elements with proper IDs
+2. The ID should either:
+   - Be stored in `questionNameIds` object (if using `nameId` field)
+   - Or follow the pattern `"answer" + questionId`
+
+STEP 4: TEST THOROUGHLY
+------------------------
+1. Test with multiple conditions (OR logic)
+2. Test with different answer values
+3. Test case sensitivity
+4. Test on page load (initial visibility)
+5. Test when user changes answers
+6. Test with multiple questions depending on the same trigger question
+
+COMMON PITFALLS:
+================
+
+1. WRONG EVENT TYPE:
+   - Using "input" for dropdowns (should use "change")
+   - Using "change" for text fields (should use "input")
+   - Solution: Check what type of element your question generates
+
+2. WRONG ELEMENT ID:
+   - Not using `questionNameIds` lookup
+   - Hardcoding element IDs
+   - Solution: Always use: `questionNameIds[questionId] || "answer" + questionId`
+
+3. CASE SENSITIVITY:
+   - Forgetting to use `.toLowerCase()` in comparisons
+   - Solution: Always compare lowercased values
+
+4. CHECKBOX HANDLING:
+   - Treating checkboxes like dropdowns
+   - Solution: Use special checkbox handling that checks all checked values
+
+5. INITIAL VISIBILITY:
+   - Forgetting to call `updateVisibility()` on page load
+   - Solution: Always include `updateVisibility();` after event listener setup
+
+DEBUGGING:
+==========
+The generated code includes console.log statements for debugging:
+```javascript
+console.log('🔧 [CONDITIONAL DEBUG] Question 1: Found', cbs.length, 'inputs in container, looking for:', cPrevAns);
+console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);
+console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');
+```
+
+To debug conditional logic:
+1. Open browser console
+2. Change answers in trigger questions
+3. Look for conditional debug messages
+4. Check if `anyMatch` is being set correctly
+5. Verify element IDs are correct
+6. Check if event listeners are firing
+
+SUMMARY:
+========
+Conditional logic in FormWiz works by:
+1. Storing conditions in JSON (prevQuestion, prevAnswer)
+2. Generating JavaScript that checks conditions on page load and when answers change
+3. Using CSS class "hidden" to show/hide questions
+4. Supporting OR logic (multiple conditions, any can match)
+5. Using case-insensitive matching
+6. Supporting special question types (checkbox, text, etc.)
+
+KEY FILES:
+==========
+- FormWiz GUI/gui.js: GUI configuration and condition setup
+- FormWiz GUI/generate.js: HTML/JavaScript generation (lines ~1956-2054)
+- Generated output.html: Runtime execution
+
+KEY FUNCTIONS:
+==============
+- `updateLogicAnswersForRow()`: Populates answer options based on question type
+- Condition checking logic: Generated in `generate.js`, executed in output.html
+- `updateVisibility()`: Shows/hides questions based on conditions
+
+RELATED FILES:
+=============
+- FormWiz GUI/gui.js (GUI configuration)
+- FormWiz GUI/generate.js (HTML generation)
+- FormWiz GUI/output.html (generated form with runtime logic)
+
+FUTURE REFERENCE:
+=================
+When implementing conditional logic for new question types:
+1. Add question type handling in `updateLogicAnswersForRow()` in gui.js
+2. Add condition checking logic in generate.js (around line 1985)
+3. Add event listener attachment in generate.js (around line 2030)
+4. Ensure proper element IDs are generated
+5. Test thoroughly with multiple conditions and scenarios
+6. Use the debugging console.log statements to verify behavior
+
+=====================================

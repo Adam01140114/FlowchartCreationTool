@@ -731,12 +731,124 @@ function loadFormData(formData) {
                                                             }
                                                             addTriggerDate(question.questionId, fieldOrder, sequenceIndex + 1);
                                                             
+                                                            // Calculate the correct triggerFieldCount by finding the date field we just created
+                                                            // The field count is based on the number of fields in the container
+                                                            const triggerFieldsContainer = document.getElementById(`triggerFields${question.questionId}_${fieldOrder}_${sequenceIndex + 1}`);
+                                                            let triggerFieldCount = triggerFieldIndex + 1;
+                                                            
+                                                            // Try to find the actual field count by matching the nodeId
+                                                            if (triggerFieldsContainer) {
+                                                                const allFields = triggerFieldsContainer.querySelectorAll('[class*="trigger-field-"]');
+                                                                for (let i = 0; i < allFields.length; i++) {
+                                                                    const fieldEl = allFields[i];
+                                                                    const nodeIdInput = fieldEl.querySelector(`#triggerDateNodeId${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${i + 1}`);
+                                                                    if (nodeIdInput && nodeIdInput.value === triggerField.nodeId) {
+                                                                        triggerFieldCount = i + 1;
+                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found date field at index:', triggerFieldCount);
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                            
                                                             // Set the trigger date field values
-                                                            const triggerDateLabelEl = document.getElementById('triggerDateLabel' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
-                                                            const triggerDateNodeIdEl = document.getElementById('triggerDateNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
+                                                            const triggerDateLabelEl = document.getElementById('triggerDateLabel' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
+                                                            const triggerDateNodeIdEl = document.getElementById('triggerDateNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
                                                             
                                                             if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                             if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
+                                                            
+                                                            // Restore conditional logic if enabled
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checking for conditional logic in triggerField:', triggerField);
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Using triggerFieldCount:', triggerFieldCount);
+                                                            if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic enabled, restoring...');
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditions:', triggerField.conditionalLogic.conditions);
+                                                                
+                                                                // Initialize the data structure first
+                                                                const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                                if (!window.triggerDateConditionalLogic) {
+                                                                    window.triggerDateConditionalLogic = {};
+                                                                }
+                                                                window.triggerDateConditionalLogic[key] = {
+                                                                    enabled: true,
+                                                                    conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                                };
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Initialized data structure:', window.triggerDateConditionalLogic[key]);
+                                                                
+                                                                setTimeout(() => {
+                                                                    const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogic${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Looking for checkbox with ID: enableConditionalLogic' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox found:', !!enableConditionalLogicCheckbox);
+                                                                    
+                                                                    if (enableConditionalLogicCheckbox) {
+                                                                        enableConditionalLogicCheckbox.checked = true;
+                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked, triggering change event...');
+                                                                        
+                                                                        // Manually trigger the change event to update the UI
+                                                                        const event = new Event('change');
+                                                                        enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                        
+                                                                        // Set the conditions after a delay to ensure UI is ready
+                                                                        setTimeout(() => {
+                                                                            if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Updating UI with conditions...');
+                                                                                
+                                                                                // Update the UI with the conditions
+                                                                                if (typeof updateTriggerDateConditionalLogicUI === 'function') {
+                                                                                    updateTriggerDateConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                    
+                                                                                    // Set the condition values after UI is updated
+                                                                                    setTimeout(() => {
+                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting condition dropdown values...');
+                                                                                        triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting condition', condIndex, ':', condition);
+                                                                                            
+                                                                                            // Add condition if needed
+                                                                                            if (condIndex > 0) {
+                                                                                                const addConditionBtn = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                                if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Clicking "Add Another Condition" button...');
+                                                                                                    addConditionBtn.click();
+                                                                                                    // Wait a bit for the new dropdown to be created
+                                                                                                    setTimeout(() => {
+                                                                                                        const conditionDropdown = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                                        if (conditionDropdown) {
+                                                                                                            conditionDropdown.value = condition;
+                                                                                                            conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set condition', condIndex, 'to:', condition);
+                                                                                                        } else {
+                                                                                                            console.error('🔍 [CONDITIONAL LOGIC DEBUG] Condition dropdown not found for index', condIndex);
+                                                                                                        }
+                                                                                                    }, 100);
+                                                                                                    return;
+                                                                                                }
+                                                                                            }
+                                                                                            
+                                                                                            // Set the condition value for the first condition or after adding
+                                                                                            setTimeout(() => {
+                                                                                                const conditionDropdown = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                                if (conditionDropdown) {
+                                                                                                    conditionDropdown.value = condition;
+                                                                                                    conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set condition', condIndex, 'to:', condition);
+                                                                                                } else {
+                                                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG] Condition dropdown not found for index', condIndex);
+                                                                                                }
+                                                                                            }, 150 * (condIndex + 1));
+                                                                                        });
+                                                                                    }, 300);
+                                                                                } else {
+                                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDateConditionalLogicUI function not found!');
+                                                                                }
+                                                                            }
+                                                                        }, 400);
+                                                                    } else {
+                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Enable conditional logic checkbox not found!');
+                                                                    }
+                                                                }, 200);
+                                                            } else {
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic not enabled or not present');
+                                                            }
                                                         } else if (triggerField.type === 'location') {
                                                             // Handle simplified location field format ("Location Data Added")
                                                             if (typeof addTriggerLocation !== 'function') {
@@ -1091,18 +1203,162 @@ function loadFormData(formData) {
                                                             });
                                                         }
                                                     } else if (triggerField.type === 'date') {
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Date field import starting...');
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] triggerField:', triggerField);
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] questionId:', question.questionId, 'fieldOrder:', fieldOrder, 'sequenceIndex:', sequenceIndex, 'triggerFieldIndex:', triggerFieldIndex);
+                                                        
                                                         if (typeof addTriggerDate !== 'function') {
                                                             console.error('🔧 [IMPORT DEBUG] addTriggerDate function not available!');
                                                             return;
                                                         }
                                                         addTriggerDate(question.questionId, fieldOrder, sequenceIndex + 1);
                                                         
+                                                        // Calculate the correct triggerFieldCount by finding the date field we just created
+                                                        // The field count is based on the number of fields in the container
+                                                        const triggerFieldsContainer = document.getElementById(`triggerFields${question.questionId}_${fieldOrder}_${sequenceIndex + 1}`);
+                                                        let triggerFieldCount = triggerFieldIndex + 1;
+                                                        
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Initial triggerFieldCount:', triggerFieldCount);
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Trigger fields container found:', !!triggerFieldsContainer);
+                                                        
+                                                        // Try to find the actual field count by matching the nodeId
+                                                        if (triggerFieldsContainer) {
+                                                            const allFields = triggerFieldsContainer.querySelectorAll('[class*="trigger-field-"]');
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Found', allFields.length, 'trigger fields in container');
+                                                            for (let i = 0; i < allFields.length; i++) {
+                                                                const fieldEl = allFields[i];
+                                                                const nodeIdInput = fieldEl.querySelector(`#triggerDateNodeId${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${i + 1}`);
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checking field', i + 1, 'nodeIdInput found:', !!nodeIdInput);
+                                                                if (nodeIdInput && nodeIdInput.value === triggerField.nodeId) {
+                                                                    triggerFieldCount = i + 1;
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Found date field at index:', triggerFieldCount);
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        
                                                         // Set the trigger date field values
-                                                        const triggerDateLabelEl = document.getElementById('triggerDateLabel' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
-                                                        const triggerDateNodeIdEl = document.getElementById('triggerDateNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
+                                                        const triggerDateLabelEl = document.getElementById('triggerDateLabel' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
+                                                        const triggerDateNodeIdEl = document.getElementById('triggerDateNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
+                                                        
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Final triggerFieldCount:', triggerFieldCount);
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Label element found:', !!triggerDateLabelEl);
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] NodeId element found:', !!triggerDateNodeIdEl);
                                                         
                                                         if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                         if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
+                                                        
+                                                        // Restore conditional logic if enabled
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checking for conditional logic in triggerField:', triggerField);
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] conditionalLogic exists:', !!(triggerField.conditionalLogic));
+                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] conditionalLogic.enabled:', !!(triggerField.conditionalLogic && triggerField.conditionalLogic.enabled));
+                                                        
+                                                        if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Conditional logic enabled, restoring...');
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Conditions:', triggerField.conditionalLogic.conditions);
+                                                            
+                                                            // Initialize the data structure first
+                                                            const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                            if (!window.triggerDateConditionalLogic) {
+                                                                window.triggerDateConditionalLogic = {};
+                                                            }
+                                                            window.triggerDateConditionalLogic[key] = {
+                                                                enabled: true,
+                                                                conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                            };
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Initialized data structure with key:', key);
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Data structure:', window.triggerDateConditionalLogic[key]);
+                                                            
+                                                            setTimeout(() => {
+                                                                const checkboxId = `enableConditionalLogic${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Looking for checkbox with ID:', checkboxId);
+                                                                
+                                                                const enableConditionalLogicCheckbox = document.getElementById(checkboxId);
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checkbox found:', !!enableConditionalLogicCheckbox);
+                                                                
+                                                                if (enableConditionalLogicCheckbox) {
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Setting checkbox to checked...');
+                                                                    enableConditionalLogicCheckbox.checked = true;
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checkbox checked state:', enableConditionalLogicCheckbox.checked);
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Triggering change event...');
+                                                                    
+                                                                    // Manually trigger the change event to update the UI
+                                                                    const event = new Event('change');
+                                                                    enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Change event dispatched');
+                                                                    
+                                                                    // Set the conditions after a delay to ensure UI is ready
+                                                                    setTimeout(() => {
+                                                                        if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Updating UI with conditions...');
+                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Number of conditions:', triggerField.conditionalLogic.conditions.length);
+                                                                            
+                                                                            // Update the UI with the conditions
+                                                                            if (typeof updateTriggerDateConditionalLogicUI === 'function') {
+                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Calling updateTriggerDateConditionalLogicUI...');
+                                                                                updateTriggerDateConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                
+                                                                                // Set the condition values after UI is updated
+                                                                                setTimeout(() => {
+                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Setting condition dropdown values...');
+                                                                                    triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Setting condition', condIndex, ':', condition);
+                                                                                        
+                                                                                        // Add condition if needed
+                                                                                        if (condIndex > 0) {
+                                                                                            const addConditionBtn = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Add condition button found:', !!addConditionBtn);
+                                                                                            if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Clicking "Add Another Condition" button...');
+                                                                                                addConditionBtn.click();
+                                                                                                // Wait a bit for the new dropdown to be created
+                                                                                                setTimeout(() => {
+                                                                                                    const conditionDropdown = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                                    if (conditionDropdown) {
+                                                                                                        conditionDropdown.value = condition;
+                                                                                                        conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Set condition', condIndex, 'to:', condition);
+                                                                                                    } else {
+                                                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Condition dropdown not found for index', condIndex);
+                                                                                                    }
+                                                                                                }, 150);
+                                                                                                return;
+                                                                                            }
+                                                                                        }
+                                                                                        
+                                                                                        // Set the condition value for the first condition or after adding
+                                                                                        setTimeout(() => {
+                                                                                            const conditionDropdown = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Condition dropdown found for index', condIndex, ':', !!conditionDropdown);
+                                                                                            if (conditionDropdown) {
+                                                                                                conditionDropdown.value = condition;
+                                                                                                conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Set condition', condIndex, 'to:', condition);
+                                                                                            } else {
+                                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Condition dropdown not found for index', condIndex);
+                                                                                            }
+                                                                                        }, 200 * (condIndex + 1));
+                                                                                    });
+                                                                                }, 400);
+                                                                            } else {
+                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] updateTriggerDateConditionalLogicUI function not found!');
+                                                                            }
+                                                                        }
+                                                                    }, 500);
+                                                                } else {
+                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Enable conditional logic checkbox not found!');
+                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Searched for ID:', checkboxId);
+                                                                    // Try to find all checkboxes with similar IDs for debugging
+                                                                    const allCheckboxes = document.querySelectorAll(`input[id^="enableConditionalLogic${question.questionId}_${fieldOrder}_${sequenceIndex + 1}"]`);
+                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Found', allCheckboxes.length, 'checkboxes with similar IDs');
+                                                                    allCheckboxes.forEach((cb, idx) => {
+                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checkbox', idx, 'ID:', cb.id);
+                                                                    });
+                                                                }
+                                                            }, 300);
+                                                        } else {
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Conditional logic not enabled or not present');
+                                                        }
                                                     } else if (triggerField.type === 'pdf') {
                                                         if (typeof addTriggerPdf !== 'function') {
                                                             console.error('🔧 [IMPORT DEBUG] addTriggerPdf function not available!');
@@ -2445,11 +2701,58 @@ function exportForm() {
                                             } else if (dateLabelEl && dateNodeIdEl) {
                                                 // Trigger date field
                                                 console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as DATE field');
-                                                triggerFields.push({
+                                                
+                                                // Check for conditional logic
+                                                const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogic${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
+                                                
+                                                const dateField = {
                                                     type: 'date',
                                                     label: dateLabelEl.value.trim(),
                                                     nodeId: dateNodeIdEl.value.trim()
-                                                });
+                                                };
+                                                
+                                                // Include conditional logic if enabled
+                                                if (conditionalLogicEnabled) {
+                                                    // Get conditions from the conditional logic UI
+                                                    const conditionalLogicContainer = fieldEl.querySelector(`#conditionalLogicUI${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    const conditions = [];
+                                                    
+                                                    if (conditionalLogicContainer) {
+                                                        const conditionDropdowns = conditionalLogicContainer.querySelectorAll('select');
+                                                        conditionDropdowns.forEach(dropdown => {
+                                                            const value = dropdown.value.trim();
+                                                            if (value) {
+                                                                conditions.push(value);
+                                                            }
+                                                        });
+                                                    }
+                                                    
+                                                    // Also check window.triggerDateConditionalLogic for the data
+                                                    const key = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`;
+                                                    if (window.triggerDateConditionalLogic && window.triggerDateConditionalLogic[key]) {
+                                                        const storedConditions = window.triggerDateConditionalLogic[key].conditions || [];
+                                                        // Use stored conditions if available, otherwise use dropdown values
+                                                        if (storedConditions.length > 0) {
+                                                            dateField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: storedConditions.filter(c => c && c.trim() !== '')
+                                                            };
+                                                        } else if (conditions.length > 0) {
+                                                            dateField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: conditions
+                                                            };
+                                                        }
+                                                    } else if (conditions.length > 0) {
+                                                        dateField.conditionalLogic = {
+                                                            enabled: true,
+                                                            conditions: conditions
+                                                        };
+                                                    }
+                                                }
+                                                
+                                                triggerFields.push(dateField);
                                             } else {
                                                 // Check for trigger PDF field by looking for "Trigger PDF" text
                                                 const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
