@@ -1366,3 +1366,166 @@ When implementing conditional logic for new question types:
 6. Use the debugging console.log statements to verify behavior
 
 =====================================
+
+INCIDENT: Conditional Logic for Date Fields in Trigger Sequences Not Working
+DATE: [Current Date]
+ISSUE ID: CONDITIONAL_LOGIC_DATE_FIELDS_001
+
+PROBLEM DESCRIPTION:
+===================
+Date fields within trigger sequences had conditional logic configured, but the date field was always visible even when the required checkbox was not checked. The conditional logic was defined in the GUI JSON (output.json) with `conditionalLogic: { enabled: true, conditions: [...] }`, but when the HTML was generated, the date field appeared regardless of checkbox state.
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make date fields within trigger sequences conditionally visible based on checkbox selections
+- Only show the date field when the user checks the specified checkbox option
+- Hide the date field by default when conditional logic is enabled
+- Ensure the conditional logic data flows correctly from GUI JSON → unifiedFieldsMap → generated HTML
+
+ISSUES ENCOUNTERED:
+==================
+1. CONDITIONAL LOGIC DATA NOT IN UNIFIEDFIELDSMAP:
+   - When `generate.js` built the `unifiedFieldsMap` from the GUI editor's DOM, it wasn't reading `conditionalLogic` from `window.triggerDateConditionalLogic`
+   - The date field in `triggerFields` array was missing the `conditionalLogic` property
+   - This caused `createTriggerFieldsContainer` to receive date fields without conditional logic data
+   - Result: `triggerField.conditionalLogic` was `undefined` in the generated HTML
+
+2. DATA FLOW GAP:
+   - `download.js` correctly stored `conditionalLogic` in `window.triggerDateConditionalLogic` when importing GUI JSON
+   - But `generate.js` was building `triggerFields` by reading from the DOM, not from `window.triggerDateConditionalLogic`
+   - The conditional logic data existed in memory but wasn't being used when building the trigger fields
+
+3. INITIAL HIDING ISSUE:
+   - Even when conditional logic was eventually detected, the date field wasn't being hidden initially
+   - The field was visible on page load even when no checkboxes were checked
+
+TECHNICAL DETAILS:
+==================
+- File: FormWiz GUI/generate.js
+- Function: Building `triggerFields` array (around line 1710-1740)
+- The code was creating date field objects like this:
+  ```javascript
+  triggerFields.push({
+    type: 'date',
+    label: dateLabelEl.value.trim(),
+    nodeId: dateNodeIdEl.value.trim()
+    // Missing: conditionalLogic property
+  });
+  ```
+- `window.triggerDateConditionalLogic` structure:
+  ```javascript
+  {
+    "2_4_1_1": {  // Key format: questionId_fieldOrder_sequenceIndex_triggerFieldCount
+      enabled: true,
+      conditions: ["is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]
+    }
+  }
+  ```
+
+SOLUTION THAT WORKED:
+====================
+1. READ CONDITIONAL LOGIC WHEN BUILDING TRIGGER FIELDS:
+   ```javascript
+   } else if (dateLabelEl && dateNodeIdEl) {
+     // Trigger date field
+     const dateField = {
+       type: 'date',
+       label: dateLabelEl.value.trim(),
+       nodeId: dateNodeIdEl.value.trim()
+     };
+     
+     // Check for conditional logic from window.triggerDateConditionalLogic
+     const triggerFieldCount = fieldIndex + 1;
+     const conditionalLogicKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+     if (window.triggerDateConditionalLogic && window.triggerDateConditionalLogic[conditionalLogicKey]) {
+       const storedLogic = window.triggerDateConditionalLogic[conditionalLogicKey];
+       if (storedLogic.enabled && storedLogic.conditions && storedLogic.conditions.length > 0) {
+         dateField.conditionalLogic = {
+           enabled: storedLogic.enabled,
+           conditions: storedLogic.conditions.filter(c => c && c.trim() !== '')
+         };
+       }
+     }
+     
+     triggerFields.push(dateField);
+   }
+   ```
+
+2. ENSURED INITIAL HIDING:
+   - In `createTriggerFieldsContainer` function (in generated HTML), the date field is now hidden immediately when conditional logic is enabled:
+   ```javascript
+   if (hasConditionalLogic) {
+     fieldDiv.style.cssText = '... display: none; ...';
+   }
+   ```
+
+3. CLEANED UP CONSOLE LOGS:
+   - Removed excessive debugging logs
+   - Kept only essential logs for conditional logic debugging
+
+CODE CHANGES:
+=============
+1. In FormWiz GUI/generate.js (around line 1710-1740):
+   - Modified date field creation to check `window.triggerDateConditionalLogic`
+   - Added logic to read conditional logic data using the correct key format
+   - Added `conditionalLogic` property to date field object if found
+   - Added debug logging to trace the conditional logic lookup
+
+2. In FormWiz GUI/generate.js (around line 2566-2680):
+   - Already had conditional logic implementation in `createTriggerFieldsContainer`
+   - Ensured field is hidden immediately when conditional logic is enabled
+   - Simplified console logs to reduce noise
+
+KEY LEARNINGS:
+==============
+1. When building data structures from multiple sources (DOM + window variables), ensure all sources are checked
+2. The key format for `window.triggerDateConditionalLogic` must match exactly: `questionId_fieldOrder_sequenceIndex_triggerFieldCount`
+3. Conditional logic data stored in `window.triggerDateConditionalLogic` during import needs to be read when generating HTML
+4. Always hide fields initially when conditional logic is enabled, then show them when conditions are met
+5. Use multiple delayed checks (100ms, 500ms, 1000ms, 2000ms) to catch checkboxes that might be created after the date field
+
+PREVENTION:
+===========
+- When importing GUI JSON, ensure conditional logic data is stored in a format that `generate.js` can read
+- When building trigger fields, always check for conditional logic data in `window.triggerDateConditionalLogic`
+- Use consistent key formats across all functions (download.js, generate.js, etc.)
+- Test that conditional logic data flows correctly: GUI JSON → window variable → unifiedFieldsMap → generated HTML
+- Always hide fields initially when conditional logic is enabled
+
+RELATED FILES:
+=============
+- FormWiz GUI/generate.js (main file - builds triggerFields and generates HTML)
+- FormWiz GUI/download.js (stores conditional logic in window.triggerDateConditionalLogic)
+- FormWiz GUI/gui.js (manages conditional logic UI in GUI editor)
+- FormWiz GUI/output.html (generated HTML with runtime conditional logic)
+
+FUTURE REFERENCE:
+================
+When implementing conditional logic for trigger sequence fields:
+1. Store conditional logic data in `window.triggerDateConditionalLogic` during import (download.js)
+2. Read conditional logic data when building triggerFields (generate.js)
+3. Use correct key format: `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`
+4. Include `conditionalLogic` property in the field object when building unifiedFieldsMap
+5. In generated HTML, hide fields initially when conditional logic is enabled
+6. Use retry logic to attach event listeners to checkboxes that might not exist yet
+7. Use multiple delayed checks to catch checkboxes created after the conditional field
+
+KEY FORMAT REFERENCE:
+=====================
+- Key format: `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`
+- Example: `2_4_1_1` means:
+  - questionId: 2
+  - fieldOrder: 4
+  - sequenceIndex: 0 (shown as 1 in key, but 0-based in code)
+  - triggerFieldCount: 1 (1-based index)
+
+DATA FLOW:
+==========
+1. User configures conditional logic in GUI editor → stored in GUI JSON
+2. GUI JSON imported → `download.js` stores in `window.triggerDateConditionalLogic`
+3. HTML generation → `generate.js` reads from `window.triggerDateConditionalLogic`
+4. Data included in `unifiedFieldsMap` → embedded in generated HTML
+5. Runtime → `createTriggerFieldsContainer` receives date field with `conditionalLogic`
+6. Conditional logic executed → date field shown/hidden based on checkbox state
+
+=====================================

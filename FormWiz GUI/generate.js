@@ -2557,6 +2557,12 @@ if (s > 1){
                 if (typeof createHiddenCheckboxForRadio === 'function') {
                   createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                 }
+                
+                // Trigger conditional logic re-evaluation for all date fields
+                // Dispatch a custom event that conditional logic listeners can catch
+                window.dispatchEvent(new CustomEvent('radioGroupChanged', {
+                  detail: { entryNumber: entryNumber, radioGroup: this.name }
+                }));
               }
             });
           }
@@ -2578,8 +2584,6 @@ if (s > 1){
         // Check if conditional logic is enabled
         const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
         const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
-        
-        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Date field - hasConditionalLogic:', hasConditionalLogic, 'conditions:', conditionalConditions);
         
         // Initially hide if conditional logic is enabled
         if (hasConditionalLogic) {
@@ -2630,12 +2634,25 @@ if (s > 1){
             conditionalConditions.forEach((conditionNodeId) => {
               if (!conditionNodeId) return;
               
-              // Find the checkbox with this nodeId for this entry number
+              // Check for both checkbox and radio button (for "Mark only one" selection type)
               const checkboxId = conditionNodeId + "_" + entryNumber;
-              const checkbox = document.getElementById(checkboxId);
+              const radioId = conditionNodeId + "_" + entryNumber + "_radio";
               
-              if (checkbox && checkbox.checked) {
+              // First try to find a radio button (for "Mark only one")
+              const radio = document.getElementById(radioId);
+              if (radio && radio.checked) {
                 anyMatch = true;
+                return;
+              }
+              
+              // Try to find a regular checkbox or hidden checkbox
+              const checkbox = document.getElementById(checkboxId);
+              if (checkbox) {
+                // Check if it's a regular checkbox or hidden checkbox for radio buttons
+                if (checkbox.type === 'checkbox' && checkbox.checked) {
+                  anyMatch = true;
+                  return;
+                }
               }
             });
             
@@ -2647,32 +2664,59 @@ if (s > 1){
             }
           };
           
-          // Set up event listeners for each condition checkbox
+          // Set up event listeners for each condition
           conditionalConditions.forEach((conditionNodeId) => {
             if (!conditionNodeId) return;
             
             const checkboxId = conditionNodeId + "_" + entryNumber;
+            const radioId = conditionNodeId + "_" + entryNumber + "_radio";
             
-            // Function to attach listener when checkbox is created
+            // Function to attach listener when element is created
             const attachListener = (attemptCount = 0) => {
-              const maxAttempts = 50; // Try for up to 5 seconds (50 * 100ms)
-              const checkbox = document.getElementById(checkboxId);
+              const maxAttempts = 100; // Increased attempts for dynamic entries
               
-              if (checkbox) {
+              // Try to find checkbox first
+              let element = document.getElementById(checkboxId);
+              let isRadio = false;
+              
+              // If not found, try to find radio button
+              if (!element) {
+                element = document.getElementById(radioId);
+                isRadio = true;
+              }
+              
+              if (element) {
                 const newCheckConditionalLogic = () => {
-                  checkConditionalLogic();
+                  // Small delay to ensure hidden checkbox is created for radios
+                  setTimeout(() => checkConditionalLogic(), 10);
                 };
                 
-                checkbox.addEventListener('change', newCheckConditionalLogic);
-                checkbox.addEventListener('click', newCheckConditionalLogic);
+                element.addEventListener('change', newCheckConditionalLogic);
+                element.addEventListener('click', newCheckConditionalLogic);
+                
+                // For radio buttons, also listen to all radios in the same group
+                if (isRadio && element.type === 'radio') {
+                  const radioGroup = document.querySelectorAll('input[name="' + element.name + '"]');
+                  radioGroup.forEach(radio => {
+                    if (radio !== element) {
+                      radio.addEventListener('change', newCheckConditionalLogic);
+                      radio.addEventListener('click', newCheckConditionalLogic);
+                    }
+                  });
+                  
+                  // Also listen to the custom radioGroupChanged event for this entry
+                  const radioGroupHandler = function(event) {
+                    if (event.detail && event.detail.entryNumber === entryNumber) {
+                      setTimeout(() => checkConditionalLogic(), 50);
+                    }
+                  };
+                  window.addEventListener('radioGroupChanged', radioGroupHandler);
+                }
                 
                 // Also check initial state
-                checkConditionalLogic();
+                setTimeout(() => checkConditionalLogic(), 50);
               } else if (attemptCount < maxAttempts) {
-                // Retry after a short delay if checkbox doesn't exist yet
                 setTimeout(() => attachListener(attemptCount + 1), 100);
-              } else {
-                console.error('🔍 [CONDITIONAL LOGIC DEBUG] ❌ Failed to find checkbox after', maxAttempts, 'attempts. Checkbox ID:', checkboxId);
               }
             };
             
@@ -2693,8 +2737,6 @@ if (s > 1){
         locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;';
         
         const fieldNameLabel = document.createElement('label');
-        console.log('🔧 [LOCATION TITLE DEBUG] triggerField:', triggerField);
-        console.log('🔧 [LOCATION TITLE DEBUG] triggerField.fieldName:', triggerField.fieldName);
         fieldNameLabel.textContent = (triggerField.fieldName || 'Location Data') + ':';
         fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px; text-align: center;';
         locationFieldDiv.appendChild(fieldNameLabel);
