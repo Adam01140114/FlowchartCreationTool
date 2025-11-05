@@ -1180,11 +1180,9 @@ var hiddenTextCalculations = [];
       var questionContainer = document.getElementById('question-container-' + cPrevQNum);
       // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
       var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      console.log('🔧 [CONDITIONAL DEBUG] Question 1: Found', cbs.length, 'inputs in container, looking for:', cPrevAns);
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      console.log('🔧 [CONDITIONAL DEBUG] Checked values:', checkedVals, 'Looking for:', cPrevAns);
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; console.log('🔧 [CONDITIONAL DEBUG] ✅ MATCH FOUND!');}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1261,7 +1259,6 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -1271,7 +1268,6 @@ function removeHiddenCheckbox(radioId) {
     const hiddenCheckbox = document.getElementById(radioId);
     if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
         hiddenCheckbox.remove();
-        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
 }
 
@@ -1337,7 +1333,6 @@ function deduplicatePdfs(pdfArray) {
       seen.add(key);
       deduplicated.push(pdf);
     } else {
-      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key, 'Original:', pdf.title);
     }
   }
   
@@ -1346,7 +1341,6 @@ function deduplicatePdfs(pdfArray) {
 
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  console.log('🛒 [CART DEBUG] showCartModal called');
   
   // Calculate all PDFs that will be added to cart
   const allPdfsToAdd = [];
@@ -1362,13 +1356,10 @@ window.showCartModal = function () {
   
   // Add conditional PDFs based on current form state
   if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
-    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
     
     for (const pdfLogic of window.pdfLogicPDFs) {
       if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
       
-      console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
-      console.log('🛒 [CART DEBUG] PDF Logic details:', {
         questionId: pdfLogic.questionId,
         pdfName: pdfLogic.pdfName,
         isBigParagraph: pdfLogic.isBigParagraph,
@@ -1386,32 +1377,18 @@ window.showCartModal = function () {
         const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                    document.getElementById('answer' + pdfLogic.questionId);
         
-        console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
-        console.log('  - Question ID:', pdfLogic.questionId);
-        console.log('  - Element found:', el);
-        console.log('  - Conditions:', pdfLogic.conditions);
-        
         if (el) {
           const questionValue = el.value || '';
-          console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
           
           // Check each character limit condition
           for (const condition of pdfLogic.conditions) {
             if (condition.characterLimit) {
-              console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
               if (questionValue.length > condition.characterLimit) {
                 matched = true;
-                console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
                 break; // Exit the loop once we find a match
               }
             }
           }
-          
-          if (!matched) {
-            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
-          }
-        } else {
-          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
         }
       } else if (pdfLogic.triggerOption) {
         // For numbered dropdown with trigger option, check if the selected value matches the trigger
@@ -2302,7 +2279,6 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -2312,7 +2288,6 @@ function removeHiddenCheckbox(radioId) {
     const hiddenCheckbox = document.getElementById(radioId);
     if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
         hiddenCheckbox.remove();
-        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
     }
 }
 
@@ -7647,7 +7622,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add to hidden container
     hiddenContainer.appendChild(hiddenCheckbox);
     
-    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
   }
 
   function removeHiddenCheckbox(radioId) {

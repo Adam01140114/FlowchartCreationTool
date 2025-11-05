@@ -1,6 +1,21 @@
 FLOWCHART TOOL - FIXIT DOCUMENTATION
 =====================================
 
+PURPOSE OF THIS DOCUMENT:
+=========================
+This document serves as a detailed troubleshooting guide for the Flowchart Creation Tool. Each entry documents a specific issue that was encountered, the root cause analysis, and the solution that was implemented. The documentation is written in a way that is so detailed and clear that if an AI agent encounters a similar problem in the future, they can reference this document and understand how to fix it.
+
+The entries in this document follow a structured format:
+- Problem Description: What was broken and what behavior was observed
+- Root Cause: Why the problem occurred (technical analysis)
+- Solution: How the problem was fixed (code changes and reasoning)
+- Key Learnings: Important insights that can prevent similar issues
+- Future Reference: How to handle similar problems
+
+When encountering a new issue that seems similar to one documented here, search this document for keywords related to the problem. The detailed explanations should provide enough context to understand and fix the issue without needing to ask the user for clarification.
+
+=====================================
+
 INCIDENT: Dropdown Layout Inconsistency in Properties Popup
 DATE: [Current Date]
 ISSUE ID: DROPDOWN_LAYOUT_001
@@ -1527,5 +1542,299 @@ DATA FLOW:
 4. Data included in `unifiedFieldsMap` → embedded in generated HTML
 5. Runtime → `createTriggerFieldsContainer` receives date field with `conditionalLogic`
 6. Conditional logic executed → date field shown/hidden based on checkbox state
+
+=====================================
+
+INCIDENT: Conditional Logic for Date Fields in Trigger Sequences Not Updating When Radio Selection Changes
+DATE: [Current Date]
+ISSUE ID: CONDITIONAL_LOGIC_RADIO_UPDATE_001
+
+PROBLEM DESCRIPTION:
+===================
+Date fields within trigger sequences had conditional logic that worked correctly when a radio button was initially selected, but failed to hide the date field when the user changed their radio selection. Specifically:
+
+1. Firebase autofilled a radio button (e.g., `is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual_1`)
+2. The date field correctly appeared (e.g., `is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire_1`)
+3. When the user clicked a different radio button (e.g., `is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association_1`), the date field did NOT hide
+4. The date field remained visible even though the condition was no longer met
+
+The conditional logic was configured correctly in the GUI JSON with:
+```json
+"conditionalLogic": {
+  "enabled": true,
+  "conditions": ["is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]
+}
+```
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make date fields within trigger sequences conditionally visible based on "Mark only one" checkbox selections (radio buttons)
+- Show the date field when the user selects the specified radio button
+- Hide the date field when the user selects a different radio button (unchecking the original one)
+- Ensure the conditional logic re-evaluates correctly when ANY radio button in the group changes
+
+ISSUES ENCOUNTERED:
+==================
+1. EVENT HANDLER NOT RECEIVING EVENTS:
+   - The `radioGroupChanged` event was being dispatched correctly when a radio button changed
+   - But the handler for entry 1's date field was not receiving the event
+   - Console logs showed the handler was set up for entry 2, but receiving events for entry 1
+   - The handler was comparing entry numbers and rejecting the event because they didn't match
+
+2. HANDLER SETUP TIMING ISSUE:
+   - The `radioGroupHandler` was only being set up inside the `attachListener` function
+   - `attachListener` only ran when the specific radio button element was found
+   - If the handler found a radio button from a different entry number (e.g., entry 2), it would capture the wrong `entryNumber` in its closure
+   - This meant the handler would be listening for entry 2 events, but the date field was for entry 1
+
+3. MISSING HANDLER FOR SOME ENTRIES:
+   - If the radio button wasn't found yet when `attachListener` ran, the handler might never be set up
+   - The handler needed to be set up immediately when the date field is created, not just when the radio button is found
+
+4. REGEX PATTERN ISSUE IN GENERATED HTML:
+   - The generated HTML had a regex pattern: `/radio_group_(d+)/` instead of `/radio_group_(\d+)/`
+   - This was causing the entry number extraction to fail (returning `null`)
+   - However, the code had a fallback to use the closure's `entryNumber`, which should have worked
+   - The real issue was the handler setup, not the regex (though the regex should still be fixed)
+
+TECHNICAL DETAILS:
+==================
+- File: FormWiz GUI/generate.js
+- Function: `createTriggerFieldsContainer` (around line 2749-2846)
+- The conditional logic handler was set up like this:
+  ```javascript
+  conditionalConditions.forEach((conditionNodeId) => {
+    const attachListener = (attemptCount = 0) => {
+      // ... find radio button ...
+      if (element) {
+        // ... set up direct listeners ...
+        if (isRadio && element.type === 'radio') {
+          // ... set up radio group listeners ...
+          
+          // PROBLEM: radioGroupHandler was only set up here
+          const radioGroupHandler = function(event) {
+            // ... check entry number match ...
+          };
+          window.addEventListener('radioGroupChanged', radioGroupHandler);
+        }
+      }
+    };
+    attachListener();
+  });
+  ```
+
+- The problem was that `radioGroupHandler` was only set up when:
+  1. The radio button element was found
+  2. The radio button was part of the same entry number as expected
+  
+- But if the handler found a radio from entry 2 when it was looking for entry 1, it would capture entry 2's `entryNumber` in its closure
+- This caused the handler to reject events for entry 1 because it was checking for entry 2
+
+SOLUTION THAT WORKED:
+====================
+1. MOVED `radioGroupHandler` OUTSIDE `attachListener`:
+   ```javascript
+   // CRITICAL: Always set up radioGroupChanged listener for this entry's date field
+   // This ensures we catch radio button changes even if the specific radio hasn't been found yet
+   const radioGroupHandler = function(event) {
+     console.log('🔍 [CONDITIONAL LOGIC DEBUG] radioGroupChanged event received for date field:', triggerField.nodeId + '_' + entryNumber);
+     console.log('🔍 [CONDITIONAL LOGIC DEBUG] Event detail:', event.detail);
+     // Compare entry numbers (handle both string and number types)
+     const eventEntryNumber = event.detail && event.detail.entryNumber;
+     const currentEntryNumber = String(entryNumber);
+     const eventEntryNumberStr = eventEntryNumber != null ? String(eventEntryNumber) : null;
+     console.log('🔍 [CONDITIONAL LOGIC DEBUG] Comparing entry numbers - event:', eventEntryNumberStr, 'current:', currentEntryNumber, 'match:', eventEntryNumberStr === currentEntryNumber);
+     
+     if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber)) {
+       console.log('🔍 [CONDITIONAL LOGIC DEBUG] Entry numbers match! Scheduling checkConditionalLogic with 200ms delay');
+       // Use a longer delay to ensure DOM is fully updated (hidden checkboxes removed/created)
+       setTimeout(() => {
+         console.log('🔍 [CONDITIONAL LOGIC DEBUG] Executing checkConditionalLogic from radioGroupChanged handler');
+         checkConditionalLogic();
+       }, 200);
+     } else {
+       console.log('🔍 [CONDITIONAL LOGIC DEBUG] Entry numbers do NOT match - ignoring event');
+     }
+   };
+   window.addEventListener('radioGroupChanged', radioGroupHandler);
+   console.log('🔍 [CONDITIONAL LOGIC DEBUG] Added radioGroupChanged event listener for entry:', entryNumber);
+   ```
+
+2. SET UP HANDLER IMMEDIATELY WHEN DATE FIELD IS CREATED:
+   - The handler is now set up before `attachListener` runs
+   - It captures the correct `entryNumber` from the closure when the date field is created
+   - It always listens for `radioGroupChanged` events, regardless of whether the radio button has been found yet
+
+3. ADDED VALIDATION IN `attachListener`:
+   - When setting up direct listeners on radio buttons, we now validate that the radio group's entry number matches the expected entry number
+   - This prevents attaching listeners to the wrong radio group
+   ```javascript
+   if (isRadio && element.type === 'radio') {
+     const radioGroupName = element.name;
+     // Extract entry number from radio group name to ensure we're listening to the right group
+     const radioGroupEntryMatch = radioGroupName.match(/radio_group_(\d+)/);
+     const radioGroupEntryNumber = radioGroupEntryMatch ? parseInt(radioGroupEntryMatch[1]) : entryNumber;
+     
+     console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting up listeners for radio group:', radioGroupName, 'Total radios in group, entry number from group name:', radioGroupEntryNumber, 'expected entry number:', entryNumber);
+     
+     // Only set up listeners if this radio group matches our entry number
+     if (radioGroupEntryNumber === entryNumber) {
+       // ... set up listeners ...
+     } else {
+       console.log('🔍 [CONDITIONAL LOGIC DEBUG] Radio group entry number (', radioGroupEntryNumber, ') does not match expected entry number (', entryNumber, ') - skipping listener setup');
+     }
+   }
+   ```
+
+CODE CHANGES:
+=============
+1. In FormWiz GUI/generate.js (around line 2749-2772):
+   - Moved `radioGroupHandler` definition outside of `attachListener` function
+   - Set up handler immediately when date field is created (before `attachListener` runs)
+   - Ensured handler captures correct `entryNumber` from closure
+   - Added extensive debug logging to track event flow
+
+2. In FormWiz GUI/generate.js (around line 2811-2836):
+   - Added validation to check radio group entry number before setting up direct listeners
+   - Prevents attaching listeners to wrong radio groups
+   - Added debug logging to show when listeners are skipped
+
+KEY LEARNINGS:
+==============
+1. **ALWAYS SET UP EVENT HANDLERS IMMEDIATELY**: When an event handler needs to capture a specific value from a closure (like `entryNumber`), set it up immediately when the closure is created, not inside a function that might run later or with different values.
+
+2. **HANDLER TIMING MATTERS**: If an event handler is set up inside a function that only runs conditionally (like `attachListener`), it might not be set up at all, or it might capture the wrong values from the closure.
+
+3. **VALIDATE BEFORE ATTACHING LISTENERS**: When attaching listeners to elements that might belong to different contexts (like different entry numbers), validate that the element belongs to the correct context before attaching.
+
+4. **USE MULTIPLE EVENT SOURCES**: For conditional logic with radio buttons, use both:
+   - Direct listeners on radio buttons (for immediate feedback)
+   - `radioGroupChanged` custom event (for cross-entry communication)
+   
+5. **ENTRY NUMBER ISOLATION**: Each entry number (1, 2, 3, etc.) has its own set of radio buttons and conditional fields. Event handlers must be scoped to the correct entry number to avoid cross-contamination.
+
+6. **CLOSURE CAPTURE TIMING**: The value captured in a closure is the value at the time the closure is created, not when it's executed. If `attachListener` runs with a different `entryNumber` than expected, the handler will capture the wrong value.
+
+PREVENTION:
+===========
+- When creating event handlers that need to capture closure values, set them up immediately when the closure is created, not inside conditional functions
+- Always validate that elements belong to the correct context before attaching listeners
+- Use both direct listeners and custom events for complex conditional logic scenarios
+- Test conditional logic thoroughly when radio button selections change
+- Ensure handlers are set up for all entries, not just the first one found
+
+RELATED FILES:
+=============
+- FormWiz GUI/generate.js (main file - conditional logic handler setup)
+- FormWiz GUI/output.html (generated HTML with runtime conditional logic)
+
+FUTURE REFERENCE:
+================
+When implementing conditional logic that responds to radio button changes:
+
+1. **SET UP HANDLERS IMMEDIATELY**: 
+   ```javascript
+   // ✅ CORRECT: Set up handler immediately when date field is created
+   const radioGroupHandler = function(event) {
+     // Handler captures entryNumber from outer closure
+     if (event.detail.entryNumber === entryNumber) {
+       checkConditionalLogic();
+     }
+   };
+   window.addEventListener('radioGroupChanged', radioGroupHandler);
+   
+   // Then set up direct listeners later
+   conditionalConditions.forEach((conditionNodeId) => {
+     const attachListener = () => {
+       // Find radio button and attach direct listeners
+     };
+     attachListener();
+   });
+   ```
+
+2. **DON'T SET UP HANDLERS INSIDE CONDITIONAL FUNCTIONS**:
+   ```javascript
+   // ❌ WRONG: Handler only set up if radio button is found
+   const attachListener = () => {
+     const radio = document.getElementById(radioId);
+     if (radio) {
+       const radioGroupHandler = function(event) {
+         // This might capture wrong entryNumber if radio belongs to different entry
+       };
+       window.addEventListener('radioGroupChanged', radioGroupHandler);
+     }
+   };
+   ```
+
+3. **VALIDATE BEFORE ATTACHING LISTENERS**:
+   ```javascript
+   // ✅ CORRECT: Validate entry number matches before attaching
+   const radioGroupEntryMatch = radioGroupName.match(/radio_group_(\d+)/);
+   const radioGroupEntryNumber = radioGroupEntryMatch ? parseInt(radioGroupEntryMatch[1]) : entryNumber;
+   
+   if (radioGroupEntryNumber === entryNumber) {
+     // Only attach listeners to correct radio group
+     radioGroup.forEach(radio => {
+       radio.addEventListener('change', handler);
+     });
+   }
+   ```
+
+4. **USE CUSTOM EVENTS FOR CROSS-ENTRY COMMUNICATION**:
+   - Radio button change handler dispatches `radioGroupChanged` event with `entryNumber`
+   - All date field handlers listen for this event
+   - Each handler checks if the event's `entryNumber` matches its own `entryNumber`
+   - This ensures handlers only respond to events for their own entry
+
+5. **DEBUG WITH EXTENSIVE LOGGING**:
+   - Log when handlers are set up (which entry number)
+   - Log when events are received (which entry number)
+   - Log when events are ignored (entry number mismatch)
+   - Log when conditional logic is checked and what the result is
+
+PATTERN FOR CONDITIONAL LOGIC WITH RADIO BUTTONS:
+=================================================
+```javascript
+// 1. Create date field with conditional logic
+if (hasConditionalLogic && conditionalConditions.length > 0) {
+  // 2. Set up radioGroupChanged handler IMMEDIATELY (captures correct entryNumber)
+  const radioGroupHandler = function(event) {
+    if (event.detail.entryNumber === entryNumber) {
+      setTimeout(() => checkConditionalLogic(), 200);
+    }
+  };
+  window.addEventListener('radioGroupChanged', radioGroupHandler);
+  
+  // 3. Set up direct listeners on radio buttons (for immediate feedback)
+  conditionalConditions.forEach((conditionNodeId) => {
+    const attachListener = () => {
+      const radio = document.getElementById(conditionNodeId + "_" + entryNumber + "_radio");
+      if (radio) {
+        // Validate radio group belongs to this entry
+        const radioGroupEntryMatch = radio.name.match(/radio_group_(\d+)/);
+        const radioGroupEntryNumber = radioGroupEntryMatch ? parseInt(radioGroupEntryMatch[1]) : entryNumber;
+        
+        if (radioGroupEntryNumber === entryNumber) {
+          // Attach direct listeners
+          radio.addEventListener('change', () => checkConditionalLogic());
+        }
+      }
+    };
+    attachListener();
+  });
+}
+```
+
+KEY TAKEAWAY:
+=============
+The critical issue was **handler setup timing and closure capture**. The `radioGroupHandler` was being set up inside `attachListener`, which meant:
+1. It might not be set up at all if the radio button wasn't found
+2. It might capture the wrong `entryNumber` if `attachListener` found a radio from a different entry
+3. The handler wouldn't receive events for the correct entry number
+
+By moving the handler setup outside `attachListener` and setting it up immediately when the date field is created, we ensure:
+1. The handler is always set up
+2. It captures the correct `entryNumber` from the closure
+3. It receives and processes events for the correct entry number
 
 =====================================

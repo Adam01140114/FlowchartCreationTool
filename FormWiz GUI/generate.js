@@ -192,6 +192,11 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
         const zipField = document.getElementById(zipFieldId);
         const stateShortField = document.getElementById(stateShortFieldId);
         
+        // Debug: Log what fields we're looking for and what we found
+        console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+        console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+        console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+        console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
         
         const street = streetField ? streetField.value.trim() : '';
         const city = cityField ? cityField.value.trim() : '';
@@ -218,6 +223,8 @@ function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, all
             // Listen for input changes
             field.addEventListener('input', updateAddress);
             field.addEventListener('change', updateAddress);
+        } else {
+            console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
         }
     });
     
@@ -1757,8 +1764,8 @@ formHTML += `</div><br></div>`;
                             pdfTitle: pdfTitleInputEl ? pdfTitleInputEl.value.trim() : '',
                             pdfName: pdfNameEl.value.trim(),
                             priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
-                          });
-                        } else {
+                        });
+                      } else {
                         // Check for trigger location field (simplified "Location Data Added" format)
                         const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
                         if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
