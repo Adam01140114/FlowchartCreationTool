@@ -435,19 +435,29 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
           // Add event listener for radio buttons to create hidden checkboxes
           if (selectionType === 'single') {
             input.addEventListener('change', function() {
+              console.log('🔍 [RADIO CHANGE DEBUG] Radio change event fired on:', this.id);
+              console.log('🔍 [RADIO CHANGE DEBUG] Radio checked:', this.checked);
+              console.log('🔍 [RADIO CHANGE DEBUG] Radio name:', this.name);
+              console.log('🔍 [RADIO CHANGE DEBUG] Entry number from closure:', entryNumber);
+              
               if (this.checked) {
                 // Uncheck all other radio buttons in this group and remove their hidden checkboxes
                 const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
+                console.log('🔍 [RADIO CHANGE DEBUG] Radio group size:', radioGroup.length);
+                
                 radioGroup.forEach(radio => {
                   if (radio !== this) {
+                    console.log('🔍 [RADIO CHANGE DEBUG] Unchecking radio:', radio.id);
                     radio.checked = false;
                     
                     // Remove hidden checkbox for unchecked radio
                     const originalNodeId = radio.id.replace('_radio', '');
                     const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                    console.log('🔍 [RADIO CHANGE DEBUG] Looking for hidden checkbox:', originalNodeId, 'found:', !!existingHiddenCheckbox);
                     
                     if (existingHiddenCheckbox) {
                       if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
+                        console.log('🔍 [RADIO CHANGE DEBUG] Removing hidden checkbox:', originalNodeId);
                         existingHiddenCheckbox.remove();
                       }
                     }
@@ -456,15 +466,30 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
                 
                 // Create hidden checkbox for the selected radio
                 const originalNodeId = this.id.replace('_radio', '');
+                console.log('🔍 [RADIO CHANGE DEBUG] Creating hidden checkbox for:', originalNodeId);
                 if (typeof createHiddenCheckboxForRadio === 'function') {
                   createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                 }
                 
+                // Extract entry number from radio name to ensure consistency
+                // Radio name format: "radio_group_ENTRYNUMBER" for trigger sequences
+                let extractedEntryNumber = entryNumber;
+                const nameMatch = this.name.match(/radio_group_(d+)/);
+                console.log('🔍 [RADIO CHANGE DEBUG] Regex match result:', nameMatch);
+                if (nameMatch) {
+                  extractedEntryNumber = parseInt(nameMatch[1]);
+                  console.log('🔍 [RADIO CHANGE DEBUG] Extracted entry number from name:', extractedEntryNumber);
+                } else {
+                  console.log('🔍 [RADIO CHANGE DEBUG] No regex match, using closure entryNumber:', extractedEntryNumber);
+                }
+                
                 // Trigger conditional logic re-evaluation for all date fields
                 // Dispatch a custom event that conditional logic listeners can catch
+                console.log('🔍 [RADIO CHANGE DEBUG] Dispatching radioGroupChanged event with entryNumber:', extractedEntryNumber, 'radioGroup:', this.name);
                 window.dispatchEvent(new CustomEvent('radioGroupChanged', {
-                  detail: { entryNumber: entryNumber, radioGroup: this.name }
+                  detail: { entryNumber: extractedEntryNumber, radioGroup: this.name }
                 }));
+                console.log('🔍 [RADIO CHANGE DEBUG] Event dispatched');
               }
             });
           }
@@ -531,6 +556,10 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
           
           // Function to check if any condition is met
           const checkConditionalLogic = () => {
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] checkConditionalLogic called for date field:', triggerField.nodeId + '_' + entryNumber);
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Entry number:', entryNumber);
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditions:', conditionalConditions);
+            
             let anyMatch = false;
             
             conditionalConditions.forEach((conditionNodeId) => {
@@ -540,23 +569,76 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
               const checkboxId = conditionNodeId + "_" + entryNumber;
               const radioId = conditionNodeId + "_" + entryNumber + "_radio";
               
+              console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checking condition:', conditionNodeId);
+              console.log('🔍 [CONDITIONAL LOGIC DEBUG] Looking for checkboxId:', checkboxId, 'radioId:', radioId);
+              
               // First try to find a radio button (for "Mark only one")
               const radio = document.getElementById(radioId);
-              if (radio && radio.checked) {
-                anyMatch = true;
-                return;
-              }
+              console.log('🔍 [CONDITIONAL LOGIC DEBUG] Radio element found:', !!radio, radio ? 'checked: ' + radio.checked : '');
               
-              // Try to find a regular checkbox or hidden checkbox
-              const checkbox = document.getElementById(checkboxId);
-              if (checkbox) {
-                // Check if it's a regular checkbox or hidden checkbox for radio buttons
-                if (checkbox.type === 'checkbox' && checkbox.checked) {
+              if (radio && radio.type === 'radio') {
+                // Check the actual checked state of the radio button directly
+                // This is the most reliable way to check radio button state
+                if (radio.checked === true) {
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] ✅ MATCH: Radio', radioId, 'is checked');
                   anyMatch = true;
                   return;
                 }
+                
+                // Also check the entire radio group to see which radio is checked
+                // This handles cases where the radio might not be found but the group has a checked radio
+                const radioGroupName = radio.name;
+                const radioGroup = document.querySelectorAll('input[type="radio"][name="' + radioGroupName + '"]');
+                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Radio group name:', radioGroupName, 'Total radios in group:', radioGroup.length);
+                
+                const checkedRadio = Array.from(radioGroup).find(r => r.checked === true && r.id === radioId);
+                if (checkedRadio) {
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] ✅ MATCH: Found checked radio in group:', radioId);
+                  anyMatch = true;
+                  return;
+                } else {
+                  // Check which radio IS checked in the group
+                  const actuallyChecked = Array.from(radioGroup).find(r => r.checked === true);
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] ❌ Radio', radioId, 'is NOT checked. Currently checked radio:', actuallyChecked ? actuallyChecked.id : 'none');
+                }
+              }
+              
+              // Try to find a regular checkbox or hidden checkbox
+              // Only check hidden checkboxes if no radio button exists (for regular checkboxes)
+              const checkbox = document.getElementById(checkboxId);
+              console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox element found:', !!checkbox, checkbox ? 'checked: ' + checkbox.checked + ', type: ' + checkbox.type : '');
+              
+              if (checkbox && checkbox.type === 'checkbox') {
+                // For hidden checkboxes, verify they're actually checked
+                // Hidden checkboxes should only be checked if their corresponding radio is checked
+                if (checkbox.checked === true) {
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] Hidden checkbox is checked, verifying radio state');
+                  // Double-check: if this is a hidden checkbox for a radio, verify the radio is checked
+                  const correspondingRadio = document.getElementById(radioId);
+                  if (correspondingRadio) {
+                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found corresponding radio:', radioId, 'checked:', correspondingRadio.checked);
+                    // This is a hidden checkbox for a radio - verify the radio is actually checked
+                    if (correspondingRadio.checked === true) {
+                      console.log('🔍 [CONDITIONAL LOGIC DEBUG] ✅ MATCH: Hidden checkbox and radio both checked');
+                      anyMatch = true;
+                      return;
+                    } else {
+                      console.log('🔍 [CONDITIONAL LOGIC DEBUG] ❌ Hidden checkbox is checked but radio is NOT checked - condition NOT met');
+                    }
+                  } else {
+                    // This is a regular checkbox, not a hidden one for radio
+                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] ✅ MATCH: Regular checkbox is checked');
+                    anyMatch = true;
+                    return;
+                  }
+                } else {
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] ❌ Checkbox is NOT checked');
+                }
               }
             });
+            
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Final anyMatch result:', anyMatch);
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting date field display to:', anyMatch ? 'flex (visible)' : 'none (hidden)');
             
             // Show or hide the date field based on match
             if (anyMatch) {
@@ -565,6 +647,31 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
               fieldDiv.style.display = 'none';
             }
           };
+          
+          // CRITICAL: Always set up radioGroupChanged listener for this entry's date field
+          // This ensures we catch radio button changes even if the specific radio hasn't been found yet
+          const radioGroupHandler = function(event) {
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] radioGroupChanged event received for date field:', triggerField.nodeId + '_' + entryNumber);
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Event detail:', event.detail);
+            // Compare entry numbers (handle both string and number types)
+            const eventEntryNumber = event.detail && event.detail.entryNumber;
+            const currentEntryNumber = String(entryNumber);
+            const eventEntryNumberStr = eventEntryNumber != null ? String(eventEntryNumber) : null;
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Comparing entry numbers - event:', eventEntryNumberStr, 'current:', currentEntryNumber, 'match:', eventEntryNumberStr === currentEntryNumber);
+            
+            if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber)) {
+              console.log('🔍 [CONDITIONAL LOGIC DEBUG] Entry numbers match! Scheduling checkConditionalLogic with 200ms delay');
+              // Use a longer delay to ensure DOM is fully updated (hidden checkboxes removed/created)
+              setTimeout(() => {
+                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Executing checkConditionalLogic from radioGroupChanged handler');
+                checkConditionalLogic();
+              }, 200);
+            } else {
+              console.log('🔍 [CONDITIONAL LOGIC DEBUG] Entry numbers do NOT match - ignoring event');
+            }
+          };
+          window.addEventListener('radioGroupChanged', radioGroupHandler);
+          console.log('🔍 [CONDITIONAL LOGIC DEBUG] Added radioGroupChanged event listener for entry:', entryNumber);
           
           // Set up event listeners for each condition
           conditionalConditions.forEach((conditionNodeId) => {
@@ -589,8 +696,15 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
               
               if (element) {
                 const newCheckConditionalLogic = () => {
-                  // Small delay to ensure hidden checkbox is created for radios
-                  setTimeout(() => checkConditionalLogic(), 10);
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] Event triggered on element:', element.id, 'type:', element.type, 'isRadio:', isRadio, 'for entry:', entryNumber);
+                  // Delay to ensure DOM is fully updated (hidden checkboxes removed/created for radios)
+                  // Use longer delay for radio buttons to ensure state is consistent
+                  const delay = isRadio && element.type === 'radio' ? 200 : 10;
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] Scheduling checkConditionalLogic with delay:', delay, 'ms');
+                  setTimeout(() => {
+                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Executing checkConditionalLogic after delay');
+                    checkConditionalLogic();
+                  }, delay);
                 };
                 
                 element.addEventListener('change', newCheckConditionalLogic);
@@ -598,21 +712,28 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
                 
                 // For radio buttons, also listen to all radios in the same group
                 if (isRadio && element.type === 'radio') {
-                  const radioGroup = document.querySelectorAll('input[name="' + element.name + '"]');
-                  radioGroup.forEach(radio => {
-                    if (radio !== element) {
-                      radio.addEventListener('change', newCheckConditionalLogic);
-                      radio.addEventListener('click', newCheckConditionalLogic);
-                    }
-                  });
+                  const radioGroupName = element.name;
+                  // Extract entry number from radio group name to ensure we're listening to the right group
+                  const radioGroupEntryMatch = radioGroupName.match(/radio_group_(d+)/);
+                  const radioGroupEntryNumber = radioGroupEntryMatch ? parseInt(radioGroupEntryMatch[1]) : entryNumber;
                   
-                  // Also listen to the custom radioGroupChanged event for this entry
-                  const radioGroupHandler = function(event) {
-                    if (event.detail && event.detail.entryNumber === entryNumber) {
-                      setTimeout(() => checkConditionalLogic(), 50);
-                    }
-                  };
-                  window.addEventListener('radioGroupChanged', radioGroupHandler);
+                  console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting up listeners for radio group:', radioGroupName, 'Total radios in group, entry number from group name:', radioGroupEntryNumber, 'expected entry number:', entryNumber);
+                  
+                  // Only set up listeners if this radio group matches our entry number
+                  if (radioGroupEntryNumber === entryNumber) {
+                    const radioGroup = document.querySelectorAll('input[name="' + radioGroupName + '"]');
+                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found', radioGroup.length, 'radios in group');
+                    radioGroup.forEach(radio => {
+                      // Add listener to all other radios in the group (element already has listener)
+                      if (radio !== element) {
+                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Adding listener to radio:', radio.id);
+                        radio.addEventListener('change', newCheckConditionalLogic);
+                        radio.addEventListener('click', newCheckConditionalLogic);
+                      }
+                    });
+                  } else {
+                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Radio group entry number (', radioGroupEntryNumber, ') does not match expected entry number (', entryNumber, ') - skipping listener setup');
+                  }
                 }
                 
                 // Also check initial state
@@ -5380,6 +5501,16 @@ if (typeof handleNext === 'function') {
                 const originalNodeId = radio.id.replace('_radio', '');
                 if (typeof createHiddenCheckboxForRadio === 'function') {
                     createHiddenCheckboxForRadio(originalNodeId, radio.name, radio.value);
+                }
+                
+                // Extract entry number from radio name (format: "radio_group_ENTRYNUMBER")
+                const entryNumberMatch = radio.name.match(/radio_group_(d+)/);
+                if (entryNumberMatch) {
+                    const entryNumber = entryNumberMatch[1];
+                    // Dispatch radioGroupChanged event to trigger conditional logic re-evaluation
+                    window.dispatchEvent(new CustomEvent('radioGroupChanged', {
+                        detail: { entryNumber: parseInt(entryNumber), radioGroup: radio.name }
+                    }));
                 }
             });
         }, 2000); // 2 second delay to ensure fallback autofill completes
