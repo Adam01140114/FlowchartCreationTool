@@ -1,5 +1,23 @@
 # Flowchart Creation Tool - Features Documentation
 
+## 📚 **Purpose of This Document**
+
+This document serves as a comprehensive guide to understanding how all features in the Flowchart Creation Tool work. Each feature is documented in great detail, following the complete flow from **GUI setup** → **generate.js processing** → **output.html implementation**. 
+
+The documentation is structured so clearly and thoroughly that when an AI agent needs to update or extend any feature, they can:
+1. Understand the complete feature lifecycle
+2. See exactly where changes need to be made
+3. Understand how the feature interacts with other parts of the system
+4. Implement updates without breaking existing functionality
+
+**Documentation Structure for Each Feature:**
+- **GUI Setup (gui.html/gui.js)**: How the feature is configured in the GUI editor
+- **Data Flow (generate.js)**: How the feature data is processed during HTML generation
+- **Output Implementation (output.html)**: How the feature works in the final generated form
+- **Data Persistence**: How the feature is saved/loaded through export/import and autosave
+
+---
+
 ## 📋 **Table of Contents**
 1. [Core Features](#core-features)
 2. [Node Types](#node-types)
@@ -346,6 +364,1033 @@
   - Automatic field population
   - URL parameter mapping
   - Form state restoration
+
+---
+
+## ✅ **Linked Checkboxes Feature**
+
+### **Overview**
+Linked checkboxes allow you to create a single checkbox that automatically becomes checked when ANY of its linked source checkboxes are checked. This implements OR logic: if any of the source checkboxes are checked, the linked checkbox becomes checked. If all source checkboxes are unchecked, the linked checkbox becomes unchecked.
+
+**Example**: If you have a linked checkbox called "hungry_or_thirsty" linked to "hungry_yes" and "thristy_yes", then:
+- When user checks "hungry_yes" → "hungry_or_thirsty" becomes checked
+- When user checks "thristy_yes" → "hungry_or_thirsty" becomes checked  
+- When user unchecks both "hungry_yes" and "thristy_yes" → "hungry_or_thirsty" becomes unchecked
+
+---
+
+### **PHASE 1: GUI Setup (gui.html / gui.js)**
+
+#### **1.1 Opening the Linked Checkbox Modal**
+**Location**: `FormWiz GUI/gui.js` - `openLinkedCheckboxModal()` function (around line 4506)
+
+When the user clicks the "Add Linked Checkbox" button in the GUI:
+```javascript
+function openLinkedCheckboxModal() {
+    if (!document.getElementById('linkedCheckboxModal')) {
+        createLinkedCheckboxModal();
+    }
+    currentLinkedCheckboxConfig = [];
+    document.getElementById('linkedCheckboxModal').style.display = 'block';
+    const container = document.getElementById('linkedCheckboxDropdowns');
+    container.innerHTML = '';
+    addLinkedCheckboxDropdown();
+    addLinkedCheckboxDropdown();
+}
+```
+
+**What happens:**
+1. Creates the modal if it doesn't exist
+2. Resets `currentLinkedCheckboxConfig` array
+3. Shows the modal
+4. Clears any existing dropdowns
+5. Adds two initial dropdowns for selecting checkbox options
+
+#### **1.2 Creating the Modal UI**
+**Location**: `FormWiz GUI/gui.js` - `createLinkedCheckboxModal()` function (around line 4518)
+
+The modal contains:
+- **Linked Checkbox ID Input**: User enters the ID for the linked checkbox (e.g., "hungry_or_thirsty")
+- **Dynamic Dropdowns**: Each dropdown allows selecting a checkbox option to link
+- **Link Another Button**: Adds additional dropdowns for more checkbox options
+- **Done Button**: Finalizes the configuration
+- **Cancel Button**: Closes the modal without saving
+
+**Modal Structure:**
+```javascript
+modal.innerHTML = `
+  <div style="background:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;">
+    <h3>Configure Linked Checkbox</h3>
+    <div id="linkedCheckboxDropdowns"></div>
+    <div>
+      <label>Linked Checkbox ID:</label>
+      <input type="text" id="linkedCheckboxIdInput" placeholder="Enter linked Checkbox ID">
+    </div>
+    <button onclick="addLinkedCheckboxDropdown()">Link Another</button>
+    <button onclick="finalizeLinkedCheckbox()">Done</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+`;
+```
+
+#### **1.3 Populating Checkbox Options**
+**Location**: `FormWiz GUI/gui.js` - `populateLinkedCheckboxDropdown()` function (around line 4562)
+
+The system automatically finds all checkbox options in the form:
+
+**How it works:**
+1. **Searches all question blocks**: Iterates through all `[id^="questionBlock"]` elements
+2. **Filters checkbox questions**: Only processes questions with `questionType === 'checkbox'`
+3. **Extracts checkbox options**: Gets both:
+   - Basic checkbox options: `input[id^="checkboxOptionName"]` and `input[id^="checkboxOptionText"]`
+   - Unified checkbox options: `input[id^="checkboxNodeId"]` and `input[id^="checkboxText"]`
+4. **Creates searchable dropdown**: Each option displays as `"Label (nodeId)"` format
+5. **Builds search overlay**: Creates a searchable list that filters as user types
+
+**Key Code:**
+```javascript
+const blocks = document.querySelectorAll('[id^="questionBlock"]');
+blocks.forEach(block => {
+    const qId = block.id.replace('questionBlock','');
+    const typeSel = block.querySelector(`#questionType${qId}`);
+    
+    if (typeSel.value === 'checkbox') {
+        // Get basic checkbox options
+        const nameInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionName${qId}_"]`);
+        const textInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionText${qId}_"]`);
+        nameInputs.forEach((nameInput, i) => {
+            const nodeId = nameInput.value.trim();
+            const labelText = (textInputs[i]?.value || '').trim();
+            if (nodeId) options.push({ nodeId, label: labelText || nodeId });
+        });
+        
+        // Get unified checkbox options (for numbered dropdowns, etc.)
+        const unifiedNodes = block.querySelectorAll(`input[id^="checkboxNodeId${qId}_"]`);
+        const unifiedTexts = block.querySelectorAll(`input[id^="checkboxText${qId}_"]`);
+        unifiedNodes.forEach((nodeInput, i) => {
+            const nodeId = nodeInput.value.trim();
+            const labelText = (unifiedTexts[i]?.value || '').trim();
+            if (nodeId) options.push({ nodeId, label: labelText || nodeId });
+        });
+    }
+});
+```
+
+#### **1.4 Finalizing the Configuration**
+**Location**: `FormWiz GUI/gui.js` - `finalizeLinkedCheckbox()` function (around line 4637)
+
+When user clicks "Done":
+```javascript
+function finalizeLinkedCheckbox(){
+    const selected = currentLinkedCheckboxConfig.filter(c => c.selectedValue);
+    if (selected.length < 2) { 
+        alert('Please select at least 2 checkbox options to link.'); 
+        return; 
+    }
+    const idInput = document.getElementById('linkedCheckboxIdInput');
+    const linkedId = idInput ? idInput.value.trim() : '';
+    if (!linkedId) { 
+        alert('Please enter a Linked Checkbox ID.'); 
+        return; 
+    }
+
+    createLinkedCheckboxDisplay(selected, linkedId);
+    document.getElementById('linkedCheckboxModal').style.display = 'none';
+}
+```
+
+**Validation:**
+- Requires at least 2 checkbox options to be selected
+- Requires a Linked Checkbox ID to be entered
+- Creates visual display of the configuration
+- Closes the modal
+
+#### **1.5 Creating the Visual Display**
+**Location**: `FormWiz GUI/gui.js` - `createLinkedCheckboxDisplay()` function (around line 4648)
+
+Creates a visual card showing the linked checkbox configuration:
+```javascript
+function createLinkedCheckboxDisplay(selectedOptions, linkedId){
+    const displayId = `linkedCheckbox${linkedCheckboxCounter++}`;
+    // Creates a container if it doesn't exist
+    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+    if (!linkedFieldsContainer) {
+        // Create container with styling
+        linkedFieldsContainer = document.createElement('div');
+        linkedFieldsContainer.id = 'linkedFieldsContainer';
+        // Insert before form builder
+        formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
+    }
+    
+    // Create display card
+    const div = document.createElement('div');
+    div.id = displayId;
+    const names = selectedOptions.map(s=>s.selectedValue).join(' ↔ ');
+    div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="flex:1;">
+                <h4>Linked Checkbox (${linkedId})</h4>
+                <p>${names}</p>
+            </div>
+            <button onclick="removeLinkedCheckbox(${displayId})">Remove</button>
+        </div>
+    `;
+    
+    // Store in global config
+    window.linkedCheckboxesConfig = window.linkedCheckboxesConfig || [];
+    window.linkedCheckboxesConfig.push({ 
+        id: displayId, 
+        linkedCheckboxId: linkedId, 
+        checkboxes: selectedOptions.map(s=>s.selectedValue) 
+    });
+}
+```
+
+**Display Format:**
+- Shows: "Linked Checkbox (hungry_or_thirsty)"
+- Shows: "hungry_yes ↔ thristy_yes"
+- Includes a Remove button
+
+**Data Storage:**
+The configuration is stored in `window.linkedCheckboxesConfig` array:
+```javascript
+[
+    {
+        id: "linkedCheckbox0",
+        linkedCheckboxId: "hungry_or_thirsty",
+        checkboxes: ["hungry_yes", "thristy_yes"]
+    }
+]
+```
+
+---
+
+### **PHASE 2: Data Processing (generate.js)**
+
+#### **2.1 Collecting Linked Checkbox Data**
+**Location**: `FormWiz GUI/generate.js` - Around line 2253-2260
+
+When generating the form HTML, `generate.js` collects linked checkbox configurations:
+
+```javascript
+// Reset linked checkboxes array
+linkedCheckboxes.length = 0;
+
+// Collect linked checkboxes from GUI
+if (window.linkedCheckboxesConfig && window.linkedCheckboxesConfig.length > 0) {
+    window.linkedCheckboxesConfig.forEach(config => {
+        linkedCheckboxes.push({
+            linkedCheckboxId: config.linkedCheckboxId,
+            checkboxes: config.checkboxes
+        });
+    });
+}
+```
+
+**What happens:**
+1. Clears the `linkedCheckboxes` array (defined at top of file: `const linkedCheckboxes = [];`)
+2. Iterates through `window.linkedCheckboxesConfig` from the GUI
+3. Pushes each configuration into the `linkedCheckboxes` array
+4. Removes the `id` field (not needed in output)
+
+**Result Array:**
+```javascript
+linkedCheckboxes = [
+    {
+        linkedCheckboxId: "hungry_or_thirsty",
+        checkboxes: ["hungry_yes", "thristy_yes"]
+    }
+]
+```
+
+#### **2.2 Embedding Linked Checkbox Data in HTML**
+**Location**: `FormWiz GUI/generate.js` - Around line 2395
+
+The `linkedCheckboxes` array is embedded as a JavaScript variable in the generated HTML:
+
+```javascript
+formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
+```
+
+**Generated Output:**
+```javascript
+var linkedCheckboxes = [{"linkedCheckboxId":"hungry_or_thirsty","checkboxes":["hungry_yes","thristy_yes"]}];
+```
+
+This variable is available globally in the generated HTML and used by the runtime JavaScript.
+
+#### **2.3 Generating Hidden Checkbox Elements**
+**Location**: `FormWiz GUI/generate.js` - `generateHiddenPDFFields()` function (around line 9737-9746)
+
+For each linked checkbox, a hidden checkbox input is generated:
+
+```javascript
+if (linkedCheckboxes && linkedCheckboxes.length > 0) {
+    linkedCheckboxes.forEach(linkedCheckboxGroup => {
+        const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+        const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+
+        if (linkedCheckboxId && checkboxIds.length > 0) {
+            hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${linkedCheckboxId}" name="${linkedCheckboxId}"></div>`;
+        }
+    });
+}
+```
+
+**Generated HTML:**
+```html
+<div style="display:none;">
+    <input type="checkbox" id="hungry_or_thirsty" name="hungry_or_thirsty">
+</div>
+```
+
+**Why hidden?**
+- The linked checkbox is not visible to the user
+- It's automatically managed by JavaScript based on source checkboxes
+- It's included in form submission data
+
+#### **2.4 Generating Runtime JavaScript**
+**Location**: `FormWiz GUI/generate.js` - Around line 9541-9617
+
+The main linked checkbox logic is generated as a `<script>` block that runs when the page loads:
+
+```javascript
+formHTML += `
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!linkedCheckboxes || linkedCheckboxes.length === 0) return;
+
+    // Function to update a linked checkbox based on its source checkboxes
+    function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
+      const linkedCheckbox = document.getElementById(linkedCheckboxId);
+      if (!linkedCheckbox) return;
+
+      // Check if ANY of the source checkboxes are checked (OR logic)
+      let anyChecked = false;
+      checkboxIds.forEach(checkboxId => {
+        const sourceCheckbox = document.getElementById(checkboxId);
+        if (sourceCheckbox && sourceCheckbox.checked) {
+          anyChecked = true;
+        }
+      });
+
+      // Update the linked checkbox state
+      linkedCheckbox.checked = anyChecked;
+    }
+
+    // Set up listeners for each linked checkbox group
+    linkedCheckboxes.forEach(linkedCheckboxGroup => {
+      const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+      const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+
+      if (!linkedCheckboxId || checkboxIds.length === 0) return;
+
+      // Set up event listeners on each source checkbox
+      checkboxIds.forEach(checkboxId => {
+        const sourceCheckbox = document.getElementById(checkboxId);
+        if (sourceCheckbox) {
+          // Add change event listener
+          sourceCheckbox.addEventListener('change', function() {
+            updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+          });
+
+          // Also listen for click events
+          sourceCheckbox.addEventListener('click', function() {
+            setTimeout(() => {
+              updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+            }, 0);
+          });
+        }
+      });
+
+      // Initial update to set correct state
+      setTimeout(() => {
+        updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+      }, 500);
+    });
+
+    // Global function to update all linked checkboxes (called after autofill)
+    window.updateAllLinkedCheckboxes = function() {
+      if (!linkedCheckboxes || linkedCheckboxes.length === 0) return;
+
+      linkedCheckboxes.forEach(linkedCheckboxGroup => {
+        const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+        const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+
+        if (!linkedCheckboxId || checkboxIds.length === 0) return;
+
+        const linkedCheckbox = document.getElementById(linkedCheckboxId);
+        if (!linkedCheckbox) return;
+
+        let anyChecked = false;
+        checkboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox && sourceCheckbox.checked) {
+            anyChecked = true;
+          }
+        });
+
+        linkedCheckbox.checked = anyChecked;
+      });
+    };
+  });
+  </script>
+`;
+```
+
+---
+
+### **PHASE 3: Runtime Implementation (output.html)**
+
+#### **3.1 Page Load Initialization**
+
+When `output.html` loads:
+1. **DOMContentLoaded Event Fires**: The script block runs after DOM is ready
+2. **Checks for Linked Checkboxes**: If `linkedCheckboxes` array is empty, exits early
+3. **Sets Up Event Listeners**: For each linked checkbox group, attaches listeners to all source checkboxes
+4. **Initial State Check**: After 500ms delay, updates all linked checkboxes to their correct initial state
+
+#### **3.2 The `updateLinkedCheckbox()` Function**
+
+**Purpose**: Updates a single linked checkbox based on its source checkboxes
+
+**Logic Flow:**
+1. Gets the linked checkbox element by ID
+2. If element doesn't exist, returns early
+3. Loops through all source checkbox IDs
+4. Checks if ANY source checkbox is checked
+5. Sets linked checkbox to `true` if any source is checked, `false` if all are unchecked
+
+**OR Logic Implementation:**
+```javascript
+let anyChecked = false;
+checkboxIds.forEach(checkboxId => {
+    const sourceCheckbox = document.getElementById(checkboxId);
+    if (sourceCheckbox && sourceCheckbox.checked) {
+        anyChecked = true;  // If ANY checkbox is checked, set to true
+    }
+});
+linkedCheckbox.checked = anyChecked;
+```
+
+#### **3.3 Event Listener Setup**
+
+For each source checkbox, two event listeners are attached:
+
+**1. Change Event Listener:**
+```javascript
+sourceCheckbox.addEventListener('change', function() {
+    updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+});
+```
+- Fires when checkbox state changes (checked/unchecked)
+- Immediately updates linked checkbox
+
+**2. Click Event Listener:**
+```javascript
+sourceCheckbox.addEventListener('click', function() {
+    setTimeout(() => {
+        updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+    }, 0);
+});
+```
+- Fires on click (before change event in some cases)
+- Uses `setTimeout(0)` to ensure checkbox state is updated before checking
+- Provides redundancy for edge cases
+
+#### **3.4 Initial State Update**
+
+After setting up listeners, an initial update runs:
+```javascript
+setTimeout(() => {
+    updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+}, 500);
+```
+
+**Why 500ms delay?**
+- Ensures all DOM elements are fully loaded
+- Allows any autofill or other initialization to complete
+- Sets correct initial state based on pre-checked checkboxes
+
+#### **3.5 Global Update Function**
+
+**Purpose**: `window.updateAllLinkedCheckboxes()` is called after autofill operations
+
+**Location**: Called from autofill code in `output.html` (around line 5343)
+
+**When it's called:**
+- After Firebase autofill completes
+- After URL parameter population
+- After any programmatic checkbox state changes
+
+**Implementation:**
+```javascript
+window.updateAllLinkedCheckboxes = function() {
+    if (!linkedCheckboxes || linkedCheckboxes.length === 0) return;
+
+    linkedCheckboxes.forEach(linkedCheckboxGroup => {
+        const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+        const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+
+        if (!linkedCheckboxId || checkboxIds.length === 0) return;
+
+        const linkedCheckbox = document.getElementById(linkedCheckboxId);
+        if (!linkedCheckbox) return;
+
+        let anyChecked = false;
+        checkboxIds.forEach(checkboxId => {
+            const sourceCheckbox = document.getElementById(checkboxId);
+            if (sourceCheckbox && sourceCheckbox.checked) {
+                anyChecked = true;
+            }
+        });
+
+        linkedCheckbox.checked = anyChecked;
+    });
+};
+```
+
+**Why it exists:**
+- Autofill might set checkbox states before linked checkbox listeners are attached
+- Ensures linked checkboxes are updated after any programmatic state changes
+- Provides a way to manually refresh all linked checkbox states
+
+---
+
+### **PHASE 4: Data Persistence**
+
+#### **4.1 Export to JSON**
+
+**Location**: `FormWiz GUI/gui.js` - When generating GUI JSON (around line 1000-1500)
+
+When exporting the form configuration, linked checkboxes are included in the JSON:
+
+```json
+{
+  "linkedCheckboxes": [
+    {
+      "id": "linkedCheckbox0",
+      "linkedCheckboxId": "hungry_or_thirsty",
+      "checkboxes": ["hungry_yes", "thristy_yes"]
+    }
+  ]
+}
+```
+
+**How it's collected:**
+- Reads from `window.linkedCheckboxesConfig` array
+- Includes all linked checkbox configurations
+- Preserves the exact structure from GUI setup
+
+#### **4.2 Import from JSON**
+
+**Location**: `FormWiz GUI/download.js` - `loadFormData()` function (around line 1898-1908)
+
+When importing a JSON file:
+```javascript
+// Load linked checkboxes
+if (formData.linkedCheckboxes && formData.linkedCheckboxes.length > 0) {
+    // Initialize linked checkboxes configuration
+    window.linkedCheckboxesConfig = [];
+    linkedCheckboxCounter = 0;
+    
+    formData.linkedCheckboxes.forEach(linkedCheckbox => {
+        // Create the linked checkbox display
+        createLinkedCheckboxDisplayFromImport(linkedCheckbox);
+    });
+}
+```
+
+**What happens:**
+1. Checks if `linkedCheckboxes` array exists in imported data
+2. Resets `window.linkedCheckboxesConfig` and counter
+3. Iterates through each linked checkbox configuration
+4. Calls `createLinkedCheckboxDisplayFromImport()` to recreate the visual display
+5. Restores the configuration in `window.linkedCheckboxesConfig`
+
+#### **4.3 Autosave Integration**
+
+**Location**: `FormWiz GUI/gui.js` - Autosave functionality
+
+Linked checkbox configurations are automatically saved:
+- When user makes changes to form questions
+- When linked checkbox configuration is modified
+- Included in autosave data structure
+
+**Autosave includes:**
+- `window.linkedCheckboxesConfig` array
+- All linked checkbox IDs and checkbox option arrays
+- Visual display elements
+
+---
+
+### **Summary: Complete Data Flow**
+
+1. **GUI Setup** (`gui.js`):
+   - User opens modal → selects checkbox options → enters linked checkbox ID → clicks Done
+   - Configuration stored in `window.linkedCheckboxesConfig`
+   - Visual display created in `linkedFieldsContainer`
+
+2. **Generate.js Processing** (`generate.js`):
+   - Reads from `window.linkedCheckboxesConfig`
+   - Copies to `linkedCheckboxes` array
+   - Embeds `linkedCheckboxes` as JavaScript variable in HTML
+   - Generates hidden checkbox elements
+   - Generates runtime JavaScript with event listeners
+
+3. **Output.html Runtime** (`output.html`):
+   - On page load: Sets up event listeners on source checkboxes
+   - On checkbox change: Updates linked checkbox state
+   - Uses OR logic: Any source checked → linked checked, All unchecked → linked unchecked
+   - Global function available for post-autofill updates
+
+4. **Data Persistence**:
+   - Export: `window.linkedCheckboxesConfig` → JSON `linkedCheckboxes` array
+   - Import: JSON `linkedCheckboxes` → `window.linkedCheckboxesConfig` → Visual display
+   - Autosave: Includes `window.linkedCheckboxesConfig` in autosave data
+
+---
+
+### **Key Technical Details**
+
+**OR Logic:**
+- The linked checkbox uses OR logic: if ANY source checkbox is checked, the linked checkbox becomes checked
+- If ALL source checkboxes are unchecked, the linked checkbox becomes unchecked
+
+**Event Handling:**
+- Both `change` and `click` events are listened to for redundancy
+- `setTimeout(0)` ensures state is updated before checking
+- Initial update after 500ms ensures DOM is ready
+
+**Hidden Checkbox:**
+- The linked checkbox is a hidden input element
+- It's included in form submission data
+- It's automatically managed by JavaScript
+
+**Global Update Function:**
+- `window.updateAllLinkedCheckboxes()` is available globally
+- Called after autofill operations
+- Can be called manually if needed
+
+**Multiple Linked Checkboxes:**
+- Supports multiple linked checkbox groups
+- Each group operates independently
+- Each group can link to different sets of source checkboxes
+
+---
+
+### **Future Enhancement Opportunities**
+
+1. **AND Logic Support**: Add option for AND logic (all checkboxes must be checked)
+2. **Custom Logic**: Allow custom boolean expressions (e.g., "A AND (B OR C)")
+3. **Visual Indicator**: Show linked checkbox state visually (even if hidden)
+4. **Conditional Linking**: Only link checkboxes when certain conditions are met
+5. **Nested Linking**: Allow linked checkboxes to link to other linked checkboxes
+
+---
+
+## 🔘 **Hidden Dropdown Checkboxes Feature**
+
+### **Overview**
+Hidden dropdown checkboxes automatically create hidden checkbox elements when a user selects an option from a dropdown question. When the user selects "Yes", a hidden checkbox with ID "hungry_yes" is created and checked. When they change to "No", the "hungry_yes" checkbox is removed and a new hidden checkbox "hungry_no" is created and checked. This feature allows dropdown selections to be treated as checkbox values for conditional logic, form submission, and other features that rely on checkbox state.
+
+**Example**: For a dropdown question "Hungry?" with options "Yes" and "No":
+- User selects "Yes" → Hidden checkbox `hungry_yes` is created and checked
+- User changes to "No" → `hungry_yes` checkbox is removed, `hungry_no` checkbox is created and checked
+- User clears selection → All checkboxes are removed
+
+**Key Benefits:**
+- Dropdown selections can be used in conditional logic that checks for checkbox states
+- Form submission includes checkbox data that matches dropdown selections
+- Compatible with linked checkbox features
+- Works with autofill from Firebase
+
+---
+
+### **PHASE 1: GUI Setup (gui.html / gui.js)**
+
+#### **1.1 Creating a Dropdown Question**
+**Location**: `FormWiz GUI/gui.js` - Dropdown question creation
+
+When a user creates a dropdown question in the GUI:
+1. User selects "Dropdown" as the question type
+2. User adds dropdown options (e.g., "Yes", "No")
+3. User can optionally set a `nameId` for the dropdown (e.g., "hungry")
+
+**No special configuration required**: The hidden checkbox feature is automatically enabled for all dropdown questions. There's no checkbox or setting to enable/disable it - it's built into every dropdown by default.
+
+#### **1.2 Dropdown Configuration Data**
+The dropdown question stores:
+- Question text (e.g., "Hungry?")
+- Question type: "dropdown"
+- Dropdown options array (e.g., ["Yes", "No"])
+- `nameId` (optional, e.g., "hungry")
+
+**Data Structure:**
+```javascript
+{
+  questionId: 1,
+  text: "Hungry?",
+  type: "dropdown",
+  options: ["Yes", "No"],
+  nameId: "hungry"
+}
+```
+
+---
+
+### **PHASE 2: Data Processing (generate.js)**
+
+#### **2.1 Generating Dropdown HTML**
+**Location**: `FormWiz GUI/generate.js` - Around line 1130-1146
+
+When generating HTML for a dropdown question, `generate.js` creates:
+
+```javascript
+// 1. The dropdown select element
+formHTML += `<select id="${ddNm}" name="${ddNm}"
+              onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+               <option value="" disabled selected>Select an option</option>`;
+
+// 2. Add dropdown options
+const ddOps = qBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
+for (let i = 0; i < ddOps.length; i++) {
+  const val = ddOps[i].value.trim();
+  if (val) {
+    formHTML += `<option value="${val}">${val}</option>`;
+  }
+}
+
+// 3. Create wrapper div for hidden checkboxes
+formHTML += `</select><br>
+      <div id="dropdowntext_${ddNm}"></div>
+      <input type="text" id="${ddNm}_dropdown" name="${ddNm}_dropdown"
+           readonly style="display:none;">`;
+```
+
+**Key Components:**
+1. **Dropdown select**: Has `onchange` handler calling `dropdownMirror(this, '${ddNm}')`
+2. **Wrapper div**: `<div id="dropdowntext_${ddNm}"></div>` - container where hidden checkboxes are placed
+3. **Hidden text field**: `<input type="text" id="${ddNm}_dropdown">` - stores dropdown value as text (separate feature)
+
+**Where `ddNm` comes from:**
+- Uses `nameId` if set (e.g., "hungry")
+- Otherwise uses `questionNameIds[questionId]` or `questionSlugMap[questionId]`
+- Falls back to sanitized question text
+
+#### **2.2 Generating the `dropdownMirror` Function**
+**Location**: `FormWiz GUI/generate.js` - Around line 5540-5571
+
+The `dropdownMirror` function is generated in the output HTML:
+
+```javascript
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    if(!val) {
+        wrap.innerHTML = "";
+        return;
+    }
+
+    const textId = baseName + "_dropdown";
+    const textField = document.getElementById(textId);
+
+    if(textField) {
+        textField.value = val;
+        textField.style.display = "none";
+    }
+
+    const existingCheckboxes = wrap.querySelectorAll("div");
+    existingCheckboxes.forEach(div => div.remove());
+
+    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+    const checkboxId = baseName + "_" + idSuffix;
+
+    const checkboxDiv = document.createElement("div");
+    checkboxDiv.style.display = "none";
+    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+
+    wrap.appendChild(checkboxDiv);
+    handleLinkedDropdowns(baseName, val);
+}
+```
+
+**What this function does:**
+1. Gets the wrapper div (`dropdowntext_${baseName}`)
+2. Gets the selected dropdown value
+3. If value is empty, clears the wrapper and returns
+4. Updates hidden text field (separate feature)
+5. **Removes all existing checkboxes** in the wrapper
+6. **Creates new hidden checkbox** with ID = `${baseName}_${sanitizedValue}`
+7. Sets checkbox to checked
+8. Appends to wrapper div
+
+**Checkbox ID Generation:**
+- Takes dropdown value (e.g., "Yes")
+- Sanitizes: `val.replace(/\W+/g, "_").toLowerCase()` → "yes"
+- Combines with base name: `baseName + "_" + idSuffix` → "hungry_yes"
+
+---
+
+### **PHASE 3: Runtime Implementation (output.html)**
+
+#### **3.1 Page Load Initialization**
+
+When `output.html` loads:
+1. All dropdowns are rendered with their options
+2. The `dropdownMirror` function is available globally
+3. Each dropdown has an `onchange` handler that calls `dropdownMirror`
+4. If a dropdown has a pre-selected value (from autofill), the handler may not fire immediately
+
+#### **3.2 User Selects Dropdown Option**
+
+**When user selects an option:**
+1. **Change event fires**: Dropdown's `onchange` attribute triggers
+2. **`dropdownMirror` is called**: With `this` (the select element) and the dropdown's `id` (baseName)
+3. **Wrapper div is found**: Gets `dropdowntext_${baseName}` container
+4. **Existing checkboxes removed**: All `<div>` elements inside wrapper are removed
+5. **New checkbox created**: For the newly selected value
+6. **Checkbox is checked**: Automatically set to `checked = true`
+7. **Appended to wrapper**: Hidden checkbox is added to the DOM
+
+**Example Flow:**
+```
+User selects "Yes" from "Hungry?" dropdown (id="hungry")
+  ↓
+dropdownMirror(selectElement, "hungry") called
+  ↓
+val = "Yes"
+  ↓
+idSuffix = "yes" (sanitized)
+  ↓
+checkboxId = "hungry_yes"
+  ↓
+Creates: <div style="display:none;">
+           <input type="checkbox" id="hungry_yes" name="hungry_yes" checked>
+           <label>hungry_yes</label>
+         </div>
+  ↓
+Appends to: <div id="dropdowntext_hungry"></div>
+```
+
+#### **3.3 User Changes Selection**
+
+**When user changes from "Yes" to "No":**
+1. **Old checkbox removed**: `existingCheckboxes.forEach(div => div.remove())` removes the "hungry_yes" checkbox
+2. **New checkbox created**: "hungry_no" checkbox is created and checked
+3. **Only one checkbox exists**: At any time, only the checkbox for the currently selected option exists
+
+**Why remove old checkboxes?**
+- Ensures only one checkbox is checked at a time (matching dropdown behavior)
+- Prevents stale checkbox data from accumulating
+- Keeps DOM clean and form submission data accurate
+
+#### **3.4 User Clears Selection**
+
+**When user clears the dropdown (returns to "Select an option"):**
+1. `val = selectEl.value.trim()` returns empty string
+2. `if(!val) { wrap.innerHTML = ""; return; }` executes
+3. All checkboxes are removed
+4. Function returns early
+
+#### **3.5 Autofill Support**
+
+**Location**: `FormWiz GUI/output.html` - `createHiddenCheckboxesForAutofilledDropdowns()` function (around line 6332)
+
+When Firebase autofills dropdown values, hidden checkboxes must be created:
+
+```javascript
+function createHiddenCheckboxesForAutofilledDropdowns() {
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.id || dropdown.id.startsWith('answer')) return; // Skip numbered dropdowns
+
+    const baseName = dropdown.id;
+    const selectedValue = dropdown.value.trim();
+
+    if (selectedValue) {
+      // Generate checkbox ID using the same pattern as dropdownMirror
+      const idSuffix = selectedValue.replace(/\W+/g, "_").toLowerCase();
+      const checkboxId = baseName + "_" + idSuffix;
+      const checkboxName = baseName + "_" + idSuffix;
+
+      // Clear any existing hidden checkboxes for this dropdown
+      const wrap = document.getElementById("dropdowntext_" + baseName);
+      if (wrap) {
+        while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+      }
+
+      // Check if this checkbox already exists
+      const existingCheckbox = document.getElementById(checkboxId);
+      if (!existingCheckbox) {
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
+
+      // Handle custom hidden logic for this dropdown
+      updateHiddenLogic(baseName, selectedValue);
+    }
+  });
+```
+
+**Helper Function `createHiddenCheckbox`:**
+- **Location**: `FormWiz GUI/output.html` - Around line 6303
+- Creates wrapper div if it doesn't exist
+- Creates hidden checkbox div with checkbox and label
+- Appends to wrapper container
+- Used by `createHiddenCheckboxesForAutofilledDropdowns()` for consistency
+
+**When it's called:**
+- After Firebase autofill completes
+- After URL parameter population
+- After any programmatic dropdown value setting
+
+**What it does:**
+1. Finds all dropdown elements (skips numbered dropdowns that start with "answer")
+2. For each dropdown with a value:
+   - Generates checkbox ID using same pattern as `dropdownMirror`
+   - Clears existing checkboxes in wrapper
+   - Creates new hidden checkbox if it doesn't exist
+   - Calls `updateHiddenLogic` for custom hidden logic
+
+---
+
+### **PHASE 4: Data Persistence**
+
+#### **4.1 Export to JSON**
+
+**Location**: `FormWiz GUI/gui.js` - When generating GUI JSON
+
+When exporting the form configuration, dropdown questions are included:
+
+```json
+{
+  "questionId": 1,
+  "text": "Hungry?",
+  "type": "dropdown",
+  "options": ["Yes", "No"],
+  "nameId": "hungry"
+}
+```
+
+**Hidden checkboxes are NOT stored in JSON:**
+- They are dynamically generated at runtime
+- Only the dropdown configuration is stored
+- Hidden checkboxes are recreated when the form loads or when user selects options
+
+#### **4.2 Import from JSON**
+
+**Location**: `FormWiz GUI/download.js` - `loadFormData()` function
+
+When importing a JSON file:
+1. Dropdown questions are recreated from JSON
+2. Dropdown options are restored
+3. Hidden checkboxes are NOT created during import
+4. Hidden checkboxes are created when:
+   - User selects a dropdown option
+   - Autofill sets a dropdown value
+   - `createHiddenCheckboxesForAutofilledDropdowns()` is called
+
+#### **4.3 Form Submission**
+
+**Hidden checkboxes are included in form submission:**
+- When user submits the form, all hidden checkboxes are included
+- Checkbox IDs follow pattern: `${dropdownName}_${optionValue}`
+- Example: `hungry_yes` or `hungry_no`
+
+**Form Data Structure:**
+```
+Form Data:
+  hungry: "Yes"                    (dropdown value)
+  hungry_dropdown: "Yes"           (hidden text field)
+  hungry_yes: "on"                (hidden checkbox, only if "Yes" selected)
+```
+
+---
+
+### **Summary: Complete Data Flow**
+
+1. **GUI Setup** (`gui.js`):
+   - User creates dropdown question with options
+   - Configuration stored in question data
+   - No special settings needed - feature is automatic
+
+2. **Generate.js Processing** (`generate.js`):
+   - Creates dropdown `<select>` element
+   - Adds `onchange="dropdownMirror(this, '${ddNm}')"` handler
+   - Creates wrapper div: `<div id="dropdowntext_${ddNm}"></div>`
+   - Generates `dropdownMirror` function in output HTML
+
+3. **Output.html Runtime** (`output.html`):
+   - On dropdown change: `dropdownMirror` function executes
+   - Removes old hidden checkboxes
+   - Creates new hidden checkbox for selected option
+   - Checkbox ID = `${dropdownName}_${sanitizedOptionValue}`
+   - Checkbox is automatically checked
+
+4. **Autofill Support**:
+   - `createHiddenCheckboxesForAutofilledDropdowns()` creates checkboxes for autofilled values
+   - Called after Firebase autofill completes
+   - Uses same checkbox ID generation pattern
+
+5. **Form Submission**:
+   - Hidden checkboxes are included in form data
+   - Only the checkbox for the currently selected option exists
+   - Checkbox state matches dropdown selection
+
+---
+
+### **Key Technical Details**
+
+**Checkbox ID Sanitization:**
+- Option value "Yes" → sanitized to "yes"
+- Option value "No Thanks" → sanitized to "no_thanks"
+- Uses regex: `/\W+/g` to replace non-word characters with underscores
+- Converts to lowercase
+
+**Wrapper Container:**
+- ID pattern: `dropdowntext_${dropdownName}`
+- Contains `<div>` elements, each with a hidden checkbox
+- Only one checkbox exists at a time (old ones are removed)
+
+**Hidden Checkbox Structure:**
+```html
+<div style="display:none;">
+  <input type="checkbox" id="hungry_yes" name="hungry_yes" checked>
+  <label for="hungry_yes">hungry_yes</label>
+</div>
+```
+
+**Event Handling:**
+- Uses inline `onchange` attribute on `<select>` element
+- Calls `dropdownMirror` immediately when selection changes
+- Also calls `updateHiddenLogic`, `updateLinkedFields`, `clearInactiveLinkedFields`
+
+**Autofill Compatibility:**
+- Separate function `createHiddenCheckboxesForAutofilledDropdowns()` handles autofill
+- Checks all dropdowns on page
+- Creates checkboxes for any dropdowns with values
+- Called after autofill completes
+
+**Integration with Other Features:**
+- **Conditional Logic**: Can check for hidden checkbox IDs (e.g., "hungry_yes")
+- **Linked Checkboxes**: Hidden checkboxes can be linked to other checkboxes
+- **Hidden Logic**: Works with custom hidden logic configurations
+- **Form Submission**: Hidden checkboxes included in submitted data
+
+---
+
+### **Future Enhancement Opportunities**
+
+1. **Multiple Selection Support**: Allow multiple checkboxes to exist simultaneously (for multi-select dropdowns)
+2. **Checkbox Persistence**: Option to persist hidden checkboxes even when dropdown is cleared
+3. **Custom Checkbox IDs**: Allow custom checkbox ID format instead of automatic generation
+4. **Visual Indicator**: Option to show hidden checkbox state in debug mode
+5. **Checkbox Unchecking**: Option to uncheck (but not remove) checkbox when dropdown is cleared
 
 ---
 

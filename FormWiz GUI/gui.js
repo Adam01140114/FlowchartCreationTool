@@ -4590,6 +4590,35 @@ function populateLinkedCheckboxDropdown(idx) {
             const labelText = (unifiedTexts[i]?.value || '').trim();
             if (nodeId) options.push({ nodeId, label: labelText || nodeId });
         });
+
+        // Hidden dropdown checkboxes - generate IDs for dropdown options
+        if (typeSel.value === 'dropdown') {
+            // Get the dropdown's nameId (similar to how textbox gets its nameId)
+            const nameIdInput = block.querySelector(`#textboxName${qId}`);
+            const nameId = nameIdInput ? nameIdInput.value.trim() : '';
+            
+            // Get dropdown question text for better labeling
+            const questionTextEl = block.querySelector(`#question${qId}`);
+            const questionText = questionTextEl ? questionTextEl.value.trim() : `Question ${qId}`;
+            
+            // Get all dropdown options
+            const dropdownOptionInputs = block.querySelectorAll(`#dropdownOptions${qId} input`);
+            dropdownOptionInputs.forEach((optionInput) => {
+                const optionValue = optionInput.value.trim();
+                if (optionValue) {
+                    // Generate checkbox ID using same pattern as dropdownMirror
+                    // Sanitize: replace non-word chars with underscore, convert to lowercase
+                    const sanitizedValue = optionValue.replace(/\W+/g, "_").toLowerCase();
+                    const dropdownNameId = nameId || `answer${qId}`;
+                    const checkboxId = `${dropdownNameId}_${sanitizedValue}`;
+                    
+                    // Create label: "Question Text - Option Value (checkboxId)"
+                    const label = `${questionText} - ${optionValue} (${checkboxId})`;
+                    
+                    options.push({ nodeId: checkboxId, label: label });
+                }
+            });
+        }
     });
 
     // Build options list and searchable overlay
