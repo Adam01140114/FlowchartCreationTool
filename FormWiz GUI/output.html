@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_are_you_the_only_person_suing"></div>
               <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container data-question-type="numberedDropdown" hidden"><label><h3>How many extra plantiffs</h3></label><p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many_extra_plantiffs" name="how_many_extra_plantiffs" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_extra_plantiffs', this.value)">
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden" data-question-type="numberedDropdown"><label><h3>How many extra plantiffs</h3></label><p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many_extra_plantiffs" name="how_many_extra_plantiffs" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_extra_plantiffs', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
@@ -368,8 +368,8 @@ document.addEventListener("DOMContentLoaded", function() {
 window.formId = '';
 var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"how_many_extra_plantiffs"};
 var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_extra_plantiffs"};
-var linkedCheckboxes = [{"linkedCheckboxId":"linked_checkbox","checkboxes":["hello_option_w_1","are_you_the_only_person_suing_yes"]}];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_plantiffs_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_plantiffs_phone_number","order":2},{"type":"location","fieldName":"bruh what","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Please list the person or agent authorized for service of process","fields":[{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"dropdown","fieldName":"hello","options":[{"text":"option w"}]}]}],"order":4}]};
+var linkedCheckboxes = [{"linkedCheckboxId":"linked_checkbox","checkboxes":["are_you_the_only_person_suing_no","user_biz","is_this_plaintiff_a_business_yes_1"]}];
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_plantiffs_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_plantiffs_phone_number","order":2},{"type":"location","fieldName":"bruh what","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"dropdown","fieldName":"bruh","options":[{"text":"what"}]}]}],"order":4}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText) {
     const triggerContainer = document.createElement('div');
@@ -510,7 +510,13 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
 
         const select = document.createElement('select');
         const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
-        select.id = sanitizedFieldName + "_" + entryNumber;
+        
+        // Get question nodeId - this will be at the start of the hidden checkbox ID
+        const questionNodeId = questionNameIds[questionId] || ('answer' + questionId);
+        
+        // Format: {questionNodeId}_{dropdownFieldName}_{entryNumber}
+        // When dropdownMirror is called, it will create: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+        select.id = questionNodeId + "_" + sanitizedFieldName + "_" + entryNumber;
         select.name = select.id;
         select.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto; display: block;';
 
@@ -1240,10 +1246,14 @@ var hiddenTextCalculations = [];
     }
   })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || thisQ.querySelector('select[id^="answer"]')){
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     console.log('🔧 [CONDITIONAL LOGIC] Resetting numbered dropdown question 2');
      if(typeof resetNumberedDropdownFields === 'function'){
        resetNumberedDropdownFields("2");
+     } else {
+       console.warn('🔧 [CONDITIONAL LOGIC] resetNumberedDropdownFields function not found');
      }
    }
    thisQ.classList.add("hidden");
@@ -3248,10 +3258,13 @@ function showTextboxLabels(questionId, count){
 
 // Reset all fields in a numbered dropdown question to their default values
 function resetNumberedDropdownFields(questionId) {
+    console.log('🔧 [RESET DEBUG] resetNumberedDropdownFields called for questionId:', questionId);
     // Reset the main dropdown select to its default (empty/placeholder)
     const dropdownId = questionNameIds[questionId] || ("answer" + questionId);
+    console.log('🔧 [RESET DEBUG] Looking for dropdown with ID:', dropdownId);
     const dropdown = document.getElementById(dropdownId);
     if (dropdown) {
+        console.log('🔧 [RESET DEBUG] Found dropdown, resetting value');
         dropdown.value = '';
         // Find and select the placeholder option
         const placeholderOption = dropdown.querySelector('option[disabled]');
@@ -3260,6 +3273,10 @@ function resetNumberedDropdownFields(questionId) {
         } else if (dropdown.options.length > 0) {
             dropdown.selectedIndex = 0;
         }
+        // Don't trigger change event here - it causes initialization issues with isCreatingFields
+        // Instead, we'll clear the container directly
+    } else {
+        console.log('🔧 [RESET DEBUG] Dropdown not found with ID:', dropdownId);
     }
     
     // Get the label container
@@ -3349,15 +3366,19 @@ function resetNumberedDropdownFields(questionId) {
         }
     });
     
-    // Clear all entries by calling showTextboxLabels with count 0
-    if (typeof showTextboxLabels === 'function') {
-        showTextboxLabels(questionId, 0);
+    // Clear all entries by directly clearing the container instead of calling showTextboxLabels
+    // This avoids the isCreatingFields initialization issue
+    const labelContainer = document.getElementById("labelContainer" + questionId);
+    if (labelContainer) {
+        labelContainer.innerHTML = '';
     }
     
     // Also update hidden checkboxes
     if (typeof updateHiddenCheckboxes === 'function') {
         updateHiddenCheckboxes(questionId, 0);
     }
+    
+    // Don't trigger change event - we've already cleared everything manually
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -3608,7 +3629,8 @@ function dropdownMirror(selectEl, baseName){
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: AFTER replace - idSuffix:', idSuffix);
     
     // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)
-    // Format should be: fieldName_optionValue_entryNumber (entry number last)
+    // Format should be: {questionNodeId}_{triggerTitle}_{fieldName}_optionValue_entryNumber (entry number last)
+    // OR: fieldName_optionValue_entryNumber for numbered dropdowns
     const lastUnderscoreIndex = baseName.lastIndexOf('_');
     let checkboxId;
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: baseName:', baseName, 'lastUnderscoreIndex:', lastUnderscoreIndex);
@@ -3620,12 +3642,23 @@ function dropdownMirror(selectEl, baseName){
         console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: potentialEntryNumber:', potentialEntryNumber, 'regex test:', /^[0-9]+$/.test(potentialEntryNumber));
         
         if (/^[0-9]+$/.test(potentialEntryNumber)) {
-            // It's a numbered dropdown or trigger sequence dropdown: extract field name and entry number
-            const fieldName = baseName.substring(0, lastUnderscoreIndex);
-            const entryNumber = potentialEntryNumber;
-            // Format: fieldName_optionValue_entryNumber (entry number last)
-            checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
-            console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered/trigger dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            // It's a numbered dropdown or trigger sequence dropdown
+            const baseWithoutEntry = baseName.substring(0, lastUnderscoreIndex);
+            const underscoreCount = (baseWithoutEntry.match(/_/g) || []).length;
+            
+            if (underscoreCount >= 1) {
+                // This is likely a trigger sequence dropdown: {questionNodeId}_{dropdownFieldName}_{entryNumber}
+                // We want: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+                // So we just insert the option value before the entry number
+                checkboxId = baseWithoutEntry + "_" + idSuffix + "_" + potentialEntryNumber;
+                console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: trigger sequence dropdown detected, baseName:', baseName, 'baseWithoutEntry:', baseWithoutEntry, 'entryNumber:', potentialEntryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            } else {
+                // This is a numbered dropdown: fieldName_entryNumber -> fieldName_optionValue_entryNumber
+                const fieldName = baseWithoutEntry;
+                const entryNumber = potentialEntryNumber;
+                checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+                console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            }
         } else {
             // Regular dropdown: keep original format
             checkboxId = baseName + "_" + idSuffix;

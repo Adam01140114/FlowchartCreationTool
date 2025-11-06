@@ -1230,6 +1230,7 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
   const orderedTimes = [];
   const orderedLocations = [];
   const orderedPdfs = [];
+  const orderedDropdowns = [];
   
   // Create unified order array that preserves cross-type ordering
   const unifiedOrder = [];
@@ -1345,6 +1346,17 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
         orderedPdfs.push(pdf);
         unifiedOrder.push({ type: 'pdf', identifier: identifier || 'pdf' });
       }
+    } else if (type === 'dropdown') {
+      // Find the dropdown object by matching fieldName from the DOM
+      const fieldNameInput = entry.querySelector('input[placeholder="Enter dropdown question title..."]');
+      if (fieldNameInput) {
+        const fieldName = fieldNameInput.value.trim();
+        const dropdown = (triggerSequence.dropdowns || []).find(d => d.fieldName === fieldName);
+        if (dropdown) {
+          orderedDropdowns.push(dropdown);
+          unifiedOrder.push({ type: 'dropdown', identifier: fieldName });
+        }
+      }
     }
   });
   
@@ -1373,6 +1385,10 @@ function saveTriggerSequenceOrder(actionsList, triggerSequence) {
   
   if (triggerSequence.pdfs) {
     triggerSequence.pdfs = orderedPdfs;
+  }
+  
+  if (triggerSequence.dropdowns) {
+    triggerSequence.dropdowns = orderedDropdowns;
   }
   
   // Store the unified order array to preserve cross-type ordering
@@ -4481,9 +4497,233 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           }
         };
         
+        const addDropdownBtn = document.createElement('button');
+        addDropdownBtn.textContent = 'Add Dropdown';
+        addDropdownBtn.style.cssText = `
+          background: #17a2b8;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        addDropdownBtn.onclick = () => {
+          // Create new dropdown entry
+          const newDropdown = {
+            fieldName: '',
+            options: []
+          };
+          if (!triggerSequence.dropdowns) triggerSequence.dropdowns = [];
+          triggerSequence.dropdowns.push(newDropdown);
+          
+          // Update the actions list for this trigger sequence
+          const triggerDiv = addDropdownBtn.closest('.trigger-sequence');
+          if (triggerDiv) {
+            const actionsList = triggerDiv.querySelector('.actions-list');
+            if (actionsList) {
+              // Create dropdown entry container
+              const dropdownContainer = document.createElement('div');
+              dropdownContainer.draggable = true;
+              dropdownContainer.dataset.type = 'dropdown';
+              dropdownContainer.dataset.triggerIndex = triggerIndex;
+              dropdownContainer.style.cssText = `
+                margin-bottom: 10px;
+                padding: 8px;
+                background: #e0f7fa;
+                border: 1px solid #17a2b8;
+                border-radius: 4px;
+                cursor: move;
+                position: relative;
+              `;
+              
+              // Add drag handle
+              const dragHandle = document.createElement('div');
+              dragHandle.innerHTML = '⋮⋮';
+              dragHandle.style.cssText = `
+                position: absolute;
+                left: 4px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: move;
+                color: #17a2b8;
+                font-size: 14px;
+                user-select: none;
+                padding: 2px;
+              `;
+              dropdownContainer.appendChild(dragHandle);
+              
+              // Create content container
+              const contentContainer = document.createElement('div');
+              contentContainer.style.cssText = `
+                margin-left: 24px;
+              `;
+              
+              // Field name input
+              const fieldNameInput = document.createElement('input');
+              fieldNameInput.type = 'text';
+              fieldNameInput.placeholder = 'Enter dropdown question title...';
+              fieldNameInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              fieldNameInput.onblur = () => {
+                newDropdown.fieldName = fieldNameInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Add option button
+              const addOptionBtn = document.createElement('button');
+              addOptionBtn.textContent = 'Add option';
+              addOptionBtn.style.cssText = `
+                background: #17a2b8;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+                margin-bottom: 8px;
+              `;
+              
+              // Options container
+              const optionsContainer = document.createElement('div');
+              optionsContainer.className = 'dropdown-options-container';
+              optionsContainer.style.cssText = `
+                margin-bottom: 8px;
+              `;
+              
+              addOptionBtn.onclick = () => {
+                const newOption = { text: '' };
+                newDropdown.options.push(newOption);
+                
+                // Create option input
+                const optionDiv = document.createElement('div');
+                optionDiv.style.cssText = `
+                  display: flex;
+                  gap: 4px;
+                  margin-bottom: 4px;
+                  align-items: center;
+                `;
+                
+                const optionInput = document.createElement('input');
+                optionInput.type = 'text';
+                optionInput.placeholder = 'Enter option text...';
+                optionInput.style.cssText = `
+                  flex: 1;
+                  padding: 4px 8px;
+                  border: 1px solid #ddd;
+                  border-radius: 3px;
+                  font-size: 12px;
+                `;
+                optionInput.value = newOption.text || '';
+                optionInput.onblur = () => {
+                  newOption.text = optionInput.value.trim();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                };
+                
+                const deleteOptionBtn = document.createElement('button');
+                deleteOptionBtn.textContent = '×';
+                deleteOptionBtn.style.cssText = `
+                  background: #f44336;
+                  color: white;
+                  border: none;
+                  padding: 2px 6px;
+                  border-radius: 3px;
+                  cursor: pointer;
+                  font-size: 14px;
+                  width: 24px;
+                  height: 24px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                `;
+                deleteOptionBtn.onclick = () => {
+                  const optionIndex = newDropdown.options.findIndex(o => o === newOption);
+                  if (optionIndex !== -1) {
+                    newDropdown.options.splice(optionIndex, 1);
+                  }
+                  optionDiv.remove();
+                  if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                  }
+                };
+                
+                optionDiv.appendChild(optionInput);
+                optionDiv.appendChild(deleteOptionBtn);
+                optionsContainer.appendChild(optionDiv);
+                optionInput.focus();
+              };
+              
+              // Delete dropdown button
+              const deleteDropdownBtn = document.createElement('button');
+              deleteDropdownBtn.textContent = 'Delete Dropdown';
+              deleteDropdownBtn.style.cssText = `
+                background: #f44336;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 11px;
+              `;
+              deleteDropdownBtn.onclick = () => {
+                const dropdownIndex = triggerSequence.dropdowns.findIndex(d => d === newDropdown);
+                if (dropdownIndex !== -1) {
+                  triggerSequence.dropdowns.splice(dropdownIndex, 1);
+                }
+                dropdownContainer.remove();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              contentContainer.appendChild(fieldNameInput);
+              contentContainer.appendChild(addOptionBtn);
+              contentContainer.appendChild(optionsContainer);
+              contentContainer.appendChild(deleteDropdownBtn);
+              
+              dropdownContainer.appendChild(contentContainer);
+              
+              // Add drag handlers
+              dropdownContainer.addEventListener('dragstart', (e) => {
+                dropdownContainer.classList.add('dragging');
+                dropdownContainer.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', JSON.stringify({
+                  type: 'dropdown',
+                  triggerIndex: triggerIndex,
+                  dropdownIndex: triggerSequence.dropdowns.indexOf(newDropdown)
+                }));
+              });
+              
+              dropdownContainer.addEventListener('dragend', (e) => {
+                dropdownContainer.classList.remove('dragging');
+                dropdownContainer.style.opacity = '1';
+              });
+              
+              actionsList.appendChild(dropdownContainer);
+              fieldNameInput.focus();
+            }
+          }
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
         actionButtons.appendChild(addLabelBtn);
         actionButtons.appendChild(addCheckboxBtn);
         actionButtons.appendChild(addTimeBtn);
+        actionButtons.appendChild(addDropdownBtn);
         actionButtons.appendChild(addLocationBtn);
         actionButtons.appendChild(addPdfBtn);
         triggerDiv.appendChild(actionButtons);
@@ -5850,9 +6090,233 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       }
     };
     
+    const addDropdownBtn = document.createElement('button');
+    addDropdownBtn.textContent = 'Add Dropdown';
+    addDropdownBtn.style.cssText = `
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    `;
+    addDropdownBtn.onclick = () => {
+      // Create new dropdown entry
+      const newDropdown = {
+        fieldName: '',
+        options: []
+      };
+      if (!trigger.dropdowns) trigger.dropdowns = [];
+      trigger.dropdowns.push(newDropdown);
+      
+      // Update the actions list for this trigger sequence
+      const triggerDiv = addDropdownBtn.closest('.trigger-sequence');
+      if (triggerDiv) {
+        const actionsList = triggerDiv.querySelector('.actions-list');
+        if (actionsList) {
+          // Create dropdown entry container
+          const dropdownContainer = document.createElement('div');
+          dropdownContainer.draggable = true;
+          dropdownContainer.dataset.type = 'dropdown';
+          dropdownContainer.dataset.triggerIndex = triggerIndex;
+          dropdownContainer.style.cssText = `
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #e0f7fa;
+            border: 1px solid #17a2b8;
+            border-radius: 4px;
+            cursor: move;
+            position: relative;
+          `;
+          
+          // Add drag handle
+          const dragHandle = document.createElement('div');
+          dragHandle.innerHTML = '⋮⋮';
+          dragHandle.style.cssText = `
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: move;
+            color: #17a2b8;
+            font-size: 14px;
+            user-select: none;
+            padding: 2px;
+          `;
+          dropdownContainer.appendChild(dragHandle);
+          
+          // Create content container
+          const contentContainer = document.createElement('div');
+          contentContainer.style.cssText = `
+            margin-left: 24px;
+          `;
+          
+          // Field name input
+          const fieldNameInput = document.createElement('input');
+          fieldNameInput.type = 'text';
+          fieldNameInput.placeholder = 'Enter dropdown question title...';
+          fieldNameInput.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+          `;
+          fieldNameInput.onblur = () => {
+            newDropdown.fieldName = fieldNameInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          // Add option button
+          const addOptionBtn = document.createElement('button');
+          addOptionBtn.textContent = 'Add option';
+          addOptionBtn.style.cssText = `
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-bottom: 8px;
+          `;
+          
+          // Options container
+          const optionsContainer = document.createElement('div');
+          optionsContainer.className = 'dropdown-options-container';
+          optionsContainer.style.cssText = `
+            margin-bottom: 8px;
+          `;
+          
+          addOptionBtn.onclick = () => {
+            const newOption = { text: '' };
+            newDropdown.options.push(newOption);
+            
+            // Create option input
+            const optionDiv = document.createElement('div');
+            optionDiv.style.cssText = `
+              display: flex;
+              gap: 4px;
+              margin-bottom: 4px;
+              align-items: center;
+            `;
+            
+            const optionInput = document.createElement('input');
+            optionInput.type = 'text';
+            optionInput.placeholder = 'Enter option text...';
+            optionInput.style.cssText = `
+              flex: 1;
+              padding: 4px 8px;
+              border: 1px solid #ddd;
+              border-radius: 3px;
+              font-size: 12px;
+            `;
+            optionInput.value = newOption.text || '';
+            optionInput.onblur = () => {
+              newOption.text = optionInput.value.trim();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const deleteOptionBtn = document.createElement('button');
+            deleteOptionBtn.textContent = '×';
+            deleteOptionBtn.style.cssText = `
+              background: #f44336;
+              color: white;
+              border: none;
+              padding: 2px 6px;
+              border-radius: 3px;
+              cursor: pointer;
+              font-size: 14px;
+              width: 24px;
+              height: 24px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            `;
+            deleteOptionBtn.onclick = () => {
+              const optionIndex = newDropdown.options.findIndex(o => o === newOption);
+              if (optionIndex !== -1) {
+                newDropdown.options.splice(optionIndex, 1);
+              }
+              optionDiv.remove();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            optionDiv.appendChild(optionInput);
+            optionDiv.appendChild(deleteOptionBtn);
+            optionsContainer.appendChild(optionDiv);
+            optionInput.focus();
+          };
+          
+          // Delete dropdown button
+          const deleteDropdownBtn = document.createElement('button');
+          deleteDropdownBtn.textContent = 'Delete Dropdown';
+          deleteDropdownBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+          `;
+          deleteDropdownBtn.onclick = () => {
+            const dropdownIndex = trigger.dropdowns.findIndex(d => d === newDropdown);
+            if (dropdownIndex !== -1) {
+              trigger.dropdowns.splice(dropdownIndex, 1);
+            }
+            dropdownContainer.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          contentContainer.appendChild(fieldNameInput);
+          contentContainer.appendChild(addOptionBtn);
+          contentContainer.appendChild(optionsContainer);
+          contentContainer.appendChild(deleteDropdownBtn);
+          
+          dropdownContainer.appendChild(contentContainer);
+          
+          // Add drag handlers
+          dropdownContainer.addEventListener('dragstart', (e) => {
+            dropdownContainer.classList.add('dragging');
+            dropdownContainer.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+              type: 'dropdown',
+              triggerIndex: triggerIndex,
+              dropdownIndex: trigger.dropdowns.indexOf(newDropdown)
+            }));
+          });
+          
+          dropdownContainer.addEventListener('dragend', (e) => {
+            dropdownContainer.classList.remove('dragging');
+            dropdownContainer.style.opacity = '1';
+          });
+          
+          actionsList.appendChild(dropdownContainer);
+          fieldNameInput.focus();
+        }
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
     actionButtons.appendChild(addLabelBtn);
     actionButtons.appendChild(addCheckboxBtn);
     actionButtons.appendChild(addTimeBtn);
+    actionButtons.appendChild(addDropdownBtn);
     actionButtons.appendChild(addLocationBtn);
     actionButtons.appendChild(addPdfBtn);
     triggerDiv.appendChild(actionButtons);
@@ -7226,6 +7690,260 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         // Store in map instead of appending directly
         const pdfIdentifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
         storeEntryContainer('pdf', pdfIdentifier, pdfContainer);
+      });
+    }
+    
+    // Display existing dropdowns
+    if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+      trigger.dropdowns.forEach((dropdown, dropdownIndex) => {
+        const dropdownContainer = document.createElement('div');
+        dropdownContainer.draggable = true;
+        dropdownContainer.dataset.type = 'dropdown';
+        dropdownContainer.dataset.triggerIndex = triggerIndex;
+        dropdownContainer.style.cssText = `
+          margin-bottom: 10px;
+          padding: 8px;
+          background: #e0f7fa;
+          border: 1px solid #17a2b8;
+          border-radius: 4px;
+          cursor: move;
+          position: relative;
+        `;
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.innerHTML = '⋮⋮';
+        dragHandle.style.cssText = `
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          cursor: move;
+          color: #17a2b8;
+          font-size: 14px;
+          user-select: none;
+          padding: 2px;
+        `;
+        dropdownContainer.appendChild(dragHandle);
+        
+        // Create content container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+          margin-left: 24px;
+        `;
+        
+        // Field name input
+        const fieldNameInput = document.createElement('input');
+        fieldNameInput.type = 'text';
+        fieldNameInput.placeholder = 'Enter dropdown question title...';
+        fieldNameInput.value = dropdown.fieldName || '';
+        fieldNameInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        fieldNameInput.onblur = () => {
+          dropdown.fieldName = fieldNameInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Add option button
+        const addOptionBtn = document.createElement('button');
+        addOptionBtn.textContent = 'Add option';
+        addOptionBtn.style.cssText = `
+          background: #17a2b8;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+          margin-bottom: 8px;
+        `;
+        
+        // Options container
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'dropdown-options-container';
+        optionsContainer.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        
+        // Render existing options
+        if (dropdown.options && dropdown.options.length > 0) {
+          dropdown.options.forEach((option, optionIndex) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.style.cssText = `
+              display: flex;
+              gap: 4px;
+              margin-bottom: 4px;
+              align-items: center;
+            `;
+            
+            const optionInput = document.createElement('input');
+            optionInput.type = 'text';
+            optionInput.placeholder = 'Enter option text...';
+            optionInput.value = option.text || '';
+            optionInput.style.cssText = `
+              flex: 1;
+              padding: 4px 8px;
+              border: 1px solid #ddd;
+              border-radius: 3px;
+              font-size: 12px;
+            `;
+            optionInput.onblur = () => {
+              option.text = optionInput.value.trim();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            const deleteOptionBtn = document.createElement('button');
+            deleteOptionBtn.textContent = '×';
+            deleteOptionBtn.style.cssText = `
+              background: #f44336;
+              color: white;
+              border: none;
+              padding: 2px 6px;
+              border-radius: 3px;
+              cursor: pointer;
+              font-size: 14px;
+              width: 24px;
+              height: 24px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            `;
+            deleteOptionBtn.onclick = () => {
+              const optIndex = dropdown.options.findIndex(o => o === option);
+              if (optIndex !== -1) {
+                dropdown.options.splice(optIndex, 1);
+              }
+              optionDiv.remove();
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            };
+            
+            optionDiv.appendChild(optionInput);
+            optionDiv.appendChild(deleteOptionBtn);
+            optionsContainer.appendChild(optionDiv);
+          });
+        }
+        
+        addOptionBtn.onclick = () => {
+          const newOption = { text: '' };
+          dropdown.options.push(newOption);
+          
+          // Create option input
+          const optionDiv = document.createElement('div');
+          optionDiv.style.cssText = `
+            display: flex;
+            gap: 4px;
+            margin-bottom: 4px;
+            align-items: center;
+          `;
+          
+          const optionInput = document.createElement('input');
+          optionInput.type = 'text';
+          optionInput.placeholder = 'Enter option text...';
+          optionInput.style.cssText = `
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+          `;
+          optionInput.value = newOption.text || '';
+          optionInput.onblur = () => {
+            newOption.text = optionInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const deleteOptionBtn = document.createElement('button');
+          deleteOptionBtn.textContent = '×';
+          deleteOptionBtn.style.cssText = `
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          `;
+          deleteOptionBtn.onclick = () => {
+            const optIndex = dropdown.options.findIndex(o => o === newOption);
+            if (optIndex !== -1) {
+              dropdown.options.splice(optIndex, 1);
+            }
+            optionDiv.remove();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          optionDiv.appendChild(optionInput);
+          optionDiv.appendChild(deleteOptionBtn);
+          optionsContainer.appendChild(optionDiv);
+          optionInput.focus();
+        };
+        
+        // Delete dropdown button
+        const deleteDropdownBtn = document.createElement('button');
+        deleteDropdownBtn.textContent = 'Delete Dropdown';
+        deleteDropdownBtn.style.cssText = `
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 11px;
+        `;
+        deleteDropdownBtn.onclick = () => {
+          const dropIndex = trigger.dropdowns.findIndex(d => d === dropdown);
+          if (dropIndex !== -1) {
+            trigger.dropdowns.splice(dropIndex, 1);
+          }
+          dropdownContainer.remove();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        contentContainer.appendChild(fieldNameInput);
+        contentContainer.appendChild(addOptionBtn);
+        contentContainer.appendChild(optionsContainer);
+        contentContainer.appendChild(deleteDropdownBtn);
+        
+        dropdownContainer.appendChild(contentContainer);
+        
+        // Add drag handlers
+        dropdownContainer.addEventListener('dragstart', (e) => {
+          dropdownContainer.classList.add('dragging');
+          dropdownContainer.style.opacity = '0.5';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        dropdownContainer.addEventListener('dragend', (e) => {
+          dropdownContainer.classList.remove('dragging');
+          dropdownContainer.style.opacity = '1';
+        });
+        
+        // Store in map instead of appending directly
+        const dropdownIdentifier = dropdown.fieldName || 'dropdown';
+        storeEntryContainer('dropdown', dropdownIdentifier, dropdownContainer);
       });
     }
     

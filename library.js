@@ -996,6 +996,13 @@ window.exportGuiJson = function(download = true) {
                     });
                   }
                   
+                  const dropdownMap = new Map();
+                  if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+                    trigger.dropdowns.forEach(dropdown => {
+                      dropdownMap.set(dropdown.fieldName || '', dropdown);
+                    });
+                  }
+                  
                   // Use unified order if available, otherwise use type-based order
                   if (trigger._actionOrder && trigger._actionOrder.length > 0) {
                     // Add fields in the unified order
@@ -1042,6 +1049,19 @@ window.exportGuiJson = function(download = true) {
                           }
                           
                           fields.push(dateField);
+                        }
+                      } else if (orderItem.type === 'dropdown') {
+                        const dropdown = dropdownMap.get(orderItem.identifier);
+                        if (dropdown) {
+                          const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
+                            text: option.text || ""
+                          })) : [];
+                          
+                          fields.push({
+                            type: "dropdown",
+                            fieldName: dropdown.fieldName || "",
+                            options: dropdownOptions
+                          });
                         }
                       } else if (orderItem.type === 'location') {
                         const location = locationMap.get(orderItem.identifier);
@@ -1144,6 +1164,24 @@ window.exportGuiJson = function(download = true) {
                       });
                     }
                     
+                    if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+                      trigger.dropdowns.forEach(dropdown => {
+                        // Check if this dropdown was already added to fields
+                        const existingField = fields.find(f => f.type === 'dropdown' && f.fieldName === dropdown.fieldName);
+                        if (!existingField) {
+                          const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
+                            text: option.text || ""
+                          })) : [];
+                          
+                          fields.push({
+                            type: "dropdown",
+                            fieldName: dropdown.fieldName || "",
+                            options: dropdownOptions
+                          });
+                        }
+                      });
+                    }
+                    
                     if (trigger.pdfs && trigger.pdfs.length > 0) {
                       trigger.pdfs.forEach(pdf => {
                         const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
@@ -1219,6 +1257,21 @@ window.exportGuiJson = function(download = true) {
                           type: "location",
                           fieldName: location.locationTitle || "",
                           nodeId: "location_data"
+                        });
+                      });
+                    }
+                    
+                    // Add dropdowns
+                    if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+                      trigger.dropdowns.forEach(dropdown => {
+                        const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
+                          text: option.text || ""
+                        })) : [];
+                        
+                        fields.push({
+                          type: "dropdown",
+                          fieldName: dropdown.fieldName || "",
+                          options: dropdownOptions
                         });
                       });
                     }

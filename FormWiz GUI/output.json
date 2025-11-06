@@ -171,7 +171,7 @@
               "triggerSequences": [
                 {
                   "condition": "Yes",
-                  "title": "Please list the person or agent authorized for service of process",
+                  "title": "Additional Information",
                   "fields": [
                     {
                       "type": "label",
@@ -180,10 +180,10 @@
                     },
                     {
                       "type": "dropdown",
-                      "fieldName": "hello",
+                      "fieldName": "bruh",
                       "options": [
                         {
-                          "text": "option w"
+                          "text": "what"
                         }
                       ]
                     }
@@ -212,11 +212,12 @@
   "linkedFields": [],
   "linkedCheckboxes": [
     {
-      "id": "linkedCheckbox1",
+      "id": "linkedCheckbox0",
       "linkedCheckboxId": "linked_checkbox",
       "checkboxes": [
-        "hello_option_w_1",
-        "are_you_the_only_person_suing_yes"
+        "are_you_the_only_person_suing_no",
+        "user_biz",
+        "is_this_plaintiff_a_business_yes_1"
       ]
     }
   ]

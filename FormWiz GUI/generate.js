@@ -2590,7 +2590,13 @@ if (s > 1){
 
         const select = document.createElement('select');
         const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
-        select.id = sanitizedFieldName + "_" + entryNumber;
+        
+        // Get question nodeId - this will be at the start of the hidden checkbox ID
+        const questionNodeId = questionNameIds[questionId] || ('answer' + questionId);
+        
+        // Format: {questionNodeId}_{dropdownFieldName}_{entryNumber}
+        // When dropdownMirror is called, it will create: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+        select.id = questionNodeId + "_" + sanitizedFieldName + "_" + entryNumber;
         select.name = select.id;
         select.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto; display: block;';
 
@@ -5944,7 +5950,8 @@ function dropdownMirror(selectEl, baseName){
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: AFTER replace - idSuffix:', idSuffix);
     
     // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)
-    // Format should be: fieldName_optionValue_entryNumber (entry number last)
+    // Format should be: {questionNodeId}_{triggerTitle}_{fieldName}_optionValue_entryNumber (entry number last)
+    // OR: fieldName_optionValue_entryNumber for numbered dropdowns
     const lastUnderscoreIndex = baseName.lastIndexOf('_');
     let checkboxId;
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: baseName:', baseName, 'lastUnderscoreIndex:', lastUnderscoreIndex);
@@ -5956,12 +5963,23 @@ function dropdownMirror(selectEl, baseName){
         console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: potentialEntryNumber:', potentialEntryNumber, 'regex test:', /^[0-9]+$/.test(potentialEntryNumber));
         
         if (/^[0-9]+$/.test(potentialEntryNumber)) {
-            // It's a numbered dropdown or trigger sequence dropdown: extract field name and entry number
-            const fieldName = baseName.substring(0, lastUnderscoreIndex);
-            const entryNumber = potentialEntryNumber;
-            // Format: fieldName_optionValue_entryNumber (entry number last)
-            checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
-            console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered/trigger dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            // It's a numbered dropdown or trigger sequence dropdown
+            const baseWithoutEntry = baseName.substring(0, lastUnderscoreIndex);
+            const underscoreCount = (baseWithoutEntry.match(/_/g) || []).length;
+            
+            if (underscoreCount >= 1) {
+                // This is likely a trigger sequence dropdown: {questionNodeId}_{dropdownFieldName}_{entryNumber}
+                // We want: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+                // So we just insert the option value before the entry number
+                checkboxId = baseWithoutEntry + "_" + idSuffix + "_" + potentialEntryNumber;
+                console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: trigger sequence dropdown detected, baseName:', baseName, 'baseWithoutEntry:', baseWithoutEntry, 'entryNumber:', potentialEntryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            } else {
+                // This is a numbered dropdown: fieldName_entryNumber -> fieldName_optionValue_entryNumber
+                const fieldName = baseWithoutEntry;
+                const entryNumber = potentialEntryNumber;
+                checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+                console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            }
         } else {
             // Regular dropdown: keep original format
             checkboxId = baseName + "_" + idSuffix;
