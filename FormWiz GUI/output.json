@@ -171,60 +171,12 @@
               "triggerSequences": [
                 {
                   "condition": "Yes",
+                  "title": "Please list the person or agent authorized for service of process",
                   "fields": [
-                    {
-                      "type": "location",
-                      "fieldName": "Where did they file their fictitious business name",
-                      "nodeId": "location_data"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Business Name",
-                      "nodeId": "is_this_plaintiff_a_business_yes_business_name"
-                    },
                     {
                       "type": "label",
                       "label": "Business Name Statement Number",
                       "nodeId": "is_this_plaintiff_a_business_yes_business_name_statement_number"
-                    },
-                    {
-                      "type": "checkbox",
-                      "fieldName": "What do they do business as?",
-                      "selectionType": "multiple",
-                      "options": [
-                        {
-                          "text": "An Individual",
-                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
-                        },
-                        {
-                          "text": "An Association",
-                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"
-                        },
-                        {
-                          "text": "A Partnership",
-                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"
-                        },
-                        {
-                          "text": "A Corporation",
-                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"
-                        },
-                        {
-                          "text": "A Limited Liability Company",
-                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "date",
-                      "label": "When does their business statement expire?",
-                      "nodeId": "is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "1",
-                      "pdfTitle": "SC-500",
-                      "pdfName": "sc500.pdf",
-                      "priceId": "1234"
                     }
                   ]
                 }
@@ -249,5 +201,15 @@
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],
-  "linkedCheckboxes": []
+  "linkedCheckboxes": [
+    {
+      "id": "linkedCheckbox0",
+      "linkedCheckboxId": "linked_checkbox",
+      "checkboxes": [
+        "are_you_the_only_person_suing_no",
+        "user_biz",
+        "is_this_plaintiff_a_business_yes_1"
+      ]
+    }
+  ]
 }

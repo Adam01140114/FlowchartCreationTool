@@ -1728,8 +1728,22 @@ formHTML += `</div><br></div>`;
                     });
                   }
                   
+                  // Get trigger title - try multiple selector strategies
+                  let triggerTitleEl = sequenceEl.querySelector('#triggerTitle' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                  if (!triggerTitleEl) {
+                    // Try alternative: search by input with id containing triggerTitle
+                    triggerTitleEl = sequenceEl.querySelector('input[id*="triggerTitle' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '"]');
+                  }
+                  if (!triggerTitleEl) {
+                    // Try alternative: search by any input with triggerTitle in the sequence
+                    triggerTitleEl = sequenceEl.querySelector('input[id^="triggerTitle"]');
+                  }
+                  const triggerTitle = triggerTitleEl ? (triggerTitleEl.value.trim() || 'Additional Information') : 'Additional Information';
+                  console.log('🔧 [GENERATE DEBUG] Trigger title for sequence', sequenceIndex + 1, ':', triggerTitle, 'found:', !!triggerTitleEl);
+                  
                   triggerSequences.push({
                     condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
+                    title: triggerTitle,
                     fields: triggerFields
                   });
                 });
@@ -2397,13 +2411,13 @@ if (s > 1){
 
   // Add createTriggerFieldsContainer function early so it's available for numbered dropdown code
   formHTML += `
-  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName) {
+  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText) {
     const triggerContainer = document.createElement('div');
     triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
     triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
 
     const triggerTitle = document.createElement('h5');
-    triggerTitle.textContent = 'Additional Information';
+    triggerTitle.textContent = triggerTitleText || 'Additional Information';
     triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
     triggerContainer.appendChild(triggerTitle);
 
@@ -5222,7 +5236,8 @@ function showTextboxLabels(questionId, count){
                                     triggerFieldsContainer.style.display = 'block';
                                 } else {
                                     // Create trigger fields container if it doesn't exist
-                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName);
+                                    const triggerTitle = sequence.title || 'Additional Information';
+                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName, triggerTitle);
                                 }
                             } else {
                                 // Hide trigger fields for other conditions

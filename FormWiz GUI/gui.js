@@ -3007,6 +3007,14 @@ function addTriggerSequence(questionId, fieldCount) {
     sequenceDiv.innerHTML = `
         <div style="font-weight: bold; color: #2E7D32; margin-bottom: 10px; text-align: center;">Trigger Sequence ${sequenceCount}</div>
         
+        <!-- Trigger Title Input -->
+        <div style="margin-bottom: 15px;">
+            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 5px;">Trigger Title:</div>
+            <div style="text-align: center;">
+                <input type="text" id="triggerTitle${questionId}_${fieldCount}_${sequenceCount}" placeholder="Additional Information" value="Additional Information" style="width: 80%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; margin: 0 auto; display: block;" onchange="updateTriggerTitle(${questionId}, ${fieldCount}, ${sequenceCount})">
+            </div>
+        </div>
+        
         <!-- Trigger Condition Dropdown -->
         <div style="margin-bottom: 15px;">
             <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 5px;">Trigger Condition:</div>
@@ -3073,6 +3081,13 @@ function updateTriggerCondition(questionId, fieldCount, sequenceCount) {
     const triggerSelect = document.getElementById(`triggerCondition${questionId}_${fieldCount}_${sequenceCount}`);
     if (triggerSelect) {
         console.log('🔧 [TRIGGER CONDITION] Updated trigger condition:', triggerSelect.value);
+    }
+}
+
+function updateTriggerTitle(questionId, fieldCount, sequenceCount) {
+    const triggerTitleInput = document.getElementById(`triggerTitle${questionId}_${fieldCount}_${sequenceCount}`);
+    if (triggerTitleInput) {
+        console.log('🔧 [TRIGGER TITLE] Updated trigger title:', triggerTitleInput.value);
     }
 }
 

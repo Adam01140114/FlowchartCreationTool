@@ -681,6 +681,12 @@ function loadFormData(formData) {
                                                     triggerConditionEl.value = sequence.condition;
                                                 }
                                                 
+                                                // Set the trigger title
+                                                const triggerTitleEl = document.getElementById('triggerTitle' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                                                if (triggerTitleEl && sequence.title) {
+                                                    triggerTitleEl.value = sequence.title;
+                                                }
+                                                
                                                 // Add trigger fields
                                                 if (sequence.fields && sequence.fields.length > 0) {
                                                     console.log('🔧 [IMPORT DEBUG] Adding trigger fields for sequence', sequenceIndex + 1, ':', sequence.fields);
@@ -1151,6 +1157,12 @@ function loadFormData(formData) {
                                             const triggerConditionEl = document.getElementById('triggerCondition' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                             if (triggerConditionEl && sequence.condition) {
                                                 triggerConditionEl.value = sequence.condition;
+                                            }
+                                            
+                                            // Set the trigger title
+                                            const triggerTitleEl = document.getElementById('triggerTitle' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                                            if (triggerTitleEl && sequence.title) {
+                                                triggerTitleEl.value = sequence.title;
                                             }
                                             
                                             // Add trigger fields
@@ -2640,6 +2652,7 @@ function exportForm() {
                                     console.log('🔧 [EXPORT DEBUG - PATH 1] Sequence element class:', sequenceEl.className);
                                     console.log('🔧 [EXPORT DEBUG - PATH 1] Sequence element innerHTML preview:', sequenceEl.innerHTML.substring(0, 500));
                                     const triggerConditionEl = sequenceEl.querySelector('#triggerCondition' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                                    const triggerTitleEl = sequenceEl.querySelector('#triggerTitle' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     
                                     const triggerFields = [];
@@ -2849,6 +2862,7 @@ function exportForm() {
                                     
                                     triggerSequences.push({
                                         condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
+                                        title: triggerTitleEl ? (triggerTitleEl.value.trim() || 'Additional Information') : 'Additional Information',
                                         fields: triggerFields
                                     });
                                     
