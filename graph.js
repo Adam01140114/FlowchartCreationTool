@@ -4883,10 +4883,25 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
       });
     }
     
-    // Get numbered dropdown question text and range
+    // Get numbered dropdown question text, nodeId, and range
     const questionText = node._questionText || node.value || `Question ${node._questionId || ''}`;
     const minValue = node._twoNumbers ? (parseInt(node._twoNumbers.first) || 1) : 1;
     const maxValue = node._twoNumbers ? (parseInt(node._twoNumbers.second) || 1) : 1;
+    
+    // Get the question nodeId for this numbered dropdown
+    let questionNodeId = '';
+    if (typeof window.getNodeId === 'function') {
+      questionNodeId = window.getNodeId(node);
+    }
+    if (!questionNodeId) {
+      const nodeIdMatch = node.style.match(/nodeId=([^;]+)/);
+      if (nodeIdMatch && nodeIdMatch[1]) {
+        questionNodeId = nodeIdMatch[1];
+      }
+    }
+    if (!questionNodeId) {
+      questionNodeId = `answer${node._questionId || ''}`;
+    }
     
     // 5. Add hidden dropdown checkboxes from dropdowns inside numbered dropdown questions
     if (node._dropdowns && Array.isArray(node._dropdowns)) {
@@ -4920,9 +4935,10 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
           }
         }
         
-        // Trigger sequence checkboxes
+        // Trigger sequence checkboxes and dropdowns
         if (dropdownItem.triggerSequences && Array.isArray(dropdownItem.triggerSequences)) {
           dropdownItem.triggerSequences.forEach(trigger => {
+            // Handle checkboxes in trigger sequences
             if (trigger.checkboxes && Array.isArray(trigger.checkboxes)) {
               trigger.checkboxes.forEach(checkbox => {
                 if (checkbox.options && Array.isArray(checkbox.options)) {
@@ -4931,6 +4947,41 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
                       addOptionIfNotExists(option.nodeId, option.nodeId);
                     }
                   });
+                }
+              });
+            }
+            
+            // Handle dropdowns in trigger sequences
+            if (trigger.dropdowns && Array.isArray(trigger.dropdowns)) {
+              trigger.dropdowns.forEach(triggerDropdown => {
+                const triggerDropdownFieldName = triggerDropdown.fieldName || '';
+                if (triggerDropdownFieldName) {
+                  // Sanitize trigger dropdown field name
+                  const sanitizedTriggerFieldName = triggerDropdownFieldName
+                    .toLowerCase()
+                    .replace(/[?]/g, '')
+                    .replace(/[^a-z0-9_]+/g, '_')
+                    .replace(/^_+|_+$/g, '');
+                  
+                  // Get all dropdown options
+                  if (triggerDropdown.options && Array.isArray(triggerDropdown.options)) {
+                    triggerDropdown.options.forEach(option => {
+                      const optionValue = option.text || '';
+                      if (optionValue) {
+                        // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+                        // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues
+                        const sanitizedOptionValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+                        
+                        // Generate checkbox IDs for each entry number (minValue to maxValue)
+                        // Format: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+                        for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
+                          const checkboxId = `${questionNodeId}_${sanitizedTriggerFieldName}_${sanitizedOptionValue}_${entryNum}`;
+                          const label = `${questionText} - ${fieldName} [Trigger] - ${triggerDropdownFieldName} (${entryNum}) - ${optionValue} (${checkboxId})`;
+                          addOptionIfNotExists(checkboxId, label);
+                        }
+                      }
+                    });
+                  }
                 }
               });
             }

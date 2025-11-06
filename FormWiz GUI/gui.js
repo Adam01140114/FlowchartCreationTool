@@ -4788,6 +4788,11 @@ function populateLinkedCheckboxDropdown(idx) {
             }
             
             // Hidden dropdown checkboxes from dropdowns inside trigger sequences
+            // Get the numbered dropdown's nodeId (question nodeId)
+            // For numbered dropdowns, nodeId is stored in #nodeId${qId}, not #textboxName${qId}
+            const nodeIdInput = block.querySelector(`#nodeId${qId}`);
+            const questionNodeId = nodeIdInput ? nodeIdInput.value.trim() : `answer${qId}`;
+            
             // Find all dropdown fields within this numbered dropdown
             const unifiedFieldsContainerForTriggers = block.querySelector(`#unifiedFields${qId}`);
             if (unifiedFieldsContainerForTriggers) {
@@ -4841,9 +4846,9 @@ function populateLinkedCheckboxDropdown(idx) {
                                                                 .replace(/^_+|_+$/g, '');
                                                             
                                                             // Generate checkbox IDs for each entry number (minValue to maxValue)
+                                                            // Format: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
                                                             for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
-                                                                // Format: fieldName_optionValue_entryNumber (entry number last)
-                                                                const checkboxId = `${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}_${entryNum}`;
+                                                                const checkboxId = `${questionNodeId}_${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}_${entryNum}`;
                                                                 const label = `${questionText} - ${fieldName} [Trigger] - ${triggerDropdownFieldName} (${entryNum}) - ${triggerOptionValue} (${checkboxId})`;
                                                                 options.push({ nodeId: checkboxId, label: label });
                                                             }
