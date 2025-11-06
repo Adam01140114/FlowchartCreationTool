@@ -706,6 +706,56 @@ function loadFormData(formData) {
                                                             
                                                             if (triggerLabelTextEl) triggerLabelTextEl.value = triggerField.label;
                                                             if (triggerLabelNodeIdEl) triggerLabelNodeIdEl.value = triggerField.nodeId;
+                                                            
+                                                            // Restore conditional logic if enabled
+                                                            if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                                const triggerFieldCount = triggerFieldIndex + 1;
+                                                                const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                                
+                                                                if (!window.triggerLabelConditionalLogic) {
+                                                                    window.triggerLabelConditionalLogic = {};
+                                                                }
+                                                                window.triggerLabelConditionalLogic[key] = {
+                                                                    enabled: true,
+                                                                    conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                                };
+                                                                
+                                                                setTimeout(() => {
+                                                                    const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicLabel${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                    if (enableConditionalLogicCheckbox) {
+                                                                        enableConditionalLogicCheckbox.checked = true;
+                                                                        const event = new Event('change');
+                                                                        enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                        
+                                                                        setTimeout(() => {
+                                                                            if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                                if (typeof updateTriggerLabelConditionalLogicUI === 'function') {
+                                                                                    updateTriggerLabelConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                    
+                                                                                    setTimeout(() => {
+                                                                                        triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                            if (condIndex > 0) {
+                                                                                                const addConditionBtn = document.querySelector(`#conditionalLogicUILabel${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                                if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                    addConditionBtn.click();
+                                                                                                }
+                                                                                            }
+                                                                                            
+                                                                                            setTimeout(() => {
+                                                                                                const conditionDropdown = document.querySelector(`#conditionalLogicUILabel${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                                if (conditionDropdown) {
+                                                                                                    conditionDropdown.value = condition;
+                                                                                                    conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                }
+                                                                                            }, 150 * (condIndex + 1));
+                                                                                        });
+                                                                                    }, 300);
+                                                                                }
+                                                                            }
+                                                                        }, 400);
+                                                                    }
+                                                                }, 200);
+                                                            }
                                                         } else if (triggerField.type === 'checkbox') {
                                                             if (typeof addTriggerCheckbox !== 'function') {
                                                                 console.error('🔧 [IMPORT DEBUG] addTriggerCheckbox function not available!');
@@ -729,6 +779,62 @@ function loadFormData(formData) {
                                                                     if (triggerOptionTextEl) triggerOptionTextEl.value = option.text;
                                                                     if (triggerOptionNodeIdEl) triggerOptionNodeIdEl.value = option.nodeId;
                                                                 });
+                                                            }
+                                                            
+                                                            // Set the selection type
+                                                            const triggerCheckboxSelectionTypeEl = document.getElementById('triggerCheckboxSelectionType' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
+                                                            if (triggerCheckboxSelectionTypeEl && triggerField.selectionType) {
+                                                                triggerCheckboxSelectionTypeEl.value = triggerField.selectionType;
+                                                            }
+                                                            
+                                                            // Restore conditional logic if enabled
+                                                            if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                                const triggerFieldCount = triggerFieldIndex + 1;
+                                                                const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                                
+                                                                if (!window.triggerCheckboxConditionalLogic) {
+                                                                    window.triggerCheckboxConditionalLogic = {};
+                                                                }
+                                                                window.triggerCheckboxConditionalLogic[key] = {
+                                                                    enabled: true,
+                                                                    conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                                };
+                                                                
+                                                                setTimeout(() => {
+                                                                    const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicCheckbox${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                    if (enableConditionalLogicCheckbox) {
+                                                                        enableConditionalLogicCheckbox.checked = true;
+                                                                        const event = new Event('change');
+                                                                        enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                        
+                                                                        setTimeout(() => {
+                                                                            if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                                if (typeof updateTriggerCheckboxConditionalLogicUI === 'function') {
+                                                                                    updateTriggerCheckboxConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                    
+                                                                                    setTimeout(() => {
+                                                                                        triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                            if (condIndex > 0) {
+                                                                                                const addConditionBtn = document.querySelector(`#conditionalLogicUICheckbox${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                                if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                    addConditionBtn.click();
+                                                                                                }
+                                                                                            }
+                                                                                            
+                                                                                            setTimeout(() => {
+                                                                                                const conditionDropdown = document.querySelector(`#conditionalLogicUICheckbox${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                                if (conditionDropdown) {
+                                                                                                    conditionDropdown.value = condition;
+                                                                                                    conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                }
+                                                                                            }, 150 * (condIndex + 1));
+                                                                                        });
+                                                                                    }, 300);
+                                                                                }
+                                                                            }
+                                                                        }, 400);
+                                                                    }
+                                                                }, 200);
                                                             }
                                                         } else if (triggerField.type === 'dropdown') {
                                                             if (typeof addTriggerDropdown !== 'function') {
@@ -1206,6 +1312,56 @@ function loadFormData(formData) {
                                                         
                                                         if (triggerLabelTextEl) triggerLabelTextEl.value = triggerField.label;
                                                         if (triggerLabelNodeIdEl) triggerLabelNodeIdEl.value = triggerField.nodeId;
+                                                        
+                                                        // Restore conditional logic if enabled
+                                                        if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                            const triggerFieldCount = triggerFieldIndex + 1;
+                                                            const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                            
+                                                            if (!window.triggerLabelConditionalLogic) {
+                                                                window.triggerLabelConditionalLogic = {};
+                                                            }
+                                                            window.triggerLabelConditionalLogic[key] = {
+                                                                enabled: true,
+                                                                conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                            };
+                                                            
+                                                            setTimeout(() => {
+                                                                const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicLabel${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                if (enableConditionalLogicCheckbox) {
+                                                                    enableConditionalLogicCheckbox.checked = true;
+                                                                    const event = new Event('change');
+                                                                    enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                    
+                                                                    setTimeout(() => {
+                                                                        if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                            if (typeof updateTriggerLabelConditionalLogicUI === 'function') {
+                                                                                updateTriggerLabelConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                
+                                                                                setTimeout(() => {
+                                                                                    triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                        if (condIndex > 0) {
+                                                                                            const addConditionBtn = document.querySelector(`#conditionalLogicUILabel${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                            if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                addConditionBtn.click();
+                                                                                            }
+                                                                                        }
+                                                                                        
+                                                                                        setTimeout(() => {
+                                                                                            const conditionDropdown = document.querySelector(`#conditionalLogicUILabel${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                            if (conditionDropdown) {
+                                                                                                conditionDropdown.value = condition;
+                                                                                                conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                            }
+                                                                                        }, 150 * (condIndex + 1));
+                                                                                    });
+                                                                                }, 300);
+                                                                            }
+                                                                        }
+                                                                    }, 400);
+                                                                }
+                                                            }, 200);
+                                                        }
                                                     } else if (triggerField.type === 'checkbox') {
                                                         if (typeof addTriggerCheckbox !== 'function') {
                                                             console.error('🔧 [IMPORT DEBUG] addTriggerCheckbox function not available!');
@@ -1235,6 +1391,56 @@ function loadFormData(formData) {
                                                                 if (triggerOptionTextEl) triggerOptionTextEl.value = option.text;
                                                                 if (triggerOptionNodeIdEl) triggerOptionNodeIdEl.value = option.nodeId;
                                                             });
+                                                        }
+                                                        
+                                                        // Restore conditional logic if enabled
+                                                        if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                            const triggerFieldCount = triggerFieldIndex + 1;
+                                                            const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                            
+                                                            if (!window.triggerCheckboxConditionalLogic) {
+                                                                window.triggerCheckboxConditionalLogic = {};
+                                                            }
+                                                            window.triggerCheckboxConditionalLogic[key] = {
+                                                                enabled: true,
+                                                                conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                            };
+                                                            
+                                                            setTimeout(() => {
+                                                                const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicCheckbox${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                if (enableConditionalLogicCheckbox) {
+                                                                    enableConditionalLogicCheckbox.checked = true;
+                                                                    const event = new Event('change');
+                                                                    enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                    
+                                                                    setTimeout(() => {
+                                                                        if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                            if (typeof updateTriggerCheckboxConditionalLogicUI === 'function') {
+                                                                                updateTriggerCheckboxConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                
+                                                                                setTimeout(() => {
+                                                                                    triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                        if (condIndex > 0) {
+                                                                                            const addConditionBtn = document.querySelector(`#conditionalLogicUICheckbox${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                            if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                addConditionBtn.click();
+                                                                                            }
+                                                                                        }
+                                                                                        
+                                                                                        setTimeout(() => {
+                                                                                            const conditionDropdown = document.querySelector(`#conditionalLogicUICheckbox${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                            if (conditionDropdown) {
+                                                                                                conditionDropdown.value = condition;
+                                                                                                conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                            }
+                                                                                        }, 150 * (condIndex + 1));
+                                                                                    });
+                                                                                }, 300);
+                                                                            }
+                                                                        }
+                                                                    }, 400);
+                                                                }
+                                                            }, 200);
                                                         }
                                                     } else if (triggerField.type === 'dropdown') {
                                                         if (typeof addTriggerDropdown !== 'function') {
@@ -2815,11 +3021,57 @@ function exportForm() {
                                             
                                             if (labelTextEl && labelNodeIdEl) {
                                                 // Trigger label field
-                                                triggerFields.push({
+                                                const labelField = {
                                                     type: 'label',
                                                     label: labelTextEl.value.trim(),
                                                     nodeId: labelNodeIdEl.value.trim()
-                                                });
+                                                };
+                                                
+                                                // Check for conditional logic
+                                                const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogicLabel${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
+                                                
+                                                // Include conditional logic if enabled
+                                                if (conditionalLogicEnabled) {
+                                                    // Get conditions from the conditional logic UI
+                                                    const conditionalLogicContainer = fieldEl.querySelector(`#conditionalLogicUILabel${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    const conditions = [];
+                                                    
+                                                    if (conditionalLogicContainer) {
+                                                        const conditionDropdowns = conditionalLogicContainer.querySelectorAll('select');
+                                                        conditionDropdowns.forEach(dropdown => {
+                                                            const value = dropdown.value.trim();
+                                                            if (value) {
+                                                                conditions.push(value);
+                                                            }
+                                                        });
+                                                    }
+                                                    
+                                                    // Also check window.triggerLabelConditionalLogic for the data
+                                                    const key = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`;
+                                                    if (window.triggerLabelConditionalLogic && window.triggerLabelConditionalLogic[key]) {
+                                                        const storedConditions = window.triggerLabelConditionalLogic[key].conditions || [];
+                                                        // Use stored conditions if available, otherwise use dropdown values
+                                                        if (storedConditions.length > 0) {
+                                                            labelField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: storedConditions.filter(c => c && c.trim() !== '')
+                                                            };
+                                                        } else if (conditions.length > 0) {
+                                                            labelField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: conditions
+                                                            };
+                                                        }
+                                                    } else if (conditions.length > 0) {
+                                                        labelField.conditionalLogic = {
+                                                            enabled: true,
+                                                            conditions: conditions
+                                                        };
+                                                    }
+                                                }
+                                                
+                                                triggerFields.push(labelField);
                                             } else if (checkboxFieldNameEl) {
                                                 // Trigger checkbox field
                                                 const checkboxOptions = [];
@@ -2842,12 +3094,58 @@ function exportForm() {
                                                 const selectionTypeEl = document.getElementById('triggerCheckboxSelectionType' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const selectionType = selectionTypeEl ? selectionTypeEl.value : 'multiple';
                                                 
-                                                triggerFields.push({
+                                                const checkboxField = {
                                                     type: 'checkbox',
                                                     fieldName: checkboxFieldNameEl.value.trim(),
                                                     selectionType: selectionType,
                                                     options: checkboxOptions
-                                                });
+                                                };
+                                                
+                                                // Check for conditional logic
+                                                const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogicCheckbox${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
+                                                
+                                                // Include conditional logic if enabled
+                                                if (conditionalLogicEnabled) {
+                                                    // Get conditions from the conditional logic UI
+                                                    const conditionalLogicContainer = fieldEl.querySelector(`#conditionalLogicUICheckbox${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    const conditions = [];
+                                                    
+                                                    if (conditionalLogicContainer) {
+                                                        const conditionDropdowns = conditionalLogicContainer.querySelectorAll('select');
+                                                        conditionDropdowns.forEach(dropdown => {
+                                                            const value = dropdown.value.trim();
+                                                            if (value) {
+                                                                conditions.push(value);
+                                                            }
+                                                        });
+                                                    }
+                                                    
+                                                    // Also check window.triggerCheckboxConditionalLogic for the data
+                                                    const key = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`;
+                                                    if (window.triggerCheckboxConditionalLogic && window.triggerCheckboxConditionalLogic[key]) {
+                                                        const storedConditions = window.triggerCheckboxConditionalLogic[key].conditions || [];
+                                                        // Use stored conditions if available, otherwise use dropdown values
+                                                        if (storedConditions.length > 0) {
+                                                            checkboxField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: storedConditions.filter(c => c && c.trim() !== '')
+                                                            };
+                                                        } else if (conditions.length > 0) {
+                                                            checkboxField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: conditions
+                                                            };
+                                                        }
+                                                    } else if (conditions.length > 0) {
+                                                        checkboxField.conditionalLogic = {
+                                                            enabled: true,
+                                                            conditions: conditions
+                                                        };
+                                                    }
+                                                }
+                                                
+                                                triggerFields.push(checkboxField);
                                             } else if (dropdownFieldNameEl) {
                                                 // Trigger dropdown field
                                                 const dropdownOptions = [];

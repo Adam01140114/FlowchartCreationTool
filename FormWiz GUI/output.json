@@ -207,6 +207,17 @@
                           "bruh_what"
                         ]
                       }
+                    },
+                    {
+                      "type": "label",
+                      "label": "hello",
+                      "nodeId": "hello",
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": [
+                          "bruh_what"
+                        ]
+                      }
                     }
                   ]
                 }

@@ -3117,6 +3117,10 @@ function addTriggerLabel(questionId, fieldCount, sequenceCount) {
     fieldDiv.style.border = '1px solid #007bff';
     fieldDiv.style.borderRadius = '4px';
     fieldDiv.style.backgroundColor = '#f0f8ff';
+    // Conditional logic UI elements
+    const conditionalLogicContainerId = `conditionalLogicUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    const enableConditionalLogicCheckboxId = `enableConditionalLogicLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    
     fieldDiv.innerHTML = `
         <div style="font-weight: bold; color: #007bff; margin-bottom: 8px; text-align: center;">Trigger Label ${triggerFieldCount}</div>
         <div style="margin-bottom: 8px; text-align: center;">
@@ -3126,6 +3130,15 @@ function addTriggerLabel(questionId, fieldCount, sequenceCount) {
         <div style="margin-bottom: 8px; text-align: center;">
             <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Node ID:</label>
             <input type="text" id="triggerLabelNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter node ID" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerLabelNodeId(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label for="${enableConditionalLogicCheckboxId}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Enable Conditional Logic</label>
+            <div style="display: flex; justify-content: center;">
+                <input type="checkbox" id="${enableConditionalLogicCheckboxId}" onchange="toggleTriggerLabelConditionalLogic(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="cursor: pointer;">
+            </div>
+            <div id="${conditionalLogicContainerId}" style="margin-top: 8px; display: none;">
+                <!-- Conditional logic UI will be populated here -->
+            </div>
         </div>
         <div style="text-align: center; margin-top: 8px;">
             <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
@@ -3151,6 +3164,10 @@ function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
     fieldDiv.style.border = '1px solid #9C27B0';
     fieldDiv.style.borderRadius = '4px';
     fieldDiv.style.backgroundColor = '#faf0ff';
+        // Conditional logic UI elements
+        const conditionalLogicContainerId = `conditionalLogicUICheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+        const enableConditionalLogicCheckboxId = `enableConditionalLogicCheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+        
         fieldDiv.innerHTML = `
             <div style="font-weight: bold; color: #9C27B0; margin-bottom: 8px; text-align: center;">Trigger Checkbox ${triggerFieldCount}</div>
             <div style="margin-bottom: 8px; text-align: center;">
@@ -3169,6 +3186,15 @@ function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
             </div>
             <div id="triggerCheckboxOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="margin-top: 8px;">
                 <!-- Trigger checkbox options will be added here -->
+            </div>
+            <div style="margin-bottom: 8px; text-align: center;">
+                <label for="${enableConditionalLogicCheckboxId}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Enable Conditional Logic</label>
+                <div style="display: flex; justify-content: center;">
+                    <input type="checkbox" id="${enableConditionalLogicCheckboxId}" onchange="toggleTriggerCheckboxConditionalLogic(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="cursor: pointer;">
+                </div>
+                <div id="${conditionalLogicContainerId}" style="margin-top: 8px; display: none;">
+                    <!-- Conditional logic UI will be populated here -->
+                </div>
             </div>
             <div style="text-align: center; margin-top: 8px;">
                 <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
@@ -3891,6 +3917,242 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
     container.appendChild(addConditionBtn);
     
     console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown conditional logic UI updated');
+}
+
+// Function to toggle conditional logic UI for label fields and update it
+function toggleTriggerLabelConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerLabelConditionalLogic called');
+    const checkbox = document.getElementById(`enableConditionalLogicLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`conditionalLogicUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!checkbox || !container) {
+        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+        return;
+    }
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    if (!window.triggerLabelConditionalLogic) {
+        window.triggerLabelConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerLabelConditionalLogic[key]) {
+        window.triggerLabelConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    window.triggerLabelConditionalLogic[key].enabled = checkbox.checked;
+    if (checkbox.checked) {
+        updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        window.triggerLabelConditionalLogic[key].conditions = [];
+    }
+    // Trigger autosave to persist the changes
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+
+// Function to update the conditional logic UI for label fields with checkbox option dropdowns
+function updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerLabelConditionalLogicUI called for label');
+    const container = document.getElementById(`conditionalLogicUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) {
+        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+        return;
+    }
+    const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount);
+    if (!window.triggerLabelConditionalLogic) {
+        window.triggerLabelConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerLabelConditionalLogic[key]) {
+        window.triggerLabelConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    container.innerHTML = '';
+    window.triggerLabelConditionalLogic[key].conditions.forEach((condition, conditionIndex) => {
+        const conditionRow = document.createElement('div');
+        conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%;';
+        const conditionDropdown = document.createElement('select');
+        conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; flex-shrink: 1;';
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select checkbox option...';
+        conditionDropdown.appendChild(placeholderOption);
+        checkboxNodeIds.forEach(nodeId => {
+            const option = document.createElement('option');
+            option.value = nodeId;
+            option.textContent = nodeId;
+            if (condition === nodeId) {
+                option.selected = true;
+            }
+            conditionDropdown.appendChild(option);
+        });
+        conditionDropdown.value = condition || '';
+        conditionDropdown.onchange = () => {
+            if (!window.triggerLabelConditionalLogic[key]) {
+                window.triggerLabelConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            window.triggerLabelConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Label condition updated:', window.triggerLabelConditionalLogic[key].conditions);
+            // Trigger autosave to persist the changes
+            if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+            }
+        };
+        const removeConditionBtn = document.createElement('button');
+        removeConditionBtn.textContent = '×';
+        removeConditionBtn.style.cssText = 'background: #f44336; color: white; border: none; width: 24px; height: 24px; min-width: 24px; max-width: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1;';
+        removeConditionBtn.onclick = () => {
+            if (!window.triggerLabelConditionalLogic[key]) {
+                window.triggerLabelConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            if (window.triggerLabelConditionalLogic[key].conditions.length > 1) {
+                window.triggerLabelConditionalLogic[key].conditions.splice(conditionIndex, 1);
+                updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+                // Trigger autosave to persist the changes
+                if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                }
+            }
+        };
+        conditionRow.appendChild(conditionDropdown);
+        conditionRow.appendChild(removeConditionBtn);
+        container.appendChild(conditionRow);
+    });
+    const addConditionBtn = document.createElement('button');
+    addConditionBtn.textContent = 'Add Another Condition';
+    addConditionBtn.style.cssText = 'background: #2196F3; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%; margin-top: 4px;';
+    addConditionBtn.onclick = () => {
+        if (!window.triggerLabelConditionalLogic[key]) {
+            window.triggerLabelConditionalLogic[key] = { enabled: true, conditions: [''] };
+        }
+        if (!window.triggerLabelConditionalLogic[key].conditions) {
+            window.triggerLabelConditionalLogic[key].conditions = [''];
+        }
+        window.triggerLabelConditionalLogic[key].conditions.push('');
+        updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    container.appendChild(addConditionBtn);
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Label conditional logic UI updated');
+}
+
+// Function to toggle conditional logic UI for checkbox fields and update it
+function toggleTriggerCheckboxConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerCheckboxConditionalLogic called');
+    const checkbox = document.getElementById(`enableConditionalLogicCheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`conditionalLogicUICheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!checkbox || !container) {
+        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+        return;
+    }
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    if (!window.triggerCheckboxConditionalLogic) {
+        window.triggerCheckboxConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerCheckboxConditionalLogic[key]) {
+        window.triggerCheckboxConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    window.triggerCheckboxConditionalLogic[key].enabled = checkbox.checked;
+    if (checkbox.checked) {
+        updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        window.triggerCheckboxConditionalLogic[key].conditions = [];
+    }
+    // Trigger autosave to persist the changes
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+
+// Function to update the conditional logic UI for checkbox fields with checkbox option dropdowns
+function updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerCheckboxConditionalLogicUI called for checkbox');
+    const container = document.getElementById(`conditionalLogicUICheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) {
+        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+        return;
+    }
+    const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount);
+    if (!window.triggerCheckboxConditionalLogic) {
+        window.triggerCheckboxConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerCheckboxConditionalLogic[key]) {
+        window.triggerCheckboxConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    container.innerHTML = '';
+    window.triggerCheckboxConditionalLogic[key].conditions.forEach((condition, conditionIndex) => {
+        const conditionRow = document.createElement('div');
+        conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%;';
+        const conditionDropdown = document.createElement('select');
+        conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; flex-shrink: 1;';
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select checkbox option...';
+        conditionDropdown.appendChild(placeholderOption);
+        checkboxNodeIds.forEach(nodeId => {
+            const option = document.createElement('option');
+            option.value = nodeId;
+            option.textContent = nodeId;
+            if (condition === nodeId) {
+                option.selected = true;
+            }
+            conditionDropdown.appendChild(option);
+        });
+        conditionDropdown.value = condition || '';
+        conditionDropdown.onchange = () => {
+            if (!window.triggerCheckboxConditionalLogic[key]) {
+                window.triggerCheckboxConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            window.triggerCheckboxConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox condition updated:', window.triggerCheckboxConditionalLogic[key].conditions);
+            // Trigger autosave to persist the changes
+            if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+            }
+        };
+        const removeConditionBtn = document.createElement('button');
+        removeConditionBtn.textContent = '×';
+        removeConditionBtn.style.cssText = 'background: #f44336; color: white; border: none; width: 24px; height: 24px; min-width: 24px; max-width: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1;';
+        removeConditionBtn.onclick = () => {
+            if (!window.triggerCheckboxConditionalLogic[key]) {
+                window.triggerCheckboxConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            if (window.triggerCheckboxConditionalLogic[key].conditions.length > 1) {
+                window.triggerCheckboxConditionalLogic[key].conditions.splice(conditionIndex, 1);
+                updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+                // Trigger autosave to persist the changes
+                if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                }
+            }
+        };
+        conditionRow.appendChild(conditionDropdown);
+        conditionRow.appendChild(removeConditionBtn);
+        container.appendChild(conditionRow);
+    });
+    const addConditionBtn = document.createElement('button');
+    addConditionBtn.textContent = 'Add Another Condition';
+    addConditionBtn.style.cssText = 'background: #2196F3; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%; margin-top: 4px;';
+    addConditionBtn.onclick = () => {
+        if (!window.triggerCheckboxConditionalLogic[key]) {
+            window.triggerCheckboxConditionalLogic[key] = { enabled: true, conditions: [''] };
+        }
+        if (!window.triggerCheckboxConditionalLogic[key].conditions) {
+            window.triggerCheckboxConditionalLogic[key].conditions = [''];
+        }
+        window.triggerCheckboxConditionalLogic[key].conditions.push('');
+        updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    container.appendChild(addConditionBtn);
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox conditional logic UI updated');
 }
 
 

@@ -1624,11 +1624,28 @@ formHTML += `</div><br></div>`;
                       
                       if (labelTextEl && labelNodeIdEl) {
                         // Trigger label field
-                        triggerFields.push({
+                        const labelField = {
                           type: 'label',
                           label: labelTextEl.value.trim(),
                           nodeId: labelNodeIdEl.value.trim()
-                        });
+                        };
+                        
+                        // Check for conditional logic from window.triggerLabelConditionalLogic
+                        const triggerFieldCount = fieldIndex + 1;
+                        const conditionalLogicKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                        
+                        if (window.triggerLabelConditionalLogic && window.triggerLabelConditionalLogic[conditionalLogicKey]) {
+                          const storedLogic = window.triggerLabelConditionalLogic[conditionalLogicKey];
+                          
+                          if (storedLogic.enabled && storedLogic.conditions && storedLogic.conditions.length > 0) {
+                            labelField.conditionalLogic = {
+                              enabled: storedLogic.enabled,
+                              conditions: storedLogic.conditions.filter(c => c && c.trim() !== '')
+                            };
+                          }
+                        }
+                        
+                        triggerFields.push(labelField);
                       } else if (checkboxFieldNameEl) {
                         // Trigger checkbox field
                         const checkboxOptions = [];
@@ -1651,12 +1668,29 @@ formHTML += `</div><br></div>`;
                         const selectionTypeEl = fieldEl.querySelector('#triggerCheckboxSelectionType' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                         const selectionType = selectionTypeEl ? selectionTypeEl.value : 'multiple';
                         
-                        triggerFields.push({
+                        const checkboxField = {
                           type: 'checkbox',
                           fieldName: checkboxFieldNameEl.value.trim(),
                           selectionType: selectionType,
                           options: checkboxOptions
-                        });
+                        };
+                        
+                        // Check for conditional logic from window.triggerCheckboxConditionalLogic
+                        const triggerFieldCount = fieldIndex + 1;
+                        const conditionalLogicKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                        
+                        if (window.triggerCheckboxConditionalLogic && window.triggerCheckboxConditionalLogic[conditionalLogicKey]) {
+                          const storedLogic = window.triggerCheckboxConditionalLogic[conditionalLogicKey];
+                          
+                          if (storedLogic.enabled && storedLogic.conditions && storedLogic.conditions.length > 0) {
+                            checkboxField.conditionalLogic = {
+                              enabled: storedLogic.enabled,
+                              conditions: storedLogic.conditions.filter(c => c && c.trim() !== '')
+                            };
+                          }
+                        }
+                        
+                        triggerFields.push(checkboxField);
                       } else if (dropdownFieldNameEl) {
                         // Trigger dropdown field
                         const dropdownOptions = [];
@@ -2481,7 +2515,17 @@ if (s > 1){
     fields.forEach((triggerField, fieldIndex) => {
       if (triggerField.type === 'label') {
         const fieldDiv = document.createElement('div');
-        fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        // Check if conditional logic is enabled
+        const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
+        const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+        
+        // Initially hide if conditional logic is enabled
+        if (hasConditionalLogic) {
+          fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: none; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        } else {
+          fieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        }
 
         const label = document.createElement('label');
         label.textContent = triggerField.label + ":";
@@ -2506,9 +2550,157 @@ if (s > 1){
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(input);
         triggerContainer.appendChild(fieldDiv);
+        
+        // Add conditional logic if enabled
+        if (hasConditionalLogic && conditionalConditions.length > 0) {
+          // CRITICAL: Ensure field is hidden immediately after appending
+          fieldDiv.style.display = 'none';
+          
+          // Function to check if any condition is met
+          const checkConditionalLogic = () => {
+            let anyMatch = false;
+            
+            // Use the parent dropdown's nodeId (same as the select.id base)
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            
+            conditionalConditions.forEach((conditionNodeId) => {
+              if (!conditionNodeId) return;
+              
+              // Construct full checkbox ID: {baseNodeId}_{condition}_{entryNumber}
+              const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+              const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+              const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
+              const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+              
+              // Try to find checkbox or radio button
+              let checkbox = document.getElementById(checkboxId);
+              if (!checkbox) {
+                checkbox = document.getElementById(simpleCheckboxId);
+              }
+              const radio = document.getElementById(radioId);
+              
+              // Check if checkbox is checked or radio is selected
+              if ((checkbox && checkbox.checked) || (radio && radio.checked)) {
+                anyMatch = true;
+                return;
+              }
+            });
+            
+            // Show or hide the label field based on match
+            if (anyMatch) {
+              fieldDiv.style.display = 'flex';
+            } else {
+              fieldDiv.style.display = 'none';
+              // Reset input value when hidden
+              input.value = '';
+            }
+          };
+          
+          // Listen for radio group changes
+          const radioGroupHandler = function(event) {
+            const eventEntryNumber = event.detail && event.detail.entryNumber;
+            if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber)) {
+              setTimeout(() => {
+                checkConditionalLogic();
+              }, 200);
+            }
+          };
+          window.addEventListener('radioGroupChanged', radioGroupHandler);
+          
+          // Listen for trigger dropdown changes to re-evaluate conditional logic
+          const triggerDropdownHandler = function(event) {
+            const eventEntryNumber = event.detail && event.detail.entryNumber;
+            const eventQuestionId = event.detail && event.detail.questionId;
+            const eventCheckboxId = event.detail && event.detail.checkboxId;
+            
+            // Re-check if:
+            // 1. It's for the same entry and question (from the change event in the dropdown)
+            // 2. OR if a checkbox was created/removed that matches one of our conditions
+            let shouldRecheck = false;
+            
+            if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && 
+                eventQuestionId != null && String(eventQuestionId) === String(questionId)) {
+              shouldRecheck = true;
+            } else if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && eventCheckboxId) {
+              // Check if the created/removed checkbox matches any of our conditions
+              const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+              conditionalConditions.forEach((conditionNodeId) => {
+                if (!conditionNodeId) return;
+                const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                if (eventCheckboxId === fullCheckboxId) {
+                  shouldRecheck = true;
+                }
+              });
+            }
+            
+            if (shouldRecheck) {
+              // Use a delay to ensure dropdownMirror has finished creating/removing checkboxes
+              setTimeout(() => {
+                checkConditionalLogic();
+              }, 150);
+            }
+          };
+          window.addEventListener('triggerDropdownChanged', triggerDropdownHandler);
+          
+          // Set up event listeners for each condition checkbox/radio
+          conditionalConditions.forEach((conditionNodeId) => {
+            if (!conditionNodeId) return;
+            
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+            const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+            const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+            
+            const attachListener = () => {
+              // Try to find checkbox first - try full pattern, then simple pattern
+              let element = document.getElementById(fullCheckboxId);
+              let isRadio = false;
+              
+              // If not found with full pattern, try simple pattern
+              if (!element) {
+                element = document.getElementById(simpleCheckboxId);
+              }
+              
+              // If not found, try to find radio button
+              if (!element) {
+                element = document.getElementById(radioId);
+                isRadio = true;
+              }
+              
+              if (element) {
+                if (isRadio) {
+                  element.addEventListener('change', checkConditionalLogic);
+                } else {
+                  element.addEventListener('change', checkConditionalLogic);
+                }
+              } else {
+                // Element not found yet, try again after a delay
+                setTimeout(attachListener, 100);
+              }
+            };
+            
+            // Start trying to attach listener
+            attachListener();
+          });
+          
+          // Initial check
+          setTimeout(() => {
+            checkConditionalLogic();
+          }, 300);
+        }
       } else if (triggerField.type === 'checkbox') {
         const checkboxFieldDiv = document.createElement('div');
-        checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        
+        // Check if conditional logic is enabled
+        const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
+        const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+        
+        // Initially hide if conditional logic is enabled
+        if (hasConditionalLogic) {
+          checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1); display: none;';
+        } else {
+          checkboxFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+        }
 
         const fieldNameLabel = document.createElement('label');
         fieldNameLabel.textContent = triggerField.fieldName + ":";
@@ -2596,6 +2788,150 @@ if (s > 1){
         });
 
         triggerContainer.appendChild(checkboxFieldDiv);
+        
+        // Add conditional logic if enabled
+        if (hasConditionalLogic && conditionalConditions.length > 0) {
+          // CRITICAL: Ensure field is hidden immediately after appending
+          checkboxFieldDiv.style.display = 'none';
+          
+          // Function to check if any condition is met
+          const checkConditionalLogic = () => {
+            let anyMatch = false;
+            
+            // Use the parent dropdown's nodeId (same as the select.id base)
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            
+            conditionalConditions.forEach((conditionNodeId) => {
+              if (!conditionNodeId) return;
+              
+              // Construct full checkbox ID: {baseNodeId}_{condition}_{entryNumber}
+              const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+              const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+              const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
+              const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+              
+              // Try to find checkbox or radio button
+              let checkbox = document.getElementById(checkboxId);
+              if (!checkbox) {
+                checkbox = document.getElementById(simpleCheckboxId);
+              }
+              const radio = document.getElementById(radioId);
+              
+              // Check if checkbox is checked or radio is selected
+              if ((checkbox && checkbox.checked) || (radio && radio.checked)) {
+                anyMatch = true;
+                return;
+              }
+            });
+            
+            // Show or hide the checkbox field based on match
+            if (anyMatch) {
+              checkboxFieldDiv.style.display = 'block';
+            } else {
+              checkboxFieldDiv.style.display = 'none';
+              // Reset checkbox values when hidden
+              checkboxOptions.forEach((option) => {
+                const optionInput = document.getElementById(selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber);
+                if (optionInput) {
+                  optionInput.checked = false;
+                  optionInput.dispatchEvent(new Event('change'));
+                }
+              });
+            }
+          };
+          
+          // Listen for radio group changes
+          const radioGroupHandler = function(event) {
+            const eventEntryNumber = event.detail && event.detail.entryNumber;
+            if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber)) {
+              setTimeout(() => {
+                checkConditionalLogic();
+              }, 200);
+            }
+          };
+          window.addEventListener('radioGroupChanged', radioGroupHandler);
+          
+          // Listen for trigger dropdown changes to re-evaluate conditional logic
+          const triggerDropdownHandler = function(event) {
+            const eventEntryNumber = event.detail && event.detail.entryNumber;
+            const eventQuestionId = event.detail && event.detail.questionId;
+            const eventCheckboxId = event.detail && event.detail.checkboxId;
+            
+            // Re-check if:
+            // 1. It's for the same entry and question (from the change event in the dropdown)
+            // 2. OR if a checkbox was created/removed that matches one of our conditions
+            let shouldRecheck = false;
+            
+            if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && 
+                eventQuestionId != null && String(eventQuestionId) === String(questionId)) {
+              shouldRecheck = true;
+            } else if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && eventCheckboxId) {
+              // Check if the created/removed checkbox matches any of our conditions
+              const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+              conditionalConditions.forEach((conditionNodeId) => {
+                if (!conditionNodeId) return;
+                const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                if (eventCheckboxId === fullCheckboxId) {
+                  shouldRecheck = true;
+                }
+              });
+            }
+            
+            if (shouldRecheck) {
+              // Use a delay to ensure dropdownMirror has finished creating/removing checkboxes
+              setTimeout(() => {
+                checkConditionalLogic();
+              }, 150);
+            }
+          };
+          window.addEventListener('triggerDropdownChanged', triggerDropdownHandler);
+          
+          // Set up event listeners for each condition checkbox/radio
+          conditionalConditions.forEach((conditionNodeId) => {
+            if (!conditionNodeId) return;
+            
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+            const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+            const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+            
+            const attachListener = () => {
+              // Try to find checkbox first - try full pattern, then simple pattern
+              let element = document.getElementById(fullCheckboxId);
+              let isRadio = false;
+              
+              // If not found with full pattern, try simple pattern
+              if (!element) {
+                element = document.getElementById(simpleCheckboxId);
+              }
+              
+              // If not found, try to find radio button
+              if (!element) {
+                element = document.getElementById(radioId);
+                isRadio = true;
+              }
+              
+              if (element) {
+                if (isRadio) {
+                  element.addEventListener('change', checkConditionalLogic);
+                } else {
+                  element.addEventListener('change', checkConditionalLogic);
+                }
+              } else {
+                // Element not found yet, try again after a delay
+                setTimeout(attachListener, 100);
+              }
+            };
+            
+            // Start trying to attach listener
+            attachListener();
+          });
+          
+          // Initial check
+          setTimeout(() => {
+            checkConditionalLogic();
+          }, 300);
+        }
       } else if (triggerField.type === 'dropdown') {
         const dropdownFieldDiv = document.createElement('div');
         

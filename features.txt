@@ -1394,6 +1394,927 @@ Form Data:
 
 ---
 
+## ⚙️ **Conditional Logic for Trigger Sequence Entries Feature**
+
+### **Overview**
+Conditional logic for trigger sequence entries allows dropdown fields within trigger sequences to be shown or hidden based on whether specific checkbox options are checked. When a user selects a dropdown option in a trigger sequence, it creates a hidden checkbox. Other dropdown fields in the same trigger sequence can be configured to only appear when certain hidden checkboxes (from other dropdowns or checkboxes) are checked. This implements "show if" logic: the dropdown field is hidden by default and only appears when at least one of its configured conditions is met.
+
+**Example**: In a trigger sequence, there's a dropdown "bruh" with options "what" and "hey", and another dropdown "other dropdown" with options "yes" and "no". The "other dropdown" can be configured to only appear when "bruh_what" (the hidden checkbox created when user selects "what" from "bruh") is checked.
+
+**Key Benefits:**
+- Dynamic form behavior based on user selections within trigger sequences
+- Reduces form clutter by hiding irrelevant fields
+- Supports multiple conditions with OR logic (any condition met = show field)
+- Works seamlessly with hidden checkboxes created by dropdown selections
+- Automatically handles checkbox creation/removal when dropdown values change
+
+---
+
+### **PHASE 1: GUI Setup (gui.html / gui.js)**
+
+#### **1.1 Adding Conditional Logic UI to Dropdown Fields**
+**Location**: `FormWiz GUI/gui.js` - `addTriggerDropdown()` function (around line 2948)
+
+When a dropdown field is added to a trigger sequence, the conditional logic UI is automatically included:
+
+```javascript
+function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
+    // ... dropdown field creation code ...
+    
+    // Conditional logic UI elements
+    const conditionalLogicContainerId = `conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    const enableConditionalLogicCheckboxId = `enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    
+    fieldDiv.innerHTML = `
+        <!-- Dropdown field name and options UI -->
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label for="${enableConditionalLogicCheckboxId}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Enable Conditional Logic</label>
+            <div style="display: flex; justify-content: center;">
+                <input type="checkbox" id="${enableConditionalLogicCheckboxId}" onchange="toggleTriggerDropdownConditionalLogic(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="cursor: pointer;">
+            </div>
+            <div id="${conditionalLogicContainerId}" style="margin-top: 8px; display: none;">
+                <!-- Conditional logic UI will be populated here -->
+            </div>
+        </div>
+    `;
+}
+```
+
+**UI Components:**
+1. **"Enable Conditional Logic" checkbox**: Toggles the conditional logic feature on/off
+2. **Conditional logic container**: Initially hidden, shown when checkbox is checked
+3. **Condition dropdowns**: Populated with available checkbox option IDs from the trigger sequence
+4. **"Add Another Condition" button**: Allows multiple conditions (OR logic)
+5. **Remove buttons (×)**: Remove individual conditions
+
+#### **1.2 Toggling Conditional Logic**
+**Location**: `FormWiz GUI/gui.js` - `toggleTriggerDropdownConditionalLogic()` function (around line 3748)
+
+When the user checks/unchecks the "Enable Conditional Logic" checkbox:
+
+```javascript
+function toggleTriggerDropdownConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const checkbox = document.getElementById(`enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    
+    if (!checkbox || !container) return;
+    
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    
+    // Initialize or update the data structure
+    if (!window.triggerDropdownConditionalLogic) {
+        window.triggerDropdownConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownConditionalLogic[key]) {
+        window.triggerDropdownConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    
+    // Update enabled state
+    window.triggerDropdownConditionalLogic[key].enabled = checkbox.checked;
+    
+    if (checkbox.checked) {
+        updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        // Clear conditions when disabled
+        window.triggerDropdownConditionalLogic[key].conditions = [];
+    }
+    
+    // Trigger autosave to persist the changes
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+```
+
+**What happens:**
+1. Shows/hides the conditional logic container
+2. Initializes `window.triggerDropdownConditionalLogic` if it doesn't exist
+3. Creates a unique key: `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`
+4. Stores the enabled state and conditions array
+5. If enabled, calls `updateTriggerDropdownConditionalLogicUI()` to build the UI
+6. If disabled, clears the conditions array
+7. Triggers autosave to persist changes
+
+**Data Structure:**
+```javascript
+window.triggerDropdownConditionalLogic = {
+    "2_4_1_3": {  // Key: questionId_fieldCount_sequenceCount_triggerFieldCount
+        enabled: true,
+        conditions: ["bruh_what"]  // Array of checkbox option IDs
+    }
+}
+```
+
+#### **1.3 Updating Conditional Logic UI**
+**Location**: `FormWiz GUI/gui.js` - `updateTriggerDropdownConditionalLogicUI()` function (around line 3788)
+
+This function populates the conditional logic container with dropdowns for selecting conditions:
+
+```javascript
+function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const container = document.getElementById(`conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) return;
+    
+    // Get available checkbox option IDs from this trigger sequence
+    const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount);
+    
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownConditionalLogic[key]) {
+        window.triggerDropdownConditionalLogic[key] = { enabled: true, conditions: [''] };
+    }
+    
+    container.innerHTML = '';
+    
+    // Create a dropdown for each condition
+    window.triggerDropdownConditionalLogic[key].conditions.forEach((condition, conditionIndex) => {
+        const conditionRow = document.createElement('div');
+        conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%;';
+        
+        // Create dropdown for selecting checkbox option
+        const conditionDropdown = document.createElement('select');
+        conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+        
+        // Add placeholder option
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select checkbox option...';
+        conditionDropdown.appendChild(placeholderOption);
+        
+        // Add available checkbox options
+        checkboxNodeIds.forEach(nodeId => {
+            const option = document.createElement('option');
+            option.value = nodeId;
+            option.textContent = nodeId;
+            if (condition === nodeId) {
+                option.selected = true;
+            }
+            conditionDropdown.appendChild(option);
+        });
+        
+        conditionDropdown.value = condition || '';
+        
+        // Update condition when dropdown value changes
+        conditionDropdown.onchange = () => {
+            if (!window.triggerDropdownConditionalLogic[key]) {
+                window.triggerDropdownConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            window.triggerDropdownConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
+            // Trigger autosave
+            if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+            }
+        };
+        
+        // Remove condition button
+        const removeConditionBtn = document.createElement('button');
+        removeConditionBtn.textContent = '×';
+        removeConditionBtn.style.cssText = 'background: #f44336; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 14px;';
+        removeConditionBtn.onclick = () => {
+            if (window.triggerDropdownConditionalLogic[key].conditions.length > 1) {
+                window.triggerDropdownConditionalLogic[key].conditions.splice(conditionIndex, 1);
+                updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                }
+            }
+        };
+        
+        conditionRow.appendChild(conditionDropdown);
+        conditionRow.appendChild(removeConditionBtn);
+        container.appendChild(conditionRow);
+    });
+    
+    // "Add Another Condition" button
+    const addConditionBtn = document.createElement('button');
+    addConditionBtn.textContent = 'Add Another Condition';
+    addConditionBtn.style.cssText = 'background: #2196F3; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%; margin-top: 4px;';
+    addConditionBtn.onclick = () => {
+        if (!window.triggerDropdownConditionalLogic[key].conditions) {
+            window.triggerDropdownConditionalLogic[key].conditions = [''];
+        }
+        window.triggerDropdownConditionalLogic[key].conditions.push('');
+        updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    container.appendChild(addConditionBtn);
+}
+```
+
+**What this function does:**
+1. Gets available checkbox option IDs from the trigger sequence using `getCheckboxOptionNodeIdsFromTriggerSequence()`
+2. Creates a dropdown for each condition in the `conditions` array
+3. Populates each dropdown with available checkbox option IDs
+4. Sets the selected value if a condition is already configured
+5. Adds change handlers to update the condition when dropdown value changes
+6. Adds remove buttons (×) to delete individual conditions
+7. Adds "Add Another Condition" button to add more conditions (OR logic)
+
+#### **1.4 Getting Available Checkbox Option IDs**
+**Location**: `FormWiz GUI/gui.js` - `getCheckboxOptionNodeIdsFromTriggerSequence()` function (around line 3537)
+
+This function collects all checkbox option IDs available in the trigger sequence:
+
+```javascript
+function getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount) {
+    const checkboxNodeIds = [];
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    
+    if (!triggerFieldsContainer) return checkboxNodeIds;
+    
+    // Find all checkbox option node ID inputs in this trigger sequence
+    const nodeIdInputs = triggerFieldsContainer.querySelectorAll('input[id^="triggerCheckboxOptionNodeId"]');
+    nodeIdInputs.forEach(input => {
+        const nodeId = input.value.trim();
+        if (nodeId && !checkboxNodeIds.includes(nodeId)) {
+            checkboxNodeIds.push(nodeId);
+        }
+    });
+    
+    // Also find dropdown fields and generate their hidden checkbox IDs
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    if (questionBlock) {
+        const triggerFieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
+        triggerFieldElements.forEach((triggerFieldEl, triggerFieldIndex) => {
+            // Check if this is a dropdown field
+            const triggerDropdownFieldNameEl = triggerFieldEl.querySelector(`#triggerDropdownFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldIndex + 1}`);
+            
+            if (triggerDropdownFieldNameEl) {
+                const triggerDropdownFieldName = triggerDropdownFieldNameEl.value.trim();
+                
+                if (triggerDropdownFieldName) {
+                    // Sanitize trigger dropdown field name
+                    const sanitizedTriggerFieldName = triggerDropdownFieldName
+                        .toLowerCase()
+                        .replace(/[?]/g, '')
+                        .replace(/[^a-z0-9_]+/g, '_')
+                        .replace(/^_+|_+$/g, '');
+                    
+                    // Get all dropdown options
+                    const triggerDropdownOptionsContainer = triggerFieldEl.querySelector(`#triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldIndex + 1}`);
+                    if (triggerDropdownOptionsContainer) {
+                        const triggerOptionInputs = triggerDropdownOptionsContainer.querySelectorAll('input[type="text"]');
+                        
+                        triggerOptionInputs.forEach((triggerOptionInput) => {
+                            const triggerOptionValue = triggerOptionInput.value.trim();
+                            if (triggerOptionValue) {
+                                // Sanitize option value
+                                const sanitizedTriggerOptionValue = triggerOptionValue
+                                    .replace(/[^A-Za-z0-9_]+/g, "_")
+                                    .toLowerCase()
+                                    .replace(/^_+|_+$/g, '');
+                                
+                                // Generate checkbox ID: {dropdownFieldName}_{optionValue}
+                                // This matches the pattern used for checkbox options (no entry numbers)
+                                const checkboxId = `${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}`;
+                                if (!checkboxNodeIds.includes(checkboxId)) {
+                                    checkboxNodeIds.push(checkboxId);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+    
+    return checkboxNodeIds;
+}
+```
+
+**What this function does:**
+1. Finds all checkbox option node ID inputs in the trigger sequence
+2. Collects their values into an array
+3. Also finds dropdown fields in the trigger sequence
+4. For each dropdown, generates hidden checkbox IDs in the format `{dropdownFieldName}_{optionValue}` (e.g., "bruh_what")
+5. Returns all available checkbox option IDs
+
+**Important:** For dropdown hidden checkboxes, the ID format is simplified to `{dropdownFieldName}_{optionValue}` (without entry numbers) because the conditional logic dropdown should show a single option like "bruh_what" instead of numbered options like "bruh_what_1", "bruh_what_2", etc.
+
+---
+
+### **PHASE 2: Data Processing (generate.js)**
+
+#### **2.1 Collecting Conditional Logic Data**
+**Location**: `FormWiz GUI/generate.js` - Around line 1660-1695
+
+When generating HTML for trigger sequence fields, `generate.js` checks for conditional logic:
+
+```javascript
+// Inside the loop that processes trigger fields
+if (dropdownFieldNameEl) {
+    // ... create dropdown options ...
+    
+    const dropdownField = {
+        type: 'dropdown',
+        fieldName: dropdownFieldNameEl.value.trim(),
+        options: dropdownOptions
+    };
+    
+    // Check for conditional logic from window.triggerDropdownConditionalLogic
+    const triggerFieldCount = fieldIndex + 1;
+    const conditionalLogicKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+    
+    if (window.triggerDropdownConditionalLogic && window.triggerDropdownConditionalLogic[conditionalLogicKey]) {
+        const storedLogic = window.triggerDropdownConditionalLogic[conditionalLogicKey];
+        
+        if (storedLogic.enabled && storedLogic.conditions && storedLogic.conditions.length > 0) {
+            dropdownField.conditionalLogic = {
+                enabled: storedLogic.enabled,
+                conditions: storedLogic.conditions.filter(c => c && c.trim() !== '')
+            };
+        }
+    }
+    
+    triggerFields.push(dropdownField);
+}
+```
+
+**What happens:**
+1. Creates the dropdown field object with type, fieldName, and options
+2. Constructs the conditional logic key: `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`
+3. Checks if conditional logic exists in `window.triggerDropdownConditionalLogic`
+4. If enabled and has conditions, adds `conditionalLogic` object to the dropdown field
+5. Filters out empty conditions
+
+**Result Structure:**
+```javascript
+{
+    type: 'dropdown',
+    fieldName: 'other dropdown',
+    options: [{ text: 'yes' }, { text: 'no' }],
+    conditionalLogic: {
+        enabled: true,
+        conditions: ['bruh_what']
+    }
+}
+```
+
+#### **2.2 Rendering Dropdown with Conditional Logic**
+**Location**: `FormWiz GUI/generate.js` - `createTriggerFieldsContainer()` function (around line 2618-2864)
+
+When rendering the dropdown in the output HTML, conditional logic is applied:
+
+```javascript
+// Check if conditional logic is enabled
+const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
+const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+
+// ... create dropdown select element ...
+
+// Add conditional logic if enabled
+if (hasConditionalLogic && conditionalConditions.length > 0) {
+    // CRITICAL: Ensure field is hidden immediately after appending
+    dropdownFieldDiv.style.display = 'none';
+    
+    // Function to check if any condition is met
+    const checkConditionalLogic = () => {
+        let anyMatch = false;
+        
+        // Use the parent dropdown's nodeId (same as the select.id base)
+        const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+        
+        conditionalConditions.forEach((conditionNodeId) => {
+            if (!conditionNodeId) return;
+            
+            // For dropdown hidden checkboxes, the condition is just the field name and option (e.g., "bruh_what")
+            // but the actual checkbox ID includes the base nodeId: {baseNodeId}_{condition}_{entryNumber}
+            const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+            const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+            const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
+            const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+            
+            // Try to find checkbox or radio button
+            let checkbox = document.getElementById(checkboxId);
+            if (!checkbox) {
+                checkbox = document.getElementById(simpleCheckboxId);
+            }
+            const radio = document.getElementById(radioId);
+            
+            // Check if checkbox is checked or radio is selected
+            if ((checkbox && checkbox.checked) || (radio && radio.checked)) {
+                anyMatch = true;
+                return;
+            }
+        });
+        
+        // Show or hide the dropdown field based on match
+        if (anyMatch) {
+            dropdownFieldDiv.style.display = 'block';
+        } else {
+            dropdownFieldDiv.style.display = 'none';
+            // Reset dropdown value when hidden
+            select.value = '';
+            select.dispatchEvent(new Event('change'));
+        }
+    };
+    
+    // Set up event listeners for condition checkboxes/radios
+    conditionalConditions.forEach((conditionNodeId) => {
+        // ... attach listeners to checkboxes/radios ...
+    });
+    
+    // Listen for trigger dropdown changes
+    const triggerDropdownHandler = function(event) {
+        const eventEntryNumber = event.detail && event.detail.entryNumber;
+        const eventCheckboxId = event.detail && event.detail.checkboxId;
+        
+        // Re-check if checkbox was created/removed that matches our conditions
+        let shouldRecheck = false;
+        if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && eventCheckboxId) {
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            conditionalConditions.forEach((conditionNodeId) => {
+                if (!conditionNodeId) return;
+                const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                if (eventCheckboxId === fullCheckboxId) {
+                    shouldRecheck = true;
+                }
+            });
+        }
+        
+        if (shouldRecheck) {
+            setTimeout(() => {
+                checkConditionalLogic();
+            }, 150);
+        }
+    };
+    window.addEventListener('triggerDropdownChanged', triggerDropdownHandler);
+    
+    // Initial check
+    setTimeout(() => {
+        checkConditionalLogic();
+    }, 300);
+}
+```
+
+**Key Components:**
+1. **Initial hiding**: Field is hidden immediately (`display: 'none'`)
+2. **`checkConditionalLogic()` function**: Checks if any condition checkbox is checked
+3. **Checkbox ID construction**: Uses `{baseNodeId}_{condition}_{entryNumber}` format (e.g., "is_this_plaintiff_a_business_bruh_what_1")
+4. **Show/hide logic**: Shows field if any condition is met, hides if none are met
+5. **Reset on hide**: Resets dropdown value when hidden
+6. **Event listeners**: Listens for changes on condition checkboxes/radios
+7. **`triggerDropdownChanged` listener**: Re-evaluates when dropdowns in trigger sequence change
+8. **Initial check**: Runs after 300ms to set initial state
+
+---
+
+### **PHASE 3: Runtime Implementation (output.html)**
+
+#### **3.1 Dropdown Change Event and Checkbox Creation**
+**Location**: `FormWiz GUI/generate.js` / `output.html` - `dropdownMirror()` function (around line 3844)
+
+When a user selects a dropdown option in a trigger sequence, `dropdownMirror` creates a hidden checkbox:
+
+```javascript
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    
+    if(!val) {
+        // When value is cleared, dispatch events for removed checkboxes
+        const existingCheckboxes = wrap.querySelectorAll('input[type="checkbox"]');
+        const removedCheckboxIds = [];
+        existingCheckboxes.forEach(checkbox => {
+            removedCheckboxIds.push(checkbox.id);
+        });
+        
+        wrap.innerHTML = "";
+        
+        // Dispatch events for removed checkboxes
+        if (removedCheckboxIds.length > 0) {
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    removedCheckboxIds.forEach(checkboxId => {
+                        const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                            detail: {
+                                entryNumber: entryNumber,
+                                checkboxId: checkboxId,
+                                baseName: baseName,
+                                removed: true
+                            }
+                        });
+                        window.dispatchEvent(triggerDropdownEvent);
+                    });
+                }
+            }
+        }
+        return;
+    }
+
+    // ... create new checkbox ...
+    
+    const newCheckbox = document.getElementById(checkboxId);
+    if (newCheckbox) {
+        // Dispatch a change event on the newly created checkbox
+        setTimeout(() => {
+            const changeEvent = new Event('change', { bubbles: true });
+            newCheckbox.dispatchEvent(changeEvent);
+            
+            // Also dispatch a custom event for trigger dropdown changes
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                        detail: {
+                            entryNumber: entryNumber,
+                            checkboxId: checkboxId,
+                            baseName: baseName
+                        }
+                    });
+                    window.dispatchEvent(triggerDropdownEvent);
+                }
+            }
+        }, 50);
+    }
+}
+```
+
+**What happens:**
+1. When dropdown value is cleared: Removes checkboxes and dispatches `triggerDropdownChanged` events for each removed checkbox
+2. When dropdown value is set: Creates new checkbox and dispatches:
+   - `change` event on the checkbox itself
+   - `triggerDropdownChanged` custom event with checkboxId and entryNumber
+
+#### **3.2 Conditional Logic Re-evaluation**
+**Location**: `FormWiz GUI/generate.js` / `output.html` - Conditional logic handler (around line 696-729)
+
+The conditional logic handler listens for `triggerDropdownChanged` events:
+
+```javascript
+const triggerDropdownHandler = function(event) {
+    const eventEntryNumber = event.detail && event.detail.entryNumber;
+    const eventCheckboxId = event.detail && event.detail.checkboxId;
+    
+    // Re-check if checkbox was created/removed that matches our conditions
+    let shouldRecheck = false;
+    
+    if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && eventCheckboxId) {
+        // Check if the created/removed checkbox matches any of our conditions
+        const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+        conditionalConditions.forEach((conditionNodeId) => {
+            if (!conditionNodeId) return;
+            const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+            if (eventCheckboxId === fullCheckboxId) {
+                shouldRecheck = true;
+            }
+        });
+    }
+    
+    if (shouldRecheck) {
+        // Use a delay to ensure dropdownMirror has finished creating/removing checkboxes
+        setTimeout(() => {
+            checkConditionalLogic();
+        }, 150);
+    }
+};
+window.addEventListener('triggerDropdownChanged', triggerDropdownHandler);
+```
+
+**What happens:**
+1. Listens for `triggerDropdownChanged` events
+2. Checks if the event's `checkboxId` matches any of the conditions
+3. If match found, re-evaluates `checkConditionalLogic()` after a delay
+4. This ensures the dropdown field appears/disappears when relevant checkboxes are created/removed
+
+#### **3.3 The `checkConditionalLogic()` Function**
+**Location**: `FormWiz GUI/generate.js` / `output.html` - Around line 611-683
+
+This function checks if any condition is met and shows/hides the dropdown field:
+
+```javascript
+const checkConditionalLogic = () => {
+    let anyMatch = false;
+    
+    // Use the parent dropdown's nodeId (same as the select.id base)
+    const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+    
+    conditionalConditions.forEach((conditionNodeId) => {
+        if (!conditionNodeId) return;
+        
+        // Construct full checkbox ID: {baseNodeId}_{condition}_{entryNumber}
+        const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+        const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+        const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
+        const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+        
+        // Try to find checkbox or radio button
+        let checkbox = document.getElementById(checkboxId);
+        if (!checkbox) {
+            checkbox = document.getElementById(simpleCheckboxId);
+        }
+        const radio = document.getElementById(radioId);
+        
+        // Check if checkbox is checked or radio is selected
+        if ((checkbox && checkbox.checked) || (radio && radio.checked)) {
+            anyMatch = true;
+            return;
+        }
+    });
+    
+    // Show or hide the dropdown field based on match
+    if (anyMatch) {
+        dropdownFieldDiv.style.display = 'block';
+    } else {
+        dropdownFieldDiv.style.display = 'none';
+        // Reset dropdown value when hidden
+        select.value = '';
+        select.dispatchEvent(new Event('change'));
+    }
+};
+```
+
+**Logic Flow:**
+1. Loops through each condition in `conditionalConditions` array
+2. For each condition, constructs the full checkbox ID: `{baseNodeId}_{condition}_{entryNumber}`
+3. Tries to find the checkbox using the full pattern, then simple pattern
+4. Also checks for radio buttons (for "Mark only one" checkboxes)
+5. If any checkbox is checked or radio is selected, sets `anyMatch = true`
+6. Shows field if `anyMatch` is true, hides if false
+7. Resets dropdown value when hidden
+
+**OR Logic:**
+- If ANY condition is met, the field is shown
+- If ALL conditions are unmet, the field is hidden
+- This implements OR logic: condition1 OR condition2 OR condition3 = show
+
+---
+
+### **PHASE 4: Data Persistence**
+
+#### **4.1 Export to GUI JSON**
+**Location**: `FormWiz GUI/download.js` - Around line 2851-2917
+
+When exporting the form configuration, conditional logic is included in the dropdown field:
+
+```javascript
+if (dropdownFieldNameEl) {
+    // ... create dropdown options ...
+    
+    const dropdownField = {
+        type: 'dropdown',
+        fieldName: dropdownFieldNameEl.value.trim(),
+        options: dropdownOptions
+    };
+    
+    // Check for conditional logic
+    const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogicDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+    const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
+    
+    // Include conditional logic if enabled
+    if (conditionalLogicEnabled) {
+        // Get conditions from the conditional logic UI
+        const conditionalLogicContainer = fieldEl.querySelector(`#conditionalLogicUIDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+        const conditions = [];
+        
+        if (conditionalLogicContainer) {
+            const conditionDropdowns = conditionalLogicContainer.querySelectorAll('select');
+            conditionDropdowns.forEach(dropdown => {
+                const value = dropdown.value.trim();
+                if (value) {
+                    conditions.push(value);
+                }
+            });
+        }
+        
+        // Also check window.triggerDropdownConditionalLogic for the data
+        const key = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`;
+        if (window.triggerDropdownConditionalLogic && window.triggerDropdownConditionalLogic[key]) {
+            const storedConditions = window.triggerDropdownConditionalLogic[key].conditions || [];
+            // Use stored conditions if available, otherwise use dropdown values
+            if (storedConditions.length > 0) {
+                dropdownField.conditionalLogic = {
+                    enabled: true,
+                    conditions: storedConditions.filter(c => c && c.trim() !== '')
+                };
+            } else if (conditions.length > 0) {
+                dropdownField.conditionalLogic = {
+                    enabled: true,
+                    conditions: conditions
+                };
+            }
+        } else if (conditions.length > 0) {
+            dropdownField.conditionalLogic = {
+                enabled: true,
+                conditions: conditions
+            };
+        }
+    }
+    
+    triggerFields.push(dropdownField);
+}
+```
+
+**Export Process:**
+1. Checks if "Enable Conditional Logic" checkbox is checked
+2. Gets conditions from the UI dropdowns
+3. Also checks `window.triggerDropdownConditionalLogic` for stored data
+4. Uses stored conditions if available, otherwise uses UI dropdown values
+5. Adds `conditionalLogic` object to the dropdown field
+
+**Exported JSON Structure:**
+```json
+{
+    "type": "dropdown",
+    "fieldName": "other dropdown",
+    "options": [
+        { "text": "yes" },
+        { "text": "no" }
+    ],
+    "conditionalLogic": {
+        "enabled": true,
+        "conditions": ["bruh_what"]
+    }
+}
+```
+
+#### **4.2 Import from GUI JSON**
+**Location**: `FormWiz GUI/download.js` - `loadFormData()` function (around line 1270-1342)
+
+When importing a JSON file, conditional logic is restored:
+
+```javascript
+// Inside the loop that processes trigger fields
+if (triggerField.type === 'dropdown') {
+    // ... create dropdown field UI ...
+    
+    // Restore conditional logic if enabled
+    if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+        const triggerFieldCount = triggerFieldIndex + 1;
+        const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+        
+        if (!window.triggerDropdownConditionalLogic) {
+            window.triggerDropdownConditionalLogic = {};
+        }
+        window.triggerDropdownConditionalLogic[key] = {
+            enabled: true,
+            conditions: [...(triggerField.conditionalLogic.conditions || [])]
+        };
+        
+        setTimeout(() => {
+            const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+            if (enableConditionalLogicCheckbox) {
+                enableConditionalLogicCheckbox.checked = true;
+                // Trigger change event to rebuild UI
+                const event = new Event('change');
+                enableConditionalLogicCheckbox.dispatchEvent(event);
+                
+                setTimeout(() => {
+                    if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                        // Update UI with conditions
+                        if (typeof updateTriggerDropdownConditionalLogicUI === 'function') {
+                            updateTriggerDropdownConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                            
+                            setTimeout(() => {
+                                // Set condition dropdown values
+                                triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                    if (condIndex > 0) {
+                                        // Click "Add Another Condition" button for additional conditions
+                                        const addConditionBtn = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                        if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                            addConditionBtn.click();
+                                        }
+                                    }
+                                    
+                                    setTimeout(() => {
+                                        const conditionDropdown = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                        if (conditionDropdown) {
+                                            conditionDropdown.value = condition;
+                                            conditionDropdown.dispatchEvent(new Event('change'));
+                                        }
+                                    }, 150 * (condIndex + 1));
+                                });
+                            }, 300);
+                        }
+                    }
+                }, 400);
+            }
+        }, 200);
+    }
+}
+```
+
+**Import Process:**
+1. Checks if `conditionalLogic` exists and is enabled in the imported data
+2. Initializes `window.triggerDropdownConditionalLogic` if needed
+3. Stores the conditions in the data structure
+4. Checks the "Enable Conditional Logic" checkbox
+5. Triggers change event to rebuild the UI
+6. Calls `updateTriggerDropdownConditionalLogicUI()` to populate dropdowns
+7. Sets each condition dropdown value
+8. Clicks "Add Another Condition" button for additional conditions
+
+#### **4.3 Autosave Integration**
+**Location**: `FormWiz GUI/gui.js` - Autosave functionality
+
+Conditional logic configurations are automatically saved:
+- When user checks/unchecks "Enable Conditional Logic" checkbox
+- When user changes condition dropdown values
+- When user adds/removes conditions
+- Included in autosave data structure
+
+**Autosave includes:**
+- `window.triggerDropdownConditionalLogic` object
+- All enabled states and conditions arrays
+- Preserved across page reloads
+
+---
+
+### **Summary: Complete Data Flow**
+
+1. **GUI Setup** (`gui.js`):
+   - User adds dropdown to trigger sequence
+   - User checks "Enable Conditional Logic" checkbox
+   - User selects checkbox options from dropdown
+   - User can add multiple conditions (OR logic)
+   - Configuration stored in `window.triggerDropdownConditionalLogic`
+
+2. **Generate.js Processing** (`generate.js`):
+   - Reads from `window.triggerDropdownConditionalLogic`
+   - Adds `conditionalLogic` object to dropdown field
+   - Generates HTML with conditional logic handlers
+   - Sets up event listeners for condition checkboxes
+   - Sets up `triggerDropdownChanged` event listener
+
+3. **Output.html Runtime** (`output.html`):
+   - Field is hidden by default
+   - `checkConditionalLogic()` runs on page load
+   - When user selects dropdown option, `dropdownMirror` creates checkbox
+   - `dropdownMirror` dispatches `triggerDropdownChanged` event
+   - Conditional logic handler re-evaluates
+   - Field appears if condition is met, disappears if not
+   - When user changes dropdown value, old checkbox removed, new one created
+   - Conditional logic re-evaluates again
+
+4. **Data Persistence**:
+   - Export: `window.triggerDropdownConditionalLogic` → JSON `conditionalLogic` object
+   - Import: JSON `conditionalLogic` → `window.triggerDropdownConditionalLogic` → UI restoration
+   - Autosave: Includes `window.triggerDropdownConditionalLogic` in autosave data
+
+---
+
+### **Key Technical Details**
+
+**Conditional Logic Key Format:**
+- Pattern: `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`
+- Example: `"2_4_1_3"` = Question 2, Field 4, Sequence 1, Trigger Field 3
+- Used to uniquely identify each dropdown field's conditional logic configuration
+
+**Checkbox ID Construction:**
+- Condition format in UI: `{dropdownFieldName}_{optionValue}` (e.g., "bruh_what")
+- Actual checkbox ID at runtime: `{baseNodeId}_{condition}_{entryNumber}` (e.g., "is_this_plaintiff_a_business_bruh_what_1")
+- The `baseNodeId` is the parent dropdown's nodeId (trigger title)
+- The `entryNumber` is the entry number from the numbered dropdown
+
+**Event System:**
+- `triggerDropdownChanged` custom event is dispatched when:
+  - Dropdown value changes (creates/removes checkboxes)
+  - Checkbox is created by `dropdownMirror`
+  - Checkbox is removed when dropdown is cleared
+- Event detail includes: `entryNumber`, `checkboxId`, `baseName`
+- Conditional logic handlers listen for this event and re-evaluate
+
+**OR Logic Implementation:**
+- Multiple conditions in `conditions` array = OR logic
+- If ANY condition is met, field is shown
+- If ALL conditions are unmet, field is hidden
+- Each condition is checked independently
+
+**Initial State:**
+- Field is hidden by default (`display: 'none'`)
+- `checkConditionalLogic()` runs after 300ms delay
+- Ensures DOM is ready and checkboxes may have been created by autofill
+
+**Reset on Hide:**
+- When field is hidden, dropdown value is reset to empty
+- `change` event is dispatched to trigger `dropdownMirror`
+- This ensures any dependent logic is also reset
+
+---
+
+### **Future Enhancement Opportunities**
+
+1. **AND Logic Support**: Add option for AND logic (all conditions must be met)
+2. **Custom Logic Expressions**: Allow custom boolean expressions (e.g., "(A OR B) AND C")
+3. **Visual Indicators**: Show which conditions are currently met in debug mode
+4. **Condition Groups**: Support grouping conditions with different logic (e.g., "(A OR B) AND (C OR D)")
+5. **Conditional Logic for Other Field Types**: Extend to labels, checkboxes, dates, PDFs, locations
+6. **Nested Conditions**: Allow conditions to reference other conditional fields
+7. **Conditional Logic Builder UI**: Visual builder for complex conditional logic
+
+---
+
 ## 🛠 **Technical Implementation Details**
 
 ### **1. Dynamic Solutions**
