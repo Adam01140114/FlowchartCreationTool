@@ -4937,6 +4937,22 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
         
         // Trigger sequence checkboxes and dropdowns
         if (dropdownItem.triggerSequences && Array.isArray(dropdownItem.triggerSequences)) {
+          // Get the parent dropdown's nodeId (trigger title) from the dropdown field's options
+          // Extract base nodeId from first option's nodeId (e.g., "is_this_plaintiff_a_business_yes" -> "is_this_plaintiff_a_business")
+          let parentDropdownNodeId = questionNodeId; // Fallback to question nodeId
+          if (dropdownItem.options && Array.isArray(dropdownItem.options) && dropdownItem.options.length > 0) {
+            const firstOption = dropdownItem.options[0];
+            if (firstOption.nodeId) {
+              const firstOptionNodeId = firstOption.nodeId;
+              const lastUnderscoreIndex = firstOptionNodeId.lastIndexOf('_');
+              if (lastUnderscoreIndex > 0) {
+                parentDropdownNodeId = firstOptionNodeId.substring(0, lastUnderscoreIndex);
+              } else {
+                parentDropdownNodeId = firstOptionNodeId;
+              }
+            }
+          }
+          
           dropdownItem.triggerSequences.forEach(trigger => {
             // Handle checkboxes in trigger sequences
             if (trigger.checkboxes && Array.isArray(trigger.checkboxes)) {
@@ -4973,9 +4989,9 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
                         const sanitizedOptionValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
                         
                         // Generate checkbox IDs for each entry number (minValue to maxValue)
-                        // Format: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+                        // Format: {parentDropdownNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
                         for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
-                          const checkboxId = `${questionNodeId}_${sanitizedTriggerFieldName}_${sanitizedOptionValue}_${entryNum}`;
+                          const checkboxId = `${parentDropdownNodeId}_${sanitizedTriggerFieldName}_${sanitizedOptionValue}_${entryNum}`;
                           const label = `${questionText} - ${fieldName} [Trigger] - ${triggerDropdownFieldName} (${entryNum}) - ${optionValue} (${checkboxId})`;
                           addOptionIfNotExists(checkboxId, label);
                         }

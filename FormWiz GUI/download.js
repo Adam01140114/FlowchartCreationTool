@@ -2864,11 +2864,57 @@ function exportForm() {
                                                     });
                                                 }
                                                 
-                                                triggerFields.push({
+                                                const dropdownField = {
                                                     type: 'dropdown',
                                                     fieldName: dropdownFieldNameEl.value.trim(),
                                                     options: dropdownOptions
-                                                });
+                                                };
+                                                
+                                                // Check for conditional logic
+                                                const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogicDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
+                                                
+                                                // Include conditional logic if enabled
+                                                if (conditionalLogicEnabled) {
+                                                    // Get conditions from the conditional logic UI
+                                                    const conditionalLogicContainer = fieldEl.querySelector(`#conditionalLogicUIDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    const conditions = [];
+                                                    
+                                                    if (conditionalLogicContainer) {
+                                                        const conditionDropdowns = conditionalLogicContainer.querySelectorAll('select');
+                                                        conditionDropdowns.forEach(dropdown => {
+                                                            const value = dropdown.value.trim();
+                                                            if (value) {
+                                                                conditions.push(value);
+                                                            }
+                                                        });
+                                                    }
+                                                    
+                                                    // Also check window.triggerDropdownConditionalLogic for the data
+                                                    const key = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`;
+                                                    if (window.triggerDropdownConditionalLogic && window.triggerDropdownConditionalLogic[key]) {
+                                                        const storedConditions = window.triggerDropdownConditionalLogic[key].conditions || [];
+                                                        // Use stored conditions if available, otherwise use dropdown values
+                                                        if (storedConditions.length > 0) {
+                                                            dropdownField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: storedConditions.filter(c => c && c.trim() !== '')
+                                                            };
+                                                        } else if (conditions.length > 0) {
+                                                            dropdownField.conditionalLogic = {
+                                                                enabled: true,
+                                                                conditions: conditions
+                                                            };
+                                                        }
+                                                    } else if (conditions.length > 0) {
+                                                        dropdownField.conditionalLogic = {
+                                                            enabled: true,
+                                                            conditions: conditions
+                                                        };
+                                                    }
+                                                }
+                                                
+                                                triggerFields.push(dropdownField);
                                             } else if (dateLabelEl && dateNodeIdEl) {
                                                 // Trigger date field
                                                 console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as DATE field');

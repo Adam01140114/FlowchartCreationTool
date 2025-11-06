@@ -3778,6 +3778,11 @@ function toggleTriggerDropdownConditionalLogic(questionId, fieldCount, sequenceC
         // Clear conditions when disabled
         window.triggerDropdownConditionalLogic[key].conditions = [];
     }
+    
+    // Trigger autosave to persist the changes
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
 }
 
 // Function to update the conditional logic UI for dropdown fields with checkbox option dropdowns
@@ -3837,6 +3842,10 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
             }
             window.triggerDropdownConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
             console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition updated:', window.triggerDropdownConditionalLogic[key].conditions);
+            // Trigger autosave to persist the changes
+            if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+            }
         };
         
         const removeConditionBtn = document.createElement('button');
@@ -3849,6 +3858,10 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
             if (window.triggerDropdownConditionalLogic[key].conditions.length > 1) {
                 window.triggerDropdownConditionalLogic[key].conditions.splice(conditionIndex, 1);
                 updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+                // Trigger autosave to persist the changes
+                if (typeof window.requestAutosave === 'function') {
+                    window.requestAutosave();
+                }
             }
         };
         
@@ -3870,6 +3883,10 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
         }
         window.triggerDropdownConditionalLogic[key].conditions.push('');
         updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
     };
     container.appendChild(addConditionBtn);
     
@@ -5024,6 +5041,28 @@ function populateLinkedCheckboxDropdown(idx) {
                                             const triggerDropdownFieldName = triggerDropdownFieldNameEl.value.trim();
                                             
                                             if (triggerDropdownFieldName) {
+                                                // Get the parent dropdown's nodeId (trigger title) from the dropdown field's options
+                                                // The parent dropdown is the one that contains this trigger sequence
+                                                let parentDropdownNodeId = questionNodeId; // Fallback to question nodeId
+                                                
+                                                // Get the dropdown field's options to extract the parent nodeId
+                                                const dropdownOptionsContainer = block.querySelector(`#dropdownOptions${qId}_${fieldCount}`);
+                                                if (dropdownOptionsContainer) {
+                                                    const dropdownOptionNodeIdInputs = dropdownOptionsContainer.querySelectorAll('input[id^="dropdownOptionNodeId"]');
+                                                    if (dropdownOptionNodeIdInputs.length > 0) {
+                                                        // Get the first option's nodeId and extract the base (e.g., "is_this_plaintiff_a_business_yes" -> "is_this_plaintiff_a_business")
+                                                        const firstOptionNodeId = dropdownOptionNodeIdInputs[0].value.trim();
+                                                        if (firstOptionNodeId) {
+                                                            const lastUnderscoreIndex = firstOptionNodeId.lastIndexOf('_');
+                                                            if (lastUnderscoreIndex > 0) {
+                                                                parentDropdownNodeId = firstOptionNodeId.substring(0, lastUnderscoreIndex);
+                                                            } else {
+                                                                parentDropdownNodeId = firstOptionNodeId;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
                                                 // Sanitize trigger dropdown field name
                                                 const sanitizedTriggerFieldName = triggerDropdownFieldName
                                                     .toLowerCase()
@@ -5046,9 +5085,9 @@ function populateLinkedCheckboxDropdown(idx) {
                                                                 .replace(/^_+|_+$/g, '');
                                                             
                                                             // Generate checkbox IDs for each entry number (minValue to maxValue)
-                                                            // Format: {questionNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+                                                            // Format: {parentDropdownNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
                                                             for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
-                                                                const checkboxId = `${questionNodeId}_${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}_${entryNum}`;
+                                                                const checkboxId = `${parentDropdownNodeId}_${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}_${entryNum}`;
                                                                 const label = `${questionText} - ${fieldName} [Trigger] - ${triggerDropdownFieldName} (${entryNum}) - ${triggerOptionValue} (${checkboxId})`;
                                                                 options.push({ nodeId: checkboxId, label: label });
                                                             }

@@ -583,27 +583,18 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
             updateHiddenLogic(this.id, this.value);
           }
           
-          // Trigger conditional logic re-evaluation for all date fields in this trigger sequence
+          // Trigger conditional logic re-evaluation for all fields in this trigger sequence
           // Wait a bit for dropdownMirror to finish creating/removing checkboxes
           setTimeout(() => {
-            // Find all date fields in this trigger container and re-check their conditional logic
-            const dateFields = triggerContainer.querySelectorAll('input[type="date"]');
-            dateFields.forEach(dateInput => {
-              // Find the parent fieldDiv
-              const fieldDiv = dateInput.closest('div[style*="display"]');
-              if (fieldDiv) {
-                // Try to find and call the checkConditionalLogic function if it exists
-                // We'll dispatch a custom event that the conditional logic can listen to
-                const recheckEvent = new CustomEvent('triggerDropdownChanged', {
-                  detail: { 
-                    entryNumber: entryNumber,
-                    questionId: questionId,
-                    triggerContainer: triggerContainer
-                  }
-                });
-                window.dispatchEvent(recheckEvent);
+            // Dispatch a custom event that all conditional logic can listen to
+            const recheckEvent = new CustomEvent('triggerDropdownChanged', {
+              detail: { 
+                entryNumber: entryNumber,
+                questionId: questionId,
+                triggerContainer: triggerContainer
               }
             });
+            window.dispatchEvent(recheckEvent);
           }, 100);
         });
         
@@ -706,10 +697,29 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_e
           const triggerDropdownHandler = function(event) {
             const eventEntryNumber = event.detail && event.detail.entryNumber;
             const eventQuestionId = event.detail && event.detail.questionId;
+            const eventCheckboxId = event.detail && event.detail.checkboxId;
             
-            // Only re-check if this is for the same entry and question
+            // Re-check if:
+            // 1. It's for the same entry and question (from the change event in the dropdown)
+            // 2. OR if a checkbox was created/removed that matches one of our conditions
+            let shouldRecheck = false;
+            
             if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && 
                 eventQuestionId != null && String(eventQuestionId) === String(questionId)) {
+              shouldRecheck = true;
+            } else if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && eventCheckboxId) {
+              // Check if the created/removed checkbox matches any of our conditions
+              const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+              conditionalConditions.forEach((conditionNodeId) => {
+                if (!conditionNodeId) return;
+                const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                if (eventCheckboxId === fullCheckboxId) {
+                  shouldRecheck = true;
+                }
+              });
+            }
+            
+            if (shouldRecheck) {
               // Use a delay to ensure dropdownMirror has finished creating/removing checkboxes
               setTimeout(() => {
                 checkConditionalLogic();
@@ -3842,8 +3852,39 @@ function dropdownMirror(selectEl, baseName){
     const val = selectEl.value.trim();
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: selected value:', val);
     if(!val) {
+        // When value is cleared, we need to dispatch events for any checkboxes that were removed
+        const existingCheckboxes = wrap.querySelectorAll('input[type="checkbox"]');
+        const removedCheckboxIds = [];
+        existingCheckboxes.forEach(checkbox => {
+            removedCheckboxIds.push(checkbox.id);
+        });
+        
         wrap.innerHTML = "";
         console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: value is empty, clearing wrap');
+        
+        // Dispatch events for removed checkboxes so conditional logic can re-evaluate
+        if (removedCheckboxIds.length > 0) {
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    removedCheckboxIds.forEach(checkboxId => {
+                        const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                            detail: {
+                                entryNumber: entryNumber,
+                                checkboxId: checkboxId,
+                                baseName: baseName,
+                                removed: true
+                            }
+                        });
+                        window.dispatchEvent(triggerDropdownEvent);
+                        console.log('🔵 [CONDITIONAL LOGIC DEBUG] dropdownMirror: dispatched triggerDropdownChanged event for removed checkbox:', checkboxId);
+                    });
+                }
+            }
+        }
+        
         return;
     }
 
@@ -3920,6 +3961,35 @@ function dropdownMirror(selectEl, baseName){
     const newCheckbox = document.getElementById(checkboxId);
     if (newCheckbox) {
         console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox created successfully, ID:', checkboxId, 'checked:', newCheckbox.checked);
+        
+        // Dispatch a change event on the newly created checkbox so conditional logic can react
+        // Use setTimeout to ensure the checkbox is fully in the DOM
+        setTimeout(() => {
+            const changeEvent = new Event('change', { bubbles: true });
+            newCheckbox.dispatchEvent(changeEvent);
+            console.log('🔵 [CONDITIONAL LOGIC DEBUG] dropdownMirror: dispatched change event on checkbox:', checkboxId);
+            
+            // Also dispatch a custom event for trigger dropdown changes
+            // Extract entry number and question info from baseName if possible
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    // Try to extract questionId from the baseName or find it from the select element
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    // Dispatch event that conditional logic can listen to
+                    const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                        detail: {
+                            entryNumber: entryNumber,
+                            checkboxId: checkboxId,
+                            baseName: baseName
+                        }
+                    });
+                    window.dispatchEvent(triggerDropdownEvent);
+                    console.log('🔵 [CONDITIONAL LOGIC DEBUG] dropdownMirror: dispatched triggerDropdownChanged event for entry:', entryNumber, 'checkbox:', checkboxId);
+                }
+            }
+        }, 50);
         
         // Check if this checkbox is part of any linked checkbox configuration
         const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
