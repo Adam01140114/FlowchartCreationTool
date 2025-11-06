@@ -4507,10 +4507,17 @@ function openLinkedCheckboxModal() {
     if (!document.getElementById('linkedCheckboxModal')) {
         createLinkedCheckboxModal();
     }
+    // Clear editing flag when opening for new entry
+    window.editingLinkedCheckboxId = null;
     currentLinkedCheckboxConfig = [];
     document.getElementById('linkedCheckboxModal').style.display = 'block';
     const container = document.getElementById('linkedCheckboxDropdowns');
     container.innerHTML = '';
+    // Clear linked checkbox ID input
+    const linkedCheckboxIdInput = document.getElementById('linkedCheckboxIdInput');
+    if (linkedCheckboxIdInput) {
+        linkedCheckboxIdInput.value = '';
+    }
     addLinkedCheckboxDropdown();
     addLinkedCheckboxDropdown();
 }
@@ -4531,7 +4538,7 @@ function createLinkedCheckboxModal() {
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
           <button type="button" onclick="addLinkedCheckboxDropdown()" style="background:#3498db;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Link Another</button>
           <button type="button" onclick="finalizeLinkedCheckbox()" style="background:#27ae60;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Done</button>
-          <button type="button" onclick="document.getElementById('linkedCheckboxModal').style.display='none'" style="background:#e74c3c;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Cancel</button>
+          <button type="button" onclick="closeLinkedCheckboxModal()" style="background:#e74c3c;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Cancel</button>
         </div>
       </div>`;
     document.body.appendChild(modal);
@@ -4675,6 +4682,41 @@ function populateLinkedCheckboxDropdown(idx) {
                 });
             }
         }
+
+        // Hidden checkboxes from hidden logic configurations
+        const enableHiddenLogicCheckbox = block.querySelector(`#enableHiddenLogic${qId}`);
+        if (enableHiddenLogicCheckbox && enableHiddenLogicCheckbox.checked) {
+            const configsContainer = block.querySelector(`#hiddenLogicConfigs${qId}`);
+            if (configsContainer) {
+                const configElements = configsContainer.querySelectorAll('.hidden-logic-config');
+                
+                configElements.forEach((configElement, configIndex) => {
+                    const typeSelect = configElement.querySelector(`#hiddenLogicType${qId}_${configIndex}`);
+                    const nodeIdInput = configElement.querySelector(`#hiddenLogicNodeId${qId}_${configIndex}`);
+                    
+                    // Only include checkbox type hidden logic
+                    if (typeSelect && typeSelect.value === 'checkbox' && nodeIdInput) {
+                        const nodeId = nodeIdInput.value.trim();
+                        if (nodeId) {
+                            // Get question text for better labeling
+                            const questionTextEl = block.querySelector(`#question${qId}`);
+                            const questionText = questionTextEl ? questionTextEl.value.trim() : `Question ${qId}`;
+                            
+                            // Get trigger value for context
+                            const triggerSelect = configElement.querySelector(`#hiddenLogicTrigger${qId}_${configIndex}`);
+                            const triggerValue = triggerSelect ? triggerSelect.value.trim() : '';
+                            
+                            // Create label: "Question Text - Hidden Logic (nodeId) [Trigger: value]"
+                            const label = triggerValue 
+                                ? `${questionText} - Hidden Logic (${nodeId}) [Trigger: ${triggerValue}]`
+                                : `${questionText} - Hidden Logic (${nodeId})`;
+                            
+                            options.push({ nodeId: nodeId, label: label });
+                        }
+                    }
+                });
+            }
+        }
     });
 
     // Build options list and searchable overlay
@@ -4687,13 +4729,84 @@ function populateLinkedCheckboxDropdown(idx) {
         select.appendChild(o);
 
         const row = document.createElement('div');
-        row.textContent = `${opt.label} (${opt.nodeId})`;
+        const displayText = `${opt.label} (${opt.nodeId})`;
+        row.textContent = displayText;
         row.style.cssText = 'padding:6px 8px;cursor:pointer;';
-        row.onclick = () => {
-            document.getElementById(`linkedCheckboxSearch${idx}`).value = opt.nodeId;
-            select.value = opt.nodeId;
-            currentLinkedCheckboxConfig[idx].selectedValue = opt.nodeId;
+        
+        // Add mousedown handler to prevent blur event from firing
+        row.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent input blur
+            console.log('🔵 [LINKED CHECKBOX DEBUG] mousedown on option row, preventing default');
+        });
+        
+        row.onclick = (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            console.log('🔵 [LINKED CHECKBOX DEBUG] Option clicked in dropdown:', {
+                idx: idx,
+                nodeId: opt.nodeId,
+                label: opt.label,
+                displayText: displayText
+            });
+            
+            const searchInput = document.getElementById(`linkedCheckboxSearch${idx}`);
+            if (!searchInput) {
+                console.error('❌ [LINKED CHECKBOX DEBUG] Search input not found for idx:', idx);
+                return;
+            }
+            
+            const selectElement = document.getElementById(`linkedCheckboxSelect${idx}`);
+            if (!selectElement) {
+                console.error('❌ [LINKED CHECKBOX DEBUG] Select element not found for idx:', idx);
+                return;
+            }
+            
+            console.log('🔵 [LINKED CHECKBOX DEBUG] Before update:', {
+                searchInputValue: searchInput.value,
+                selectValue: selectElement.value,
+                configValue: currentLinkedCheckboxConfig[idx]?.selectedValue
+            });
+            
+            // Set search input to the full display text (not just nodeId)
+            searchInput.value = displayText;
+            console.log('✅ [LINKED CHECKBOX DEBUG] Updated search input to:', displayText);
+            
+            // Verify the value was set
+            const verifySearchValue = searchInput.value;
+            console.log('🔵 [LINKED CHECKBOX DEBUG] Verified search input value after setting:', verifySearchValue);
+            
+            // Set select value to nodeId
+            selectElement.value = opt.nodeId;
+            console.log('✅ [LINKED CHECKBOX DEBUG] Updated select value to:', opt.nodeId);
+            
+            // Verify the select value was set
+            const verifySelectValue = selectElement.value;
+            console.log('🔵 [LINKED CHECKBOX DEBUG] Verified select value after setting:', verifySelectValue);
+            
+            // Update config
+            if (currentLinkedCheckboxConfig[idx]) {
+                currentLinkedCheckboxConfig[idx].selectedValue = opt.nodeId;
+                console.log('✅ [LINKED CHECKBOX DEBUG] Updated config selectedValue to:', opt.nodeId);
+            } else {
+                console.error('❌ [LINKED CHECKBOX DEBUG] Config entry not found for idx:', idx);
+            }
+            
+            // Hide overlay immediately
             overlay.style.display = 'none';
+            console.log('✅ [LINKED CHECKBOX DEBUG] Hidden overlay');
+            
+            // Re-focus the search input to prevent blur issues
+            setTimeout(() => {
+                searchInput.focus();
+                // Blur it again so it doesn't stay focused
+                setTimeout(() => searchInput.blur(), 10);
+            }, 10);
+            
+            console.log('🔵 [LINKED CHECKBOX DEBUG] After update:', {
+                searchInputValue: searchInput.value,
+                selectValue: selectElement.value,
+                configValue: currentLinkedCheckboxConfig[idx]?.selectedValue,
+                overlayDisplay: overlay.style.display
+            });
         };
         overlay.appendChild(row);
     });
@@ -4710,7 +4823,23 @@ function showLinkedCheckboxOptions(idx){
     document.getElementById(`linkedCheckboxOptions${idx}`).style.display = 'block';
 }
 function hideLinkedCheckboxOptions(idx){
-    setTimeout(()=>{ document.getElementById(`linkedCheckboxOptions${idx}`).style.display = 'none'; }, 150);
+    console.log('🔵 [LINKED CHECKBOX DEBUG] hideLinkedCheckboxOptions called for idx:', idx);
+    const overlay = document.getElementById(`linkedCheckboxOptions${idx}`);
+    if (!overlay) {
+        console.error('❌ [LINKED CHECKBOX DEBUG] Overlay not found for idx:', idx);
+        return;
+    }
+    
+    // Use a longer delay to allow clicks to register
+    setTimeout(() => {
+        // Check if overlay is still visible (might have been clicked)
+        if (overlay.style.display !== 'none') {
+            console.log('🔵 [LINKED CHECKBOX DEBUG] Hiding overlay after delay');
+            overlay.style.display = 'none';
+        } else {
+            console.log('🔵 [LINKED CHECKBOX DEBUG] Overlay already hidden, skipping');
+        }
+    }, 200);
 }
 
 function removeLinkedCheckboxDropdown(idx){
@@ -4726,8 +4855,118 @@ function finalizeLinkedCheckbox(){
     const linkedId = idInput ? idInput.value.trim() : '';
     if (!linkedId) { alert('Please enter a Linked Checkbox ID.'); return; }
 
+    // If editing, remove the old entry first
+    if (window.editingLinkedCheckboxId) {
+        const oldDiv = document.getElementById(window.editingLinkedCheckboxId);
+        if (oldDiv) {
+            oldDiv.remove();
+        }
+        removeLinkedCheckboxConfig(window.editingLinkedCheckboxId);
+        window.editingLinkedCheckboxId = null;
+    }
+
     createLinkedCheckboxDisplay(selected, linkedId);
-    document.getElementById('linkedCheckboxModal').style.display = 'none';
+    closeLinkedCheckboxModal();
+}
+
+// Remove linked checkbox from config
+function removeLinkedCheckboxConfig(displayId) {
+    if (window.linkedCheckboxesConfig) {
+        window.linkedCheckboxesConfig = window.linkedCheckboxesConfig.filter(c => c.id !== displayId);
+    }
+}
+
+// Close the linked checkbox modal
+function closeLinkedCheckboxModal() {
+    const modal = document.getElementById('linkedCheckboxModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    
+    // Clear current configuration
+    currentLinkedCheckboxConfig = [];
+    
+    // Clear dropdowns
+    const dropdownsContainer = document.getElementById('linkedCheckboxDropdowns');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
+    }
+    
+    // Clear linked checkbox ID input
+    const linkedCheckboxIdInput = document.getElementById('linkedCheckboxIdInput');
+    if (linkedCheckboxIdInput) {
+        linkedCheckboxIdInput.value = '';
+    }
+    
+    // Clear the editing flag
+    window.editingLinkedCheckboxId = null;
+}
+
+// Edit a linked checkbox display
+function editLinkedCheckboxDisplay(displayId) {
+    // Find the configuration for this display
+    const config = (window.linkedCheckboxesConfig || []).find(c => c.id === displayId);
+    if (!config) {
+        console.log('❌ [DEBUG] Configuration not found for displayId:', displayId);
+        return;
+    }
+    
+    console.log('✅ [DEBUG] Found configuration:', config);
+    
+    // Store the display ID we're editing
+    window.editingLinkedCheckboxId = displayId;
+    
+    // Create modal if it doesn't exist
+    if (!document.getElementById('linkedCheckboxModal')) {
+        createLinkedCheckboxModal();
+    }
+    
+    // Reset current configuration
+    currentLinkedCheckboxConfig = [];
+    
+    // Pre-populate the modal with existing data
+    const linkedCheckboxIdInput = document.getElementById('linkedCheckboxIdInput');
+    if (linkedCheckboxIdInput) {
+        linkedCheckboxIdInput.value = config.linkedCheckboxId || '';
+    }
+    
+    // Clear dropdowns first
+    const dropdownsContainer = document.getElementById('linkedCheckboxDropdowns');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
+    }
+    
+    // Create dropdowns for each checkbox
+    config.checkboxes.forEach((checkboxId, index) => {
+        addLinkedCheckboxDropdown();
+        const dropdownIndex = currentLinkedCheckboxConfig.length - 1;
+        
+        // Populate dropdown first, then set value
+        populateLinkedCheckboxDropdown(dropdownIndex);
+        
+        // Use setTimeout to ensure dropdown is populated before setting value
+        setTimeout(() => {
+            const select = document.getElementById(`linkedCheckboxSelect${dropdownIndex}`);
+            const searchInput = document.getElementById(`linkedCheckboxSearch${dropdownIndex}`);
+            
+            if (select) {
+                select.value = checkboxId;
+                currentLinkedCheckboxConfig[dropdownIndex].selectedValue = checkboxId;
+                
+                // Also update the search input field with the selected option text
+                if (searchInput) {
+                    const selectedOption = select.querySelector(`option[value="${checkboxId}"]`);
+                    if (selectedOption) {
+                        searchInput.value = selectedOption.textContent;
+                    }
+                }
+            }
+        }, 50 * (index + 1)); // Stagger the timeouts slightly to avoid race conditions
+    });
+    
+    // Show modal
+    document.getElementById('linkedCheckboxModal').style.display = 'block';
+    console.log('🔍 [DEBUG] Modal displayed for editing');
 }
 
 function createLinkedCheckboxDisplay(selectedOptions, linkedId){
@@ -4757,11 +4996,35 @@ function createLinkedCheckboxDisplay(selectedOptions, linkedId){
     }
     const div = document.createElement('div');
     div.id = displayId;
-    div.style.cssText = 'border:1px solid #ddd;border-radius:8px;padding:10px;margin:10px 0;background:#f9f9f9;';
+    div.style.cssText = 'border:1px solid #ddd;border-radius:8px;padding:10px;margin:10px 0;background:#f9f9f9;transition: all 0.3s ease;';
+    
+    // Add hover effect
+    div.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderColor = '#bbb';
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+    
+    div.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#f9f9f9';
+        this.style.borderColor = '#ddd';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+    });
+    
+    // Add double-click handler
+    div.addEventListener('dblclick', function() {
+        editLinkedCheckboxDisplay(displayId);
+    });
+    
     const names = selectedOptions.map(s=>s.selectedValue).join(' ↔ ');
     div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="flex:1;"><h4 style="margin:0 0 5px 0;color:#2c3e50;">Linked Checkbox (${linkedId})</h4><p style="margin:0;color:#666;font-size:.9em;">${names}</p></div>
-        <button type="button" onclick="document.getElementById('${displayId}').remove()" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+        <div onclick="editLinkedCheckboxDisplay('${displayId}')" style="flex:1;cursor:pointer;"><h4 style="margin:0 0 5px 0;color:#2c3e50;">Linked Checkbox (${linkedId})</h4><p style="margin:0;color:#666;font-size:.9em;">${names}</p></div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <button type="button" onclick="editLinkedCheckboxDisplay('${displayId}')" style="background:#3498db;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Edit</button>
+          <button type="button" onclick="document.getElementById('${displayId}').remove(); removeLinkedCheckboxConfig('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+        </div>
       </div>`;
     linkedFieldsContainer.appendChild(div);
     window.linkedCheckboxesConfig = window.linkedCheckboxesConfig || [];
@@ -4813,17 +5076,23 @@ function createLinkedCheckboxDisplayFromImport(linkedCheckboxData) {
         this.style.boxShadow = 'none';
     });
     
+    // Add double-click handler
+    linkedCheckboxDiv.addEventListener('dblclick', function() {
+        editLinkedCheckboxDisplay(displayId);
+    });
+    
     const checkboxNames = linkedCheckboxData.checkboxes.join(' ↔ ');
     
     linkedCheckboxDiv.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="flex: 1;">
+            <div onclick="editLinkedCheckboxDisplay('${displayId}')" style="flex: 1; cursor: pointer;">
                 <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Checkbox (${linkedCheckboxId})</h4>
                 <p style="margin: 0; color: #666; font-size: 0.9em;">${checkboxNames}</p>
             </div>
-            <button type="button" onclick="document.getElementById('${displayId}').remove()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
-                Remove
-            </button>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <button type="button" onclick="editLinkedCheckboxDisplay('${displayId}')" style="background:#3498db;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Edit</button>
+              <button type="button" onclick="document.getElementById('${displayId}').remove(); removeLinkedCheckboxConfig('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+            </div>
         </div>
     `;
     
