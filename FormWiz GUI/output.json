@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Hungry?",
+          "text": "Are you the only person suing?",
           "type": "dropdown",
           "logic": {
             "enabled": false,
@@ -22,8 +22,15 @@
             "answer": "Yes"
           },
           "hiddenLogic": {
-            "enabled": false,
-            "configs": []
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "user_biz",
+                "textboxText": ""
+              }
+            ]
           },
           "pdfLogic": {
             "enabled": false,
@@ -58,7 +65,7 @@
             "No"
           ],
           "labels": [],
-          "nameId": "hungry",
+          "nameId": "are_you_the_only_person_suing",
           "placeholder": "",
           "linking": {
             "enabled": false,
@@ -72,79 +79,8 @@
         },
         {
           "questionId": 2,
-          "text": "Thristy?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "Yes"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "options": [
-            "Yes",
-            "No"
-          ],
-          "labels": [],
-          "nameId": "thristy",
-          "placeholder": "",
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          }
-        },
-        {
-          "questionId": 3,
-          "text": "Sleepy?",
-          "type": "dropdown",
+          "text": "How many extra plantiffs",
+          "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
@@ -188,29 +124,114 @@
             "text": ""
           },
           "subtitle": {
-            "enabled": false,
-            "text": ""
+            "enabled": true,
+            "text": "Not including yourself"
           },
           "infoBox": {
             "enabled": false,
             "text": ""
           },
-          "options": [
-            "Yes",
-            "No"
-          ],
+          "options": [],
           "labels": [],
-          "nameId": "sleepy",
-          "placeholder": "",
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          }
+          "nodeId": "how_many_extra_plantiffs",
+          "min": "1",
+          "max": "3",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_extra_plantiffs_name",
+              "order": 1
+            },
+            {
+              "type": "label",
+              "label": "Phone Number",
+              "nodeId": "how_many_extra_plantiffs_phone_number",
+              "order": 2
+            },
+            {
+              "type": "location",
+              "fieldName": "bruh what",
+              "nodeId": "location_data",
+              "order": 3
+            },
+            {
+              "type": "dropdown",
+              "fieldName": "Is this plaintiff a business?",
+              "options": [
+                {
+                  "text": "Yes",
+                  "nodeId": "is_this_plaintiff_a_business_yes"
+                },
+                {
+                  "text": "No",
+                  "nodeId": "is_this_plaintiff_a_business_no"
+                }
+              ],
+              "triggerSequences": [
+                {
+                  "condition": "Yes",
+                  "fields": [
+                    {
+                      "type": "location",
+                      "fieldName": "Where did they file their fictitious business name",
+                      "nodeId": "location_data"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Business Name",
+                      "nodeId": "is_this_plaintiff_a_business_yes_business_name"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Business Name Statement Number",
+                      "nodeId": "is_this_plaintiff_a_business_yes_business_name_statement_number"
+                    },
+                    {
+                      "type": "checkbox",
+                      "fieldName": "What do they do business as?",
+                      "selectionType": "multiple",
+                      "options": [
+                        {
+                          "text": "An Individual",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
+                        },
+                        {
+                          "text": "An Association",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"
+                        },
+                        {
+                          "text": "A Partnership",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"
+                        },
+                        {
+                          "text": "A Corporation",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"
+                        },
+                        {
+                          "text": "A Limited Liability Company",
+                          "nodeId": "is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "date",
+                      "label": "When does their business statement expire?",
+                      "nodeId": "is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "1",
+                      "pdfTitle": "SC-500",
+                      "pdfName": "sc500.pdf",
+                      "priceId": "1234"
+                    }
+                  ]
+                }
+              ],
+              "order": 4
+            }
+          ]
         }
       ]
     }
@@ -218,7 +239,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 4,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
@@ -231,10 +252,10 @@
   "linkedCheckboxes": [
     {
       "id": "linkedCheckbox0",
-      "linkedCheckboxId": "hungry_or_thristy",
+      "linkedCheckboxId": "testing",
       "checkboxes": [
-        "hungry_yes",
-        "thristy_yes"
+        "is_this_plaintiff_a_business_1_yes",
+        "is_this_plaintiff_a_business_2_yes"
       ]
     }
   ]

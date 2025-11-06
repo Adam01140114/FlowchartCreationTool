@@ -5178,7 +5178,13 @@ function showTextboxLabels(questionId, count){
                 
                 // Create dropdown select element
                 const select = document.createElement('select');
-                select.id = field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j;
+                // Sanitize fieldName: remove question marks, replace spaces and non-word chars with underscores, convert to lowercase
+                const sanitizedFieldName = field.fieldName
+                    .toLowerCase()  // Convert to lowercase FIRST before processing
+                    .replace(/[?]/g, '')  // Remove question marks (use character class to avoid regex escaping issues)
+                    .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscores (use character class instead of \W)
+                    .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
+                select.id = sanitizedFieldName + "_" + j;
                 select.name = select.id;
                 select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
                 
@@ -5229,8 +5235,18 @@ function showTextboxLabels(questionId, count){
                     }
                 }
                 
-                // Add change event listener for conditional logic
-                select.addEventListener('change', handleConditionalLogic);
+                // Add change event listener for conditional logic and dropdown mirror
+                select.addEventListener('change', function() {
+                    handleConditionalLogic();
+                    // Call dropdownMirror to create hidden checkboxes
+                    if (typeof dropdownMirror === 'function') {
+                        dropdownMirror(this, this.id);
+                    }
+                    // Update hidden logic if needed
+                    if (typeof updateHiddenLogic === 'function') {
+                        updateHiddenLogic(this.id, this.value);
+                    }
+                });
                 
                 // Also check on load in case Firebase autofills the dropdown
                 setTimeout(handleConditionalLogic, 100);
@@ -5268,6 +5284,22 @@ function showTextboxLabels(questionId, count){
                 select.addEventListener('input', handleConditionalLogic);
                 
                 dropdownFieldDiv.appendChild(select);
+                
+                // Create wrapper div for hidden checkboxes (required for dropdownMirror)
+                const dropdownWrapper = document.createElement('div');
+                dropdownWrapper.id = 'dropdowntext_' + select.id;
+                dropdownWrapper.style.display = 'none';
+                dropdownFieldDiv.appendChild(dropdownWrapper);
+                
+                // Create hidden text input for dropdown value (matching regular dropdown structure)
+                const hiddenDropdownInput = document.createElement('input');
+                hiddenDropdownInput.type = 'text';
+                hiddenDropdownInput.id = select.id + '_dropdown';
+                hiddenDropdownInput.name = select.id + '_dropdown';
+                hiddenDropdownInput.readOnly = true;
+                hiddenDropdownInput.style.display = 'none';
+                dropdownFieldDiv.appendChild(hiddenDropdownInput);
+                
                 entryContainer.appendChild(dropdownFieldDiv);
             }
             
@@ -5581,9 +5613,10 @@ function dropdownMirror(selectEl, baseName){
         console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox created successfully, ID:', checkboxId, 'checked:', newCheckbox.checked);
         
         // Check if this checkbox is part of any linked checkbox configuration
-        if (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes && linkedCheckboxes.length > 0) {
+        const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+        if (linkedCheckboxesArray && linkedCheckboxesArray.length > 0) {
             console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: checking if checkbox is part of linked checkbox config');
-            linkedCheckboxes.forEach(linkedCheckboxGroup => {
+            linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
                 const checkboxIds = linkedCheckboxGroup.checkboxes || [];
                 if (checkboxIds.includes(checkboxId)) {
                     console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox', checkboxId, 'is part of linked checkbox group:', linkedCheckboxGroup.linkedCheckboxId);
@@ -5604,9 +5637,18 @@ function dropdownMirror(selectEl, baseName){
         // Update all linked checkboxes after creating the new checkbox
         if (typeof window.updateAllLinkedCheckboxes === 'function') {
             console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: calling updateAllLinkedCheckboxes after checkbox creation');
+            // Use a longer delay to ensure DOM is fully updated
             setTimeout(() => {
+                console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: executing updateAllLinkedCheckboxes after delay');
+                // Verify checkbox still exists before calling update
+                const verifyCheckbox = document.getElementById(checkboxId);
+                if (verifyCheckbox) {
+                    console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox verified, exists in DOM with checked state:', verifyCheckbox.checked);
+                } else {
+                    console.log('❌ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox not found after delay, ID:', checkboxId);
+                }
                 window.updateAllLinkedCheckboxes();
-            }, 100);
+            }, 200);
         } else {
             console.log('❌ [LINKED CHECKBOX DEBUG] dropdownMirror: updateAllLinkedCheckboxes function not found');
         }
@@ -9522,7 +9564,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
     multipleTextboxesQuestions.forEach(container => {
       const questionId = container.id.replace('labelContainer', '');
-      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : {};
+      const baseFieldName = questionNameIdsMap[questionId] || 'answer' + questionId;
       const addressField = document.getElementById(baseFieldName + '_address');
       
       if (addressField) {
@@ -9586,8 +9629,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up linked checkbox listeners after DOM loads
   document.addEventListener('DOMContentLoaded', function() {
     console.log('🔵 [LINKED CHECKBOX DEBUG] DOMContentLoaded: Setting up linked checkbox listeners');
-    console.log('🔵 [LINKED CHECKBOX DEBUG] DOMContentLoaded: linkedCheckboxes array:', JSON.stringify(linkedCheckboxes || []));
-    if (!linkedCheckboxes || linkedCheckboxes.length === 0) {
+    const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+    console.log('🔵 [LINKED CHECKBOX DEBUG] DOMContentLoaded: linkedCheckboxes array:', JSON.stringify(linkedCheckboxesArray));
+    if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
       console.log('⚠️ [LINKED CHECKBOX DEBUG] DOMContentLoaded: No linkedCheckboxes found, exiting');
       return;
     }
@@ -9623,7 +9667,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Set up listeners for each linked checkbox group
-    linkedCheckboxes.forEach((linkedCheckboxGroup, groupIndex) => {
+    linkedCheckboxesArray.forEach((linkedCheckboxGroup, groupIndex) => {
       console.log('🔵 [LINKED CHECKBOX DEBUG] Setting up group', groupIndex, ':', linkedCheckboxGroup);
       const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
       const checkboxIds = linkedCheckboxGroup.checkboxes || [];
@@ -9668,13 +9712,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Global function to update all linked checkboxes (called after autofill)
     window.updateAllLinkedCheckboxes = function() {
       console.log('🔵 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes called');
-      if (!linkedCheckboxes || linkedCheckboxes.length === 0) {
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
         console.log('⚠️ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: no linkedCheckboxes found');
         return;
       }
-      console.log('✅ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: processing', linkedCheckboxes.length, 'linked checkbox groups');
+      console.log('✅ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: processing', linkedCheckboxesArray.length, 'linked checkbox groups');
       
-      linkedCheckboxes.forEach((linkedCheckboxGroup, index) => {
+      linkedCheckboxesArray.forEach((linkedCheckboxGroup, index) => {
         const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
         const checkboxIds = linkedCheckboxGroup.checkboxes || [];
         
@@ -9702,6 +9747,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           } else {
             console.log('⚠️ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: source checkbox not found, ID:', checkboxId);
+            // Debug: Search for similar checkbox IDs to see if there's a format mismatch
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const matchingCheckboxes = Array.from(allCheckboxes).filter(cb => 
+              cb.id && (cb.id.includes(checkboxId) || checkboxId.includes(cb.id))
+            );
+            if (matchingCheckboxes.length > 0) {
+              console.log('🔍 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: Found similar checkbox IDs:', matchingCheckboxes.map(cb => cb.id));
+            } else {
+              console.log('🔍 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: No similar checkbox IDs found. Searching for checkboxes containing:', checkboxId.split('_').slice(-2).join('_'));
+              const partialMatches = Array.from(allCheckboxes).filter(cb => 
+                cb.id && cb.id.includes(checkboxId.split('_').slice(-2).join('_'))
+              );
+              if (partialMatches.length > 0) {
+                console.log('🔍 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: Found partial matches:', partialMatches.map(cb => cb.id));
+              }
+            }
           }
         });
         

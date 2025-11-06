@@ -233,22 +233,13 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
+                      onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>Thristy?</h3></label><select id="thristy" name="thristy"
-                      onchange="dropdownMirror(this, 'thristy'); updateHiddenLogic('thristy', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_thristy"></div>
-              <input type="text" id="thristy_dropdown" name="thristy_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-3" class="question-container hidden"><label><h3>Sleepy?</h3></label><select id="sleepy" name="sleepy"
-                      onchange="dropdownMirror(this, 'sleepy'); updateHiddenLogic('sleepy', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_sleepy"></div>
-              <input type="text" id="sleepy_dropdown" name="sleepy_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+              <div id="dropdowntext_are_you_the_only_person_suing"></div>
+              <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>How many extra plantiffs</h3></label><p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many_extra_plantiffs" name="how_many_extra_plantiffs" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_extra_plantiffs', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -258,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<div style="display:none;"><input type="checkbox" id="hungry_or_thristy" name="hungry_or_thristy"></div>
+<div style="display:none;"><input type="checkbox" id="testing" name="testing"></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
@@ -375,10 +366,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"hungry","2":"thristy","3":"sleepy"};
-var questionNameIds = {"1":"hungry","2":"thristy","3":"sleepy"};
-var linkedCheckboxes = [{"linkedCheckboxId":"hungry_or_thristy","checkboxes":["hungry_yes","thristy_yes"]}];
-var unifiedFieldsMap = {};
+var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"how_many_extra_plantiffs"};
+var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_extra_plantiffs"};
+var linkedCheckboxes = [{"linkedCheckboxId":"testing","checkboxes":["is_this_plaintiff_a_business_1_yes","is_this_plaintiff_a_business_2_yes"]}];
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_plantiffs_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_plantiffs_phone_number","order":2},{"type":"location","fieldName":"bruh what","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"multiple","options":[{"text":"An Individual","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"},{"type":"pdf","number":"1","pdfTitle":"SC-500","pdfName":"sc500.pdf","priceId":"1234"}]}],"order":4}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName) {
     const triggerContainer = document.createElement('div');
@@ -1019,16 +1010,16 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const formId = urlParams.get("formId") || window.formId || 'default';
     var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"2","pdfName":"sc500.pdf","pdfDisplayName":"SC-500","stripePriceId":"1234","triggerOption":"","conditions":[{"prevQuestion":"2","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"2":["Name","Phone Number"],"length":0};
+var amountMap = {"2":[],"length":0};
+var labelNodeIdsMap = {"2":["how_many_extra_plantiffs_name","how_many_extra_plantiffs_phone_number"]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [];
+var hiddenLogicConfigs = [{"questionId":"1","questionNameId":"are_you_the_only_person_suing","trigger":"Yes","type":"checkbox","nodeId":"user_biz","textboxText":""}];
 var linkedFields = [];
 var isHandlingLink = false;
 
@@ -1155,39 +1146,6 @@ var hiddenTextCalculations = [];
 
 (function(){
  var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
@@ -2941,7 +2899,13 @@ function showTextboxLabels(questionId, count){
                 
                 // Create dropdown select element
                 const select = document.createElement('select');
-                select.id = field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j;
+                // Sanitize fieldName: remove question marks, replace spaces and non-word chars with underscores, convert to lowercase
+                const sanitizedFieldName = field.fieldName
+                    .toLowerCase()  // Convert to lowercase FIRST before processing
+                    .replace(/[?]/g, '')  // Remove question marks (use character class to avoid regex escaping issues)
+                    .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscores (use character class instead of W)
+                    .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
+                select.id = sanitizedFieldName + "_" + j;
                 select.name = select.id;
                 select.style.cssText = 'width: 100%; padding: 12px; border: 1px solid #2196F3; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
                 
@@ -2992,8 +2956,18 @@ function showTextboxLabels(questionId, count){
                     }
                 }
                 
-                // Add change event listener for conditional logic
-                select.addEventListener('change', handleConditionalLogic);
+                // Add change event listener for conditional logic and dropdown mirror
+                select.addEventListener('change', function() {
+                    handleConditionalLogic();
+                    // Call dropdownMirror to create hidden checkboxes
+                    if (typeof dropdownMirror === 'function') {
+                        dropdownMirror(this, this.id);
+                    }
+                    // Update hidden logic if needed
+                    if (typeof updateHiddenLogic === 'function') {
+                        updateHiddenLogic(this.id, this.value);
+                    }
+                });
                 
                 // Also check on load in case Firebase autofills the dropdown
                 setTimeout(handleConditionalLogic, 100);
@@ -3031,6 +3005,22 @@ function showTextboxLabels(questionId, count){
                 select.addEventListener('input', handleConditionalLogic);
                 
                 dropdownFieldDiv.appendChild(select);
+                
+                // Create wrapper div for hidden checkboxes (required for dropdownMirror)
+                const dropdownWrapper = document.createElement('div');
+                dropdownWrapper.id = 'dropdowntext_' + select.id;
+                dropdownWrapper.style.display = 'none';
+                dropdownFieldDiv.appendChild(dropdownWrapper);
+                
+                // Create hidden text input for dropdown value (matching regular dropdown structure)
+                const hiddenDropdownInput = document.createElement('input');
+                hiddenDropdownInput.type = 'text';
+                hiddenDropdownInput.id = select.id + '_dropdown';
+                hiddenDropdownInput.name = select.id + '_dropdown';
+                hiddenDropdownInput.readOnly = true;
+                hiddenDropdownInput.style.display = 'none';
+                dropdownFieldDiv.appendChild(hiddenDropdownInput);
+                
                 entryContainer.appendChild(dropdownFieldDiv);
             }
             
@@ -3344,9 +3334,10 @@ function dropdownMirror(selectEl, baseName){
         console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox created successfully, ID:', checkboxId, 'checked:', newCheckbox.checked);
         
         // Check if this checkbox is part of any linked checkbox configuration
-        if (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes && linkedCheckboxes.length > 0) {
+        const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+        if (linkedCheckboxesArray && linkedCheckboxesArray.length > 0) {
             console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: checking if checkbox is part of linked checkbox config');
-            linkedCheckboxes.forEach(linkedCheckboxGroup => {
+            linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
                 const checkboxIds = linkedCheckboxGroup.checkboxes || [];
                 if (checkboxIds.includes(checkboxId)) {
                     console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox', checkboxId, 'is part of linked checkbox group:', linkedCheckboxGroup.linkedCheckboxId);
@@ -3367,9 +3358,18 @@ function dropdownMirror(selectEl, baseName){
         // Update all linked checkboxes after creating the new checkbox
         if (typeof window.updateAllLinkedCheckboxes === 'function') {
             console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: calling updateAllLinkedCheckboxes after checkbox creation');
+            // Use a longer delay to ensure DOM is fully updated
             setTimeout(() => {
+                console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: executing updateAllLinkedCheckboxes after delay');
+                // Verify checkbox still exists before calling update
+                const verifyCheckbox = document.getElementById(checkboxId);
+                if (verifyCheckbox) {
+                    console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox verified, exists in DOM with checked state:', verifyCheckbox.checked);
+                } else {
+                    console.log('❌ [LINKED CHECKBOX DEBUG] dropdownMirror: checkbox not found after delay, ID:', checkboxId);
+                }
                 window.updateAllLinkedCheckboxes();
-            }, 100);
+            }, 200);
         } else {
             console.log('❌ [LINKED CHECKBOX DEBUG] dropdownMirror: updateAllLinkedCheckboxes function not found');
         }
@@ -7282,7 +7282,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
     multipleTextboxesQuestions.forEach(container => {
       const questionId = container.id.replace('labelContainer', '');
-      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : {};
+      const baseFieldName = questionNameIdsMap[questionId] || 'answer' + questionId;
       const addressField = document.getElementById(baseFieldName + '_address');
       
       if (addressField) {
@@ -7346,8 +7347,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set up linked checkbox listeners after DOM loads
   document.addEventListener('DOMContentLoaded', function() {
     console.log('🔵 [LINKED CHECKBOX DEBUG] DOMContentLoaded: Setting up linked checkbox listeners');
-    console.log('🔵 [LINKED CHECKBOX DEBUG] DOMContentLoaded: linkedCheckboxes array:', JSON.stringify(linkedCheckboxes || []));
-    if (!linkedCheckboxes || linkedCheckboxes.length === 0) {
+    const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+    console.log('🔵 [LINKED CHECKBOX DEBUG] DOMContentLoaded: linkedCheckboxes array:', JSON.stringify(linkedCheckboxesArray));
+    if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
       console.log('⚠️ [LINKED CHECKBOX DEBUG] DOMContentLoaded: No linkedCheckboxes found, exiting');
       return;
     }
@@ -7383,7 +7385,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Set up listeners for each linked checkbox group
-    linkedCheckboxes.forEach((linkedCheckboxGroup, groupIndex) => {
+    linkedCheckboxesArray.forEach((linkedCheckboxGroup, groupIndex) => {
       console.log('🔵 [LINKED CHECKBOX DEBUG] Setting up group', groupIndex, ':', linkedCheckboxGroup);
       const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
       const checkboxIds = linkedCheckboxGroup.checkboxes || [];
@@ -7428,13 +7430,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Global function to update all linked checkboxes (called after autofill)
     window.updateAllLinkedCheckboxes = function() {
       console.log('🔵 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes called');
-      if (!linkedCheckboxes || linkedCheckboxes.length === 0) {
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
         console.log('⚠️ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: no linkedCheckboxes found');
         return;
       }
-      console.log('✅ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: processing', linkedCheckboxes.length, 'linked checkbox groups');
+      console.log('✅ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: processing', linkedCheckboxesArray.length, 'linked checkbox groups');
       
-      linkedCheckboxes.forEach((linkedCheckboxGroup, index) => {
+      linkedCheckboxesArray.forEach((linkedCheckboxGroup, index) => {
         const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
         const checkboxIds = linkedCheckboxGroup.checkboxes || [];
         
@@ -7462,6 +7465,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           } else {
             console.log('⚠️ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: source checkbox not found, ID:', checkboxId);
+            // Debug: Search for similar checkbox IDs to see if there's a format mismatch
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const matchingCheckboxes = Array.from(allCheckboxes).filter(cb => 
+              cb.id && (cb.id.includes(checkboxId) || checkboxId.includes(cb.id))
+            );
+            if (matchingCheckboxes.length > 0) {
+              console.log('🔍 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: Found similar checkbox IDs:', matchingCheckboxes.map(cb => cb.id));
+            } else {
+              console.log('🔍 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: No similar checkbox IDs found. Searching for checkboxes containing:', checkboxId.split('_').slice(-2).join('_'));
+              const partialMatches = Array.from(allCheckboxes).filter(cb => 
+                cb.id && cb.id.includes(checkboxId.split('_').slice(-2).join('_'))
+              );
+              if (partialMatches.length > 0) {
+                console.log('🔍 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: Found partial matches:', partialMatches.map(cb => cb.id));
+              }
+            }
           }
         });
         

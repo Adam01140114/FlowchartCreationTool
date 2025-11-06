@@ -4619,6 +4619,62 @@ function populateLinkedCheckboxDropdown(idx) {
                 }
             });
         }
+
+        // Hidden dropdown checkboxes from numbered dropdown questions
+        if (typeSel.value === 'numberedDropdown') {
+            // Get the numbered dropdown's min and max range
+            const minInput = block.querySelector(`#numberRangeStart${qId}`);
+            const maxInput = block.querySelector(`#numberRangeEnd${qId}`);
+            const minValue = minInput ? parseInt(minInput.value) || 1 : 1;
+            const maxValue = maxInput ? parseInt(maxInput.value) || 1 : 1;
+            
+            // Get numbered dropdown question text for better labeling
+            const questionTextEl = block.querySelector(`#question${qId}`);
+            const questionText = questionTextEl ? questionTextEl.value.trim() : `Question ${qId}`;
+            
+            // Find all dropdown fields within this numbered dropdown
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${qId}`);
+            if (unifiedFieldsContainer) {
+                const dropdownFields = unifiedFieldsContainer.querySelectorAll('[data-type="dropdown"]');
+                
+                dropdownFields.forEach((dropdownField) => {
+                    // Get the dropdown field name
+                    const fieldCount = dropdownField.getAttribute('data-order');
+                    const fieldNameInput = block.querySelector(`#dropdownFieldName${qId}_${fieldCount}`);
+                    const fieldName = fieldNameInput ? fieldNameInput.value.trim() : '';
+                    
+                    if (fieldName) {
+                        // Sanitize field name: lowercase, remove question marks, replace spaces with underscores
+                        const sanitizedFieldName = fieldName
+                            .toLowerCase()
+                            .replace(/[?]/g, '')
+                            .replace(/[^a-z0-9_]+/g, '_')
+                            .replace(/^_+|_+$/g, '');
+                        
+                        // Get all dropdown options for this field
+                        const dropdownOptionsContainer = block.querySelector(`#dropdownOptions${qId}_${fieldCount}`);
+                        if (dropdownOptionsContainer) {
+                            const optionInputs = dropdownOptionsContainer.querySelectorAll('input[type="text"]');
+                            
+                            optionInputs.forEach((optionInput) => {
+                                const optionValue = optionInput.value.trim();
+                                if (optionValue) {
+                                    // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+                                    const sanitizedOptionValue = optionValue.replace(/\W+/g, "_").toLowerCase();
+                                    
+                                    // Generate checkbox IDs for each entry number (1 to max)
+                                    for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
+                                        const checkboxId = `${sanitizedFieldName}_${entryNum}_${sanitizedOptionValue}`;
+                                        const label = `${questionText} - ${fieldName} (${entryNum}) - ${optionValue} (${checkboxId})`;
+                                        options.push({ nodeId: checkboxId, label: label });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
     });
 
     // Build options list and searchable overlay
