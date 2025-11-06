@@ -3030,6 +3030,7 @@ function addTriggerSequence(questionId, fieldCount) {
             <div style="font-weight: bold; color: #333; margin-bottom: 10px;">Add Fields for this trigger:</div>
             <button type="button" onclick="addTriggerLabel(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #007bff; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Label</button>
             <button type="button" onclick="addTriggerCheckbox(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Checkbox</button>
+            <button type="button" onclick="addTriggerDropdown(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #17a2b8; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Dropdown</button>
             <button type="button" onclick="addTriggerDate(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #FF9800; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Date</button>
             <button type="button" onclick="addTriggerLocation(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #28a745; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add Location</button>
             <button type="button" onclick="addTriggerPdf(${questionId}, ${fieldCount}, ${sequenceCount})" style="margin: 3px; padding: 6px 12px; border: none; border-radius: 6px; background-color: #DC3545; color: white; cursor: pointer; font-size: 12px; display: inline-block;">Add PDF</button>
@@ -3173,6 +3174,42 @@ function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
                 <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
             </div>
         `;
+    triggerFieldsContainer.appendChild(fieldDiv);
+}
+
+function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
+    const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
+    if (!triggerFieldsContainer) {
+        console.error('🔧 [ADD TRIGGER DROPDOWN DEBUG] Trigger fields container not found!');
+        return;
+    }
+    
+    const triggerFieldCount = triggerFieldsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER DROPDOWN DEBUG] Adding trigger dropdown', triggerFieldCount, 'for sequence', sequenceCount);
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `trigger-field-${triggerFieldCount}`;
+    fieldDiv.style.margin = '5px 0';
+    fieldDiv.style.padding = '8px';
+    fieldDiv.style.border = '1px solid #17a2b8';
+    fieldDiv.style.borderRadius = '4px';
+    fieldDiv.style.backgroundColor = '#f0f8ff';
+    fieldDiv.innerHTML = `
+        <div style="font-weight: bold; color: #17a2b8; margin-bottom: 8px; text-align: center;">Trigger Dropdown ${triggerFieldCount}</div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 5px;">Question Title:</label>
+            <input type="text" id="triggerDropdownFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" placeholder="Enter question title" style="width: 70%; max-width: 300px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateTriggerDropdownFieldName(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})">
+        </div>
+        <div style="text-align: center; margin-bottom: 8px;">
+            <button type="button" onclick="addTriggerDropdownOption(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="margin: 3px; padding: 4px 8px; border: none; border-radius: 4px; background-color: #17a2b8; color: white; cursor: pointer; font-size: 11px; display: inline-block;">Add option</button>
+        </div>
+        <div id="triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="margin-top: 8px;">
+            <!-- Trigger dropdown options will be added here -->
+        </div>
+        <div style="text-align: center; margin-top: 8px;">
+            <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
+        </div>
+    `;
     triggerFieldsContainer.appendChild(fieldDiv);
 }
 
@@ -3370,6 +3407,57 @@ function removeTriggerCheckboxOption(questionId, fieldCount, sequenceCount, trig
     if (optionDiv) {
         optionDiv.remove();
         console.log('🔧 [REMOVE TRIGGER CHECKBOX OPTION] Removed option', optionCount, 'from trigger field', triggerFieldCount);
+    }
+}
+
+function addTriggerDropdownOption(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const optionsContainer = document.getElementById(`triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!optionsContainer) {
+        console.error('🔧 [ADD TRIGGER DROPDOWN OPTION DEBUG] Options container not found!');
+        return;
+    }
+    
+    const optionCount = optionsContainer.children.length + 1;
+    console.log('🔧 [ADD TRIGGER DROPDOWN OPTION DEBUG] Adding option', optionCount, 'for trigger field', triggerFieldCount);
+    
+    const optionDiv = document.createElement('div');
+    optionDiv.className = `trigger-dropdown-option-${optionCount}`;
+    optionDiv.style.margin = '3px 0';
+    optionDiv.style.padding = '6px';
+    optionDiv.style.border = '1px solid #e0e0e0';
+    optionDiv.style.borderRadius = '3px';
+    optionDiv.style.backgroundColor = '#f5f5f5';
+    optionDiv.innerHTML = `
+        <div style="margin-bottom: 6px; text-align: center;">
+            <label style="font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;">Option text:</label>
+            <input type="text" id="triggerDropdownOptionText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}" placeholder="Enter option text" style="width: 60%; max-width: 200px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;" onchange="updateTriggerDropdownOptionText(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount}, ${optionCount})">
+        </div>
+        <div style="text-align: center; margin-top: 6px;">
+            <button type="button" onclick="removeTriggerDropdownOption(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount}, ${optionCount})" style="background: #ff4444; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-size: 10px;">Remove</button>
+        </div>
+    `;
+    optionsContainer.appendChild(optionDiv);
+}
+
+function removeTriggerDropdownOption(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
+    const optionDiv = document.querySelector(`.trigger-dropdown-option-${optionCount}`);
+    if (optionDiv) {
+        optionDiv.remove();
+        console.log('🔧 [REMOVE TRIGGER DROPDOWN OPTION] Removed option', optionCount, 'from trigger field', triggerFieldCount);
+    }
+}
+
+function updateTriggerDropdownFieldName(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const fieldNameInput = document.getElementById(`triggerDropdownFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (fieldNameInput) {
+        console.log('🔧 [TRIGGER DROPDOWN FIELD NAME] Updated:', fieldNameInput.value);
+    }
+}
+
+function updateTriggerDropdownOptionText(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
+    const textInput = document.getElementById(`triggerDropdownOptionText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}`);
+    if (textInput) {
+        console.log('🔧 [TRIGGER DROPDOWN OPTION TEXT] Updated:', textInput.value);
     }
 }
 
@@ -4630,7 +4718,8 @@ function populateLinkedCheckboxDropdown(idx) {
                 if (optionValue) {
                     // Generate checkbox ID using same pattern as dropdownMirror
                     // Sanitize: replace non-word chars with underscore, convert to lowercase
-                    const sanitizedValue = optionValue.replace(/\W+/g, "_").toLowerCase();
+                    // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues
+                    const sanitizedValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
                     const dropdownNameId = nameId || `answer${qId}`;
                     const checkboxId = `${dropdownNameId}_${sanitizedValue}`;
                     
@@ -4682,7 +4771,8 @@ function populateLinkedCheckboxDropdown(idx) {
                                 const optionValue = optionInput.value.trim();
                                 if (optionValue) {
                                     // Sanitize option value: replace non-word chars with underscore, convert to lowercase
-                                    const sanitizedOptionValue = optionValue.replace(/\W+/g, "_").toLowerCase();
+                                    // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues
+                                    const sanitizedOptionValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
                                     
                                     // Generate checkbox IDs for each entry number (1 to max)
                                     for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
@@ -4690,6 +4780,79 @@ function populateLinkedCheckboxDropdown(idx) {
                                         const label = `${questionText} - ${fieldName} (${entryNum}) - ${optionValue} (${checkboxId})`;
                                         options.push({ nodeId: checkboxId, label: label });
                                     }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // Hidden dropdown checkboxes from dropdowns inside trigger sequences
+            // Find all dropdown fields within this numbered dropdown
+            const unifiedFieldsContainerForTriggers = block.querySelector(`#unifiedFields${qId}`);
+            if (unifiedFieldsContainerForTriggers) {
+                const dropdownFields = unifiedFieldsContainerForTriggers.querySelectorAll('[data-type="dropdown"]');
+                
+                dropdownFields.forEach((dropdownField) => {
+                    // Get the dropdown field name
+                    const fieldCount = dropdownField.getAttribute('data-order');
+                    const fieldNameInput = block.querySelector(`#dropdownFieldName${qId}_${fieldCount}`);
+                    const fieldName = fieldNameInput ? fieldNameInput.value.trim() : '';
+                    
+                    if (fieldName) {
+                        // Find all trigger sequences for this dropdown
+                        const triggerSequencesContainer = block.querySelector(`#triggerSequences${qId}_${fieldCount}`);
+                        if (triggerSequencesContainer) {
+                            const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+                            
+                            sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+                                // Find all dropdown fields within this trigger sequence
+                                const triggerFieldsContainer = sequenceEl.querySelector(`#triggerFields${qId}_${fieldCount}_${sequenceIndex + 1}`);
+                                if (triggerFieldsContainer) {
+                                    const triggerFieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
+                                    
+                                    triggerFieldElements.forEach((triggerFieldEl, triggerFieldIndex) => {
+                                        // Check if this is a dropdown field
+                                        const triggerDropdownFieldNameEl = triggerFieldEl.querySelector(`#triggerDropdownFieldName${qId}_${fieldCount}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                        
+                                        if (triggerDropdownFieldNameEl) {
+                                            const triggerDropdownFieldName = triggerDropdownFieldNameEl.value.trim();
+                                            
+                                            if (triggerDropdownFieldName) {
+                                                // Sanitize trigger dropdown field name
+                                                const sanitizedTriggerFieldName = triggerDropdownFieldName
+                                                    .toLowerCase()
+                                                    .replace(/[?]/g, '')
+                                                    .replace(/[^a-z0-9_]+/g, '_')
+                                                    .replace(/^_+|_+$/g, '');
+                                                
+                                                // Get all dropdown options for this trigger dropdown
+                                                const triggerDropdownOptionsContainer = triggerFieldEl.querySelector(`#triggerDropdownOptions${qId}_${fieldCount}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                if (triggerDropdownOptionsContainer) {
+                                                    const triggerOptionInputs = triggerDropdownOptionsContainer.querySelectorAll('input[type="text"]');
+                                                    
+                                                    triggerOptionInputs.forEach((triggerOptionInput) => {
+                                                        const triggerOptionValue = triggerOptionInput.value.trim();
+                                                        if (triggerOptionValue) {
+                                                            // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+                                                            const sanitizedTriggerOptionValue = triggerOptionValue
+                                                                .replace(/[^A-Za-z0-9_]+/g, "_")
+                                                                .toLowerCase()
+                                                                .replace(/^_+|_+$/g, '');
+                                                            
+                                                            // Generate checkbox IDs for each entry number (minValue to maxValue)
+                                                            for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
+                                                                // Format: fieldName_optionValue_entryNumber (entry number last)
+                                                                const checkboxId = `${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}_${entryNum}`;
+                                                                const label = `${questionText} - ${fieldName} [Trigger] - ${triggerDropdownFieldName} (${entryNum}) - ${triggerOptionValue} (${checkboxId})`;
+                                                                options.push({ nodeId: checkboxId, label: label });
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
                                 }
                             });
                         }

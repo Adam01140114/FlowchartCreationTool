@@ -177,6 +177,15 @@
                       "type": "label",
                       "label": "Business Name Statement Number",
                       "nodeId": "is_this_plaintiff_a_business_yes_business_name_statement_number"
+                    },
+                    {
+                      "type": "dropdown",
+                      "fieldName": "hello",
+                      "options": [
+                        {
+                          "text": "option w"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -203,12 +212,11 @@
   "linkedFields": [],
   "linkedCheckboxes": [
     {
-      "id": "linkedCheckbox0",
+      "id": "linkedCheckbox1",
       "linkedCheckboxId": "linked_checkbox",
       "checkboxes": [
-        "are_you_the_only_person_suing_no",
-        "user_biz",
-        "is_this_plaintiff_a_business_yes_1"
+        "hello_option_w_1",
+        "are_you_the_only_person_suing_yes"
       ]
     }
   ]

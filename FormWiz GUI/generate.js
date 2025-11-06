@@ -783,9 +783,11 @@ questionSlugMap[questionId] = slug;
       }
 
       // Start the question container
+      // Add data-question-type attribute for numbered dropdown questions
+      const questionTypeAttr = questionType === "numberedDropdown" ? ' data-question-type="numberedDropdown"' : '';
       formHTML += `<div id="question-container-${questionId}" class="question-container${
         logicEnabled ? ' hidden' : ""
-      }">`;
+      }"${questionTypeAttr}>`;
       
       // Check if info box is enabled
       const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
@@ -1614,6 +1616,9 @@ formHTML += `</div><br></div>`;
                       const checkboxFieldNameEl = fieldEl.querySelector('#triggerCheckboxFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                       const checkboxOptionsContainer = fieldEl.querySelector('#triggerCheckboxOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                       
+                      const dropdownFieldNameEl = fieldEl.querySelector('#triggerDropdownFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                      const dropdownOptionsContainer = fieldEl.querySelector('#triggerDropdownOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                      
                       const dateLabelEl = fieldEl.querySelector('#triggerDateLabel' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                       const dateNodeIdEl = fieldEl.querySelector('#triggerDateNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                       
@@ -1651,6 +1656,27 @@ formHTML += `</div><br></div>`;
                           fieldName: checkboxFieldNameEl.value.trim(),
                           selectionType: selectionType,
                           options: checkboxOptions
+                        });
+                      } else if (dropdownFieldNameEl) {
+                        // Trigger dropdown field
+                        const dropdownOptions = [];
+                        if (dropdownOptionsContainer) {
+                          const dropdownOptionElements = dropdownOptionsContainer.querySelectorAll('[class^="trigger-dropdown-option-"]');
+                          dropdownOptionElements.forEach((optionEl, optionIndex) => {
+                            const textEl = optionEl.querySelector('#triggerDropdownOptionText' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1) + '_' + (optionIndex + 1));
+                            
+                            if (textEl && textEl.value.trim()) {
+                              dropdownOptions.push({
+                                text: textEl.value.trim()
+                              });
+                            }
+                          });
+                        }
+                        
+                        triggerFields.push({
+                          type: 'dropdown',
+                          fieldName: dropdownFieldNameEl.value.trim(),
+                          options: dropdownOptions
                         });
                       } else if (dateLabelEl && dateNodeIdEl) {
                         // Trigger date field
@@ -1977,7 +2003,21 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `  })();\n`;
           }
 
-          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }\n`;
+          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { \n`;
+          // Check if this is a numbered dropdown question and reset it before hiding
+          // Use fallback check since data-question-type might not be reliable
+          logicScriptBuffer += `   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');\n`;
+          logicScriptBuffer += `   var questionType = thisQ.getAttribute('data-question-type') || '';\n`;
+          logicScriptBuffer += `   if(questionType === 'numberedDropdown' || hasNumberedDropdown){\n`;
+          logicScriptBuffer += `     console.log('🔧 [CONDITIONAL LOGIC] Resetting numbered dropdown question ${questionId}');\n`;
+          logicScriptBuffer += `     if(typeof resetNumberedDropdownFields === 'function'){\n`;
+          logicScriptBuffer += `       resetNumberedDropdownFields("${questionId}");\n`;
+          logicScriptBuffer += `     } else {\n`;
+          logicScriptBuffer += `       console.warn('🔧 [CONDITIONAL LOGIC] resetNumberedDropdownFields function not found');\n`;
+          logicScriptBuffer += `     }\n`;
+          logicScriptBuffer += `   }\n`;
+          logicScriptBuffer += `   thisQ.classList.add("hidden");\n`;
+          logicScriptBuffer += ` }\n`;
           logicScriptBuffer += `}\n`;
 
           // attach event listeners
@@ -2539,6 +2579,78 @@ if (s > 1){
         });
 
         triggerContainer.appendChild(checkboxFieldDiv);
+      } else if (triggerField.type === 'dropdown') {
+        const dropdownFieldDiv = document.createElement('div');
+        dropdownFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1);';
+
+        const fieldNameLabel = document.createElement('label');
+        fieldNameLabel.textContent = triggerField.fieldName + ":";
+        fieldNameLabel.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
+        dropdownFieldDiv.appendChild(fieldNameLabel);
+
+        const select = document.createElement('select');
+        const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+        select.id = sanitizedFieldName + "_" + entryNumber;
+        select.name = select.id;
+        select.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto; display: block;';
+
+        // Add placeholder option
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select an option...';
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        select.appendChild(placeholderOption);
+
+        // Add dropdown options
+        const dropdownOptions = triggerField.options || [];
+        dropdownOptions.forEach((option) => {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.text;
+          optionElement.textContent = option.text;
+          select.appendChild(optionElement);
+        });
+
+        // Add hover effect
+        select.addEventListener('mouseenter', function() {
+          this.style.borderColor = '#5DADE2';
+          this.style.backgroundColor = '#f8f9ff';
+        });
+        select.addEventListener('mouseleave', function() {
+          this.style.borderColor = '#87CEEB';
+          this.style.backgroundColor = 'white';
+        });
+
+        // Create wrapper div for hidden checkboxes (required for dropdownMirror)
+        const dropdownWrapper = document.createElement('div');
+        dropdownWrapper.id = 'dropdowntext_' + select.id;
+        dropdownWrapper.style.display = 'none';
+        dropdownWrapper.style.margin = '0';
+        dropdownWrapper.style.padding = '0';
+        
+        // Create hidden text input (required for dropdownMirror)
+        const hiddenDropdownInput = document.createElement('input');
+        hiddenDropdownInput.type = 'text';
+        hiddenDropdownInput.id = select.id + '_dropdown';
+        hiddenDropdownInput.name = select.id + '_dropdown';
+        hiddenDropdownInput.style.display = 'none';
+        dropdownWrapper.appendChild(hiddenDropdownInput);
+        
+        // Add change event listener to call dropdownMirror
+        select.addEventListener('change', function() {
+          console.log('🔵 [TRIGGER DROPDOWN DEBUG] Dropdown changed, calling dropdownMirror with baseName:', this.id);
+          if (typeof dropdownMirror === 'function') {
+            dropdownMirror(this, this.id);
+          }
+          // Also update hidden logic if needed
+          if (typeof updateHiddenLogic === 'function') {
+            updateHiddenLogic(this.id, this.value);
+          }
+        });
+        
+        dropdownFieldDiv.appendChild(select);
+        dropdownFieldDiv.appendChild(dropdownWrapper);
+        triggerContainer.appendChild(dropdownFieldDiv);
       } else if (triggerField.type === 'date') {
         const fieldDiv = document.createElement('div');
 
@@ -5220,6 +5332,92 @@ function showTextboxLabels(questionId, count){
                     select.appendChild(optionElement);
                 });
                 
+                // Function to reset all fields in a trigger sequence container
+                function resetTriggerSequenceFields(container) {
+                    if (!container) return;
+                    
+                    // Reset text inputs (labels)
+                    const textInputs = container.querySelectorAll('input[type="text"]:not([style*="display: none"])');
+                    textInputs.forEach(input => {
+                        input.value = '';
+                    });
+                    
+                    // Reset number inputs (like Zip)
+                    const numberInputs = container.querySelectorAll('input[type="number"]');
+                    numberInputs.forEach(input => {
+                        input.value = '';
+                    });
+                    
+                    // Reset date inputs
+                    const dateInputs = container.querySelectorAll('input[type="date"]');
+                    dateInputs.forEach(input => {
+                        input.value = '';
+                    });
+                    
+                    // Reset checkboxes (uncheck all)
+                    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
+                    // Reset radio buttons (uncheck all)
+                    const radios = container.querySelectorAll('input[type="radio"]');
+                    radios.forEach(radio => {
+                        radio.checked = false;
+                        // Remove hidden checkboxes created by radio buttons
+                        const originalNodeId = radio.id.replace('_radio', '');
+                        const hiddenCheckbox = document.getElementById(originalNodeId);
+                        if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+                            hiddenCheckbox.remove();
+                        }
+                    });
+                    
+                    // Reset dropdowns (select elements) - set to placeholder/default option
+                    const selects = container.querySelectorAll('select');
+                    selects.forEach(select => {
+                        // Find the first disabled option (placeholder) or first option
+                        const placeholderOption = select.querySelector('option[disabled]');
+                        if (placeholderOption) {
+                            select.value = '';
+                            placeholderOption.selected = true;
+                        } else if (select.options.length > 0) {
+                            select.selectedIndex = 0;
+                        }
+                        
+                        // Also reset any hidden dropdown inputs
+                        const hiddenDropdownInput = document.getElementById(select.id + '_dropdown');
+                        if (hiddenDropdownInput) {
+                            hiddenDropdownInput.value = '';
+                        }
+                        
+                        // Clear hidden checkboxes created by dropdownMirror
+                        const dropdownWrapper = document.getElementById('dropdowntext_' + select.id);
+                        if (dropdownWrapper) {
+                            dropdownWrapper.innerHTML = '';
+                            // Re-add the hidden input if it was removed
+                            const existingHiddenInput = document.getElementById(select.id + '_dropdown');
+                            if (!existingHiddenInput) {
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'text';
+                                hiddenInput.id = select.id + '_dropdown';
+                                hiddenInput.name = select.id + '_dropdown';
+                                hiddenInput.style.display = 'none';
+                                dropdownWrapper.appendChild(hiddenInput);
+                            }
+                        }
+                    });
+                    
+                    // Reset state dropdowns (they have hidden short fields)
+                    const stateSelects = container.querySelectorAll('select.address-select-main');
+                    stateSelects.forEach(select => {
+                        const shortHiddenId = select.id.replace('_state_', '_state_short_');
+                        const shortHidden = document.getElementById(shortHiddenId);
+                        if (shortHidden) {
+                            shortHidden.value = '';
+                        }
+                    });
+                }
+                
                 // Function to handle conditional logic
                 function handleConditionalLogic() {
                     const selectedValue = select.value;
@@ -5240,9 +5438,11 @@ function showTextboxLabels(questionId, count){
                                     createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName, triggerTitle);
                                 }
                             } else {
-                                // Hide trigger fields for other conditions
+                                // Hide trigger fields for other conditions and reset their values
                                 const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
                                 if (triggerFieldsContainer) {
+                                    // Reset all fields before hiding
+                                    resetTriggerSequenceFields(triggerFieldsContainer);
                                     triggerFieldsContainer.style.display = 'none';
                                 }
                             }
@@ -5369,6 +5569,131 @@ function showTextboxLabels(questionId, count){
     
     // 🔧 NEW: Clear flag after function completes
     isCreatingFields = false;
+}
+
+// Reset all fields in a numbered dropdown question to their default values
+function resetNumberedDropdownFields(questionId) {
+    console.log('🔧 [RESET DEBUG] resetNumberedDropdownFields called for questionId:', questionId);
+    // Reset the main dropdown select to its default (empty/placeholder)
+    const dropdownId = questionNameIds[questionId] || ("answer" + questionId);
+    console.log('🔧 [RESET DEBUG] Looking for dropdown with ID:', dropdownId);
+    const dropdown = document.getElementById(dropdownId);
+    if (dropdown) {
+        console.log('🔧 [RESET DEBUG] Found dropdown, resetting value');
+        dropdown.value = '';
+        // Find and select the placeholder option
+        const placeholderOption = dropdown.querySelector('option[disabled]');
+        if (placeholderOption) {
+            placeholderOption.selected = true;
+        } else if (dropdown.options.length > 0) {
+            dropdown.selectedIndex = 0;
+        }
+        // Don't trigger change event here - it causes initialization issues with isCreatingFields
+        // Instead, we'll clear the container directly
+    } else {
+        console.log('🔧 [RESET DEBUG] Dropdown not found with ID:', dropdownId);
+    }
+    
+    // Get the label container
+    const container = document.getElementById("labelContainer" + questionId);
+    if (!container) {
+        return;
+    }
+    
+    // Reset all text inputs (labels)
+    const textInputs = container.querySelectorAll('input[type="text"]:not([style*="display: none"])');
+    textInputs.forEach(input => {
+        input.value = '';
+    });
+    
+    // Reset number inputs (like Zip in location fields)
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+        input.value = '';
+    });
+    
+    // Reset date inputs
+    const dateInputs = container.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        input.value = '';
+    });
+    
+    // Reset checkboxes (uncheck all)
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Reset radio buttons (uncheck all)
+    const radios = container.querySelectorAll('input[type="radio"]');
+    radios.forEach(radio => {
+        radio.checked = false;
+        // Remove hidden checkboxes created by radio buttons
+        const originalNodeId = radio.id.replace('_radio', '');
+        const hiddenCheckbox = document.getElementById(originalNodeId);
+        if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+            hiddenCheckbox.remove();
+        }
+    });
+    
+    // Reset dropdowns (select elements) - set to placeholder/default option
+    const selects = container.querySelectorAll('select');
+    selects.forEach(select => {
+        // Find the first disabled option (placeholder) or first option
+        const placeholderOption = select.querySelector('option[disabled]');
+        if (placeholderOption) {
+            select.value = '';
+            placeholderOption.selected = true;
+        } else if (select.options.length > 0) {
+            select.selectedIndex = 0;
+        }
+        
+        // Also reset any hidden dropdown inputs
+        const hiddenDropdownInput = document.getElementById(select.id + '_dropdown');
+        if (hiddenDropdownInput) {
+            hiddenDropdownInput.value = '';
+        }
+        
+        // Clear hidden checkboxes created by dropdownMirror
+        const dropdownWrapper = document.getElementById('dropdowntext_' + select.id);
+        if (dropdownWrapper) {
+            dropdownWrapper.innerHTML = '';
+            // Re-add the hidden input if it was removed
+            const existingHiddenInput = document.getElementById(select.id + '_dropdown');
+            if (!existingHiddenInput) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'text';
+                hiddenInput.id = select.id + '_dropdown';
+                hiddenInput.name = select.id + '_dropdown';
+                hiddenInput.style.display = 'none';
+                dropdownWrapper.appendChild(hiddenInput);
+            }
+        }
+    });
+    
+    // Reset state dropdowns (they have hidden short fields)
+    const stateSelects = container.querySelectorAll('select.address-select-main');
+    stateSelects.forEach(select => {
+        const shortHiddenId = select.id.replace('_state_', '_state_short_');
+        const shortHidden = document.getElementById(shortHiddenId);
+        if (shortHidden) {
+            shortHidden.value = '';
+        }
+    });
+    
+    // Clear all entries by directly clearing the container instead of calling showTextboxLabels
+    // This avoids the isCreatingFields initialization issue
+    const labelContainer = document.getElementById("labelContainer" + questionId);
+    if (labelContainer) {
+        labelContainer.innerHTML = '';
+    }
+    
+    // Also update hidden checkboxes
+    if (typeof updateHiddenCheckboxes === 'function') {
+        updateHiddenCheckboxes(questionId, 0);
+    }
+    
+    // Don't trigger change event - we've already cleared everything manually
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -5611,23 +5936,32 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+    // Sanitize option value: replace all non-word characters (including spaces) with underscores
+    // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues in template literals
+    const idSuffix = val.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+    console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: idSuffix from val "' + val + '":', idSuffix);
+    console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: BEFORE replace - val:', val, 'typeof val:', typeof val);
+    console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: AFTER replace - idSuffix:', idSuffix);
     
-    // Check if baseName ends with an entry number (for numbered dropdowns)
+    // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)
     // Format should be: fieldName_optionValue_entryNumber (entry number last)
     const lastUnderscoreIndex = baseName.lastIndexOf('_');
     let checkboxId;
+    console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: baseName:', baseName, 'lastUnderscoreIndex:', lastUnderscoreIndex);
+    
     if (lastUnderscoreIndex !== -1) {
         // Check if the part after last underscore is a number (entry number)
         // Use [0-9] instead of \d to avoid backslash escaping issues when embedded in HTML
         const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+        console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: potentialEntryNumber:', potentialEntryNumber, 'regex test:', /^[0-9]+$/.test(potentialEntryNumber));
+        
         if (/^[0-9]+$/.test(potentialEntryNumber)) {
-            // It's a numbered dropdown: extract field name and entry number
+            // It's a numbered dropdown or trigger sequence dropdown: extract field name and entry number
             const fieldName = baseName.substring(0, lastUnderscoreIndex);
             const entryNumber = potentialEntryNumber;
             // Format: fieldName_optionValue_entryNumber (entry number last)
             checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
-            console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+            console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered/trigger dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
         } else {
             // Regular dropdown: keep original format
             checkboxId = baseName + "_" + idSuffix;
@@ -8710,7 +9044,11 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
     
     if (selectedValue) {
       // Generate checkbox ID using the same pattern as dropdownMirror
-      const idSuffix = selectedValue.replace(/\W+/g, "_").toLowerCase();
+      // Sanitize option value: replace all non-word characters (including spaces) with underscores
+      // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues in template literals
+      const idSuffix = selectedValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+      console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: BEFORE replace - selectedValue:', selectedValue, 'typeof selectedValue:', typeof selectedValue);
+      console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: AFTER replace - idSuffix:', idSuffix);
       
       // Check if baseName ends with an entry number (for numbered dropdowns)
       // Format should be: fieldName_optionValue_entryNumber (entry number last)
@@ -8773,7 +9111,11 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
     if (!optionValue) return;
     
     // Generate checkbox ID using the same pattern as dropdownMirror
-    const idSuffix = optionValue.replace(/\W+/g, "_").toLowerCase();
+    // Sanitize option value: replace all non-word characters (including spaces) with underscores
+    // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues in template literals
+    const idSuffix = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+    console.log('🔵 [LINKED CHECKBOX DEBUG] addRegularDropdownVirtualEntries: BEFORE replace - optionValue:', optionValue, 'typeof optionValue:', typeof optionValue);
+    console.log('🔵 [LINKED CHECKBOX DEBUG] addRegularDropdownVirtualEntries: AFTER replace - idSuffix:', idSuffix);
     const checkboxId = baseName + "_" + idSuffix;
     const checkboxName = baseName + "_" + idSuffix;
     

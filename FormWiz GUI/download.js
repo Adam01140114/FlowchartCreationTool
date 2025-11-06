@@ -730,6 +730,28 @@ function loadFormData(formData) {
                                                                     if (triggerOptionNodeIdEl) triggerOptionNodeIdEl.value = option.nodeId;
                                                                 });
                                                             }
+                                                        } else if (triggerField.type === 'dropdown') {
+                                                            if (typeof addTriggerDropdown !== 'function') {
+                                                                console.error('🔧 [IMPORT DEBUG] addTriggerDropdown function not available!');
+                                                                return;
+                                                            }
+                                                            addTriggerDropdown(question.questionId, fieldOrder, sequenceIndex + 1);
+                                                            
+                                                            // Set the trigger dropdown field values
+                                                            const triggerDropdownFieldNameEl = document.getElementById('triggerDropdownFieldName' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
+                                                            if (triggerDropdownFieldNameEl) triggerDropdownFieldNameEl.value = triggerField.fieldName;
+                                                            
+                                                            // Add trigger dropdown options
+                                                            if (triggerField.options && triggerField.options.length > 0) {
+                                                                triggerField.options.forEach((option, optionIndex) => {
+                                                                    addTriggerDropdownOption(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldIndex + 1);
+                                                                    
+                                                                    // Set the trigger option values
+                                                                    const triggerOptionTextEl = document.getElementById('triggerDropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1) + '_' + (optionIndex + 1));
+                                                                    
+                                                                    if (triggerOptionTextEl) triggerOptionTextEl.value = option.text;
+                                                                });
+                                                            }
                                                         } else if (triggerField.type === 'date') {
                                                             if (typeof addTriggerDate !== 'function') {
                                                                 console.error('🔧 [IMPORT DEBUG] addTriggerDate function not available!');
@@ -1212,6 +1234,28 @@ function loadFormData(formData) {
                                                                 
                                                                 if (triggerOptionTextEl) triggerOptionTextEl.value = option.text;
                                                                 if (triggerOptionNodeIdEl) triggerOptionNodeIdEl.value = option.nodeId;
+                                                            });
+                                                        }
+                                                    } else if (triggerField.type === 'dropdown') {
+                                                        if (typeof addTriggerDropdown !== 'function') {
+                                                            console.error('🔧 [IMPORT DEBUG] addTriggerDropdown function not available!');
+                                                            return;
+                                                        }
+                                                        addTriggerDropdown(question.questionId, fieldOrder, sequenceIndex + 1);
+                                                        
+                                                        // Set the trigger dropdown field values
+                                                        const triggerDropdownFieldNameEl = document.getElementById('triggerDropdownFieldName' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
+                                                        if (triggerDropdownFieldNameEl) triggerDropdownFieldNameEl.value = triggerField.fieldName;
+                                                        
+                                                        // Add trigger dropdown options
+                                                        if (triggerField.options && triggerField.options.length > 0) {
+                                                            triggerField.options.forEach((option, optionIndex) => {
+                                                                addTriggerDropdownOption(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldIndex + 1);
+                                                                
+                                                                // Set the trigger option values
+                                                                const triggerOptionTextEl = document.getElementById('triggerDropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1) + '_' + (optionIndex + 1));
+                                                                
+                                                                if (triggerOptionTextEl) triggerOptionTextEl.value = option.text;
                                                             });
                                                         }
                                                     } else if (triggerField.type === 'date') {
@@ -2673,6 +2717,9 @@ function exportForm() {
                                             const checkboxFieldNameEl = fieldEl.querySelector('#triggerCheckboxFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                             const checkboxOptionsContainer = fieldEl.querySelector('#triggerCheckboxOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                             
+                                            const dropdownFieldNameEl = fieldEl.querySelector('#triggerDropdownFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                            const dropdownOptionsContainer = fieldEl.querySelector('#triggerDropdownOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                            
                                             const dateLabelEl = fieldEl.querySelector('#triggerDateLabel' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                             const dateNodeIdEl = fieldEl.querySelector('#triggerDateNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                             
@@ -2710,6 +2757,27 @@ function exportForm() {
                                                     fieldName: checkboxFieldNameEl.value.trim(),
                                                     selectionType: selectionType,
                                                     options: checkboxOptions
+                                                });
+                                            } else if (dropdownFieldNameEl) {
+                                                // Trigger dropdown field
+                                                const dropdownOptions = [];
+                                                if (dropdownOptionsContainer) {
+                                                    const dropdownOptionElements = dropdownOptionsContainer.querySelectorAll('[class^="trigger-dropdown-option-"]');
+                                                    dropdownOptionElements.forEach((optionEl, optionIndex) => {
+                                                        const textEl = optionEl.querySelector('#triggerDropdownOptionText' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1) + '_' + (optionIndex + 1));
+                                                        
+                                                        if (textEl && textEl.value.trim()) {
+                                                            dropdownOptions.push({
+                                                                text: textEl.value.trim()
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                                
+                                                triggerFields.push({
+                                                    type: 'dropdown',
+                                                    fieldName: dropdownFieldNameEl.value.trim(),
+                                                    options: dropdownOptions
                                                 });
                                             } else if (dateLabelEl && dateNodeIdEl) {
                                                 // Trigger date field
