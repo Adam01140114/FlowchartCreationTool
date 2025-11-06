@@ -3187,6 +3187,10 @@ function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
     console.log('🔧 [ADD TRIGGER DROPDOWN DEBUG] Adding trigger dropdown', triggerFieldCount, 'for sequence', sequenceCount);
     
+    // Create a unique ID for the conditional logic container
+    const conditionalLogicContainerId = `conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    const enableConditionalLogicCheckboxId = `enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `trigger-field-${triggerFieldCount}`;
     fieldDiv.style.margin = '5px 0';
@@ -3206,11 +3210,22 @@ function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
         <div id="triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="margin-top: 8px;">
             <!-- Trigger dropdown options will be added here -->
         </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label for="${enableConditionalLogicCheckboxId}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Enable Conditional Logic</label>
+            <div style="display: flex; justify-content: center;">
+                <input type="checkbox" id="${enableConditionalLogicCheckboxId}" onchange="toggleTriggerDropdownConditionalLogic(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="cursor: pointer;">
+            </div>
+            <div id="${conditionalLogicContainerId}" style="margin-top: 8px; display: none;">
+                <!-- Conditional logic UI will be populated here -->
+            </div>
+        </div>
         <div style="text-align: center; margin-top: 8px;">
             <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
         </div>
     `;
     triggerFieldsContainer.appendChild(fieldDiv);
+    
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown field created, checkbox ID:', enableConditionalLogicCheckboxId, 'container ID:', conditionalLogicContainerId);
 }
 
 function addTriggerDate(questionId, fieldCount, sequenceCount) {
@@ -3541,6 +3556,60 @@ function getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, seq
         }
     });
     
+    // Also find dropdown fields in this trigger sequence and generate their hidden checkbox IDs
+    // Get the numbered dropdown's nodeId
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    if (questionBlock) {
+        const nodeIdInput = questionBlock.querySelector(`#nodeId${questionId}`);
+        const questionNodeId = nodeIdInput ? nodeIdInput.value.trim() : `answer${questionId}`;
+        
+        // Find all dropdown fields in this trigger sequence
+        const triggerFieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
+        triggerFieldElements.forEach((triggerFieldEl, triggerFieldIndex) => {
+            // Check if this is a dropdown field
+            const triggerDropdownFieldNameEl = triggerFieldEl.querySelector(`#triggerDropdownFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldIndex + 1}`);
+            
+            if (triggerDropdownFieldNameEl) {
+                const triggerDropdownFieldName = triggerDropdownFieldNameEl.value.trim();
+                
+                if (triggerDropdownFieldName) {
+                    // Sanitize trigger dropdown field name
+                    const sanitizedTriggerFieldName = triggerDropdownFieldName
+                        .toLowerCase()
+                        .replace(/[?]/g, '')
+                        .replace(/[^a-z0-9_]+/g, '_')
+                        .replace(/^_+|_+$/g, '');
+                    
+                    // Get all dropdown options for this trigger dropdown
+                    const triggerDropdownOptionsContainer = triggerFieldEl.querySelector(`#triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldIndex + 1}`);
+                    if (triggerDropdownOptionsContainer) {
+                        const triggerOptionInputs = triggerDropdownOptionsContainer.querySelectorAll('input[type="text"]');
+                        
+                        triggerOptionInputs.forEach((triggerOptionInput) => {
+                            const triggerOptionValue = triggerOptionInput.value.trim();
+                            if (triggerOptionValue) {
+                                // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+                                const sanitizedTriggerOptionValue = triggerOptionValue
+                                    .replace(/[^A-Za-z0-9_]+/g, "_")
+                                    .toLowerCase()
+                                    .replace(/^_+|_+$/g, '');
+                                
+                                // Generate a single checkbox ID using just field name and option value (matching checkbox option behavior)
+                                // Format: {dropdownFieldName}_{optionValue}
+                                // This matches the pattern used for checkbox options which don't include entry numbers
+                                const checkboxId = `${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}`;
+                                if (!checkboxNodeIds.includes(checkboxId)) {
+                                    checkboxNodeIds.push(checkboxId);
+                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found dropdown hidden checkbox ID:', checkboxId);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+    
     console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found checkbox option node IDs:', checkboxNodeIds);
     return checkboxNodeIds;
 }
@@ -3674,6 +3743,137 @@ function updateTriggerDateConditionalLogicUI(questionId, fieldCount, sequenceCou
     container.appendChild(addConditionBtn);
     
     console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic UI updated');
+}
+
+// Function to toggle conditional logic UI for dropdown fields and update it
+function toggleTriggerDropdownConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerDropdownConditionalLogic called');
+    
+    const checkbox = document.getElementById(`enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    
+    if (!checkbox || !container) {
+        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+        return;
+    }
+    
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    
+    // Initialize or update the data structure
+    if (!window.triggerDropdownConditionalLogic) {
+        window.triggerDropdownConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownConditionalLogic[key]) {
+        window.triggerDropdownConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    
+    // Update enabled state
+    window.triggerDropdownConditionalLogic[key].enabled = checkbox.checked;
+    
+    if (checkbox.checked) {
+        updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        // Clear conditions when disabled
+        window.triggerDropdownConditionalLogic[key].conditions = [];
+    }
+}
+
+// Function to update the conditional logic UI for dropdown fields with checkbox option dropdowns
+function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDropdownConditionalLogicUI called for dropdown');
+    
+    const container = document.getElementById(`conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) {
+        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+        return;
+    }
+    
+    // Get checkbox option node IDs from the trigger sequence
+    const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount);
+    
+    // Initialize conditions array if it doesn't exist
+    if (!window.triggerDropdownConditionalLogic) {
+        window.triggerDropdownConditionalLogic = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownConditionalLogic[key]) {
+        window.triggerDropdownConditionalLogic[key] = { enabled: false, conditions: [''] };
+    }
+    
+    // Clear existing UI
+    container.innerHTML = '';
+    
+    // Create condition rows
+    window.triggerDropdownConditionalLogic[key].conditions.forEach((condition, conditionIndex) => {
+        const conditionRow = document.createElement('div');
+        conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%;';
+        
+        const conditionDropdown = document.createElement('select');
+        conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; flex-shrink: 1;';
+        
+        // Add placeholder option
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select checkbox option...';
+        conditionDropdown.appendChild(placeholderOption);
+        
+        // Add checkbox option node IDs
+        checkboxNodeIds.forEach(nodeId => {
+            const option = document.createElement('option');
+            option.value = nodeId;
+            option.textContent = nodeId;
+            if (condition === nodeId) {
+                option.selected = true;
+            }
+            conditionDropdown.appendChild(option);
+        });
+        
+        conditionDropdown.value = condition || '';
+        conditionDropdown.onchange = () => {
+            if (!window.triggerDropdownConditionalLogic[key]) {
+                window.triggerDropdownConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            window.triggerDropdownConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
+            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition updated:', window.triggerDropdownConditionalLogic[key].conditions);
+        };
+        
+        const removeConditionBtn = document.createElement('button');
+        removeConditionBtn.textContent = '×';
+        removeConditionBtn.style.cssText = 'background: #f44336; color: white; border: none; width: 24px; height: 24px; min-width: 24px; max-width: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1;';
+        removeConditionBtn.onclick = () => {
+            if (!window.triggerDropdownConditionalLogic[key]) {
+                window.triggerDropdownConditionalLogic[key] = { enabled: true, conditions: [] };
+            }
+            if (window.triggerDropdownConditionalLogic[key].conditions.length > 1) {
+                window.triggerDropdownConditionalLogic[key].conditions.splice(conditionIndex, 1);
+                updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+            }
+        };
+        
+        conditionRow.appendChild(conditionDropdown);
+        conditionRow.appendChild(removeConditionBtn);
+        container.appendChild(conditionRow);
+    });
+    
+    // Add Another Condition button
+    const addConditionBtn = document.createElement('button');
+    addConditionBtn.textContent = 'Add Another Condition';
+    addConditionBtn.style.cssText = 'background: #2196F3; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; width: 100%; margin-top: 4px;';
+    addConditionBtn.onclick = () => {
+        if (!window.triggerDropdownConditionalLogic[key]) {
+            window.triggerDropdownConditionalLogic[key] = { enabled: true, conditions: [''] };
+        }
+        if (!window.triggerDropdownConditionalLogic[key].conditions) {
+            window.triggerDropdownConditionalLogic[key].conditions = [''];
+        }
+        window.triggerDropdownConditionalLogic[key].conditions.push('');
+        updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    };
+    container.appendChild(addConditionBtn);
+    
+    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown conditional logic UI updated');
 }
 
 
@@ -4967,7 +5167,7 @@ function populateLinkedCheckboxDropdown(idx) {
             
             // Update config
             if (currentLinkedCheckboxConfig[idx]) {
-                currentLinkedCheckboxConfig[idx].selectedValue = opt.nodeId;
+            currentLinkedCheckboxConfig[idx].selectedValue = opt.nodeId;
                 console.log('✅ [LINKED CHECKBOX DEBUG] Updated config selectedValue to:', opt.nodeId);
             } else {
                 console.error('❌ [LINKED CHECKBOX DEBUG] Config entry not found for idx:', idx);

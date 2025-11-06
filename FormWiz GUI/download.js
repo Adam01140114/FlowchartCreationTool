@@ -1258,6 +1258,96 @@ function loadFormData(formData) {
                                                                 if (triggerOptionTextEl) triggerOptionTextEl.value = option.text;
                                                             });
                                                         }
+                                                        
+                                                        // Restore conditional logic if enabled
+                                                        if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown conditional logic enabled, restoring...');
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditions:', triggerField.conditionalLogic.conditions);
+                                                            
+                                                            // Initialize the data structure first
+                                                            const triggerFieldCount = triggerFieldIndex + 1;
+                                                            const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+                                                            if (!window.triggerDropdownConditionalLogic) {
+                                                                window.triggerDropdownConditionalLogic = {};
+                                                            }
+                                                            window.triggerDropdownConditionalLogic[key] = {
+                                                                enabled: true,
+                                                                conditions: [...(triggerField.conditionalLogic.conditions || [])]
+                                                            };
+                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Initialized dropdown conditional logic data structure:', window.triggerDropdownConditionalLogic[key]);
+                                                            
+                                                            setTimeout(() => {
+                                                                const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Looking for dropdown checkbox with ID: enableConditionalLogicDropdown' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
+                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox found:', !!enableConditionalLogicCheckbox);
+                                                                
+                                                                if (enableConditionalLogicCheckbox) {
+                                                                    enableConditionalLogicCheckbox.checked = true;
+                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown checkbox checked, triggering change event...');
+                                                                    
+                                                                    // Manually trigger the change event to update the UI
+                                                                    const event = new Event('change');
+                                                                    enableConditionalLogicCheckbox.dispatchEvent(event);
+                                                                    
+                                                                    // Set the conditions after a delay to ensure UI is ready
+                                                                    setTimeout(() => {
+                                                                        if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
+                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Updating dropdown UI with conditions...');
+                                                                            
+                                                                            // Update the UI with the conditions
+                                                                            if (typeof updateTriggerDropdownConditionalLogicUI === 'function') {
+                                                                                updateTriggerDropdownConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
+                                                                                
+                                                                                // Set the condition values after UI is updated
+                                                                                setTimeout(() => {
+                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting dropdown condition dropdown values...');
+                                                                                    triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
+                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting dropdown condition', condIndex, ':', condition);
+                                                                                        
+                                                                                        // Add condition if needed
+                                                                                        if (condIndex > 0) {
+                                                                                            const addConditionBtn = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
+                                                                                            if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
+                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Clicking "Add Another Condition" button for dropdown...');
+                                                                                                addConditionBtn.click();
+                                                                                                // Wait a bit for the new dropdown to be created
+                                                                                                setTimeout(() => {
+                                                                                                    const conditionDropdown = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                                    if (conditionDropdown) {
+                                                                                                        conditionDropdown.value = condition;
+                                                                                                        conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set dropdown condition', condIndex, 'to:', condition);
+                                                                                                    } else {
+                                                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition dropdown not found for index', condIndex);
+                                                                                                    }
+                                                                                                }, 100);
+                                                                                                return;
+                                                                                            }
+                                                                                        }
+                                                                                        
+                                                                                        // Set the condition value for the first condition or after adding
+                                                                                        setTimeout(() => {
+                                                                                            const conditionDropdown = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
+                                                                                            if (conditionDropdown) {
+                                                                                                conditionDropdown.value = condition;
+                                                                                                conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set dropdown condition', condIndex, 'to:', condition);
+                                                                                            } else {
+                                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition dropdown not found for index', condIndex);
+                                                                                            }
+                                                                                        }, 150 * (condIndex + 1));
+                                                                                    });
+                                                                                }, 300);
+                                                                            } else {
+                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDropdownConditionalLogicUI function not found!');
+                                                                            }
+                                                                        }
+                                                                    }, 400);
+                                                                } else {
+                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG] Enable conditional logic checkbox not found for dropdown!');
+                                                                }
+                                                            }, 200);
+                                                        }
                                                     } else if (triggerField.type === 'date') {
                                                         console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Date field import starting...');
                                                         console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] triggerField:', triggerField);
