@@ -1838,3 +1838,186 @@ By moving the handler setup outside `attachListener` and setting it up immediate
 3. It receives and processes events for the correct entry number
 
 =====================================
+
+INCIDENT: Hidden Checkbox ID Format for Dropdowns in Numbered Dropdowns
+DATE: [Current Date]
+ISSUE ID: DROPDOWN_CHECKBOX_ID_FORMAT_001
+
+PROBLEM DESCRIPTION:
+===================
+Hidden checkboxes generated from dropdowns inside numbered dropdown questions were being created with incorrect ID format. The IDs were being generated as `is_this_plaintiff_a_business_1_yes` instead of the desired format `is_this_plaintiff_a_business_yes_1` (entry number should be last).
+
+The issue affected:
+- Dropdowns inside numbered dropdown questions (e.g., "Is this plaintiff a business?" inside "How many extra plantiffs")
+- Hidden checkboxes created by `dropdownMirror()` function
+- Hidden checkboxes created by `createHiddenCheckboxesForAutofilledDropdowns()` function
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Generate hidden checkbox IDs in the format: `fieldName_optionValue_entryNumber` (entry number last)
+- Example: `is_this_plaintiff_a_business_yes_1` instead of `is_this_plaintiff_a_business_1_yes`
+- Detect when a dropdown ID ends with an entry number (e.g., `is_this_plaintiff_a_business_1`)
+- Extract the field name and entry number correctly
+- Format the checkbox ID with entry number last
+
+ISSUES ENCOUNTERED:
+==================
+1. REGEX PATTERN ESCAPING ISSUE:
+   - The code used `/^\d+$/` to detect if the last part of `baseName` was a number
+   - When JavaScript code containing regex is embedded in HTML strings, backslashes can be lost
+   - The regex `/^\d+$/` was being written as `/^d+$/` in the generated HTML
+   - This caused the regex to look for the literal character 'd' followed by '+' instead of digits
+   - Result: The code never detected that `baseName` ended with a number, so it treated all dropdowns as regular dropdowns
+
+2. FAILED NUMBER DETECTION:
+   - Because the regex failed, `potentialEntryNumber` (e.g., "1") was never detected as numeric
+   - The code fell through to the regular dropdown format: `baseName + "_" + idSuffix`
+   - This created IDs like `is_this_plaintiff_a_business_1_yes` instead of `is_this_plaintiff_a_business_yes_1`
+
+3. ADDITIONAL REGEX BUG:
+   - Line 3319 had `/W+/g` instead of `/\W+/g` (missing backslash)
+   - This caused incorrect sanitization of option values
+   - The pattern was matching literal 'W' characters instead of non-word characters
+
+TECHNICAL DETAILS:
+==================
+- File: FormWiz GUI/generate.js
+- Functions: `dropdownMirror()` (around line 5572) and `createHiddenCheckboxesForAutofilledDropdowns()` (around line 8684)
+- The dropdown ID format for numbered dropdowns: `sanitizedFieldName + "_" + j` (e.g., `is_this_plaintiff_a_business_1`)
+- The logic should detect when `baseName` ends with a number to determine it's a numbered dropdown
+- When detected, it should extract: `fieldName = "is_this_plaintiff_a_business"`, `entryNumber = "1"`
+- Then create checkbox ID as: `fieldName + "_" + idSuffix + "_" + entryNumber`
+
+SOLUTION THAT WORKED:
+====================
+1. CHANGED REGEX PATTERN TO USE CHARACTER CLASS:
+   ```javascript
+   // Before (incorrect - backslash gets lost when embedded in HTML):
+   if (/^\d+$/.test(potentialEntryNumber)) {
+   
+   // After (correct - character class doesn't require escaping):
+   if (/^[0-9]+$/.test(potentialEntryNumber)) {
+   ```
+
+2. FIXED ADDITIONAL REGEX BUG:
+   ```javascript
+   // Before (missing backslash):
+   const idSuffix = val.replace(/W+/g, "_").toLowerCase();
+   
+   // After (correct):
+   const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+   ```
+
+3. ADDED FALLBACK NUMBER DETECTION:
+   ```javascript
+   // Try multiple ways to check if it's a number
+   const isNumeric = /^[0-9]+$/.test(potentialEntryNumber);
+   const isNumericAlt = !isNaN(parseInt(potentialEntryNumber)) && potentialEntryNumber === String(parseInt(potentialEntryNumber));
+   const isNumericFinal = isNumeric || isNumericAlt;
+   ```
+
+4. ENHANCED DEBUGGING:
+   - Added extensive console logs to show:
+     - The `baseName` being processed
+     - The extracted `potentialEntryNumber`
+     - Both regex and parseInt test results
+     - The final checkbox ID being created
+
+CODE CHANGES:
+=============
+1. In `dropdownMirror()` function (generate.js, around line 5608):
+   - Changed `/^\d+$/` to `/^[0-9]+$/`
+   - Fixed `/W+/g` to `/\W+/g`
+   - Added fallback number detection using `parseInt`
+   - Added extensive debugging logs
+
+2. In `createHiddenCheckboxesForAutofilledDropdowns()` function (generate.js, around line 8709):
+   - Changed `/^\d+$/` to `/^[0-9]+$/`
+   - Fixed `/W+/g` to `/\W+/g`
+   - Added fallback number detection using `parseInt`
+   - Added extensive debugging logs
+
+KEY LEARNINGS:
+==============
+1. **REGEX ESCAPING IN EMBEDDED JAVASCRIPT**: When JavaScript code containing regex patterns is embedded in HTML strings (especially in template literals), backslashes in regex patterns can be lost. Use character classes like `[0-9]` instead of shorthand like `\d` to avoid escaping issues.
+
+2. **CHARACTER CLASSES ARE SAFER**: Character classes like `[0-9]`, `[a-z]`, `[^a-z0-9_]` don't require backslash escaping and are more reliable when code is embedded in strings.
+
+3. **ALWAYS VERIFY GENERATED CODE**: After generating HTML with embedded JavaScript, check that regex patterns are correctly preserved in the output. Look for patterns like `/^d+$/` (wrong) vs `/^[0-9]+$/` (correct).
+
+4. **USE FALLBACK DETECTION**: When detecting numeric values, use multiple methods (regex + parseInt) to ensure reliable detection even if one method fails.
+
+5. **TEST WITH ACTUAL DATA**: Always test regex patterns with actual data to ensure they work correctly in the generated HTML.
+
+PREVENTION:
+===========
+- When writing regex patterns that will be embedded in HTML strings, use character classes instead of shorthand patterns
+- Always use `/\W+/g` (with backslash) not `/W+/g` (without backslash) for non-word character matching
+- Test generated HTML to verify regex patterns are correctly preserved
+- Use fallback detection methods when checking for numeric values
+- Add debugging logs to verify regex patterns are working correctly
+
+RELATED FILES:
+=============
+- FormWiz GUI/generate.js (main file - dropdownMirror and createHiddenCheckboxesForAutofilledDropdowns functions)
+- FormWiz GUI/output.html (generated HTML with embedded JavaScript - where the issue manifests)
+
+FUTURE REFERENCE:
+================
+When creating regex patterns that will be embedded in HTML strings:
+
+1. **USE CHARACTER CLASSES**:
+   ```javascript
+   // ✅ CORRECT: Character class doesn't require escaping
+   if (/^[0-9]+$/.test(value)) {
+   
+   // ❌ WRONG: Shorthand requires backslash, may get lost in HTML
+   if (/^\d+$/.test(value)) {
+   ```
+
+2. **ALWAYS ESCAPE BACKSLASHES PROPERLY**:
+   ```javascript
+   // ✅ CORRECT: Backslash properly escaped
+   const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+   
+   // ❌ WRONG: Missing backslash
+   const idSuffix = val.replace(/W+/g, "_").toLowerCase();
+   ```
+
+3. **USE FALLBACK DETECTION**:
+   ```javascript
+   // ✅ CORRECT: Multiple detection methods
+   const isNumeric = /^[0-9]+$/.test(value);
+   const isNumericAlt = !isNaN(parseInt(value)) && value === String(parseInt(value));
+   const isNumericFinal = isNumeric || isNumericAlt;
+   ```
+
+4. **VERIFY IN GENERATED HTML**:
+   - After generating HTML, search for regex patterns
+   - Ensure they're correctly preserved (e.g., `/^[0-9]+$/` not `/^d+$/`)
+   - Test with actual data to verify they work
+
+5. **COMMON PATTERNS**:
+   - `/[0-9]+/` instead of `/\d+/` (digits)
+   - `/[a-z0-9_]+/` instead of `/\w+/` (word characters)
+   - `/[^a-z0-9_]+/` instead of `/\W+/` (non-word characters)
+   - `/[?]/` instead of `/\?/` (question mark)
+   - `/[ ]/` instead of `/\s/` (space)
+
+REGEX PATTERN REFERENCE:
+========================
+When embedding regex in HTML strings, prefer these patterns:
+
+| Intended Pattern | ❌ Risky (backslash escaping) | ✅ Safe (character class) |
+|-----------------|-------------------------------|---------------------------|
+| Digits | `/\d+/` | `/[0-9]+/` |
+| Word characters | `/\w+/` | `/[a-z0-9_]+/` |
+| Non-word characters | `/\W+/` | `/[^a-z0-9_]+/` |
+| Question mark | `/\?/` | `/[?]/` |
+| Space | `/\s/` | `/[ ]/` |
+
+KEY TAKEAWAY:
+=============
+The issue was caused by **regex pattern escaping when JavaScript is embedded in HTML strings**. The backslash in `\d` was being lost, causing the pattern to match the literal character 'd' instead of digits. By using character classes like `[0-9]` instead of shorthand patterns like `\d`, we avoid the escaping issue entirely and ensure the regex works correctly in the generated HTML.
+
+=====================================

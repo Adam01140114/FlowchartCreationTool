@@ -1893,6 +1893,42 @@ window.exportGuiJson = function(download = true) {
   
   console.log('🔍 [GUI JSON DEBUG] Final linkedFields array:', linkedFields);
   
+  // Process linked checkbox nodes from flowchart editor
+  const linkedCheckboxes = [];
+  const linkedCheckboxNodes = vertices.filter(cell => 
+    typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)
+  );
+  
+  console.log('🔍 [GUI JSON DEBUG] Found linked checkbox nodes:', linkedCheckboxNodes.length);
+  
+  linkedCheckboxNodes.forEach((cell, index) => {
+    console.log(`🔍 [GUI JSON DEBUG] Linked Checkbox node ${index}:`, {
+      cellId: cell.id,
+      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId,
+      _linkedCheckboxOptions: cell._linkedCheckboxOptions,
+      hasNodeId: !!cell._linkedCheckboxNodeId,
+      hasOptions: !!(cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0)
+    });
+    
+    if (cell._linkedCheckboxNodeId && cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0) {
+      const linkedCheckboxEntry = {
+        id: `linkedCheckbox${index}`,
+        linkedCheckboxId: cell._linkedCheckboxNodeId,
+        checkboxes: cell._linkedCheckboxOptions
+      };
+      
+      console.log('✅ [GUI JSON DEBUG] Adding linked checkbox entry:', linkedCheckboxEntry);
+      linkedCheckboxes.push(linkedCheckboxEntry);
+    } else {
+      console.log('⚠️ [GUI JSON DEBUG] Skipping linked checkbox node due to missing data:', {
+        hasNodeId: !!cell._linkedCheckboxNodeId,
+        hasOptions: !!(cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0)
+      });
+    }
+  });
+  
+  console.log('🔍 [GUI JSON DEBUG] Final linkedCheckboxes array:', linkedCheckboxes);
+  
   // Create final output object
   const output = {
     sections: sections,
@@ -1909,11 +1945,16 @@ window.exportGuiJson = function(download = true) {
     additionalPDFs: [],
     checklistItems: [],
     linkedFields: linkedFields,
-    linkedCheckboxes: (window.linkedCheckboxesConfig || []).map(c => ({
-      id: c.id,
-      linkedCheckboxId: c.linkedCheckboxId,
-      checkboxes: c.checkboxes
-    }))
+    linkedCheckboxes: [
+      // Linked checkboxes from GUI editor (window.linkedCheckboxesConfig)
+      ...(window.linkedCheckboxesConfig || []).map(c => ({
+        id: c.id,
+        linkedCheckboxId: c.linkedCheckboxId,
+        checkboxes: c.checkboxes
+      })),
+      // Linked checkboxes from flowchart editor (linkedCheckboxNodes)
+      ...linkedCheckboxes
+    ]
   };
   
   // Convert to string and download

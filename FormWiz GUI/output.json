@@ -249,14 +249,5 @@
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],
-  "linkedCheckboxes": [
-    {
-      "id": "linkedCheckbox0",
-      "linkedCheckboxId": "testing",
-      "checkboxes": [
-        "is_this_plaintiff_a_business_1_yes",
-        "is_this_plaintiff_a_business_2_yes"
-      ]
-    }
-  ]
+  "linkedCheckboxes": []
 }

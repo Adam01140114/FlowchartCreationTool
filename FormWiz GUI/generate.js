@@ -5597,7 +5597,33 @@ function dropdownMirror(selectEl, baseName){
     existingCheckboxes.forEach(div => div.remove());
 
     const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
-    const checkboxId = baseName + "_" + idSuffix;
+    
+    // Check if baseName ends with an entry number (for numbered dropdowns)
+    // Format should be: fieldName_optionValue_entryNumber (entry number last)
+    const lastUnderscoreIndex = baseName.lastIndexOf('_');
+    let checkboxId;
+    if (lastUnderscoreIndex !== -1) {
+        // Check if the part after last underscore is a number (entry number)
+        // Use [0-9] instead of \d to avoid backslash escaping issues when embedded in HTML
+        const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+        if (/^[0-9]+$/.test(potentialEntryNumber)) {
+            // It's a numbered dropdown: extract field name and entry number
+            const fieldName = baseName.substring(0, lastUnderscoreIndex);
+            const entryNumber = potentialEntryNumber;
+            // Format: fieldName_optionValue_entryNumber (entry number last)
+            checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+            console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+        } else {
+            // Regular dropdown: keep original format
+            checkboxId = baseName + "_" + idSuffix;
+            console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: regular dropdown, baseName:', baseName, 'idSuffix:', idSuffix, 'potentialEntryNumber:', potentialEntryNumber, 'regex test result:', /^[0-9]+$/.test(potentialEntryNumber));
+        }
+    } else {
+        // No underscore, keep original format
+        checkboxId = baseName + "_" + idSuffix;
+        console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: no underscore in baseName, baseName:', baseName, 'idSuffix:', idSuffix);
+    }
+    
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: creating checkbox with ID:', checkboxId);
     
     const checkboxDiv = document.createElement("div");
@@ -8670,8 +8696,36 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
     if (selectedValue) {
       // Generate checkbox ID using the same pattern as dropdownMirror
       const idSuffix = selectedValue.replace(/\W+/g, "_").toLowerCase();
-      const checkboxId = baseName + "_" + idSuffix;
-      const checkboxName = baseName + "_" + idSuffix;
+      
+      // Check if baseName ends with an entry number (for numbered dropdowns)
+      // Format should be: fieldName_optionValue_entryNumber (entry number last)
+      const lastUnderscoreIndex = baseName.lastIndexOf('_');
+      let checkboxId;
+      let checkboxName;
+      if (lastUnderscoreIndex !== -1) {
+          // Check if the part after last underscore is a number (entry number)
+          // Use [0-9] instead of \d to avoid backslash escaping issues when embedded in HTML
+          const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+          if (/^[0-9]+$/.test(potentialEntryNumber)) {
+              // It's a numbered dropdown: extract field name and entry number
+              const fieldName = baseName.substring(0, lastUnderscoreIndex);
+              const entryNumber = potentialEntryNumber;
+              // Format: fieldName_optionValue_entryNumber (entry number last)
+              checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+              checkboxName = checkboxId;
+              console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+          } else {
+              // Regular dropdown: keep original format
+              checkboxId = baseName + "_" + idSuffix;
+              checkboxName = checkboxId;
+              console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: regular dropdown, baseName:', baseName, 'idSuffix:', idSuffix, 'potentialEntryNumber:', potentialEntryNumber, 'regex test result:', /^[0-9]+$/.test(potentialEntryNumber));
+          }
+      } else {
+          // No underscore, keep original format
+          checkboxId = baseName + "_" + idSuffix;
+          checkboxName = checkboxId;
+          console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: no underscore in baseName, baseName:', baseName, 'idSuffix:', idSuffix);
+      }
       
       // Clear any existing hidden checkboxes for this dropdown to prevent stale checks
       const wrap = document.getElementById("dropdowntext_" + baseName);
@@ -8682,7 +8736,10 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       // Check if this checkbox already exists
       const existingCheckbox = document.getElementById(checkboxId);
       if (!existingCheckbox) {
+        console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: creating checkbox with ID:', checkboxId);
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      } else {
+        console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: checkbox already exists with ID:', checkboxId);
       }
       
       // Handle custom hidden logic for this dropdown
@@ -9653,7 +9710,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sourceCheckbox) {
           console.log('🔵 [LINKED CHECKBOX DEBUG] updateLinkedCheckbox: found source checkbox', checkboxId, 'checked:', sourceCheckbox.checked);
           if (sourceCheckbox.checked) {
-            anyChecked = true;
+          anyChecked = true;
           }
         } else {
           console.log('⚠️ [LINKED CHECKBOX DEBUG] updateLinkedCheckbox: source checkbox not found, ID:', checkboxId);
@@ -9743,7 +9800,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (sourceCheckbox) {
             console.log('🔵 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: found source checkbox', checkboxId, 'checked:', sourceCheckbox.checked);
             if (sourceCheckbox.checked) {
-              anyChecked = true;
+            anyChecked = true;
             }
           } else {
             console.log('⚠️ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: source checkbox not found, ID:', checkboxId);

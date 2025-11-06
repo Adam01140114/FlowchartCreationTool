@@ -4731,13 +4731,49 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
     return false;
   });
   
+  // Find all dropdown question nodes (for hidden dropdown checkboxes)
+  const dropdownNodes = allCells.filter(cell => {
+    if (cell.style && cell.style.includes('nodeType=question')) {
+      return cell.style.includes('questionType=dropdown') || cell.style.includes('questionType=text2');
+    }
+    return false;
+  });
+  
   // Find all numbered dropdown question nodes that have checkboxes
   const numberedDropdownNodes = allCells.filter(cell => {
     return cell.style && cell.style.includes('nodeType=question') && 
            cell.style.includes('questionType=multipleDropdownType');
   });
   
-  // Add options from checkbox questions (regular checkbox questions with option nodes)
+  // Find all hidden checkbox nodes (for hidden logic checkboxes)
+  const hiddenCheckboxNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=hiddenCheckbox');
+  });
+  
+  // Helper function to add option if not already present
+  function addOptionIfNotExists(nodeId, label) {
+    const existingOption = Array.from(optionsContainer.children).find(
+      opt => opt.getAttribute('data-value') === nodeId
+    );
+    if (!existingOption) {
+      const optionDiv = document.createElement('div');
+      optionDiv.textContent = label || nodeId;
+      optionDiv.style.cssText = `
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      `;
+      optionDiv.setAttribute('data-value', nodeId);
+      optionsContainer.appendChild(optionDiv);
+      
+      const selectOption = document.createElement('option');
+      selectOption.value = nodeId;
+      selectOption.textContent = label || nodeId;
+      hiddenSelect.appendChild(selectOption);
+    }
+  }
+  
+  // 1. Add options from checkbox questions (regular checkbox questions with option nodes)
   checkboxNodes.forEach(node => {
     // For regular checkbox questions, find option nodes connected via edges
     const outgoingEdges = graph.getOutgoingEdges(node);
@@ -4757,26 +4793,7 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
           }
           
           if (optionNodeId) {
-            // Check if already added
-            const existingOption = Array.from(optionsContainer.children).find(
-              opt => opt.getAttribute('data-value') === optionNodeId
-            );
-            if (!existingOption) {
-              const option = document.createElement('div');
-              option.textContent = optionNodeId;
-              option.style.cssText = `
-                padding: 8px;
-                cursor: pointer;
-                border-bottom: 1px solid #eee;
-              `;
-              option.setAttribute('data-value', optionNodeId);
-              optionsContainer.appendChild(option);
-              
-              const selectOption = document.createElement('option');
-              selectOption.value = optionNodeId;
-              selectOption.textContent = optionNodeId;
-              hiddenSelect.appendChild(selectOption);
-            }
+            addOptionIfNotExists(optionNodeId, optionNodeId);
           }
         }
       });
@@ -4788,26 +4805,7 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
         if (checkbox.options && Array.isArray(checkbox.options)) {
           checkbox.options.forEach(option => {
             if (option.nodeId) {
-              // Check if already added
-              const existingOption = Array.from(optionsContainer.children).find(
-                opt => opt.getAttribute('data-value') === option.nodeId
-              );
-              if (!existingOption) {
-                const optionDiv = document.createElement('div');
-                optionDiv.textContent = option.nodeId;
-                optionDiv.style.cssText = `
-                  padding: 8px;
-                  cursor: pointer;
-                  border-bottom: 1px solid #eee;
-                `;
-                optionDiv.setAttribute('data-value', option.nodeId);
-                optionsContainer.appendChild(optionDiv);
-                
-                const selectOption = document.createElement('option');
-                selectOption.value = option.nodeId;
-                selectOption.textContent = option.nodeId;
-                hiddenSelect.appendChild(selectOption);
-              }
+              addOptionIfNotExists(option.nodeId, option.nodeId);
             }
           });
         }
@@ -4815,7 +4813,62 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
     }
   });
   
-  // Add options from numbered dropdown questions (main checkboxes and trigger sequence checkboxes)
+  // 2. Add hidden dropdown checkboxes from regular dropdown questions
+  dropdownNodes.forEach(node => {
+    // Get the dropdown's nodeId (nameId)
+    let dropdownNameId = null;
+    if (typeof window.getNodeId === 'function') {
+      dropdownNameId = window.getNodeId(node);
+    }
+    if (!dropdownNameId) {
+      const nodeIdMatch = node.style.match(/nodeId=([^;]+)/);
+      if (nodeIdMatch && nodeIdMatch[1]) {
+        dropdownNameId = nodeIdMatch[1];
+      }
+    }
+    
+    // Fallback to questionId-based name
+    if (!dropdownNameId && node._questionId) {
+      dropdownNameId = `answer${node._questionId}`;
+    }
+    
+    // Get dropdown question text for better labeling
+    const questionText = node._questionText || node.value || `Question ${node._questionId || ''}`;
+    
+    // Get dropdown options from the graph (connected option nodes)
+    const outgoingEdges = graph.getOutgoingEdges(node);
+    if (outgoingEdges && outgoingEdges.length > 0) {
+      outgoingEdges.forEach(edge => {
+        const targetCell = edge.target;
+        if (targetCell && targetCell.style && targetCell.style.includes('nodeType=options')) {
+          // Get the option text from the cell value
+          const optionText = (targetCell.value || '').replace(/<[^>]*>/g, '').trim();
+          if (optionText && dropdownNameId) {
+            // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+            const sanitizedValue = optionText.replace(/\W+/g, "_").toLowerCase();
+            const checkboxId = `${dropdownNameId}_${sanitizedValue}`;
+            const label = `${questionText} - ${optionText} (${checkboxId})`;
+            addOptionIfNotExists(checkboxId, label);
+          }
+        }
+      });
+    }
+  });
+  
+  // 3. Add hidden checkboxes from hidden logic nodes
+  hiddenCheckboxNodes.forEach(node => {
+    if (node._hiddenNodeId) {
+      const nodeId = node._hiddenNodeId.trim();
+      if (nodeId) {
+        // Get node text for better labeling
+        const nodeText = (node.value || '').replace(/<[^>]*>/g, '').trim() || nodeId;
+        const label = `Hidden Logic: ${nodeText} (${nodeId})`;
+        addOptionIfNotExists(nodeId, label);
+      }
+    }
+  });
+  
+  // 4. Add options from numbered dropdown questions (main checkboxes and trigger sequence checkboxes)
   numberedDropdownNodes.forEach(node => {
     // Main checkboxes
     if (node._checkboxes && Array.isArray(node._checkboxes)) {
@@ -4823,35 +4876,51 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
         if (checkbox.options && Array.isArray(checkbox.options)) {
           checkbox.options.forEach(option => {
             if (option.nodeId) {
-              // Check if already added
-              const existingOption = Array.from(optionsContainer.children).find(
-                opt => opt.getAttribute('data-value') === option.nodeId
-              );
-              if (!existingOption) {
-                const optionDiv = document.createElement('div');
-                optionDiv.textContent = option.nodeId;
-                optionDiv.style.cssText = `
-                  padding: 8px;
-                  cursor: pointer;
-                  border-bottom: 1px solid #eee;
-                `;
-                optionDiv.setAttribute('data-value', option.nodeId);
-                optionsContainer.appendChild(optionDiv);
-                
-                const selectOption = document.createElement('option');
-                selectOption.value = option.nodeId;
-                selectOption.textContent = option.nodeId;
-                hiddenSelect.appendChild(selectOption);
-              }
+              addOptionIfNotExists(option.nodeId, option.nodeId);
             }
           });
         }
       });
     }
     
-    // Trigger sequence checkboxes
+    // Get numbered dropdown question text and range
+    const questionText = node._questionText || node.value || `Question ${node._questionId || ''}`;
+    const minValue = node._twoNumbers ? (parseInt(node._twoNumbers.first) || 1) : 1;
+    const maxValue = node._twoNumbers ? (parseInt(node._twoNumbers.second) || 1) : 1;
+    
+    // 5. Add hidden dropdown checkboxes from dropdowns inside numbered dropdown questions
     if (node._dropdowns && Array.isArray(node._dropdowns)) {
       node._dropdowns.forEach(dropdownItem => {
+        const fieldName = dropdownItem.name || '';
+        if (fieldName) {
+          // Sanitize field name: lowercase, remove question marks, replace spaces with underscores
+          const sanitizedFieldName = fieldName
+            .toLowerCase()
+            .replace(/[?]/g, '')
+            .replace(/[^a-z0-9_]+/g, '_')
+            .replace(/^_+|_+$/g, '');
+          
+          // Get all dropdown options
+          if (dropdownItem.options && Array.isArray(dropdownItem.options)) {
+            dropdownItem.options.forEach(option => {
+              const optionValue = option.text || option.value || '';
+              if (optionValue) {
+                // Sanitize option value
+                const sanitizedOptionValue = optionValue.replace(/\W+/g, "_").toLowerCase();
+                
+                // Generate checkbox IDs for each entry number (1 to max)
+                // Format: fieldName_optionValue_entryNumber (entry number last)
+                for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
+                  const checkboxId = `${sanitizedFieldName}_${sanitizedOptionValue}_${entryNum}`;
+                  const label = `${questionText} - ${fieldName} (${entryNum}) - ${optionValue} (${checkboxId})`;
+                  addOptionIfNotExists(checkboxId, label);
+                }
+              }
+            });
+          }
+        }
+        
+        // Trigger sequence checkboxes
         if (dropdownItem.triggerSequences && Array.isArray(dropdownItem.triggerSequences)) {
           dropdownItem.triggerSequences.forEach(trigger => {
             if (trigger.checkboxes && Array.isArray(trigger.checkboxes)) {
@@ -4859,26 +4928,7 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
                 if (checkbox.options && Array.isArray(checkbox.options)) {
                   checkbox.options.forEach(option => {
                     if (option.nodeId) {
-                      // Check if already added
-                      const existingOption = Array.from(optionsContainer.children).find(
-                        opt => opt.getAttribute('data-value') === option.nodeId
-                      );
-                      if (!existingOption) {
-                        const optionDiv = document.createElement('div');
-                        optionDiv.textContent = option.nodeId;
-                        optionDiv.style.cssText = `
-                          padding: 8px;
-                          cursor: pointer;
-                          border-bottom: 1px solid #eee;
-                        `;
-                        optionDiv.setAttribute('data-value', option.nodeId);
-                        optionsContainer.appendChild(optionDiv);
-                        
-                        const selectOption = document.createElement('option');
-                        selectOption.value = option.nodeId;
-                        selectOption.textContent = option.nodeId;
-                        hiddenSelect.appendChild(selectOption);
-                      }
+                      addOptionIfNotExists(option.nodeId, option.nodeId);
                     }
                   });
                 }

@@ -249,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<div style="display:none;"><input type="checkbox" id="testing" name="testing"></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
@@ -368,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function() {
 window.formId = '';
 var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"how_many_extra_plantiffs"};
 var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_extra_plantiffs"};
-var linkedCheckboxes = [{"linkedCheckboxId":"testing","checkboxes":["is_this_plaintiff_a_business_1_yes","is_this_plaintiff_a_business_2_yes"]}];
+var linkedCheckboxes = [];
 var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_extra_plantiffs_name","order":1},{"type":"label","label":"Phone Number","nodeId":"how_many_extra_plantiffs_phone_number","order":2},{"type":"location","fieldName":"bruh what","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"multiple","options":[{"text":"An Individual","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire"},{"type":"pdf","number":"1","pdfTitle":"SC-500","pdfName":"sc500.pdf","priceId":"1234"}]}],"order":4}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName) {
@@ -3317,8 +3316,45 @@ function dropdownMirror(selectEl, baseName){
     const existingCheckboxes = wrap.querySelectorAll("div");
     existingCheckboxes.forEach(div => div.remove());
 
-    const idSuffix = val.replace(/W+/g, "_").toLowerCase();
-    const checkboxId = baseName + "_" + idSuffix;
+    const idSuffix = val.replace(/\W+/g, "_").toLowerCase();
+    
+    // Check if baseName ends with an entry number (for numbered dropdowns)
+    // Format should be: fieldName_optionValue_entryNumber (entry number last)
+    const lastUnderscoreIndex = baseName.lastIndexOf('_');
+    let checkboxId;
+    console.log('🔍 [DEBUG] dropdownMirror: baseName =', baseName, 'lastUnderscoreIndex =', lastUnderscoreIndex, 'val =', val, 'idSuffix =', idSuffix);
+    
+    if (lastUnderscoreIndex !== -1) {
+        // Check if the part after last underscore is a number (entry number)
+        // Use [0-9] instead of \d to avoid backslash escaping issues when embedded in HTML
+        const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+        console.log('🔍 [DEBUG] dropdownMirror: potentialEntryNumber =', potentialEntryNumber, 'type:', typeof potentialEntryNumber);
+        
+        // Try multiple ways to check if it's a number
+        const isNumeric = /^[0-9]+$/.test(potentialEntryNumber);
+        const isNumericAlt = !isNaN(parseInt(potentialEntryNumber)) && potentialEntryNumber === String(parseInt(potentialEntryNumber));
+        const isNumericFinal = isNumeric || isNumericAlt;
+        
+        console.log('🔍 [DEBUG] dropdownMirror: regex test (/^[0-9]+$/) =', isNumeric, 'parseInt test =', isNumericAlt, 'final decision =', isNumericFinal);
+        
+        if (isNumericFinal) {
+            // It's a numbered dropdown: extract field name and entry number
+            const fieldName = baseName.substring(0, lastUnderscoreIndex);
+            const entryNumber = potentialEntryNumber;
+            // Format: fieldName_optionValue_entryNumber (entry number last)
+            checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+            console.log('✅ [LINKED CHECKBOX DEBUG] dropdownMirror: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+        } else {
+            // Regular dropdown: keep original format
+            checkboxId = baseName + "_" + idSuffix;
+            console.log('⚠️ [LINKED CHECKBOX DEBUG] dropdownMirror: regular dropdown (not detected as numbered), baseName:', baseName, 'idSuffix:', idSuffix, 'potentialEntryNumber:', potentialEntryNumber, 'regex test result:', isNumeric, 'parseInt test:', isNumericAlt);
+        }
+    } else {
+        // No underscore, keep original format
+        checkboxId = baseName + "_" + idSuffix;
+        console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: no underscore in baseName, baseName:', baseName, 'idSuffix:', idSuffix);
+    }
+    
     console.log('🔵 [LINKED CHECKBOX DEBUG] dropdownMirror: creating checkbox with ID:', checkboxId);
     
     const checkboxDiv = document.createElement("div");
@@ -6390,9 +6426,48 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
     
     if (selectedValue) {
       // Generate checkbox ID using the same pattern as dropdownMirror
-      const idSuffix = selectedValue.replace(/W+/g, "_").toLowerCase();
-      const checkboxId = baseName + "_" + idSuffix;
-      const checkboxName = baseName + "_" + idSuffix;
+      const idSuffix = selectedValue.replace(/\W+/g, "_").toLowerCase();
+      
+      // Check if baseName ends with an entry number (for numbered dropdowns)
+      // Format should be: fieldName_optionValue_entryNumber (entry number last)
+      const lastUnderscoreIndex = baseName.lastIndexOf('_');
+      let checkboxId;
+      let checkboxName;
+      console.log('🔍 [DEBUG] createHiddenCheckboxesForAutofilledDropdowns: baseName =', baseName, 'lastUnderscoreIndex =', lastUnderscoreIndex, 'selectedValue =', selectedValue, 'idSuffix =', idSuffix);
+      
+      if (lastUnderscoreIndex !== -1) {
+          // Check if the part after last underscore is a number (entry number)
+          // Use [0-9] instead of \d to avoid backslash escaping issues when embedded in HTML
+          const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+          console.log('🔍 [DEBUG] createHiddenCheckboxesForAutofilledDropdowns: potentialEntryNumber =', potentialEntryNumber, 'type:', typeof potentialEntryNumber);
+          
+          // Try multiple ways to check if it's a number
+          const isNumeric = /^[0-9]+$/.test(potentialEntryNumber);
+          const isNumericAlt = !isNaN(parseInt(potentialEntryNumber)) && potentialEntryNumber === String(parseInt(potentialEntryNumber));
+          const isNumericFinal = isNumeric || isNumericAlt;
+          
+          console.log('🔍 [DEBUG] createHiddenCheckboxesForAutofilledDropdowns: regex test (/^[0-9]+$/) =', isNumeric, 'parseInt test =', isNumericAlt, 'final decision =', isNumericFinal);
+          
+          if (isNumericFinal) {
+              // It's a numbered dropdown: extract field name and entry number
+              const fieldName = baseName.substring(0, lastUnderscoreIndex);
+              const entryNumber = potentialEntryNumber;
+              // Format: fieldName_optionValue_entryNumber (entry number last)
+              checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+              checkboxName = checkboxId;
+              console.log('✅ [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: numbered dropdown detected, baseName:', baseName, 'fieldName:', fieldName, 'entryNumber:', entryNumber, 'idSuffix:', idSuffix, 'final checkboxId:', checkboxId);
+          } else {
+              // Regular dropdown: keep original format
+              checkboxId = baseName + "_" + idSuffix;
+              checkboxName = checkboxId;
+              console.log('⚠️ [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: regular dropdown (not detected as numbered), baseName:', baseName, 'idSuffix:', idSuffix, 'potentialEntryNumber:', potentialEntryNumber, 'regex test result:', isNumeric, 'parseInt test:', isNumericAlt);
+          }
+      } else {
+          // No underscore, keep original format
+          checkboxId = baseName + "_" + idSuffix;
+          checkboxName = checkboxId;
+          console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: no underscore in baseName, baseName:', baseName, 'idSuffix:', idSuffix);
+      }
       
       // Clear any existing hidden checkboxes for this dropdown to prevent stale checks
       const wrap = document.getElementById("dropdowntext_" + baseName);
@@ -6403,7 +6478,10 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       // Check if this checkbox already exists
       const existingCheckbox = document.getElementById(checkboxId);
       if (!existingCheckbox) {
+        console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: creating checkbox with ID:', checkboxId);
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      } else {
+        console.log('🔵 [LINKED CHECKBOX DEBUG] createHiddenCheckboxesForAutofilledDropdowns: checkbox already exists with ID:', checkboxId);
       }
       
       // Handle custom hidden logic for this dropdown
@@ -7371,7 +7449,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sourceCheckbox) {
           console.log('🔵 [LINKED CHECKBOX DEBUG] updateLinkedCheckbox: found source checkbox', checkboxId, 'checked:', sourceCheckbox.checked);
           if (sourceCheckbox.checked) {
-            anyChecked = true;
+          anyChecked = true;
           }
         } else {
           console.log('⚠️ [LINKED CHECKBOX DEBUG] updateLinkedCheckbox: source checkbox not found, ID:', checkboxId);
@@ -7461,7 +7539,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (sourceCheckbox) {
             console.log('🔵 [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: found source checkbox', checkboxId, 'checked:', sourceCheckbox.checked);
             if (sourceCheckbox.checked) {
-              anyChecked = true;
+            anyChecked = true;
             }
           } else {
             console.log('⚠️ [LINKED CHECKBOX DEBUG] updateAllLinkedCheckboxes: source checkbox not found, ID:', checkboxId);
