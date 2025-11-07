@@ -526,6 +526,12 @@ function loadFormData(formData) {
                         nodeIdInput.value = question.nodeId;
                     }
                     
+                    // Ensure the unified fields container is visible
+                    const unifiedFieldsContainer = questionBlock.querySelector(`#unifiedFieldsContainer${question.questionId}`);
+                    if (unifiedFieldsContainer) {
+                        unifiedFieldsContainer.style.display = 'block';
+                    }
+                    
                     // Check if we have unified fields data (new format)
                     if (question.allFieldsInOrder && question.allFieldsInOrder.length > 0) {
                         console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Loading unified fields:', question.allFieldsInOrder);
@@ -607,6 +613,15 @@ function loadFormData(formData) {
                                         const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                         if (labelTextEl) labelTextEl.textContent = field.label;
                                         if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
+                                } else if (field.type === 'location') {
+                                    // Add a main location unified field and set title
+                                    addLocationFields(question.questionId, 'multipleTextboxes');
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const titleEl = lastField.querySelector('#locationTitle' + question.questionId + '_' + fieldOrder);
+                                        if (titleEl && field.fieldName) titleEl.value = field.fieldName;
                                     }
                                 } else if (field.type === 'dropdown') {
                                     console.log('🔧 [IMPORT DEBUG] Processing dropdown field:', field);
@@ -3847,6 +3862,18 @@ function exportForm() {
                                 console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Dropdown field data:', fieldData);
                                 allFieldsInOrder.push(fieldData);
                             }
+                        } else if (fieldType === 'location') {
+                            // Handle main location unified field
+                            const titleEl = el.querySelector('#locationTitle' + questionId + '_' + fieldOrder);
+                            const title = titleEl ? titleEl.value.trim() : 'Location Data';
+                            const fieldData = {
+                                type: 'location',
+                                fieldName: title || 'Location Data',
+                                nodeId: 'location_data',
+                                order: fieldOrder
+                            };
+                            console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Location field data:', fieldData);
+                            allFieldsInOrder.push(fieldData);
                         } else if (fieldType === 'time') {
                             // Handle time fields - use same structure as label fields
                         if (labelTextEl && nodeIdTextEl) {

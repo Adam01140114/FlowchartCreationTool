@@ -233,13 +233,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
-                      onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_are_you_the_only_person_suing"></div>
-              <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden" data-question-type="numberedDropdown"><label><h3>How many people are you suing?</h3></label><p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>bruh</h3></label><div id="labelContainer1"></div><input type="text" id="bruh_address" name="bruh_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">example:</label><input type="text" id="bruh_example_street_1" name="bruh_example_street_1" placeholder="Street" style="width: 200px; padding: 10px; margin: 5px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><input type="text" id="bruh_example_city_1" name="bruh_example_city_1" placeholder="City" style="width: 200px; padding: 10px; margin: 5px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><select id="bruh_example_state_1" name="bruh_example_state_1" class="address-select-trigger" style="width: 250px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="bruh_example_state_short_1" name="bruh_example_state_short_1" style="display: none;"><input type="text" id="bruh_example_zip_1" name="bruh_example_zip_1" placeholder="Zip" style="width: 200px; padding: 10px; margin: 5px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"></div></div><br></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -249,7 +243,6 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<div style="display:none;"><input type="checkbox" id="test" name="test"></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
@@ -366,10 +359,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"how_many_people_are_you_suing"};
-var questionNameIds = {"1":"are_you_the_only_person_suing","2":"how_many_people_are_you_suing"};
-var linkedCheckboxes = [{"linkedCheckboxId":"test","checkboxes":["is_this_defendant_a_business/public_entity_are_they_a_public_entity_yes_1","are_you_the_only_person_suing_yes"]}];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1},{"type":"amount","label":"Phone Number","nodeId":"how_many_people_are_you_suing_phone_number","order":2},{"type":"location","fieldName":"Location Data","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this defendant a business/public entity?","options":[{"text":"Yes","nodeId":"is_this_defendant_a_business/public_entity_yes"},{"text":"No","nodeId":"is_this_defendant_a_business/public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"is_this_defendant_a_business/public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"is_this_defendant_a_business/public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address:","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"date","label":"When did you file it?","nodeId":"is_this_defendant_a_business/public_entity_yes_when_did_you_file_it"}]}],"order":4}]};
+var questionSlugMap = {"1":"bruh"};
+var questionNameIds = {"1":"bruh"};
+var linkedCheckboxes = [];
+var unifiedFieldsMap = {"1":[{"type":"location","fieldName":"example","nodeId":"location_data","order":1}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId) {
     const triggerContainer = document.createElement('div');
@@ -1632,11 +1625,11 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"2":["Name"],"length":0};
-var amountMap = {"2":["Phone Number"],"length":0};
-var labelNodeIdsMap = {"2":["how_many_people_are_you_suing_name"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [{"questionId":"1","questionNameId":"are_you_the_only_person_suing","trigger":"Yes","type":"checkbox","nodeId":"user_biz","textboxText":""}];
+var hiddenLogicConfigs = [];
 var linkedFields = [];
 var isHandlingLink = false;
 
@@ -1760,75 +1753,6 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   thisQ.classList.add("hidden");
- }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*

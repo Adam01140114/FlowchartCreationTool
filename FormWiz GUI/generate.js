@@ -1353,7 +1353,18 @@ formHTML += `</div><br></div>`;
             const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
             const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
 
-            if (labelTextEl && nodeIdTextEl) {
+            if (fieldType === 'location') {
+              // Handle location fields
+              const titleEl = el.querySelector('#locationTitle' + questionId + '_' + fieldOrder);
+              const title = titleEl ? titleEl.value.trim() : 'Location Data';
+              const fieldData = {
+                type: 'location',
+                fieldName: title || 'Location Data',
+                nodeId: 'location_data',
+                order: fieldOrder
+              };
+              allFieldsInOrder.push(fieldData);
+            } else if (labelTextEl && nodeIdTextEl) {
               const fieldData = {
                 type: fieldType,
                 label: labelTextEl.textContent.trim(),
@@ -1421,7 +1432,7 @@ formHTML += `</div><br></div>`;
             // Process all fields in creation order
             for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
               const field = allFieldsInOrder[fieldIndex];
-              const isLocationField = locationFields.includes(field.label);
+              const isLocationField = field.type === 'location' || locationFields.includes(field.label);
 
               // Skip location fields that should be conditional trigger fields
               // Check if this question has a dropdown with trigger sequences that contain location fields
@@ -1445,7 +1456,73 @@ formHTML += `</div><br></div>`;
                 entryContainer.appendChild(br);
               }
 
-              if (field.type === 'label') {
+              if (field.type === 'location') {
+                // Render main location field block
+                const locationFieldDiv = document.createElement('div');
+                locationFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: #ffffff; border: 1px solid #e1e5e9; border-radius: 10px; display:flex; flex-direction:column; align-items:center; box-shadow: 0 2px 6px rgba(0,0,0,0.05);';
+                const title = (field.fieldName || 'Location Data') + ':';
+                const fieldNameLabel = document.createElement('label');
+                fieldNameLabel.textContent = title;
+                fieldNameLabel.style.cssText = 'display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:15px;text-align:center;';
+                locationFieldDiv.appendChild(fieldNameLabel);
+
+                // Inputs
+                const locs = [
+                    { label:'Street', nodeId:'street' },
+                    { label:'City', nodeId:'city' },
+                    { label:'State', nodeId:'state' },
+                    { label:'Zip', nodeId:'zip' }
+                ];
+                // Build locPrefix: question nodeId + location fieldName
+                const questionNodeId = questionNameIds[questionId] || questionSlugMap[questionId] || 'answer' + questionId;
+                const locationFieldName = sanitizeQuestionText(field.fieldName || 'location');
+                const sanitizedLocationName = locationFieldName.replace(/ +/g, '_').toLowerCase();
+                let locPrefix = questionNodeId + '_' + sanitizedLocationName;
+                locs.forEach(f=>{
+                    let input;
+                    if (f.label === 'State'){
+                        input = document.createElement('select');
+                        input.id = locPrefix + '_' + f.nodeId + '_' + j;
+                        input.name = input.id;
+                        input.className = 'address-select-trigger';
+                        input.style.cssText = 'width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: 0.2s;';
+                        // Create hidden short code field for state abbreviation
+                        const shortHidden = document.createElement('input');
+                        shortHidden.type = 'text';
+                        shortHidden.id = locPrefix + '_state_short_' + j;
+                        shortHidden.name = shortHidden.id;
+                        shortHidden.style.display = 'none';
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Select State';
+                        input.appendChild(defaultOption);
+                        const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+                        states.forEach(state=>{ const o=document.createElement('option'); o.value=state; o.textContent=state; input.appendChild(o); });
+
+                        // Keep short field and hidden checkbox in sync with selection
+                        input.addEventListener('change', function(){
+                            if (typeof updateStateHiddenFields === 'function') {
+                                updateStateHiddenFields(this, input.id, shortHidden.id);
+                            }
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(this, input.id);
+                            }
+                        });
+                        locationFieldDiv.appendChild(input);
+                        locationFieldDiv.appendChild(shortHidden);
+                    } else {
+                        input = document.createElement('input');
+                        input.type = 'text';
+                        input.id = locPrefix + '_' + f.nodeId + '_' + j;
+                        input.name = input.id;
+                        input.placeholder = f.label;
+                        input.style.cssText = 'width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
+                        locationFieldDiv.appendChild(input);
+                    }
+                });
+                entryContainer.appendChild(locationFieldDiv);
+                lastWasLocation = true;
+              } else if (field.type === 'label') {
                 // For multipleTextboxes, use the base nodeId without numbering
                 const fieldId = field.nodeId;
                 if (field.label === 'State') {
