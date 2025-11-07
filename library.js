@@ -414,36 +414,25 @@ window.exportGuiJson = function(download = true) {
           });
         }
         
-        // Insert location fields at the correct position if locationIndex is set
+        // Insert location entry at the correct position if locationIndex is set
         const shouldIncludeLocationFields = locationIndex >= 0;
         
         if (shouldIncludeLocationFields) {
-          const locationFields = [
-            { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
-            { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
-            { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
-            { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
-          ];
+          // Export as a single location entry with fieldName (location title) and nodeId: "location_data"
+          // Similar to how numbered dropdown questions export location data
+          const locationEntry = {
+            type: "location",
+            fieldName: cell._locationTitle || "",
+            nodeId: "location_data",
+            order: locationIndex + 1
+          };
           
           if (allFieldsInOrder.length === 0) {
-            locationFields.forEach((field, fieldIndex) => {
-              allFieldsInOrder.push({
-                type: field.label === "Zip" ? "amount" : "label",
-                label: field.label,
-                nodeId: field.nodeId,
-                order: fieldIndex + 1
-              });
-            });
+            allFieldsInOrder.push(locationEntry);
           } else {
-            locationFields.forEach((field, fieldIndex) => {
-              allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
-                type: field.label === "Zip" ? "amount" : "label",
-                label: field.label,
-                nodeId: field.nodeId,
-                order: locationIndex + fieldIndex + 1
-              });
-            });
+            allFieldsInOrder.splice(locationIndex, 0, locationEntry);
             
+            // Re-number all fields after insertion
             allFieldsInOrder.forEach((field, index) => {
               field.order = index + 1;
             });

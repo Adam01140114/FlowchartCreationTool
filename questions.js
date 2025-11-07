@@ -10090,6 +10090,34 @@ function createTextboxLocationContainer(cell) {
     locationInfo.textContent = '📍 Location Date Inserted';
     container.appendChild(locationInfo);
     
+    // Location title input field
+    const locationTitleInput = document.createElement('input');
+    locationTitleInput.type = 'text';
+    locationTitleInput.placeholder = 'Enter location title...';
+    locationTitleInput.value = cell._locationTitle || '';
+    locationTitleInput.style.cssText = `
+      width: 100%;
+      max-width: 300px;
+      padding: 8px 12px;
+      border: 1px solid #28a745;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-top: 10px;
+      text-align: center;
+      background: white;
+      color: #333;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    `;
+    locationTitleInput.onblur = () => {
+      cell._locationTitle = locationTitleInput.value.trim();
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    container.appendChild(locationTitleInput);
+    
     const removeBtn = document.createElement('button');
     removeBtn.textContent = 'Remove Location';
     removeBtn.style.cssText = `
@@ -10101,9 +10129,11 @@ function createTextboxLocationContainer(cell) {
       cursor: pointer;
       font-size: 14px;
       font-weight: 500;
+      margin-top: 10px;
     `;
     removeBtn.onclick = () => {
       delete cell._locationIndex;
+      delete cell._locationTitle;
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
@@ -10670,13 +10700,29 @@ window.addMultipleTextboxLocationHandler = function(cellId) {
   }
 };
 
+window.updateMultipleTextboxLocationTitle = function(cellId, locationTitle) {
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleTextboxes") {
+    getGraph().getModel().beginUpdate();
+    try {
+      cell._locationTitle = locationTitle.trim();
+    } finally {
+      getGraph().getModel().endUpdate();
+    }
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  }
+};
+
 window.removeMultipleTextboxLocationHandler = function(cellId) {
   const cell = getGraph()?.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleTextboxes") {
     getGraph().getModel().beginUpdate();
     try {
-      // Remove the location index
+      // Remove the location index and title
       delete cell._locationIndex;
+      delete cell._locationTitle;
     } finally {
       getGraph().getModel().endUpdate();
     }
