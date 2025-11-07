@@ -2,7 +2,7 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Section 1",
+      "sectionName": "Introduction",
       "questions": [
         {
           "questionId": 1,
@@ -79,11 +79,15 @@
         },
         {
           "questionId": 2,
-          "text": "How many extra plantiffs",
+          "text": "How many people are you suing?",
           "type": "numberedDropdown",
           "logic": {
             "enabled": true,
             "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              },
               {
                 "prevQuestion": "1",
                 "prevAnswer": "No"
@@ -133,39 +137,39 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "how_many_extra_plantiffs",
+          "nodeId": "how_many_people_are_you_suing",
           "min": "1",
           "max": "3",
           "allFieldsInOrder": [
             {
               "type": "label",
               "label": "Name",
-              "nodeId": "how_many_extra_plantiffs_name",
+              "nodeId": "how_many_people_are_you_suing_name",
               "order": 1
             },
             {
-              "type": "label",
+              "type": "amount",
               "label": "Phone Number",
-              "nodeId": "how_many_extra_plantiffs_phone_number",
+              "nodeId": "how_many_people_are_you_suing_phone_number",
               "order": 2
             },
             {
               "type": "location",
-              "fieldName": "location example",
+              "fieldName": "Location Data",
               "nodeId": "location_data",
               "order": 3
             },
             {
               "type": "dropdown",
-              "fieldName": "Is this plaintiff a business?",
+              "fieldName": "Is this defendant a business/public entity?",
               "options": [
                 {
                   "text": "Yes",
-                  "nodeId": "is_this_plaintiff_a_business_yes"
+                  "nodeId": "is_this_defendant_a_business/public_entity_yes"
                 },
                 {
                   "text": "No",
-                  "nodeId": "is_this_plaintiff_a_business_no"
+                  "nodeId": "is_this_defendant_a_business/public_entity_no"
                 }
               ],
               "triggerSequences": [
@@ -175,49 +179,51 @@
                   "fields": [
                     {
                       "type": "label",
-                      "label": "Business Name Statement Number",
-                      "nodeId": "is_this_plaintiff_a_business_yes_business_name_statement_number"
+                      "label": "Name",
+                      "nodeId": "is_this_defendant_a_business/public_entity_yes_name"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Job Title",
+                      "nodeId": "is_this_defendant_a_business/public_entity_yes_job_title"
+                    },
+                    {
+                      "type": "location",
+                      "fieldName": "Work Address:",
+                      "nodeId": "location_data"
                     },
                     {
                       "type": "dropdown",
-                      "fieldName": "bruh",
+                      "fieldName": "Are they a public entity?",
                       "options": [
                         {
-                          "text": "what"
+                          "text": "Yes"
                         },
                         {
-                          "text": "hey"
+                          "text": "No"
                         }
                       ]
                     },
                     {
-                      "type": "dropdown",
-                      "fieldName": "other dropdown",
-                      "options": [
-                        {
-                          "text": "yes"
-                        },
-                        {
-                          "text": "no"
-                        }
-                      ],
+                      "type": "date",
+                      "label": "When did you file it?",
+                      "nodeId": "is_this_defendant_a_business/public_entity_yes_when_did_you_file_it",
                       "conditionalLogic": {
                         "enabled": true,
-                        "conditions": [
-                          "bruh_what"
-                        ]
+                        "conditions": []
                       }
                     },
                     {
-                      "type": "label",
-                      "label": "hello",
-                      "nodeId": "hello",
-                      "conditionalLogic": {
-                        "enabled": true,
-                        "conditions": [
-                          "bruh_what"
-                        ]
-                      }
+                      "type": "dropdown",
+                      "fieldName": "Have you filed a written claim against them?",
+                      "options": [
+                        {
+                          "text": "Yes"
+                        },
+                        {
+                          "text": "No"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -242,5 +248,14 @@
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],
-  "linkedCheckboxes": []
+  "linkedCheckboxes": [
+    {
+      "id": "linkedCheckbox1",
+      "linkedCheckboxId": "what the hell bruh",
+      "checkboxes": [
+        "is_this_defendant_a_business/public_entity_are_they_a_public_entity_yes_1",
+        "are_you_the_only_person_suing_yes"
+      ]
+    }
+  ]
 }

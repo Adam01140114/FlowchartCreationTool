@@ -511,6 +511,7 @@ function showPropertiesPopup(cell) {
   
   // Create header
   const header = document.createElement('div');
+  header.className = 'properties-popup-header';
   header.style.cssText = `
     display: flex;
     justify-content: space-between;
@@ -519,6 +520,7 @@ function showPropertiesPopup(cell) {
     padding-bottom: 12px;
     border-bottom: 1px solid #e0e0e0;
     min-height: 40px;
+    cursor: move;
   `;
   
   const title = document.createElement('h3');
@@ -546,6 +548,7 @@ function showPropertiesPopup(cell) {
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '&times;';
   closeBtn.id = 'closePropertiesPopup';
+  closeBtn.className = 'close-btn';
   closeBtn.style.cssText = `
     background: none;
     border: none;
@@ -3359,6 +3362,75 @@ function showPropertiesPopup(cell) {
     }
   `;
   document.head.appendChild(style);
+  
+  // Make popup draggable
+  if (typeof makePopupDraggable === 'function') {
+    // Try to use the existing makePopupDraggable function, but it expects .location-ids-header
+    // So we'll use our own implementation
+    makePropertiesPopupDraggable(popup);
+  } else {
+    // Fallback: implement draggable functionality directly
+    makePropertiesPopupDraggable(popup);
+  }
+}
+
+/**
+ * Make properties popup draggable
+ */
+function makePropertiesPopupDraggable(popup) {
+  let isDragging = false;
+  let startX, startY, initialX, initialY;
+
+  const header = popup.querySelector('.properties-popup-header');
+  if (!header) return;
+
+  // Set initial centered position
+  popup.style.top = '50%';
+  popup.style.left = '50%';
+  popup.style.transform = 'translate(-50%, -50%)';
+
+  header.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  function dragStart(e) {
+    // Don't drag when clicking close button
+    if (e.target.classList.contains('close-btn') || e.target.closest('.close-btn')) return;
+    
+    isDragging = true;
+    header.style.cursor = 'grabbing';
+    
+    // Get the current actual position of the popup
+    const rect = popup.getBoundingClientRect();
+    initialX = rect.left;
+    initialY = rect.top;
+    
+    // Get the mouse position relative to the popup
+    startX = e.clientX - initialX;
+    startY = e.clientY - initialY;
+    
+    // Remove the centering transform and set absolute positioning
+    popup.style.top = initialY + 'px';
+    popup.style.left = initialX + 'px';
+    popup.style.transform = 'none';
+  }
+
+  function drag(e) {
+    if (isDragging) {
+      e.preventDefault();
+      
+      const newX = e.clientX - startX;
+      const newY = e.clientY - startY;
+      
+      popup.style.left = newX + 'px';
+      popup.style.top = newY + 'px';
+    }
+  }
+
+  function dragEnd(e) {
+    isDragging = false;
+    header.style.cursor = 'move';
+  }
 }
 
 /**
@@ -4939,6 +5011,7 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
         if (dropdownItem.triggerSequences && Array.isArray(dropdownItem.triggerSequences)) {
           // Get the parent dropdown's nodeId (trigger title) from the dropdown field's options
           // Extract base nodeId from first option's nodeId (e.g., "is_this_plaintiff_a_business_yes" -> "is_this_plaintiff_a_business")
+          // Use sanitizeNameId to preserve forward slashes
           let parentDropdownNodeId = questionNodeId; // Fallback to question nodeId
           if (dropdownItem.options && Array.isArray(dropdownItem.options) && dropdownItem.options.length > 0) {
             const firstOption = dropdownItem.options[0];
@@ -4950,6 +5023,20 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
               } else {
                 parentDropdownNodeId = firstOptionNodeId;
               }
+            } else if (dropdownItem.name) {
+              // If no nodeId in options, generate from dropdown name using sanitizeNameId
+              if (typeof window.sanitizeNameId === 'function') {
+                parentDropdownNodeId = window.sanitizeNameId(dropdownItem.name);
+              } else {
+                parentDropdownNodeId = (dropdownItem.name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
+              }
+            }
+          } else if (dropdownItem.name) {
+            // If no options, generate from dropdown name using sanitizeNameId
+            if (typeof window.sanitizeNameId === 'function') {
+              parentDropdownNodeId = window.sanitizeNameId(dropdownItem.name);
+            } else {
+              parentDropdownNodeId = (dropdownItem.name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
             }
           }
           
@@ -4972,21 +5059,31 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
               trigger.dropdowns.forEach(triggerDropdown => {
                 const triggerDropdownFieldName = triggerDropdown.fieldName || '';
                 if (triggerDropdownFieldName) {
-                  // Sanitize trigger dropdown field name
-                  const sanitizedTriggerFieldName = triggerDropdownFieldName
-                    .toLowerCase()
-                    .replace(/[?]/g, '')
-                    .replace(/[^a-z0-9_]+/g, '_')
-                    .replace(/^_+|_+$/g, '');
+                  // Sanitize trigger dropdown field name - use sanitizeNameId to preserve forward slashes
+                  let sanitizedTriggerFieldName;
+                  if (typeof window.sanitizeNameId === 'function') {
+                    sanitizedTriggerFieldName = window.sanitizeNameId(triggerDropdownFieldName);
+                  } else {
+                    sanitizedTriggerFieldName = triggerDropdownFieldName
+                      .toLowerCase()
+                      .replace(/[?]/g, '')
+                      .replace(/[^a-z0-9\s\/]+/g, '')
+                      .replace(/\s+/g, '_')
+                      .replace(/^_+|_+$/g, '');
+                  }
                   
                   // Get all dropdown options
                   if (triggerDropdown.options && Array.isArray(triggerDropdown.options)) {
                     triggerDropdown.options.forEach(option => {
                       const optionValue = option.text || '';
                       if (optionValue) {
-                        // Sanitize option value: replace non-word chars with underscore, convert to lowercase
-                        // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues
-                        const sanitizedOptionValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+                        // Sanitize option value - use sanitizeNameId to preserve forward slashes
+                        let sanitizedOptionValue;
+                        if (typeof window.sanitizeNameId === 'function') {
+                          sanitizedOptionValue = window.sanitizeNameId(optionValue);
+                        } else {
+                          sanitizedOptionValue = optionValue.replace(/[^A-Za-z0-9\/]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+                        }
                         
                         // Generate checkbox IDs for each entry number (minValue to maxValue)
                         // Format: {parentDropdownNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}

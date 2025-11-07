@@ -4627,7 +4627,7 @@ function createPdfConfigurationModule() {
 // ============================================
 function addLocationFields(questionId, questionType) {
     // New simplified single entry with title, same as trigger location UI
-    const unifiedDiv = getUnifiedContainer(questionId);
+            const unifiedDiv = getUnifiedContainer(questionId);
     if (!unifiedDiv) return;
 
     const fieldCount = unifiedDiv.children.length + 1;
@@ -5110,7 +5110,7 @@ function createLinkedCheckboxModal() {
     modal.style.cssText = 'display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)';
     modal.addEventListener('click', () => modal.style.display = 'none');
     modal.innerHTML = `
-      <div style="background:#fff;margin:5% auto;padding:20px;border-radius:10px;width:80%;max-width:600px;max-height:80vh;overflow:auto;" onclick="event.stopPropagation()">
+      <div style="background:#fff;margin:5% auto;padding:20px;border-radius:10px;width:90%;max-width:1200px;max-height:80vh;overflow:auto;" onclick="event.stopPropagation()">
         <h3 style="text-align:center;margin-bottom:20px;color:#2c3e50;">Configure Linked Checkbox</h3>
         <div id="linkedCheckboxDropdowns" style="margin-bottom:20px;"></div>
         <div style="margin-bottom:20px;">

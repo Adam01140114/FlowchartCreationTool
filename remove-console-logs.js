@@ -31,14 +31,14 @@ const originalLines = content.split('\n').length;
 console.log(`📄 Processing file: ${filePath}`);
 console.log(`📊 Original file size: ${originalLength} characters, ${originalLines} lines`);
 
-// Count console.log statements before removal
-const consoleLogPattern = /console\.log\([^)]*\);?/g;
+// Count all console statements before removal (log, error, warn, debug)
+const consoleLogPattern = /console\.(log|error|warn|debug)\([^)]*\);?/g;
 const matches = content.match(consoleLogPattern);
 const countBefore = matches ? matches.length : 0;
 
-console.log(`🔍 Found ${countBefore} console.log() statements`);
+console.log(`🔍 Found ${countBefore} console statements (log/error/warn/debug)`);
 
-// Remove console.log statements
+// Remove all console statements (log, error, warn, debug)
 // We need to handle:
 // - Single-line: console.log("text");
 // - Multi-line: console.log("text",
@@ -51,22 +51,47 @@ let result = '';
 let i = 0;
 
 while (i < content.length) {
-  // Look for "console.log("
+  // Look for "console.log(", "console.error(", "console.warn(", or "console.debug("
   const consoleLogIndex = content.indexOf('console.log(', i);
+  const consoleErrorIndex = content.indexOf('console.error(', i);
+  const consoleWarnIndex = content.indexOf('console.warn(', i);
+  const consoleDebugIndex = content.indexOf('console.debug(', i);
   
-  if (consoleLogIndex === -1) {
-    // No more console.log statements, add remaining content
+  // Find the earliest occurrence
+  const indices = [consoleLogIndex, consoleErrorIndex, consoleWarnIndex, consoleDebugIndex]
+    .filter(idx => idx !== -1);
+  const consoleIndex = indices.length > 0 ? Math.min(...indices) : -1;
+  
+  if (consoleIndex === -1) {
+    // No more console statements, add remaining content
     result += content.substring(i);
     break;
   }
   
-  // Add content before the console.log
-  result += content.substring(i, consoleLogIndex);
+  // Determine which console method we found
+  let consoleMethod = '';
+  let consoleMethodLength = 0;
+  if (consoleIndex === consoleLogIndex) {
+    consoleMethod = 'console.log(';
+    consoleMethodLength = 'console.log('.length;
+  } else if (consoleIndex === consoleErrorIndex) {
+    consoleMethod = 'console.error(';
+    consoleMethodLength = 'console.error('.length;
+  } else if (consoleIndex === consoleWarnIndex) {
+    consoleMethod = 'console.warn(';
+    consoleMethodLength = 'console.warn('.length;
+  } else if (consoleIndex === consoleDebugIndex) {
+    consoleMethod = 'console.debug(';
+    consoleMethodLength = 'console.debug('.length;
+  }
+  
+  // Add content before the console statement
+  result += content.substring(i, consoleIndex);
   
   // Find the matching closing parenthesis
-  // console.log( already has an opening paren, so we start with depth = 1
+  // console.xxx( already has an opening paren, so we start with depth = 1
   let depth = 1;
-  let j = consoleLogIndex + 'console.log('.length;
+  let j = consoleIndex + consoleMethodLength;
   
   // Track parentheses to find the matching closing
   while (j < content.length) {
@@ -77,7 +102,7 @@ while (i < content.length) {
     } else if (char === ')') {
       depth--;
       if (depth === 0) {
-        // Found the closing parenthesis for console.log
+        // Found the closing parenthesis for console statement
         j++; // Skip the closing parenthesis
         
         // Check if there's a semicolon after (skip whitespace)
@@ -90,7 +115,7 @@ while (i < content.length) {
           j++;
         }
         
-        // Skip the console.log statement
+        // Skip the console statement
         removedCount++;
         i = j;
         break;
@@ -102,13 +127,13 @@ while (i < content.length) {
   
   // If we didn't find a proper closing (malformed), try to find semicolon as fallback
   if (j >= content.length || depth > 0) {
-    const semicolonIndex = content.indexOf(';', consoleLogIndex);
+    const semicolonIndex = content.indexOf(';', consoleIndex);
     if (semicolonIndex !== -1) {
       removedCount++;
       i = semicolonIndex + 1;
     } else {
-      // Can't find closing or semicolon, skip past this console.log to avoid infinite loop
-      i = consoleLogIndex + 'console.log('.length;
+      // Can't find closing or semicolon, skip past this console statement to avoid infinite loop
+      i = consoleIndex + consoleMethodLength;
     }
   }
 }
@@ -149,7 +174,7 @@ fs.writeFileSync(filePath, content, 'utf8');
 const finalLength = content.length;
 const finalLines = content.split('\n').length;
 
-console.log(`✅ Removed ${removedCount} console.log() statements`);
+console.log(`✅ Removed ${removedCount} console statements (log/error/warn/debug)`);
 console.log(`📊 Final file size: ${finalLength} characters, ${finalLines} lines`);
 console.log(`📉 Reduction: ${originalLength - finalLength} characters, ${originalLines - finalLines} lines`);
 console.log(`💾 File saved: ${filePath}`);

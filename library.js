@@ -944,8 +944,9 @@ window.exportGuiJson = function(download = true) {
               const dropdown = cell._dropdowns[item.index];
               const dropdownOptions = dropdown.options ? dropdown.options.map(option => {
                 // Sanitize the dropdown name and option value for nodeId
-                const sanitizedDropdownName = (dropdown.name || "").toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
-                const sanitizedOptionValue = (option.value || "").toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
+                // Preserve forward slashes "/" in the name
+                const sanitizedDropdownName = (dropdown.name || "").toLowerCase().replace(/[^a-z0-9\s\/]/g, '').replace(/\s+/g, '_');
+                const sanitizedOptionValue = (option.value || "").toLowerCase().replace(/[^a-z0-9\s\/]/g, '').replace(/\s+/g, '_');
                 return {
                   text: option.text || "",
                   nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
@@ -1010,10 +1011,18 @@ window.exportGuiJson = function(download = true) {
                       if (orderItem.type === 'label') {
                         const label = labelMap.get(orderItem.identifier);
                         if (label) {
+                          // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                          let nodeId = label.nodeId || "";
+                          if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                            // Regenerate using generateNodeIdForDropdownField if available
+                            if (typeof window.generateNodeIdForDropdownField === 'function') {
+                              nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                            }
+                          }
                           fields.push({
                             type: "label",
                             label: label.fieldName || "",
-                            nodeId: label.nodeId || ""
+                            nodeId: nodeId
                           });
                         }
                       } else if (orderItem.type === 'checkbox') {
@@ -1034,34 +1043,102 @@ window.exportGuiJson = function(download = true) {
                       } else if (orderItem.type === 'time') {
                         const time = timeMap.get(orderItem.identifier);
                         if (time) {
+                          // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                          let nodeId = time.nodeId || "";
+                          if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                            // Regenerate using generateNodeIdForDropdownField if available
+                            if (typeof window.generateNodeIdForDropdownField === 'function') {
+                              nodeId = window.generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                            }
+                          }
                           const dateField = {
                             type: "date",
                             label: time.fieldName || "",
-                            nodeId: time.nodeId || ""
+                            nodeId: nodeId
                           };
                           
                           // Include conditional logic if it exists
                           if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                            // Regenerate conditions if they're missing forward slashes
+                            let conditions = time.conditionalLogic.conditions || [];
+                            if (dropdown.name && dropdown.name.includes('/')) {
+                              conditions = conditions.map(condition => {
+                                // If condition doesn't have forward slash but should, regenerate it
+                                if (condition && !condition.includes('/')) {
+                                  // Try to regenerate using getCheckboxOptionNodeIdsFromTriggerSequence
+                                  if (typeof window.getCheckboxOptionNodeIdsFromTriggerSequence === 'function') {
+                                    const availableNodeIds = window.getCheckboxOptionNodeIdsFromTriggerSequence(trigger, dropdown, cell);
+                                    // Find matching nodeId that has the forward slash
+                                    const matchingNodeId = availableNodeIds.find(nodeId => {
+                                      // Normalize both strings by removing slashes and underscores for comparison
+                                      // This handles cases where old conditions had underscores instead of slashes
+                                      const normalize = (str) => str.replace(/[\/_]/g, '').toLowerCase();
+                                      return normalize(condition) === normalize(nodeId);
+                                    });
+                                    if (matchingNodeId) {
+                                      return matchingNodeId;
+                                    }
+                                  }
+                                }
+                                return condition;
+                              });
+                            }
+                            
                             dateField.conditionalLogic = {
                               enabled: time.conditionalLogic.enabled,
-                              conditions: time.conditionalLogic.conditions || []
+                              conditions: conditions.filter(c => c && c.trim() !== '')
                             };
                           }
                           
                           fields.push(dateField);
                         }
                       } else if (orderItem.type === 'dropdown') {
-                        const dropdown = dropdownMap.get(orderItem.identifier);
-                        if (dropdown) {
-                          const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
+                        const nestedDropdown = dropdownMap.get(orderItem.identifier);
+                        if (nestedDropdown) {
+                          const dropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                             text: option.text || ""
                           })) : [];
                           
-                          fields.push({
+                          const dropdownField = {
                             type: "dropdown",
-                            fieldName: dropdown.fieldName || "",
+                            fieldName: nestedDropdown.fieldName || "",
                             options: dropdownOptions
-                          });
+                          };
+                          
+                          // Include conditional logic if it exists
+                          if (nestedDropdown.conditionalLogic && nestedDropdown.conditionalLogic.enabled) {
+                            // Regenerate conditions if they're missing forward slashes
+                            let conditions = nestedDropdown.conditionalLogic.conditions || [];
+                            if (dropdown.name && dropdown.name.includes('/')) {
+                              conditions = conditions.map(condition => {
+                                // If condition doesn't have forward slash but should, regenerate it
+                                if (condition && !condition.includes('/')) {
+                                  // Try to regenerate using getCheckboxOptionNodeIdsFromTriggerSequence
+                                  if (typeof window.getCheckboxOptionNodeIdsFromTriggerSequence === 'function') {
+                                    const availableNodeIds = window.getCheckboxOptionNodeIdsFromTriggerSequence(trigger, dropdown, cell);
+                                    // Find matching nodeId that has the forward slash
+                                    const matchingNodeId = availableNodeIds.find(nodeId => {
+                                      // Normalize both strings by removing slashes and underscores for comparison
+                                      // This handles cases where old conditions had underscores instead of slashes
+                                      const normalize = (str) => str.replace(/[\/_]/g, '').toLowerCase();
+                                      return normalize(condition) === normalize(nodeId);
+                                    });
+                                    if (matchingNodeId) {
+                                      return matchingNodeId;
+                                    }
+                                  }
+                                }
+                                return condition;
+                              });
+                            }
+                            
+                            dropdownField.conditionalLogic = {
+                              enabled: nestedDropdown.conditionalLogic.enabled,
+                              conditions: conditions.filter(c => c && c.trim() !== '')
+                            };
+                          }
+                          
+                          fields.push(dropdownField);
                         }
                       } else if (orderItem.type === 'location') {
                         const location = locationMap.get(orderItem.identifier);
@@ -1092,10 +1169,17 @@ window.exportGuiJson = function(download = true) {
                         if (!labelMap.has(label.fieldName || '')) {
                           const existingField = fields.find(f => f.type === 'label' && f.label === label.fieldName);
                           if (!existingField) {
+                            // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                            let nodeId = label.nodeId || "";
+                            if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                              if (typeof window.generateNodeIdForDropdownField === 'function') {
+                                nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                              }
+                            }
                             fields.push({
                               type: "label",
                               label: label.fieldName || "",
-                              nodeId: label.nodeId || ""
+                              nodeId: nodeId
                             });
                           }
                         }
@@ -1128,10 +1212,17 @@ window.exportGuiJson = function(download = true) {
                         if (!timeMap.has(time.fieldName || '')) {
                           const existingField = fields.find(f => f.type === 'date' && f.label === time.fieldName);
                           if (!existingField) {
+                            // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                            let nodeId = time.nodeId || "";
+                            if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                              if (typeof window.generateNodeIdForDropdownField === 'function') {
+                                nodeId = window.generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                              }
+                            }
                             const dateField = {
                               type: "date",
                               label: time.fieldName || "",
-                              nodeId: time.nodeId || ""
+                              nodeId: nodeId
                             };
                             
                             // Include conditional logic if it exists
@@ -3416,24 +3507,57 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
     const parent = graph.getDefaultParent();
     graph.removeCells(graph.getChildVertices(parent));
     const createdCells = {};
+    
+    // Store section renumbering map for use in setTimeout callbacks
+    let sectionRenumberMap = null;
 
     if (data.sectionPrefs) {
       
-      // Update section preferences through the proper accessor
+      // Renumber sections sequentially (1, 2, 3, etc. without gaps)
+      const originalSectionPrefs = data.sectionPrefs;
+      const sectionNumbers = Object.keys(originalSectionPrefs)
+        .map(num => parseInt(num))
+        .filter(num => !isNaN(num))
+        .sort((a, b) => a - b);
       
+      // Create mapping from old section numbers to new sequential numbers
+      sectionRenumberMap = {};
+      sectionNumbers.forEach((oldNum, index) => {
+        const newNum = (index + 1).toString();
+        sectionRenumberMap[oldNum.toString()] = newNum;
+      });
+      
+      // Create renumbered sectionPrefs
+      const renumberedSectionPrefs = {};
+      sectionNumbers.forEach((oldNum, index) => {
+        const newNum = (index + 1).toString();
+        renumberedSectionPrefs[newNum] = originalSectionPrefs[oldNum.toString()];
+      });
+      
+      // Update section references in all cells before they're created
+      if (data.cells && Array.isArray(data.cells)) {
+        data.cells.forEach(cell => {
+          if (cell.style) {
+            // Update section= in style string
+            cell.style = cell.style.replace(/section=([^;]+)/g, (match, sectionNum) => {
+              const newSectionNum = sectionRenumberMap[sectionNum] || sectionNum;
+              return `section=${newSectionNum}`;
+            });
+          }
+        });
+      }
+      
+      // Update section preferences through the proper accessor
       if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
-        window.flowchartConfig.sectionPrefs = data.sectionPrefs;
+        window.flowchartConfig.sectionPrefs = renumberedSectionPrefs;
       } else {
-        window.sectionPrefs = data.sectionPrefs;
+        window.sectionPrefs = renumberedSectionPrefs;
       }
       
       // Test the getSectionPrefs function immediately after setting
       if (typeof getSectionPrefs === 'function') {
         const testResult = getSectionPrefs();
       }
-      
-      // Add a watcher to detect if section preferences are modified after this point
-      const originalSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
       
       // updateSectionLegend is defined in legend.js
       // Add a small delay to ensure DOM is ready
@@ -3453,20 +3577,25 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
     }
     
     // After creating cells, check for missing section preferences and create them
+    // Also ensure all cells have correct section numbers after renumbering
     setTimeout(() => {
       const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
       const usedSections = new Set();
       
       // Collect all sections used by cells
-      data.cells.forEach(cell => {
+      const graph = window.graph;
+      if (graph) {
+        const allCells = graph.getChildVertices(graph.getDefaultParent());
+        allCells.forEach(cell => {
         if (cell.style) {
           const sectionMatch = cell.style.match(/section=([^;]+)/);
           if (sectionMatch) {
-            usedSections.add(sectionMatch[1]);
+              const sectionNum = sectionMatch[1];
+              usedSections.add(sectionNum);
           }
         }
       });
-      
+      }
       
       // Create missing section preferences
       let needsUpdate = false;

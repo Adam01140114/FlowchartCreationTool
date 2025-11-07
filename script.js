@@ -4268,11 +4268,12 @@ while (stillHaveIssues && fixIteration < maxIterations) {
 }
 
 // --- PATCH START: sanitize option nameId generation ---
+// Preserves forward slashes "/" in the name
 function sanitizeNameId(str) {
   return str
     .toLowerCase()
     .replace(/<[^>]+>/g, "")
-    .replace(/[^a-z0-9]+/gi, "_") // replace any sequence of non-alphanumeric chars with _
+    .replace(/[^a-z0-9\/]+/gi, "_") // replace any sequence of non-alphanumeric chars (except /) with _
     .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
 }
 // --- PATCH END ---

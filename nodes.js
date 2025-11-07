@@ -742,12 +742,13 @@ window.getNodeId = function(cell) {
 
 /**
  * Sanitize a name ID for use in JSON export
+ * Preserves forward slashes "/" in the name
  */
 window.sanitizeNameId = function(name) {
   if (!name) return "";
   return name.toString()
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/[^a-z0-9\s\/]/g, '')
     .replace(/\s+/g, '_')
     .trim();
 };
