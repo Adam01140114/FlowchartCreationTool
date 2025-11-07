@@ -347,7 +347,8 @@ window.exportGuiJson = function(download = true) {
         console.log('🔧 [GUI EXPORT DEBUG] Using _itemOrder for field ordering:', cell._itemOrder);
         
         cell._itemOrder.forEach((item, orderIndex) => {
-          if (item.type === 'option' && cell._textboxes && cell._textboxes[item.index]) {
+          // Handle both 'option' (for numbered dropdowns) and 'textbox' (for multiple textboxes) types
+          if ((item.type === 'option' || item.type === 'textbox') && cell._textboxes && cell._textboxes[item.index]) {
             const tb = cell._textboxes[item.index];
             const labelName = tb.nameId || "";
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
@@ -361,7 +362,7 @@ window.exportGuiJson = function(download = true) {
             });
           } else if (item.type === 'location') {
             // Create a single location entry instead of expanding into individual fields
-              allFieldsInOrder.push({
+            allFieldsInOrder.push({
               type: "location",
               fieldName: cell._locationTitle || "",
               nodeId: "location_data",

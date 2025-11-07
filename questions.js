@@ -9829,11 +9829,7 @@ window.showMultipleTextboxProperties = function(cell) {
   ]);
   modalContent.appendChild(optionsSection);
   
-  // Location Section
-  const locationSection = createFieldSection('Location Settings', [
-    createTextboxLocationContainer(cell)
-  ]);
-  modalContent.appendChild(locationSection);
+  // Location is now included in the unified textbox options container, so we don't need a separate section
   
   // Footer buttons
   const footer = document.createElement('div');
@@ -9895,21 +9891,289 @@ window.showMultipleTextboxProperties = function(cell) {
   };
 };
 
-// Helper function to create textbox options container
+// Helper function to create textbox options container (unified with location entries)
 function createTextboxOptionsContainer(cell) {
   const container = document.createElement('div');
+  container.className = 'unified-textbox-fields-container';
   container.style.cssText = `
     display: flex;
     flex-direction: column;
     gap: 10px;
   `;
   
-  // Add existing textboxes
-  const textboxes = cell._textboxes || [];
-  textboxes.forEach((textbox, index) => {
-    const textboxContainer = createTextboxField(textbox, index, cell, container);
-    container.appendChild(textboxContainer);
+  // Initialize item order if it doesn't exist
+  if (!cell._itemOrder) {
+    cell._itemOrder = [];
+    const textboxes = cell._textboxes || [];
+    const locationIndex = cell._locationIndex !== undefined && cell._locationIndex >= 0 ? cell._locationIndex : -1;
+    
+    // Add all textboxes first
+    textboxes.forEach((_, index) => {
+      cell._itemOrder.push({ type: 'textbox', index: index });
+    });
+    
+    // Add location if it exists (at the end by default)
+    if (locationIndex >= 0) {
+      cell._itemOrder.push({ type: 'location', index: locationIndex });
+    }
+  }
+  
+  // Add drag and drop event listeners
+  let draggedElement = null;
+  
+  container.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    // Add visual feedback for where the item will be dropped
+    const dropTarget = e.target.closest('[data-index]');
+    if (dropTarget && (dropTarget.dataset.type === 'textbox' || dropTarget.dataset.type === 'location')) {
+      dropTarget.style.borderColor = '#007bff';
+      dropTarget.style.borderWidth = '2px';
+    }
   });
+  
+  container.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+  });
+  
+  container.addEventListener('dragleave', (e) => {
+    // Remove visual feedback when leaving drop targets
+    const dropTarget = e.target.closest('[data-index]');
+    if (dropTarget && (dropTarget.dataset.type === 'textbox' || dropTarget.dataset.type === 'location')) {
+      dropTarget.style.borderColor = '#ddd';
+      dropTarget.style.borderWidth = '1px';
+    }
+  });
+  
+  container.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (!draggedElement) return;
+    
+    const dropTarget = e.target.closest('[data-index]');
+    if (!dropTarget || dropTarget === draggedElement) return;
+    
+    // Try to get drag data from dataTransfer first, fallback to dataset
+    let draggedType, draggedIndex;
+    try {
+      const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+      draggedType = dragData.type || draggedElement.dataset.type;
+      draggedIndex = dragData.index !== undefined ? dragData.index : parseInt(draggedElement.dataset.index);
+    } catch (error) {
+      // Fallback to dataset if dataTransfer parsing fails
+      draggedType = draggedElement.dataset.type;
+      draggedIndex = parseInt(draggedElement.dataset.index);
+    }
+    
+    const dropType = dropTarget.dataset.type;
+    const dropIndex = parseInt(dropTarget.dataset.index);
+    
+    if (draggedType === dropType && draggedType === 'textbox') {
+      // Reorder textboxes
+      const textboxes = cell._textboxes || [];
+      const draggedTextbox = textboxes[draggedIndex];
+      textboxes.splice(draggedIndex, 1);
+      textboxes.splice(dropIndex, 0, draggedTextbox);
+      
+      // Update item order
+      const draggedItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'textbox' && item.index === draggedIndex
+      );
+      const targetItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'textbox' && item.index === dropIndex
+      );
+      
+      if (draggedItemIndex !== -1 && targetItemIndex !== -1) {
+        const draggedItem = cell._itemOrder.splice(draggedItemIndex, 1)[0];
+        cell._itemOrder.splice(targetItemIndex, 0, draggedItem);
+        
+        // Update indices in item order
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'textbox') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'textbox'
+            ).length - 1;
+          }
+        });
+      }
+    } else if (draggedType === 'location' && dropType === 'textbox') {
+      // Move location to position of textbox
+      const locationItemIndex = cell._itemOrder.findIndex(item => item.type === 'location');
+      const targetItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'textbox' && item.index === dropIndex
+      );
+      
+      if (locationItemIndex !== -1 && targetItemIndex !== -1) {
+        const locationItem = cell._itemOrder.splice(locationItemIndex, 1)[0];
+        cell._itemOrder.splice(targetItemIndex, 0, locationItem);
+        cell._locationIndex = dropIndex;
+      }
+    } else if (draggedType === 'textbox' && dropType === 'location') {
+      // Move textbox to position of location
+      const textboxes = cell._textboxes || [];
+      const draggedTextbox = textboxes[draggedIndex];
+      textboxes.splice(draggedIndex, 1);
+      
+      const locationItemIndex = cell._itemOrder.findIndex(item => item.type === 'location');
+      const targetItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'textbox' && item.index === dropIndex
+      );
+      
+      if (locationItemIndex !== -1) {
+        // Insert textbox before location
+        textboxes.splice(locationItemIndex > 0 ? locationItemIndex - 1 : 0, 0, draggedTextbox);
+        
+        const draggedItemIndex = cell._itemOrder.findIndex(item => 
+          item.type === 'textbox' && item.index === draggedIndex
+        );
+        if (draggedItemIndex !== -1) {
+          const draggedItem = cell._itemOrder.splice(draggedItemIndex, 1)[0];
+          cell._itemOrder.splice(locationItemIndex, 0, draggedItem);
+          
+          // Update indices
+          cell._itemOrder.forEach((item, index) => {
+            if (item.type === 'textbox') {
+              item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+                prevIndex <= index && prevItem.type === 'textbox'
+              ).length - 1;
+            }
+          });
+        }
+      }
+    }
+    
+    // Refresh the container
+    const newContainer = createTextboxOptionsContainer(cell);
+    container.parentNode.replaceChild(newContainer, container);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  });
+  
+  // Render items in unified order
+  const textboxes = cell._textboxes || [];
+  const locationIndex = cell._locationIndex !== undefined && cell._locationIndex >= 0 ? cell._locationIndex : -1;
+  
+  if (cell._itemOrder && cell._itemOrder.length > 0) {
+    cell._itemOrder.forEach((item, displayIndex) => {
+      if (item.type === 'textbox' && textboxes[item.index]) {
+        const textboxContainer = createTextboxField(textboxes[item.index], item.index, cell, container);
+        
+        // Add drag event listeners
+        textboxContainer.addEventListener('dragstart', (e) => {
+          draggedElement = textboxContainer;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', JSON.stringify({ 
+            cellId: cell.id, 
+            index: item.index, 
+            type: 'textbox' 
+          }));
+          textboxContainer.style.opacity = '0.5';
+        });
+        
+        textboxContainer.addEventListener('dragend', (e) => {
+          textboxContainer.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(textboxContainer);
+      } else if (item.type === 'location' && locationIndex >= 0) {
+        const locationIndicator = createTextboxLocationIndicator(cell, container);
+        
+        // Add drag event listeners to location indicator
+        locationIndicator.addEventListener('dragstart', (e) => {
+          draggedElement = locationIndicator;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', JSON.stringify({ 
+            cellId: cell.id, 
+            index: locationIndex, 
+            type: 'location' 
+          }));
+          locationIndicator.style.opacity = '0.5';
+        });
+        
+        locationIndicator.addEventListener('dragend', (e) => {
+          locationIndicator.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(locationIndicator);
+      }
+    });
+  } else {
+    // Fallback to default order (textboxes first, then location)
+    textboxes.forEach((textbox, index) => {
+      const textboxContainer = createTextboxField(textbox, index, cell, container);
+      
+      // Add drag event listeners
+      textboxContainer.addEventListener('dragstart', (e) => {
+        draggedElement = textboxContainer;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', JSON.stringify({ 
+          cellId: cell.id, 
+          index: index, 
+          type: 'textbox' 
+        }));
+        textboxContainer.style.opacity = '0.5';
+      });
+      
+      textboxContainer.addEventListener('dragend', (e) => {
+        textboxContainer.style.opacity = '1';
+        draggedElement = null;
+      });
+      
+      container.appendChild(textboxContainer);
+      
+      // Add location indicator BEFORE this textbox if it's at the location index
+      if (index === locationIndex) {
+        const locationIndicator = createTextboxLocationIndicator(cell, container);
+        
+        // Add drag event listeners to location indicator
+        locationIndicator.addEventListener('dragstart', (e) => {
+          draggedElement = locationIndicator;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', JSON.stringify({ 
+            cellId: cell.id, 
+            index: locationIndex, 
+            type: 'location' 
+          }));
+          locationIndicator.style.opacity = '0.5';
+        });
+        
+        locationIndicator.addEventListener('dragend', (e) => {
+          locationIndicator.style.opacity = '1';
+          draggedElement = null;
+        });
+        
+        container.appendChild(locationIndicator);
+      }
+    });
+    
+    // Add location indicator at the end if location index is beyond the current textboxes
+    if (locationIndex >= textboxes.length) {
+      const locationIndicator = createTextboxLocationIndicator(cell, container);
+      
+      // Add drag event listeners to location indicator
+      locationIndicator.addEventListener('dragstart', (e) => {
+        draggedElement = locationIndicator;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', JSON.stringify({ 
+          cellId: cell.id, 
+          index: locationIndex, 
+          type: 'location' 
+        }));
+        locationIndicator.style.opacity = '0.5';
+      });
+      
+      locationIndicator.addEventListener('dragend', (e) => {
+        locationIndicator.style.opacity = '1';
+        draggedElement = null;
+      });
+      
+      container.appendChild(locationIndicator);
+    }
+  }
   
   // Add new textbox button
   const addBtn = document.createElement('button');
@@ -9930,8 +10194,29 @@ function createTextboxOptionsContainer(cell) {
     if (!cell._textboxes) cell._textboxes = [];
     cell._textboxes.push(newTextbox);
     
-    const textboxContainer = createTextboxField(newTextbox, cell._textboxes.length - 1, cell, container);
-    container.insertBefore(textboxContainer, addBtn);
+    // Initialize item order if it doesn't exist
+    if (!cell._itemOrder) {
+      cell._itemOrder = [];
+      const existingTextboxes = cell._textboxes.slice(0, -1);
+      existingTextboxes.forEach((_, index) => {
+        cell._itemOrder.push({ type: 'textbox', index: index });
+      });
+      if (cell._locationIndex >= 0) {
+        cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
+      }
+    }
+    
+    // Add the new textbox to the end of the item order (before location if it exists)
+    const locationItemIndex = cell._itemOrder.findIndex(item => item.type === 'location');
+    if (locationItemIndex !== -1) {
+      cell._itemOrder.splice(locationItemIndex, 0, { type: 'textbox', index: cell._textboxes.length - 1 });
+    } else {
+      cell._itemOrder.push({ type: 'textbox', index: cell._textboxes.length - 1 });
+    }
+    
+    // Refresh the container
+    const newContainer = createTextboxOptionsContainer(cell);
+    container.parentNode.replaceChild(newContainer, container);
     
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
@@ -9940,12 +10225,57 @@ function createTextboxOptionsContainer(cell) {
   
   container.appendChild(addBtn);
   
+  // Add location button (only show if location doesn't exist)
+  if (locationIndex < 0) {
+    const addLocationBtn = document.createElement('button');
+    addLocationBtn.textContent = 'Add Location';
+    addLocationBtn.style.cssText = `
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 5px;
+    `;
+    addLocationBtn.onclick = () => {
+      cell._locationIndex = (cell._textboxes || []).length;
+      
+      // Initialize item order if it doesn't exist
+      if (!cell._itemOrder) {
+        cell._itemOrder = [];
+        const textboxes = cell._textboxes || [];
+        textboxes.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'textbox', index: index });
+        });
+      }
+      
+      // Add location to the end of the item order
+      cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
+      
+      // Refresh the container
+      const newContainer = createTextboxOptionsContainer(cell);
+      container.parentNode.replaceChild(newContainer, container);
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    container.appendChild(addLocationBtn);
+  }
+  
   return container;
 }
 
 // Helper function to create individual textbox field
 function createTextboxField(textbox, index, cell, parentContainer) {
   const textboxContainer = document.createElement('div');
+  textboxContainer.draggable = true;
+  textboxContainer.dataset.type = 'textbox';
+  textboxContainer.dataset.index = index;
   textboxContainer.style.cssText = `
     display: flex;
     align-items: center;
@@ -9954,7 +10284,22 @@ function createTextboxField(textbox, index, cell, parentContainer) {
     background: white;
     border: 1px solid #ddd;
     border-radius: 6px;
+    cursor: move;
+    position: relative;
   `;
+  
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.innerHTML = '⋮⋮';
+  dragHandle.style.cssText = `
+    cursor: move;
+    color: #666;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+    margin-right: 5px;
+  `;
+  textboxContainer.appendChild(dragHandle);
   
   // Textbox name input
   const nameInput = document.createElement('input');
@@ -10061,7 +10406,182 @@ function createTextboxField(textbox, index, cell, parentContainer) {
   textboxContainer.appendChild(copyBtn);
   textboxContainer.appendChild(deleteBtn);
   
+  // Add hover effect
+  textboxContainer.addEventListener('mouseenter', () => {
+    textboxContainer.style.backgroundColor = '#f8f9fa';
+    textboxContainer.style.borderColor = '#007bff';
+  });
+  textboxContainer.addEventListener('mouseleave', () => {
+    textboxContainer.style.backgroundColor = 'white';
+    textboxContainer.style.borderColor = '#ddd';
+  });
+  
   return textboxContainer;
+}
+
+// Helper function to create textbox location indicator
+function createTextboxLocationIndicator(cell, parentContainer) {
+  const locationIndicator = document.createElement('div');
+  locationIndicator.style.cssText = `
+    margin: 8px 0;
+    padding: 8px;
+    background-color: #e8f5e8;
+    border: 2px dashed #28a745;
+    border-radius: 4px;
+    text-align: center;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: move;
+    transition: all 0.2s ease;
+    position: relative;
+  `;
+  locationIndicator.draggable = true;
+  locationIndicator.dataset.type = 'location';
+  locationIndicator.dataset.index = cell._locationIndex;
+  
+  // Add hover effect
+  locationIndicator.addEventListener('mouseenter', () => {
+    locationIndicator.style.backgroundColor = '#d4edda';
+    locationIndicator.style.borderColor = '#1e7e34';
+  });
+  locationIndicator.addEventListener('mouseleave', () => {
+    locationIndicator.style.backgroundColor = '#e8f5e8';
+    locationIndicator.style.borderColor = '#28a745';
+  });
+  
+  // Drag handle
+  const dragHandle = document.createElement('div');
+  dragHandle.innerHTML = '⋮⋮';
+  dragHandle.style.cssText = `
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: move;
+    color: #28a745;
+    font-size: 14px;
+    user-select: none;
+    padding: 2px;
+  `;
+  
+  const locationText = document.createElement('span');
+  locationText.textContent = '📍 Location Date Inserted';
+  
+  // Location title input field
+  const locationTitleInput = document.createElement('input');
+  locationTitleInput.type = 'text';
+  locationTitleInput.placeholder = 'Enter location title...';
+  locationTitleInput.value = cell._locationTitle || '';
+  locationTitleInput.style.cssText = `
+    width: 100%;
+    max-width: 300px;
+    padding: 4px 8px;
+    border: 1px solid #28a745;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: center;
+    background: white;
+    color: #333;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  `;
+  locationTitleInput.onblur = () => {
+    cell._locationTitle = locationTitleInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Copy Location IDs button
+  const copyLocationIdsBtn = document.createElement('button');
+  copyLocationIdsBtn.textContent = 'Copy ID\'s';
+  copyLocationIdsBtn.style.cssText = `
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    width: 100%;
+    max-width: 200px;
+  `;
+  copyLocationIdsBtn.onclick = () => {
+    if (typeof window.showLocationIdsPopup === 'function') {
+      window.showLocationIdsPopup(cell.id);
+    }
+  };
+  
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.style.cssText = `
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    width: 100%;
+    max-width: 200px;
+  `;
+  removeBtn.onclick = () => {
+    delete cell._locationIndex;
+    delete cell._locationTitle;
+    
+    // Remove location from item order
+    if (cell._itemOrder) {
+      const locationItemIndex = cell._itemOrder.findIndex(item => item.type === 'location');
+      if (locationItemIndex !== -1) {
+        cell._itemOrder.splice(locationItemIndex, 1);
+      }
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    
+    // Refresh the entire container
+    const newContainer = createTextboxOptionsContainer(cell);
+    parentContainer.parentNode.replaceChild(newContainer, parentContainer);
+  };
+  
+  // Create a text container to hold the location text
+  const textContainer = document.createElement('div');
+  textContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-left: 24px;
+  `;
+  textContainer.appendChild(locationText);
+  
+  // Create main container for the entire location indicator
+  const mainContainer = document.createElement('div');
+  mainContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  `;
+  
+  mainContainer.appendChild(dragHandle);
+  mainContainer.appendChild(textContainer);
+  mainContainer.appendChild(locationTitleInput);
+  mainContainer.appendChild(copyLocationIdsBtn);
+  mainContainer.appendChild(removeBtn);
+  
+  locationIndicator.appendChild(mainContainer);
+  
+  return locationIndicator;
 }
 
 // Helper function to create textbox location container
