@@ -152,37 +152,37 @@
               "fieldName": "Hello",
               "options": [
                 {
-                  "text": "yes",
-                  "nodeId": "yes"
+                  "text": "Yes",
+                  "nodeId": "Yes"
                 },
                 {
-                  "text": "no",
-                  "nodeId": "no"
+                  "text": "No",
+                  "nodeId": "No"
                 }
               ],
               "triggerSequences": [
                 {
-                  "condition": "yes",
+                  "condition": "Yes",
                   "fields": [
                     {
                       "type": "label",
-                      "label": "name",
-                      "nodeId": "name"
+                      "label": "Name",
+                      "nodeId": "hello_yes_name"
                     },
                     {
                       "type": "label",
-                      "label": "phone",
-                      "nodeId": "phone"
+                      "label": "Phone",
+                      "nodeId": "hello_yes_phone"
                     },
                     {
                       "type": "location",
-                      "fieldName": "example location",
+                      "fieldName": "Example Location",
                       "nodeId": "location_data"
                     },
                     {
                       "type": "date",
-                      "label": "when",
-                      "nodeId": "when"
+                      "label": "When",
+                      "nodeId": "hello_yes_when"
                     },
                     {
                       "type": "checkbox",
@@ -196,13 +196,13 @@
                     },
                     {
                       "type": "dropdown",
-                      "fieldName": "really",
+                      "fieldName": "Really",
                       "options": [
                         {
-                          "text": "yes"
+                          "text": "Yes"
                         },
                         {
-                          "text": "no"
+                          "text": "No"
                         }
                       ]
                     }

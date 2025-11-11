@@ -3195,11 +3195,11 @@ if (s > 1){
 
         const input = document.createElement('input');
         input.type = 'text';
-        // For multipleTextboxes: {dropdownName}_{triggerCondition}_{fieldName}
+        // For multipleTextboxes: use nodeId directly from JSON (e.g., "hello_yes_name")
         // For numberedDropdown: {fieldName}_{entryNumber}
-        if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
-          const sanitizedFieldName = sanitizeForId(triggerField.nodeId || triggerField.label);
-          input.id = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName;
+        if (isMultipleTextboxes) {
+          // Use the nodeId directly as specified in the JSON
+          input.id = triggerField.nodeId || triggerField.label;
         } else {
           input.id = triggerField.nodeId + "_" + entryNumber;
         }
@@ -3928,11 +3928,11 @@ if (s > 1){
 
         const input = document.createElement('input');
         input.type = 'date';
-        // For multipleTextboxes: {dropdownName}_{triggerCondition}_{fieldName}
+        // For multipleTextboxes: use nodeId directly from JSON (e.g., "hello_yes_when")
         // For numberedDropdown: {fieldName}_{entryNumber}
-        if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
-          const sanitizedFieldName = sanitizeForId(triggerField.nodeId || triggerField.label);
-          input.id = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName;
+        if (isMultipleTextboxes) {
+          // Use the nodeId directly as specified in the JSON
+          input.id = triggerField.nodeId || triggerField.label;
         } else {
           input.id = triggerField.nodeId + "_" + entryNumber;
         }

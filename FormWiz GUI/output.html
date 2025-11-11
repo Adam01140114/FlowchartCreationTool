@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                     dropdownFieldName: fieldData.fieldName,
                                     triggerTitle: triggerTitle
                                   });
-                                  createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, fieldData.fieldName, triggerTitle, parentDropdownBaseNodeId);
+                                  createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, fieldData.fieldName, triggerTitle, parentDropdownBaseNodeId, conditionValue, true);
                                   console.log('🔧 [MULTIPLE TEXTBOXES RENDER] createTriggerFieldsContainer call completed');
                                 } else {
                                   console.error('🔧 [MULTIPLE TEXTBOXES RENDER] dropdownFieldDiv not found!');
@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       handleMultipleTextboxesDropdown_2_3(select);
                     }
                   }, 1000);
-                </script><h4 style="margin: 0px 0px 15px; color: rgb(25, 118, 210); font-size: 18px; font-weight: 600; text-align: center;">Hello</h4><select id="hello" name="hello" data-field-data="{&quot;questionId&quot;:&quot;2&quot;,&quot;fieldName&quot;:&quot;Hello&quot;,&quot;triggerSequences&quot;:[{&quot;condition&quot;:&quot;yes&quot;,&quot;title&quot;:&quot;Additional Information&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;name&quot;,&quot;nodeId&quot;:&quot;name&quot;},{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;phone&quot;,&quot;nodeId&quot;:&quot;phone&quot;},{&quot;type&quot;:&quot;location&quot;,&quot;fieldName&quot;:&quot;example location&quot;,&quot;nodeId&quot;:&quot;location_data&quot;},{&quot;type&quot;:&quot;date&quot;,&quot;label&quot;:&quot;when&quot;,&quot;nodeId&quot;:&quot;when&quot;},{&quot;type&quot;:&quot;checkbox&quot;,&quot;fieldName&quot;:&quot;bruh&quot;,&quot;selectionType&quot;:&quot;single&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;123&quot;,&quot;nodeId&quot;:&quot;123&quot;}]},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;really&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;yes&quot;},{&quot;text&quot;:&quot;no&quot;}]}]}],&quot;options&quot;:[{&quot;text&quot;:&quot;yes&quot;,&quot;nodeId&quot;:&quot;yes&quot;},{&quot;text&quot;:&quot;no&quot;,&quot;nodeId&quot;:&quot;no&quot;}]}" data-question-id="2" data-entry-number="1" onchange="handleMultipleTextboxesDropdown_2_3(this)" style="width: 100%; padding: 12px; border: 1px solid rgb(33, 150, 243); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); cursor: pointer; transition: 0.2s;"><option value="" disabled="">Select an option...</option><option value="yes" data-node-id="yes">yes</option><option value="no" data-node-id="no">no</option></select><div id="dropdowntext_hello" style="display: none;"><input type="text" id="hello_dropdown" name="hello_dropdown" style="display: none;"></div></div></div><br></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+                </script><h4 style="margin: 0px 0px 15px; color: rgb(25, 118, 210); font-size: 18px; font-weight: 600; text-align: center;">Hello</h4><select id="hello" name="hello" data-field-data="{&quot;questionId&quot;:&quot;2&quot;,&quot;fieldName&quot;:&quot;Hello&quot;,&quot;triggerSequences&quot;:[{&quot;condition&quot;:&quot;Yes&quot;,&quot;title&quot;:&quot;Additional Information&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Name&quot;,&quot;nodeId&quot;:&quot;hello_yes_name&quot;},{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Phone&quot;,&quot;nodeId&quot;:&quot;hello_yes_phone&quot;},{&quot;type&quot;:&quot;location&quot;,&quot;fieldName&quot;:&quot;Example Location&quot;,&quot;nodeId&quot;:&quot;location_data&quot;},{&quot;type&quot;:&quot;date&quot;,&quot;label&quot;:&quot;When&quot;,&quot;nodeId&quot;:&quot;hello_yes_when&quot;},{&quot;type&quot;:&quot;checkbox&quot;,&quot;fieldName&quot;:&quot;bruh&quot;,&quot;selectionType&quot;:&quot;multiple&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;123&quot;,&quot;nodeId&quot;:&quot;123&quot;}]},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Really&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]}]}],&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;,&quot;nodeId&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;,&quot;nodeId&quot;:&quot;No&quot;}]}" data-question-id="2" data-entry-number="1" onchange="handleMultipleTextboxesDropdown_2_3(this)" style="width: 100%; padding: 12px; border: 1px solid rgb(33, 150, 243); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); cursor: pointer; transition: 0.2s;"><option value="" disabled="">Select an option...</option><option value="Yes" data-node-id="Yes">Yes</option><option value="No" data-node-id="No">No</option></select><div id="dropdowntext_hello" style="display: none;"><input type="text" id="hello_dropdown" name="hello_dropdown" style="display: none;"></div></div></div><br></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -467,9 +467,12 @@ window.formId = '';
 var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"enter_question_text"};
 var questionNameIds = {"1":"are_you_the_only_person_suing","2":"enter_question_text"};
 var linkedCheckboxes = [{"linkedCheckboxId":"test","checkboxes":["is_this_defendant_a_business/public_entity_are_they_a_public_entity_yes_1","are_you_the_only_person_suing_yes"]}];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_question_text_bruh","order":1},{"type":"location","fieldName":"Location Data","nodeId":"location_data","order":2},{"type":"dropdown","fieldName":"Hello","options":[{"text":"yes","nodeId":"yes"},{"text":"no","nodeId":"no"}],"triggerSequences":[{"condition":"yes","title":"Additional Information","fields":[{"type":"label","label":"name","nodeId":"name"},{"type":"label","label":"phone","nodeId":"phone"},{"type":"location","fieldName":"example location","nodeId":"location_data"},{"type":"date","label":"when","nodeId":"when"},{"type":"checkbox","fieldName":"bruh","selectionType":"single","options":[{"text":"123","nodeId":"123"}]},{"type":"dropdown","fieldName":"really","options":[{"text":"yes"},{"text":"no"}]}]}],"order":3}]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_question_text_bruh","order":1},{"type":"location","fieldName":"Location Data","nodeId":"location_data","order":2},{"type":"dropdown","fieldName":"Hello","options":[{"text":"Yes","nodeId":"Yes"},{"text":"No","nodeId":"No"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"hello_yes_name"},{"type":"label","label":"Phone","nodeId":"hello_yes_phone"},{"type":"location","fieldName":"Example Location","nodeId":"location_data"},{"type":"date","label":"When","nodeId":"hello_yes_when"},{"type":"checkbox","fieldName":"bruh","selectionType":"multiple","options":[{"text":"123","nodeId":"123"}]},{"type":"dropdown","fieldName":"Really","options":[{"text":"Yes"},{"text":"No"}]}]}],"order":3}]};
 
-  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId) {
+  function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId, triggerCondition, isMultipleTextboxes) {
+    // Default parameters for backward compatibility
+    triggerCondition = triggerCondition || '';
+    isMultipleTextboxes = isMultipleTextboxes === true; // Only true if explicitly set to true
     const triggerContainer = document.createElement('div');
     triggerContainer.id = 'triggerFields_' + questionId + '_' + entryNumber + '_' + sequenceIndex;
     triggerContainer.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #87CEEB; border-radius: 12px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15); display: block;';
@@ -478,6 +481,19 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
     triggerTitle.textContent = triggerTitleText || 'Additional Information';
     triggerTitle.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center;';
     triggerContainer.appendChild(triggerTitle);
+
+    // Helper function to sanitize names for IDs
+    function sanitizeForId(str) {
+      return String(str || '')
+        .toLowerCase()
+        .replace(/[?]/g, '')
+        .replace(/[^a-z0-9_]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    }
+
+    // Sanitize dropdown name and trigger condition for multipleTextboxes ID format
+    const sanitizedDropdownName = sanitizeForId(dropdownFieldName);
+    const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
 
     fields.forEach((triggerField, fieldIndex) => {
       if (triggerField.type === 'label') {
@@ -500,7 +516,14 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
 
         const input = document.createElement('input');
         input.type = 'text';
-        input.id = triggerField.nodeId + "_" + entryNumber;
+        // For multipleTextboxes: {dropdownName}_{triggerCondition}_{fieldName}
+        // For numberedDropdown: {fieldName}_{entryNumber}
+        if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+          const sanitizedFieldName = sanitizeForId(triggerField.nodeId || triggerField.label);
+          input.id = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName;
+        } else {
+          input.id = triggerField.nodeId + "_" + entryNumber;
+        }
         input.name = input.id;
         input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
 
@@ -683,8 +706,22 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
 
           const input = document.createElement('input');
           input.type = selectionType === 'single' ? 'radio' : 'checkbox';
-          input.id = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
-          input.name = selectionType === 'single' ? 'radio_group_' + entryNumber : option.nodeId + "_" + entryNumber;
+          // For multipleTextboxes: {dropdownName}_{triggerCondition}_{fieldName}_{optionNodeId} or {dropdownName}_{triggerCondition}_{fieldName}_{optionNodeId}_radio
+          // For numberedDropdown: {optionNodeId}_{entryNumber} or {optionNodeId}_{entryNumber}_radio
+          let checkboxId;
+          if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+            const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
+            const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
+            if (selectionType === 'single') {
+              checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
+            } else {
+              checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
+            }
+          } else {
+            checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+          }
+          input.id = checkboxId;
+          input.name = selectionType === 'single' ? (isMultipleTextboxes ? 'radio_group_' + sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizeForId(triggerField.fieldName) : 'radio_group_' + entryNumber) : checkboxId;
           input.value = option.text;
           input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #87CEEB; cursor: pointer;';
 
@@ -798,7 +835,20 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
               checkboxFieldDiv.style.display = 'none';
               // Reset checkbox values when hidden
               checkboxOptions.forEach((option) => {
-                const optionInput = document.getElementById(selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber);
+                // Use the same ID format as when creating the checkbox
+                let checkboxId;
+                if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+                  const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
+                  const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
+                  if (selectionType === 'single') {
+                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
+                  } else {
+                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
+                  }
+                } else {
+                  checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+                }
+                const optionInput = document.getElementById(checkboxId);
                 if (optionInput) {
                   optionInput.checked = false;
                   optionInput.dispatchEvent(new Event('change'));
@@ -919,15 +969,19 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
         dropdownFieldDiv.appendChild(fieldNameLabel);
 
         const select = document.createElement('select');
-        const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+        const sanitizedTriggerFieldName = sanitizeForId(triggerField.fieldName || '');
 
-        // Use the parent dropdown's nodeId (passed as parameter) instead of the question nodeId
-        // If not provided, fallback to question nodeId
-        const baseNodeId = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
-
-        // Format: {baseNodeId}_{dropdownFieldName}_{entryNumber}
-        // When dropdownMirror is called, it will create: {baseNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
-        select.id = baseNodeId + "_" + sanitizedFieldName + "_" + entryNumber;
+        // For multipleTextboxes: {dropdownName}_{triggerCondition}_{fieldName}
+        // For numberedDropdown: {baseNodeId}_{dropdownFieldName}_{entryNumber}
+        if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+          select.id = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedTriggerFieldName;
+        } else {
+          // Use the parent dropdown's nodeId (passed as parameter) instead of the question nodeId
+          // If not provided, fallback to question nodeId
+          const baseNodeId = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+          // Format: {baseNodeId}_{dropdownFieldName}_{entryNumber}
+          select.id = baseNodeId + "_" + sanitizedTriggerFieldName + "_" + entryNumber;
+        }
         select.name = select.id;
         select.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease; margin: 0 auto; display: block;';
 
@@ -1195,7 +1249,14 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
 
         const input = document.createElement('input');
         input.type = 'date';
-        input.id = triggerField.nodeId + "_" + entryNumber;
+        // For multipleTextboxes: {dropdownName}_{triggerCondition}_{fieldName}
+        // For numberedDropdown: {fieldName}_{entryNumber}
+        if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+          const sanitizedFieldName = sanitizeForId(triggerField.nodeId || triggerField.label);
+          input.id = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName;
+        } else {
+          input.id = triggerField.nodeId + "_" + entryNumber;
+        }
         input.name = input.id;
         input.style.cssText = 'width: 200px; padding: 10px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; cursor: pointer; transition: all 0.2s ease;';
 
@@ -1464,37 +1525,37 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
           { label: 'Zip', nodeId: 'zip' }
         ];
         // Build locPrefix: dropdown fieldName + location field's fieldName
-        // First sanitize the dropdown field name
-        const sanitizedDropdownName = String(dropdownFieldName || 'dropdown')
-            .toLowerCase()
-            .replace(/[?]/g, '')  // Remove question marks
-            .replace(/[ ]+/g, '_') // Replace spaces with underscores
-            .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
-            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
-
-        // Then sanitize the location field's fieldName
+        // Use the sanitizeForId helper function
+        const sanitizedDropdownNameForLocation = sanitizeForId(dropdownFieldName || 'dropdown');
         const locationFieldName = triggerField.fieldName || 'location';
-        const sanitizedLocationName = String(locationFieldName)
-            .toLowerCase()
-            .replace(/[?]/g, '')  // Remove question marks
-            .replace(/[ ]+/g, '_') // Replace spaces with underscores
-            .replace(/[^a-z0-9_]+/g, '_') // Replace any other non-alphanumeric characters except underscores
-            .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+        const sanitizedLocationName = sanitizeForId(locationFieldName);
 
         // Combine: dropdown name + location field name
-        let locPrefix = (sanitizedDropdownName || 'dropdown') + '_' + (sanitizedLocationName || 'location');
+        // For multipleTextboxes: {dropdownName}_{locationFieldName} (no entry number, no trigger condition)
+        // For numberedDropdown: {dropdownName}_{locationFieldName} (entry number added per field)
+        const locPrefix = sanitizedDropdownNameForLocation + '_' + sanitizedLocationName;
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
             // Create state dropdown
             input = document.createElement('select');
-            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            // For multipleTextboxes: {dropdownName}_{locationFieldName}_{fieldType}
+            // For numberedDropdown: {dropdownName}_{locationFieldName}_{fieldType}_{entryNumber}
+            if (isMultipleTextboxes) {
+              input.id = locPrefix + '_' + field.nodeId;
+            } else {
+              input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            }
             input.name = input.id;
             input.className = 'address-select-main';
             // Hidden short code field
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';
-            shortHidden.id = locPrefix + '_state_short_' + entryNumber;
+            if (isMultipleTextboxes) {
+              shortHidden.id = locPrefix + '_state_short';
+            } else {
+              shortHidden.id = locPrefix + '_state_short_' + entryNumber;
+            }
             shortHidden.name = shortHidden.id;
             shortHidden.style.display = 'none';
 
@@ -1543,7 +1604,13 @@ var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_ques
             // Create text input for other fields
             input = document.createElement('input');
             input.type = field.label === 'Zip' ? 'number' : 'text';
-            input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            // For multipleTextboxes: {dropdownName}_{locationFieldName}_{fieldType}
+            // For numberedDropdown: {dropdownName}_{locationFieldName}_{fieldType}_{entryNumber}
+            if (isMultipleTextboxes) {
+              input.id = locPrefix + '_' + field.nodeId;
+            } else {
+              input.id = locPrefix + '_' + field.nodeId + "_" + entryNumber;
+            }
             input.name = input.id;
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
@@ -3534,10 +3601,16 @@ function showTextboxLabels(questionId, count){
                                     if (radio !== this) {
                                         radio.checked = false;
                                         
-                                        // Remove hidden checkbox for unchecked radio
-                                        // The hidden checkbox ID should be the original nodeId (without _radio suffix)
-                                        const originalNodeId = radio.id.replace('_radio', '');
-                                        const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                    // Remove hidden checkbox for unchecked radio
+                    // The hidden checkbox ID should be the original nodeId (without _radio suffix)
+                    let originalNodeId;
+                    if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+                      // For multipleTextboxes, remove _radio suffix to get the checkbox ID
+                      originalNodeId = radio.id.replace('_radio', '');
+                    } else {
+                      originalNodeId = radio.id.replace('_radio', '');
+                    }
+                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
                                         
                                         if (existingHiddenCheckbox) {
                                             if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
@@ -3547,10 +3620,12 @@ function showTextboxLabels(questionId, count){
                                     }
                                 });
                                 
-                                // Create hidden checkbox for the selected radio
-                                // Use the original nodeId (without _radio suffix) for the hidden checkbox
-                                const originalNodeId = this.id.replace('_radio', '');
-                                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                // Create hidden checkbox for the selected radio
+                // Use the original nodeId (without _radio suffix) for the hidden checkbox
+                // For multipleTextboxes, the ID already has the full format, so just remove _radio
+                // For numberedDropdown, remove _radio to get the base nodeId
+                const originalNodeId = this.id.replace('_radio', '');
+                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                             }
                         });
                     }
@@ -3768,7 +3843,8 @@ function showTextboxLabels(questionId, count){
                                         parentDropdownBaseNodeId = firstOptionNodeId;
                                       }
                                     }
-                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName, triggerTitle, parentDropdownBaseNodeId);
+                                    const triggerCondition = sequence.condition || '';
+                                    createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, field.fieldName, triggerTitle, parentDropdownBaseNodeId, triggerCondition, false);
                                 }
                             } else {
                                 // Hide trigger fields for other conditions and reset their values
