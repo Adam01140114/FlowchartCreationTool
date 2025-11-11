@@ -3965,7 +3965,17 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 miniOptionEntry.appendChild(checkboxIdInput);
                 miniOptionEntry.appendChild(copyCheckboxIdBtn);
                 miniOptionEntry.appendChild(deleteOptionBtn);
-                checkboxContainer.appendChild(miniOptionEntry);
+                
+                // Insert the new option before the delete button in contentContainer
+                // Find the delete button by searching for a button with "Delete Checkbox" text
+                const allButtons = Array.from(contentContainer.querySelectorAll('button'));
+                const deleteCheckboxBtn = allButtons.find(btn => btn.textContent.trim() === 'Delete Checkbox');
+                if (deleteCheckboxBtn) {
+                  contentContainer.insertBefore(miniOptionEntry, deleteCheckboxBtn);
+                } else {
+                  // Fallback: append to contentContainer if delete button not found yet
+                  contentContainer.appendChild(miniOptionEntry);
+                }
                 
                 checkboxTextInput.focus();
               };
@@ -7321,17 +7331,35 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 12px;
           margin-bottom: 8px;
         `;
-        fieldNameInput.onblur = () => {
+        // Update all checkbox option node IDs in real-time as user types field name
+        const updateCheckboxFieldNameAndNodeIds = () => {
           checkbox.fieldName = fieldNameInput.value.trim();
           
           // Update all checkbox option node IDs when field name changes
           if (checkbox.options && checkbox.options.length > 0) {
-            checkbox.options.forEach(option => {
+            checkbox.options.forEach((option, optionIndex) => {
               const combinedFieldName = `${checkbox.fieldName}_${option.checkboxText || ''}`;
               const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
               option.nodeId = updatedNodeId;
+              
+              // Update the checkbox ID input in the UI if it exists
+              const checkboxOptionEntry = checkboxContainer.querySelector(`[data-option-index="${optionIndex}"]`);
+              if (checkboxOptionEntry) {
+                const optionIdInput = checkboxOptionEntry.querySelector('input[placeholder*="Checkbox ID"]');
+                if (optionIdInput) {
+                  optionIdInput.value = updatedNodeId;
+                }
+              }
             });
           }
+        };
+        
+        // Update on input (real-time as user types)
+        fieldNameInput.oninput = updateCheckboxFieldNameAndNodeIds;
+        
+        // Also update on blur (for final save)
+        fieldNameInput.onblur = () => {
+          updateCheckboxFieldNameAndNodeIds();
           
           if (typeof window.requestAutosave === 'function') {
             window.requestAutosave();
@@ -7401,6 +7429,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           
           // Create mini checkbox option entry
           const miniOptionEntry = document.createElement('div');
+          const optionIndex = checkbox.options.length - 1; // Get the index of this option
+          miniOptionEntry.dataset.optionIndex = optionIndex;
           miniOptionEntry.style.cssText = `
             display: flex;
             align-items: center;
@@ -7422,29 +7452,67 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             border-radius: 2px;
             font-size: 11px;
           `;
-          checkboxTextInput.onblur = () => {
+          // Update node ID in real-time as user types
+          const updateCheckboxOptionNodeId = () => {
             newOption.checkboxText = checkboxTextInput.value.trim();
+            
+            // Update the node ID when checkbox text changes
+            const combinedFieldName = `${checkbox.fieldName}_${newOption.checkboxText || ''}`;
+            const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
+            newOption.nodeId = updatedNodeId;
+            checkboxIdInput.value = updatedNodeId;
+          };
+          
+          // Update on input (real-time as user types)
+          checkboxTextInput.oninput = updateCheckboxOptionNodeId;
+          
+          // Also update on blur (for final save)
+          checkboxTextInput.onblur = () => {
+            updateCheckboxOptionNodeId();
+            
             if (typeof window.requestAutosave === 'function') {
               window.requestAutosave();
             }
           };
           
-          const checkboxIdInput = document.createElement('input');
-          checkboxIdInput.type = 'text';
-          checkboxIdInput.placeholder = 'Checkbox ID...';
+          const checkboxIdInput = createUneditableNodeIdInput('Checkbox ID...', '', (input) => {
+            // Double-click to copy functionality
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(input.value).then(() => {
+                // Show visual feedback
+                const originalBg = input.style.backgroundColor;
+                input.style.backgroundColor = '#d4edda';
+                input.style.borderColor = '#28a745';
+                setTimeout(() => {
+                  input.style.backgroundColor = originalBg;
+                  input.style.borderColor = '#ddd';
+                }, 1000);
+              });
+            } else {
+              // Fallback for older browsers
+              input.select();
+              document.execCommand('copy');
+              const originalBg = input.style.backgroundColor;
+              input.style.backgroundColor = '#d4edda';
+              input.style.borderColor = '#28a745';
+              setTimeout(() => {
+                input.style.backgroundColor = originalBg;
+                input.style.borderColor = '#ddd';
+              }, 1000);
+            }
+          });
           checkboxIdInput.style.cssText = `
             flex: 1;
             padding: 2px 4px;
             border: 1px solid #ddd;
             border-radius: 2px;
             font-size: 11px;
+            background-color: #f8f9fa;
+            cursor: pointer;
           `;
-          checkboxIdInput.onblur = () => {
-            newOption.nodeId = checkboxIdInput.value.trim();
-            if (typeof window.requestAutosave === 'function') {
-              window.requestAutosave();
-            }
-          };
+          
+          // Initialize the node ID
+          updateCheckboxOptionNodeId();
           
           const deleteOptionBtn = document.createElement('button');
           deleteOptionBtn.textContent = '×';
@@ -7517,7 +7585,17 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           miniOptionEntry.appendChild(checkboxIdInput);
           miniOptionEntry.appendChild(copyCheckboxIdBtn);
           miniOptionEntry.appendChild(deleteOptionBtn);
-          checkboxContainer.appendChild(miniOptionEntry);
+          
+          // Insert the new option before the delete button in contentContainer
+          // Find the delete button by searching for a button with "Delete Checkbox" text
+          const allButtons = Array.from(contentContainer.querySelectorAll('button'));
+          const deleteCheckboxBtn = allButtons.find(btn => btn.textContent.trim() === 'Delete Checkbox');
+          if (deleteCheckboxBtn) {
+            contentContainer.insertBefore(miniOptionEntry, deleteCheckboxBtn);
+          } else {
+            // Fallback: append to contentContainer if delete button not found yet
+            contentContainer.appendChild(miniOptionEntry);
+          }
           
           checkboxTextInput.focus();
         };
@@ -7552,6 +7630,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         if (checkbox.options && checkbox.options.length > 0) {
           checkbox.options.forEach((option, optionIndex) => {
             const optionDiv = document.createElement('div');
+            optionDiv.dataset.optionIndex = optionIndex; // Add data attribute for finding this option
             optionDiv.style.cssText = `
               display: flex;
               align-items: center;
@@ -7574,7 +7653,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               border-radius: 2px;
               font-size: 11px;
             `;
-            checkboxTextInput.onblur = () => {
+            
+            // Update node ID in real-time as user types
+            const updateCheckboxOptionNodeId = () => {
               option.checkboxText = checkboxTextInput.value.trim();
               
               // Update the node ID when checkbox text changes
@@ -7582,6 +7663,14 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               const updatedNodeId = generateNodeIdForDropdownField(combinedFieldName, dropdown.name || '', cell, trigger.triggerOption || '');
               option.nodeId = updatedNodeId;
               checkboxIdInput.value = updatedNodeId;
+            };
+            
+            // Update on input (real-time as user types)
+            checkboxTextInput.oninput = updateCheckboxOptionNodeId;
+            
+            // Also update on blur (for final save)
+            checkboxTextInput.onblur = () => {
+              updateCheckboxOptionNodeId();
               
               if (typeof window.requestAutosave === 'function') {
                 window.requestAutosave();

@@ -189,8 +189,12 @@
                       "fieldName": "bruh",
                       "options": [
                         {
-                          "text": "123",
-                          "nodeId": "123"
+                          "text": "Option One",
+                          "nodeId": "hello_yes_bruh_option_one"
+                        },
+                        {
+                          "text": "Option Two",
+                          "nodeId": "hello_yes_bruh_option_two"
                         }
                       ]
                     },
