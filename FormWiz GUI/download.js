@@ -598,6 +598,36 @@ function loadFormData(formData) {
                                                 
                                                 if (optionTextEl) optionTextEl.value = option.text;
                                                 if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
+                                                
+                                                // Restore linked fields if they exist
+                                                if (option.linkedFields && option.linkedFields.length > 0) {
+                                                    option.linkedFields.forEach((linkedField) => {
+                                                        // Handle both old format (string) and new format (object with nodeId and title)
+                                                        const linkedFieldNodeId = typeof linkedField === 'string' ? linkedField : linkedField.nodeId;
+                                                        const linkedFieldTitle = typeof linkedField === 'object' && linkedField.title ? linkedField.title : '';
+                                                        
+                                                        // Add a linked field dropdown
+                                                        if (typeof addLinkedField === 'function') {
+                                                            addLinkedField(question.questionId, fieldOrder, optionIndex + 1);
+                                                            
+                                                            // Find the last added linked field and set its values
+                                                            const linkedFieldsContainer = document.getElementById('linkedFields' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                                            if (linkedFieldsContainer) {
+                                                                const lastLinkedFieldDiv = linkedFieldsContainer.querySelector('[class^="linked-field-"]:last-of-type');
+                                                                if (lastLinkedFieldDiv) {
+                                                                    const lastSelect = lastLinkedFieldDiv.querySelector('select[id^="linkedField"]');
+                                                                    const lastTitleInput = lastLinkedFieldDiv.querySelector('input[id^="linkedFieldTitle"]');
+                                                                    if (lastSelect) {
+                                                                        lastSelect.value = linkedFieldNodeId;
+                                                                    }
+                                                                    if (lastTitleInput && linkedFieldTitle) {
+                                                                        lastTitleInput.value = linkedFieldTitle;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
                                             });
                                         }
                                     }
@@ -1191,6 +1221,36 @@ function loadFormData(formData) {
                                             
                                             if (optionTextEl) optionTextEl.value = option.text;
                                             if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
+                                            
+                                            // Restore linked fields if they exist
+                                            if (option.linkedFields && option.linkedFields.length > 0) {
+                                                option.linkedFields.forEach((linkedField) => {
+                                                    // Handle both old format (string) and new format (object with nodeId and title)
+                                                    const linkedFieldNodeId = typeof linkedField === 'string' ? linkedField : linkedField.nodeId;
+                                                    const linkedFieldTitle = typeof linkedField === 'object' && linkedField.title ? linkedField.title : '';
+                                                    
+                                                    // Add a linked field dropdown
+                                                    if (typeof addLinkedField === 'function') {
+                                                        addLinkedField(question.questionId, fieldOrder, optionIndex + 1);
+                                                        
+                                                        // Find the last added linked field and set its values
+                                                        const linkedFieldsContainer = document.getElementById('linkedFields' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                                        if (linkedFieldsContainer) {
+                                                            const lastLinkedFieldDiv = linkedFieldsContainer.querySelector('[class^="linked-field-"]:last-of-type');
+                                                            if (lastLinkedFieldDiv) {
+                                                                const lastSelect = lastLinkedFieldDiv.querySelector('select[id^="linkedField"]');
+                                                                const lastTitleInput = lastLinkedFieldDiv.querySelector('input[id^="linkedFieldTitle"]');
+                                                                if (lastSelect) {
+                                                                    lastSelect.value = linkedFieldNodeId;
+                                                                }
+                                                                if (lastTitleInput && linkedFieldTitle) {
+                                                                    lastTitleInput.value = linkedFieldTitle;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
                                         });
                                     }
                                 }
@@ -2942,9 +3002,27 @@ function exportForm() {
                                     const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
                                     
                                     if (textEl && nodeIdEl) {
+                                        // Collect linked fields for this option
+                                        const linkedFields = [];
+                                        const linkedFieldsContainer = optionEl.querySelector('#linkedFields' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                        if (linkedFieldsContainer) {
+                                            const linkedFieldDivs = linkedFieldsContainer.querySelectorAll('[class^="linked-field-"]');
+                                            linkedFieldDivs.forEach((linkedFieldDiv) => {
+                                                const select = linkedFieldDiv.querySelector('select[id^="linkedField"]');
+                                                const titleInput = linkedFieldDiv.querySelector('input[id^="linkedFieldTitle"]');
+                                                if (select && select.value && select.value.trim()) {
+                                                    linkedFields.push({
+                                                        nodeId: select.value.trim(),
+                                                        title: titleInput ? titleInput.value.trim() : ''
+                                                    });
+                                                }
+                                            });
+                                        }
+                                        
                                         checkboxOptions.push({
                                             text: textEl.value.trim(),
-                                            nodeId: nodeIdEl.value.trim()
+                                            nodeId: nodeIdEl.value.trim(),
+                                            linkedFields: linkedFields
                                         });
                                     }
                                 });
@@ -3541,9 +3619,27 @@ function exportForm() {
                                         const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
                                         
                                         if (textEl && nodeIdEl) {
+                                            // Collect linked fields for this option
+                                            const linkedFields = [];
+                                            const linkedFieldsContainer = optionEl.querySelector('#linkedFields' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                            if (linkedFieldsContainer) {
+                                                const linkedFieldDivs = linkedFieldsContainer.querySelectorAll('[class^="linked-field-"]');
+                                                linkedFieldDivs.forEach((linkedFieldDiv) => {
+                                                    const select = linkedFieldDiv.querySelector('select[id^="linkedField"]');
+                                                    const titleInput = linkedFieldDiv.querySelector('input[id^="linkedFieldTitle"]');
+                                                    if (select && select.value && select.value.trim()) {
+                                                        linkedFields.push({
+                                                            nodeId: select.value.trim(),
+                                                            title: titleInput ? titleInput.value.trim() : ''
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            
                                             checkboxOptions.push({
                                                 text: textEl.value.trim(),
-                                                nodeId: nodeIdEl.value.trim()
+                                                nodeId: nodeIdEl.value.trim(),
+                                                linkedFields: linkedFields
                                             });
                                         }
                                     });

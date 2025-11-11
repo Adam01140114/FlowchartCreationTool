@@ -5791,6 +5791,16 @@ function autosaveFlowchartToLocalStorage() {
     // Get current library flowchart name (if any)
     const libraryFlowchartName = window.currentFlowchartName || null;
     
+    // Get current camera/viewport position
+    const view = graph.getView();
+    const translate = view.getTranslate();
+    const scale = view.getScale();
+    const viewportPosition = {
+      translateX: translate.x,
+      translateY: translate.y,
+      scale: scale
+    };
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
@@ -5798,7 +5808,8 @@ function autosaveFlowchartToLocalStorage() {
       defaultPdfProperties: defaultPdfProps,
       formName: formName,
       libraryFlowchartName: libraryFlowchartName,
-      edgeStyle: currentEdgeStyle
+      edgeStyle: currentEdgeStyle,
+      viewportPosition: viewportPosition
     };
     
     // Cache the data and hash for next comparison
@@ -6040,11 +6051,19 @@ function setupAutosaveHooks() {
   
   // Save after loadFlowchartData (delayed to ensure groups are loaded)
   const origLoadFlowchartData = window.loadFlowchartData;
-  window.loadFlowchartData = function(data) {
+  window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallback) {
     // Set flag to prevent automatic Node ID regeneration during loading
     window._isLoadingFlowchart = true;
     
-    origLoadFlowchartData.apply(this, arguments);
+    // Wrap the callback to reset the flag after loading
+    const wrappedCallback = () => {
+      if (typeof onCompleteCallback === 'function') {
+        onCompleteCallback();
+      }
+      window._isLoadingFlowchart = false;
+    };
+    
+    origLoadFlowchartData.call(this, data, libraryFlowchartName, wrappedCallback);
     
     // Apply groups from imported JSON if present
     if (data && Array.isArray(data.groups)) {
@@ -6170,14 +6189,56 @@ function showAutosaveRestorePrompt() {
         // Set the current flowchart name first
         window.currentFlowchartName = data.libraryFlowchartName;
         
-        // Open the library flowchart directly (this will load the latest version from the library)
-        window.openSavedFlowchart(data.libraryFlowchartName);
+        // Store viewport position before opening (since openSavedFlowchart will load from library)
+        const savedViewportPosition = data.viewportPosition;
+        
+        // Create callback to restore viewport after flowchart loads
+        const restoreViewportCallback = () => {
+          if (savedViewportPosition && graph) {
+            try {
+              const view = graph.getView();
+              if (view && savedViewportPosition.translateX !== undefined && savedViewportPosition.translateY !== undefined) {
+                view.setTranslate(savedViewportPosition.translateX, savedViewportPosition.translateY);
+                if (savedViewportPosition.scale !== undefined) {
+                  view.setScale(savedViewportPosition.scale);
+                }
+                // Refresh the view to ensure changes are visible
+                graph.refresh();
+              }
+            } catch (e) {
+              console.warn('Failed to restore viewport position for library flowchart:', e);
+            }
+          }
+        };
+        
+        // Open the library flowchart directly with completion callback
+        window.openSavedFlowchart(data.libraryFlowchartName, restoreViewportCallback);
         
         // Wait for groups to be loaded before setting up autosave hooks
         setTimeout(safeSetupAutosaveHooks, 1000);
       } else {
         // Handle regular autosave restore (non-library flowchart)
-        window.loadFlowchartData(data);
+        // Create callback to restore viewport after flowchart loads
+        const restoreViewportCallback = () => {
+          if (data.viewportPosition && graph) {
+            try {
+              const view = graph.getView();
+              if (view && data.viewportPosition.translateX !== undefined && data.viewportPosition.translateY !== undefined) {
+                view.setTranslate(data.viewportPosition.translateX, data.viewportPosition.translateY);
+                if (data.viewportPosition.scale !== undefined) {
+                  view.setScale(data.viewportPosition.scale);
+                }
+                // Refresh the view to ensure changes are visible
+                graph.refresh();
+              }
+            } catch (e) {
+              console.warn('Failed to restore viewport position:', e);
+            }
+          }
+        };
+        
+        // Load flowchart data with completion callback
+        window.loadFlowchartData(data, null, restoreViewportCallback);
         
         // Restore form name if it exists
         if (data.formName) {

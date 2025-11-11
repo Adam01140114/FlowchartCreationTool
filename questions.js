@@ -1831,6 +1831,75 @@ function createNumberField(label, value, onChange) {
   return container;
 }
 
+// Helper function to ensure _itemOrder is initialized with all existing items
+function ensureItemOrderInitialized(cell) {
+  if (!cell._itemOrder || cell._itemOrder.length === 0) {
+    cell._itemOrder = [];
+    const options = cell._textboxes || [];
+    const checkboxes = cell._checkboxes || [];
+    const times = cell._times || [];
+    const dropdowns = cell._dropdowns || [];
+    
+    // Add all existing options
+    options.forEach((_, index) => {
+      cell._itemOrder.push({ type: 'option', index: index });
+    });
+    
+    // Add all existing checkboxes
+    checkboxes.forEach((_, index) => {
+      cell._itemOrder.push({ type: 'checkbox', index: index });
+    });
+    
+    // Add all existing times
+    times.forEach((_, index) => {
+      cell._itemOrder.push({ type: 'time', index: index });
+    });
+    
+    // Add all existing dropdowns
+    dropdowns.forEach((_, index) => {
+      cell._itemOrder.push({ type: 'dropdown', index: index });
+    });
+    
+    // Add location if it exists
+    if (cell._locationIndex !== undefined && cell._locationIndex >= 0) {
+      cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
+    }
+  }
+  return cell._itemOrder;
+}
+
+// Helper function to validate indices before reordering
+function validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex) {
+  // Ensure item order exists
+  ensureItemOrderInitialized(cell);
+  
+  // Validate dragged item exists
+  const draggedItem = cell._itemOrder.find(item => 
+    item.type === draggedType && item.index === draggedIndex
+  );
+  if (!draggedItem) {
+    console.warn(`🔍 [REORDER VALIDATION] Dragged item not found: type=${draggedType}, index=${draggedIndex}`);
+    return false;
+  }
+  
+  // Validate drop target exists
+  const dropItem = cell._itemOrder.find(item => 
+    item.type === dropType && item.index === dropIndex
+  );
+  if (!dropItem) {
+    console.warn(`🔍 [REORDER VALIDATION] Drop target not found: type=${dropType}, index=${dropIndex}`);
+    return false;
+  }
+  
+  // Don't allow reordering item onto itself
+  if (draggedType === dropType && draggedIndex === dropIndex) {
+    console.warn(`🔍 [REORDER VALIDATION] Cannot reorder item onto itself`);
+    return false;
+  }
+  
+  return true;
+}
+
 // Helper function to create options container
 function createOptionsContainer(cell) {
   const container = document.createElement('div');
@@ -1916,7 +1985,11 @@ function createOptionsContainer(cell) {
     
     if (draggedType === 'option' && dropType === 'option') {
       // Reorder options using unified item order
-      const options = cell._textboxes || [];
+      ensureItemOrderInitialized(cell);
+      
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
+      }
       
       // Find the dragged option in the item order
       const draggedOptionIndex = cell._itemOrder.findIndex(item => 
@@ -1951,38 +2024,49 @@ function createOptionsContainer(cell) {
         itemOrder: cell._itemOrder
       });
     } else if (draggedType === 'checkbox' && dropType === 'checkbox') {
-      // Reorder checkboxes
-      const checkboxes = cell._checkboxes || [];
-      const draggedCheckbox = checkboxes[draggedIndex];
-      checkboxes.splice(draggedIndex, 1);
-      checkboxes.splice(dropIndex, 0, draggedCheckbox);
+      // Reorder checkboxes using unified item order
+      ensureItemOrderInitialized(cell);
       
-      console.log('🔍 [CHECKBOX ORDER DEBUG] Checkbox reordered:', {
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
+      }
+      
+      // Find the dragged checkbox in the item order
+      const draggedCheckboxIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'checkbox' && item.index === draggedIndex
+      );
+      
+      // Find the target checkbox in the item order
+      const targetCheckboxIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'checkbox' && item.index === dropIndex
+      );
+      
+      if (draggedCheckboxIndex !== -1 && targetCheckboxIndex !== -1) {
+        const draggedItem = cell._itemOrder.splice(draggedCheckboxIndex, 1)[0];
+        cell._itemOrder.splice(targetCheckboxIndex, 0, draggedItem);
+        
+        // Update checkbox indices in item order to match their new positions
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'checkbox') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'checkbox'
+            ).length - 1;
+          }
+        });
+      }
+      
+      console.log('🔍 [CHECKBOX ORDER DEBUG] Checkbox reordered using unified item order:', {
         draggedIndex: draggedIndex,
         dropIndex: dropIndex,
+        itemOrder: cell._itemOrder,
         checkboxesCount: checkboxes.length
       });
     } else if (draggedType === 'checkbox' && dropType === 'option') {
       // Move checkbox to position of option using unified ordering
-      const checkboxes = cell._checkboxes || [];
-      const options = cell._textboxes || [];
-      const draggedCheckbox = checkboxes[draggedIndex];
+      ensureItemOrderInitialized(cell);
       
-      // Initialize item order if it doesn't exist
-      if (!cell._itemOrder) {
-        cell._itemOrder = [];
-        // Add all options first
-        options.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'option', index: index });
-        });
-        // Add all checkboxes second
-        checkboxes.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'checkbox', index: index });
-        });
-        // Add location if it exists
-        if (cell._locationIndex >= 0) {
-          cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
-        }
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
       }
       
       // Find the dragged checkbox in the item order
@@ -2018,8 +2102,7 @@ function createOptionsContainer(cell) {
       });
     } else if (draggedType === 'location' && dropType === 'option') {
       // Move location to position of option using unified item order
-      console.log('🔍 [LOCATION ORDER DEBUG] Moving location to position:', dropIndex);
-      console.log('🔍 [PROPERTIES MENU DEBUG] Before location index update:', cell._locationIndex);
+      ensureItemOrderInitialized(cell);
       
       // Find the dragged location in the item order
       const draggedLocationIndex = cell._itemOrder.findIndex(item => 
@@ -2054,7 +2137,7 @@ function createOptionsContainer(cell) {
       console.log('🔍 [PROPERTIES MENU DEBUG] This will place the location BEFORE the option at index:', cell._locationIndex);
     } else if (draggedType === 'option' && dropType === 'location') {
       // Move option to position of location using unified item order
-      const options = cell._textboxes || [];
+      ensureItemOrderInitialized(cell);
       
       // Find the dragged option in the item order
       const draggedOptionIndex = cell._itemOrder.findIndex(item => 
@@ -2090,22 +2173,10 @@ function createOptionsContainer(cell) {
       });
     } else if (draggedType === 'dropdown' && dropType === 'option') {
       // Move dropdown to position of option using unified item order
-      console.log('🔍 [DROPDOWN ORDER DEBUG] Moving dropdown to position of option:', dropIndex);
+      ensureItemOrderInitialized(cell);
       
-      // Initialize item order if it doesn't exist
-      if (!cell._itemOrder) {
-        cell._itemOrder = [];
-        const options = cell._textboxes || [];
-        const dropdowns = cell._dropdowns || [];
-        options.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'option', index: index });
-        });
-        dropdowns.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'dropdown', index: index });
-        });
-        if (cell._locationIndex >= 0) {
-          cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
-        }
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
       }
       
       // Find the dragged dropdown in the item order
@@ -2133,25 +2204,10 @@ function createOptionsContainer(cell) {
       }
     } else if (draggedType === 'dropdown' && dropType === 'dropdown') {
       // Reorder dropdowns using unified item order
-      console.log('🔍 [DROPDOWN ORDER DEBUG] Reordering dropdowns:', {
-        draggedIndex: draggedIndex,
-        dropIndex: dropIndex
-      });
+      ensureItemOrderInitialized(cell);
       
-      // Initialize item order if it doesn't exist
-      if (!cell._itemOrder) {
-        cell._itemOrder = [];
-        const options = cell._textboxes || [];
-        const dropdowns = cell._dropdowns || [];
-        options.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'option', index: index });
-        });
-        dropdowns.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'dropdown', index: index });
-        });
-        if (cell._locationIndex >= 0) {
-          cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
-        }
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
       }
       
       // Find the dragged dropdown in the item order
@@ -2188,23 +2244,7 @@ function createOptionsContainer(cell) {
       }
     } else if (draggedType === 'dropdown' && dropType === 'location') {
       // Move dropdown to position of location using unified item order
-      console.log('🔍 [DROPDOWN ORDER DEBUG] Moving dropdown to position of location');
-      
-      // Initialize item order if it doesn't exist
-      if (!cell._itemOrder) {
-        cell._itemOrder = [];
-        const options = cell._textboxes || [];
-        const dropdowns = cell._dropdowns || [];
-        options.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'option', index: index });
-        });
-        dropdowns.forEach((_, index) => {
-          cell._itemOrder.push({ type: 'dropdown', index: index });
-        });
-        if (cell._locationIndex >= 0) {
-          cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
-        }
-      }
+      ensureItemOrderInitialized(cell);
       
       // Find the dragged dropdown in the item order
       const draggedDropdownIndex = cell._itemOrder.findIndex(item => 
@@ -2231,7 +2271,11 @@ function createOptionsContainer(cell) {
       }
     } else if (draggedType === 'option' && dropType === 'dropdown') {
       // Move option to position of dropdown using unified item order
-      console.log('🔍 [DROPDOWN ORDER DEBUG] Moving option to position of dropdown:', dropIndex);
+      ensureItemOrderInitialized(cell);
+      
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
+      }
       
       // Find the dragged option in the item order
       const draggedOptionIndex = cell._itemOrder.findIndex(item => 
@@ -2267,7 +2311,7 @@ function createOptionsContainer(cell) {
       }
     } else if (draggedType === 'location' && dropType === 'dropdown') {
       // Move location to position of dropdown using unified item order
-      console.log('🔍 [DROPDOWN ORDER DEBUG] Moving location to position of dropdown:', dropIndex);
+      ensureItemOrderInitialized(cell);
       
       // Find the dragged location in the item order
       const draggedLocationIndex = cell._itemOrder.findIndex(item => 
@@ -2295,6 +2339,119 @@ function createOptionsContainer(cell) {
         console.log('🔍 [DROPDOWN ORDER DEBUG] Location moved to dropdown position:', {
           dropIndex: dropIndex,
           newLocationIndex: newLocationIndex,
+          itemOrder: cell._itemOrder
+        });
+      }
+    } else if (draggedType === 'time' && dropType === 'time') {
+      // Reorder times using unified item order
+      ensureItemOrderInitialized(cell);
+      
+      if (!validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropIndex)) {
+        return;
+      }
+      
+      // Find the dragged time in the item order
+      const draggedTimeIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'time' && item.index === draggedIndex
+      );
+      
+      // Find the target time in the item order
+      const targetTimeIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'time' && item.index === dropIndex
+      );
+      
+      if (draggedTimeIndex !== -1 && targetTimeIndex !== -1) {
+        const draggedItem = cell._itemOrder.splice(draggedTimeIndex, 1)[0];
+        cell._itemOrder.splice(targetTimeIndex, 0, draggedItem);
+        
+        // Update time indices in item order to match their new positions
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'time') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'time'
+            ).length - 1;
+          }
+        });
+        
+        console.log('🔍 [TIME ORDER DEBUG] Times reordered using unified item order:', {
+          draggedIndex: draggedIndex,
+          dropIndex: dropIndex,
+          itemOrder: cell._itemOrder
+        });
+      }
+    } else if (draggedType === 'time' && (dropType === 'checkbox' || dropType === 'option' || dropType === 'dropdown' || dropType === 'location')) {
+      // Move time to position of another field type
+      ensureItemOrderInitialized(cell);
+      
+      // Find the dragged time in the item order
+      const draggedItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'time' && item.index === draggedIndex
+      );
+      
+      // Find the target item in the item order
+      let targetItemIndex = -1;
+      if (dropType === 'location') {
+        targetItemIndex = cell._itemOrder.findIndex(item => item.type === 'location');
+      } else {
+        targetItemIndex = cell._itemOrder.findIndex(item => 
+          item.type === dropType && item.index === dropIndex
+        );
+      }
+      
+      if (draggedItemIndex !== -1 && targetItemIndex !== -1) {
+        const draggedItem = cell._itemOrder.splice(draggedItemIndex, 1)[0];
+        cell._itemOrder.splice(targetItemIndex, 0, draggedItem);
+        
+        // Update time indices in item order to match their new positions
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'time') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'time'
+            ).length - 1;
+          }
+        });
+        
+        console.log(`🔍 [TIME ORDER DEBUG] Time moved to ${dropType} position:`, {
+          draggedIndex: draggedIndex,
+          dropIndex: dropIndex,
+          itemOrder: cell._itemOrder
+        });
+      }
+    } else if (draggedType === 'checkbox' && (dropType === 'time' || dropType === 'dropdown' || dropType === 'location')) {
+      // Move checkbox to position of time/dropdown/location (checkbox-to-option is already handled above)
+      ensureItemOrderInitialized(cell);
+      
+      // Find the dragged checkbox in the item order
+      const draggedItemIndex = cell._itemOrder.findIndex(item => 
+        item.type === 'checkbox' && item.index === draggedIndex
+      );
+      
+      // Find the target item in the item order
+      let targetItemIndex = -1;
+      if (dropType === 'location') {
+        targetItemIndex = cell._itemOrder.findIndex(item => item.type === 'location');
+      } else {
+        targetItemIndex = cell._itemOrder.findIndex(item => 
+          item.type === dropType && item.index === dropIndex
+        );
+      }
+      
+      if (draggedItemIndex !== -1 && targetItemIndex !== -1) {
+        const draggedItem = cell._itemOrder.splice(draggedItemIndex, 1)[0];
+        cell._itemOrder.splice(targetItemIndex, 0, draggedItem);
+        
+        // Update checkbox indices in item order to match their new positions
+        cell._itemOrder.forEach((item, index) => {
+          if (item.type === 'checkbox') {
+            item.index = cell._itemOrder.filter((prevItem, prevIndex) => 
+              prevIndex <= index && prevItem.type === 'checkbox'
+            ).length - 1;
+          }
+        });
+        
+        console.log(`🔍 [CHECKBOX ORDER DEBUG] Checkbox moved to ${dropType} position:`, {
+          draggedIndex: draggedIndex,
+          dropIndex: dropIndex,
           itemOrder: cell._itemOrder
         });
       }
@@ -2720,22 +2877,58 @@ function createOptionsContainer(cell) {
       textboxesCount: (cell._textboxes || []).length
     });
     
-    cell._locationIndex = (cell._textboxes || []).length;
-    
-    console.log('🔍 [LOCATION ORDER DEBUG] After adding location:', {
-      locationIndex: cell._locationIndex,
-      textboxesCount: (cell._textboxes || []).length
-    });
-    console.log('🔍 [PROPERTIES MENU DEBUG] Location index set to:', cell._locationIndex);
-    
-    if (typeof window.requestAutosave === 'function') {
-      window.requestAutosave();
+    // Only add if location doesn't already exist
+    if (cell._locationIndex === undefined || cell._locationIndex < 0) {
+      cell._locationIndex = (cell._textboxes || []).length;
+      
+      // Initialize item order if it doesn't exist
+      if (!cell._itemOrder) {
+        cell._itemOrder = [];
+        const options = cell._textboxes || [];
+        const checkboxes = cell._checkboxes || [];
+        const times = cell._times || [];
+        const dropdowns = cell._dropdowns || [];
+        
+        // Add all existing options
+        options.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'option', index: index });
+        });
+        
+        // Add all existing checkboxes
+        checkboxes.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'checkbox', index: index });
+        });
+        
+        // Add all existing times
+        times.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'time', index: index });
+        });
+        
+        // Add all existing dropdowns
+        dropdowns.forEach((_, index) => {
+          cell._itemOrder.push({ type: 'dropdown', index: index });
+        });
+      }
+      
+      // Add location to the end of the item order
+      cell._itemOrder.push({ type: 'location', index: cell._locationIndex });
+      
+      console.log('🔍 [LOCATION ORDER DEBUG] After adding location:', {
+        locationIndex: cell._locationIndex,
+        textboxesCount: (cell._textboxes || []).length,
+        itemOrder: cell._itemOrder
+      });
+      console.log('🔍 [PROPERTIES MENU DEBUG] Location index set to:', cell._locationIndex);
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+      // Refresh the entire container to show the location indicator
+      console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
+      const newContainer = createOptionsContainer(cell);
+      container.parentNode.replaceChild(newContainer, container);
+      console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
     }
-    // Refresh the entire container to show the location indicator
-    console.log('🔍 [PROPERTIES MENU DEBUG] Refreshing properties menu container');
-    const newContainer = createOptionsContainer(cell);
-    container.parentNode.replaceChild(newContainer, container);
-    console.log('🔍 [PROPERTIES MENU DEBUG] Properties menu container refreshed');
   };
   
   container.appendChild(addLocationIndicatorBtn);
@@ -3376,6 +3569,12 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           margin-bottom: 10px;
         `;
         deleteTriggerBtn.onclick = () => {
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
+            return;
+          }
+          
           const triggerIndex = dropdown.triggerSequences.findIndex(trigger => trigger.id === triggerSequence.id);
           if (triggerIndex !== -1) {
             dropdown.triggerSequences.splice(triggerIndex, 1);
@@ -3408,6 +3607,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addLabelBtn.onclick = () => {
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
+          }
+          
           // Create new label entry like the main button
           const newLabel = { fieldName: '', nodeId: '' };
           if (!triggerSequence.labels) triggerSequence.labels = [];
@@ -3636,6 +3840,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           console.log('🔍 [DEBUG] Cell before checkbox addition:', cell.id, 'Style:', cell.style);
           if (typeof window.getQuestionType === 'function') {
             console.log('🔍 [DEBUG] Question type before:', window.getQuestionType(cell));
+          }
+          
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
           }
           
           // Create new checkbox entry like the main button
@@ -4050,6 +4259,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addTimeBtn.onclick = () => {
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
+          }
+          
           // Create new time entry like the main button
           const newTime = { fieldName: '', nodeId: '' };
           if (!triggerSequence.times) triggerSequence.times = [];
@@ -4435,6 +4649,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addLocationBtn.onclick = () => {
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
+          }
+          
           // Create new location entry (like the main location button)
           const newLocation = { 
             type: 'location',

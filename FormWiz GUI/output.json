@@ -2,93 +2,15 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Introduction",
+      "sectionName": "Section 1",
       "questions": [
         {
           "questionId": 1,
-          "text": "Are you the only person suing?",
-          "type": "dropdown",
+          "text": "How many",
+          "type": "numberedDropdown",
           "logic": {
             "enabled": false,
             "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "user_biz",
-                "textboxText": ""
-              }
-            ]
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "options": [
-            "Yes",
-            "No"
-          ],
-          "labels": [],
-          "nameId": "are_you_the_only_person_suing",
-          "placeholder": "",
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          }
-        },
-        {
-          "questionId": 2,
-          "text": "Enter question text",
-          "type": "multipleTextboxes",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "No"
-              }
-            ]
           },
           "jump": {
             "enabled": false,
@@ -133,82 +55,34 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "enter_question_text",
+          "nodeId": "how_many",
+          "min": "1",
+          "max": "3",
           "allFieldsInOrder": [
             {
               "type": "label",
-              "label": "bruh",
-              "nodeId": "enter_question_text_bruh",
+              "label": "Name",
+              "nodeId": "how_many_extra_defendants_name",
               "order": 1
             },
             {
-              "type": "location",
-              "fieldName": "Location Data",
-              "nodeId": "location_data",
+              "type": "label",
+              "label": "Phone",
+              "nodeId": "how_many_extra_defendants_phone",
               "order": 2
             },
             {
-              "type": "dropdown",
-              "fieldName": "Hello",
+              "type": "checkbox",
+              "fieldName": "Army Status",
+              "selectionType": "multiple",
               "options": [
                 {
-                  "text": "Yes",
-                  "nodeId": "Yes"
-                },
-                {
-                  "text": "No",
-                  "nodeId": "No"
-                }
-              ],
-              "triggerSequences": [
-                {
-                  "condition": "Yes",
-                  "fields": [
+                  "text": "Military Duty",
+                  "nodeId": "how_many_army_status_military_duty",
+                  "linkedFields": [
                     {
-                      "type": "label",
-                      "label": "Name",
-                      "nodeId": "hello_yes_name"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Phone",
-                      "nodeId": "hello_yes_phone"
-                    },
-                    {
-                      "type": "location",
-                      "fieldName": "Example Location",
-                      "nodeId": "location_data"
-                    },
-                    {
-                      "type": "date",
-                      "label": "When",
-                      "nodeId": "hello_yes_when"
-                    },
-                    {
-                      "type": "checkbox",
-                      "fieldName": "bruh",
-                      "options": [
-                        {
-                          "text": "Option One",
-                          "nodeId": "hello_yes_bruh_option_one"
-                        },
-                        {
-                          "text": "Option Two",
-                          "nodeId": "hello_yes_bruh_option_two"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Really",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ]
+                      "nodeId": "how_many_extra_defendants_name",
+                      "title": "example"
                     }
                   ]
                 }
@@ -223,7 +97,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 3,
+  "questionCounter": 2,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
@@ -233,14 +107,5 @@
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],
-  "linkedCheckboxes": [
-    {
-      "id": "linkedCheckbox0",
-      "linkedCheckboxId": "test",
-      "checkboxes": [
-        "is_this_defendant_a_business/public_entity_are_they_a_public_entity_yes_1",
-        "are_you_the_only_person_suing_yes"
-      ]
-    }
-  ]
+  "linkedCheckboxes": []
 }

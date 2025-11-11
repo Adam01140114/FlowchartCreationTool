@@ -2701,6 +2701,12 @@ function addCheckboxOption(questionId, fieldCount) {
             <input type="text" id="checkboxNodeId${questionId}_${fieldCount}_${optionCount}" placeholder="Enter checkbox node ID" style="width: 70%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;" onchange="updateCheckboxOptionNodeId(${questionId}, ${fieldCount}, ${optionCount})">
         </div>
         <div style="text-align: center; margin-top: 10px;">
+            <button type="button" onclick="addLinkedField(${questionId}, ${fieldCount}, ${optionCount})" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; display: block; margin: 0 auto;">Add linked field</button>
+        </div>
+        <div id="linkedFields${questionId}_${fieldCount}_${optionCount}" style="margin-top: 10px;">
+            <!-- Linked field dropdowns will be added here -->
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
             <button type="button" onclick="removeCheckboxOption(${questionId}, ${fieldCount}, ${optionCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove Option</button>
         </div>
     `;
@@ -2712,6 +2718,113 @@ function removeCheckboxOption(questionId, fieldCount, optionCount) {
     const optionDiv = document.querySelector(`#checkboxOptions${questionId}_${fieldCount} .checkbox-option-${optionCount}`);
     if (optionDiv) {
         optionDiv.remove();
+    }
+}
+
+// Get all label entries from the unified fields for a given question
+function getLabelEntries(questionId) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    if (!unifiedDiv) return [];
+    
+    const labelEntries = [];
+    const fieldElements = unifiedDiv.querySelectorAll('[data-type="label"]');
+    
+    fieldElements.forEach((fieldEl) => {
+        const fieldOrder = fieldEl.getAttribute('data-order');
+        const nodeIdTextEl = fieldEl.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+        if (nodeIdTextEl) {
+            const nodeId = nodeIdTextEl.textContent.trim();
+            const labelTextEl = fieldEl.querySelector('#labelText' + questionId + '_' + fieldOrder);
+            const label = labelTextEl ? labelTextEl.textContent.trim() : '';
+            if (nodeId) {
+                labelEntries.push({
+                    nodeId: nodeId,
+                    label: label || nodeId
+                });
+            }
+        }
+    });
+    
+    return labelEntries;
+}
+
+// Add a linked field dropdown for a checkbox option
+function addLinkedField(questionId, fieldCount, optionCount) {
+    const linkedFieldsContainer = document.getElementById(`linkedFields${questionId}_${fieldCount}_${optionCount}`);
+    if (!linkedFieldsContainer) return;
+    
+    const linkedFieldCount = linkedFieldsContainer.children.length + 1;
+    const labelEntries = getLabelEntries(questionId);
+    
+    const linkedFieldDiv = document.createElement('div');
+    linkedFieldDiv.className = `linked-field-${linkedFieldCount}`;
+    linkedFieldDiv.style.margin = '5px 0';
+    linkedFieldDiv.style.padding = '5px';
+    linkedFieldDiv.style.border = '1px solid #d0d0d0';
+    linkedFieldDiv.style.borderRadius = '3px';
+    linkedFieldDiv.style.backgroundColor = '#fafafa';
+    
+    // Add linked textbox title input
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Linked textbox title:';
+    titleLabel.style.cssText = 'font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;';
+    
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.id = `linkedFieldTitle${questionId}_${fieldCount}_${optionCount}_${linkedFieldCount}`;
+    titleInput.placeholder = 'Enter linked textbox title';
+    titleInput.style.cssText = 'width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; margin-bottom: 5px; box-sizing: border-box;';
+    
+    const select = document.createElement('select');
+    select.id = `linkedField${questionId}_${fieldCount}_${optionCount}_${linkedFieldCount}`;
+    select.style.width = '100%';
+    select.style.padding = '4px';
+    select.style.border = '1px solid #ccc';
+    select.style.borderRadius = '3px';
+    select.style.fontSize = '12px';
+    select.style.marginBottom = '5px';
+    select.style.boxSizing = 'border-box';
+    
+    // Add placeholder option
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Select a label field...';
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    select.appendChild(placeholderOption);
+    
+    // Add label entries as options
+    labelEntries.forEach((entry) => {
+        const option = document.createElement('option');
+        option.value = entry.nodeId;
+        option.textContent = entry.label + ' (' + entry.nodeId + ')';
+        select.appendChild(option);
+    });
+    
+    // Add remove button
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = 'Remove';
+    removeBtn.style.cssText = 'background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;';
+    removeBtn.onclick = function() {
+        linkedFieldDiv.remove();
+    };
+    
+    linkedFieldDiv.appendChild(titleLabel);
+    linkedFieldDiv.appendChild(titleInput);
+    linkedFieldDiv.appendChild(select);
+    linkedFieldDiv.appendChild(removeBtn);
+    linkedFieldsContainer.appendChild(linkedFieldDiv);
+}
+
+// Remove a linked field
+function removeLinkedField(questionId, fieldCount, optionCount, linkedFieldCount) {
+    const linkedFieldsContainer = document.getElementById(`linkedFields${questionId}_${fieldCount}_${optionCount}`);
+    if (!linkedFieldsContainer) return;
+    
+    const linkedFieldDiv = linkedFieldsContainer.querySelector(`.linked-field-${linkedFieldCount}`);
+    if (linkedFieldDiv) {
+        linkedFieldDiv.remove();
     }
 }
 

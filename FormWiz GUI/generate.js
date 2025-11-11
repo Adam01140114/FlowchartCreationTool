@@ -1547,9 +1547,27 @@ formHTML += `</div><br></div>`;
                     const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
                     
                     if (textEl && nodeIdEl) {
+                      // Collect linked fields for this option
+                      const linkedFields = [];
+                      const linkedFieldsContainer = optionEl.querySelector('#linkedFields' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                      if (linkedFieldsContainer) {
+                        const linkedFieldDivs = linkedFieldsContainer.querySelectorAll('[class^="linked-field-"]');
+                        linkedFieldDivs.forEach((linkedFieldDiv) => {
+                          const select = linkedFieldDiv.querySelector('select[id^="linkedField"]');
+                          const titleInput = linkedFieldDiv.querySelector('input[id^="linkedFieldTitle"]');
+                          if (select && select.value && select.value.trim()) {
+                            linkedFields.push({
+                              nodeId: select.value.trim(),
+                              title: titleInput ? titleInput.value.trim() : ''
+                            });
+                          }
+                        });
+                      }
+                      
                       checkboxOptions.push({
                         text: textEl.value.trim(),
-                        nodeId: nodeIdEl.value.trim()
+                        nodeId: nodeIdEl.value.trim(),
+                        linkedFields: linkedFields
                       });
                     }
                   });
@@ -2034,6 +2052,86 @@ formHTML += `</div><br></div>`;
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     
+                    // Handle linked fields for this checkbox option
+                    const linkedFields = option.linkedFields || [];
+                    
+                    // Function to create linked textboxes when checkbox is checked
+                    function createLinkedTextboxes() {
+                        linkedFields.forEach((linkedField) => {
+                            if (linkedField.nodeId && linkedField.title) {
+                                const sourceField = document.getElementById(linkedField.nodeId);
+                                if (sourceField) {
+                                    // Create hidden textbox with title as ID
+                                    const hiddenTextbox = document.createElement('input');
+                                    hiddenTextbox.type = 'text';
+                                    hiddenTextbox.id = linkedField.title;
+                                    hiddenTextbox.name = linkedField.title;
+                                    hiddenTextbox.style.display = 'none';
+                                    hiddenTextbox.value = sourceField.value || '';
+                                    
+                                    // Add to form (append to body or a container)
+                                    document.body.appendChild(hiddenTextbox);
+                                    
+                                    // Sync with source field
+                                    function syncLinkedField() {
+                                        hiddenTextbox.value = sourceField.value || '';
+                                    }
+                                    
+                                    // Initial sync
+                                    syncLinkedField();
+                                    
+                                    // Listen for changes on source field
+                                    sourceField.addEventListener('input', syncLinkedField);
+                                    sourceField.addEventListener('change', syncLinkedField);
+                                    
+                                    // Poll periodically to catch any missed updates (especially for autofill)
+                                    // This ensures the linked textbox always stays in sync, even if events are missed
+                                    const pollInterval = setInterval(function() {
+                                        if (hiddenTextbox.value !== sourceField.value) {
+                                            syncLinkedField();
+                                        }
+                                    }, 100); // Check every 100ms
+                                    
+                                    // Store references for cleanup
+                                    hiddenTextbox._syncFunction = syncLinkedField;
+                                    hiddenTextbox._sourceField = sourceField;
+                                    hiddenTextbox._pollInterval = pollInterval;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Function to remove linked textboxes when checkbox is unchecked
+                    function removeLinkedTextboxes() {
+                        linkedFields.forEach((linkedField) => {
+                            if (linkedField.title) {
+                                const hiddenTextbox = document.getElementById(linkedField.title);
+                                if (hiddenTextbox) {
+                                    // Remove event listeners
+                                    if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                        hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                        hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                    }
+                                    // Clear polling interval
+                                    if (hiddenTextbox._pollInterval) {
+                                        clearInterval(hiddenTextbox._pollInterval);
+                                    }
+                                    // Remove the hidden textbox
+                                    hiddenTextbox.remove();
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Add event listener for checkbox/radio changes
+                    input.addEventListener('change', function() {
+                        if (this.checked) {
+                            createLinkedTextboxes();
+                        } else {
+                            removeLinkedTextboxes();
+                        }
+                    });
+                    
                     // Add event listener for radio buttons to create hidden checkboxes
                     if (selectionType === 'single') {
                         input.addEventListener('change', function() {
@@ -2047,12 +2145,37 @@ formHTML += `</div><br></div>`;
                                         if (existingHiddenCheckbox && existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
                                             existingHiddenCheckbox.remove();
                                         }
+                                        // Also remove linked textboxes for unchecked radio
+                                        const uncheckedOption = checkboxOptions.find(opt => opt.nodeId === originalNodeId);
+                                        if (uncheckedOption && uncheckedOption.linkedFields) {
+                                            uncheckedOption.linkedFields.forEach((linkedField) => {
+                                                if (linkedField.title) {
+                                                    const hiddenTextbox = document.getElementById(linkedField.title);
+                                                    if (hiddenTextbox) {
+                                                        if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                            hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                            hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                                        }
+                                                        // Stop MutationObserver
+                                                        if (hiddenTextbox._observer) {
+                                                            hiddenTextbox._observer.disconnect();
+                                                        }
+                                                        // Clear polling interval
+                                                        if (hiddenTextbox._pollInterval) {
+                                                            clearInterval(hiddenTextbox._pollInterval);
+                                                        }
+                                                        hiddenTextbox.remove();
+                                                    }
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                                 const originalNodeId = this.id.replace('_radio', '');
                                 if (typeof createHiddenCheckboxForRadio === 'function') {
                                     createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                                 }
+                                createLinkedTextboxes();
                             }
                         });
                     }
@@ -2191,9 +2314,27 @@ formHTML += `</div><br></div>`;
                   const nodeIdEl = optionEl.querySelector('#checkboxNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
                   
                   if (textEl && nodeIdEl) {
+                    // Collect linked fields for this option
+                    const linkedFields = [];
+                    const linkedFieldsContainer = optionEl.querySelector('#linkedFields' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                    if (linkedFieldsContainer) {
+                      const linkedFieldDivs = linkedFieldsContainer.querySelectorAll('[class^="linked-field-"]');
+                      linkedFieldDivs.forEach((linkedFieldDiv) => {
+                        const select = linkedFieldDiv.querySelector('select[id^="linkedField"]');
+                        const titleInput = linkedFieldDiv.querySelector('input[id^="linkedFieldTitle"]');
+                        if (select && select.value && select.value.trim()) {
+                          linkedFields.push({
+                            nodeId: select.value.trim(),
+                            title: titleInput ? titleInput.value.trim() : ''
+                          });
+                        }
+                      });
+                    }
+                    
                     checkboxOptions.push({
                       text: textEl.value.trim(),
-                      nodeId: nodeIdEl.value.trim()
+                      nodeId: nodeIdEl.value.trim(),
+                      linkedFields: linkedFields
                     });
                   }
                 });
@@ -6498,6 +6639,91 @@ function showTextboxLabels(questionId, count){
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     
+                    // Handle linked fields for this checkbox option
+                    const linkedFields = option.linkedFields || [];
+                    
+                    // Function to create linked textboxes when checkbox is checked
+                    function createLinkedTextboxes() {
+                        linkedFields.forEach((linkedField) => {
+                            if (linkedField.nodeId && linkedField.title) {
+                                // For numberedDropdown, source field ID includes entry number
+                                const sourceFieldId = linkedField.nodeId + "_" + j;
+                                const sourceField = document.getElementById(sourceFieldId);
+                                if (sourceField) {
+                                    // Create hidden textbox with title as ID (append entry number for numberedDropdown)
+                                    const hiddenTextboxId = linkedField.title + "_" + j;
+                                    const hiddenTextbox = document.createElement('input');
+                                    hiddenTextbox.type = 'text';
+                                    hiddenTextbox.id = hiddenTextboxId;
+                                    hiddenTextbox.name = hiddenTextboxId;
+                                    hiddenTextbox.style.display = 'none';
+                                    hiddenTextbox.value = sourceField.value || '';
+                                    
+                                    // Add to form (append to body or a container)
+                                    document.body.appendChild(hiddenTextbox);
+                                    
+                                    // Sync with source field
+                                    function syncLinkedField() {
+                                        hiddenTextbox.value = sourceField.value || '';
+                                    }
+                                    
+                                    // Initial sync
+                                    syncLinkedField();
+                                    
+                                    // Listen for changes on source field
+                                    sourceField.addEventListener('input', syncLinkedField);
+                                    sourceField.addEventListener('change', syncLinkedField);
+                                    
+                                    // Poll periodically to catch any missed updates (especially for autofill)
+                                    // This ensures the linked textbox always stays in sync, even if events are missed
+                                    const pollInterval = setInterval(function() {
+                                        if (hiddenTextbox.value !== sourceField.value) {
+                                            syncLinkedField();
+                                        }
+                                    }, 100); // Check every 100ms
+                                    
+                                    // Store references for cleanup
+                                    hiddenTextbox._syncFunction = syncLinkedField;
+                                    hiddenTextbox._sourceField = sourceField;
+                                    hiddenTextbox._pollInterval = pollInterval;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Function to remove linked textboxes when checkbox is unchecked
+                    function removeLinkedTextboxes() {
+                        linkedFields.forEach((linkedField) => {
+                            if (linkedField.title) {
+                                // For numberedDropdown, hidden textbox ID includes entry number
+                                const hiddenTextboxId = linkedField.title + "_" + j;
+                                const hiddenTextbox = document.getElementById(hiddenTextboxId);
+                                if (hiddenTextbox) {
+                                    // Remove event listeners
+                                    if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                        hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                        hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                    }
+                                    // Clear polling interval
+                                    if (hiddenTextbox._pollInterval) {
+                                        clearInterval(hiddenTextbox._pollInterval);
+                                    }
+                                    // Remove the hidden textbox
+                                    hiddenTextbox.remove();
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Add event listener for checkbox/radio changes
+                    input.addEventListener('change', function() {
+                        if (this.checked) {
+                            createLinkedTextboxes();
+                        } else {
+                            removeLinkedTextboxes();
+                        }
+                    });
+                    
                     // Add event listener for radio buttons to create hidden checkboxes
                     if (selectionType === 'single') {
                         input.addEventListener('change', function() {
@@ -6524,6 +6750,34 @@ function showTextboxLabels(questionId, count){
                                                 existingHiddenCheckbox.remove();
                                             }
                                         }
+                                        // Also remove linked textboxes for unchecked radio
+                                        const uncheckedOption = checkboxOptions.find(opt => {
+                                            const optId = selectionType === 'single' ? opt.nodeId + "_" + j + "_radio" : opt.nodeId + "_" + j;
+                                            return optId === radio.id;
+                                        });
+                                        if (uncheckedOption && uncheckedOption.linkedFields) {
+                                            uncheckedOption.linkedFields.forEach((linkedField) => {
+                                                if (linkedField.title) {
+                                                    const hiddenTextboxId = linkedField.title + "_" + j;
+                                                    const hiddenTextbox = document.getElementById(hiddenTextboxId);
+                                                    if (hiddenTextbox) {
+                                                        if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                            hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                            hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                                        }
+                                                        // Stop MutationObserver
+                                                        if (hiddenTextbox._observer) {
+                                                            hiddenTextbox._observer.disconnect();
+                                                        }
+                                                        // Clear polling interval
+                                                        if (hiddenTextbox._pollInterval) {
+                                                            clearInterval(hiddenTextbox._pollInterval);
+                                                        }
+                                                        hiddenTextbox.remove();
+                                                    }
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                                 
@@ -6533,6 +6787,7 @@ function showTextboxLabels(questionId, count){
                 // For numberedDropdown, remove _radio to get the base nodeId
                 const originalNodeId = this.id.replace('_radio', '');
                 createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                                createLinkedTextboxes();
                             }
                         });
                     }
@@ -6849,6 +7104,69 @@ function showTextboxLabels(questionId, count){
     
     // Update linked fields after creating new textboxes
     updateLinkedFields();
+    
+    // 🔧 NEW: Immediately autofill newly created fields if Firebase data is available
+    // This ensures fields are autofilled instantly instead of waiting for delayed passes
+    if (window.mappedData && typeof window.mappedData === 'object') {
+        const allCreatedFields = container.querySelectorAll('input, select, textarea');
+        allCreatedFields.forEach(field => {
+            if (field.id || field.name) {
+                const fieldId = field.id || field.name;
+                let autofillValue = null;
+                
+                // Check both by name and by ID for autofill
+                if (window.mappedData.hasOwnProperty(field.name)) {
+                    autofillValue = window.mappedData[field.name];
+                } else if (fieldId && window.mappedData.hasOwnProperty(fieldId)) {
+                    autofillValue = window.mappedData[fieldId];
+                }
+                
+                if (autofillValue !== null && autofillValue !== '') {
+                    // Skip current_date field - it should be set dynamically
+                    if (fieldId === 'current_date' || field.name === 'current_date') {
+                        return;
+                    }
+                    
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        if (field.type === 'radio') {
+                            // For radio buttons, check if this specific radio should be selected
+                            if (field.value === autofillValue) {
+                                field.checked = true;
+                                const changeEvent = new Event('change', { bubbles: true });
+                                field.dispatchEvent(changeEvent);
+                            } else {
+                                field.checked = false;
+                            }
+                        } else {
+                            // For checkboxes, use the boolean value
+                            const wasChecked = field.checked;
+                            field.checked = !!autofillValue;
+                            if (field.checked !== wasChecked) {
+                                const changeEvent = new Event('change', { bubbles: true });
+                                field.dispatchEvent(changeEvent);
+                            }
+                        }
+                    } else {
+                        field.value = autofillValue;
+                        
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (field.tagName === 'INPUT' && (field.type === 'text' || field.type === 'number' || !field.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            field.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            field.dispatchEvent(changeEvent);
+                        }
+                        
+                        // If this is a select element (dropdown), trigger change event
+                        if (field.tagName === 'SELECT') {
+                            const changeEvent = new Event('change', { bubbles: true });
+                            field.dispatchEvent(changeEvent);
+                        }
+                    }
+                }
+            }
+        });
+    }
     
     // Attach autosave listeners to newly generated textbox inputs
     const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
@@ -8934,6 +9252,9 @@ if (typeof handleNext === 'function') {
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
                 
+                // 🔧 NEW: Store mappedData globally so showTextboxLabels can access it for immediate autofill
+                window.mappedData = mappedData;
+                
                 // 🔧 NEW: Debug all radio buttons in the form
                 const allRadioButtons = document.querySelectorAll('input[type="radio"]');
                 
@@ -8975,15 +9296,32 @@ if (typeof handleNext === 'function') {
                                 // For radio buttons, we need to check if this specific radio button should be selected
                                 if (el.value === autofillValue) {
                                     el.checked = true;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
                             } else {
                                     el.checked = false;
                                 }
                             } else {
                                 // For checkboxes, use the boolean value
+                                const wasChecked = el.checked;
                                 el.checked = !!autofillValue;
+                                // Dispatch change event if checkbox state changed to trigger linked textbox creation
+                                if (el.checked !== wasChecked) {
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
+                                }
                             }
                         } else {
                             el.value = autofillValue;
+                            
+                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                const inputEvent = new Event('input', { bubbles: true });
+                                el.dispatchEvent(inputEvent);
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
 
                             // If this is a select element (dropdown), trigger change event to update conditional logic
                             if (el.tagName === 'SELECT') {
@@ -9342,15 +9680,32 @@ if (typeof handleNext === 'function') {
                             // For radio buttons, we need to check if this specific radio button should be selected
                             if (el.value === autofillValue) {
                                 el.checked = true;
+                                // Dispatch change event to trigger linked textbox creation
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
                             } else {
                                 el.checked = false;
                             }
                         } else {
                             // For checkboxes, use the boolean value
+                            const wasChecked = el.checked;
                             el.checked = !!autofillValue;
+                            // Dispatch change event if checkbox state changed to trigger linked textbox creation
+                            if (el.checked !== wasChecked) {
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
                         }
                     } else {
                         el.value = autofillValue;
+                        
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
 
                         // If this is a select element (dropdown), trigger change event to update conditional logic
                         if (el.tagName === 'SELECT') {
@@ -9383,6 +9738,14 @@ if (typeof handleNext === 'function') {
                     // Only process fields that have autofill data but are still empty
                     if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                         el.value = autofillValue;
+                        
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
 
                         // If this is a select element (dropdown), trigger change event to update conditional logic
                         if (el.tagName === 'SELECT') {
@@ -9773,15 +10136,32 @@ if (typeof handleNext === 'function') {
                                         // For radio buttons, we need to check if this specific radio button should be selected
                                         if (el.value === autofillValue) {
                                             el.checked = true;
+                                            // Dispatch change event to trigger linked textbox creation
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
                                         } else {
                                             el.checked = false;
                                         }
                                     } else {
                                         // For checkboxes, use the boolean value
+                                        const wasChecked = el.checked;
                                         el.checked = !!autofillValue;
+                                        // Dispatch change event if checkbox state changed to trigger linked textbox creation
+                                        if (el.checked !== wasChecked) {
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
+                                        }
                                     }
                                 } else {
                                     el.value = autofillValue;
+                                    
+                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                        const inputEvent = new Event('input', { bubbles: true });
+                                        el.dispatchEvent(inputEvent);
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
 
                                     // If this is a select element (dropdown), trigger change event to update conditional logic
                                     if (el.tagName === 'SELECT') {
@@ -9814,6 +10194,14 @@ if (typeof handleNext === 'function') {
                                 // Only process fields that have autofill data but are still empty
                                 if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                                     el.value = autofillValue;
+                                    
+                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                        const inputEvent = new Event('input', { bubbles: true });
+                                        el.dispatchEvent(inputEvent);
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
 
                                     // If this is a select element (dropdown), trigger change event to update conditional logic
                                     if (el.tagName === 'SELECT') {
@@ -9824,7 +10212,11 @@ if (typeof handleNext === 'function') {
 
                                 } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
                                     el.checked = !!autofillValue;
-
+                                    // Dispatch change event to trigger linked textbox creation
+                                    if (el.checked) {
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
                                 }
                             });
                         }, 1000); // Additional 1 second delay for stubborn fields

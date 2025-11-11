@@ -3121,7 +3121,7 @@ function displayFlowcharts(flowcharts) {
   document.getElementById("flowchartList").innerHTML = html;
 }
 
-window.openSavedFlowchart = function(name) {
+window.openSavedFlowchart = function(name, onCompleteCallback) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
   
   
@@ -3131,7 +3131,7 @@ window.openSavedFlowchart = function(name) {
       
       currentFlowchartName = name;
       window.currentFlowchartName = name;
-      loadFlowchartData(docSnap.data().flowchart, name);
+      loadFlowchartData(docSnap.data().flowchart, name, onCompleteCallback);
       
       // Update last used timestamp
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
@@ -3938,7 +3938,7 @@ window.testEdgeStylePersistence = function() {
 /**
  * Load a flowchart from JSON data.
  */
-window.loadFlowchartData = function(data, libraryFlowchartName) {
+window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallback) {
   
   // Store library flowchart name in a global variable for autosave to access
   window._loadingLibraryFlowchartName = libraryFlowchartName || null;
@@ -4396,6 +4396,14 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
   }
 
   refreshAllCells();
+  
+  // Call completion callback if provided (after main loading is done)
+  if (typeof onCompleteCallback === 'function') {
+    // Use requestAnimationFrame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      onCompleteCallback();
+    });
+  }
   
   // Load groups data if present (after sections are fully processed)
   console.log('loadFlowchartData: checking for groups data');

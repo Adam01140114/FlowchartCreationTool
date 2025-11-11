@@ -233,111 +233,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
-                      onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_are_you_the_only_person_suing"></div>
-              <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>Enter question text</h3></label><div id="labelContainer2"></div><input type="text" id="enter_question_text_address" name="enter_question_text_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="enter_question_text_bruh" name="enter_question_text_bruh" placeholder="bruh" class="address-input"></div><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(33, 150, 243); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(227, 242, 253) 100%); box-shadow: rgba(33, 150, 243, 0.15) 0px 2px 8px;"><script>
-                  function handleMultipleTextboxesDropdown_2_3(select) {
-                    try {
-                      const fieldData = JSON.parse(select.getAttribute('data-field-data') || '{}');
-                      const questionId = parseInt(select.getAttribute('data-question-id') || '0');
-                      const j = parseInt(select.getAttribute('data-entry-number') || '1');
-                      const selectedValue = (select.value || '').trim().toLowerCase();
-                      
-                      console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Dropdown changed:', select.id, 'value:', selectedValue);
-                      
-                      // Handle trigger sequences
-                      if (fieldData.triggerSequences && fieldData.triggerSequences.length > 0) {
-                        console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Found', fieldData.triggerSequences.length, 'trigger sequences');
-                        fieldData.triggerSequences.forEach(function(sequence, sequenceIndex) {
-                          const conditionValue = (sequence.condition || '').trim().toLowerCase();
-                          console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Checking sequence', sequenceIndex, 'condition:', conditionValue, 'selectedValue:', selectedValue, 'match:', conditionValue === selectedValue);
-                          
-                          if (conditionValue === selectedValue) {
-                            console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Condition matches! Showing trigger fields for sequence', sequenceIndex);
-                            const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
-                            if (triggerFieldsContainer) {
-                              console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Trigger fields container found, showing it');
-                              triggerFieldsContainer.style.display = 'block';
-                            } else {
-                              console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Trigger fields container not found, creating it');
-                              const triggerTitle = sequence.title || 'Additional Information';
-                              const parentDropdownBaseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
-                              console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Creating trigger fields container with parentDropdownBaseNodeId:', parentDropdownBaseNodeId);
-                              console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Sequence fields:', JSON.stringify(sequence.fields, null, 2));
-                              console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Fields count:', sequence.fields ? sequence.fields.length : 0);
-                              if (sequence.fields) {
-                                sequence.fields.forEach(function(f, idx) {
-                                  console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Field', idx, ':', f.type, f.fieldName || f.label, f.nodeId);
-                                });
-                              }
-                              if (typeof createTriggerFieldsContainer === 'function') {
-                                const dropdownFieldDiv = select.closest('div[style*="border: 2px solid #2196F3"]') || select.parentElement;
-                                if (dropdownFieldDiv) {
-                                  console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Calling createTriggerFieldsContainer with:', {
-                                    questionId: questionId,
-                                    entryNumber: j,
-                                    sequenceIndex: sequenceIndex,
-                                    fieldsCount: sequence.fields ? sequence.fields.length : 0,
-                                    dropdownFieldName: fieldData.fieldName,
-                                    triggerTitle: triggerTitle
-                                  });
-                                  createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, fieldData.fieldName, triggerTitle, parentDropdownBaseNodeId, conditionValue, true);
-                                  console.log('🔧 [MULTIPLE TEXTBOXES RENDER] createTriggerFieldsContainer call completed');
-                                } else {
-                                  console.error('🔧 [MULTIPLE TEXTBOXES RENDER] dropdownFieldDiv not found!');
-                                }
-                              } else {
-                                console.error('🔧 [MULTIPLE TEXTBOXES RENDER] createTriggerFieldsContainer function not found!');
-                              }
-                            }
-                          } else {
-                            console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Condition does not match, hiding trigger fields for sequence', sequenceIndex);
-                            const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
-                            if (triggerFieldsContainer) {
-                              triggerFieldsContainer.style.display = 'none';
-                            }
-                          }
-                        });
-                      } else {
-                        console.log('🔧 [MULTIPLE TEXTBOXES RENDER] No trigger sequences found for this dropdown');
-                      }
-                      
-                      // Call dropdownMirror to create hidden checkboxes
-                      if (typeof dropdownMirror === 'function') {
-                        dropdownMirror(select, select.id);
-                      }
-                      // Update hidden logic if needed
-                      if (typeof updateHiddenLogic === 'function') {
-                        updateHiddenLogic(select.id, select.value);
-                      }
-                    } catch (e) {
-                      console.error('🔧 [MULTIPLE TEXTBOXES RENDER] Error in dropdown handler:', e);
-                    }
-                  }
-                  
-                  // Check on load
-                  setTimeout(function() {
-                    const select = document.getElementById('hello');
-                    if (select && select.value) {
-                      handleMultipleTextboxesDropdown_2_3(select);
-                    }
-                  }, 100);
-                  setTimeout(function() {
-                    const select = document.getElementById('hello');
-                    if (select && select.value) {
-                      handleMultipleTextboxesDropdown_2_3(select);
-                    }
-                  }, 500);
-                  setTimeout(function() {
-                    const select = document.getElementById('hello');
-                    if (select && select.value) {
-                      handleMultipleTextboxesDropdown_2_3(select);
-                    }
-                  }, 1000);
-                </script><h4 style="margin: 0px 0px 15px; color: rgb(25, 118, 210); font-size: 18px; font-weight: 600; text-align: center;">Hello</h4><select id="hello" name="hello" data-field-data="{&quot;questionId&quot;:&quot;2&quot;,&quot;fieldName&quot;:&quot;Hello&quot;,&quot;triggerSequences&quot;:[{&quot;condition&quot;:&quot;Yes&quot;,&quot;title&quot;:&quot;Additional Information&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Name&quot;,&quot;nodeId&quot;:&quot;hello_yes_name&quot;},{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Phone&quot;,&quot;nodeId&quot;:&quot;hello_yes_phone&quot;},{&quot;type&quot;:&quot;location&quot;,&quot;fieldName&quot;:&quot;Example Location&quot;,&quot;nodeId&quot;:&quot;location_data&quot;},{&quot;type&quot;:&quot;date&quot;,&quot;label&quot;:&quot;When&quot;,&quot;nodeId&quot;:&quot;hello_yes_when&quot;},{&quot;type&quot;:&quot;checkbox&quot;,&quot;fieldName&quot;:&quot;bruh&quot;,&quot;selectionType&quot;:&quot;multiple&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Option One&quot;,&quot;nodeId&quot;:&quot;hello_yes_bruh_option_one&quot;},{&quot;text&quot;:&quot;Option Two&quot;,&quot;nodeId&quot;:&quot;hello_yes_bruh_option_two&quot;}]},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Really&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]}]}],&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;,&quot;nodeId&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;,&quot;nodeId&quot;:&quot;No&quot;}]}" data-question-id="2" data-entry-number="1" onchange="handleMultipleTextboxesDropdown_2_3(this)" style="width: 100%; padding: 12px; border: 1px solid rgb(33, 150, 243); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); cursor: pointer; transition: 0.2s;"><option value="" disabled="">Select an option...</option><option value="Yes" data-node-id="Yes">Yes</option><option value="No" data-node-id="No">No</option></select><div id="dropdowntext_hello" style="display: none;"><input type="text" id="hello_dropdown" name="hello_dropdown" style="display: none;"></div></div></div><br></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container" data-question-type="numberedDropdown"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -347,7 +244,6 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<div style="display:none;"><input type="checkbox" id="test" name="test"></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
@@ -464,10 +360,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"enter_question_text"};
-var questionNameIds = {"1":"are_you_the_only_person_suing","2":"enter_question_text"};
-var linkedCheckboxes = [{"linkedCheckboxId":"test","checkboxes":["is_this_defendant_a_business/public_entity_are_they_a_public_entity_yes_1","are_you_the_only_person_suing_yes"]}];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"bruh","nodeId":"enter_question_text_bruh","order":1},{"type":"location","fieldName":"Location Data","nodeId":"location_data","order":2},{"type":"dropdown","fieldName":"Hello","options":[{"text":"Yes","nodeId":"Yes"},{"text":"No","nodeId":"No"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"hello_yes_name"},{"type":"label","label":"Phone","nodeId":"hello_yes_phone"},{"type":"location","fieldName":"Example Location","nodeId":"location_data"},{"type":"date","label":"When","nodeId":"hello_yes_when"},{"type":"checkbox","fieldName":"bruh","selectionType":"multiple","options":[{"text":"Option One","nodeId":"hello_yes_bruh_option_one"},{"text":"Option Two","nodeId":"hello_yes_bruh_option_two"}]},{"type":"dropdown","fieldName":"Really","options":[{"text":"Yes"},{"text":"No"}]}]}],"order":3}]};
+var questionSlugMap = {"1":"how_many"};
+var questionNameIds = {"1":"how_many"};
+var linkedCheckboxes = [];
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_extra_defendants_name","order":1},{"type":"label","label":"Phone","nodeId":"how_many_extra_defendants_phone","order":2},{"type":"checkbox","label":"Army Status","nodeId":"","selectionType":"multiple","options":[{"text":"Military Duty","nodeId":"how_many_army_status_military_duty","linkedFields":[{"nodeId":"how_many_extra_defendants_name","title":"example"}]}],"order":3}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId, triggerCondition, isMultipleTextboxes) {
     // Default parameters for backward compatibility
@@ -1797,11 +1693,11 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"1":["Name","Phone"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_extra_defendants_name","how_many_extra_defendants_phone"]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [{"questionId":"1","questionNameId":"are_you_the_only_person_suing","trigger":"Yes","type":"checkbox","nodeId":"user_biz","textboxText":""}];
+var hiddenLogicConfigs = [];
 var linkedFields = [];
 var isHandlingLink = false;
 
@@ -1925,51 +1821,6 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   thisQ.classList.add("hidden");
- }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -3591,6 +3442,91 @@ function showTextboxLabels(questionId, count){
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     
+                    // Handle linked fields for this checkbox option
+                    const linkedFields = option.linkedFields || [];
+                    
+                    // Function to create linked textboxes when checkbox is checked
+                    function createLinkedTextboxes() {
+                        linkedFields.forEach((linkedField) => {
+                            if (linkedField.nodeId && linkedField.title) {
+                                // For numberedDropdown, source field ID includes entry number
+                                const sourceFieldId = linkedField.nodeId + "_" + j;
+                                const sourceField = document.getElementById(sourceFieldId);
+                                if (sourceField) {
+                                    // Create hidden textbox with title as ID (append entry number for numberedDropdown)
+                                    const hiddenTextboxId = linkedField.title + "_" + j;
+                                    const hiddenTextbox = document.createElement('input');
+                                    hiddenTextbox.type = 'text';
+                                    hiddenTextbox.id = hiddenTextboxId;
+                                    hiddenTextbox.name = hiddenTextboxId;
+                                    hiddenTextbox.style.display = 'none';
+                                    hiddenTextbox.value = sourceField.value || '';
+                                    
+                                    // Add to form (append to body or a container)
+                                    document.body.appendChild(hiddenTextbox);
+                                    
+                                    // Sync with source field
+                                    function syncLinkedField() {
+                                        hiddenTextbox.value = sourceField.value || '';
+                                    }
+                                    
+                                    // Initial sync
+                                    syncLinkedField();
+                                    
+                                    // Listen for changes on source field
+                                    sourceField.addEventListener('input', syncLinkedField);
+                                    sourceField.addEventListener('change', syncLinkedField);
+                                    
+                                    // Poll periodically to catch any missed updates (especially for autofill)
+                                    // This ensures the linked textbox always stays in sync, even if events are missed
+                                    const pollInterval = setInterval(function() {
+                                        if (hiddenTextbox.value !== sourceField.value) {
+                                            syncLinkedField();
+                                        }
+                                    }, 100); // Check every 100ms
+                                    
+                                    // Store references for cleanup
+                                    hiddenTextbox._syncFunction = syncLinkedField;
+                                    hiddenTextbox._sourceField = sourceField;
+                                    hiddenTextbox._pollInterval = pollInterval;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Function to remove linked textboxes when checkbox is unchecked
+                    function removeLinkedTextboxes() {
+                        linkedFields.forEach((linkedField) => {
+                            if (linkedField.title) {
+                                // For numberedDropdown, hidden textbox ID includes entry number
+                                const hiddenTextboxId = linkedField.title + "_" + j;
+                                const hiddenTextbox = document.getElementById(hiddenTextboxId);
+                                if (hiddenTextbox) {
+                                    // Remove event listeners
+                                    if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                        hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                        hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                    }
+                                    // Clear polling interval
+                                    if (hiddenTextbox._pollInterval) {
+                                        clearInterval(hiddenTextbox._pollInterval);
+                                    }
+                                    // Remove the hidden textbox
+                                    hiddenTextbox.remove();
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Add event listener for checkbox/radio changes
+                    input.addEventListener('change', function() {
+                        if (this.checked) {
+                            createLinkedTextboxes();
+                        } else {
+                            removeLinkedTextboxes();
+                        }
+                    });
+                    
                     // Add event listener for radio buttons to create hidden checkboxes
                     if (selectionType === 'single') {
                         input.addEventListener('change', function() {
@@ -3617,6 +3553,34 @@ function showTextboxLabels(questionId, count){
                                                 existingHiddenCheckbox.remove();
                                             }
                                         }
+                                        // Also remove linked textboxes for unchecked radio
+                                        const uncheckedOption = checkboxOptions.find(opt => {
+                                            const optId = selectionType === 'single' ? opt.nodeId + "_" + j + "_radio" : opt.nodeId + "_" + j;
+                                            return optId === radio.id;
+                                        });
+                                        if (uncheckedOption && uncheckedOption.linkedFields) {
+                                            uncheckedOption.linkedFields.forEach((linkedField) => {
+                                                if (linkedField.title) {
+                                                    const hiddenTextboxId = linkedField.title + "_" + j;
+                                                    const hiddenTextbox = document.getElementById(hiddenTextboxId);
+                                                    if (hiddenTextbox) {
+                                                        if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                            hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                            hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                                        }
+                                                        // Stop MutationObserver
+                                                        if (hiddenTextbox._observer) {
+                                                            hiddenTextbox._observer.disconnect();
+                                                        }
+                                                        // Clear polling interval
+                                                        if (hiddenTextbox._pollInterval) {
+                                                            clearInterval(hiddenTextbox._pollInterval);
+                                                        }
+                                                        hiddenTextbox.remove();
+                                                    }
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                                 
@@ -3626,6 +3590,7 @@ function showTextboxLabels(questionId, count){
                 // For numberedDropdown, remove _radio to get the base nodeId
                 const originalNodeId = this.id.replace('_radio', '');
                 createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                                createLinkedTextboxes();
                             }
                         });
                     }
@@ -6068,15 +6033,32 @@ if (typeof handleNext === 'function') {
                                 // For radio buttons, we need to check if this specific radio button should be selected
                                 if (el.value === autofillValue) {
                                     el.checked = true;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
                             } else {
                                     el.checked = false;
                                 }
                             } else {
                                 // For checkboxes, use the boolean value
+                                const wasChecked = el.checked;
                                 el.checked = !!autofillValue;
+                                // Dispatch change event if checkbox state changed to trigger linked textbox creation
+                                if (el.checked !== wasChecked) {
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
+                                }
                             }
                         } else {
                             el.value = autofillValue;
+                            
+                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                const inputEvent = new Event('input', { bubbles: true });
+                                el.dispatchEvent(inputEvent);
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
 
                             // If this is a select element (dropdown), trigger change event to update conditional logic
                             if (el.tagName === 'SELECT') {
@@ -6435,15 +6417,32 @@ if (typeof handleNext === 'function') {
                             // For radio buttons, we need to check if this specific radio button should be selected
                             if (el.value === autofillValue) {
                                 el.checked = true;
+                                // Dispatch change event to trigger linked textbox creation
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
                             } else {
                                 el.checked = false;
                             }
                         } else {
                             // For checkboxes, use the boolean value
+                            const wasChecked = el.checked;
                             el.checked = !!autofillValue;
+                            // Dispatch change event if checkbox state changed to trigger linked textbox creation
+                            if (el.checked !== wasChecked) {
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
                         }
                     } else {
                         el.value = autofillValue;
+                        
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
 
                         // If this is a select element (dropdown), trigger change event to update conditional logic
                         if (el.tagName === 'SELECT') {
@@ -6476,6 +6475,14 @@ if (typeof handleNext === 'function') {
                     // Only process fields that have autofill data but are still empty
                     if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                         el.value = autofillValue;
+                        
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
 
                         // If this is a select element (dropdown), trigger change event to update conditional logic
                         if (el.tagName === 'SELECT') {
@@ -6866,15 +6873,32 @@ if (typeof handleNext === 'function') {
                                         // For radio buttons, we need to check if this specific radio button should be selected
                                         if (el.value === autofillValue) {
                                             el.checked = true;
+                                            // Dispatch change event to trigger linked textbox creation
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
                                         } else {
                                             el.checked = false;
                                         }
                                     } else {
                                         // For checkboxes, use the boolean value
+                                        const wasChecked = el.checked;
                                         el.checked = !!autofillValue;
+                                        // Dispatch change event if checkbox state changed to trigger linked textbox creation
+                                        if (el.checked !== wasChecked) {
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
+                                        }
                                     }
                                 } else {
                                     el.value = autofillValue;
+                                    
+                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                        const inputEvent = new Event('input', { bubbles: true });
+                                        el.dispatchEvent(inputEvent);
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
 
                                     // If this is a select element (dropdown), trigger change event to update conditional logic
                                     if (el.tagName === 'SELECT') {
@@ -6907,6 +6931,14 @@ if (typeof handleNext === 'function') {
                                 // Only process fields that have autofill data but are still empty
                                 if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                                     el.value = autofillValue;
+                                    
+                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                        const inputEvent = new Event('input', { bubbles: true });
+                                        el.dispatchEvent(inputEvent);
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
 
                                     // If this is a select element (dropdown), trigger change event to update conditional logic
                                     if (el.tagName === 'SELECT') {
@@ -6917,7 +6949,11 @@ if (typeof handleNext === 'function') {
 
                                 } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
                                     el.checked = !!autofillValue;
-
+                                    // Dispatch change event to trigger linked textbox creation
+                                    if (el.checked) {
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
                                 }
                             });
                         }, 1000); // Additional 1 second delay for stubborn fields
