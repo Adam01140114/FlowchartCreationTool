@@ -6734,8 +6734,8 @@ function showTextboxLabels(questionId, count){
                                     if (radio !== this) {
                                         radio.checked = false;
                                         
-                    // Remove hidden checkbox for unchecked radio
-                    // The hidden checkbox ID should be the original nodeId (without _radio suffix)
+                                        // Remove hidden checkbox for unchecked radio
+                                        // The hidden checkbox ID should be the original nodeId (without _radio suffix)
                     let originalNodeId;
                     if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
                       // For multipleTextboxes, remove _radio suffix to get the checkbox ID
@@ -6743,7 +6743,7 @@ function showTextboxLabels(questionId, count){
                     } else {
                       originalNodeId = radio.id.replace('_radio', '');
                     }
-                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                                        const existingHiddenCheckbox = document.getElementById(originalNodeId);
                                         
                                         if (existingHiddenCheckbox) {
                                             if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
@@ -6781,12 +6781,12 @@ function showTextboxLabels(questionId, count){
                                     }
                                 });
                                 
-                // Create hidden checkbox for the selected radio
-                // Use the original nodeId (without _radio suffix) for the hidden checkbox
+                                // Create hidden checkbox for the selected radio
+                                // Use the original nodeId (without _radio suffix) for the hidden checkbox
                 // For multipleTextboxes, the ID already has the full format, so just remove _radio
                 // For numberedDropdown, remove _radio to get the base nodeId
-                const originalNodeId = this.id.replace('_radio', '');
-                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                                const originalNodeId = this.id.replace('_radio', '');
+                                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                                 createLinkedTextboxes();
                             }
                         });

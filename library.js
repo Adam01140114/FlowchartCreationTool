@@ -378,10 +378,31 @@ window.exportGuiJson = function(download = true) {
             });
           } else if (item.type === 'checkbox' && cell._checkboxes && cell._checkboxes[item.index]) {
             const checkbox = cell._checkboxes[item.index];
-            const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+            const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+              const optionObj = {
               text: option.checkboxText || option.text || "",
               nodeId: option.nodeId || ""
-            })) : [];
+              };
+              
+              // Add linked fields if they exist
+              if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                optionObj.linkedFields = option.linkedFields.map(linkedField => {
+                  // Strip entry number suffix from selectedNodeId to match label nodeId format
+                  // Format: baseNodeId_${entryNumber} -> baseNodeId
+                  let baseNodeId = linkedField.selectedNodeId || "";
+                  if (baseNodeId) {
+                    // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
+                    baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                  }
+                  return {
+                    nodeId: baseNodeId,
+                    title: linkedField.title || ""
+                  };
+                });
+              }
+              
+              return optionObj;
+            }) : [];
             
             allFieldsInOrder.push({
               type: "checkbox",
@@ -478,10 +499,22 @@ window.exportGuiJson = function(download = true) {
                     } else if (orderItem.type === 'checkbox') {
                       const checkbox = checkboxMap.get(orderItem.identifier);
                       if (checkbox) {
-                        const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
-                          text: option.checkboxText || "",
-                          nodeId: option.nodeId || ""
-                        })) : [];
+                        const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+                          const optionObj = {
+                            text: option.checkboxText || "",
+                            nodeId: option.nodeId || ""
+                          };
+                          
+                          // Add linked fields if they exist
+                          if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                            optionObj.linkedFields = option.linkedFields.map(linkedField => ({
+                              nodeId: linkedField.selectedNodeId || "",
+                              title: linkedField.title || ""
+                            }));
+                          }
+                          
+                          return optionObj;
+                        }) : [];
                         
                         fields.push({
                           type: "checkbox",
@@ -756,10 +789,22 @@ window.exportGuiJson = function(download = true) {
                   // Add checkboxes
                   if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                     trigger.checkboxes.forEach(checkbox => {
-                      const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
-                        text: option.checkboxText || "",
-                        nodeId: option.nodeId || ""
-                      })) : [];
+                      const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+                        const optionObj = {
+                          text: option.checkboxText || "",
+                          nodeId: option.nodeId || ""
+                        };
+                        
+                        // Add linked fields if they exist
+                        if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                          optionObj.linkedFields = option.linkedFields.map(linkedField => ({
+                            nodeId: linkedField.selectedNodeId || "",
+                            title: linkedField.title || ""
+                          }));
+                        }
+                        
+                        return optionObj;
+                      }) : [];
                       
                       fields.push({
                         type: "checkbox",
@@ -906,10 +951,31 @@ window.exportGuiJson = function(download = true) {
         // Add checkbox fields if they exist
         if (cell._checkboxes && cell._checkboxes.length > 0) {
           cell._checkboxes.forEach((checkbox, checkboxIndex) => {
-            const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+            const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+              const optionObj = {
               text: option.checkboxText || option.text || "",
               nodeId: option.nodeId || ""
-            })) : [];
+              };
+              
+              // Add linked fields if they exist
+              if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                optionObj.linkedFields = option.linkedFields.map(linkedField => {
+                  // Strip entry number suffix from selectedNodeId to match label nodeId format
+                  // Format: baseNodeId_${entryNumber} -> baseNodeId
+                  let baseNodeId = linkedField.selectedNodeId || "";
+                  if (baseNodeId) {
+                    // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
+                    baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                  }
+                  return {
+                    nodeId: baseNodeId,
+                    title: linkedField.title || ""
+                  };
+                });
+              }
+              
+              return optionObj;
+            }) : [];
             
             allFieldsInOrder.push({
               type: "checkbox",
@@ -1381,10 +1447,31 @@ window.exportGuiJson = function(download = true) {
               });
             } else if (item.type === 'checkbox' && cell._checkboxes && cell._checkboxes[item.index]) {
               const checkbox = cell._checkboxes[item.index];
-              const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+              const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+                const optionObj = {
                 text: option.checkboxText || option.text || "",
                 nodeId: option.nodeId || ""
-              })) : [];
+                };
+                
+                // Add linked fields if they exist
+                if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                  optionObj.linkedFields = option.linkedFields.map(linkedField => {
+                    // Strip entry number suffix from selectedNodeId to match label nodeId format
+                    // Format: baseNodeId_${entryNumber} -> baseNodeId
+                    let baseNodeId = linkedField.selectedNodeId || "";
+                    if (baseNodeId) {
+                      // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
+                      baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                    }
+                    return {
+                      nodeId: baseNodeId,
+                      title: linkedField.title || ""
+                    };
+                  });
+                }
+                
+                return optionObj;
+              }) : [];
               
               allFieldsInOrder.push({
                 type: "checkbox",
@@ -1759,10 +1846,22 @@ window.exportGuiJson = function(download = true) {
                     // Add checkboxes
                     if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                       trigger.checkboxes.forEach(checkbox => {
-                        const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
-                          text: option.checkboxText || "",
-                          nodeId: option.nodeId || ""
-                        })) : [];
+                        const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+                          const optionObj = {
+                            text: option.checkboxText || "",
+                            nodeId: option.nodeId || ""
+                          };
+                          
+                          // Add linked fields if they exist
+                          if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                            optionObj.linkedFields = option.linkedFields.map(linkedField => ({
+                              nodeId: linkedField.selectedNodeId || "",
+                              title: linkedField.title || ""
+                            }));
+                          }
+                          
+                          return optionObj;
+                        }) : [];
                         
                         fields.push({
                           type: "checkbox",
@@ -2707,6 +2806,20 @@ window.exportBothJson = function() {
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
+      
+      // checkbox properties (including linked fields in options)
+      if (cell._checkboxes) {
+        cellData._checkboxes = JSON.parse(JSON.stringify(cell._checkboxes));
+      }
+      if (cell._itemOrder) {
+        cellData._itemOrder = JSON.parse(JSON.stringify(cell._itemOrder));
+      }
+      if (cell._times) {
+        cellData._times = JSON.parse(JSON.stringify(cell._times));
+      }
+      if (cell._dropdowns) {
+        cellData._dropdowns = JSON.parse(JSON.stringify(cell._dropdowns));
+      }
 
       return cellData;
     });

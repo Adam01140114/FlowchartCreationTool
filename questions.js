@@ -9610,6 +9610,22 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     return idToCopy;
   };
 
+  // Initialize linked fields array if it doesn't exist
+  if (!option.linkedFields) {
+    option.linkedFields = [];
+  }
+  
+  // Container for linked fields (created early so updateNodeId can access it)
+  const linkedFieldsContainer = document.createElement('div');
+  linkedFieldsContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e9ecef;
+  `;
+
   // Function to update Node ID and save
   const updateNodeId = () => {
     const fieldName = checkbox.fieldName || '';
@@ -9618,6 +9634,16 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     
     option.nodeId = generatedNodeId;
     nodeIdInput.value = generatedNodeId;
+    
+    // Update all linked field titles when nodeId changes
+    if (option.linkedFields && Array.isArray(option.linkedFields) && linkedFieldsContainer) {
+      const linkedFieldEntries = linkedFieldsContainer.querySelectorAll('[data-linked-field-index]');
+      linkedFieldEntries.forEach(entry => {
+        if (entry.updateTitle && typeof entry.updateTitle === 'function') {
+          entry.updateTitle();
+        }
+      });
+    }
     
     // Force save the cell properties to the graph model
     const graph = getGraph();
@@ -9780,11 +9806,272 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     }
   };
   
+  // Helper function to get all option entries from the numbered dropdown
+  const getOptionEntries = () => {
+    const options = [];
+    const seenFieldNames = new Set(); // Track field names we've already added
+    
+    if (cell._textboxes && Array.isArray(cell._textboxes)) {
+      const questionText = cell._questionText || '';
+      const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+      
+      // Check if this question has a PDF property
+      const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
+      const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+      
+      const minValue = cell._twoNumbers ? (parseInt(cell._twoNumbers.first) || 1) : 1;
+      
+      cell._textboxes.forEach((textbox, textboxIndex) => {
+        const fieldName = textbox.nameId || '';
+        if (fieldName && !seenFieldNames.has(fieldName)) {
+          seenFieldNames.add(fieldName);
+          const sanitizedFieldName = fieldName.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+          
+          // Use the first entry number (minValue) for the node ID
+          let nodeId;
+          if (sanitizedPdfName && sanitizedQuestion) {
+            nodeId = `${sanitizedPdfName}_${sanitizedQuestion}_${sanitizedFieldName}_${minValue}`;
+          } else if (sanitizedQuestion) {
+            nodeId = `${sanitizedQuestion}_${sanitizedFieldName}_${minValue}`;
+          } else {
+            nodeId = `${sanitizedFieldName}_${minValue}`;
+          }
+          
+          options.push({
+            nodeId: nodeId,
+            label: fieldName,
+            fieldName: fieldName,
+            entryNum: minValue
+          });
+        }
+      });
+    }
+    return options;
+  };
+  
+  // Helper function to create a linked field entry
+  const createLinkedFieldEntry = (linkedField, linkedFieldIndex) => {
+    const linkedFieldEntry = document.createElement('div');
+    linkedFieldEntry.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    `;
+    linkedFieldEntry.dataset.linkedFieldIndex = linkedFieldIndex;
+    
+    // Helper function to generate linked field title
+    const generateLinkedFieldTitle = () => {
+      const checkboxOptionNodeId = option.nodeId || '';
+      let linkedFieldNodeId = linkedField.selectedNodeId || '';
+      
+      // Strip entry number suffix from linked field nodeId
+      if (linkedFieldNodeId) {
+        linkedFieldNodeId = linkedFieldNodeId.replace(/_\d+$/, '');
+      }
+      
+      // Combine: checkboxOptionNodeId + linkedFieldNodeId
+      if (checkboxOptionNodeId && linkedFieldNodeId) {
+        return `${checkboxOptionNodeId}_${linkedFieldNodeId}`;
+      } else if (checkboxOptionNodeId) {
+        return checkboxOptionNodeId;
+      } else if (linkedFieldNodeId) {
+        return linkedFieldNodeId;
+      }
+      return '';
+    };
+    
+    // Linked field title input (read-only, auto-generated)
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.readOnly = true;
+    titleInput.value = generateLinkedFieldTitle();
+    titleInput.placeholder = 'Linked Field Title (auto-generated)';
+    titleInput.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+      background-color: #f8f9fa;
+      color: #495057;
+      cursor: pointer;
+    `;
+    titleInput.title = 'Double-click to copy to clipboard';
+    
+    // Update title when linked field nodeId changes
+    const updateTitle = () => {
+      const newTitle = generateLinkedFieldTitle();
+      titleInput.value = newTitle;
+      linkedField.title = newTitle; // Store for persistence
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    // Store updateTitle function on the linkedFieldEntry so it can be called externally
+    linkedFieldEntry.updateTitle = updateTitle;
+    
+    // Double-click to copy functionality with visual indicator
+    let copyIndicatorTimeout = null;
+    titleInput.ondblclick = () => {
+      // Clear any existing indicator
+      if (copyIndicatorTimeout) {
+        clearTimeout(copyIndicatorTimeout);
+      }
+      
+      // Copy to clipboard
+      titleInput.select();
+      document.execCommand('copy');
+      
+      // Show visual indicator (green)
+      const originalBg = titleInput.style.backgroundColor;
+      const originalBorder = titleInput.style.borderColor;
+      const originalColor = titleInput.style.color;
+      
+      titleInput.style.backgroundColor = '#d4edda';
+      titleInput.style.borderColor = '#28a745';
+      titleInput.style.color = '#155724';
+      
+      // Hide indicator after 1 second
+      copyIndicatorTimeout = setTimeout(() => {
+        titleInput.style.backgroundColor = originalBg;
+        titleInput.style.borderColor = originalBorder;
+        titleInput.style.color = originalColor;
+      }, 1000);
+    };
+    
+    // Linked field dropdown
+    const linkedFieldSelect = document.createElement('select');
+    linkedFieldSelect.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+      background: white;
+    `;
+    
+    // Populate dropdown with option entries
+    const optionEntries = getOptionEntries();
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select an option...';
+    linkedFieldSelect.appendChild(defaultOption);
+    
+    optionEntries.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.nodeId;
+      option.textContent = opt.label;
+      if (linkedField.selectedNodeId === opt.nodeId) {
+        option.selected = true;
+      }
+      linkedFieldSelect.appendChild(option);
+    });
+    
+    linkedFieldSelect.onchange = () => {
+      linkedField.selectedNodeId = linkedFieldSelect.value;
+      updateTitle(); // Update the auto-generated title
+    };
+    
+    // Delete linked field button
+    const deleteLinkedFieldBtn = document.createElement('button');
+    deleteLinkedFieldBtn.textContent = 'Delete';
+    deleteLinkedFieldBtn.style.cssText = `
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      align-self: flex-end;
+      margin-top: 4px;
+    `;
+    deleteLinkedFieldBtn.onclick = () => {
+      option.linkedFields.splice(linkedFieldIndex, 1);
+      linkedFieldEntry.remove();
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    linkedFieldEntry.appendChild(titleInput);
+    linkedFieldEntry.appendChild(linkedFieldSelect);
+    linkedFieldEntry.appendChild(deleteLinkedFieldBtn);
+    
+    return linkedFieldEntry;
+  };
+  
+  // Render existing linked fields
+  if (option.linkedFields && option.linkedFields.length > 0) {
+    option.linkedFields.forEach((linkedField, linkedFieldIndex) => {
+      const linkedFieldEntry = createLinkedFieldEntry(linkedField, linkedFieldIndex);
+      linkedFieldsContainer.appendChild(linkedFieldEntry);
+    });
+  }
+  
+  // Add Linked Field button
+  const addLinkedFieldBtn = document.createElement('button');
+  addLinkedFieldBtn.textContent = 'Add Linked Field';
+  addLinkedFieldBtn.style.cssText = `
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-top: 4px;
+    align-self: flex-start;
+  `;
+  addLinkedFieldBtn.onclick = () => {
+    const newLinkedField = {
+      title: '',
+      selectedNodeId: ''
+    };
+    option.linkedFields.push(newLinkedField);
+    
+    const linkedFieldEntry = createLinkedFieldEntry(newLinkedField, option.linkedFields.length - 1);
+    linkedFieldsContainer.insertBefore(linkedFieldEntry, addLinkedFieldBtn);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  linkedFieldsContainer.appendChild(addLinkedFieldBtn);
+  
   // Assemble mini option entry
   miniOptionEntry.appendChild(checkboxTextInput);
   miniOptionEntry.appendChild(nodeIdInput);
   miniOptionEntry.appendChild(copyIdBtn);
   miniOptionEntry.appendChild(deleteMiniBtn);
+  
+  // Add linked fields container below the main row
+  miniOptionEntry.style.flexDirection = 'column';
+  miniOptionEntry.style.alignItems = 'stretch';
+  
+  // Create a wrapper for the top row
+  const topRow = document.createElement('div');
+  topRow.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  `;
+  topRow.appendChild(checkboxTextInput);
+  topRow.appendChild(nodeIdInput);
+  topRow.appendChild(copyIdBtn);
+  topRow.appendChild(deleteMiniBtn);
+  
+  // Clear and rebuild mini option entry
+  miniOptionEntry.innerHTML = '';
+  miniOptionEntry.appendChild(topRow);
+  miniOptionEntry.appendChild(linkedFieldsContainer);
   
   return miniOptionEntry;
 }
