@@ -1645,22 +1645,6 @@ formHTML += `</div><br></div>`;
               const field = allFieldsInOrder[fieldIndex];
               const isLocationField = field.type === 'location' || locationFields.includes(field.label);
               
-              // Skip location fields that should be conditional trigger fields
-              // Check if this question has a dropdown with trigger sequences that contain location fields
-              const hasLocationTriggerFields = allFieldsInOrder.some(f => 
-                f.type === 'dropdown' && 
-                f.triggerSequences && 
-                f.triggerSequences.some(seq => 
-                  seq.fields && 
-                  seq.fields.some(tf => tf.type === 'location')
-                )
-              );
-              
-              if (isLocationField && hasLocationTriggerFields) {
-                // Skip this location field as it should be handled by trigger sequences
-                continue;
-              }
-              
               // Add <br> before first location field in each count
               if (isLocationField && !lastWasLocation && !firstField) {
                 const br = document.createElement('br');
@@ -1693,14 +1677,16 @@ formHTML += `</div><br></div>`;
                     let input;
                     if (f.label === 'State'){
                         input = document.createElement('select');
-                        input.id = locPrefix + '_' + f.nodeId + '_' + j;
+                        // For multipleTextboxes, don't add entry number suffix (j is always 1)
+                        input.id = locPrefix + '_' + f.nodeId;
                         input.name = input.id;
                         input.className = 'address-select-trigger';
                         input.style.cssText = 'width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: 0.2s;';
                         // Create hidden short code field for state abbreviation
                         const shortHidden = document.createElement('input');
                         shortHidden.type = 'text';
-                        shortHidden.id = locPrefix + '_state_short_' + j;
+                        // For multipleTextboxes, don't add entry number suffix (j is always 1)
+                        shortHidden.id = locPrefix + '_state_short';
                         shortHidden.name = shortHidden.id;
                         shortHidden.style.display = 'none';
                         const defaultOption = document.createElement('option');
@@ -1724,7 +1710,8 @@ formHTML += `</div><br></div>`;
                     } else {
                         input = document.createElement('input');
                         input.type = 'text';
-                        input.id = locPrefix + '_' + f.nodeId + '_' + j;
+                        // For multipleTextboxes, don't add entry number suffix (j is always 1)
+                        input.id = locPrefix + '_' + f.nodeId;
                         input.name = input.id;
                         input.placeholder = f.label;
                         input.style.cssText = 'width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
