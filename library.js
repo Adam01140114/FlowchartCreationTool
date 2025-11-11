@@ -362,7 +362,7 @@ window.exportGuiJson = function(download = true) {
             });
           } else if (item.type === 'location') {
             // Create a single location entry instead of expanding into individual fields
-            allFieldsInOrder.push({
+              allFieldsInOrder.push({
               type: "location",
               fieldName: cell._locationTitle || "",
               nodeId: "location_data",

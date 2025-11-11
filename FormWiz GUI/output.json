@@ -2,15 +2,93 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Section 1",
+      "sectionName": "Introduction",
       "questions": [
         {
           "questionId": 1,
-          "text": "bruh",
-          "type": "multipleTextboxes",
+          "text": "Are you the only person suing?",
+          "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": true,
+            "configs": [
+              {
+                "trigger": "Yes",
+                "type": "checkbox",
+                "nodeId": "user_biz",
+                "textboxText": ""
+              }
+            ]
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "are_you_the_only_person_suing",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "Enter question text",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              }
+            ]
           },
           "jump": {
             "enabled": false,
@@ -55,13 +133,83 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "bruh",
+          "nodeId": "enter_question_text",
           "allFieldsInOrder": [
             {
-              "type": "location",
-              "fieldName": "example",
-              "nodeId": "location_data",
+              "type": "label",
+              "label": "bruh",
+              "nodeId": "enter_question_text_bruh",
               "order": 1
+            },
+            {
+              "type": "location",
+              "fieldName": "Location Data",
+              "nodeId": "location_data",
+              "order": 2
+            },
+            {
+              "type": "dropdown",
+              "fieldName": "Hello",
+              "options": [
+                {
+                  "text": "yes",
+                  "nodeId": "yes"
+                },
+                {
+                  "text": "no",
+                  "nodeId": "no"
+                }
+              ],
+              "triggerSequences": [
+                {
+                  "condition": "yes",
+                  "fields": [
+                    {
+                      "type": "label",
+                      "label": "name",
+                      "nodeId": "name"
+                    },
+                    {
+                      "type": "label",
+                      "label": "phone",
+                      "nodeId": "phone"
+                    },
+                    {
+                      "type": "location",
+                      "fieldName": "example location",
+                      "nodeId": "location_data"
+                    },
+                    {
+                      "type": "date",
+                      "label": "when",
+                      "nodeId": "when"
+                    },
+                    {
+                      "type": "checkbox",
+                      "fieldName": "bruh",
+                      "options": [
+                        {
+                          "text": "123",
+                          "nodeId": "123"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "dropdown",
+                      "fieldName": "really",
+                      "options": [
+                        {
+                          "text": "yes"
+                        },
+                        {
+                          "text": "no"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "order": 3
             }
           ]
         }
@@ -71,7 +219,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 2,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
@@ -81,5 +229,14 @@
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],
-  "linkedCheckboxes": []
+  "linkedCheckboxes": [
+    {
+      "id": "linkedCheckbox0",
+      "linkedCheckboxId": "test",
+      "checkboxes": [
+        "is_this_defendant_a_business/public_entity_are_they_a_public_entity_yes_1",
+        "are_you_the_only_person_suing_yes"
+      ]
+    }
+  ]
 }

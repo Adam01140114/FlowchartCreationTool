@@ -2315,6 +2315,839 @@ Conditional logic configurations are automatically saved:
 
 ---
 
+## 📋 **Add Dropdown Field Feature in Numbered Dropdown Questions**
+
+### **Overview**
+The "Add Dropdown" feature allows users to add dropdown fields within numbered dropdown questions. These dropdown fields appear for each entry created by the numbered dropdown (e.g., if user selects "3" from "How many cars?", the dropdown field appears 3 times, once for each car entry). Dropdown fields can have multiple options, trigger sequences (conditional fields that appear based on dropdown selection), and conditional logic (show/hide based on checkbox states).
+
+**Example**: In a numbered dropdown question "How many cars?" with range 1-3:
+- User adds a dropdown field "Is this car a Toyota?" with options "Yes" and "No"
+- User adds a trigger sequence: When "Yes" is selected, show a date field "When did you buy it?"
+- When user selects "2" from the numbered dropdown, two entry containers are created
+- Each entry container contains the "Is this car a Toyota?" dropdown
+- When user selects "Yes" in entry 1, the date field "When did you buy it?" appears for entry 1 only
+
+**Key Benefits:**
+- Dynamic form generation based on user selection
+- Conditional field display within entries
+- Support for complex nested logic
+- Full integration with export/import and autosave
+
+---
+
+### **PHASE 1: GUI Setup (gui.html / gui.js)**
+
+#### **1.1 Adding a Dropdown Field**
+**Location**: `FormWiz GUI/gui.js` - `addDropdownField()` function (around line 2810)
+
+When the user clicks the "Add Dropdown" button in a numbered dropdown question:
+
+```javascript
+function addDropdownField(questionId) {
+    const unifiedDiv = getUnifiedContainer(questionId);
+    
+    // Ensure the unified container is visible
+    if (unifiedDiv.style.display === 'none') {
+        unifiedDiv.style.display = 'block';
+    }
+    
+    const fieldCount = unifiedDiv.children.length + 1;
+    
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'dropdown');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    
+    // Create the dropdown field UI
+    fieldDiv.innerHTML = `
+        <div style="...">
+            <div>Dropdown Field</div>
+            
+            <!-- Field Name Input -->
+            <input type="text" id="dropdownFieldName${questionId}_${fieldCount}" 
+                   placeholder="Enter dropdown field name">
+            
+            <!-- Add Options Section -->
+            <div id="dropdownOptions${questionId}_${fieldCount}">
+                <!-- Options will be added here -->
+            </div>
+            <button onclick="addDropdownOption(${questionId}, ${fieldCount})">
+                Add dropdown option
+            </button>
+            
+            <!-- Conditional Logic Section -->
+            <div id="triggerSequences${questionId}_${fieldCount}">
+                <!-- Trigger sequences will be added here -->
+            </div>
+            <button onclick="addTriggerSequence(${questionId}, ${fieldCount})">
+                Add trigger
+            </button>
+            
+            <button onclick="removeUnifiedField(${questionId}, ${fieldCount})">
+                Remove
+            </button>
+        </div>
+    `;
+    
+    unifiedDiv.appendChild(fieldDiv);
+}
+```
+
+**What happens:**
+1. Gets the unified fields container for the question
+2. Makes the container visible if hidden
+3. Calculates the next field order number
+4. Creates a new unified field div with `data-type="dropdown"` and `data-order` attribute
+5. Creates UI for:
+   - Field name input
+   - Options container (initially empty)
+   - "Add dropdown option" button
+   - Trigger sequences container (initially empty)
+   - "Add trigger" button
+   - Remove button
+
+**Data Structure:**
+- Each dropdown field is stored as a unified field with:
+  - `data-type="dropdown"` - Identifies it as a dropdown field
+  - `data-order={fieldCount}` - Preserves creation order
+  - Field name stored in `#dropdownFieldName${questionId}_${fieldCount}` input
+
+#### **1.2 Adding Dropdown Options**
+**Location**: `FormWiz GUI/gui.js` - `addDropdownOption()` function (around line 2909)
+
+When the user clicks "Add dropdown option":
+
+```javascript
+function addDropdownOption(questionId, fieldCount) {
+    const optionsContainer = document.getElementById(`dropdownOptions${questionId}_${fieldCount}`);
+    const optionCount = optionsContainer.children.length + 1;
+    
+    const optionDiv = document.createElement('div');
+    optionDiv.className = `dropdown-option-${optionCount}`;
+    optionDiv.innerHTML = `
+        <label>Option text:</label>
+        <input type="text" id="dropdownOptionText${questionId}_${fieldCount}_${optionCount}" 
+               placeholder="Enter option text">
+        
+        <label>Option Node ID:</label>
+        <input type="text" id="dropdownOptionNodeId${questionId}_${fieldCount}_${optionCount}" 
+               placeholder="Enter option node ID">
+        
+        <button onclick="removeDropdownOption(${questionId}, ${fieldCount}, ${optionCount})">
+            Remove Option
+        </button>
+    `;
+    
+    optionsContainer.appendChild(optionDiv);
+    
+    // Update trigger condition options for all trigger sequences
+    const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
+    if (triggerSequencesContainer) {
+        const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+        sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+            updateTriggerConditionOptions(questionId, fieldCount, sequenceIndex + 1);
+        });
+    }
+}
+```
+
+**What happens:**
+1. Gets the options container for this dropdown field
+2. Calculates the next option number
+3. Creates an option div with:
+   - Option text input
+   - Option Node ID input
+   - Remove button
+4. Appends to options container
+5. Updates trigger condition dropdowns (so new options appear in trigger sequence conditions)
+
+**Option Data Structure:**
+- Each option has:
+  - `text` - Display text (from `dropdownOptionText` input)
+  - `nodeId` - Unique identifier (from `dropdownOptionNodeId` input)
+
+#### **1.3 Adding Trigger Sequences**
+**Location**: `FormWiz GUI/gui.js` - `addTriggerSequence()` function (around line 2990)
+
+When the user clicks "Add trigger":
+
+```javascript
+function addTriggerSequence(questionId, fieldCount) {
+    const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
+    const sequenceCount = triggerSequencesContainer.children.length + 1;
+    
+    const sequenceDiv = document.createElement('div');
+    sequenceDiv.className = `trigger-sequence-${sequenceCount}`;
+    sequenceDiv.innerHTML = `
+        <div>Trigger Sequence ${sequenceCount}</div>
+        
+        <!-- Trigger Condition Dropdown -->
+        <label>When this option is selected:</label>
+        <select id="triggerCondition${questionId}_${fieldCount}_${sequenceCount}">
+            <!-- Options populated dynamically -->
+        </select>
+        
+        <!-- Trigger Title Input -->
+        <label>Title for additional fields:</label>
+        <input type="text" id="triggerTitle${questionId}_${fieldCount}_${sequenceCount}" 
+               value="Additional Information">
+        
+        <!-- Trigger Fields Container -->
+        <div id="triggerFields${questionId}_${fieldCount}_${sequenceCount}">
+            <!-- Fields will be added here -->
+        </div>
+        
+        <button onclick="addTriggerLabel(...)">Add Label</button>
+        <button onclick="addTriggerCheckbox(...)">Add Checkbox</button>
+        <button onclick="addTriggerDropdown(...)">Add Dropdown</button>
+        <button onclick="addTriggerDate(...)">Add Date</button>
+        <!-- ... other field type buttons ... -->
+        
+        <button onclick="removeTriggerSequence(...)">Remove Sequence</button>
+    `;
+    
+    triggerSequencesContainer.appendChild(sequenceDiv);
+    
+    // Populate trigger condition options
+    updateTriggerConditionOptions(questionId, fieldCount, sequenceCount);
+}
+```
+
+**What happens:**
+1. Gets the trigger sequences container
+2. Calculates the next sequence number
+3. Creates a sequence div with:
+   - Trigger condition dropdown (populated with dropdown options)
+   - Trigger title input (default: "Additional Information")
+   - Trigger fields container (for conditional fields)
+   - Buttons to add different field types
+   - Remove button
+4. Populates the trigger condition dropdown with available options
+
+**Trigger Sequence Data Structure:**
+- Each sequence has:
+  - `condition` - The dropdown option value that triggers this sequence
+  - `title` - Title shown above the conditional fields
+  - `fields` - Array of fields that appear when condition is met
+
+---
+
+### **PHASE 2: Data Processing (generate.js)**
+
+#### **2.1 Collecting Dropdown Field Data**
+**Location**: `FormWiz GUI/generate.js` - Around line 1654-1912
+
+When generating HTML, `generate.js` processes unified fields:
+
+```javascript
+// Process unified fields
+unifiedFields.forEach((field) => {
+    const fieldType = field.getAttribute('data-type');
+    const fieldOrder = field.getAttribute('data-order');
+    
+    if (fieldType === 'dropdown') {
+        const fieldNameEl = field.querySelector('#dropdownFieldName' + questionId + '_' + fieldOrder);
+        const optionsContainer = field.querySelector('#dropdownOptions' + questionId + '_' + fieldOrder);
+        const triggerSequencesContainer = field.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
+        
+        if (fieldNameEl) {
+            // Collect dropdown options
+            const dropdownOptions = [];
+            if (optionsContainer) {
+                const optionElements = optionsContainer.querySelectorAll('[class^="dropdown-option-"]');
+                optionElements.forEach((optionEl, optionIndex) => {
+                    const textEl = optionEl.querySelector('#dropdownOptionText' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                    const nodeIdEl = optionEl.querySelector('#dropdownOptionNodeId' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                    
+                    if (textEl && nodeIdEl) {
+                        dropdownOptions.push({
+                            text: textEl.value.trim(),
+                            nodeId: nodeIdEl.value.trim()
+                        });
+                    }
+                });
+            }
+            
+            // Collect trigger sequences
+            const triggerSequences = [];
+            if (triggerSequencesContainer) {
+                const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+                sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+                    const triggerConditionEl = sequenceEl.querySelector('#triggerCondition' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                    const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                    
+                    const triggerFields = [];
+                    // ... collect trigger fields (labels, checkboxes, dropdowns, dates, etc.) ...
+                    
+                    const triggerTitleEl = sequenceEl.querySelector('#triggerTitle' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                    const triggerTitle = triggerTitleEl ? (triggerTitleEl.value.trim() || 'Additional Information') : 'Additional Information';
+                    
+                    triggerSequences.push({
+                        condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
+                        title: triggerTitle,
+                        fields: triggerFields
+                    });
+                });
+            }
+            
+            allElements.push({
+                type: fieldType,
+                fieldName: fieldNameEl.value.trim(),
+                options: dropdownOptions,
+                triggerSequences: triggerSequences,
+                order: parseInt(fieldOrder)
+            });
+        }
+    }
+});
+```
+
+**What happens:**
+1. Iterates through all unified fields
+2. For dropdown fields:
+   - Gets field name from input
+   - Collects all dropdown options (text and nodeId)
+   - Collects all trigger sequences with their conditions, titles, and fields
+3. Adds to `allFieldsInOrder` array sorted by `order` attribute
+
+**Result Structure:**
+```javascript
+{
+    type: 'dropdown',
+    fieldName: 'Is this car a Toyota?',
+    options: [
+        { text: 'Yes', nodeId: 'is_this_car_a_toyota_yes' },
+        { text: 'No', nodeId: 'is_this_car_a_toyota_no' }
+    ],
+    triggerSequences: [
+        {
+            condition: 'Yes',
+            title: 'Additional Information',
+            fields: [
+                { type: 'date', label: 'When did you buy it?', nodeId: 'is_this_car_a_toyota_yes_when_did_you_buy_it' }
+            ]
+        }
+    ],
+    order: 2
+}
+```
+
+#### **2.2 Storing in unifiedFieldsMap**
+**Location**: `FormWiz GUI/generate.js` - Around line 1982-1984
+
+The dropdown field data is stored in `window.unifiedFieldsMap`:
+
+```javascript
+window.unifiedFieldsMap = window.unifiedFieldsMap || {};
+window.unifiedFieldsMap[questionId] = allFieldsInOrder;
+```
+
+This map is embedded in the generated HTML as a JavaScript variable for runtime use.
+
+#### **2.3 Embedding in Generated HTML**
+**Location**: `FormWiz GUI/generate.js` - Around line 3918-3921
+
+The `unifiedFieldsMap` is embedded as a JavaScript variable:
+
+```javascript
+formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
+```
+
+**Generated Output:**
+```javascript
+var unifiedFieldsMap = {
+    "1": [
+        {
+            "type": "label",
+            "label": "Name",
+            "nodeId": "how_many_cars_name",
+            "order": 1
+        },
+        {
+            "type": "dropdown",
+            "fieldName": "Is this car a Toyota?",
+            "options": [
+                { "text": "Yes", "nodeId": "is_this_car_a_toyota_yes" },
+                { "text": "No", "nodeId": "is_this_car_a_toyota_no" }
+            ],
+            "triggerSequences": [
+                {
+                    "condition": "Yes",
+                    "title": "Additional Information",
+                    "fields": [
+                        {
+                            "type": "date",
+                            "label": "When did you buy it?",
+                            "nodeId": "is_this_car_a_toyota_yes_when_did_you_buy_it"
+                        }
+                    ]
+                }
+            ],
+            "order": 2
+        }
+    ]
+};
+```
+
+---
+
+### **PHASE 3: Runtime Implementation (output.html)**
+
+#### **3.1 Rendering Dropdown Fields**
+**Location**: `FormWiz GUI/generate.js` - `showTextboxLabels()` function (around line 5962-6110)
+
+When the user selects a number from the numbered dropdown, `showTextboxLabels()` is called:
+
+```javascript
+function showTextboxLabels(questionId, count) {
+    const container = document.getElementById("labelContainer" + questionId);
+    container.innerHTML = "";
+    
+    // Get all fields in order from unifiedFieldsMap
+    const allFieldsInOrder = window.unifiedFieldsMap[questionId] || [];
+    
+    // Generate entries for the selected count
+    for(let j = 1; j <= count; j++) {
+        const entryContainer = document.createElement('div');
+        entryContainer.className = 'entry-container';
+        
+        // Process all fields in creation order
+        for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++) {
+            const field = allFieldsInOrder[fieldIndex];
+            
+            if (field.type === 'dropdown') {
+                // Create dropdown field div
+                const dropdownFieldDiv = document.createElement('div');
+                dropdownFieldDiv.style.cssText = 'margin: 15px 0; padding: 20px; border: 2px solid #2196F3; ...';
+                
+                // Add field name as label
+                const fieldNameLabel = document.createElement('h4');
+                fieldNameLabel.textContent = field.fieldName;
+                dropdownFieldDiv.appendChild(fieldNameLabel);
+                
+                // Create dropdown select element
+                const select = document.createElement('select');
+                const sanitizedFieldName = field.fieldName
+                    .toLowerCase()
+                    .replace(/[?]/g, '')
+                    .replace(/[^a-z0-9_]+/g, '_')
+                    .replace(/^_+|_+$/g, '');
+                select.id = sanitizedFieldName + "_" + j;
+                select.name = select.id;
+                
+                // Add placeholder option
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Select an option...';
+                placeholderOption.disabled = true;
+                placeholderOption.selected = true;
+                select.appendChild(placeholderOption);
+                
+                // Add dropdown options
+                const dropdownOptions = field.options || [];
+                dropdownOptions.forEach((option) => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.text;
+                    optionElement.textContent = option.text;
+                    optionElement.setAttribute('data-node-id', option.nodeId);
+                    select.appendChild(optionElement);
+                });
+                
+                // Handle trigger sequences
+                if (field.triggerSequences && field.triggerSequences.length > 0) {
+                    // ... create trigger sequence containers and fields ...
+                }
+                
+                dropdownFieldDiv.appendChild(select);
+                entryContainer.appendChild(dropdownFieldDiv);
+            }
+        }
+        
+        container.appendChild(entryContainer);
+    }
+}
+```
+
+**What happens:**
+1. Clears the label container
+2. Gets `allFieldsInOrder` from `unifiedFieldsMap[questionId]`
+3. For each entry (1 to count):
+   - Creates an entry container div
+   - Processes all fields in order
+   - For dropdown fields:
+     - Creates a styled dropdown field div
+     - Adds field name as heading
+     - Creates `<select>` element with sanitized ID: `{sanitizedFieldName}_{entryNumber}`
+     - Adds placeholder option
+     - Adds all dropdown options
+     - Sets up trigger sequence handling
+   - Appends entry container to label container
+
+**Dropdown ID Format:**
+- Field name: "Is this car a Toyota?"
+- Sanitized: "is_this_car_a_toyota"
+- Entry 1: `is_this_car_a_toyota_1`
+- Entry 2: `is_this_car_a_toyota_2`
+
+#### **3.2 Trigger Sequence Handling**
+**Location**: `FormWiz GUI/generate.js` - Around line 6099-6110
+
+When a dropdown option is selected, trigger sequences are evaluated:
+
+```javascript
+// Handle trigger sequences
+if (field.triggerSequences && field.triggerSequences.length > 0) {
+    field.triggerSequences.forEach((sequence, sequenceIndex) => {
+        // Create trigger fields container (initially hidden)
+        const triggerFieldsContainer = document.createElement('div');
+        triggerFieldsContainer.id = 'triggerFields_' + questionId + '_' + j + '_' + sequenceIndex;
+        triggerFieldsContainer.style.display = 'none';
+        
+        // Add trigger title
+        const triggerTitle = document.createElement('h5');
+        triggerTitle.textContent = sequence.title || 'Additional Information';
+        triggerFieldsContainer.appendChild(triggerTitle);
+        
+        // Add trigger fields
+        if (sequence.fields && sequence.fields.length > 0) {
+            sequence.fields.forEach((triggerField) => {
+                // Create field based on type (label, checkbox, dropdown, date, etc.)
+                // ... field creation logic ...
+            });
+        }
+        
+        // Set up change handler
+        select.addEventListener('change', function() {
+            const selectedValue = this.value;
+            if (sequence.condition === selectedValue) {
+                triggerFieldsContainer.style.display = 'block';
+            } else {
+                triggerFieldsContainer.style.display = 'none';
+                // Reset fields when hidden
+                resetTriggerSequenceFields(triggerFieldsContainer);
+            }
+        });
+        
+        dropdownFieldDiv.appendChild(triggerFieldsContainer);
+    });
+}
+```
+
+**What happens:**
+1. For each trigger sequence:
+   - Creates a trigger fields container (initially hidden)
+   - Adds trigger title
+   - Creates all trigger fields (labels, checkboxes, dropdowns, dates, etc.)
+2. Sets up change event listener on the dropdown:
+   - When selected value matches sequence condition → show container
+   - When selected value doesn't match → hide container and reset fields
+
+**Trigger Sequence Logic:**
+- Only one trigger sequence can be active at a time (based on selected dropdown value)
+- When dropdown value changes, old trigger sequence is hidden, new one is shown
+- Fields in hidden trigger sequences are reset to prevent stale data
+
+#### **3.3 Dropdown Change Events**
+**Location**: `FormWiz GUI/generate.js` - Around line 6093-6095
+
+When a dropdown option is selected:
+
+```javascript
+select.addEventListener('change', function() {
+    const selectedValue = this.value;
+    const selectedOption = this.options[this.selectedIndex];
+    const nodeId = selectedOption ? selectedOption.getAttribute('data-node-id') : '';
+    
+    // Handle trigger sequences
+    // ... show/hide trigger fields based on condition ...
+    
+    // Call dropdownMirror to create hidden checkbox
+    if (typeof dropdownMirror === 'function') {
+        dropdownMirror(this, this.id);
+    }
+    
+    // Update hidden logic if needed
+    if (typeof updateHiddenLogic === 'function') {
+        updateHiddenLogic(this.id, selectedValue);
+    }
+});
+```
+
+**What happens:**
+1. Gets selected value and nodeId
+2. Evaluates trigger sequences (show/hide conditional fields)
+3. Calls `dropdownMirror()` to create hidden checkbox (see Hidden Dropdown Checkboxes feature)
+4. Calls `updateHiddenLogic()` for custom hidden logic
+
+---
+
+### **PHASE 4: Data Persistence**
+
+#### **4.1 Export to JSON**
+**Location**: `FormWiz GUI/download.js` - `exportForm()` function (around line 3850-4000)
+
+When exporting the form configuration:
+
+```javascript
+// Process unified fields
+unifiedFields.forEach((el) => {
+    const fieldType = el.getAttribute('data-type');
+    const fieldOrder = parseInt(el.getAttribute('data-order'));
+    
+    if (fieldType === 'dropdown') {
+        const fieldNameEl = el.querySelector('#dropdownFieldName' + questionId + '_' + fieldOrder);
+        const optionsContainer = el.querySelector('#dropdownOptions' + questionId + '_' + fieldOrder);
+        const triggerSequencesContainer = el.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
+        
+        if (fieldNameEl) {
+            // Collect dropdown options
+            const dropdownOptions = [];
+            // ... collect options ...
+            
+            // Collect trigger sequences
+            const triggerSequences = [];
+            // ... collect trigger sequences ...
+            
+            allFieldsInOrder.push({
+                type: 'dropdown',
+                fieldName: fieldNameEl.value.trim(),
+                options: dropdownOptions,
+                triggerSequences: triggerSequences,
+                order: fieldOrder
+            });
+        }
+    }
+});
+
+// Add to question's allFieldsInOrder
+question.allFieldsInOrder = allFieldsInOrder;
+```
+
+**Exported JSON Structure:**
+```json
+{
+    "questionId": 1,
+    "text": "How many cars",
+    "type": "numberedDropdown",
+    "allFieldsInOrder": [
+        {
+            "type": "label",
+            "label": "Name",
+            "nodeId": "how_many_cars_name",
+            "order": 1
+        },
+        {
+            "type": "dropdown",
+            "fieldName": "Is this car a Toyota?",
+            "options": [
+                {
+                    "text": "Yes",
+                    "nodeId": "is_this_car_a_toyota_yes"
+                },
+                {
+                    "text": "No",
+                    "nodeId": "is_this_car_a_toyota_no"
+                }
+            ],
+            "triggerSequences": [
+                {
+                    "condition": "Yes",
+                    "title": "Additional Information",
+                    "fields": [
+                        {
+                            "type": "date",
+                            "label": "When did you buy it?",
+                            "nodeId": "is_this_car_a_toyota_yes_when_did_you_buy_it"
+                        }
+                    ]
+                }
+            ],
+            "order": 2
+        }
+    ]
+}
+```
+
+#### **4.2 Import from JSON**
+**Location**: `FormWiz GUI/download.js` - `loadFormData()` function (around line 626-800)
+
+When importing a JSON file:
+
+```javascript
+// Process allFieldsInOrder
+if (question.allFieldsInOrder && question.allFieldsInOrder.length > 0) {
+    question.allFieldsInOrder.forEach((field) => {
+        if (field.type === 'dropdown') {
+            // Check if addDropdownField function is available
+            if (typeof addDropdownField !== 'function') {
+                console.error('addDropdownField function not available!');
+                return;
+            }
+            
+            // Add a dropdown field
+            addDropdownField(question.questionId);
+            
+            // Set the field values
+            const lastField = unifiedFieldsDiv.lastElementChild;
+            if (lastField) {
+                const fieldOrder = lastField.getAttribute('data-order');
+                const fieldNameEl = lastField.querySelector('#dropdownFieldName' + question.questionId + '_' + fieldOrder);
+                
+                if (fieldNameEl && field.fieldName) {
+                    fieldNameEl.value = field.fieldName;
+                }
+                
+                // Add dropdown options
+                if (field.options && field.options.length > 0) {
+                    field.options.forEach((option, optionIndex) => {
+                        addDropdownOption(question.questionId, fieldOrder);
+                        
+                        // Set the option values
+                        const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                        const optionNodeIdEl = document.getElementById('dropdownOptionNodeId' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                        
+                        if (optionTextEl) optionTextEl.value = option.text;
+                        if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
+                    });
+                }
+                
+                // Add trigger sequences
+                if (field.triggerSequences && field.triggerSequences.length > 0) {
+                    field.triggerSequences.forEach((sequence, sequenceIndex) => {
+                        addTriggerSequence(question.questionId, fieldOrder);
+                        
+                        // Set trigger condition and title
+                        const triggerConditionEl = document.getElementById('triggerCondition' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                        if (triggerConditionEl && sequence.condition) {
+                            triggerConditionEl.value = sequence.condition;
+                        }
+                        
+                        const triggerTitleEl = document.getElementById('triggerTitle' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
+                        if (triggerTitleEl && sequence.title) {
+                            triggerTitleEl.value = sequence.title;
+                        }
+                        
+                        // Add trigger fields
+                        if (sequence.fields && sequence.fields.length > 0) {
+                            sequence.fields.forEach((triggerField, triggerFieldIndex) => {
+                                // Add field based on type (label, checkbox, dropdown, date, etc.)
+                                // ... field restoration logic ...
+                            });
+                        }
+                    });
+                }
+            }
+        }
+    });
+}
+```
+
+**Import Process:**
+1. Iterates through `allFieldsInOrder` array
+2. For dropdown fields:
+   - Calls `addDropdownField()` to create the UI
+   - Sets field name
+   - Calls `addDropdownOption()` for each option and sets values
+   - Calls `addTriggerSequence()` for each trigger sequence
+   - Sets trigger condition and title
+   - Adds all trigger fields
+
+#### **4.3 Autosave Integration**
+**Location**: `FormWiz GUI/gui.js` - Autosave functionality
+
+Dropdown field configurations are automatically saved:
+- When user adds/removes dropdown fields
+- When user adds/removes dropdown options
+- When user adds/removes trigger sequences
+- When user modifies field names, option text, or node IDs
+- Included in autosave data structure
+
+**Autosave includes:**
+- All unified fields with their `data-type` and `data-order` attributes
+- All dropdown field names, options, and trigger sequences
+- Preserved across page reloads
+
+---
+
+### **Summary: Complete Data Flow**
+
+1. **GUI Setup** (`gui.js`):
+   - User clicks "Add Dropdown" → `addDropdownField()` creates UI
+   - User adds options → `addDropdownOption()` creates option inputs
+   - User adds trigger sequences → `addTriggerSequence()` creates conditional fields
+   - Configuration stored in unified fields container with `data-type="dropdown"`
+
+2. **Generate.js Processing** (`generate.js`):
+   - Reads unified fields from DOM
+   - Collects dropdown field name, options, and trigger sequences
+   - Stores in `allFieldsInOrder` array sorted by `order`
+   - Embeds `unifiedFieldsMap` as JavaScript variable in HTML
+
+3. **Output.html Runtime** (`output.html`):
+   - User selects number from numbered dropdown → `showTextboxLabels()` called
+   - Creates entry containers for each entry (1 to count)
+   - For each entry, renders dropdown field with all options
+   - Sets up trigger sequence handlers
+   - When user selects dropdown option:
+     - Shows/hides trigger sequence fields based on condition
+     - Calls `dropdownMirror()` to create hidden checkbox
+     - Updates hidden logic if configured
+
+4. **Data Persistence**:
+   - Export: Unified fields → JSON `allFieldsInOrder` array
+   - Import: JSON `allFieldsInOrder` → Unified fields UI restoration
+   - Autosave: Includes all unified fields in autosave data
+
+---
+
+### **Key Technical Details**
+
+**Field Ordering:**
+- Fields are ordered by `data-order` attribute (set when created)
+- Order is preserved in `allFieldsInOrder` array
+- Fields appear in the same order in each entry container
+
+**Dropdown ID Sanitization:**
+- Field name: "Is this car a Toyota?"
+- Sanitized: `is_this_car_a_toyota`
+- Entry 1: `is_this_car_a_toyota_1`
+- Entry 2: `is_this_car_a_toyota_2`
+- Uses lowercase, removes question marks, replaces non-word chars with underscores
+
+**Trigger Sequence Logic:**
+- Only one trigger sequence active per dropdown selection
+- When dropdown value changes, old sequence hidden, new one shown
+- Fields in hidden sequences are reset to prevent stale data
+- Each entry has independent trigger sequence state
+
+**Integration with Other Features:**
+- **Hidden Dropdown Checkboxes**: Dropdown selections create hidden checkboxes via `dropdownMirror()`
+- **Conditional Logic**: Dropdown fields can have conditional logic (show/hide based on checkbox states)
+- **Linked Fields**: Dropdown fields can be linked to other fields
+- **Hidden Logic**: Dropdown fields can trigger custom hidden logic
+
+**Event Handling:**
+- Dropdown change events trigger:
+  - Trigger sequence show/hide
+  - Hidden checkbox creation (`dropdownMirror`)
+  - Hidden logic updates (`updateHiddenLogic`)
+  - Linked field updates (`updateLinkedFields`)
+
+---
+
+### **Future Enhancement Opportunities**
+
+1. **Multi-Select Dropdowns**: Allow selecting multiple options simultaneously
+2. **Dropdown Validation**: Add required field validation for dropdowns
+3. **Dynamic Options**: Load dropdown options from external API
+4. **Option Grouping**: Group related options in dropdown (optgroup)
+5. **Searchable Dropdowns**: Add search functionality to large option lists
+6. **Custom Styling**: Allow custom CSS for dropdown fields
+7. **Dependent Dropdowns**: Chain dropdowns where one dropdown's options depend on another's selection
+8. **Dropdown Templates**: Save and reuse common dropdown configurations
+
+---
+
 ## 🛠 **Technical Implementation Details**
 
 ### **1. Dynamic Solutions**

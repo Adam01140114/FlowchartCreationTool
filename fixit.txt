@@ -2021,3 +2021,383 @@ KEY TAKEAWAY:
 The issue was caused by **regex pattern escaping when JavaScript is embedded in HTML strings**. The backslash in `\d` was being lost, causing the pattern to match the literal character 'd' instead of digits. By using character classes like `[0-9]` instead of shorthand patterns like `\d`, we avoid the escaping issue entirely and ensure the regex works correctly in the generated HTML.
 
 =====================================
+
+INCIDENT: Making Properties Menu Draggable and Resizable with Dynamic Content Layout
+DATE: [Current Date]
+ISSUE ID: DRAGGABLE_RESIZABLE_MENU_001
+
+PROBLEM DESCRIPTION:
+===================
+The properties menu needed to be made draggable and resizable while ensuring that:
+1. The content area dynamically adjusts its height when the menu is resized
+2. The close button always stays at the bottom, eliminating white space
+3. The menu can be dragged by the header
+4. The menu can be resized by dragging from edges and corners
+5. Content remains scrollable when it exceeds available space
+
+WHAT WE WERE ATTEMPTING TO DO:
+=============================
+- Make the properties menu draggable by clicking and dragging the header
+- Make the menu resizable by dragging from edges and corners
+- Ensure content area automatically adjusts to fill available space
+- Keep the close button at the bottom at all times
+- Prevent white space when menu is resized
+
+TECHNICAL DETAILS:
+==================
+- File: graph.js
+- Function: `makePropertiesPopupDraggable(popup)` (around line 3495)
+- Function: `showPropertiesPopup(cell)` (around line 480)
+- The popup structure:
+  - Header (draggable, flex-shrink: 0)
+  - Content area (scrollable, flex: 1)
+  - Button container (close button, margin-top: auto, flex-shrink: 0)
+
+SOLUTION THAT WORKED:
+====================
+1. FLEXBOX LAYOUT STRUCTURE:
+   ```javascript
+   // Popup container
+   popup.style.cssText = `
+     display: flex;
+     flex-direction: column;
+     overflow: hidden;
+     height: 600px; // Initial height
+     min-height: 400px;
+     max-height: 90vh;
+   `;
+   
+   // Header (fixed size, no shrinking)
+   header.style.cssText = `
+     flex-shrink: 0;
+     cursor: move;
+   `;
+   
+   // Content area (grows/shrinks to fill space)
+   content.style.cssText = `
+     flex: 1;
+     overflow-y: auto;
+     overflow-x: hidden;
+     display: flex;
+     flex-direction: column;
+   `;
+   
+   // Button container (pushed to bottom)
+   buttonContainer.style.cssText = `
+     margin-top: auto;
+     flex-shrink: 0;
+   `;
+   ```
+
+2. DRAGGABLE FUNCTIONALITY:
+   ```javascript
+   function dragStart(e) {
+     // Don't drag when clicking close button or resize handles
+     if (e.target.classList.contains('close-btn') || 
+         e.target.closest('.close-btn') ||
+         e.target.classList.contains('resize-handle') ||
+         e.target.closest('.resize-handle')) return;
+     
+     isDragging = true;
+     
+     // Get actual position
+     const rect = popup.getBoundingClientRect();
+     initialX = rect.left;
+     initialY = rect.top;
+     
+     // Calculate mouse offset
+     startX = e.clientX - initialX;
+     startY = e.clientY - initialY;
+     
+     // Switch from centered transform to absolute positioning
+     popup.style.top = initialY + 'px';
+     popup.style.left = initialX + 'px';
+     popup.style.transform = 'none';
+   }
+   
+   function handleMouseMove(e) {
+     if (isDragging) {
+       const newX = e.clientX - startX;
+       const newY = e.clientY - startY;
+       popup.style.left = newX + 'px';
+       popup.style.top = newY + 'px';
+     }
+   }
+   ```
+
+3. RESIZABLE FUNCTIONALITY:
+   ```javascript
+   // Create resize handles for all edges and corners
+   const resizeHandles = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+   resizeHandles.forEach(direction => {
+     const handle = document.createElement('div');
+     handle.className = `resize-handle resize-${direction}`;
+     handle.style.cssText = `
+       position: absolute;
+       background: transparent;
+       z-index: 10001;
+     `;
+     
+     // Position based on direction
+     if (direction.includes('n')) {
+       handle.style.top = '0';
+       handle.style.height = '8px';
+       handle.style.cursor = 'ns-resize';
+     }
+     if (direction.includes('s')) {
+       handle.style.bottom = '0';
+       handle.style.height = '8px';
+       handle.style.cursor = 'ns-resize';
+     }
+     if (direction.includes('e')) {
+       handle.style.right = '0';
+       handle.style.width = '8px';
+       handle.style.cursor = 'ew-resize';
+     }
+     if (direction.includes('w')) {
+       handle.style.left = '0';
+       handle.style.width = '8px';
+       handle.style.cursor = 'ew-resize';
+     }
+     
+     // Corner handles are larger
+     if (direction.length === 2) {
+       handle.style.width = '12px';
+       handle.style.height = '12px';
+     }
+     
+     handle.addEventListener('mousedown', (e) => {
+       isResizing = true;
+       resizeDirection = direction;
+       const rect = popup.getBoundingClientRect();
+       initialX = rect.left;
+       initialY = rect.top;
+       initialWidth = rect.width;
+       initialHeight = rect.height;
+       startX = e.clientX;
+       startY = e.clientY;
+     });
+     
+     popup.appendChild(handle);
+   });
+   
+   function handleMouseMove(e) {
+     if (isResizing) {
+       const deltaX = e.clientX - startX;
+       const deltaY = e.clientY - startY;
+       const minWidth = parseInt(popup.style.minWidth) || 500;
+       const minHeight = 300;
+       
+       let newWidth = initialWidth;
+       let newHeight = initialHeight;
+       let newLeft = initialX;
+       let newTop = initialY;
+       
+       // Handle horizontal resizing
+       if (resizeDirection.includes('e')) {
+         newWidth = Math.max(minWidth, initialWidth + deltaX);
+       }
+       if (resizeDirection.includes('w')) {
+         newWidth = Math.max(minWidth, initialWidth - deltaX);
+         newLeft = initialX + (initialWidth - newWidth);
+       }
+       
+       // Handle vertical resizing
+       if (resizeDirection.includes('s')) {
+         newHeight = Math.max(minHeight, initialHeight + deltaY);
+       }
+       if (resizeDirection.includes('n')) {
+         newHeight = Math.max(minHeight, initialHeight - deltaY);
+         newTop = initialY + (initialHeight - newHeight);
+       }
+       
+       popup.style.width = newWidth + 'px';
+       popup.style.height = newHeight + 'px';
+       popup.style.left = newLeft + 'px';
+       popup.style.top = newTop + 'px';
+       popup.style.transform = 'none';
+       popup.style.display = 'flex'; // Ensure flex layout is active
+     }
+   }
+   ```
+
+4. DYNAMIC CONTENT ADJUSTMENT:
+   - The flexbox layout automatically handles content adjustment
+   - `flex: 1` on content area makes it grow/shrink to fill available space
+   - `margin-top: auto` on button container pushes it to the bottom
+   - `overflow-y: auto` on content area enables scrolling when needed
+   - No ResizeObserver needed - flexbox handles it automatically
+
+CODE CHANGES:
+=============
+1. In `showPropertiesPopup()` function (graph.js, around line 480):
+   - Set popup to `display: flex; flex-direction: column;`
+   - Set `overflow: hidden` on popup
+   - Set initial `height: 600px`, `min-height: 400px`, `max-height: 90vh`
+   - Set header to `flex-shrink: 0`
+   - Set content to `flex: 1; overflow-y: auto;`
+   - Set button container to `margin-top: auto; flex-shrink: 0`
+
+2. Created `makePropertiesPopupDraggable()` function (graph.js, around line 3495):
+   - Implemented drag functionality using header
+   - Created 8 resize handles (n, s, e, w, ne, nw, se, sw)
+   - Implemented resize logic with min-width and min-height constraints
+   - Handled both dragging and resizing in same mouse move handler
+
+KEY LEARNINGS:
+==============
+1. **FLEXBOX IS KEY**: Using flexbox layout (`display: flex; flex-direction: column`) automatically handles dynamic content adjustment. The `flex: 1` property makes the content area grow/shrink to fill available space.
+
+2. **MARGIN-TOP: AUTO**: Using `margin-top: auto` on the button container pushes it to the bottom of the flex container, eliminating the need for JavaScript to calculate positions.
+
+3. **OVERFLOW HANDLING**: Set `overflow: hidden` on the popup container and `overflow-y: auto` on the content area. This ensures scrolling works correctly while preventing content from spilling outside the popup.
+
+4. **RESIZE HANDLES**: Create transparent resize handles positioned absolutely at edges and corners. Use appropriate cursor styles (`ns-resize`, `ew-resize`, `nwse-resize`, `nesw-resize`) for visual feedback.
+
+5. **MINIMUM CONSTRAINTS**: Always enforce minimum width and height when resizing to prevent the popup from becoming too small to use.
+
+6. **TRANSFORM TO ABSOLUTE**: When starting to drag, switch from `transform: translate(-50%, -50%)` (centering) to absolute positioning (`top`/`left`). This prevents teleporting issues.
+
+7. **FLEX DISPLAY ON RESIZE**: When resizing, ensure `display: flex` is set to maintain the flexbox layout. This ensures content continues to adjust dynamically.
+
+PREVENTION:
+===========
+- Always use flexbox layout for resizable modals with dynamic content
+- Set `flex: 1` on content areas that should grow/shrink
+- Use `margin-top: auto` to push buttons to the bottom
+- Set `overflow: hidden` on container and `overflow-y: auto` on scrollable content
+- Create resize handles for all edges and corners for better UX
+- Enforce minimum width and height constraints
+- Switch from transform-based centering to absolute positioning when dragging starts
+
+RELATED FILES:
+=============
+- graph.js (main file - makePropertiesPopupDraggable and showPropertiesPopup functions)
+
+FUTURE REFERENCE:
+================
+To make any menu/popup draggable and resizable with dynamic content:
+
+1. **SET UP FLEXBOX LAYOUT**:
+   ```javascript
+   popup.style.cssText = `
+     display: flex;
+     flex-direction: column;
+     overflow: hidden;
+     height: 600px;
+     min-height: 400px;
+     max-height: 90vh;
+   `;
+   ```
+
+2. **STRUCTURE THE CONTENT**:
+   ```javascript
+   // Header (fixed)
+   header.style.cssText = `flex-shrink: 0;`;
+   
+   // Content (grows/shrinks)
+   content.style.cssText = `
+     flex: 1;
+     overflow-y: auto;
+     overflow-x: hidden;
+   `;
+   
+   // Buttons (pushed to bottom)
+   buttonContainer.style.cssText = `
+     margin-top: auto;
+     flex-shrink: 0;
+   `;
+   ```
+
+3. **IMPLEMENT DRAGGING**:
+   ```javascript
+   header.addEventListener('mousedown', (e) => {
+     if (e.target.classList.contains('close-btn')) return;
+     isDragging = true;
+     const rect = popup.getBoundingClientRect();
+     initialX = rect.left;
+     initialY = rect.top;
+     startX = e.clientX - initialX;
+     startY = e.clientY - initialY;
+     popup.style.top = initialY + 'px';
+     popup.style.left = initialX + 'px';
+     popup.style.transform = 'none';
+   });
+   ```
+
+4. **IMPLEMENT RESIZING**:
+   ```javascript
+   const resizeHandles = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+   resizeHandles.forEach(direction => {
+     const handle = document.createElement('div');
+     handle.className = `resize-handle resize-${direction}`;
+     // Position and style handle...
+     handle.addEventListener('mousedown', (e) => {
+       isResizing = true;
+       resizeDirection = direction;
+       // Store initial dimensions and position...
+     });
+     popup.appendChild(handle);
+   });
+   ```
+
+5. **HANDLE MOUSE MOVEMENT**:
+   ```javascript
+   function handleMouseMove(e) {
+     if (isResizing) {
+       // Calculate new dimensions based on resizeDirection
+       // Enforce min-width and min-height
+       // Update popup.style.width, height, left, top
+       popup.style.display = 'flex'; // Maintain flex layout
+     } else if (isDragging) {
+       // Calculate new position
+       popup.style.left = (e.clientX - startX) + 'px';
+       popup.style.top = (e.clientY - startY) + 'px';
+     }
+   }
+   ```
+
+PATTERN FOR DRAGGABLE AND RESIZABLE MENUS:
+===========================================
+```javascript
+function makeMenuDraggableAndResizable(popup) {
+  // 1. Set up flexbox layout
+  popup.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 600px;
+    min-height: 400px;
+    max-height: 90vh;
+  `;
+  
+  // 2. Structure: Header (flex-shrink: 0) + Content (flex: 1) + Buttons (margin-top: auto)
+  
+  // 3. Make header draggable
+  header.addEventListener('mousedown', dragStart);
+  
+  // 4. Create resize handles
+  ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].forEach(direction => {
+    const handle = createResizeHandle(direction);
+    popup.appendChild(handle);
+  });
+  
+  // 5. Handle mouse movement for both dragging and resizing
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+}
+```
+
+KEY TAKEAWAY:
+=============
+The key to making menus draggable and resizable with dynamic content is using **flexbox layout** with:
+- `flex: 1` on content area (grows/shrinks automatically)
+- `margin-top: auto` on button container (pushes to bottom)
+- `overflow-y: auto` on content (enables scrolling)
+- Resize handles positioned absolutely at edges/corners
+- Minimum width/height constraints during resize
+- Switching from transform-based centering to absolute positioning when dragging starts
+
+The flexbox layout automatically handles content adjustment - no ResizeObserver or manual height calculations needed!
+
+=====================================

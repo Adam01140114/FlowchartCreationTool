@@ -3624,11 +3624,13 @@ function exportForm() {
                                         
                                         const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                         console.log('🔧 [EXPORT DEBUG] Trigger fields container found:', !!triggerFieldsContainer);
+                                        
+                                        // Initialize triggerFields array before the if block so it's always available
+                                        const triggerFields = [];
+                                        
                                         if (triggerFieldsContainer) {
                                             console.log('🔧 [EXPORT DEBUG] Trigger fields container innerHTML length:', triggerFieldsContainer.innerHTML.length);
                                             console.log('🔧 [EXPORT DEBUG] Trigger fields container innerHTML preview:', triggerFieldsContainer.innerHTML.substring(0, 1000));
-                                        
-                                        const triggerFields = [];
                                             const fieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
                                             console.log('🔧 [EXPORT DEBUG] Found', fieldElements.length, 'trigger field elements for question', questionId, 'field', fieldOrder, 'sequence', sequenceIndex + 1);
                                             
@@ -3645,6 +3647,10 @@ function exportForm() {
                                                 const checkboxFieldNameEl = fieldEl.querySelector('#triggerCheckboxFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const checkboxOptionsContainer = fieldEl.querySelector('#triggerCheckboxOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 console.log('🔧 [EXPORT DEBUG] Checkbox elements - fieldName:', !!checkboxFieldNameEl, 'optionsContainer:', !!checkboxOptionsContainer);
+                                                
+                                                const dropdownFieldNameEl = fieldEl.querySelector('#triggerDropdownFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                                const dropdownOptionsContainer = fieldEl.querySelector('#triggerDropdownOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
+                                                console.log('🔧 [EXPORT DEBUG] Dropdown elements - fieldName:', !!dropdownFieldNameEl, 'optionsContainer:', !!dropdownOptionsContainer);
                                                 
                                                 const dateLabelEl = fieldEl.querySelector('#triggerDateLabel' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const dateNodeIdEl = fieldEl.querySelector('#triggerDateNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
@@ -3726,6 +3732,28 @@ function exportForm() {
                                                         type: 'checkbox',
                                                         fieldName: checkboxFieldNameEl.value.trim(),
                                                         options: checkboxOptions
+                                                    });
+                                                } else if (dropdownFieldNameEl) {
+                                                    // Trigger dropdown field
+                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as DROPDOWN field');
+                                                    const dropdownOptions = [];
+                                                    if (dropdownOptionsContainer) {
+                                                        const dropdownOptionElements = dropdownOptionsContainer.querySelectorAll('[class^="trigger-dropdown-option-"]');
+                                                        dropdownOptionElements.forEach((optionEl, optionIndex) => {
+                                                            const textEl = optionEl.querySelector('#triggerDropdownOptionText' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1) + '_' + (optionIndex + 1));
+                                                            
+                                                            if (textEl && textEl.value.trim()) {
+                                                                dropdownOptions.push({
+                                                                    text: textEl.value.trim()
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                                    
+                                                    triggerFields.push({
+                                                        type: 'dropdown',
+                                                        fieldName: dropdownFieldNameEl.value.trim(),
+                                                        options: dropdownOptions
                                                     });
                                                 } else if (dateLabelEl && dateNodeIdEl) {
                                                     // Trigger date field

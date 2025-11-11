@@ -694,6 +694,9 @@ function addQuestion(sectionId, questionId = null) {
                 <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
                 <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
                 <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
+                <button type="button" onclick="addCheckboxField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Checkbox</button>
+                <button type="button" onclick="addDateField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #FF9800; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Date</button>
+                <button type="button" onclick="addDropdownField(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #2196F3; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Dropdown</button>
             </div>
             
             <!-- Hidden containers for backward compatibility -->

@@ -3798,6 +3798,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           if (!triggerSequence.times) triggerSequence.times = [];
           triggerSequence.times.push(newTime);
           
+          // Calculate triggerIndex by finding the index of this triggerSequence in the dropdown's triggerSequences array
+          const triggerIndex = dropdown.triggerSequences.findIndex(trigger => trigger.id === triggerSequence.id);
+          console.log('🔍 [ADD TIME DEBUG] triggerIndex calculated:', triggerIndex, 'for triggerSequence.id:', triggerSequence.id);
+          
           // Update the actions list for this trigger sequence
           const triggerDiv = addTimeBtn.closest('.trigger-sequence');
           if (triggerDiv) {
@@ -3807,7 +3811,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               const timeContainer = document.createElement('div');
               timeContainer.draggable = true;
               timeContainer.dataset.type = 'time';
-              timeContainer.dataset.triggerIndex = triggerIndex;
+              timeContainer.dataset.triggerIndex = triggerIndex >= 0 ? triggerIndex : 0;
               timeContainer.style.cssText = `
                 margin-bottom: 10px;
                 padding: 8px;

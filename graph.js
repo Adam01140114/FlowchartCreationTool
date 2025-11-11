@@ -485,6 +485,14 @@ function showPropertiesPopup(cell) {
   // Create popup container
   const popup = document.createElement('div');
   popup.className = 'properties-modal';
+  popup._cell = cell; // Store cell reference for use in event handlers
+  
+  // Determine if this is a linked checkbox node (needs wider width)
+  const isLinkedCheckbox = typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell);
+  const initialWidth = isLinkedCheckbox ? '800px' : '600px';
+  const minWidth = isLinkedCheckbox ? '600px' : '500px';
+  const maxWidth = isLinkedCheckbox ? '1200px' : '800px';
+  
   popup.style.cssText = `
     position: fixed;
     top: 50%;
@@ -496,17 +504,24 @@ function showPropertiesPopup(cell) {
     padding: 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     z-index: 10000;
-    min-width: 500px;
-    max-width: 600px;
+    width: ${initialWidth};
+    min-width: ${minWidth};
+    max-width: ${maxWidth};
+    height: 600px;
+    min-height: 400px;
+    max-height: 90vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     pointer-events: auto;
     opacity: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   `;
   
   // Force the popup to be visible by setting styles directly
   popup.style.pointerEvents = 'auto';
   popup.style.opacity = '1';
-  popup.style.display = 'block';
+  popup.style.display = 'flex';
   popup.style.visibility = 'visible';
   
   // Create header
@@ -521,6 +536,7 @@ function showPropertiesPopup(cell) {
     border-bottom: 1px solid #e0e0e0;
     min-height: 40px;
     cursor: move;
+    flex-shrink: 0;
   `;
   
   const title = document.createElement('h3');
@@ -570,14 +586,18 @@ function showPropertiesPopup(cell) {
   
   // Create content area
   const content = document.createElement('div');
+  content.className = 'properties-popup-content';
   content.style.cssText = `
-    max-height: 400px;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 8px;
     min-height: 200px;
     background: #f9f9f9;
     border-radius: 8px;
     padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   `;
   
   // Get cell properties with improved text extraction
@@ -894,6 +914,14 @@ function showPropertiesPopup(cell) {
     console.log('🔍 [PROPERTIES] Loading Linked Checkbox properties for cell:', cell.id);
     console.log('🔍 [PROPERTIES] _linkedCheckboxNodeId:', cell._linkedCheckboxNodeId);
     console.log('🔍 [PROPERTIES] _linkedCheckboxOptions:', cell._linkedCheckboxOptions);
+    console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Opening popup, cell data:', {
+      cellId: cell.id,
+      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId,
+      _linkedCheckboxOptions: cell._linkedCheckboxOptions,
+      _linkedCheckboxOptionsType: typeof cell._linkedCheckboxOptions,
+      _linkedCheckboxOptionsIsArray: Array.isArray(cell._linkedCheckboxOptions),
+      _linkedCheckboxOptionsLength: cell._linkedCheckboxOptions ? cell._linkedCheckboxOptions.length : 0
+    });
     properties = [
       { label: 'Node ID', value: cell._linkedCheckboxNodeId || 'linked_checkbox', id: 'propLinkedCheckboxNodeId', editable: true },
       { label: 'Linked Checkbox Options', value: 'linkedCheckboxOptions', id: 'propLinkedCheckboxOptions', editable: false, special: 'linkedCheckboxOptions' }
@@ -1673,12 +1701,15 @@ function showPropertiesPopup(cell) {
       `;
       
       const linkedCheckboxOptionsContainer = document.createElement('div');
+      linkedCheckboxOptionsContainer.setAttribute('data-linked-checkbox-container', 'true');
       linkedCheckboxOptionsContainer.style.cssText = `
         display: flex;
         flex-direction: column;
         gap: 8px;
         width: 100%;
       `;
+      
+      console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Creating container, cell._linkedCheckboxOptions:', cell._linkedCheckboxOptions);
       
       // Create initial dropdowns (minimum 2)
       const linkedCheckboxOptions = cell._linkedCheckboxOptions || [];
@@ -1764,12 +1795,35 @@ function showPropertiesPopup(cell) {
         populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSelect, cell);
         
         // Set selected value if it exists
+        console.log(`🔍 [LINKED CHECKBOX OPTIONS DEBUG] Setting initial value for dropdown ${i}:`, {
+          linkedCheckboxOptions: linkedCheckboxOptions,
+          valueAtIndex: linkedCheckboxOptions[i],
+          optionsContainerChildren: optionsContainer.children.length
+        });
+        
         if (linkedCheckboxOptions[i]) {
           const selectedOption = optionsContainer.querySelector(`[data-value="${linkedCheckboxOptions[i]}"]`);
+          console.log(`🔍 [LINKED CHECKBOX OPTIONS DEBUG] Looking for option with value "${linkedCheckboxOptions[i]}":`, {
+            found: !!selectedOption,
+            selectedOptionText: selectedOption ? selectedOption.textContent : 'not found',
+            allOptions: Array.from(optionsContainer.querySelectorAll('[data-value]')).map(opt => ({
+              value: opt.getAttribute('data-value'),
+              text: opt.textContent
+            }))
+          });
+          
           if (selectedOption) {
             dropdownDisplay.textContent = selectedOption.textContent;
             hiddenSelect.value = linkedCheckboxOptions[i];
+            console.log(`✅ [LINKED CHECKBOX OPTIONS DEBUG] Set initial value for dropdown ${i}:`, {
+              displayText: dropdownDisplay.textContent,
+              hiddenSelectValue: hiddenSelect.value
+            });
+          } else {
+            console.warn(`⚠️ [LINKED CHECKBOX OPTIONS DEBUG] Could not find option with value "${linkedCheckboxOptions[i]}"`);
           }
+        } else {
+          console.log(`🔍 [LINKED CHECKBOX OPTIONS DEBUG] No initial value for dropdown ${i}`);
         }
         
         newDropdownContainer.appendChild(dropdownDisplay);
@@ -3025,9 +3079,10 @@ function showPropertiesPopup(cell) {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: auto;
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
   `;
   
   const cancelBtn = document.createElement('button');
@@ -3300,6 +3355,57 @@ function showPropertiesPopup(cell) {
       window.saveBigParagraphPdfLogic(cell);
     }
     
+    // Auto-save Linked Checkbox Options if this is a linked checkbox node
+    if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
+      console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Closing popup, saving linked checkbox options');
+      const linkedCheckboxOptionsContainer = popup.querySelector('[data-linked-checkbox-container]');
+      
+      if (linkedCheckboxOptionsContainer) {
+        const dropdowns = linkedCheckboxOptionsContainer.querySelectorAll('select[style*="display: none"], select[style*="display:none"]');
+        const newLinkedCheckboxOptions = Array.from(dropdowns)
+          .map(dropdown => dropdown.value)
+          .filter(value => value && value.trim() !== '');
+        
+        console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Saving on close:', {
+          oldValue: cell._linkedCheckboxOptions,
+          newValue: newLinkedCheckboxOptions,
+          dropdownsFound: dropdowns.length,
+          dropdownValues: Array.from(dropdowns).map(d => ({ value: d.value, id: d.id || 'no-id' }))
+        });
+        
+        cell._linkedCheckboxOptions = newLinkedCheckboxOptions;
+        
+        // Also update the linked checkbox node ID if it exists
+        const nodeIdElement = document.getElementById('propLinkedCheckboxNodeId');
+        if (nodeIdElement) {
+          let nodeIdValue;
+          if (nodeIdElement.tagName === 'INPUT') {
+            nodeIdValue = nodeIdElement.value;
+          } else {
+            nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
+          }
+          if (nodeIdValue) {
+            console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Saving node ID on close:', nodeIdValue);
+            cell._linkedCheckboxNodeId = nodeIdValue;
+          }
+        }
+        
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Triggering autosave on close');
+          window.requestAutosave();
+        }
+        
+        console.log('✅ [LINKED CHECKBOX OPTIONS DEBUG] Saved on close:', {
+          cellId: cell.id,
+          _linkedCheckboxNodeId: cell._linkedCheckboxNodeId,
+          _linkedCheckboxOptions: cell._linkedCheckboxOptions
+        });
+      } else {
+        console.warn('⚠️ [LINKED CHECKBOX OPTIONS DEBUG] Could not find linkedCheckboxOptionsContainer on close');
+      }
+    }
+    
     if (outsideClickHandler) {
       document.removeEventListener('click', outsideClickHandler, true);
       outsideClickHandler = null;
@@ -3348,7 +3454,7 @@ function showPropertiesPopup(cell) {
     cancelBtn.style.borderColor = '#ddd';
   });
   
-  // Add CSS for close button hit area
+  // Add CSS for close button hit area and resize handles
   const style = document.createElement('style');
   style.textContent = `
     #closePropertiesPopup::before {
@@ -3359,6 +3465,15 @@ function showPropertiesPopup(cell) {
       right: -8px;
       bottom: -8px;
       z-index: -1;
+    }
+    .properties-modal .resize-handle {
+      transition: background-color 0.2s ease;
+    }
+    .properties-modal .resize-handle:hover {
+      background-color: rgba(25, 118, 210, 0.2);
+    }
+    .properties-modal .resize-handle:active {
+      background-color: rgba(25, 118, 210, 0.4);
     }
   `;
   document.head.appendChild(style);
@@ -3375,11 +3490,13 @@ function showPropertiesPopup(cell) {
 }
 
 /**
- * Make properties popup draggable
+ * Make properties popup draggable and resizable
  */
 function makePropertiesPopupDraggable(popup) {
   let isDragging = false;
-  let startX, startY, initialX, initialY;
+  let isResizing = false;
+  let resizeDirection = '';
+  let startX, startY, initialX, initialY, initialWidth, initialHeight;
 
   const header = popup.querySelector('.properties-popup-header');
   if (!header) return;
@@ -3389,13 +3506,77 @@ function makePropertiesPopupDraggable(popup) {
   popup.style.left = '50%';
   popup.style.transform = 'translate(-50%, -50%)';
 
+  // Create resize handles
+  const resizeHandles = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+  resizeHandles.forEach(direction => {
+    const handle = document.createElement('div');
+    handle.className = `resize-handle resize-${direction}`;
+    handle.style.cssText = `
+      position: absolute;
+      background: transparent;
+      z-index: 10001;
+    `;
+    
+    // Set position and size based on direction
+    if (direction.includes('n')) {
+      handle.style.top = '0';
+      handle.style.height = '8px';
+      handle.style.cursor = direction === 'n' ? 'ns-resize' : direction === 'ne' ? 'nesw-resize' : 'nwse-resize';
+    }
+    if (direction.includes('s')) {
+      handle.style.bottom = '0';
+      handle.style.height = '8px';
+      handle.style.cursor = direction === 's' ? 'ns-resize' : direction === 'se' ? 'nwse-resize' : 'nesw-resize';
+    }
+    if (direction.includes('e')) {
+      handle.style.right = '0';
+      handle.style.width = '8px';
+      if (!direction.includes('n') && !direction.includes('s')) {
+        handle.style.cursor = 'ew-resize';
+      }
+    }
+    if (direction.includes('w')) {
+      handle.style.left = '0';
+      handle.style.width = '8px';
+      if (!direction.includes('n') && !direction.includes('s')) {
+        handle.style.cursor = 'ew-resize';
+      }
+    }
+    
+    // Make corner handles larger
+    if (direction.length === 2) {
+      handle.style.width = '12px';
+      handle.style.height = '12px';
+    }
+    
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isResizing = true;
+      resizeDirection = direction;
+      
+      const rect = popup.getBoundingClientRect();
+      initialX = rect.left;
+      initialY = rect.top;
+      initialWidth = rect.width;
+      initialHeight = rect.height;
+      startX = e.clientX;
+      startY = e.clientY;
+    });
+    
+    popup.appendChild(handle);
+  });
+
   header.addEventListener('mousedown', dragStart);
-  document.addEventListener('mousemove', drag);
-  document.addEventListener('mouseup', dragEnd);
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
 
   function dragStart(e) {
-    // Don't drag when clicking close button
-    if (e.target.classList.contains('close-btn') || e.target.closest('.close-btn')) return;
+    // Don't drag when clicking close button or resize handles
+    if (e.target.classList.contains('close-btn') || 
+        e.target.closest('.close-btn') ||
+        e.target.classList.contains('resize-handle') ||
+        e.target.closest('.resize-handle')) return;
     
     isDragging = true;
     header.style.cursor = 'grabbing';
@@ -3415,8 +3596,50 @@ function makePropertiesPopupDraggable(popup) {
     popup.style.transform = 'none';
   }
 
-  function drag(e) {
-    if (isDragging) {
+  function handleMouseMove(e) {
+    if (isResizing) {
+      e.preventDefault();
+      
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      
+      const rect = popup.getBoundingClientRect();
+      const minWidth = parseInt(popup.style.minWidth) || 500;
+      const minHeight = 300;
+      
+      let newWidth = initialWidth;
+      let newHeight = initialHeight;
+      let newLeft = initialX;
+      let newTop = initialY;
+      
+      // Handle horizontal resizing
+      if (resizeDirection.includes('e')) {
+        newWidth = Math.max(minWidth, initialWidth + deltaX);
+      }
+      if (resizeDirection.includes('w')) {
+        newWidth = Math.max(minWidth, initialWidth - deltaX);
+        newLeft = initialX + (initialWidth - newWidth);
+      }
+      
+      // Handle vertical resizing
+      if (resizeDirection.includes('s')) {
+        newHeight = Math.max(minHeight, initialHeight + deltaY);
+      }
+      if (resizeDirection.includes('n')) {
+        newHeight = Math.max(minHeight, initialHeight - deltaY);
+        newTop = initialY + (initialHeight - newHeight);
+      }
+      
+      popup.style.width = newWidth + 'px';
+      popup.style.height = newHeight + 'px';
+      popup.style.left = newLeft + 'px';
+      popup.style.top = newTop + 'px';
+      popup.style.transform = 'none';
+      
+      // Force content to recalculate its available space
+      // The flexbox layout will automatically adjust, but we need to ensure the popup height is set
+      popup.style.display = 'flex';
+    } else if (isDragging) {
       e.preventDefault();
       
       const newX = e.clientX - startX;
@@ -3427,8 +3650,10 @@ function makePropertiesPopupDraggable(popup) {
     }
   }
 
-  function dragEnd(e) {
+  function handleMouseUp(e) {
     isDragging = false;
+    isResizing = false;
+    resizeDirection = '';
     header.style.cursor = 'move';
   }
 }
@@ -5189,12 +5414,70 @@ function setupLinkedCheckboxOptionsCustomSearch(optionsContainer, hiddenSelect, 
       const value = clickedOption.getAttribute('data-value');
       const text = clickedOption.textContent;
       
+      console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Option clicked:', {
+        value: value,
+        text: text,
+        hiddenSelectId: hiddenSelect.id || 'no-id',
+        dropdownDisplayText: dropdownDisplay.textContent
+      });
+      
       if (value) {
         hiddenSelect.value = value;
         dropdownDisplay.textContent = text;
         optionsContainer.style.display = 'none';
         searchBar.value = ''; // Clear search
         updateOptions(''); // Restore all options
+        
+        console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] After setting value:', {
+          hiddenSelectValue: hiddenSelect.value,
+          dropdownDisplayText: dropdownDisplay.textContent,
+          hiddenSelectOptions: Array.from(hiddenSelect.options).map(opt => ({ value: opt.value, text: opt.text }))
+        });
+        
+        // Find the cell from the popup context
+        const popup = optionsContainer.closest('.properties-modal');
+        if (popup && popup._cell) {
+          const cell = popup._cell;
+          console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Found cell:', {
+            cellId: cell.id,
+            currentLinkedCheckboxOptions: cell._linkedCheckboxOptions
+          });
+          
+          // Immediately update the cell's linked checkbox options
+          const linkedCheckboxOptionsContainer = optionsContainer.closest('[data-linked-checkbox-container]') || 
+                                                 document.querySelector('[data-linked-checkbox-container]');
+          
+          if (linkedCheckboxOptionsContainer) {
+            const dropdowns = linkedCheckboxOptionsContainer.querySelectorAll('select[style*="display: none"], select[style*="display:none"]');
+            const newLinkedCheckboxOptions = Array.from(dropdowns)
+              .map(dropdown => dropdown.value)
+              .filter(value => value && value.trim() !== '');
+            
+            console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Updating cell._linkedCheckboxOptions:', {
+              oldValue: cell._linkedCheckboxOptions,
+              newValue: newLinkedCheckboxOptions,
+              dropdownsFound: dropdowns.length,
+              dropdownValues: Array.from(dropdowns).map(d => ({ value: d.value, id: d.id }))
+            });
+            
+            cell._linkedCheckboxOptions = newLinkedCheckboxOptions;
+            
+            // Trigger autosave
+            if (typeof window.requestAutosave === 'function') {
+              console.log('🔍 [LINKED CHECKBOX OPTIONS DEBUG] Triggering autosave');
+              window.requestAutosave();
+            }
+            
+            console.log('✅ [LINKED CHECKBOX OPTIONS DEBUG] Cell updated successfully:', {
+              cellId: cell.id,
+              _linkedCheckboxOptions: cell._linkedCheckboxOptions
+            });
+          } else {
+            console.warn('⚠️ [LINKED CHECKBOX OPTIONS DEBUG] Could not find linkedCheckboxOptionsContainer');
+          }
+        } else {
+          console.warn('⚠️ [LINKED CHECKBOX OPTIONS DEBUG] Could not find cell from popup context');
+        }
       }
     }
   });
