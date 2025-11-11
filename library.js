@@ -390,6 +390,469 @@ window.exportGuiJson = function(download = true) {
               options: checkboxOptions,
               order: orderIndex + 1
             });
+          } else if (item.type === 'dropdown' && cell._dropdowns && cell._dropdowns[item.index]) {
+            const dropdown = cell._dropdowns[item.index];
+            const dropdownOptions = dropdown.options ? dropdown.options.map(option => {
+              // Sanitize the dropdown name and option value for nodeId
+              // Preserve forward slashes "/" in the name
+              const sanitizedDropdownName = (dropdown.name || "").toLowerCase().replace(/[^a-z0-9\s\/]/g, '').replace(/\s+/g, '_');
+              const sanitizedOptionValue = (option.value || option.text || "").toLowerCase().replace(/[^a-z0-9\s\/]/g, '').replace(/\s+/g, '_');
+              return {
+                text: option.text || "",
+                nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
+              };
+            }) : [];
+            
+            // Process trigger sequences
+            const triggerSequences = [];
+            if (dropdown.triggerSequences && dropdown.triggerSequences.length > 0) {
+              dropdown.triggerSequences.forEach(trigger => {
+                const fields = [];
+                
+                // Create maps for quick lookup by identifier
+                const labelMap = new Map();
+                if (trigger.labels && trigger.labels.length > 0) {
+                  trigger.labels.forEach(label => {
+                    labelMap.set(label.fieldName || '', label);
+                  });
+                }
+                
+                const checkboxMap = new Map();
+                if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+                  trigger.checkboxes.forEach(checkbox => {
+                    checkboxMap.set(checkbox.fieldName || '', checkbox);
+                  });
+                }
+                
+                const timeMap = new Map();
+                if (trigger.times && trigger.times.length > 0) {
+                  trigger.times.forEach(time => {
+                    timeMap.set(time.fieldName || '', time);
+                  });
+                }
+                
+                const locationMap = new Map();
+                if (trigger.locations && trigger.locations.length > 0) {
+                  trigger.locations.forEach(location => {
+                    const identifier = location.locationTitle || location.fieldName || 'location';
+                    locationMap.set(identifier, location);
+                  });
+                }
+                
+                const pdfMap = new Map();
+                if (trigger.pdfs && trigger.pdfs.length > 0) {
+                  trigger.pdfs.forEach(pdf => {
+                    const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+                    pdfMap.set(identifier, pdf);
+                  });
+                }
+                
+                const dropdownMap = new Map();
+                if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+                  trigger.dropdowns.forEach(nestedDropdown => {
+                    dropdownMap.set(nestedDropdown.fieldName || '', nestedDropdown);
+                  });
+                }
+                
+                // Use unified order if available, otherwise use type-based order
+                if (trigger._actionOrder && trigger._actionOrder.length > 0) {
+                  // Add fields in the unified order
+                  trigger._actionOrder.forEach(orderItem => {
+                    if (orderItem.type === 'label') {
+                      const label = labelMap.get(orderItem.identifier);
+                      if (label) {
+                        // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                        let nodeId = label.nodeId || "";
+                        if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                          // Regenerate using generateNodeIdForDropdownField if available
+                          if (typeof window.generateNodeIdForDropdownField === 'function') {
+                            nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                          }
+                        }
+                        fields.push({
+                          type: "label",
+                          label: label.fieldName || "",
+                          nodeId: nodeId
+                        });
+                      }
+                    } else if (orderItem.type === 'checkbox') {
+                      const checkbox = checkboxMap.get(orderItem.identifier);
+                      if (checkbox) {
+                        const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                          text: option.checkboxText || "",
+                          nodeId: option.nodeId || ""
+                        })) : [];
+                        
+                        fields.push({
+                          type: "checkbox",
+                          fieldName: checkbox.fieldName || "",
+                          selectionType: checkbox.selectionType || "multiple",
+                          options: checkboxOptions
+                        });
+                      }
+                    } else if (orderItem.type === 'time') {
+                      const time = timeMap.get(orderItem.identifier);
+                      if (time) {
+                        // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                        let nodeId = time.nodeId || "";
+                        if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                          // Regenerate using generateNodeIdForDropdownField if available
+                          if (typeof window.generateNodeIdForDropdownField === 'function') {
+                            nodeId = window.generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                          }
+                        }
+                        const dateField = {
+                          type: "date",
+                          label: time.fieldName || "",
+                          nodeId: nodeId
+                        };
+                        
+                        // Include conditional logic if it exists
+                        if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                          // Regenerate conditions if they're missing forward slashes
+                          let conditions = time.conditionalLogic.conditions || [];
+                          if (dropdown.name && dropdown.name.includes('/')) {
+                            conditions = conditions.map(condition => {
+                              // If condition doesn't have forward slash but should, regenerate it
+                              if (condition && !condition.includes('/')) {
+                                // Try to regenerate using getCheckboxOptionNodeIdsFromTriggerSequence
+                                if (typeof window.getCheckboxOptionNodeIdsFromTriggerSequence === 'function') {
+                                  const availableNodeIds = window.getCheckboxOptionNodeIdsFromTriggerSequence(trigger, dropdown, cell);
+                                  // Find matching nodeId that has the forward slash
+                                  const matchingNodeId = availableNodeIds.find(nodeId => {
+                                    // Normalize both strings by removing slashes and underscores for comparison
+                                    // This handles cases where old conditions had underscores instead of slashes
+                                    const normalize = (str) => str.replace(/[\/_]/g, '').toLowerCase();
+                                    return normalize(condition) === normalize(nodeId);
+                                  });
+                                  if (matchingNodeId) {
+                                    return matchingNodeId;
+                                  }
+                                }
+                              }
+                              return condition;
+                            });
+                          }
+                          
+                          dateField.conditionalLogic = {
+                            enabled: time.conditionalLogic.enabled,
+                            conditions: conditions.filter(c => c && c.trim() !== '')
+                          };
+                        }
+                        
+                        fields.push(dateField);
+                      }
+                    } else if (orderItem.type === 'dropdown') {
+                      const nestedDropdown = dropdownMap.get(orderItem.identifier);
+                      if (nestedDropdown) {
+                        const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
+                          text: option.text || ""
+                        })) : [];
+                        
+                        const dropdownField = {
+                          type: "dropdown",
+                          fieldName: nestedDropdown.fieldName || "",
+                          options: nestedDropdownOptions
+                        };
+                        
+                        // Include conditional logic if it exists
+                        if (nestedDropdown.conditionalLogic && nestedDropdown.conditionalLogic.enabled) {
+                          // Regenerate conditions if they're missing forward slashes
+                          let conditions = nestedDropdown.conditionalLogic.conditions || [];
+                          if (dropdown.name && dropdown.name.includes('/')) {
+                            conditions = conditions.map(condition => {
+                              // If condition doesn't have forward slash but should, regenerate it
+                              if (condition && !condition.includes('/')) {
+                                // Try to regenerate using getCheckboxOptionNodeIdsFromTriggerSequence
+                                if (typeof window.getCheckboxOptionNodeIdsFromTriggerSequence === 'function') {
+                                  const availableNodeIds = window.getCheckboxOptionNodeIdsFromTriggerSequence(trigger, dropdown, cell);
+                                  // Find matching nodeId that has the forward slash
+                                  const matchingNodeId = availableNodeIds.find(nodeId => {
+                                    // Normalize both strings by removing slashes and underscores for comparison
+                                    // This handles cases where old conditions had underscores instead of slashes
+                                    const normalize = (str) => str.replace(/[\/_]/g, '').toLowerCase();
+                                    return normalize(condition) === normalize(nodeId);
+                                  });
+                                  if (matchingNodeId) {
+                                    return matchingNodeId;
+                                  }
+                                }
+                              }
+                              return condition;
+                            });
+                          }
+                          
+                          dropdownField.conditionalLogic = {
+                            enabled: nestedDropdown.conditionalLogic.enabled,
+                            conditions: conditions.filter(c => c && c.trim() !== '')
+                          };
+                        }
+                        
+                        fields.push(dropdownField);
+                      }
+                    } else if (orderItem.type === 'location') {
+                      const location = locationMap.get(orderItem.identifier);
+                      if (location) {
+                        fields.push({
+                          type: "location",
+                          fieldName: location.locationTitle || "",
+                          nodeId: "location_data"
+                        });
+                      }
+                    } else if (orderItem.type === 'pdf') {
+                      const pdf = pdfMap.get(orderItem.identifier);
+                      if (pdf) {
+                        fields.push({
+                          type: "pdf",
+                          number: pdf.triggerNumber || "",
+                          pdfTitle: pdf.pdfTitle || "",
+                          pdfName: pdf.pdfFilename || "",
+                          priceId: pdf.pdfPriceId || ""
+                        });
+                      }
+                    }
+                  });
+                  
+                  // Add any fields not in the unified order (safety check)
+                  if (trigger.labels && trigger.labels.length > 0) {
+                    trigger.labels.forEach(label => {
+                      if (!labelMap.has(label.fieldName || '')) {
+                        const existingField = fields.find(f => f.type === 'label' && f.label === label.fieldName);
+                        if (!existingField) {
+                          // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                          let nodeId = label.nodeId || "";
+                          if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                            if (typeof window.generateNodeIdForDropdownField === 'function') {
+                              nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                            }
+                          }
+                          fields.push({
+                            type: "label",
+                            label: label.fieldName || "",
+                            nodeId: nodeId
+                          });
+                        }
+                      }
+                    });
+                  }
+                  
+                  if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+                    trigger.checkboxes.forEach(checkbox => {
+                      if (!checkboxMap.has(checkbox.fieldName || '')) {
+                        const existingField = fields.find(f => f.type === 'checkbox' && f.fieldName === checkbox.fieldName);
+                        if (!existingField) {
+                          const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                            text: option.checkboxText || "",
+                            nodeId: option.nodeId || ""
+                          })) : [];
+                          
+                          fields.push({
+                            type: "checkbox",
+                            fieldName: checkbox.fieldName || "",
+                            selectionType: checkbox.selectionType || "multiple",
+                            options: checkboxOptions
+                          });
+                        }
+                      }
+                    });
+                  }
+                  
+                  if (trigger.times && trigger.times.length > 0) {
+                    trigger.times.forEach(time => {
+                      if (!timeMap.has(time.fieldName || '')) {
+                        const existingField = fields.find(f => f.type === 'date' && f.label === time.fieldName);
+                        if (!existingField) {
+                          // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
+                          let nodeId = time.nodeId || "";
+                          if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
+                            if (typeof window.generateNodeIdForDropdownField === 'function') {
+                              nodeId = window.generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
+                            }
+                          }
+                          const dateField = {
+                            type: "date",
+                            label: time.fieldName || "",
+                            nodeId: nodeId
+                          };
+                          
+                          // Include conditional logic if it exists
+                          if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                            dateField.conditionalLogic = {
+                              enabled: time.conditionalLogic.enabled,
+                              conditions: time.conditionalLogic.conditions || []
+                            };
+                          }
+                          
+                          fields.push(dateField);
+                        }
+                      }
+                    });
+                  }
+                  
+                  if (trigger.locations && trigger.locations.length > 0) {
+                    trigger.locations.forEach(location => {
+                      const identifier = location.locationTitle || location.fieldName || 'location';
+                      if (!locationMap.has(identifier)) {
+                        const existingField = fields.find(f => f.type === 'location' && f.fieldName === location.locationTitle);
+                        if (!existingField) {
+                          fields.push({
+                            type: "location",
+                            fieldName: location.locationTitle || "",
+                            nodeId: "location_data"
+                          });
+                        }
+                      }
+                    });
+                  }
+                  
+                  if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+                    trigger.dropdowns.forEach(nestedDropdown => {
+                      // Check if this dropdown was already added to fields
+                      const existingField = fields.find(f => f.type === 'dropdown' && f.fieldName === nestedDropdown.fieldName);
+                      if (!existingField) {
+                        const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
+                          text: option.text || ""
+                        })) : [];
+                        
+                        fields.push({
+                          type: "dropdown",
+                          fieldName: nestedDropdown.fieldName || "",
+                          options: nestedDropdownOptions
+                        });
+                      }
+                    });
+                  }
+                  
+                  if (trigger.pdfs && trigger.pdfs.length > 0) {
+                    trigger.pdfs.forEach(pdf => {
+                      const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
+                      if (!pdfMap.has(identifier)) {
+                        const existingField = fields.find(f => f.type === 'pdf' && f.number === pdf.triggerNumber);
+                        if (!existingField) {
+                          fields.push({
+                            type: "pdf",
+                            number: pdf.triggerNumber || "",
+                            pdfTitle: pdf.pdfTitle || "",
+                            pdfName: pdf.pdfFilename || "",
+                            priceId: pdf.pdfPriceId || ""
+                          });
+                        }
+                      }
+                    });
+                  }
+                } else {
+                  // Fallback: Add fields in type-based order (for backward compatibility)
+                  // Add labels
+                  if (trigger.labels && trigger.labels.length > 0) {
+                    trigger.labels.forEach(label => {
+                      fields.push({
+                        type: "label",
+                        label: label.fieldName || "",
+                        nodeId: label.nodeId || ""
+                      });
+                    });
+                  }
+                  
+                  // Add checkboxes
+                  if (trigger.checkboxes && trigger.checkboxes.length > 0) {
+                    trigger.checkboxes.forEach(checkbox => {
+                      const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
+                        text: option.checkboxText || "",
+                        nodeId: option.nodeId || ""
+                      })) : [];
+                      
+                      fields.push({
+                        type: "checkbox",
+                        fieldName: checkbox.fieldName || "",
+                        selectionType: checkbox.selectionType || "multiple",
+                        options: checkboxOptions
+                      });
+                    });
+                  }
+                  
+                  // Add times
+                  if (trigger.times && trigger.times.length > 0) {
+                    trigger.times.forEach(time => {
+                      const dateField = {
+                        type: "date",
+                        label: time.fieldName || "",
+                        nodeId: time.nodeId || ""
+                      };
+                      
+                      // Include conditional logic if it exists
+                      if (time.conditionalLogic && time.conditionalLogic.enabled) {
+                        dateField.conditionalLogic = {
+                          enabled: time.conditionalLogic.enabled,
+                          conditions: time.conditionalLogic.conditions || []
+                        };
+                      }
+                      
+                      fields.push(dateField);
+                    });
+                  }
+                  
+                  // Add locations
+                  if (trigger.locations && trigger.locations.length > 0) {
+                    trigger.locations.forEach(location => {
+                      fields.push({
+                        type: "location",
+                        fieldName: location.locationTitle || "",
+                        nodeId: "location_data"
+                      });
+                    });
+                  }
+                  
+                  // Add dropdowns
+                  if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+                    trigger.dropdowns.forEach(nestedDropdown => {
+                      const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
+                        text: option.text || ""
+                      })) : [];
+                      
+                      fields.push({
+                        type: "dropdown",
+                        fieldName: nestedDropdown.fieldName || "",
+                        options: nestedDropdownOptions
+                      });
+                    });
+                  }
+                  
+                  // Add PDFs
+                  if (trigger.pdfs && trigger.pdfs.length > 0) {
+                    trigger.pdfs.forEach(pdf => {
+                      fields.push({
+                        type: "pdf",
+                        number: pdf.triggerNumber || "",
+                        pdfTitle: pdf.pdfTitle || "",
+                        pdfName: pdf.pdfFilename || "",
+                        priceId: pdf.pdfPriceId || ""
+                      });
+                    });
+                  }
+                }
+                
+                // Find the matching option text for the condition
+                const matchingOption = dropdown.options.find(option => option.value === trigger.triggerOption);
+                const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
+                
+                triggerSequences.push({
+                  condition: conditionText,
+                  fields: fields
+                });
+              });
+            }
+            
+            // Calculate the correct order for dropdown
+            // All items (including location) are now single entries, so use orderIndex + 1
+            let dropdownOrder = orderIndex + 1;
+            
+            allFieldsInOrder.push({
+              type: "dropdown",
+              fieldName: dropdown.name || "",
+              options: dropdownOptions,
+              triggerSequences: triggerSequences,
+              order: dropdownOrder
+            });
           }
         });
       } else {
