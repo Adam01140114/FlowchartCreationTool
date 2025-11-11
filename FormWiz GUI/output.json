@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "How many",
+          "text": "How many extra defendants",
           "type": "numberedDropdown",
           "logic": {
             "enabled": false,
@@ -55,7 +55,7 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "how_many",
+          "nodeId": "how_many_extra_defendants",
           "min": "1",
           "max": "3",
           "allFieldsInOrder": [
@@ -72,22 +72,36 @@
               "order": 2
             },
             {
+              "type": "location",
+              "fieldName": "Please enter their address",
+              "nodeId": "location_data",
+              "order": 3
+            },
+            {
               "type": "checkbox",
-              "fieldName": "Army Status",
+              "fieldName": "Military Status",
               "selectionType": "multiple",
               "options": [
                 {
-                  "text": "Military Duty",
-                  "nodeId": "how_many_army_status_military_duty",
+                  "text": "Check here if the defendant is on military duty",
+                  "nodeId": "example",
                   "linkedFields": [
                     {
                       "nodeId": "how_many_extra_defendants_name",
-                      "title": "example"
+                      "title": "Bruh"
+                    }
+                  ],
+                  "pdfEntries": [
+                    {
+                      "triggerNumber": "1",
+                      "pdfName": "Test Name",
+                      "pdfFile": "sc500.pdf",
+                      "priceId": "price_1SB7CbFJeSRMFQ8X2afGFckf"
                     }
                   ]
                 }
               ],
-              "order": 3
+              "order": 4
             }
           ]
         }
@@ -101,9 +115,9 @@
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
-  "defaultPDFName": "",
-  "pdfOutputName": "",
-  "stripePriceId": "",
+  "defaultPDFName": "SC-100",
+  "pdfOutputName": "sc100.pdf",
+  "stripePriceId": "price_1SB7CbFJeSRMFQ8X2afGFckf",
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],

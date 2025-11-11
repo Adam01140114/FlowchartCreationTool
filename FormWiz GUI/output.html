@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container" data-question-type="numberedDropdown"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many', this.value)">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container" data-question-type="numberedDropdown"><label><h3>How many extra defendants</h3></label><select id="how_many_extra_defendants" name="how_many_extra_defendants" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_extra_defendants', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
@@ -359,11 +359,11 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
-var questionSlugMap = {"1":"how_many"};
-var questionNameIds = {"1":"how_many"};
+window.formId = 'SC-100';
+var questionSlugMap = {"1":"how_many_extra_defendants"};
+var questionNameIds = {"1":"how_many_extra_defendants"};
 var linkedCheckboxes = [];
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_extra_defendants_name","order":1},{"type":"label","label":"Phone","nodeId":"how_many_extra_defendants_phone","order":2},{"type":"checkbox","label":"Army Status","nodeId":"","selectionType":"multiple","options":[{"text":"Military Duty","nodeId":"how_many_army_status_military_duty","linkedFields":[{"nodeId":"how_many_extra_defendants_name","title":"example"}]}],"order":3}]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_extra_defendants_name","order":1},{"type":"label","label":"Phone","nodeId":"how_many_extra_defendants_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"example","linkedFields":[{"nodeId":"how_many_extra_defendants_name","title":"Bruh"}],"pdfEntries":[{"triggerNumber":"1","pdfName":"Test Name","pdfFile":"sc500.pdf","priceId":"price_1SB7CbFJeSRMFQ8X2afGFckf"}]}],"order":4}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId, triggerCondition, isMultipleTextboxes) {
     // Default parameters for backward compatibility
@@ -1689,6 +1689,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
+var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
@@ -1813,11 +1814,11 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "SC-100";
+var pdfOutputFileName = "sc100.pdf";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc100", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -2152,6 +2153,33 @@ window.showCartModal = function () {
 
       }
     }
+  }
+  
+  // Add checkbox PDF entries
+  if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+    console.log('🔧 [CART MODAL] Adding checkbox PDF entries:', window.checkboxPdfEntries);
+    for (const pdfEntry of window.checkboxPdfEntries) {
+      if (pdfEntry.pdfFile && pdfEntry.priceId) {
+        // Use the pdfName as the display title (preserve original casing from JSON)
+        // pdfName is the display name like "Test Name", pdfFile is the filename like "sc500.pdf"
+        const displayTitle = pdfEntry.pdfName || pdfEntry.pdfFile.replace(/.pdf$/i, '');
+        
+        allPdfsToAdd.push({
+          formId: pdfEntry.pdfFile.replace(/.pdf$/i, '').toLowerCase(),
+          title: displayTitle,
+          priceId: pdfEntry.priceId,
+          pdfName: pdfEntry.pdfFile
+        });
+        console.log('🔧 [CART MODAL] Added checkbox PDF:', {
+          formId: pdfEntry.pdfFile.replace(/.pdf$/i, '').toLowerCase(),
+          title: displayTitle,
+          priceId: pdfEntry.priceId,
+          pdfName: pdfEntry.pdfFile
+        });
+      }
+    }
+  } else {
+    console.log('🔧 [CART MODAL] No checkbox PDF entries found. checkboxPdfEntries:', window.checkboxPdfEntries);
   }
   
   // Deduplicate PDFs to prevent multiple requests for the same PDF
@@ -2581,6 +2609,29 @@ window.addFormToCart = function (priceId) {
 
     }
     
+    // Add checkbox PDF entries
+    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+      console.log('🔧 [CART] Adding checkbox PDF entries to cart:', window.checkboxPdfEntries);
+      for (const pdfEntry of window.checkboxPdfEntries) {
+        // Use the pdfName as the display title (preserve original casing from JSON)
+        // pdfName is the display name like "Test Name", pdfFile is the filename like "sc500.pdf"
+        const displayTitle = pdfEntry.pdfName || pdfEntry.pdfFile.replace(/.pdf$/i, '');
+        
+        const pdfItem = {
+          formId: pdfEntry.pdfFile.replace(/.pdf$/i, '').toLowerCase(),
+          title: displayTitle,
+          priceId: pdfEntry.priceId,
+          formData: { ...formData, originalFormId: originalFormId, portfolioId: portfolioId, pdfName: pdfEntry.pdfFile },
+          countyName: countyName,
+          defendantName: defendantName
+        };
+        allItems.push(pdfItem);
+        console.log('🔧 [CART] Added checkbox PDF to cart:', pdfItem);
+      }
+    } else {
+      console.log('🔧 [CART] No checkbox PDF entries found. checkboxPdfEntries:', window.checkboxPdfEntries);
+    }
+    
     // Add all items to cart with a small delay between each to prevent race conditions
     let addedCount = 0;
     allItems.forEach((item, index) => {
@@ -2634,6 +2685,29 @@ window.addFormToCart = function (priceId) {
   for (const item of deduplicatedPdfLogicItems) {
     cart.push(item);
 
+  }
+  
+  // Add checkbox PDF entries to cart
+  if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+    for (const pdfEntry of window.checkboxPdfEntries) {
+      // Use the pdfName as the display title (preserve original casing from JSON)
+      // pdfName is the display name like "Test Name", pdfFile is the filename like "sc500.pdf"
+      const displayTitle = pdfEntry.pdfName || pdfEntry.pdfFile.replace(/.pdf$/i, '');
+      
+      const cartItem = {
+        formId: pdfEntry.pdfFile.replace(/.pdf$/i, '').toLowerCase(),
+        title: displayTitle,
+        priceId: pdfEntry.priceId,
+        pdfName: pdfEntry.pdfFile,
+        originalFormId: originalFormId,
+        portfolioId: portfolioId,
+        formData: formData,
+        countyName: countyName,
+        defendantName: defendantName,
+        timestamp: nowTs
+      };
+      cart.push(cartItem);
+    }
   }
 
   // Final deduplication of the entire cart to prevent any duplicates
@@ -3445,6 +3519,67 @@ function showTextboxLabels(questionId, count){
                     // Handle linked fields for this checkbox option
                     const linkedFields = option.linkedFields || [];
                     
+                    // Handle PDF entries for this checkbox option
+                    const pdfEntries = option.pdfEntries || [];
+                    console.log('🔧 [PDF ENTRY DEBUG] Checkbox option PDF entries:', {
+                        checkboxId: input.id,
+                        entryNumber: j,
+                        pdfEntries: pdfEntries,
+                        option: option
+                    });
+                    
+                    // Function to add PDF entries when checkbox is checked
+                    function addPdfEntries() {
+                        console.log('🔧 [PDF ENTRY DEBUG] addPdfEntries called for checkbox:', input.id, 'entryNumber:', j, 'pdfEntries:', pdfEntries);
+                        pdfEntries.forEach((pdfEntry) => {
+                            // Check if trigger number matches entry number (for numberedDropdown, j is the entry number)
+                            const triggerNumber = parseInt(pdfEntry.triggerNumber) || 1;
+                            if (triggerNumber === j && pdfEntry.pdfName && pdfEntry.pdfFile && pdfEntry.priceId) {
+                                // Add to global checkbox PDF entries array
+                                if (!window.checkboxPdfEntries) {
+                                    window.checkboxPdfEntries = [];
+                                }
+                                
+                                // Check if this PDF entry already exists (avoid duplicates)
+                                const existingEntry = window.checkboxPdfEntries.find(entry => 
+                                    entry.pdfName === pdfEntry.pdfName && 
+                                    entry.entryNumber === j &&
+                                    entry.checkboxId === input.id
+                                );
+                                
+                                if (!existingEntry) {
+                                    window.checkboxPdfEntries.push({
+                                        pdfName: pdfEntry.pdfName,
+                                        pdfFile: pdfEntry.pdfFile,
+                                        priceId: pdfEntry.priceId,
+                                        entryNumber: j,
+                                        checkboxId: input.id
+                                    });
+                                    console.log('🔧 [PDF ENTRY] Added PDF entry:', {
+                                        pdfName: pdfEntry.pdfName,
+                                        pdfFile: pdfEntry.pdfFile,
+                                        priceId: pdfEntry.priceId,
+                                        entryNumber: j,
+                                        checkboxId: input.id,
+                                        triggerNumber: triggerNumber
+                                    });
+                                }
+                            } else {
+                                console.log('🔧 [PDF ENTRY] Skipped PDF entry - triggerNumber:', triggerNumber, 'entryNumber:', j, 'checkboxId:', input.id);
+                            }
+                        });
+                    }
+                    
+                    // Function to remove PDF entries when checkbox is unchecked
+                    function removePdfEntries() {
+                        if (window.checkboxPdfEntries) {
+                            // Remove PDF entries for this checkbox and entry number
+                            window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry => 
+                                !(entry.checkboxId === input.id && entry.entryNumber === j)
+                            );
+                        }
+                    }
+                    
                     // Function to create linked textboxes when checkbox is checked
                     function createLinkedTextboxes() {
                         linkedFields.forEach((linkedField) => {
@@ -3522,8 +3657,10 @@ function showTextboxLabels(questionId, count){
                     input.addEventListener('change', function() {
                         if (this.checked) {
                             createLinkedTextboxes();
+                            addPdfEntries();
                         } else {
                             removeLinkedTextboxes();
+                            removePdfEntries();
                         }
                     });
                     
@@ -3537,8 +3674,8 @@ function showTextboxLabels(questionId, count){
                                     if (radio !== this) {
                                         radio.checked = false;
                                         
-                    // Remove hidden checkbox for unchecked radio
-                    // The hidden checkbox ID should be the original nodeId (without _radio suffix)
+                                        // Remove hidden checkbox for unchecked radio
+                                        // The hidden checkbox ID should be the original nodeId (without _radio suffix)
                     let originalNodeId;
                     if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
                       // For multipleTextboxes, remove _radio suffix to get the checkbox ID
@@ -3546,51 +3683,59 @@ function showTextboxLabels(questionId, count){
                     } else {
                       originalNodeId = radio.id.replace('_radio', '');
                     }
-                    const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                                        const existingHiddenCheckbox = document.getElementById(originalNodeId);
                                         
                                         if (existingHiddenCheckbox) {
                                             if (existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
                                                 existingHiddenCheckbox.remove();
                                             }
                                         }
-                                        // Also remove linked textboxes for unchecked radio
+                                        // Also remove linked textboxes and PDF entries for unchecked radio
                                         const uncheckedOption = checkboxOptions.find(opt => {
                                             const optId = selectionType === 'single' ? opt.nodeId + "_" + j + "_radio" : opt.nodeId + "_" + j;
                                             return optId === radio.id;
                                         });
-                                        if (uncheckedOption && uncheckedOption.linkedFields) {
-                                            uncheckedOption.linkedFields.forEach((linkedField) => {
-                                                if (linkedField.title) {
-                                                    const hiddenTextboxId = linkedField.title + "_" + j;
-                                                    const hiddenTextbox = document.getElementById(hiddenTextboxId);
-                                                    if (hiddenTextbox) {
-                                                        if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
-                                                            hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
-                                                            hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                        if (uncheckedOption) {
+                                            // Remove linked textboxes
+                                            if (uncheckedOption.linkedFields) {
+                                                uncheckedOption.linkedFields.forEach((linkedField) => {
+                                                    if (linkedField.title) {
+                                                        const hiddenTextboxId = linkedField.title + "_" + j;
+                                                        const hiddenTextbox = document.getElementById(hiddenTextboxId);
+                                                        if (hiddenTextbox) {
+                                                            if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                                hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                                hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                                            }
+                                                            // Clear polling interval
+                                                            if (hiddenTextbox._pollInterval) {
+                                                                clearInterval(hiddenTextbox._pollInterval);
+                                                            }
+                                                            hiddenTextbox.remove();
                                                         }
-                                                        // Stop MutationObserver
-                                                        if (hiddenTextbox._observer) {
-                                                            hiddenTextbox._observer.disconnect();
-                                                        }
-                                                        // Clear polling interval
-                                                        if (hiddenTextbox._pollInterval) {
-                                                            clearInterval(hiddenTextbox._pollInterval);
-                                                        }
-                                                        hiddenTextbox.remove();
                                                     }
-                                                }
-                                            });
+                                                });
+                                            }
+                                            
+                                            // Remove PDF entries for unchecked radio
+                                            if (window.checkboxPdfEntries && uncheckedOption.pdfEntries) {
+                                                const uncheckedRadioId = radio.id;
+                                                window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry => 
+                                                    !(entry.checkboxId === uncheckedRadioId && entry.entryNumber === j)
+                                                );
+                                            }
                                         }
                                     }
                                 });
                                 
-                // Create hidden checkbox for the selected radio
-                // Use the original nodeId (without _radio suffix) for the hidden checkbox
+                                // Create hidden checkbox for the selected radio
+                                // Use the original nodeId (without _radio suffix) for the hidden checkbox
                 // For multipleTextboxes, the ID already has the full format, so just remove _radio
                 // For numberedDropdown, remove _radio to get the base nodeId
-                const originalNodeId = this.id.replace('_radio', '');
-                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                                const originalNodeId = this.id.replace('_radio', '');
+                                createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                                 createLinkedTextboxes();
+                                addPdfEntries(); // Add PDF entries for the newly checked radio
                             }
                         });
                     }
@@ -3907,6 +4052,69 @@ function showTextboxLabels(questionId, count){
     
     // Update linked fields after creating new textboxes
     updateLinkedFields();
+    
+    // 🔧 NEW: Immediately autofill newly created fields if Firebase data is available
+    // This ensures fields are autofilled instantly instead of waiting for delayed passes
+    if (window.mappedData && typeof window.mappedData === 'object') {
+        const allCreatedFields = container.querySelectorAll('input, select, textarea');
+        allCreatedFields.forEach(field => {
+            if (field.id || field.name) {
+                const fieldId = field.id || field.name;
+                let autofillValue = null;
+                
+                // Check both by name and by ID for autofill
+                if (window.mappedData.hasOwnProperty(field.name)) {
+                    autofillValue = window.mappedData[field.name];
+                } else if (fieldId && window.mappedData.hasOwnProperty(fieldId)) {
+                    autofillValue = window.mappedData[fieldId];
+                }
+                
+                if (autofillValue !== null && autofillValue !== '') {
+                    // Skip current_date field - it should be set dynamically
+                    if (fieldId === 'current_date' || field.name === 'current_date') {
+                        return;
+                    }
+                    
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        if (field.type === 'radio') {
+                            // For radio buttons, check if this specific radio should be selected
+                            if (field.value === autofillValue) {
+                                field.checked = true;
+                                const changeEvent = new Event('change', { bubbles: true });
+                                field.dispatchEvent(changeEvent);
+                            } else {
+                                field.checked = false;
+                            }
+                        } else {
+                            // For checkboxes, use the boolean value
+                            const wasChecked = field.checked;
+                            field.checked = !!autofillValue;
+                            if (field.checked !== wasChecked) {
+                                const changeEvent = new Event('change', { bubbles: true });
+                                field.dispatchEvent(changeEvent);
+                            }
+                        }
+                    } else {
+                        field.value = autofillValue;
+                        
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (field.tagName === 'INPUT' && (field.type === 'text' || field.type === 'number' || !field.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            field.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            field.dispatchEvent(changeEvent);
+                        }
+                        
+                        // If this is a select element (dropdown), trigger change event
+                        if (field.tagName === 'SELECT') {
+                            const changeEvent = new Event('change', { bubbles: true });
+                            field.dispatchEvent(changeEvent);
+                        }
+                    }
+                }
+            }
+        });
+    }
     
     // Attach autosave listeners to newly generated textbox inputs
     const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
@@ -5185,6 +5393,27 @@ async function processAllPdfs() {
             }
         }
     }
+    
+    // Process Checkbox PDF Entries
+    // These PDFs are already "approved" since the checkbox is checked, so download them directly
+    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+        console.log('🔧 [PDF DOWNLOAD] Processing checkbox PDF entries:', window.checkboxPdfEntries);
+        for (const pdfEntry of window.checkboxPdfEntries) {
+            if (pdfEntry.pdfFile) {
+                // Remove .pdf extension if present since server adds it automatically
+                const baseName = pdfEntry.pdfFile.replace(/.pdf$/i, '');
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    console.log('🔧 [PDF DOWNLOAD] Downloading checkbox PDF:', baseName);
+                    await editAndDownloadPDF(baseName);
+                } else {
+                    console.log('🔧 [PDF DOWNLOAD] Skipping duplicate checkbox PDF:', baseName);
+                }
+            }
+        }
+    } else {
+        console.log('🔧 [PDF DOWNLOAD] No checkbox PDF entries found. checkboxPdfEntries:', window.checkboxPdfEntries);
+    }
 }
 
 // Function to go back to the form from the thank you screen
@@ -5991,6 +6220,9 @@ if (typeof handleNext === 'function') {
                 }
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
+                
+                // 🔧 NEW: Store mappedData globally so showTextboxLabels can access it for immediate autofill
+                window.mappedData = mappedData;
                 
                 // 🔧 NEW: Debug all radio buttons in the form
                 const allRadioButtons = document.querySelectorAll('input[type="radio"]');

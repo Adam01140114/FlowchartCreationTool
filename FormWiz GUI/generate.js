@@ -1564,10 +1564,31 @@ formHTML += `</div><br></div>`;
                         });
                       }
                       
+                      // Collect PDF entries for this option
+                      const pdfEntries = [];
+                      const pdfEntriesContainer = optionEl.querySelector('#pdfEntries' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                      if (pdfEntriesContainer) {
+                        const pdfEntryDivs = pdfEntriesContainer.querySelectorAll('[class^="pdf-entry-"]');
+                        pdfEntryDivs.forEach((pdfEntryDiv) => {
+                          const triggerNumberInput = pdfEntryDiv.querySelector('input[id^="pdfEntryTriggerNumber"]');
+                          const pdfNameInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfName"]');
+                          const pdfFileInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfFile"]');
+                          const priceIdInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPriceId"]');
+                          
+                          pdfEntries.push({
+                            triggerNumber: triggerNumberInput ? triggerNumberInput.value.trim() : '',
+                            pdfName: pdfNameInput ? pdfNameInput.value.trim() : '',
+                            pdfFile: pdfFileInput ? pdfFileInput.value.trim() : '',
+                            priceId: priceIdInput ? priceIdInput.value.trim() : ''
+                          });
+                        });
+                      }
+                      
                       checkboxOptions.push({
                         text: textEl.value.trim(),
                         nodeId: nodeIdEl.value.trim(),
-                        linkedFields: linkedFields
+                        linkedFields: linkedFields,
+                        pdfEntries: pdfEntries
                       });
                     }
                   });
@@ -2055,6 +2076,64 @@ formHTML += `</div><br></div>`;
                     // Handle linked fields for this checkbox option
                     const linkedFields = option.linkedFields || [];
                     
+                    // Handle PDF entries for this checkbox option
+                    const pdfEntries = option.pdfEntries || [];
+                    console.log('🔧 [PDF ENTRY DEBUG] Checkbox option PDF entries (multipleTextboxes):', {
+                        checkboxId: input.id,
+                        pdfEntries: pdfEntries,
+                        option: option
+                    });
+                    
+                    // Function to add PDF entries when checkbox is checked (for multipleTextboxes, entry number is always 1)
+                    function addPdfEntries() {
+                        console.log('🔧 [PDF ENTRY DEBUG] addPdfEntries called for checkbox (multipleTextboxes):', input.id, 'pdfEntries:', pdfEntries);
+                        pdfEntries.forEach((pdfEntry) => {
+                            // For multipleTextboxes, trigger number should be 1 (only one entry)
+                            const triggerNumber = parseInt(pdfEntry.triggerNumber) || 1;
+                            if (triggerNumber === 1 && pdfEntry.pdfName && pdfEntry.pdfFile && pdfEntry.priceId) {
+                                // Add to global checkbox PDF entries array
+                                if (!window.checkboxPdfEntries) {
+                                    window.checkboxPdfEntries = [];
+                                }
+                                
+                                // Check if this PDF entry already exists (avoid duplicates)
+                                const existingEntry = window.checkboxPdfEntries.find(entry => 
+                                    entry.pdfName === pdfEntry.pdfName && 
+                                    entry.checkboxId === input.id
+                                );
+                                
+                                if (!existingEntry) {
+                                    window.checkboxPdfEntries.push({
+                                        pdfName: pdfEntry.pdfName,
+                                        pdfFile: pdfEntry.pdfFile,
+                                        priceId: pdfEntry.priceId,
+                                        entryNumber: 1, // Always 1 for multipleTextboxes
+                                        checkboxId: input.id
+                                    });
+                                    console.log('🔧 [PDF ENTRY] Added PDF entry (multipleTextboxes):', {
+                                        pdfName: pdfEntry.pdfName,
+                                        pdfFile: pdfEntry.pdfFile,
+                                        priceId: pdfEntry.priceId,
+                                        checkboxId: input.id,
+                                        triggerNumber: triggerNumber
+                                    });
+                                }
+                            } else {
+                                console.log('🔧 [PDF ENTRY] Skipped PDF entry (multipleTextboxes) - triggerNumber:', triggerNumber, 'checkboxId:', input.id);
+                            }
+                        });
+                    }
+                    
+                    // Function to remove PDF entries when checkbox is unchecked
+                    function removePdfEntries() {
+                        if (window.checkboxPdfEntries) {
+                            // Remove PDF entries for this checkbox
+                            window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry => 
+                                entry.checkboxId !== input.id
+                            );
+                        }
+                    }
+                    
                     // Function to create linked textboxes when checkbox is checked
                     function createLinkedTextboxes() {
                         linkedFields.forEach((linkedField) => {
@@ -2127,8 +2206,10 @@ formHTML += `</div><br></div>`;
                     input.addEventListener('change', function() {
                         if (this.checked) {
                             createLinkedTextboxes();
+                            addPdfEntries();
                         } else {
                             removeLinkedTextboxes();
+                            removePdfEntries();
                         }
                     });
                     
@@ -2331,10 +2412,31 @@ formHTML += `</div><br></div>`;
                       });
                     }
                     
+                    // Collect PDF entries for this option
+                    const pdfEntries = [];
+                    const pdfEntriesContainer = optionEl.querySelector('#pdfEntries' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                    if (pdfEntriesContainer) {
+                      const pdfEntryDivs = pdfEntriesContainer.querySelectorAll('[class^="pdf-entry-"]');
+                      pdfEntryDivs.forEach((pdfEntryDiv) => {
+                        const triggerNumberInput = pdfEntryDiv.querySelector('input[id^="pdfEntryTriggerNumber"]');
+                        const pdfNameInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfName"]');
+                        const pdfFileInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfFile"]');
+                        const priceIdInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPriceId"]');
+                        
+                        pdfEntries.push({
+                          triggerNumber: triggerNumberInput ? triggerNumberInput.value.trim() : '',
+                          pdfName: pdfNameInput ? pdfNameInput.value.trim() : '',
+                          pdfFile: pdfFileInput ? pdfFileInput.value.trim() : '',
+                          priceId: priceIdInput ? priceIdInput.value.trim() : ''
+                        });
+                      });
+                    }
+                    
                     checkboxOptions.push({
                       text: textEl.value.trim(),
                       nodeId: nodeIdEl.value.trim(),
-                      linkedFields: linkedFields
+                      linkedFields: linkedFields,
+                      pdfEntries: pdfEntries
                     });
                   }
                 });
@@ -4677,6 +4779,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
   formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs || [])};\n`;
   formHTML += `var pdfLogicPDFs = ${JSON.stringify(pdfLogicPDFs || [])};\n`;
+  formHTML += `var checkboxPdfEntries = [];\n`; // Global array to store PDF entries from checkboxes
   formHTML += `var alertLogics = ${JSON.stringify(alertLogics || [])};\n`;
   formHTML += `var checklistLogics = ${JSON.stringify(checklistLogics || [])};\n`;
   formHTML += `var checklistItems = ${JSON.stringify(checklistItems || [])};\n`;
@@ -5256,6 +5359,33 @@ window.showCartModal = function () {
     }
   }
   
+  // Add checkbox PDF entries
+  if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+    console.log('🔧 [CART MODAL] Adding checkbox PDF entries:', window.checkboxPdfEntries);
+    for (const pdfEntry of window.checkboxPdfEntries) {
+      if (pdfEntry.pdfFile && pdfEntry.priceId) {
+        // Use the pdfName as the display title (preserve original casing from JSON)
+        // pdfName is the display name like "Test Name", pdfFile is the filename like "sc500.pdf"
+        const displayTitle = pdfEntry.pdfName || pdfEntry.pdfFile.replace(/\.pdf$/i, '');
+        
+        allPdfsToAdd.push({
+          formId: pdfEntry.pdfFile.replace(/\.pdf$/i, '').toLowerCase(),
+          title: displayTitle,
+          priceId: pdfEntry.priceId,
+          pdfName: pdfEntry.pdfFile
+        });
+        console.log('🔧 [CART MODAL] Added checkbox PDF:', {
+          formId: pdfEntry.pdfFile.replace(/\.pdf$/i, '').toLowerCase(),
+          title: displayTitle,
+          priceId: pdfEntry.priceId,
+          pdfName: pdfEntry.pdfFile
+        });
+      }
+    }
+  } else {
+    console.log('🔧 [CART MODAL] No checkbox PDF entries found. checkboxPdfEntries:', window.checkboxPdfEntries);
+  }
+  
   // Deduplicate PDFs to prevent multiple requests for the same PDF
   const originalCount = allPdfsToAdd.length;
   const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
@@ -5683,6 +5813,29 @@ window.addFormToCart = function (priceId) {
 
     }
     
+    // Add checkbox PDF entries
+    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+      console.log('🔧 [CART] Adding checkbox PDF entries to cart:', window.checkboxPdfEntries);
+      for (const pdfEntry of window.checkboxPdfEntries) {
+        // Use the pdfName as the display title (preserve original casing from JSON)
+        // pdfName is the display name like "Test Name", pdfFile is the filename like "sc500.pdf"
+        const displayTitle = pdfEntry.pdfName || pdfEntry.pdfFile.replace(/\.pdf$/i, '');
+        
+        const pdfItem = {
+          formId: pdfEntry.pdfFile.replace(/\.pdf$/i, '').toLowerCase(),
+          title: displayTitle,
+          priceId: pdfEntry.priceId,
+          formData: { ...formData, originalFormId: originalFormId, portfolioId: portfolioId, pdfName: pdfEntry.pdfFile },
+          countyName: countyName,
+          defendantName: defendantName
+        };
+        allItems.push(pdfItem);
+        console.log('🔧 [CART] Added checkbox PDF to cart:', pdfItem);
+      }
+    } else {
+      console.log('🔧 [CART] No checkbox PDF entries found. checkboxPdfEntries:', window.checkboxPdfEntries);
+    }
+    
     // Add all items to cart with a small delay between each to prevent race conditions
     let addedCount = 0;
     allItems.forEach((item, index) => {
@@ -5736,6 +5889,29 @@ window.addFormToCart = function (priceId) {
   for (const item of deduplicatedPdfLogicItems) {
     cart.push(item);
 
+  }
+  
+  // Add checkbox PDF entries to cart
+  if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+    for (const pdfEntry of window.checkboxPdfEntries) {
+      // Use the pdfName as the display title (preserve original casing from JSON)
+      // pdfName is the display name like "Test Name", pdfFile is the filename like "sc500.pdf"
+      const displayTitle = pdfEntry.pdfName || pdfEntry.pdfFile.replace(/\.pdf$/i, '');
+      
+      const cartItem = {
+        formId: pdfEntry.pdfFile.replace(/\.pdf$/i, '').toLowerCase(),
+        title: displayTitle,
+        priceId: pdfEntry.priceId,
+        pdfName: pdfEntry.pdfFile,
+        originalFormId: originalFormId,
+        portfolioId: portfolioId,
+        formData: formData,
+        countyName: countyName,
+        defendantName: defendantName,
+        timestamp: nowTs
+      };
+      cart.push(cartItem);
+    }
   }
 
   // Final deduplication of the entire cart to prevent any duplicates
@@ -6642,6 +6818,67 @@ function showTextboxLabels(questionId, count){
                     // Handle linked fields for this checkbox option
                     const linkedFields = option.linkedFields || [];
                     
+                    // Handle PDF entries for this checkbox option
+                    const pdfEntries = option.pdfEntries || [];
+                    console.log('🔧 [PDF ENTRY DEBUG] Checkbox option PDF entries:', {
+                        checkboxId: input.id,
+                        entryNumber: j,
+                        pdfEntries: pdfEntries,
+                        option: option
+                    });
+                    
+                    // Function to add PDF entries when checkbox is checked
+                    function addPdfEntries() {
+                        console.log('🔧 [PDF ENTRY DEBUG] addPdfEntries called for checkbox:', input.id, 'entryNumber:', j, 'pdfEntries:', pdfEntries);
+                        pdfEntries.forEach((pdfEntry) => {
+                            // Check if trigger number matches entry number (for numberedDropdown, j is the entry number)
+                            const triggerNumber = parseInt(pdfEntry.triggerNumber) || 1;
+                            if (triggerNumber === j && pdfEntry.pdfName && pdfEntry.pdfFile && pdfEntry.priceId) {
+                                // Add to global checkbox PDF entries array
+                                if (!window.checkboxPdfEntries) {
+                                    window.checkboxPdfEntries = [];
+                                }
+                                
+                                // Check if this PDF entry already exists (avoid duplicates)
+                                const existingEntry = window.checkboxPdfEntries.find(entry => 
+                                    entry.pdfName === pdfEntry.pdfName && 
+                                    entry.entryNumber === j &&
+                                    entry.checkboxId === input.id
+                                );
+                                
+                                if (!existingEntry) {
+                                    window.checkboxPdfEntries.push({
+                                        pdfName: pdfEntry.pdfName,
+                                        pdfFile: pdfEntry.pdfFile,
+                                        priceId: pdfEntry.priceId,
+                                        entryNumber: j,
+                                        checkboxId: input.id
+                                    });
+                                    console.log('🔧 [PDF ENTRY] Added PDF entry:', {
+                                        pdfName: pdfEntry.pdfName,
+                                        pdfFile: pdfEntry.pdfFile,
+                                        priceId: pdfEntry.priceId,
+                                        entryNumber: j,
+                                        checkboxId: input.id,
+                                        triggerNumber: triggerNumber
+                                    });
+                                }
+                            } else {
+                                console.log('🔧 [PDF ENTRY] Skipped PDF entry - triggerNumber:', triggerNumber, 'entryNumber:', j, 'checkboxId:', input.id);
+                            }
+                        });
+                    }
+                    
+                    // Function to remove PDF entries when checkbox is unchecked
+                    function removePdfEntries() {
+                        if (window.checkboxPdfEntries) {
+                            // Remove PDF entries for this checkbox and entry number
+                            window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry => 
+                                !(entry.checkboxId === input.id && entry.entryNumber === j)
+                            );
+                        }
+                    }
+                    
                     // Function to create linked textboxes when checkbox is checked
                     function createLinkedTextboxes() {
                         linkedFields.forEach((linkedField) => {
@@ -6719,8 +6956,10 @@ function showTextboxLabels(questionId, count){
                     input.addEventListener('change', function() {
                         if (this.checked) {
                             createLinkedTextboxes();
+                            addPdfEntries();
                         } else {
                             removeLinkedTextboxes();
+                            removePdfEntries();
                         }
                     });
                     
@@ -6750,33 +6989,40 @@ function showTextboxLabels(questionId, count){
                                                 existingHiddenCheckbox.remove();
                                             }
                                         }
-                                        // Also remove linked textboxes for unchecked radio
+                                        // Also remove linked textboxes and PDF entries for unchecked radio
                                         const uncheckedOption = checkboxOptions.find(opt => {
                                             const optId = selectionType === 'single' ? opt.nodeId + "_" + j + "_radio" : opt.nodeId + "_" + j;
                                             return optId === radio.id;
                                         });
-                                        if (uncheckedOption && uncheckedOption.linkedFields) {
-                                            uncheckedOption.linkedFields.forEach((linkedField) => {
-                                                if (linkedField.title) {
-                                                    const hiddenTextboxId = linkedField.title + "_" + j;
-                                                    const hiddenTextbox = document.getElementById(hiddenTextboxId);
-                                                    if (hiddenTextbox) {
-                                                        if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
-                                                            hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
-                                                            hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                        if (uncheckedOption) {
+                                            // Remove linked textboxes
+                                            if (uncheckedOption.linkedFields) {
+                                                uncheckedOption.linkedFields.forEach((linkedField) => {
+                                                    if (linkedField.title) {
+                                                        const hiddenTextboxId = linkedField.title + "_" + j;
+                                                        const hiddenTextbox = document.getElementById(hiddenTextboxId);
+                                                        if (hiddenTextbox) {
+                                                            if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                                hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                                hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                                            }
+                                                            // Clear polling interval
+                                                            if (hiddenTextbox._pollInterval) {
+                                                                clearInterval(hiddenTextbox._pollInterval);
+                                                            }
+                                                            hiddenTextbox.remove();
                                                         }
-                                                        // Stop MutationObserver
-                                                        if (hiddenTextbox._observer) {
-                                                            hiddenTextbox._observer.disconnect();
-                                                        }
-                                                        // Clear polling interval
-                                                        if (hiddenTextbox._pollInterval) {
-                                                            clearInterval(hiddenTextbox._pollInterval);
-                                                        }
-                                                        hiddenTextbox.remove();
                                                     }
-                                                }
-                                            });
+                                                });
+                                            }
+                                            
+                                            // Remove PDF entries for unchecked radio
+                                            if (window.checkboxPdfEntries && uncheckedOption.pdfEntries) {
+                                                const uncheckedRadioId = radio.id;
+                                                window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry => 
+                                                    !(entry.checkboxId === uncheckedRadioId && entry.entryNumber === j)
+                                                );
+                                            }
                                         }
                                     }
                                 });
@@ -6788,6 +7034,7 @@ function showTextboxLabels(questionId, count){
                                 const originalNodeId = this.id.replace('_radio', '');
                                 createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
                                 createLinkedTextboxes();
+                                addPdfEntries(); // Add PDF entries for the newly checked radio
                             }
                         });
                     }
@@ -8444,6 +8691,27 @@ async function processAllPdfs() {
                 }
             }
         }
+    }
+    
+    // Process Checkbox PDF Entries
+    // These PDFs are already "approved" since the checkbox is checked, so download them directly
+    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+        console.log('🔧 [PDF DOWNLOAD] Processing checkbox PDF entries:', window.checkboxPdfEntries);
+        for (const pdfEntry of window.checkboxPdfEntries) {
+            if (pdfEntry.pdfFile) {
+                // Remove .pdf extension if present since server adds it automatically
+                const baseName = pdfEntry.pdfFile.replace(/\.pdf$/i, '');
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    console.log('🔧 [PDF DOWNLOAD] Downloading checkbox PDF:', baseName);
+                    await editAndDownloadPDF(baseName);
+                } else {
+                    console.log('🔧 [PDF DOWNLOAD] Skipping duplicate checkbox PDF:', baseName);
+                }
+            }
+        }
+    } else {
+        console.log('🔧 [PDF DOWNLOAD] No checkbox PDF entries found. checkboxPdfEntries:', window.checkboxPdfEntries);
     }
 }
 
