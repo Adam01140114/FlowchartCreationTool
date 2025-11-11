@@ -9615,9 +9615,25 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     option.linkedFields = [];
   }
   
+  // Initialize PDF entries array if it doesn't exist
+  if (!option.pdfEntries) {
+    option.pdfEntries = [];
+  }
+  
   // Container for linked fields (created early so updateNodeId can access it)
   const linkedFieldsContainer = document.createElement('div');
   linkedFieldsContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e9ecef;
+  `;
+  
+  // Container for PDF entries
+  const pdfEntriesContainer = document.createElement('div');
+  pdfEntriesContainer.style.cssText = `
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -9924,9 +9940,37 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
         clearTimeout(copyIndicatorTimeout);
       }
       
+      // Prompt user for a number
+      const number = prompt('Enter a number to append to the ID:');
+      if (number === null || number.trim() === '') {
+        return; // User cancelled or entered nothing
+      }
+      
+      // Get the base ID from the title input
+      const baseId = titleInput.value || '';
+      if (!baseId) {
+        alert('No ID to copy');
+        return;
+      }
+      
+      // Append the number to the ID
+      const idToCopy = `${baseId}_${number.trim()}`;
+      
       // Copy to clipboard
-      titleInput.select();
-      document.execCommand('copy');
+      const textArea = document.createElement('textarea');
+      textArea.value = idToCopy;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+      
+      document.body.removeChild(textArea);
       
       // Show visual indicator (green)
       const originalBg = titleInput.style.backgroundColor;
@@ -10046,6 +10090,169 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   
   linkedFieldsContainer.appendChild(addLinkedFieldBtn);
   
+  // Helper function to create a PDF entry
+  const createPdfEntry = (pdfEntry, pdfEntryIndex) => {
+    const pdfEntryDiv = document.createElement('div');
+    pdfEntryDiv.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    `;
+    pdfEntryDiv.dataset.pdfEntryIndex = pdfEntryIndex;
+    
+    // Trigger Number input
+    const triggerNumberInput = document.createElement('input');
+    triggerNumberInput.type = 'text';
+    triggerNumberInput.value = pdfEntry.triggerNumber || '';
+    triggerNumberInput.placeholder = 'Trigger Number';
+    triggerNumberInput.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+    `;
+    triggerNumberInput.onblur = () => {
+      pdfEntry.triggerNumber = triggerNumberInput.value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    // PDF Name input
+    const pdfNameInput = document.createElement('input');
+    pdfNameInput.type = 'text';
+    pdfNameInput.value = pdfEntry.pdfName || '';
+    pdfNameInput.placeholder = 'PDF Name';
+    pdfNameInput.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+    `;
+    pdfNameInput.onblur = () => {
+      pdfEntry.pdfName = pdfNameInput.value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    // PDF File input
+    const pdfFileInput = document.createElement('input');
+    pdfFileInput.type = 'text';
+    pdfFileInput.value = pdfEntry.pdfFile || '';
+    pdfFileInput.placeholder = 'PDF File';
+    pdfFileInput.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+    `;
+    pdfFileInput.onblur = () => {
+      pdfEntry.pdfFile = pdfFileInput.value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    // Price ID input
+    const priceIdInput = document.createElement('input');
+    priceIdInput.type = 'text';
+    priceIdInput.value = pdfEntry.priceId || '';
+    priceIdInput.placeholder = 'Price ID';
+    priceIdInput.style.cssText = `
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      font-size: 12px;
+    `;
+    priceIdInput.onblur = () => {
+      pdfEntry.priceId = priceIdInput.value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    // Delete PDF entry button
+    const deletePdfEntryBtn = document.createElement('button');
+    deletePdfEntryBtn.textContent = 'Delete';
+    deletePdfEntryBtn.style.cssText = `
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      align-self: flex-end;
+      margin-top: 4px;
+    `;
+    deletePdfEntryBtn.onclick = () => {
+      option.pdfEntries.splice(pdfEntryIndex, 1);
+      pdfEntryDiv.remove();
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    pdfEntryDiv.appendChild(triggerNumberInput);
+    pdfEntryDiv.appendChild(pdfNameInput);
+    pdfEntryDiv.appendChild(pdfFileInput);
+    pdfEntryDiv.appendChild(priceIdInput);
+    pdfEntryDiv.appendChild(deletePdfEntryBtn);
+    
+    return pdfEntryDiv;
+  };
+  
+  // Render existing PDF entries
+  if (option.pdfEntries && option.pdfEntries.length > 0) {
+    option.pdfEntries.forEach((pdfEntry, pdfEntryIndex) => {
+      const pdfEntryDiv = createPdfEntry(pdfEntry, pdfEntryIndex);
+      pdfEntriesContainer.appendChild(pdfEntryDiv);
+    });
+  }
+  
+  // Add PDF button
+  const addPdfBtn = document.createElement('button');
+  addPdfBtn.textContent = 'Add PDF';
+  addPdfBtn.style.cssText = `
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-top: 4px;
+    align-self: flex-start;
+  `;
+  addPdfBtn.onclick = () => {
+    const newPdfEntry = {
+      triggerNumber: '',
+      pdfName: '',
+      pdfFile: '',
+      priceId: ''
+    };
+    option.pdfEntries.push(newPdfEntry);
+    
+    const pdfEntryDiv = createPdfEntry(newPdfEntry, option.pdfEntries.length - 1);
+    pdfEntriesContainer.insertBefore(pdfEntryDiv, addPdfBtn);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  pdfEntriesContainer.appendChild(addPdfBtn);
+  
   // Assemble mini option entry
   miniOptionEntry.appendChild(checkboxTextInput);
   miniOptionEntry.appendChild(nodeIdInput);
@@ -10072,6 +10279,7 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   miniOptionEntry.innerHTML = '';
   miniOptionEntry.appendChild(topRow);
   miniOptionEntry.appendChild(linkedFieldsContainer);
+  miniOptionEntry.appendChild(pdfEntriesContainer);
   
   return miniOptionEntry;
 }

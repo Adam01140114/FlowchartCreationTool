@@ -380,8 +380,8 @@ window.exportGuiJson = function(download = true) {
             const checkbox = cell._checkboxes[item.index];
             const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
               const optionObj = {
-              text: option.checkboxText || option.text || "",
-              nodeId: option.nodeId || ""
+                text: option.checkboxText || option.text || "",
+                nodeId: option.nodeId || ""
               };
               
               // Add linked fields if they exist
@@ -399,6 +399,16 @@ window.exportGuiJson = function(download = true) {
                     title: linkedField.title || ""
                   };
                 });
+              }
+              
+              // Add PDF entries if they exist
+              if (option.pdfEntries && Array.isArray(option.pdfEntries) && option.pdfEntries.length > 0) {
+                optionObj.pdfEntries = option.pdfEntries.map(pdfEntry => ({
+                  triggerNumber: pdfEntry.triggerNumber || "",
+                  pdfName: pdfEntry.pdfName || "",
+                  pdfFile: pdfEntry.pdfFile || "",
+                  priceId: pdfEntry.priceId || ""
+                }));
               }
               
               return optionObj;
@@ -953,8 +963,8 @@ window.exportGuiJson = function(download = true) {
           cell._checkboxes.forEach((checkbox, checkboxIndex) => {
             const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
               const optionObj = {
-              text: option.checkboxText || option.text || "",
-              nodeId: option.nodeId || ""
+                text: option.checkboxText || option.text || "",
+                nodeId: option.nodeId || ""
               };
               
               // Add linked fields if they exist
@@ -972,6 +982,16 @@ window.exportGuiJson = function(download = true) {
                     title: linkedField.title || ""
                   };
                 });
+              }
+              
+              // Add PDF entries if they exist
+              if (option.pdfEntries && Array.isArray(option.pdfEntries) && option.pdfEntries.length > 0) {
+                optionObj.pdfEntries = option.pdfEntries.map(pdfEntry => ({
+                  triggerNumber: pdfEntry.triggerNumber || "",
+                  pdfName: pdfEntry.pdfName || "",
+                  pdfFile: pdfEntry.pdfFile || "",
+                  priceId: pdfEntry.priceId || ""
+                }));
               }
               
               return optionObj;
@@ -1447,31 +1467,41 @@ window.exportGuiJson = function(download = true) {
               });
             } else if (item.type === 'checkbox' && cell._checkboxes && cell._checkboxes[item.index]) {
               const checkbox = cell._checkboxes[item.index];
-              const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
-                const optionObj = {
+            const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
+              const optionObj = {
                 text: option.checkboxText || option.text || "",
                 nodeId: option.nodeId || ""
-                };
-                
-                // Add linked fields if they exist
-                if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
-                  optionObj.linkedFields = option.linkedFields.map(linkedField => {
-                    // Strip entry number suffix from selectedNodeId to match label nodeId format
-                    // Format: baseNodeId_${entryNumber} -> baseNodeId
-                    let baseNodeId = linkedField.selectedNodeId || "";
-                    if (baseNodeId) {
-                      // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
-                      baseNodeId = baseNodeId.replace(/_\d+$/, '');
-                    }
-                    return {
-                      nodeId: baseNodeId,
-                      title: linkedField.title || ""
-                    };
-                  });
-                }
-                
-                return optionObj;
-              }) : [];
+              };
+              
+              // Add linked fields if they exist
+              if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
+                optionObj.linkedFields = option.linkedFields.map(linkedField => {
+                  // Strip entry number suffix from selectedNodeId to match label nodeId format
+                  // Format: baseNodeId_${entryNumber} -> baseNodeId
+                  let baseNodeId = linkedField.selectedNodeId || "";
+                  if (baseNodeId) {
+                    // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
+                    baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                  }
+                  return {
+                    nodeId: baseNodeId,
+                    title: linkedField.title || ""
+                  };
+                });
+              }
+              
+              // Add PDF entries if they exist
+              if (option.pdfEntries && Array.isArray(option.pdfEntries) && option.pdfEntries.length > 0) {
+                optionObj.pdfEntries = option.pdfEntries.map(pdfEntry => ({
+                  triggerNumber: pdfEntry.triggerNumber || "",
+                  pdfName: pdfEntry.pdfName || "",
+                  pdfFile: pdfEntry.pdfFile || "",
+                  priceId: pdfEntry.priceId || ""
+                }));
+              }
+              
+              return optionObj;
+            }) : [];
               
               allFieldsInOrder.push({
                 type: "checkbox",

@@ -2707,6 +2707,12 @@ function addCheckboxOption(questionId, fieldCount) {
             <!-- Linked field dropdowns will be added here -->
         </div>
         <div style="text-align: center; margin-top: 10px;">
+            <button type="button" onclick="addPdfEntry(${questionId}, ${fieldCount}, ${optionCount})" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; display: block; margin: 0 auto;">Add PDF</button>
+        </div>
+        <div id="pdfEntries${questionId}_${fieldCount}_${optionCount}" style="margin-top: 10px;">
+            <!-- PDF entries will be added here -->
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
             <button type="button" onclick="removeCheckboxOption(${questionId}, ${fieldCount}, ${optionCount})" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove Option</button>
         </div>
     `;
@@ -2826,6 +2832,86 @@ function removeLinkedField(questionId, fieldCount, optionCount, linkedFieldCount
     if (linkedFieldDiv) {
         linkedFieldDiv.remove();
     }
+}
+
+// Add a PDF entry to a checkbox option
+function addPdfEntry(questionId, fieldCount, optionCount) {
+    const pdfEntriesContainer = document.getElementById(`pdfEntries${questionId}_${fieldCount}_${optionCount}`);
+    if (!pdfEntriesContainer) return;
+    
+    const pdfEntryCount = pdfEntriesContainer.children.length + 1;
+    
+    const pdfEntryDiv = document.createElement('div');
+    pdfEntryDiv.className = `pdf-entry-${pdfEntryCount}`;
+    pdfEntryDiv.style.margin = '5px 0';
+    pdfEntryDiv.style.padding = '8px';
+    pdfEntryDiv.style.border = '1px solid #d0d0d0';
+    pdfEntryDiv.style.borderRadius = '3px';
+    pdfEntryDiv.style.backgroundColor = '#fafafa';
+    
+    // Trigger Number input
+    const triggerNumberLabel = document.createElement('label');
+    triggerNumberLabel.textContent = 'Trigger Number:';
+    triggerNumberLabel.style.cssText = 'font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;';
+    
+    const triggerNumberInput = document.createElement('input');
+    triggerNumberInput.type = 'text';
+    triggerNumberInput.id = `pdfEntryTriggerNumber${questionId}_${fieldCount}_${optionCount}_${pdfEntryCount}`;
+    triggerNumberInput.placeholder = 'Enter trigger number';
+    triggerNumberInput.style.cssText = 'width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; margin-bottom: 5px; box-sizing: border-box;';
+    
+    // PDF Name input
+    const pdfNameLabel = document.createElement('label');
+    pdfNameLabel.textContent = 'PDF Name:';
+    pdfNameLabel.style.cssText = 'font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;';
+    
+    const pdfNameInput = document.createElement('input');
+    pdfNameInput.type = 'text';
+    pdfNameInput.id = `pdfEntryPdfName${questionId}_${fieldCount}_${optionCount}_${pdfEntryCount}`;
+    pdfNameInput.placeholder = 'Enter PDF name';
+    pdfNameInput.style.cssText = 'width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; margin-bottom: 5px; box-sizing: border-box;';
+    
+    // PDF File input
+    const pdfFileLabel = document.createElement('label');
+    pdfFileLabel.textContent = 'PDF File:';
+    pdfFileLabel.style.cssText = 'font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;';
+    
+    const pdfFileInput = document.createElement('input');
+    pdfFileInput.type = 'text';
+    pdfFileInput.id = `pdfEntryPdfFile${questionId}_${fieldCount}_${optionCount}_${pdfEntryCount}`;
+    pdfFileInput.placeholder = 'Enter PDF file';
+    pdfFileInput.style.cssText = 'width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; margin-bottom: 5px; box-sizing: border-box;';
+    
+    // Price ID input
+    const priceIdLabel = document.createElement('label');
+    priceIdLabel.textContent = 'Price ID:';
+    priceIdLabel.style.cssText = 'font-weight: bold; color: #333; display: block; margin-bottom: 3px; font-size: 12px;';
+    
+    const priceIdInput = document.createElement('input');
+    priceIdInput.type = 'text';
+    priceIdInput.id = `pdfEntryPriceId${questionId}_${fieldCount}_${optionCount}_${pdfEntryCount}`;
+    priceIdInput.placeholder = 'Enter price ID';
+    priceIdInput.style.cssText = 'width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; margin-bottom: 5px; box-sizing: border-box;';
+    
+    // Remove button
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.textContent = 'Remove';
+    removeBtn.style.cssText = 'background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;';
+    removeBtn.onclick = function() {
+        pdfEntryDiv.remove();
+    };
+    
+    pdfEntryDiv.appendChild(triggerNumberLabel);
+    pdfEntryDiv.appendChild(triggerNumberInput);
+    pdfEntryDiv.appendChild(pdfNameLabel);
+    pdfEntryDiv.appendChild(pdfNameInput);
+    pdfEntryDiv.appendChild(pdfFileLabel);
+    pdfEntryDiv.appendChild(pdfFileInput);
+    pdfEntryDiv.appendChild(priceIdLabel);
+    pdfEntryDiv.appendChild(priceIdInput);
+    pdfEntryDiv.appendChild(removeBtn);
+    pdfEntriesContainer.appendChild(pdfEntryDiv);
 }
 
 function updateCheckboxFieldName(questionId, fieldCount) {

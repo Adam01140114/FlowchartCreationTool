@@ -628,6 +628,41 @@ function loadFormData(formData) {
                                                         }
                                                     });
                                                 }
+                                                
+                                                // Restore PDF entries if they exist
+                                                if (option.pdfEntries && option.pdfEntries.length > 0) {
+                                                    option.pdfEntries.forEach((pdfEntry) => {
+                                                        // Add a PDF entry
+                                                        if (typeof addPdfEntry === 'function') {
+                                                            addPdfEntry(question.questionId, fieldOrder, optionIndex + 1);
+                                                            
+                                                            // Find the last added PDF entry and set its values
+                                                            const pdfEntriesContainer = document.getElementById('pdfEntries' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                                            if (pdfEntriesContainer) {
+                                                                const lastPdfEntryDiv = pdfEntriesContainer.querySelector('[class^="pdf-entry-"]:last-of-type');
+                                                                if (lastPdfEntryDiv) {
+                                                                    const triggerNumberInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryTriggerNumber"]');
+                                                                    const pdfNameInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryPdfName"]');
+                                                                    const pdfFileInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryPdfFile"]');
+                                                                    const priceIdInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryPriceId"]');
+                                                                    
+                                                                    if (triggerNumberInput && pdfEntry.triggerNumber) {
+                                                                        triggerNumberInput.value = pdfEntry.triggerNumber;
+                                                                    }
+                                                                    if (pdfNameInput && pdfEntry.pdfName) {
+                                                                        pdfNameInput.value = pdfEntry.pdfName;
+                                                                    }
+                                                                    if (pdfFileInput && pdfEntry.pdfFile) {
+                                                                        pdfFileInput.value = pdfEntry.pdfFile;
+                                                                    }
+                                                                    if (priceIdInput && pdfEntry.priceId) {
+                                                                        priceIdInput.value = pdfEntry.priceId;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
                                             });
                                         }
                                     }
@@ -1245,6 +1280,41 @@ function loadFormData(formData) {
                                                                 }
                                                                 if (lastTitleInput && linkedFieldTitle) {
                                                                     lastTitleInput.value = linkedFieldTitle;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            
+                                            // Restore PDF entries if they exist
+                                            if (option.pdfEntries && option.pdfEntries.length > 0) {
+                                                option.pdfEntries.forEach((pdfEntry) => {
+                                                    // Add a PDF entry
+                                                    if (typeof addPdfEntry === 'function') {
+                                                        addPdfEntry(question.questionId, fieldOrder, optionIndex + 1);
+                                                        
+                                                        // Find the last added PDF entry and set its values
+                                                        const pdfEntriesContainer = document.getElementById('pdfEntries' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                                        if (pdfEntriesContainer) {
+                                                            const lastPdfEntryDiv = pdfEntriesContainer.querySelector('[class^="pdf-entry-"]:last-of-type');
+                                                            if (lastPdfEntryDiv) {
+                                                                const triggerNumberInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryTriggerNumber"]');
+                                                                const pdfNameInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryPdfName"]');
+                                                                const pdfFileInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryPdfFile"]');
+                                                                const priceIdInput = lastPdfEntryDiv.querySelector('input[id^="pdfEntryPriceId"]');
+                                                                
+                                                                if (triggerNumberInput && pdfEntry.triggerNumber) {
+                                                                    triggerNumberInput.value = pdfEntry.triggerNumber;
+                                                                }
+                                                                if (pdfNameInput && pdfEntry.pdfName) {
+                                                                    pdfNameInput.value = pdfEntry.pdfName;
+                                                                }
+                                                                if (pdfFileInput && pdfEntry.pdfFile) {
+                                                                    pdfFileInput.value = pdfEntry.pdfFile;
+                                                                }
+                                                                if (priceIdInput && pdfEntry.priceId) {
+                                                                    priceIdInput.value = pdfEntry.priceId;
                                                                 }
                                                             }
                                                         }
@@ -3019,10 +3089,31 @@ function exportForm() {
                                             });
                                         }
                                         
+                                        // Collect PDF entries for this option
+                                        const pdfEntries = [];
+                                        const pdfEntriesContainer = optionEl.querySelector('#pdfEntries' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                        if (pdfEntriesContainer) {
+                                            const pdfEntryDivs = pdfEntriesContainer.querySelectorAll('[class^="pdf-entry-"]');
+                                            pdfEntryDivs.forEach((pdfEntryDiv) => {
+                                                const triggerNumberInput = pdfEntryDiv.querySelector('input[id^="pdfEntryTriggerNumber"]');
+                                                const pdfNameInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfName"]');
+                                                const pdfFileInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfFile"]');
+                                                const priceIdInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPriceId"]');
+                                                
+                                                pdfEntries.push({
+                                                    triggerNumber: triggerNumberInput ? triggerNumberInput.value.trim() : '',
+                                                    pdfName: pdfNameInput ? pdfNameInput.value.trim() : '',
+                                                    pdfFile: pdfFileInput ? pdfFileInput.value.trim() : '',
+                                                    priceId: priceIdInput ? priceIdInput.value.trim() : ''
+                                                });
+                                            });
+                                        }
+                                        
                                         checkboxOptions.push({
                                             text: textEl.value.trim(),
                                             nodeId: nodeIdEl.value.trim(),
-                                            linkedFields: linkedFields
+                                            linkedFields: linkedFields,
+                                            pdfEntries: pdfEntries
                                         });
                                     }
                                 });
@@ -3636,10 +3727,31 @@ function exportForm() {
                                                 });
                                             }
                                             
+                                            // Collect PDF entries for this option
+                                            const pdfEntries = [];
+                                            const pdfEntriesContainer = optionEl.querySelector('#pdfEntries' + questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
+                                            if (pdfEntriesContainer) {
+                                                const pdfEntryDivs = pdfEntriesContainer.querySelectorAll('[class^="pdf-entry-"]');
+                                                pdfEntryDivs.forEach((pdfEntryDiv) => {
+                                                    const triggerNumberInput = pdfEntryDiv.querySelector('input[id^="pdfEntryTriggerNumber"]');
+                                                    const pdfNameInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfName"]');
+                                                    const pdfFileInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPdfFile"]');
+                                                    const priceIdInput = pdfEntryDiv.querySelector('input[id^="pdfEntryPriceId"]');
+                                                    
+                                                    pdfEntries.push({
+                                                        triggerNumber: triggerNumberInput ? triggerNumberInput.value.trim() : '',
+                                                        pdfName: pdfNameInput ? pdfNameInput.value.trim() : '',
+                                                        pdfFile: pdfFileInput ? pdfFileInput.value.trim() : '',
+                                                        priceId: priceIdInput ? priceIdInput.value.trim() : ''
+                                                    });
+                                                });
+                                            }
+                                            
                                             checkboxOptions.push({
                                                 text: textEl.value.trim(),
                                                 nodeId: nodeIdEl.value.trim(),
-                                                linkedFields: linkedFields
+                                                linkedFields: linkedFields,
+                                                pdfEntries: pdfEntries
                                             });
                                         }
                                     });
