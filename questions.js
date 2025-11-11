@@ -4445,6 +4445,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           if (!triggerSequence.locations) triggerSequence.locations = [];
           triggerSequence.locations.push(newLocation);
           
+          // Calculate triggerIndex by finding the index of this triggerSequence in the dropdown's triggerSequences array
+          const triggerIndex = dropdown.triggerSequences.findIndex(trigger => trigger.id === triggerSequence.id);
+          console.log('🔍 [ADD LOCATION DEBUG] triggerIndex calculated:', triggerIndex, 'for triggerSequence.id:', triggerSequence.id);
+          
           // Update the actions list for this trigger sequence
           const triggerDiv = addLocationBtn.closest('.trigger-sequence');
           if (triggerDiv) {
