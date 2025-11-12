@@ -800,15 +800,15 @@ questionSlugMap[questionId] = slug;
       if (infoBoxEnabled && infoBoxText) {
         formHTML += `
           <div class="question-header">
-            <label><h3>${questionText}</h3></label>
+            <label><h3 class="question-text">${questionText}</h3></label>
             <div class="info-icon" tabindex="0">
               <span>i</span>
-              <div class="info-tooltip">${infoBoxText}</div>
+              <div class="info-box-text info-tooltip">${infoBoxText}</div>
             </div>
           </div>
         `;
       } else {
-        formHTML += `<label><h3>${questionText}</h3></label>`;
+        formHTML += `<label><h3 class="question-text">${questionText}</h3></label>`;
       }
 
       // Add subtitle if enabled
@@ -816,7 +816,7 @@ questionSlugMap[questionId] = slug;
       if (subtitleEnabled) {
         const subtitleText = qBlock.querySelector(`#subtitleText${questionId}`)?.value || "";
         if (subtitleText) {
-          formHTML += `<p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">${subtitleText}</p>`;
+          formHTML += `<p class="subtitle-text question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">${subtitleText}</p>`;
         }
       }
 
@@ -5108,11 +5108,73 @@ if (document.readyState === 'loading') {
 '    }\n' +
 '    \n' +
 '}\n\n' +
+'// Function to replace URL parameter placeholders in text\n' +
+'function replaceUrlParametersInText(text) {\n' +
+'    if (!text || typeof text !== \'string\') return text;\n' +
+'    \n' +
+'    // Replace [paramName] with URL parameter value\n' +
+'    return text.replace(/\\[([^\\]]+)\\]/g, function(match, paramName) {\n' +
+'        const value = getUrlParameter(paramName);\n' +
+'        return value || match; // Return the value if found, otherwise keep the placeholder\n' +
+'    });\n' +
+'}\n\n' +
+'// Function to replace URL parameters in all question text, section names, etc.\n' +
+'function replaceUrlParametersInForm() {\n' +
+'    // Replace in section titles\n' +
+'    document.querySelectorAll(\'.section-title\').forEach(function(el) {\n' +
+'        if (el.textContent) {\n' +
+'            el.textContent = replaceUrlParametersInText(el.textContent);\n' +
+'        }\n' +
+'    });\n' +
+'    \n' +
+'    // Replace in question text\n' +
+'    document.querySelectorAll(\'.question-text\').forEach(function(el) {\n' +
+'        if (el.textContent) {\n' +
+'            el.textContent = replaceUrlParametersInText(el.textContent);\n' +
+'        }\n' +
+'    });\n' +
+'    \n' +
+'    // Replace in question labels\n' +
+'    document.querySelectorAll(\'label[for^="question"], label.question-label\').forEach(function(el) {\n' +
+'        if (el.textContent) {\n' +
+'            el.textContent = replaceUrlParametersInText(el.textContent);\n' +
+'        }\n' +
+'    });\n' +
+'    \n' +
+'    // Replace in subtitles\n' +
+'    document.querySelectorAll(\'.subtitle-text\').forEach(function(el) {\n' +
+'        if (el.textContent) {\n' +
+'            el.textContent = replaceUrlParametersInText(el.textContent);\n' +
+'        }\n' +
+'    });\n' +
+'    \n' +
+'    // Replace in info boxes\n' +
+'    document.querySelectorAll(\'.info-box-text\').forEach(function(el) {\n' +
+'        if (el.textContent) {\n' +
+'            el.textContent = replaceUrlParametersInText(el.textContent);\n' +
+'        }\n' +
+'    });\n' +
+'    \n' +
+'    // Replace in conditional alert messages\n' +
+'    document.querySelectorAll(\'.alert-message\').forEach(function(el) {\n' +
+'        if (el.textContent) {\n' +
+'            el.textContent = replaceUrlParametersInText(el.textContent);\n' +
+'        }\n' +
+'    });\n' +
+'}\n\n' +
 '// Auto-populate on page load\n' +
-'document.addEventListener("DOMContentLoaded", function() {\n' +
+'if (document.readyState === \'loading\') {\n' +
+'    document.addEventListener("DOMContentLoaded", function() {\n' +
+'        populateHiddenFieldsFromUrl();\n' +
+'        setupLinkedFields();\n' +
+'        replaceUrlParametersInForm();\n' +
+'    });\n' +
+'} else {\n' +
+'    // DOM already loaded, run immediately\n' +
 '    populateHiddenFieldsFromUrl();\n' +
 '    setupLinkedFields();\n' +
-'});\n\n' +
+'    replaceUrlParametersInForm();\n' +
+'}\n\n' +
 '// Function to check paragraph limit and create hidden checkbox\n' +
 'function checkParagraphLimit(textareaId, paragraphLimit) {\n' +
 '    if (!paragraphLimit || paragraphLimit === "null") return;\n' +

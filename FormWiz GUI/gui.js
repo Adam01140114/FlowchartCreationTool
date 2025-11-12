@@ -582,7 +582,10 @@ function addQuestion(sectionId, questionId = null) {
     questionBlock.id = `questionBlock${currentQuestionId}`;
     questionBlock.innerHTML = `
         <label>Question ${currentQuestionId}: </label>
-        <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <input type="text" placeholder="Enter your question" id="question${currentQuestionId}" style="flex: 1;">
+            <button type="button" onclick="showUrlVariableMenu(${currentQuestionId}, event)" title="Insert URL Parameter Variable" style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📎 URL Var</button>
+        </div><br>
 
         <label>Question Type: </label>
         <center>
@@ -913,6 +916,86 @@ function updateAllLinkingTargets() {
 /**
  * Removes a question block entirely
  */
+// Show URL variable menu for inserting URL parameter placeholders
+function showUrlVariableMenu(questionId, event) {
+    const questionInput = document.getElementById(`question${questionId}`);
+    if (!questionInput) return;
+    
+    // Common URL parameters
+    const urlVariables = [
+        { name: 'county', display: 'County', example: '[county]' },
+        { name: 'defendantName', display: 'Defendant Name', example: '[defendantName]' },
+        { name: 'zipCode', display: 'Zip Code', example: '[zipCode]' },
+        { name: 'formId', display: 'Form ID', example: '[formId]' },
+        { name: 'portfolioId', display: 'Portfolio ID', example: '[portfolioId]' },
+        { name: 'defendant', display: 'Defendant', example: '[defendant]' }
+    ];
+    
+    // Create dropdown menu
+    const menu = document.createElement('div');
+    menu.id = `urlVarMenu${questionId}`;
+    menu.style.cssText = `
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 5px 0;
+    `;
+    
+    urlVariables.forEach(variable => {
+        const item = document.createElement('div');
+        item.style.cssText = `
+            padding: 8px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        `;
+        item.onmouseover = () => item.style.background = '#f0f0f0';
+        item.onmouseout = () => item.style.background = 'white';
+        item.innerHTML = `
+            <strong>${variable.display}</strong><br>
+            <small style="color: #666;">${variable.example}</small>
+        `;
+        item.onclick = () => {
+            const cursorPos = questionInput.selectionStart || questionInput.value.length;
+            const textBefore = questionInput.value.substring(0, cursorPos);
+            const textAfter = questionInput.value.substring(questionInput.selectionEnd || cursorPos);
+            questionInput.value = textBefore + variable.example + textAfter;
+            questionInput.focus();
+            questionInput.setSelectionRange(cursorPos + variable.example.length, cursorPos + variable.example.length);
+            menu.remove();
+        };
+        menu.appendChild(item);
+    });
+    
+    // Position menu near the button
+    const button = event ? event.target : document.querySelector(`button[onclick*="showUrlVariableMenu(${questionId})"]`);
+    if (button) {
+        const rect = button.getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.top = (rect.bottom + 5) + 'px';
+        menu.style.left = rect.left + 'px';
+    }
+    
+    // Remove any existing menu
+    const existingMenu = document.getElementById(`urlVarMenu${questionId}`);
+    if (existingMenu) existingMenu.remove();
+    
+    document.body.appendChild(menu);
+    
+    // Close menu when clicking outside
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target) && e.target !== button) {
+            menu.remove();
+            document.removeEventListener('click', closeMenu);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closeMenu), 100);
+}
+
 function removeQuestion(questionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     if (!questionBlock) return;
