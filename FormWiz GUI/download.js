@@ -554,6 +554,12 @@ function loadFormData(formData) {
                                         const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                         if (labelTextEl) labelTextEl.textContent = field.label;
                                         if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                        
+                                        // Set prefill value (always set it, even if empty, to ensure it's preserved)
+                                        if (field.prefill !== undefined) {
+                                            lastField.setAttribute('data-prefill', field.prefill || '');
+                                            console.log('🔧 [IMPORT DEBUG] Set prefill for field:', field.label, 'prefill:', field.prefill);
+                                        }
                                     }
                                 } else if (field.type === 'amount') {
                                     // Add an amount field
@@ -3604,13 +3610,24 @@ function exportForm() {
                             // Handle regular fields (label, amount, etc.)
                         const labelText = labelTextEl.textContent.trim();
                         const nodeIdText = nodeIdTextEl.textContent.trim();
+                        const prefillValue = el.getAttribute('data-prefill') || '';
                         
-                        allFieldsInOrder.push({
+                        console.log('🔧 [EXPORT DEBUG] Field:', { fieldType, labelText, nodeIdText, prefillValue, hasAttribute: el.hasAttribute('data-prefill') });
+                        
+                        const fieldData = {
                             type: fieldType,
                             label: labelText,
                             nodeId: nodeIdText,
                             order: parseInt(fieldOrder)
-                        });
+                        };
+                        
+                        // Always include prefill for label type fields (even if empty)
+                        if (fieldType === 'label') {
+                            fieldData.prefill = prefillValue;
+                            console.log('🔧 [EXPORT DEBUG] Added prefill to fieldData:', fieldData);
+                        }
+                        
+                        allFieldsInOrder.push(fieldData);
                     }
                 });
                 
@@ -4113,23 +4130,33 @@ function exportForm() {
                         } else if (fieldType === 'time') {
                             // Handle time fields - use same structure as label fields
                         if (labelTextEl && nodeIdTextEl) {
-                                const fieldData = {
-                                    type: fieldType,
-                                    label: labelTextEl.textContent.trim(),
-                                    nodeId: nodeIdTextEl.textContent.trim(),
-                                    order: fieldOrder
-                                };
-                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Time field data:', fieldData);
-                                allFieldsInOrder.push(fieldData);
-                            }
-                        } else if (labelTextEl && nodeIdTextEl) {
-                            // Handle regular fields (label, amount, etc.)
                             const fieldData = {
                                 type: fieldType,
                                 label: labelTextEl.textContent.trim(),
                                 nodeId: nodeIdTextEl.textContent.trim(),
                                 order: fieldOrder
                             };
+                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Time field data:', fieldData);
+                                allFieldsInOrder.push(fieldData);
+                            }
+                        } else if (labelTextEl && nodeIdTextEl) {
+                            // Handle regular fields (label, amount, etc.)
+                            const labelText = labelTextEl.textContent.trim();
+                            const nodeIdText = nodeIdTextEl.textContent.trim();
+                            const prefillValue = el.getAttribute('data-prefill') || '';
+                            
+                            const fieldData = {
+                                type: fieldType,
+                                label: labelText,
+                                nodeId: nodeIdText,
+                                order: fieldOrder
+                            };
+                            
+                            // Always include prefill for label type fields (even if empty)
+                            if (fieldType === 'label') {
+                                fieldData.prefill = prefillValue;
+                            }
+                            
                             console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Field data:', fieldData);
                             allFieldsInOrder.push(fieldData);
                         }

@@ -96,16 +96,18 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 }
 
 // Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text') {
+function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
+    // Always include value attribute if prefill is provided (even if empty string, we want to preserve it)
+    const valueAttr = (prefill !== undefined && prefill !== null && prefill !== '') ? ' value="' + String(prefill).replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '"' : '';
     
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input">' +
+           'class="address-input"' + (valueAttr ? ' ' + valueAttr : '') + '>' +
            '</div>';
 }
 
@@ -1319,6 +1321,12 @@ formHTML += `</div><br></div>`;
         const amountVals = [];
         let allFieldsInOrder = []; // Declare here so it's available in the entire scope
         
+        // Pre-populate unifiedFieldsMap from any existing data if available
+        // This ensures we have access to prefill values even if DOM attributes aren't set yet
+        if (!window.unifiedFieldsMap) {
+          window.unifiedFieldsMap = {};
+        }
+        
         // If no unified fields found, try fallback to old containers
         if (unifiedFields.length === 0) {
           const lblInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:first-of-type");
@@ -1606,13 +1614,59 @@ formHTML += `</div><br></div>`;
               }
             } else if (labelTextEl && nodeIdTextEl) {
               // Handle label, date, time fields
+              const nodeIdText = nodeIdTextEl.textContent.trim();
+              
+              // Try multiple ways to get prefill value - this is the PRIMARY source
+              let prefillValue = el.getAttribute('data-prefill');
+              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Reading prefill from DOM:', { 
+                hasAttribute: el.hasAttribute('data-prefill'), 
+                attributeValue: prefillValue, 
+                nodeId: nodeIdText,
+                fieldType: fieldType,
+                element: el
+              });
+              
+              // Also try dataset property (handles data-prefill automatically)
+              if ((prefillValue === null || prefillValue === undefined || prefillValue === '') && el.dataset) {
+                if (el.dataset.prefill !== undefined && el.dataset.prefill !== null && el.dataset.prefill !== '') {
+                  prefillValue = el.dataset.prefill;
+                  console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Found prefill in dataset:', prefillValue);
+                }
+              }
+              
+              // Fallback: Check unifiedFieldsMap if data-prefill attribute is not set or is empty
+              // This is important because unifiedFieldsMap may be populated from JSON export data
+              // or from a previous HTML generation
+              if ((prefillValue === null || prefillValue === undefined || prefillValue === '') && fieldType === 'label') {
+                // First check window.unifiedFieldsMap (may be set from JSON export in generated HTML)
+                if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+                  const existingField = window.unifiedFieldsMap[questionId].find(f => f.nodeId === nodeIdText && f.type === 'label' && f.prefill);
+                  if (existingField && existingField.prefill) {
+                    prefillValue = existingField.prefill;
+                    console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Found prefill in unifiedFieldsMap:', prefillValue, 'for nodeId:', nodeIdText);
+                  }
+                }
+              }
+              
+              // If still not found, set to empty string (but we've already checked all sources)
+              if (prefillValue === null || prefillValue === undefined) {
+                prefillValue = '';
+              }
+              
+              // Log final prefill value for debugging
+              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Final prefill value for', nodeIdText, ':', prefillValue);
+              
               const fieldData = {
                 type: fieldType,
                 label: labelTextEl.textContent.trim(),
-                nodeId: nodeIdTextEl.textContent.trim(),
+                nodeId: nodeIdText,
                 order: fieldOrder
               };
-              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Added', fieldType, 'field:', fieldData);
+              // Always include prefill for label type fields (even if empty)
+              if (fieldType === 'label') {
+                fieldData.prefill = prefillValue || '';
+              }
+              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Added', fieldType, 'field:', fieldData, 'prefillValue:', prefillValue, 'hasAttribute:', el.hasAttribute('data-prefill'), 'attributeValue:', el.getAttribute('data-prefill'));
               allFieldsInOrder.push(fieldData);
             } else {
               console.warn('🔧 [MULTIPLE TEXTBOXES DEBUG] Unknown field type or missing elements:', { fieldType, fieldOrder, hasLabelText: !!labelTextEl, hasNodeIdText: !!nodeIdTextEl });
@@ -1623,8 +1677,23 @@ formHTML += `</div><br></div>`;
           allFieldsInOrder.sort((a, b) => a.order - b.order);
         }
         
+        // Before storing, ensure prefill values are preserved from existing unifiedFieldsMap if DOM didn't have them
+        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+          const existingMap = window.unifiedFieldsMap[questionId];
+          allFieldsInOrder.forEach(field => {
+            if (field.type === 'label' && (!field.prefill || field.prefill === '')) {
+              const existingField = existingMap.find(f => f.nodeId === field.nodeId && f.type === 'label' && f.prefill);
+              if (existingField && existingField.prefill) {
+                field.prefill = existingField.prefill;
+                console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Restored prefill from existing unifiedFieldsMap:', field.nodeId, 'prefill:', field.prefill);
+              }
+            }
+          });
+        }
+        
         console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Final allFieldsInOrder:', allFieldsInOrder);
         console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Field types found:', allFieldsInOrder.map(f => f.type));
+        console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Prefill values:', allFieldsInOrder.filter(f => f.prefill).map(f => ({ nodeId: f.nodeId, prefill: f.prefill })));
         
         // Store the unified fields data for use in showTextboxLabels
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
@@ -1762,6 +1831,52 @@ formHTML += `</div><br></div>`;
               } else if (field.type === 'label') {
                 // For multipleTextboxes, use the base nodeId without numbering
                 const fieldId = field.nodeId;
+                // Start with prefill from the field object itself
+                let prefillValue = field.prefill;
+                
+                // CRITICAL: If prefill is not set or is empty, check multiple fallback sources
+                // This is important because the prefill might not be in field.prefill if DOM didn't have it
+                if (!prefillValue || prefillValue === '') {
+                  // First check the allFieldsInOrder array directly (it should have the prefill if it was read from DOM)
+                  const fieldInArray = allFieldsInOrder.find(f => f.nodeId === fieldId && f.type === 'label' && f.prefill && f.prefill !== '');
+                  if (fieldInArray && fieldInArray.prefill) {
+                    prefillValue = fieldInArray.prefill;
+                    console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Found prefill in allFieldsInOrder:', prefillValue);
+                  }
+                  // Also check window.unifiedFieldsMap as additional fallback (may be populated from JSON export)
+                  else if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+                    const existingField = window.unifiedFieldsMap[questionId].find(f => f.nodeId === fieldId && f.type === 'label' && f.prefill && f.prefill !== '');
+                    if (existingField && existingField.prefill) {
+                      prefillValue = existingField.prefill;
+                      console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Found prefill in unifiedFieldsMap:', prefillValue);
+                    }
+                  }
+                }
+                
+                // Ensure we have a string value (even if empty)
+                if (prefillValue === null || prefillValue === undefined) {
+                  prefillValue = '';
+                }
+                
+                // FINAL FALLBACK: If still no prefill, check the stored unifiedFieldsMap that will be embedded in HTML
+                // This ensures we get the prefill even if it wasn't in the DOM during generation
+                if ((!prefillValue || prefillValue === '') && window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+                  // The unifiedFieldsMap should have been populated by now (it's set right before rendering)
+                  const mapField = window.unifiedFieldsMap[questionId].find(f => f.nodeId === fieldId && f.type === 'label' && f.prefill);
+                  if (mapField && mapField.prefill) {
+                    prefillValue = mapField.prefill;
+                    console.log('🔧 [MULTIPLE TEXTBOXES RENDER] FINAL FALLBACK - Found prefill in stored unifiedFieldsMap:', prefillValue);
+                  }
+                }
+                
+                console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Rendering label field:', { 
+                  fieldId, 
+                  label: field.label, 
+                  prefillValue, 
+                  fieldPrefill: field.prefill,
+                  allFieldsHasPrefill: allFieldsInOrder.find(f => f.nodeId === fieldId)?.prefill 
+                });
+                
                 if (field.label === 'State') {
                   // Use dropdown for State field
                   const dropdownDiv = document.createElement('div');
@@ -1770,7 +1885,9 @@ formHTML += `</div><br></div>`;
                 } else {
                   // Use regular input for other fields
                   const inputDiv = document.createElement('div');
-                  inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                  const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
+                  console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Generated input HTML:', inputHTML, 'prefillValue:', prefillValue, 'willHaveValue:', prefillValue !== '' && prefillValue !== null && prefillValue !== undefined);
+                  inputDiv.innerHTML = inputHTML;
                   entryContainer.appendChild(inputDiv.firstElementChild);
                 }
               } else if (field.type === 'amount') {
@@ -3174,7 +3291,50 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `  })();\n`;
           }
 
-          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { \n`;
+          logicScriptBuffer += ` if(anyMatch){ 
+   thisQ.classList.remove("hidden");
+   // Restore prefill values when container becomes visible
+   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
+   setTimeout(function() {
+     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
+     for(var i = 0; i < textInputs.length; i++) {
+       var input = textInputs[i];
+       var prefillApplied = false;
+       
+       // Check unifiedFieldsMap for prefill value (this is the source of truth)
+       if(window.unifiedFieldsMap) {
+         for(var qId in window.unifiedFieldsMap) {
+           var fields = window.unifiedFieldsMap[qId];
+           if(Array.isArray(fields)) {
+             for(var j = 0; j < fields.length; j++) {
+               if(fields[j].nodeId === input.id && fields[j].prefill) {
+                 input.value = fields[j].prefill;
+                 input.setAttribute('value', fields[j].prefill); // Update attribute too
+                 prefillApplied = true;
+                 break;
+               }
+             }
+           }
+         }
+       }
+       
+       // Also check original value attribute if no prefill was found in unifiedFieldsMap
+       if(!prefillApplied) {
+         var originalValue = input.getAttribute('value');
+         if(originalValue && originalValue.trim() !== '') {
+           input.value = originalValue;
+         }
+       }
+     }
+   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
+   
+   // Also call applyPrefillValues to ensure all prefill values are applied
+   if(typeof applyPrefillValues === 'function') {
+     setTimeout(function() {
+       applyPrefillValues();
+     }, 200);
+   }
+ } else { \n`;
           // Check if this is a numbered dropdown question and reset it before hiding
           // Use fallback check since data-question-type might not be reliable
           logicScriptBuffer += `   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');\n`;
@@ -4830,16 +4990,17 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   window.__addressHelpersInjected = true;
 
   // Create stylized address <input>
-  window.createAddressInput = function(id, label, index, type = 'text') {
+  window.createAddressInput = function(id, label, index, type = 'text', prefill = '') {
     const inputType = (type === 'number') ? 'number' : 'text';
     const placeholder = label;
+    const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
       'id="' + id + '" ' +
       'name="' + id + '" ' +
       'placeholder="' + placeholder + '" ' +
-      'class="address-input">' +
+      'class="address-input"' + valueAttr + '>' +
       '</div>'
     );
   };
@@ -5162,18 +5323,52 @@ if (document.readyState === 'loading') {
 '        }\n' +
 '    });\n' +
 '}\n\n' +
+'// Function to apply prefill values from unifiedFieldsMap\n' +
+'function applyPrefillValues() {\n' +
+'    if (!window.unifiedFieldsMap) return;\n' +
+'    \n' +
+'    // Iterate through all questions in unifiedFieldsMap\n' +
+'    for (const questionId in window.unifiedFieldsMap) {\n' +
+'        const fields = window.unifiedFieldsMap[questionId];\n' +
+'        if (!Array.isArray(fields)) continue;\n' +
+'        \n' +
+'        // Find each field with a prefill value\n' +
+'        fields.forEach(field => {\n' +
+'            if (field.prefill && field.nodeId) {\n' +
+'                const input = document.getElementById(field.nodeId);\n' +
+'                // Apply prefill even if container is hidden - the value should be set regardless\n' +
+'                if (input && (input.type === \'text\' || input.type === \'email\' || input.type === \'tel\' || input.type === \'number\' || !input.type)) {\n' +
+'                    // Always apply prefill value from unifiedFieldsMap (it\'s the source of truth)\n' +
+'                    // Only set if the field is empty or if we\'re forcing an update\n' +
+'                    if (!input.value || input.value.trim() === \'\' || input.value !== field.prefill) {\n' +
+'                        input.value = field.prefill;\n' +
+'                        // Also update the value attribute to ensure it persists\n' +
+'                        input.setAttribute(\'value\', field.prefill);\n' +
+'                    }\n' +
+'                }\n' +
+'            }\n' +
+'        });\n' +
+'    }\n' +
+'}\n\n' +
 '// Auto-populate on page load\n' +
 'if (document.readyState === \'loading\') {\n' +
 '    document.addEventListener("DOMContentLoaded", function() {\n' +
 '        populateHiddenFieldsFromUrl();\n' +
 '        setupLinkedFields();\n' +
 '        replaceUrlParametersInForm();\n' +
+'        // Apply prefill values after a short delay to ensure all elements are ready\n' +
+'        // Use a longer delay to ensure visibility updates have run first\n' +
+'        setTimeout(applyPrefillValues, 200);\n' +
+'        // Also apply again after a bit more time to catch any late updates\n' +
+'        setTimeout(applyPrefillValues, 400);\n' +
 '    });\n' +
 '} else {\n' +
 '    // DOM already loaded, run immediately\n' +
 '    populateHiddenFieldsFromUrl();\n' +
 '    setupLinkedFields();\n' +
 '    replaceUrlParametersInForm();\n' +
+'    // Apply prefill values after a short delay to ensure all elements are ready\n' +
+'    setTimeout(applyPrefillValues, 100);\n' +
 '}\n\n' +
 '// Function to check paragraph limit and create hidden checkbox\n' +
 'function checkParagraphLimit(textareaId, paragraphLimit) {\n' +
@@ -7686,7 +7881,12 @@ function showTextboxLabels(questionId, count){
                     autofillValue = window.mappedData[fieldId];
                 }
                 
-                if (autofillValue !== null && autofillValue !== '') {
+                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                const isBlankValue = autofillValue === null || 
+                                   autofillValue === '' || 
+                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                
+                if (!isBlankValue) {
                     // Skip current_date field - it should be set dynamically
                     if (fieldId === 'current_date' || field.name === 'current_date') {
                         return;
@@ -9867,7 +10067,12 @@ if (typeof handleNext === 'function') {
                         autofillValue = mappedData[el.id];
                     }
                     
-                    if (autofillValue !== null) {
+                    // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                    const isBlankValue = autofillValue === null || 
+                                       autofillValue === '' || 
+                                       (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                    
+                    if (!isBlankValue) {
                             // Skip current_date field - it should be set dynamically
                             if (el.id === 'current_date' || el.name === 'current_date') {
 
@@ -10030,17 +10235,27 @@ if (typeof handleNext === 'function') {
                                     return;
                                 }
                                 
+                                const autofillValue = mappedData[el.name];
+                                
+                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                                const isBlankValue = autofillValue === null || 
+                                                   autofillValue === '' || 
+                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                                
                                 if (el.type === 'checkbox') {
-                                    el.checked = !!mappedData[el.name];
+                                    el.checked = !!autofillValue;
                                 } else if (el.type === 'radio') {
                                     // For radio buttons, only check the one that matches the value
-                                    if (el.value === mappedData[el.name]) {
+                                    if (el.value === autofillValue) {
                                         el.checked = true;
                                     } else {
                                         el.checked = false;
                                     }
                                 } else {
-                                    el.value = mappedData[el.name];
+                                    // Only set value if it's not blank
+                                    if (!isBlankValue) {
+                                        el.value = autofillValue;
+                                    }
                                 }
                             }
                         });
@@ -10054,6 +10269,13 @@ if (typeof handleNext === 'function') {
                             
                             const fieldById = fieldsById[fieldName];
                             if (fieldById && mappedData[fieldName]) {
+                                const autofillValue = mappedData[fieldName];
+                                
+                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                                const isBlankValue = autofillValue === null || 
+                                                   autofillValue === '' || 
+                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                                
                                 // Check if field needs autofilling (different logic for different field types)
                                 const needsAutofill = (fieldById.type === 'checkbox' || fieldById.type === 'radio') 
                                     ? !fieldById.checked 
@@ -10063,17 +10285,20 @@ if (typeof handleNext === 'function') {
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
                                             // For radio buttons, check if this specific radio should be selected
-                                            if (fieldById.value === mappedData[fieldName]) {
+                                            if (fieldById.value === autofillValue) {
                                                 fieldById.checked = true;
                                             } else {
                                                 fieldById.checked = false;
                                             }
                                         } else {
                                             // For checkboxes, use boolean value
-                                    fieldById.checked = !!mappedData[fieldName];
+                                    fieldById.checked = !!autofillValue;
                                         }
                                 } else {
-                                    fieldById.value = mappedData[fieldName];
+                                    // Only set value if it's not blank
+                                    if (!isBlankValue) {
+                                        fieldById.value = autofillValue;
+                                    }
                                     }
                                 }
                             }
@@ -10141,13 +10366,27 @@ if (typeof handleNext === 'function') {
                                                     // Check first pattern
                                                     let fieldElement = document.getElementById(fieldId1);
                                                     if (fieldElement && mappedData[fieldId1]) {
-                                                        fieldElement.value = mappedData[fieldId1];
+                                                        // 🔧 NEW: Prevent autofilling with blank values
+                                                        const autofillValue1 = mappedData[fieldId1];
+                                                        const isBlank1 = autofillValue1 === null || 
+                                                                        autofillValue1 === '' || 
+                                                                        (typeof autofillValue1 === 'string' && autofillValue1.trim() === '');
+                                                        if (!isBlank1) {
+                                                            fieldElement.value = autofillValue1;
+                                                        }
                                                     }
                                                     
                                                     // Check second pattern
                                                     fieldElement = document.getElementById(fieldId2);
                                                     if (fieldElement && mappedData[fieldId2]) {
-                                                        fieldElement.value = mappedData[fieldId2];
+                                                        // 🔧 NEW: Prevent autofilling with blank values
+                                                        const autofillValue2 = mappedData[fieldId2];
+                                                        const isBlank2 = autofillValue2 === null || 
+                                                                        autofillValue2 === '' || 
+                                                                        (typeof autofillValue2 === 'string' && autofillValue2.trim() === '');
+                                                        if (!isBlank2) {
+                                                            fieldElement.value = autofillValue2;
+                                                        }
                                                     }
                                                 });
                                             }
@@ -10221,13 +10460,27 @@ if (typeof handleNext === 'function') {
                                                 // Check first pattern
                                                 let fieldElement = document.getElementById(fieldId1);
                                                 if (fieldElement && mappedData[fieldId1]) {
-                                                    fieldElement.value = mappedData[fieldId1];
+                                                    // 🔧 NEW: Prevent autofilling with blank values
+                                                    const autofillValue1 = mappedData[fieldId1];
+                                                    const isBlank1 = autofillValue1 === null || 
+                                                                    autofillValue1 === '' || 
+                                                                    (typeof autofillValue1 === 'string' && autofillValue1.trim() === '');
+                                                    if (!isBlank1) {
+                                                        fieldElement.value = autofillValue1;
+                                                    }
                                                 }
                                                 
                                                 // Check second pattern
                                                 fieldElement = document.getElementById(fieldId2);
                                                 if (fieldElement && mappedData[fieldId2]) {
-                                                    fieldElement.value = mappedData[fieldId2];
+                                                    // 🔧 NEW: Prevent autofilling with blank values
+                                                    const autofillValue2 = mappedData[fieldId2];
+                                                    const isBlank2 = autofillValue2 === null || 
+                                                                    autofillValue2 === '' || 
+                                                                    (typeof autofillValue2 === 'string' && autofillValue2.trim() === '');
+                                                    if (!isBlank2) {
+                                                        fieldElement.value = autofillValue2;
+                                                    }
                                                 }
                                             });
                                         }
@@ -10259,7 +10512,12 @@ if (typeof handleNext === 'function') {
 
                 }
                 
-                if (autofillValue !== null) {
+                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                const isBlankValue = autofillValue === null || 
+                                   autofillValue === '' || 
+                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                
+                if (!isBlankValue) {
                     // Skip current_date field - it should be set dynamically
                     if (el.id === 'current_date' || el.name === 'current_date') {
                         return;
@@ -10325,8 +10583,13 @@ if (typeof handleNext === 'function') {
                         autofillValue = mappedData[el.id];
                     }
                     
-                    // Only process fields that have autofill data but are still empty
-                    if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                    // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                    const isBlankValue = autofillValue === null || 
+                                       autofillValue === '' || 
+                                       (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                    
+                    // Only process fields that have autofill data but are still empty, AND the autofill value is not blank
+                    if (!isBlankValue && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                         el.value = autofillValue;
                         
                         // Dispatch input and change events for text inputs to trigger linked textbox syncing
@@ -10781,8 +11044,13 @@ if (typeof handleNext === 'function') {
                                     autofillValue = data[el.id];
                                 }
                                 
-                                // Only process fields that have autofill data but are still empty
-                                if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
+                                const isBlankValue = autofillValue === null || 
+                                                   autofillValue === '' || 
+                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
+                                
+                                // Only process fields that have autofill data but are still empty, AND the autofill value is not blank
+                                if (!isBlankValue && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                                     el.value = autofillValue;
                                     
                                     // Dispatch input and change events for text inputs to trigger linked textbox syncing
@@ -12892,3 +13160,5 @@ function generateHiddenPDFFields(formName) {
     hiddenFieldsHTML += "\n</div>";
     return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
+
+

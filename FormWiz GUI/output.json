@@ -132,7 +132,8 @@
               "type": "label",
               "label": "Name",
               "nodeId": "please_explain_name",
-              "order": 1
+              "order": 1,
+              "prefill": "adam"
             },
             {
               "type": "checkbox",
@@ -153,99 +154,6 @@
               "order": 2
             }
           ]
-        },
-        {
-          "questionId": 3,
-          "text": "How many",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "No"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "options": [],
-          "labels": [],
-          "nodeId": "how_many",
-          "min": "1",
-          "max": "3",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Name",
-              "nodeId": "how_many_name",
-              "order": 1
-            },
-            {
-              "type": "location",
-              "fieldName": "Enter their location",
-              "nodeId": "location_data",
-              "order": 2
-            },
-            {
-              "type": "checkbox",
-              "fieldName": "Example Two",
-              "selectionType": "multiple",
-              "options": [
-                {
-                  "text": "Test2",
-                  "nodeId": "how_many_example_two_test2",
-                  "linkedFields": [
-                    {
-                      "nodeId": "how_many_name",
-                      "title": "how_many_example_two_test2_how_many_name"
-                    }
-                  ],
-                  "pdfEntries": []
-                }
-              ],
-              "order": 3
-            }
-          ]
         }
       ]
     }
@@ -253,7 +161,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 4,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
@@ -262,15 +170,6 @@
   "stripePriceId": "",
   "additionalPDFs": [],
   "checklistItems": [],
-  "linkedFields": [
-    {
-      "id": "linkedField0",
-      "linkedFieldId": "bruh",
-      "fields": [
-        "please_explain_example_one_test1_please_explain_name",
-        "how_many_example_two_test2_how_many_name_1"
-      ]
-    }
-  ],
+  "linkedFields": [],
   "linkedCheckboxes": []
 }

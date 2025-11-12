@@ -5013,6 +5013,7 @@ function editUnifiedField(questionId, fieldOrder) {
     
     const labelText = labelTextEl.textContent;
     const nodeIdText = nodeIdTextEl.textContent;
+    const currentPrefill = fieldDiv.getAttribute('data-prefill') || '';
     
     // Create edit form
     const editForm = document.createElement('div');
@@ -5029,11 +5030,15 @@ function editUnifiedField(questionId, fieldOrder) {
         </div>
         <div style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Type:</label>
-            <select id="editType${questionId}_${fieldOrder}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+            <select id="editType${questionId}_${fieldOrder}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;" onchange="togglePrefillField(${questionId}, ${fieldOrder})">
                 <option value="label" ${currentType === 'label' ? 'selected' : ''}>Label</option>
                 <option value="amount" ${currentType === 'amount' ? 'selected' : ''}>Amount</option>
                 <option value="date" ${currentType === 'date' ? 'selected' : ''}>Date</option>
             </select>
+        </div>
+        <div id="prefillContainer${questionId}_${fieldOrder}" style="margin-bottom: 15px; ${currentType === 'label' ? '' : 'display: none;'}">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Prefill:</label>
+            <input type="text" id="editPrefill${questionId}_${fieldOrder}" value="${currentPrefill}" placeholder="Enter default value (e.g., Adam)" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
         </div>
         <div style="text-align: center; margin-top: 15px;">
             <button type="button" onclick="saveUnifiedField(${questionId}, ${fieldOrder})" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 10px; font-size: 14px; font-weight: 500; display: inline-block;">Save</button>
@@ -5046,10 +5051,21 @@ function editUnifiedField(questionId, fieldOrder) {
     fieldDiv.parentNode.insertBefore(editForm, fieldDiv.nextSibling);
 }
 
+// Toggle prefill field visibility based on type
+function togglePrefillField(questionId, fieldOrder) {
+    const typeSelect = document.getElementById(`editType${questionId}_${fieldOrder}`);
+    const prefillContainer = document.getElementById(`prefillContainer${questionId}_${fieldOrder}`);
+    if (typeSelect && prefillContainer) {
+        prefillContainer.style.display = typeSelect.value === 'label' ? 'block' : 'none';
+    }
+}
+
 function saveUnifiedField(questionId, fieldOrder) {
     const newLabel = document.getElementById(`editLabel${questionId}_${fieldOrder}`).value.trim();
     const newNodeId = document.getElementById(`editNodeId${questionId}_${fieldOrder}`).value.trim();
     const newType = document.getElementById(`editType${questionId}_${fieldOrder}`).value;
+    const prefillInput = document.getElementById(`editPrefill${questionId}_${fieldOrder}`);
+    const newPrefill = prefillInput ? prefillInput.value.trim() : '';
     
     
     if (!newLabel) {
@@ -5064,6 +5080,12 @@ function saveUnifiedField(questionId, fieldOrder) {
     
     // Update field attributes
     fieldDiv.setAttribute('data-type', newType);
+    if (newType === 'label') {
+        fieldDiv.setAttribute('data-prefill', newPrefill);
+        console.log('🔧 [SAVE DEBUG] Set data-prefill for label field:', { questionId, fieldOrder, newPrefill, attributeValue: fieldDiv.getAttribute('data-prefill') });
+    } else {
+        fieldDiv.removeAttribute('data-prefill');
+    }
     
     // Update display elements
     const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);

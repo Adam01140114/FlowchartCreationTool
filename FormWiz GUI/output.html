@@ -233,12 +233,12 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3 class="question-text">Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
                       onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_are_you_the_only_person_suing"></div>
               <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3>Please explain</h3></label><div id="labelContainer2"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="please_explain_name" name="please_explain_name" placeholder="Name" class="address-input"></div><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(135, 206, 235); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(230, 243, 255) 100%); box-shadow: rgba(135, 206, 235, 0.15) 0px 2px 8px;"><h4 style="margin: 0px 0px 15px; color: rgb(41, 128, 185); font-size: 18px; font-weight: 600; text-align: center;">Example One</h4><div style="margin: 12px 0px; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); display: flex; align-items: center; transition: 0.2s;"><input type="checkbox" id="please_explain_example_one_test1" name="please_explain_example_one_test1" value="Test1" onchange="
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3 class="question-text">Please explain</h3></label><div id="labelContainer2"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="please_explain_name" name="please_explain_name" placeholder="Name" class="address-input"></div><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(135, 206, 235); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(230, 243, 255) 100%); box-shadow: rgba(135, 206, 235, 0.15) 0px 2px 8px;"><h4 style="margin: 0px 0px 15px; color: rgb(41, 128, 185); font-size: 18px; font-weight: 600; text-align: center;">Example One</h4><div style="margin: 12px 0px; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); display: flex; align-items: center; transition: 0.2s;"><input type="checkbox" id="please_explain_example_one_test1" name="please_explain_example_one_test1" value="Test1" onchange="
                         var self = this; (function() {
                             const linkedFields = [{&quot;nodeId&quot;:&quot;please_explain_name&quot;,&quot;title&quot;:&quot;please_explain_example_one_test1_please_explain_name&quot;}];
                             const pdfEntries = [];
@@ -376,8 +376,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 }
                             }
                         })();
-                    " style="margin-right: 12px; width: 18px; height: 18px; accent-color: rgb(41, 128, 185); cursor: pointer;"><label for="please_explain_example_one_test1" style="flex: 1 1 0%; cursor: pointer; color: rgb(44, 62, 80); font-size: 15px; font-weight: 500; margin: 0px;">Test1</label></div></div></div><br></div><div id="question-container-3" class="question-container hidden" data-question-type="numberedDropdown"><label><h3>How many</h3></label><select id="how_many" name="how_many" data-question-id="3" onchange="showTextboxLabels(3, this.value); updateHiddenCheckboxes(3, this.value); updateHiddenLogic('how_many', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer3"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+                    " style="margin-right: 12px; width: 18px; height: 18px; accent-color: rgb(41, 128, 185); cursor: pointer;"><label for="please_explain_example_one_test1" style="flex: 1 1 0%; cursor: pointer; color: rgb(44, 62, 80); font-size: 15px; font-weight: 500; margin: 0px;">Test1</label></div></div></div><br></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -503,10 +502,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"please_explain","3":"how_many"};
-var questionNameIds = {"1":"are_you_the_only_person_suing","2":"please_explain","3":"how_many"};
+var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"please_explain"};
+var questionNameIds = {"1":"are_you_the_only_person_suing","2":"please_explain"};
 var linkedCheckboxes = [];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"please_explain_name","order":1},{"type":"checkbox","fieldName":"Example One","selectionType":"multiple","options":[{"text":"Test1","nodeId":"please_explain_example_one_test1","linkedFields":[{"nodeId":"please_explain_name","title":"please_explain_example_one_test1_please_explain_name"}],"pdfEntries":[]}],"order":2}],"3":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1},{"type":"location","fieldName":"Enter their location","nodeId":"location_data","order":2},{"type":"checkbox","label":"Example Two","nodeId":"","selectionType":"multiple","options":[{"text":"Test2","nodeId":"how_many_example_two_test2","linkedFields":[{"nodeId":"how_many_name","title":"how_many_example_two_test2_how_many_name"}],"pdfEntries":[]}],"order":3}]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"please_explain_name","order":1,"prefill":"adam"},{"type":"checkbox","fieldName":"Example One","selectionType":"multiple","options":[{"text":"Test1","nodeId":"please_explain_example_one_test1","linkedFields":[{"nodeId":"please_explain_name","title":"please_explain_example_one_test1_please_explain_name"}],"pdfEntries":[]}],"order":2}]};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId, triggerCondition, isMultipleTextboxes) {
     // Default parameters for backward compatibility
@@ -1710,16 +1709,17 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   window.__addressHelpersInjected = true;
 
   // Create stylized address <input>
-  window.createAddressInput = function(id, label, index, type = 'text') {
+  window.createAddressInput = function(id, label, index, type = 'text', prefill = '') {
     const inputType = (type === 'number') ? 'number' : 'text';
     const placeholder = label;
+    const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
       'id="' + id + '" ' +
       'name="' + id + '" ' +
       'placeholder="' + placeholder + '" ' +
-      'class="address-input">' +
+      'class="address-input"' + valueAttr + '>' +
       '</div>'
     );
   };
@@ -1837,12 +1837,12 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"3":["Name"],"length":0};
-var amountMap = {"3":[],"length":0};
-var labelNodeIdsMap = {"3":["how_many_name"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
-var linkedFields = [{"linkedFieldId":"bruh","fields":["please_explain_example_one_test1_please_explain_name","how_many_example_two_test2_how_many_name_1"]}];
+var linkedFields = [];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
@@ -1914,11 +1914,110 @@ function populateHiddenFieldsFromUrl() {
     
 }
 
+// Function to replace URL parameter placeholders in text
+function replaceUrlParametersInText(text) {
+    if (!text || typeof text !== 'string') return text;
+    
+    // Replace [paramName] with URL parameter value
+    return text.replace(/\[([^\]]+)\]/g, function(match, paramName) {
+        const value = getUrlParameter(paramName);
+        return value || match; // Return the value if found, otherwise keep the placeholder
+    });
+}
+
+// Function to replace URL parameters in all question text, section names, etc.
+function replaceUrlParametersInForm() {
+    // Replace in section titles
+    document.querySelectorAll('.section-title').forEach(function(el) {
+        if (el.textContent) {
+            el.textContent = replaceUrlParametersInText(el.textContent);
+        }
+    });
+    
+    // Replace in question text
+    document.querySelectorAll('.question-text').forEach(function(el) {
+        if (el.textContent) {
+            el.textContent = replaceUrlParametersInText(el.textContent);
+        }
+    });
+    
+    // Replace in question labels
+    document.querySelectorAll('label[for^="question"], label.question-label').forEach(function(el) {
+        if (el.textContent) {
+            el.textContent = replaceUrlParametersInText(el.textContent);
+        }
+    });
+    
+    // Replace in subtitles
+    document.querySelectorAll('.subtitle-text').forEach(function(el) {
+        if (el.textContent) {
+            el.textContent = replaceUrlParametersInText(el.textContent);
+        }
+    });
+    
+    // Replace in info boxes
+    document.querySelectorAll('.info-box-text').forEach(function(el) {
+        if (el.textContent) {
+            el.textContent = replaceUrlParametersInText(el.textContent);
+        }
+    });
+    
+    // Replace in conditional alert messages
+    document.querySelectorAll('.alert-message').forEach(function(el) {
+        if (el.textContent) {
+            el.textContent = replaceUrlParametersInText(el.textContent);
+        }
+    });
+}
+
+// Function to apply prefill values from unifiedFieldsMap
+function applyPrefillValues() {
+    if (!window.unifiedFieldsMap) return;
+    
+    // Iterate through all questions in unifiedFieldsMap
+    for (const questionId in window.unifiedFieldsMap) {
+        const fields = window.unifiedFieldsMap[questionId];
+        if (!Array.isArray(fields)) continue;
+        
+        // Find each field with a prefill value
+        fields.forEach(field => {
+            if (field.prefill && field.nodeId) {
+                const input = document.getElementById(field.nodeId);
+                // Apply prefill even if container is hidden - the value should be set regardless
+                if (input && (input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || !input.type)) {
+                    // Always apply prefill value from unifiedFieldsMap (it's the source of truth)
+                    // Only set if the field is empty or if we're forcing an update
+                    if (!input.value || input.value.trim() === '' || input.value !== field.prefill) {
+                        input.value = field.prefill;
+                        // Also update the value attribute to ensure it persists
+                        input.setAttribute('value', field.prefill);
+                    }
+                }
+            }
+        });
+    }
+}
+
 // Auto-populate on page load
-document.addEventListener("DOMContentLoaded", function() {
+if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", function() {
+        populateHiddenFieldsFromUrl();
+        setupLinkedFields();
+        replaceUrlParametersInForm();
+        // Apply prefill values after a short delay to ensure all elements are ready
+        // Use a longer delay to ensure visibility updates have run first
+        setTimeout(applyPrefillValues, 200);
+        // Also apply again after a bit more time to catch any late updates
+        setTimeout(applyPrefillValues, 400);
+    });
+} else {
+    // DOM already loaded, run immediately
     populateHiddenFieldsFromUrl();
     setupLinkedFields();
-});
+    replaceUrlParametersInForm();
+    // Apply prefill values after a short delay to ensure all elements are ready
+    setTimeout(applyPrefillValues, 100);
+}
 
 // Function to check paragraph limit and create hidden checkbox
 function checkParagraphLimit(textareaId, paragraphLimit) {
@@ -1989,58 +2088,56 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+ if(anyMatch){ 
+   thisQ.classList.remove("hidden");
+   // Restore prefill values when container becomes visible
+   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
+   setTimeout(function() {
+     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
+     for(var i = 0; i < textInputs.length; i++) {
+       var input = textInputs[i];
+       var prefillApplied = false;
+       
+       // Check unifiedFieldsMap for prefill value (this is the source of truth)
+       if(window.unifiedFieldsMap) {
+         for(var qId in window.unifiedFieldsMap) {
+           var fields = window.unifiedFieldsMap[qId];
+           if(Array.isArray(fields)) {
+             for(var j = 0; j < fields.length; j++) {
+               if(fields[j].nodeId === input.id && fields[j].prefill) {
+                 input.value = fields[j].prefill;
+                 input.setAttribute('value', fields[j].prefill); // Update attribute too
+                 prefillApplied = true;
+                 break;
+               }
+             }
+           }
+         }
+       }
+       
+       // Also check original value attribute if no prefill was found in unifiedFieldsMap
+       if(!prefillApplied) {
+         var originalValue = input.getAttribute('value');
+         if(originalValue && originalValue.trim() !== '') {
+           input.value = originalValue;
+         }
+       }
+     }
+   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
+   
+   // Also call applyPrefillValues to ensure all prefill values are applied
+   if(typeof applyPrefillValues === 'function') {
+     setTimeout(function() {
+       applyPrefillValues();
+     }, 200);
+   }
+ } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
      
      if(typeof resetNumberedDropdownFields === 'function'){
        resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   thisQ.classList.add("hidden");
- }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("3");
      } else {
        
      }
