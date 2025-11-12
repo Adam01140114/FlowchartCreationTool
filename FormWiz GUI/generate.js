@@ -2172,6 +2172,10 @@ formHTML += `</div><br></div>`;
                                     // Sync with source field
                                     function syncLinkedField() {
                                         hiddenTextbox.value = sourceField.value || '';
+                                        // Trigger linked field synchronization if updateLinkedFields function exists
+                                        if (typeof updateLinkedFields === 'function') {
+                                            updateLinkedFields();
+                                        }
                                     }
                                     
                                     // Initial sync
@@ -2224,6 +2228,10 @@ formHTML += `</div><br></div>`;
                                 }
                             }
                         });
+                        // Update linked fields after removing textboxes
+                        if (typeof updateLinkedFields === 'function') {
+                            updateLinkedFields();
+                        }
                     }
                     
                     // Add inline onchange handler (since addEventListener is lost when converting to HTML)
@@ -2276,6 +2284,10 @@ formHTML += `</div><br></div>`;
                                             // Sync with source field
                                             function syncLinkedField() {
                                                 hiddenTextbox.value = sourceField.value || '';
+                                                // Trigger linked field synchronization if updateLinkedFields function exists
+                                                if (typeof updateLinkedFields === 'function') {
+                                                    updateLinkedFields();
+                                                }
                                             }
                                             
                                             // Initial sync
@@ -2354,6 +2366,11 @@ formHTML += `</div><br></div>`;
                                         }
                                     }
                                 });
+                                
+                                // Update linked fields after removing textboxes
+                                if (typeof updateLinkedFields === 'function') {
+                                    updateLinkedFields();
+                                }
                                 
                                 // Remove PDF entries
                                 if (window.checkboxPdfEntries) {
@@ -2441,6 +2458,10 @@ formHTML += `</div><br></div>`;
                                                 document.body.appendChild(hiddenTextbox);
                                                 function syncLinkedField() {
                                                     hiddenTextbox.value = sourceField.value || '';
+                                                    // Trigger linked field synchronization if updateLinkedFields function exists
+                                                    if (typeof updateLinkedFields === 'function') {
+                                                        updateLinkedFields();
+                                                    }
                                                 }
                                                 syncLinkedField();
                                                 sourceField.addEventListener('input', syncLinkedField);
@@ -7125,6 +7146,10 @@ function showTextboxLabels(questionId, count){
                                     // Sync with source field
                                     function syncLinkedField() {
                                         hiddenTextbox.value = sourceField.value || '';
+                                        // Trigger linked field synchronization if updateLinkedFields function exists
+                                        if (typeof updateLinkedFields === 'function') {
+                                            updateLinkedFields();
+                                        }
                                     }
                                     
                                     // Initial sync
@@ -7173,6 +7198,10 @@ function showTextboxLabels(questionId, count){
                                 }
                             }
                         });
+                        // Update linked fields after removing textboxes
+                        if (typeof updateLinkedFields === 'function') {
+                            updateLinkedFields();
+                        }
                     }
                     
                     // Add event listener for checkbox/radio changes
@@ -7237,6 +7266,10 @@ function showTextboxLabels(questionId, count){
                                                         }
                                                     }
                                                 });
+                                                // Update linked fields after removing textboxes
+                                                if (typeof updateLinkedFields === 'function') {
+                                                    updateLinkedFields();
+                                                }
                                             }
                                             
                                             // Remove PDF entries for unchecked radio
@@ -8330,10 +8363,14 @@ function updateLinkedFields() {
             }
         }
         
-        // Get all the linked textboxes
+        // Get all the linked textboxes (filter out null/undefined - textboxes that have been removed)
         const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
         
-        if (linkedTextboxes.length === 0) return;
+        // If no linked textboxes exist (all have been removed), clear the hidden field
+        if (linkedTextboxes.length === 0) {
+            hiddenField.value = '';
+            return;
+        }
         
         // Find which textbox has content
         const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');

@@ -141,7 +141,12 @@
                 {
                   "text": "Test1",
                   "nodeId": "please_explain_example_one_test1",
-                  "linkedFields": [],
+                  "linkedFields": [
+                    {
+                      "nodeId": "please_explain_name",
+                      "title": "please_explain_example_one_test1_please_explain_name"
+                    }
+                  ],
                   "pdfEntries": []
                 }
               ],
@@ -257,6 +262,15 @@
   "stripePriceId": "",
   "additionalPDFs": [],
   "checklistItems": [],
-  "linkedFields": [],
+  "linkedFields": [
+    {
+      "id": "linkedField0",
+      "linkedFieldId": "bruh",
+      "fields": [
+        "please_explain_example_one_test1_please_explain_name",
+        "how_many_example_two_test2_how_many_name_1"
+      ]
+    }
+  ],
   "linkedCheckboxes": []
 }

@@ -4721,8 +4721,76 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
     }
   });
   
+  // Find all numbered dropdown and multiple textbox questions to extract linked fields from checkbox options
+  const numberedDropdownNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           (cell.style.includes('questionType=multipleDropdownType') ||
+            cell.style.includes('questionType=multipleTextboxes'));
+  });
+  
+  // Helper function to add option if not already present
+  const addOptionIfNotExists = (nodeId) => {
+    // Check if option already exists
+    const existingOption = Array.from(optionsContainer.children).find(
+      opt => opt.getAttribute('data-value') === nodeId
+    );
+    if (!existingOption) {
+      const option = document.createElement('div');
+      option.textContent = nodeId;
+      option.style.cssText = `
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      `;
+      option.setAttribute('data-value', nodeId);
+      optionsContainer.appendChild(option);
+      
+      const selectOption = document.createElement('option');
+      selectOption.value = nodeId;
+      selectOption.textContent = nodeId;
+      hiddenSelect.appendChild(selectOption);
+    }
+  };
+  
+  // Extract linked fields from checkbox options in numbered dropdown/multiple textbox questions
+  numberedDropdownNodes.forEach(node => {
+    if (node._checkboxes && Array.isArray(node._checkboxes)) {
+      const isNumberedDropdown = node.style && node.style.includes('questionType=multipleDropdownType');
+      
+      // Get the number range from _twoNumbers (only for numbered dropdowns)
+      const firstNumber = isNumberedDropdown ? (parseInt(node._twoNumbers?.first) || 1) : null;
+      const secondNumber = isNumberedDropdown ? (parseInt(node._twoNumbers?.second) || 1) : null;
+      
+      node._checkboxes.forEach(checkbox => {
+        if (checkbox.options && Array.isArray(checkbox.options)) {
+          checkbox.options.forEach(option => {
+            if (option.linkedFields && Array.isArray(option.linkedFields)) {
+              option.linkedFields.forEach(linkedField => {
+                // Use the auto-generated title as the base ID
+                const baseLinkedFieldId = linkedField.title || '';
+                
+                if (baseLinkedFieldId) {
+                  if (isNumberedDropdown && firstNumber !== null && secondNumber !== null) {
+                    // Generate numbered versions based on the parent question's range
+                    for (let num = firstNumber; num <= secondNumber; num++) {
+                      const numberedLinkedFieldId = `${baseLinkedFieldId}_${num}`;
+                      addOptionIfNotExists(numberedLinkedFieldId);
+                    }
+                  } else {
+                    // For multiple textbox questions, just add the base ID without numbers
+                    addOptionIfNotExists(baseLinkedFieldId);
+                  }
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+  
   // If no questions found, add a placeholder
-  if (textboxNodes.length === 0 && multipleDropdownNodes.length === 0) {
+  if (textboxNodes.length === 0 && multipleDropdownNodes.length === 0 && numberedDropdownNodes.length === 0) {
     const noOptions = document.createElement('div');
     noOptions.textContent = 'No textbox questions found';
     noOptions.style.cssText = `
