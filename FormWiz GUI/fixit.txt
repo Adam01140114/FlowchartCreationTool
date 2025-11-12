@@ -1,0 +1,302 @@
+================================================================================
+CHECKBOX PDF ENTRY FUNCTIONALITY - COMPREHENSIVE DOCUMENTATION
+================================================================================
+
+This document explains how the Checkbox PDF Entry feature works in the FormWiz
+system. This feature allows users to attach extra PDFs to the cart and download
+queue when specific checkbox options are checked.
+
+================================================================================
+1. GUI CONFIGURATION (gui.js)
+================================================================================
+
+A. ADDING PDF ENTRIES TO CHECKBOX OPTIONS
+------------------------------------------
+In the GUI, when configuring a checkbox field, each checkbox option can have
+multiple PDF entries associated with it.
+
+1. Location: Inside the checkbox option configuration block
+   - After the "Add linked field" button
+   - A new "Add PDF" button is available
+
+2. PDF Entry Fields:
+   - Trigger Number: The entry number that triggers this PDF (for numberedDropdown)
+     - For numberedDropdown: Must match the entry number (1, 2, 3, etc.)
+     - For multipleTextboxes: Should always be 1 (only one entry exists)
+   - PDF Name: The display name shown in the cart (e.g., "Test Name")
+   - PDF File: The actual PDF filename for download (e.g., "sc500.pdf")
+   - Price ID: The Stripe Price ID for payment processing
+
+3. Multiple PDF Entries:
+   - Users can add multiple PDF entries per checkbox option
+   - Each PDF entry can have different trigger numbers, PDF files, and price IDs
+
+B. JSON EXPORT/IMPORT (download.js)
+-----------------------------------
+PDF entries are preserved in JSON export/import:
+
+Export (lines ~3022-3040 and ~3660-3678):
+- PDF entries are collected from the GUI DOM elements
+- Stored in the checkbox option's `pdfEntries` array:
+  {
+    "pdfEntries": [
+      {
+        "triggerNumber": "1",
+        "pdfName": "Test Name",
+        "pdfFile": "sc500.pdf",
+        "priceId": "price_1SB7CbFJeSRMFQ8X2afGFckf"
+      }
+    ]
+  }
+
+Import (lines ~632-665 and ~1255-1288):
+- PDF entries are restored when loading JSON
+- `addPdfEntry()` function is called for each PDF entry
+- Input values are populated from the JSON data
+
+================================================================================
+2. HTML GENERATION (generate.js)
+================================================================================
+
+A. PDF ENTRIES COLLECTION
+--------------------------
+During HTML generation, PDF entries are collected from the GUI and stored in
+the `unifiedFieldsMap`:
+
+1. For numberedDropdown (lines ~2400-2418):
+   - PDF entries are collected from checkbox option DOM elements
+   - Stored in the checkbox option's `pdfEntries` property
+
+2. For multipleTextboxes (lines ~1567-1585):
+   - Same collection process as numberedDropdown
+   - PDF entries stored in the same format
+
+3. Global Array Initialization (line ~4680):
+   - `window.checkboxPdfEntries = []` is initialized in the generated HTML
+   - This array stores PDF entries that are currently "active" (checkbox checked)
+
+B. CHECKBOX RENDERING WITH PDF ENTRIES
+---------------------------------------
+When checkboxes are rendered in the generated HTML:
+
+1. For numberedDropdown (lines ~6775-6828):
+   - Each checkbox option includes its `pdfEntries` array
+   - `addPdfEntries()` function is created for each checkbox
+   - Checks if trigger number matches entry number (j)
+   - Adds PDF entry to `window.checkboxPdfEntries` if conditions match
+
+2. For multipleTextboxes (lines ~2079-2119):
+   - Similar structure to numberedDropdown
+   - Trigger number should always be 1 (only one entry)
+   - Adds PDF entry to `window.checkboxPdfEntries` if trigger number is 1
+
+C. EVENT LISTENERS
+------------------
+Change event listeners are attached to checkboxes (lines ~6928-6937 and ~2206-2214):
+
+When checkbox is checked:
+- `createLinkedTextboxes()` - Creates linked hidden textboxes
+- `addPdfEntries()` - Adds PDF entries to `window.checkboxPdfEntries`
+
+When checkbox is unchecked:
+- `removeLinkedTextboxes()` - Removes linked hidden textboxes
+- `removePdfEntries()` - Removes PDF entries from `window.checkboxPdfEntries`
+
+For radio buttons (single selection):
+- When a radio is checked, PDF entries for unchecked radios are removed
+- PDF entries for the newly checked radio are added
+
+================================================================================
+3. CART INTEGRATION (generate.js)
+================================================================================
+
+A. CART MODAL (showCartModal function, lines ~5362-5387)
+-------------------------------------------------------
+When the user clicks "Continue" and the cart modal is shown:
+
+1. PDF entries from `window.checkboxPdfEntries` are added to `allPdfsToAdd` array
+2. Each PDF entry is formatted with:
+   - formId: `pdfFile` without .pdf extension (lowercase)
+   - title: `pdfName` (preserves original casing from JSON)
+   - priceId: Stripe Price ID
+   - pdfName: `pdfFile` (for download)
+
+3. PDFs are deduplicated and prices are fetched
+4. Cart modal displays all PDFs including checkbox PDF entries
+
+B. ADD TO CART (addFormToCart function, lines ~5816-5837)
+---------------------------------------------------------
+When the user adds items to the cart:
+
+1. Site Cart Manager Path (lines ~5816-5837):
+   - Checkbox PDF entries are added to `allItems` array
+   - Each entry becomes a cart item with formData, countyName, defendantName
+
+2. LocalStorage/Cookie Fallback Path (lines ~5894-5915):
+   - Checkbox PDF entries are added to `cart` array
+   - Same structure as site cart manager path
+
+3. Display Title:
+   - Uses `pdfEntry.pdfName` directly (preserves original casing)
+   - Example: "Test Name" stays as "Test Name", not "TEST NAME"
+
+================================================================================
+4. PDF DOWNLOAD INTEGRATION (generate.js)
+================================================================================
+
+A. PROCESS ALL PDFS (processAllPdfs function, lines ~8669-8688)
+-------------------------------------------------------------
+When the user clicks "Download PDF" button:
+
+1. Main PDF is downloaded first
+2. Conditional PDFs are processed
+3. PDF Logic PDFs are processed
+4. Checkbox PDF Entries are processed (NEW):
+   - Iterates through `window.checkboxPdfEntries`
+   - For each entry, downloads the PDF using `pdfFile`
+   - No condition checking needed (checkbox is already checked)
+   - PDFs are deduplicated to prevent multiple downloads
+
+B. PDF FILE NAMING
+------------------
+- `pdfFile`: Used for actual download (e.g., "sc500.pdf")
+- `pdfName`: Used for display in cart (e.g., "Test Name")
+- `formId`: Generated from `pdfFile` without extension (lowercase)
+
+================================================================================
+5. DATA STRUCTURE
+================================================================================
+
+A. PDF ENTRY OBJECT
+-------------------
+Each PDF entry in `window.checkboxPdfEntries` has:
+{
+  pdfName: "Test Name",           // Display name (preserves casing)
+  pdfFile: "sc500.pdf",            // Actual PDF filename
+  priceId: "price_1SB7CbFJeSRMFQ8X2afGFckf",  // Stripe Price ID
+  entryNumber: 1,                  // Entry number (for numberedDropdown)
+  checkboxId: "example_1"          // ID of the checkbox that triggered this
+}
+
+B. TRIGGER NUMBER LOGIC
+-----------------------
+- For numberedDropdown: Trigger number must match entry number (j)
+  - Entry 1: triggerNumber must be "1"
+  - Entry 2: triggerNumber must be "2"
+  - etc.
+
+- For multipleTextboxes: Trigger number should always be "1"
+  - Only one entry exists, so trigger number is always 1
+
+================================================================================
+6. EXAMPLE WORKFLOW
+================================================================================
+
+1. USER CONFIGURES IN GUI:
+   - Creates a checkbox field "Military Status"
+   - Adds checkbox option "Check here if the defendant is on military duty"
+   - Clicks "Add PDF" button
+   - Enters:
+     - Trigger Number: "1"
+     - PDF Name: "Test Name"
+     - PDF File: "sc500.pdf"
+     - Price ID: "price_1SB7CbFJeSRMFQ8X2afGFckf"
+
+2. JSON EXPORT:
+   - PDF entry is saved in the checkbox option's `pdfEntries` array
+   - Preserved in JSON structure
+
+3. HTML GENERATION:
+   - PDF entry data is included in `unifiedFieldsMap`
+   - Checkbox is rendered with PDF entry data available
+   - `addPdfEntries()` function is created for the checkbox
+
+4. USER INTERACTION:
+   - User checks "example_1" checkbox
+   - `addPdfEntries()` is called
+   - Trigger number (1) matches entry number (1)
+   - PDF entry is added to `window.checkboxPdfEntries`
+
+5. CART ADDITION:
+   - User clicks "Continue" or "Add to Cart"
+   - `showCartModal()` or `addFormToCart()` processes `window.checkboxPdfEntries`
+   - PDF is added to cart with:
+     - Title: "Test Name"
+     - Form ID: "sc500"
+     - Price ID: "price_1SB7CbFJeSRMFQ8X2afGFckf"
+
+6. PDF DOWNLOAD:
+   - User clicks "Download PDF" button
+   - `processAllPdfs()` processes `window.checkboxPdfEntries`
+   - PDF "sc500.pdf" is downloaded
+
+================================================================================
+7. KEY FUNCTIONS
+================================================================================
+
+A. addPdfEntry(questionId, fieldCount, optionCount) - gui.js
+   - Creates a new PDF entry UI in the checkbox option
+   - Adds input fields for Trigger Number, PDF Name, PDF File, Price ID
+
+B. addPdfEntries() - generate.js (runtime)
+   - Called when checkbox is checked
+   - Adds PDF entry to `window.checkboxPdfEntries` if trigger number matches
+
+C. removePdfEntries() - generate.js (runtime)
+   - Called when checkbox is unchecked
+   - Removes PDF entry from `window.checkboxPdfEntries`
+
+D. processAllPdfs() - generate.js
+   - Processes checkbox PDF entries for download
+   - Downloads PDFs directly (no condition checking needed)
+
+E. showCartModal() - generate.js
+   - Includes checkbox PDF entries in cart modal preview
+
+F. addFormToCart() - generate.js
+   - Includes checkbox PDF entries when adding to cart
+
+================================================================================
+8. IMPORTANT NOTES
+================================================================================
+
+1. PDF entries are only added to `window.checkboxPdfEntries` when:
+   - The checkbox is checked
+   - The trigger number matches the entry number (for numberedDropdown)
+   - The trigger number is 1 (for multipleTextboxes)
+
+2. PDF entries are automatically removed when:
+   - The checkbox is unchecked
+   - A different radio button is selected (for single selection)
+
+3. Display names preserve original casing:
+   - "Test Name" stays as "Test Name" (not "TEST NAME")
+   - Uses `pdfEntry.pdfName` directly from JSON
+
+4. PDF files are downloaded using `pdfFile`:
+   - "sc500.pdf" is used for the actual download
+   - Display name "Test Name" is only for cart/UI display
+
+5. Multiple PDF entries per checkbox:
+   - Each checkbox option can have multiple PDF entries
+   - Each entry can have different trigger numbers
+   - All matching entries are added when checkbox is checked
+
+================================================================================
+9. DEBUGGING
+================================================================================
+
+Console logs are available for debugging:
+
+- 🔧 [PDF ENTRY DEBUG] Checkbox option PDF entries: ... (when checkbox is created)
+- 🔧 [PDF ENTRY DEBUG] addPdfEntries called for checkbox: ... (when checkbox changes)
+- 🔧 [PDF ENTRY] Added PDF entry: ... (when PDF entry is successfully added)
+- 🔧 [PDF ENTRY] Skipped PDF entry: ... (when trigger number doesn't match)
+- 🔧 [CART] Adding checkbox PDF entries to cart: ... (when adding to cart)
+- 🔧 [CART MODAL] Adding checkbox PDF entries: ... (when showing cart modal)
+- 🔧 [PDF DOWNLOAD] Processing checkbox PDF entries: ... (when downloading PDFs)
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
+

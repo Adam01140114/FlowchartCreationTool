@@ -2075,6 +2075,11 @@ formHTML += `</div><br></div>`;
                     
                     // Handle linked fields for this checkbox option
                     const linkedFields = option.linkedFields || [];
+                    console.log('🔧 [LINKED TEXTBOX] Checkbox option linkedFields (multipleTextboxes):', {
+                        checkboxId: input.id,
+                        linkedFields: linkedFields,
+                        option: option
+                    });
                     
                     // Handle PDF entries for this checkbox option
                     const pdfEntries = option.pdfEntries || [];
@@ -2136,10 +2141,21 @@ formHTML += `</div><br></div>`;
                     
                     // Function to create linked textboxes when checkbox is checked
                     function createLinkedTextboxes() {
+                        console.log('🔧 [LINKED TEXTBOX] createLinkedTextboxes called for checkbox:', input.id, 'linkedFields:', linkedFields);
                         linkedFields.forEach((linkedField) => {
+                            console.log('🔧 [LINKED TEXTBOX] Processing linkedField:', linkedField);
                             if (linkedField.nodeId && linkedField.title) {
+                                console.log('🔧 [LINKED TEXTBOX] Looking for source field with ID:', linkedField.nodeId);
                                 const sourceField = document.getElementById(linkedField.nodeId);
                                 if (sourceField) {
+                                    console.log('🔧 [LINKED TEXTBOX] Source field found:', sourceField.id, 'value:', sourceField.value);
+                                    // Check if hidden textbox already exists
+                                    const existingHiddenTextbox = document.getElementById(linkedField.title);
+                                    if (existingHiddenTextbox) {
+                                        console.log('🔧 [LINKED TEXTBOX] Hidden textbox already exists:', linkedField.title);
+                                        return; // Skip creating duplicate
+                                    }
+                                    
                                     // Create hidden textbox with title as ID
                                     const hiddenTextbox = document.createElement('input');
                                     hiddenTextbox.type = 'text';
@@ -2147,6 +2163,8 @@ formHTML += `</div><br></div>`;
                                     hiddenTextbox.name = linkedField.title;
                                     hiddenTextbox.style.display = 'none';
                                     hiddenTextbox.value = sourceField.value || '';
+                                    
+                                    console.log('🔧 [LINKED TEXTBOX] Creating hidden textbox:', linkedField.title, 'linked to:', linkedField.nodeId);
                                     
                                     // Add to form (append to body or a container)
                                     document.body.appendChild(hiddenTextbox);
@@ -2175,7 +2193,13 @@ formHTML += `</div><br></div>`;
                                     hiddenTextbox._syncFunction = syncLinkedField;
                                     hiddenTextbox._sourceField = sourceField;
                                     hiddenTextbox._pollInterval = pollInterval;
+                                    
+                                    console.log('🔧 [LINKED TEXTBOX] Hidden textbox created and synced:', linkedField.title);
+                                } else {
+                                    console.log('🔧 [LINKED TEXTBOX] ❌ Source field NOT found with ID:', linkedField.nodeId);
                                 }
+                            } else {
+                                console.log('🔧 [LINKED TEXTBOX] ❌ Invalid linkedField - missing nodeId or title:', linkedField);
                             }
                         });
                     }
@@ -2202,63 +2226,262 @@ formHTML += `</div><br></div>`;
                         });
                     }
                     
-                    // Add event listener for checkbox/radio changes
-                    input.addEventListener('change', function() {
-                        if (this.checked) {
-                            createLinkedTextboxes();
-                            addPdfEntries();
-                        } else {
-                            removeLinkedTextboxes();
-                            removePdfEntries();
-                        }
-                    });
+                    // Add inline onchange handler (since addEventListener is lost when converting to HTML)
+                    // Serialize linkedFields and pdfEntries to JSON for use in inline handler
+                    const linkedFieldsJson = JSON.stringify(linkedFields);
+                    const pdfEntriesJson = JSON.stringify(pdfEntries);
+                    const checkboxId = input.id;
                     
-                    // Add event listener for radio buttons to create hidden checkboxes
-                    if (selectionType === 'single') {
-                        input.addEventListener('change', function() {
-                            if (this.checked) {
-                                const radioGroup = document.querySelectorAll('input[name="' + this.name + '"]');
-                                radioGroup.forEach(radio => {
-                                    if (radio !== this) {
-                                        radio.checked = false;
-                                        const originalNodeId = radio.id.replace('_radio', '');
-                                        const existingHiddenCheckbox = document.getElementById(originalNodeId);
-                                        if (existingHiddenCheckbox && existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
-                                            existingHiddenCheckbox.remove();
-                                        }
-                                        // Also remove linked textboxes for unchecked radio
-                                        const uncheckedOption = checkboxOptions.find(opt => opt.nodeId === originalNodeId);
-                                        if (uncheckedOption && uncheckedOption.linkedFields) {
-                                            uncheckedOption.linkedFields.forEach((linkedField) => {
-                                                if (linkedField.title) {
-                                                    const hiddenTextbox = document.getElementById(linkedField.title);
-                                                    if (hiddenTextbox) {
-                                                        if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
-                                                            hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
-                                                            hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
-                                                        }
-                                                        // Stop MutationObserver
-                                                        if (hiddenTextbox._observer) {
-                                                            hiddenTextbox._observer.disconnect();
-                                                        }
-                                                        // Clear polling interval
-                                                        if (hiddenTextbox._pollInterval) {
-                                                            clearInterval(hiddenTextbox._pollInterval);
-                                                        }
-                                                        hiddenTextbox.remove();
-                                                    }
+                    // Create inline onchange handler that will work in the generated HTML
+                    // Capture 'this' before the IIFE since inline handlers have 'this' referring to the element
+                    input.setAttribute('onchange', `
+                        var self = this; (function() {
+                            const linkedFields = ${linkedFieldsJson};
+                            const pdfEntries = ${pdfEntriesJson};
+                            const checkboxId = '${checkboxId}';
+                            const checkbox = self; // Use captured 'this' from inline handler
+                            const isChecked = checkbox ? checkbox.checked : false;
+                            
+                            console.log('🔧 [LINKED TEXTBOX] Checkbox changed (multipleTextboxes):', checkboxId, 'checked:', isChecked);
+                            
+                            if (isChecked) {
+                                // Create linked textboxes
+                                linkedFields.forEach((linkedField) => {
+                                    console.log('🔧 [LINKED TEXTBOX] Processing linkedField:', linkedField);
+                                    if (linkedField.nodeId && linkedField.title) {
+                                        console.log('🔧 [LINKED TEXTBOX] Looking for source field with ID:', linkedField.nodeId);
+                                        const sourceField = document.getElementById(linkedField.nodeId);
+                                        if (sourceField) {
+                                            console.log('🔧 [LINKED TEXTBOX] Source field found:', sourceField.id, 'value:', sourceField.value);
+                                            // Check if hidden textbox already exists
+                                            const existingHiddenTextbox = document.getElementById(linkedField.title);
+                                            if (existingHiddenTextbox) {
+                                                console.log('🔧 [LINKED TEXTBOX] Hidden textbox already exists:', linkedField.title);
+                                                return; // Skip creating duplicate
+                                            }
+                                            
+                                            // Create hidden textbox with title as ID
+                                            const hiddenTextbox = document.createElement('input');
+                                            hiddenTextbox.type = 'text';
+                                            hiddenTextbox.id = linkedField.title;
+                                            hiddenTextbox.name = linkedField.title;
+                                            hiddenTextbox.style.display = 'none';
+                                            hiddenTextbox.value = sourceField.value || '';
+                                            
+                                            console.log('🔧 [LINKED TEXTBOX] Creating hidden textbox:', linkedField.title, 'linked to:', linkedField.nodeId);
+                                            
+                                            // Add to form (append to body or a container)
+                                            document.body.appendChild(hiddenTextbox);
+                                            
+                                            // Sync with source field
+                                            function syncLinkedField() {
+                                                hiddenTextbox.value = sourceField.value || '';
+                                            }
+                                            
+                                            // Initial sync
+                                            syncLinkedField();
+                                            
+                                            // Listen for changes on source field
+                                            sourceField.addEventListener('input', syncLinkedField);
+                                            sourceField.addEventListener('change', syncLinkedField);
+                                            
+                                            // Poll periodically to catch any missed updates (especially for autofill)
+                                            const pollInterval = setInterval(function() {
+                                                if (hiddenTextbox.value !== sourceField.value) {
+                                                    syncLinkedField();
                                                 }
+                                            }, 100); // Check every 100ms
+                                            
+                                            // Store references for cleanup
+                                            hiddenTextbox._syncFunction = syncLinkedField;
+                                            hiddenTextbox._sourceField = sourceField;
+                                            hiddenTextbox._pollInterval = pollInterval;
+                                            
+                                            console.log('🔧 [LINKED TEXTBOX] Hidden textbox created and synced:', linkedField.title);
+                                        } else {
+                                            console.log('🔧 [LINKED TEXTBOX] ❌ Source field NOT found with ID:', linkedField.nodeId);
+                                        }
+                                    } else {
+                                        console.log('🔧 [LINKED TEXTBOX] ❌ Invalid linkedField - missing nodeId or title:', linkedField);
+                                    }
+                                });
+                                
+                                // Add PDF entries
+                                pdfEntries.forEach((pdfEntry) => {
+                                    const triggerNumber = parseInt(pdfEntry.triggerNumber) || 1;
+                                    if (triggerNumber === 1 && pdfEntry.pdfName && pdfEntry.pdfFile && pdfEntry.priceId) {
+                                        if (!window.checkboxPdfEntries) {
+                                            window.checkboxPdfEntries = [];
+                                        }
+                                        const existingEntry = window.checkboxPdfEntries.find(entry => 
+                                            entry.pdfName === pdfEntry.pdfName && 
+                                            entry.checkboxId === checkboxId
+                                        );
+                                        if (!existingEntry) {
+                                            window.checkboxPdfEntries.push({
+                                                pdfName: pdfEntry.pdfName,
+                                                pdfFile: pdfEntry.pdfFile,
+                                                priceId: pdfEntry.priceId,
+                                                entryNumber: 1,
+                                                checkboxId: checkboxId
+                                            });
+                                            console.log('🔧 [PDF ENTRY] Added PDF entry (multipleTextboxes):', {
+                                                pdfName: pdfEntry.pdfName,
+                                                pdfFile: pdfEntry.pdfFile,
+                                                priceId: pdfEntry.priceId,
+                                                checkboxId: checkboxId
                                             });
                                         }
                                     }
                                 });
-                                const originalNodeId = this.id.replace('_radio', '');
-                                if (typeof createHiddenCheckboxForRadio === 'function') {
-                                    createHiddenCheckboxForRadio(originalNodeId, this.name, this.value);
+                            } else {
+                                // Remove linked textboxes
+                                linkedFields.forEach((linkedField) => {
+                                    if (linkedField.title) {
+                                        const hiddenTextbox = document.getElementById(linkedField.title);
+                                        if (hiddenTextbox) {
+                                            // Remove event listeners
+                                            if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                            }
+                                            // Clear polling interval
+                                            if (hiddenTextbox._pollInterval) {
+                                                clearInterval(hiddenTextbox._pollInterval);
+                                            }
+                                            // Remove the hidden textbox
+                                            hiddenTextbox.remove();
+                                        }
+                                    }
+                                });
+                                
+                                // Remove PDF entries
+                                if (window.checkboxPdfEntries) {
+                                    window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry => 
+                                        entry.checkboxId !== checkboxId
+                                    );
                                 }
-                                createLinkedTextboxes();
                             }
-                        });
+                        })();
+                    `);
+                    
+                    // Add inline onchange handler for radio buttons (since addEventListener is lost when converting to HTML)
+                    if (selectionType === 'single') {
+                        // For radio buttons, we need to handle the radio group and also create linked textboxes
+                        // Get all options to find linkedFields for unchecked radios
+                        const allOptionsJson = JSON.stringify(checkboxOptions);
+                        const radioName = input.name;
+                        const radioId = input.id;
+                        const radioCheckboxId = radioId; // For radio buttons, use the radio ID as checkboxId
+                        
+                        input.setAttribute('onchange', `
+                            var self = this; (function() {
+                                const linkedFields = ${linkedFieldsJson};
+                                const pdfEntries = ${pdfEntriesJson};
+                                const checkboxId = '${radioCheckboxId}';
+                                const allOptions = ${allOptionsJson};
+                                const radioName = '${radioName}';
+                                const radioId = '${radioId}';
+                                const radio = self; // Use captured 'this' from inline handler
+                                const isChecked = radio ? radio.checked : false;
+                                
+                                if (isChecked) {
+                                    // Uncheck all other radio buttons in this group
+                                    const radioGroup = document.querySelectorAll('input[name="' + radioName + '"]');
+                                    radioGroup.forEach(radioBtn => {
+                                        if (radioBtn !== radio) {
+                                            radioBtn.checked = false;
+                                            const originalNodeId = radioBtn.id.replace('_radio', '');
+                                            const existingHiddenCheckbox = document.getElementById(originalNodeId);
+                                            if (existingHiddenCheckbox && existingHiddenCheckbox.type === 'checkbox' && existingHiddenCheckbox.style.display === 'none') {
+                                                existingHiddenCheckbox.remove();
+                                            }
+                                            // Also remove linked textboxes for unchecked radio
+                                            const uncheckedOption = allOptions.find(opt => opt.nodeId === originalNodeId);
+                                            if (uncheckedOption && uncheckedOption.linkedFields) {
+                                                uncheckedOption.linkedFields.forEach((linkedField) => {
+                                                    if (linkedField.title) {
+                                                        const hiddenTextbox = document.getElementById(linkedField.title);
+                                                        if (hiddenTextbox) {
+                                                            if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
+                                                                hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
+                                                                hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+                                                            }
+                                                            if (hiddenTextbox._pollInterval) {
+                                                                clearInterval(hiddenTextbox._pollInterval);
+                                                            }
+                                                            hiddenTextbox.remove();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                    
+                                    const originalNodeId = radioId.replace('_radio', '');
+                                    if (typeof createHiddenCheckboxForRadio === 'function') {
+                                        createHiddenCheckboxForRadio(originalNodeId, radioName, radio.value);
+                                    }
+                                    
+                                    // Create linked textboxes for the checked radio
+                                    linkedFields.forEach((linkedField) => {
+                                        if (linkedField.nodeId && linkedField.title) {
+                                            const sourceField = document.getElementById(linkedField.nodeId);
+                                            if (sourceField) {
+                                                const existingHiddenTextbox = document.getElementById(linkedField.title);
+                                                if (existingHiddenTextbox) {
+                                                    return;
+                                                }
+                                                const hiddenTextbox = document.createElement('input');
+                                                hiddenTextbox.type = 'text';
+                                                hiddenTextbox.id = linkedField.title;
+                                                hiddenTextbox.name = linkedField.title;
+                                                hiddenTextbox.style.display = 'none';
+                                                hiddenTextbox.value = sourceField.value || '';
+                                                document.body.appendChild(hiddenTextbox);
+                                                function syncLinkedField() {
+                                                    hiddenTextbox.value = sourceField.value || '';
+                                                }
+                                                syncLinkedField();
+                                                sourceField.addEventListener('input', syncLinkedField);
+                                                sourceField.addEventListener('change', syncLinkedField);
+                                                const pollInterval = setInterval(function() {
+                                                    if (hiddenTextbox.value !== sourceField.value) {
+                                                        syncLinkedField();
+                                                    }
+                                                }, 100);
+                                                hiddenTextbox._syncFunction = syncLinkedField;
+                                                hiddenTextbox._sourceField = sourceField;
+                                                hiddenTextbox._pollInterval = pollInterval;
+                                            }
+                                        }
+                                    });
+                                    
+                                    // Add PDF entries
+                                    pdfEntries.forEach((pdfEntry) => {
+                                        const triggerNumber = parseInt(pdfEntry.triggerNumber) || 1;
+                                        if (triggerNumber === 1 && pdfEntry.pdfName && pdfEntry.pdfFile && pdfEntry.priceId) {
+                                            if (!window.checkboxPdfEntries) {
+                                                window.checkboxPdfEntries = [];
+                                            }
+                                            const existingEntry = window.checkboxPdfEntries.find(entry => 
+                                                entry.pdfName === pdfEntry.pdfName && 
+                                                entry.checkboxId === checkboxId
+                                            );
+                                            if (!existingEntry) {
+                                                window.checkboxPdfEntries.push({
+                                                    pdfName: pdfEntry.pdfName,
+                                                    pdfFile: pdfEntry.pdfFile,
+                                                    priceId: pdfEntry.priceId,
+                                                    entryNumber: 1,
+                                                    checkboxId: checkboxId
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            })();
+                        `);
                     }
                     
                     const label = document.createElement('label');
