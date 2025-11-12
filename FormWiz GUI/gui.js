@@ -5236,8 +5236,8 @@ function createLinkedFieldModal() {
             margin: 5% auto;
             padding: 20px;
             border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 1200px;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -6266,6 +6266,104 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                 });
             } else {
                 console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+            }
+        }
+        
+        // Collect linked textbox IDs from checkbox options in numberedDropdown and multipleTextboxes
+        if (questionTypeSelect && (questionTypeSelect.value === 'numberedDropdown' || questionTypeSelect.value === 'multipleTextboxes')) {
+            console.log(`🔍 [DEBUG] Collecting linked textboxes from checkbox options in ${questionTypeSelect.value} question ${questionId}`);
+            
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            const minValue = questionTypeSelect.value === 'numberedDropdown' 
+                ? parseInt(block.querySelector(`#numberRangeStart${questionId}`)?.value || '1')
+                : 1;
+            const maxValue = questionTypeSelect.value === 'numberedDropdown'
+                ? parseInt(block.querySelector(`#numberRangeEnd${questionId}`)?.value || '1')
+                : 1;
+            
+            // Get all checkbox fields from unified fields
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
+            if (unifiedFieldsContainer) {
+                const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field[data-type="checkbox"]');
+                console.log(`🔍 [DEBUG] Found ${fieldContainers.length} checkbox fields in ${questionTypeSelect.value} question ${questionId}`);
+                
+                fieldContainers.forEach((fieldContainer) => {
+                    const fieldOrder = fieldContainer.getAttribute('data-order');
+                    const fieldNameEl = fieldContainer.querySelector(`#checkboxFieldName${questionId}_${fieldOrder}`);
+                    const fieldName = fieldNameEl ? fieldNameEl.value.trim() : '';
+                    
+                    console.log(`🔍 [DEBUG] Processing checkbox field ${fieldOrder} (${fieldName})`);
+                    
+                    // Get all checkbox options
+                    const optionsContainer = fieldContainer.querySelector(`#checkboxOptions${questionId}_${fieldOrder}`);
+                    if (optionsContainer) {
+                        const optionDivs = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
+                        console.log(`🔍 [DEBUG] Found ${optionDivs.length} checkbox options`);
+                        
+                        optionDivs.forEach((optionDiv, optionIndex) => {
+                            const optionNodeIdEl = optionDiv.querySelector(`input[id^="checkboxNodeId${questionId}_${fieldOrder}_"]`);
+                            const optionTextEl = optionDiv.querySelector(`input[id^="checkboxText${questionId}_${fieldOrder}_"]`);
+                            const optionNodeId = optionNodeIdEl ? optionNodeIdEl.value.trim() : '';
+                            const optionText = optionTextEl ? optionTextEl.value.trim() : '';
+                            
+                            console.log(`🔍 [DEBUG] Processing checkbox option ${optionIndex + 1} (${optionText}, nodeId: ${optionNodeId})`);
+                            
+                            // Get linked fields for this option
+                            const linkedFieldsContainer = optionDiv.querySelector(`#linkedFields${questionId}_${fieldOrder}_${optionIndex + 1}`);
+                            if (linkedFieldsContainer) {
+                                const linkedFieldDivs = linkedFieldsContainer.querySelectorAll('[class^="linked-field-"]');
+                                console.log(`🔍 [DEBUG] Found ${linkedFieldDivs.length} linked fields for option ${optionIndex + 1}`);
+                                
+                                linkedFieldDivs.forEach((linkedFieldDiv) => {
+                                    const titleInput = linkedFieldDiv.querySelector(`input[id^="linkedFieldTitle${questionId}_${fieldOrder}_${optionIndex + 1}_"]`);
+                                    const linkedFieldTitle = titleInput ? titleInput.value.trim() : '';
+                                    
+                                    if (linkedFieldTitle) {
+                                        console.log(`✅ [DEBUG] Found linked field title: ${linkedFieldTitle}`);
+                                        
+                                        if (questionTypeSelect.value === 'numberedDropdown') {
+                                            // For numberedDropdown, generate entries for each entry number
+                                            for (let i = minValue; i <= maxValue; i++) {
+                                                // The linked textbox ID format is: {optionNodeId}_{sourceFieldNodeId}_{entryNumber}
+                                                // But the title is already the full ID, so we need to replace the entry number
+                                                // Actually, looking at the code, the title is already the full ID including entry number
+                                                // So we need to construct it: {optionNodeId}_{sourceFieldNodeId}_{i}
+                                                // But wait, the title might already have the pattern, let me check the format
+                                                // From the output.json, the title is: "how_many_example_two_test1_how_many_name"
+                                                // And it should become: "how_many_example_two_test1_how_many_name_1", "_2", "_3"
+                                                
+                                                // The title format from the GUI is: {optionNodeId}_{sourceFieldNodeId}
+                                                // We need to add _{i} to it
+                                                const linkedTextboxId = `${linkedFieldTitle}_${i}`;
+                                                const displayText = `${questionText} - ${fieldName} - ${optionText} - Linked (${i})`;
+                                                
+                                                console.log(`✅ [DEBUG] Adding linked textbox for numberedDropdown: ${displayText} (${linkedTextboxId})`);
+                                                
+                                                textQuestions.push({
+                                                    questionId: questionId,
+                                                    nodeId: linkedTextboxId,
+                                                    questionText: displayText
+                                                });
+                                            }
+                                        } else {
+                                            // For multipleTextboxes, the title is already the full ID (no entry number)
+                                            const linkedTextboxId = linkedFieldTitle;
+                                            const displayText = `${questionText} - ${fieldName} - ${optionText} - Linked`;
+                                            
+                                            console.log(`✅ [DEBUG] Adding linked textbox for multipleTextboxes: ${displayText} (${linkedTextboxId})`);
+                                            
+                                            textQuestions.push({
+                                                questionId: questionId,
+                                                nodeId: linkedTextboxId,
+                                                questionText: displayText
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
         }
     });

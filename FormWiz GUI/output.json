@@ -22,15 +22,8 @@
             "answer": "Yes"
           },
           "hiddenLogic": {
-            "enabled": true,
-            "configs": [
-              {
-                "trigger": "Yes",
-                "type": "checkbox",
-                "nodeId": "user_biz",
-                "textboxText": ""
-              }
-            ]
+            "enabled": false,
+            "configs": []
           },
           "pdfLogic": {
             "enabled": false,
@@ -79,6 +72,85 @@
         },
         {
           "questionId": 2,
+          "text": "Please explain",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [],
+          "labels": [],
+          "nodeId": "please_explain",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "please_explain_name",
+              "order": 1
+            },
+            {
+              "type": "checkbox",
+              "fieldName": "Example One",
+              "options": [
+                {
+                  "text": "Test1",
+                  "nodeId": "please_explain_example_one_test1",
+                  "linkedFields": [],
+                  "pdfEntries": []
+                }
+              ],
+              "order": 2
+            }
+          ]
+        },
+        {
+          "questionId": 3,
           "text": "How many",
           "type": "numberedDropdown",
           "logic": {
@@ -155,97 +227,18 @@
               "selectionType": "multiple",
               "options": [
                 {
-                  "text": "Test1",
-                  "nodeId": "how_many_example_two_test1",
+                  "text": "Test2",
+                  "nodeId": "how_many_example_two_test2",
                   "linkedFields": [
                     {
                       "nodeId": "how_many_name",
-                      "title": "how_many_example_two_test1_how_many_name"
+                      "title": "how_many_example_two_test2_how_many_name"
                     }
                   ],
                   "pdfEntries": []
                 }
               ],
               "order": 3
-            }
-          ]
-        },
-        {
-          "questionId": 3,
-          "text": "Please explain",
-          "type": "multipleTextboxes",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "No"
-              }
-            ]
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "options": [],
-          "labels": [],
-          "nodeId": "please_explain",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Name",
-              "nodeId": "please_explain_name",
-              "order": 1
-            },
-            {
-              "type": "checkbox",
-              "fieldName": "Example One",
-              "options": [
-                {
-                  "text": "Test1",
-                  "nodeId": "please_explain_example_one_test1",
-                  "linkedFields": [],
-                  "pdfEntries": []
-                }
-              ],
-              "order": 2
             }
           ]
         }
