@@ -99,15 +99,14 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
-    // Always include value attribute if prefill is provided (even if empty string, we want to preserve it)
-    const valueAttr = (prefill !== undefined && prefill !== null && prefill !== '') ? ' value="' + String(prefill).replace(/"/g, '&quot;').replace(/'/g, '&#39;') + '"' : '';
+    const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + (valueAttr ? ' ' + valueAttr : '') + '>' +
+           'class="address-input"' + valueAttr + '>' +
            '</div>';
 }
 
@@ -342,6 +341,22 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    <link rel="stylesheet" href="generate2.css">',
     '    <style>',
     '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
+    '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 567px; width: 100%; }',
+    '        .question-container .question-text { margin-top: 0; }',
+    '        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }',
+    '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 567px; }',
+    '        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }',
+    '        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }',
+    '        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }',
+    '        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }',
+    '        .question-step-hidden { display: none !important; }',
+    '        #box { padding-top: 100px; margin: 50px; }',
+    '        @media (max-width: 600px) {',
+    '            body { padding: 0 !important; }',
+    '            #box { margin: 12px !important; max-width: none !important; }',
+    '            .question-container { margin: 6px auto !important; padding: 20px 18px !important; }',
+    '            .question-nav { margin: 40px auto 0 !important; }',
+    '        }',
     '        .address-field { margin: 4px auto; }',
     '        .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }',
     '        .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }',
@@ -707,7 +722,8 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
 
     // Grab all questions in this section
     const questionsInSection = sectionBlock.querySelectorAll(".question-block");
-    for (let qIdx = 0; qIdx < questionsInSection.length; qIdx++) {
+    const questionCount = questionsInSection.length;
+    for (let qIdx = 0; qIdx < questionCount; qIdx++) {
       const qBlock = questionsInSection[qIdx];
       const questionId = qBlock.id.replace("questionBlock", "");
 
@@ -787,9 +803,9 @@ questionSlugMap[questionId] = slug;
       // Start the question container
       // Add data-question-type attribute for numbered dropdown questions
       const questionTypeAttr = questionType === "numberedDropdown" ? ' data-question-type="numberedDropdown"' : '';
-      formHTML += `<div id="question-container-${questionId}" class="question-container${
+      formHTML += `<div id="question-container-${questionId}" class="question-container question-item${
         logicEnabled ? ' hidden' : ""
-      }"${questionTypeAttr}>`;
+      }${qIdx === 0 ? "" : " question-step-hidden"}" data-section="${s}" data-question-index="${qIdx + 1}"${questionTypeAttr}>`;
       
       // Check if info box is enabled
       const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
@@ -1321,12 +1337,6 @@ formHTML += `</div><br></div>`;
         const amountVals = [];
         let allFieldsInOrder = []; // Declare here so it's available in the entire scope
         
-        // Pre-populate unifiedFieldsMap from any existing data if available
-        // This ensures we have access to prefill values even if DOM attributes aren't set yet
-        if (!window.unifiedFieldsMap) {
-          window.unifiedFieldsMap = {};
-        }
-        
         // If no unified fields found, try fallback to old containers
         if (unifiedFields.length === 0) {
           const lblInputs = qBlock.querySelectorAll("#textboxLabels" + questionId + " input[type='text']:first-of-type");
@@ -1614,59 +1624,18 @@ formHTML += `</div><br></div>`;
               }
             } else if (labelTextEl && nodeIdTextEl) {
               // Handle label, date, time fields
-              const nodeIdText = nodeIdTextEl.textContent.trim();
-              
-              // Try multiple ways to get prefill value - this is the PRIMARY source
-              let prefillValue = el.getAttribute('data-prefill');
-              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Reading prefill from DOM:', { 
-                hasAttribute: el.hasAttribute('data-prefill'), 
-                attributeValue: prefillValue, 
-                nodeId: nodeIdText,
-                fieldType: fieldType,
-                element: el
-              });
-              
-              // Also try dataset property (handles data-prefill automatically)
-              if ((prefillValue === null || prefillValue === undefined || prefillValue === '') && el.dataset) {
-                if (el.dataset.prefill !== undefined && el.dataset.prefill !== null && el.dataset.prefill !== '') {
-                  prefillValue = el.dataset.prefill;
-                  console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Found prefill in dataset:', prefillValue);
-                }
-              }
-              
-              // Fallback: Check unifiedFieldsMap if data-prefill attribute is not set or is empty
-              // This is important because unifiedFieldsMap may be populated from JSON export data
-              // or from a previous HTML generation
-              if ((prefillValue === null || prefillValue === undefined || prefillValue === '') && fieldType === 'label') {
-                // First check window.unifiedFieldsMap (may be set from JSON export in generated HTML)
-                if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-                  const existingField = window.unifiedFieldsMap[questionId].find(f => f.nodeId === nodeIdText && f.type === 'label' && f.prefill);
-                  if (existingField && existingField.prefill) {
-                    prefillValue = existingField.prefill;
-                    console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Found prefill in unifiedFieldsMap:', prefillValue, 'for nodeId:', nodeIdText);
-                  }
-                }
-              }
-              
-              // If still not found, set to empty string (but we've already checked all sources)
-              if (prefillValue === null || prefillValue === undefined) {
-                prefillValue = '';
-              }
-              
-              // Log final prefill value for debugging
-              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Final prefill value for', nodeIdText, ':', prefillValue);
-              
+              const prefillValue = el.getAttribute('data-prefill') || '';
               const fieldData = {
                 type: fieldType,
                 label: labelTextEl.textContent.trim(),
-                nodeId: nodeIdText,
+                nodeId: nodeIdTextEl.textContent.trim(),
                 order: fieldOrder
               };
               // Always include prefill for label type fields (even if empty)
               if (fieldType === 'label') {
-                fieldData.prefill = prefillValue || '';
+                fieldData.prefill = prefillValue;
               }
-              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Added', fieldType, 'field:', fieldData, 'prefillValue:', prefillValue, 'hasAttribute:', el.hasAttribute('data-prefill'), 'attributeValue:', el.getAttribute('data-prefill'));
+              console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Added', fieldType, 'field:', fieldData, 'prefillValue:', prefillValue, 'hasAttribute:', el.hasAttribute('data-prefill'));
               allFieldsInOrder.push(fieldData);
             } else {
               console.warn('🔧 [MULTIPLE TEXTBOXES DEBUG] Unknown field type or missing elements:', { fieldType, fieldOrder, hasLabelText: !!labelTextEl, hasNodeIdText: !!nodeIdTextEl });
@@ -1677,23 +1646,8 @@ formHTML += `</div><br></div>`;
           allFieldsInOrder.sort((a, b) => a.order - b.order);
         }
         
-        // Before storing, ensure prefill values are preserved from existing unifiedFieldsMap if DOM didn't have them
-        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-          const existingMap = window.unifiedFieldsMap[questionId];
-          allFieldsInOrder.forEach(field => {
-            if (field.type === 'label' && (!field.prefill || field.prefill === '')) {
-              const existingField = existingMap.find(f => f.nodeId === field.nodeId && f.type === 'label' && f.prefill);
-              if (existingField && existingField.prefill) {
-                field.prefill = existingField.prefill;
-                console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Restored prefill from existing unifiedFieldsMap:', field.nodeId, 'prefill:', field.prefill);
-              }
-            }
-          });
-        }
-        
         console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Final allFieldsInOrder:', allFieldsInOrder);
         console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Field types found:', allFieldsInOrder.map(f => f.type));
-        console.log('🔧 [MULTIPLE TEXTBOXES DEBUG] Prefill values:', allFieldsInOrder.filter(f => f.prefill).map(f => ({ nodeId: f.nodeId, prefill: f.prefill })));
         
         // Store the unified fields data for use in showTextboxLabels
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
@@ -1831,52 +1785,8 @@ formHTML += `</div><br></div>`;
               } else if (field.type === 'label') {
                 // For multipleTextboxes, use the base nodeId without numbering
                 const fieldId = field.nodeId;
-                // Start with prefill from the field object itself
-                let prefillValue = field.prefill;
-                
-                // CRITICAL: If prefill is not set or is empty, check multiple fallback sources
-                // This is important because the prefill might not be in field.prefill if DOM didn't have it
-                if (!prefillValue || prefillValue === '') {
-                  // First check the allFieldsInOrder array directly (it should have the prefill if it was read from DOM)
-                  const fieldInArray = allFieldsInOrder.find(f => f.nodeId === fieldId && f.type === 'label' && f.prefill && f.prefill !== '');
-                  if (fieldInArray && fieldInArray.prefill) {
-                    prefillValue = fieldInArray.prefill;
-                    console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Found prefill in allFieldsInOrder:', prefillValue);
-                  }
-                  // Also check window.unifiedFieldsMap as additional fallback (may be populated from JSON export)
-                  else if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-                    const existingField = window.unifiedFieldsMap[questionId].find(f => f.nodeId === fieldId && f.type === 'label' && f.prefill && f.prefill !== '');
-                    if (existingField && existingField.prefill) {
-                      prefillValue = existingField.prefill;
-                      console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Found prefill in unifiedFieldsMap:', prefillValue);
-                    }
-                  }
-                }
-                
-                // Ensure we have a string value (even if empty)
-                if (prefillValue === null || prefillValue === undefined) {
-                  prefillValue = '';
-                }
-                
-                // FINAL FALLBACK: If still no prefill, check the stored unifiedFieldsMap that will be embedded in HTML
-                // This ensures we get the prefill even if it wasn't in the DOM during generation
-                if ((!prefillValue || prefillValue === '') && window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-                  // The unifiedFieldsMap should have been populated by now (it's set right before rendering)
-                  const mapField = window.unifiedFieldsMap[questionId].find(f => f.nodeId === fieldId && f.type === 'label' && f.prefill);
-                  if (mapField && mapField.prefill) {
-                    prefillValue = mapField.prefill;
-                    console.log('🔧 [MULTIPLE TEXTBOXES RENDER] FINAL FALLBACK - Found prefill in stored unifiedFieldsMap:', prefillValue);
-                  }
-                }
-                
-                console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Rendering label field:', { 
-                  fieldId, 
-                  label: field.label, 
-                  prefillValue, 
-                  fieldPrefill: field.prefill,
-                  allFieldsHasPrefill: allFieldsInOrder.find(f => f.nodeId === fieldId)?.prefill 
-                });
-                
+                const prefillValue = field.prefill || '';
+                console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Rendering label field:', { fieldId, label: field.label, prefillValue, fieldData: field });
                 if (field.label === 'State') {
                   // Use dropdown for State field
                   const dropdownDiv = document.createElement('div');
@@ -1886,7 +1796,7 @@ formHTML += `</div><br></div>`;
                   // Use regular input for other fields
                   const inputDiv = document.createElement('div');
                   const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
-                  console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Generated input HTML:', inputHTML, 'prefillValue:', prefillValue, 'willHaveValue:', prefillValue !== '' && prefillValue !== null && prefillValue !== undefined);
+                  console.log('🔧 [MULTIPLE TEXTBOXES RENDER] Generated input HTML:', inputHTML);
                   inputDiv.innerHTML = inputHTML;
                   entryContainer.appendChild(inputDiv.firstElementChild);
                 }
@@ -3291,50 +3201,7 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `  })();\n`;
           }
 
-          logicScriptBuffer += ` if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { \n`;
+          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { \n`;
           // Check if this is a numbered dropdown question and reset it before hiding
           // Use fallback check since data-question-type might not be reliable
           logicScriptBuffer += `   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');\n`;
@@ -3349,6 +3216,10 @@ formHTML += `</div><br></div>`;
           logicScriptBuffer += `   }\n`;
           logicScriptBuffer += `   thisQ.classList.add("hidden");\n`;
           logicScriptBuffer += ` }\n`;
+          logicScriptBuffer += `  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;\n`;
+          logicScriptBuffer += `  if(parentSection){\n`;
+          logicScriptBuffer += `    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));\n`;
+          logicScriptBuffer += `  }\n`;
           logicScriptBuffer += `}\n`;
 
           // attach event listeners
@@ -3617,6 +3488,13 @@ formHTML += `</div><br></div>`;
       }
     } // end each question
 
+    formHTML += `
+      <div class="question-nav" data-section-index="${s}">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="${s}">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="${s}">&rarr;</button>
+      </div>
+    `;
+
     // Section nav
     formHTML += '<br><br><div class="navigation-buttons">';
 if (s > 1){
@@ -3626,13 +3504,354 @@ if (s > 1){
 
     if (s === sectionCounter - 1) {
       formHTML += `<button type="submit" class="next-button">Submit</button>`;
-    } else {
-      formHTML += `<button type="button" class="next-button" onclick="validateAndProceed(${s})" id="next-button-${s}">Next</button>`;
     }
     formHTML += "</div>";
 
     formHTML += "</div>"; // end this section
   }
+
+  formHTML += `
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sectionNodeList = document.querySelectorAll('[id^="section"]');
+      const sectionElements = Array.from(sectionNodeList);
+      const sectionNumbers = sectionElements.map(sectionEl => {
+        const match = sectionEl.id && sectionEl.id.match(/^section(\\d+)$/);
+        return match ? parseInt(match[1], 10) : null;
+      });
+      if (!window.questionNavControllers) {
+        window.questionNavControllers = {};
+      }
+
+      sectionElements.forEach(function(sectionEl, sectionIdx) {
+        const questionItems = Array.from(sectionEl.querySelectorAll('.question-container.question-item'));
+        const navWrapper = sectionEl.querySelector('.question-nav');
+        if (!questionItems.length || !navWrapper) {
+          return;
+        }
+
+        const sectionId = sectionEl.id;
+        const currentSectionNumber = sectionNumbers[sectionIdx] || (sectionIdx + 1);
+        const prevBtn = navWrapper.querySelector('.question-prev');
+        const nextBtn = navWrapper.querySelector('.question-next');
+        const progressCurrent = navWrapper.querySelector('.question-current');
+        const progressTotal = navWrapper.querySelector('.question-total');
+
+        function getVisibleIndices() {
+          const indices = [];
+          questionItems.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return indices;
+        }
+
+        function getVisibleIndicesForSectionElement(targetSectionEl) {
+          const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+          const indices = [];
+          items.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return { indices, items };
+        }
+
+        function findNextSectionWithVisibleQuestions() {
+          for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
+            const candidateSection = sectionElements[nextIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: visibleInfo.indices[0]
+              };
+            }
+          }
+          return null;
+        }
+
+        function findPrevSectionWithVisibleQuestions() {
+          for (let prevIdx = sectionIdx - 1; prevIdx >= 0; prevIdx--) {
+            const candidateSection = sectionElements[prevIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[prevIdx] || (prevIdx + 1),
+                lastVisibleIndex: visibleInfo.indices[visibleInfo.indices.length - 1]
+              };
+            }
+          }
+          return null;
+        }
+
+        let activeIndex = -1;
+        let isUpdating = false;
+        let cachedNextSectionInfo = null;
+        let cachedPrevSectionInfo = null;
+
+        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo) {
+          if (prevBtn) {
+            const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
+            prevBtn.disabled = !canGoBack;
+            if (!canGoBack) {
+              prevBtn.dataset.advanceMode = '';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else if (hasPrevQuestion) {
+              prevBtn.dataset.advanceMode = 'question';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else {
+              prevBtn.dataset.advanceMode = 'section';
+              if (prevSectionInfo) {
+                prevBtn.dataset.prevSectionNumber = String(prevSectionInfo.sectionNumber);
+                prevBtn.dataset.prevSectionId = prevSectionInfo.sectionId;
+              }
+            }
+          }
+          if (nextBtn) {
+            const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+            nextBtn.disabled = !canAdvance;
+            if (!canAdvance) {
+              nextBtn.dataset.advanceMode = '';
+              delete nextBtn.dataset.nextSectionNumber;
+              delete nextBtn.dataset.nextSectionId;
+            } else if (canAdvanceWithinSection) {
+              nextBtn.dataset.advanceMode = 'question';
+              delete nextBtn.dataset.nextSectionNumber;
+              delete nextBtn.dataset.nextSectionId;
+            } else {
+              nextBtn.dataset.advanceMode = 'section';
+              if (nextSectionInfo) {
+                nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
+                nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+              }
+            }
+          }
+        }
+
+        function activateIndex(targetIdx) {
+          if (isUpdating) return;
+          isUpdating = true;
+          
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length) {
+            questionItems.forEach(function(item) {
+              item.classList.add('question-step-hidden');
+            });
+            if (progressCurrent) {
+              progressCurrent.textContent = '0';
+            }
+            if (progressTotal) {
+              progressTotal.textContent = String(questionItems.length);
+            }
+            if (prevBtn) {
+              prevBtn.disabled = true;
+            }
+            if (nextBtn) {
+              nextBtn.disabled = true;
+            }
+            activeIndex = -1;
+            isUpdating = false;
+            return;
+          }
+
+          if (visibleIndices.indexOf(targetIdx) === -1) {
+            targetIdx = visibleIndices[0];
+          }
+
+          questionItems.forEach(function(item, idx) {
+            if (idx === targetIdx && !item.classList.contains('hidden')) {
+              item.classList.remove('question-step-hidden');
+            } else {
+              item.classList.add('question-step-hidden');
+            }
+          });
+
+          const currentPos = visibleIndices.indexOf(targetIdx);
+          const position = currentPos + 1;
+          const visibleTotal = visibleIndices.length;
+          const displayTotal = questionItems.length;
+
+          if (progressCurrent) {
+            progressCurrent.textContent = String(position > 0 ? position : 0);
+          }
+          if (progressTotal) {
+            progressTotal.textContent = String(displayTotal);
+          }
+
+          const hasPrevQuestion = currentPos > 0;
+          const canAdvanceWithinSection = currentPos !== -1 && currentPos < visibleTotal - 1;
+          cachedNextSectionInfo = findNextSectionWithVisibleQuestions();
+          cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+          const canAdvanceAcrossSection = !!cachedNextSectionInfo;
+
+          updateButtons(
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo
+          );
+          activeIndex = targetIdx;
+          isUpdating = false;
+        }
+
+        function goToNextSection() {
+          if (!cachedNextSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedNextSectionInfo.sectionId;
+          const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const triggerNavigation = () => {
+            if (typeof validateAndProceed === 'function') {
+              validateAndProceed(currentSectionNumber);
+            } else if (typeof navigateSection === 'function') {
+              navigateSection(targetSectionNumber);
+            }
+          };
+          const updateTargetNav = () => {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId]();
+              }
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+
+        function goToPrevSection() {
+          if (!cachedPrevSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedPrevSectionInfo.sectionId;
+          const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
+          const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          const triggerNavigation = () => {
+            if (typeof navigateSection === 'function') {
+              navigateSection(targetSectionNumber);
+            } else if (typeof validateAndProceed === 'function') {
+              navigateSection(targetSectionNumber);
+            }
+          };
+          const updateTargetNav = () => {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId](targetQuestionIndex);
+              }
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+
+        function shiftQuestion(direction) {
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length || activeIndex === -1) {
+            if (direction > 0 && cachedNextSectionInfo) {
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+              goToPrevSection();
+            }
+            return;
+          }
+          const currentPos = visibleIndices.indexOf(activeIndex);
+          const nextPos = currentPos + direction;
+          if (nextPos < 0 || nextPos >= visibleIndices.length) {
+            if (direction > 0 && cachedNextSectionInfo) {
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+              goToPrevSection();
+            }
+            return;
+          }
+          activateIndex(visibleIndices[nextPos]);
+        }
+
+        function refreshNav(targetIdx) {
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length) {
+            activateIndex(0);
+            return;
+          }
+
+          if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+            const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
+            if (currentVisibleIdx === -1) {
+              activateIndex(visibleIndices[0]);
+            } else {
+              activateIndex(activeIndex);
+            }
+            return;
+          }
+
+          activateIndex(targetIdx);
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            shiftQuestion(-1);
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            shiftQuestion(1);
+          });
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+          if (isUpdating) return;
+          let shouldUpdate = false;
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const oldClasses = mutation.oldValue || '';
+              const newClasses = mutation.target.className || '';
+              if (oldClasses.includes('hidden') !== newClasses.includes('hidden')) {
+                shouldUpdate = true;
+              }
+            }
+          });
+          if (shouldUpdate) {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          }
+        });
+
+        questionItems.forEach(function(item) {
+          observer.observe(item, { 
+            attributes: true, 
+            attributeFilter: ['class'],
+            attributeOldValue: true
+          });
+        });
+
+        document.addEventListener('questionVisibilityChanged', function(evt) {
+          if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
+            refreshNav();
+          }
+        });
+
+        window.questionNavControllers[sectionId] = refreshNav;
+
+        const visibleIndices = getVisibleIndices();
+        if (visibleIndices.length) {
+          activateIndex(visibleIndices[0]);
+        } else {
+          activateIndex(0);
+        }
+      });
+    });
+  </script>
+  `;
 
   // Collect linked checkboxes data from GUI (must be before generateHiddenPDFFields)
   if (window.linkedCheckboxesConfig && window.linkedCheckboxesConfig.length > 0) {
@@ -3647,6 +3866,24 @@ if (s > 1){
   // Insert hidden fields (including multi-term calculations)
   const genHidden = generateHiddenPDFFields(formName);
   formHTML += genHidden.hiddenFieldsHTML;
+
+  // Ensure login modal helpers are safe even when modal markup is absent
+  formHTML += `
+  <script>
+    window.showLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    };
+    window.hideLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+  `;
 
   // Close the form & add the thank-you message
   formHTML += [
@@ -3668,7 +3905,7 @@ if (s > 1){
     '        </div>',
     '        <div class="pro-footer-col nav-col">',
     '            <div class="pro-footer-title">Navigation</div>',
-    '            <a href="../Pages/index.html">Home</a>',
+    '            <a href="index.html">Home</a>',
     '            <a href="../Pages/FreeForm.html">Forms</a>',
     '            <a href="../Pages/FAQ.html">FAQ</a>',
     '            <a href="../Pages/about.html">About Us</a>',
@@ -5163,7 +5400,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   } else {
     // In test mode, set user as logged in by default
     formHTML += `
-      let isUserLoggedIn = false;
+      let isUserLoggedIn = true;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
@@ -5323,52 +5560,18 @@ if (document.readyState === 'loading') {
 '        }\n' +
 '    });\n' +
 '}\n\n' +
-'// Function to apply prefill values from unifiedFieldsMap\n' +
-'function applyPrefillValues() {\n' +
-'    if (!window.unifiedFieldsMap) return;\n' +
-'    \n' +
-'    // Iterate through all questions in unifiedFieldsMap\n' +
-'    for (const questionId in window.unifiedFieldsMap) {\n' +
-'        const fields = window.unifiedFieldsMap[questionId];\n' +
-'        if (!Array.isArray(fields)) continue;\n' +
-'        \n' +
-'        // Find each field with a prefill value\n' +
-'        fields.forEach(field => {\n' +
-'            if (field.prefill && field.nodeId) {\n' +
-'                const input = document.getElementById(field.nodeId);\n' +
-'                // Apply prefill even if container is hidden - the value should be set regardless\n' +
-'                if (input && (input.type === \'text\' || input.type === \'email\' || input.type === \'tel\' || input.type === \'number\' || !input.type)) {\n' +
-'                    // Always apply prefill value from unifiedFieldsMap (it\'s the source of truth)\n' +
-'                    // Only set if the field is empty or if we\'re forcing an update\n' +
-'                    if (!input.value || input.value.trim() === \'\' || input.value !== field.prefill) {\n' +
-'                        input.value = field.prefill;\n' +
-'                        // Also update the value attribute to ensure it persists\n' +
-'                        input.setAttribute(\'value\', field.prefill);\n' +
-'                    }\n' +
-'                }\n' +
-'            }\n' +
-'        });\n' +
-'    }\n' +
-'}\n\n' +
 '// Auto-populate on page load\n' +
 'if (document.readyState === \'loading\') {\n' +
 '    document.addEventListener("DOMContentLoaded", function() {\n' +
 '        populateHiddenFieldsFromUrl();\n' +
 '        setupLinkedFields();\n' +
 '        replaceUrlParametersInForm();\n' +
-'        // Apply prefill values after a short delay to ensure all elements are ready\n' +
-'        // Use a longer delay to ensure visibility updates have run first\n' +
-'        setTimeout(applyPrefillValues, 200);\n' +
-'        // Also apply again after a bit more time to catch any late updates\n' +
-'        setTimeout(applyPrefillValues, 400);\n' +
 '    });\n' +
 '} else {\n' +
 '    // DOM already loaded, run immediately\n' +
 '    populateHiddenFieldsFromUrl();\n' +
 '    setupLinkedFields();\n' +
 '    replaceUrlParametersInForm();\n' +
-'    // Apply prefill values after a short delay to ensure all elements are ready\n' +
-'    setTimeout(applyPrefillValues, 100);\n' +
 '}\n\n' +
 '// Function to check paragraph limit and create hidden checkbox\n' +
 'function checkParagraphLimit(textareaId, paragraphLimit) {\n' +
@@ -7881,12 +8084,7 @@ function showTextboxLabels(questionId, count){
                     autofillValue = window.mappedData[fieldId];
                 }
                 
-                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                const isBlankValue = autofillValue === null || 
-                                   autofillValue === '' || 
-                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                
-                if (!isBlankValue) {
+                if (autofillValue !== null && autofillValue !== '') {
                     // Skip current_date field - it should be set dynamically
                     if (fieldId === 'current_date' || field.name === 'current_date') {
                         return;
@@ -9844,8 +10042,11 @@ if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
     if (!isUserLoggedIn) {
-      showLoginRequiredModal();
-      return;
+      var loginModal = document.getElementById('loginRequiredModal');
+      if (loginModal && typeof showLoginRequiredModal === 'function') {
+        showLoginRequiredModal();
+        return;
+      }
     }
     originalHandleNext(currentSection);
   };
@@ -10067,12 +10268,7 @@ if (typeof handleNext === 'function') {
                         autofillValue = mappedData[el.id];
                     }
                     
-                    // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                    const isBlankValue = autofillValue === null || 
-                                       autofillValue === '' || 
-                                       (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                    
-                    if (!isBlankValue) {
+                    if (autofillValue !== null) {
                             // Skip current_date field - it should be set dynamically
                             if (el.id === 'current_date' || el.name === 'current_date') {
 
@@ -10235,27 +10431,17 @@ if (typeof handleNext === 'function') {
                                     return;
                                 }
                                 
-                                const autofillValue = mappedData[el.name];
-                                
-                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                                const isBlankValue = autofillValue === null || 
-                                                   autofillValue === '' || 
-                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                                
                                 if (el.type === 'checkbox') {
-                                    el.checked = !!autofillValue;
+                                    el.checked = !!mappedData[el.name];
                                 } else if (el.type === 'radio') {
                                     // For radio buttons, only check the one that matches the value
-                                    if (el.value === autofillValue) {
+                                    if (el.value === mappedData[el.name]) {
                                         el.checked = true;
                                     } else {
                                         el.checked = false;
                                     }
                                 } else {
-                                    // Only set value if it's not blank
-                                    if (!isBlankValue) {
-                                        el.value = autofillValue;
-                                    }
+                                    el.value = mappedData[el.name];
                                 }
                             }
                         });
@@ -10269,13 +10455,6 @@ if (typeof handleNext === 'function') {
                             
                             const fieldById = fieldsById[fieldName];
                             if (fieldById && mappedData[fieldName]) {
-                                const autofillValue = mappedData[fieldName];
-                                
-                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                                const isBlankValue = autofillValue === null || 
-                                                   autofillValue === '' || 
-                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                                
                                 // Check if field needs autofilling (different logic for different field types)
                                 const needsAutofill = (fieldById.type === 'checkbox' || fieldById.type === 'radio') 
                                     ? !fieldById.checked 
@@ -10285,20 +10464,17 @@ if (typeof handleNext === 'function') {
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
                                             // For radio buttons, check if this specific radio should be selected
-                                            if (fieldById.value === autofillValue) {
+                                            if (fieldById.value === mappedData[fieldName]) {
                                                 fieldById.checked = true;
                                             } else {
                                                 fieldById.checked = false;
                                             }
                                         } else {
                                             // For checkboxes, use boolean value
-                                    fieldById.checked = !!autofillValue;
+                                    fieldById.checked = !!mappedData[fieldName];
                                         }
                                 } else {
-                                    // Only set value if it's not blank
-                                    if (!isBlankValue) {
-                                        fieldById.value = autofillValue;
-                                    }
+                                    fieldById.value = mappedData[fieldName];
                                     }
                                 }
                             }
@@ -10366,27 +10542,13 @@ if (typeof handleNext === 'function') {
                                                     // Check first pattern
                                                     let fieldElement = document.getElementById(fieldId1);
                                                     if (fieldElement && mappedData[fieldId1]) {
-                                                        // 🔧 NEW: Prevent autofilling with blank values
-                                                        const autofillValue1 = mappedData[fieldId1];
-                                                        const isBlank1 = autofillValue1 === null || 
-                                                                        autofillValue1 === '' || 
-                                                                        (typeof autofillValue1 === 'string' && autofillValue1.trim() === '');
-                                                        if (!isBlank1) {
-                                                            fieldElement.value = autofillValue1;
-                                                        }
+                                                        fieldElement.value = mappedData[fieldId1];
                                                     }
                                                     
                                                     // Check second pattern
                                                     fieldElement = document.getElementById(fieldId2);
                                                     if (fieldElement && mappedData[fieldId2]) {
-                                                        // 🔧 NEW: Prevent autofilling with blank values
-                                                        const autofillValue2 = mappedData[fieldId2];
-                                                        const isBlank2 = autofillValue2 === null || 
-                                                                        autofillValue2 === '' || 
-                                                                        (typeof autofillValue2 === 'string' && autofillValue2.trim() === '');
-                                                        if (!isBlank2) {
-                                                            fieldElement.value = autofillValue2;
-                                                        }
+                                                        fieldElement.value = mappedData[fieldId2];
                                                     }
                                                 });
                                             }
@@ -10460,27 +10622,13 @@ if (typeof handleNext === 'function') {
                                                 // Check first pattern
                                                 let fieldElement = document.getElementById(fieldId1);
                                                 if (fieldElement && mappedData[fieldId1]) {
-                                                    // 🔧 NEW: Prevent autofilling with blank values
-                                                    const autofillValue1 = mappedData[fieldId1];
-                                                    const isBlank1 = autofillValue1 === null || 
-                                                                    autofillValue1 === '' || 
-                                                                    (typeof autofillValue1 === 'string' && autofillValue1.trim() === '');
-                                                    if (!isBlank1) {
-                                                        fieldElement.value = autofillValue1;
-                                                    }
+                                                    fieldElement.value = mappedData[fieldId1];
                                                 }
                                                 
                                                 // Check second pattern
                                                 fieldElement = document.getElementById(fieldId2);
                                                 if (fieldElement && mappedData[fieldId2]) {
-                                                    // 🔧 NEW: Prevent autofilling with blank values
-                                                    const autofillValue2 = mappedData[fieldId2];
-                                                    const isBlank2 = autofillValue2 === null || 
-                                                                    autofillValue2 === '' || 
-                                                                    (typeof autofillValue2 === 'string' && autofillValue2.trim() === '');
-                                                    if (!isBlank2) {
-                                                        fieldElement.value = autofillValue2;
-                                                    }
+                                                    fieldElement.value = mappedData[fieldId2];
                                                 }
                                             });
                                         }
@@ -10512,12 +10660,7 @@ if (typeof handleNext === 'function') {
 
                 }
                 
-                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                const isBlankValue = autofillValue === null || 
-                                   autofillValue === '' || 
-                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                
-                if (!isBlankValue) {
+                if (autofillValue !== null) {
                     // Skip current_date field - it should be set dynamically
                     if (el.id === 'current_date' || el.name === 'current_date') {
                         return;
@@ -10583,13 +10726,8 @@ if (typeof handleNext === 'function') {
                         autofillValue = mappedData[el.id];
                     }
                     
-                    // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                    const isBlankValue = autofillValue === null || 
-                                       autofillValue === '' || 
-                                       (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                    
-                    // Only process fields that have autofill data but are still empty, AND the autofill value is not blank
-                    if (!isBlankValue && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                    // Only process fields that have autofill data but are still empty
+                    if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                         el.value = autofillValue;
                         
                         // Dispatch input and change events for text inputs to trigger linked textbox syncing
@@ -11044,13 +11182,8 @@ if (typeof handleNext === 'function') {
                                     autofillValue = data[el.id];
                                 }
                                 
-                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                                const isBlankValue = autofillValue === null || 
-                                                   autofillValue === '' || 
-                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                                
-                                // Only process fields that have autofill data but are still empty, AND the autofill value is not blank
-                                if (!isBlankValue && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                                // Only process fields that have autofill data but are still empty
+                                if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                                     el.value = autofillValue;
                                     
                                     // Dispatch input and change events for text inputs to trigger linked textbox syncing
@@ -11172,7 +11305,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = '../Pages/index.html';
+                        window.location.href = 'index.html';
                     }).catch(function(error) {
 
                     });
@@ -13160,5 +13293,3 @@ function generateHiddenPDFFields(formName) {
     hiddenFieldsHTML += "\n</div>";
     return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
-
-

@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="generate2.css">
     <style>
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
+        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 24px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 700px; width: 100%; }
+        .question-container .question-text { margin-top: 0; }
+        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .question-nav { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 12px auto 0; max-width: 700px; }
+        .question-nav-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: linear-gradient(135deg, #4da3ff, #1c7ed6); color: #ffffff; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 14px rgba(30,73,150,0.18); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
+        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
+        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
+        .question-step-hidden { display: none !important; }
         .address-field { margin: 4px auto; }
         .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
         .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
@@ -233,150 +242,375 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3 class="question-text">Are you the only person suing?</h3></label><select id="are_you_the_only_person_suing" name="are_you_the_only_person_suing"
-                      onchange="dropdownMirror(this, 'are_you_the_only_person_suing'); updateHiddenLogic('are_you_the_only_person_suing', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_are_you_the_only_person_suing"></div>
-              <input type="text" id="are_you_the_only_person_suing_dropdown" name="are_you_the_only_person_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container hidden"><label><h3 class="question-text">Please explain</h3></label><div id="labelContainer2"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="please_explain_name" name="please_explain_name" placeholder="Name" class="address-input"></div><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(135, 206, 235); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(230, 243, 255) 100%); box-shadow: rgba(135, 206, 235, 0.15) 0px 2px 8px;"><h4 style="margin: 0px 0px 15px; color: rgb(41, 128, 185); font-size: 18px; font-weight: 600; text-align: center;">Example One</h4><div style="margin: 12px 0px; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); display: flex; align-items: center; transition: 0.2s;"><input type="checkbox" id="please_explain_example_one_test1" name="please_explain_example_one_test1" value="Test1" onchange="
-                        var self = this; (function() {
-                            const linkedFields = [{&quot;nodeId&quot;:&quot;please_explain_name&quot;,&quot;title&quot;:&quot;please_explain_example_one_test1_please_explain_name&quot;}];
-                            const pdfEntries = [];
-                            const checkboxId = 'please_explain_example_one_test1';
-                            const checkbox = self; // Use captured 'this' from inline handler
-                            const isChecked = checkbox ? checkbox.checked : false;
-                            
-                            console.log('🔧 [LINKED TEXTBOX] Checkbox changed (multipleTextboxes):', checkboxId, 'checked:', isChecked);
-                            
-                            if (isChecked) {
-                                // Create linked textboxes
-                                linkedFields.forEach((linkedField) =&gt; {
-                                    console.log('🔧 [LINKED TEXTBOX] Processing linkedField:', linkedField);
-                                    if (linkedField.nodeId &amp;&amp; linkedField.title) {
-                                        console.log('🔧 [LINKED TEXTBOX] Looking for source field with ID:', linkedField.nodeId);
-                                        const sourceField = document.getElementById(linkedField.nodeId);
-                                        if (sourceField) {
-                                            console.log('🔧 [LINKED TEXTBOX] Source field found:', sourceField.id, 'value:', sourceField.value);
-                                            // Check if hidden textbox already exists
-                                            const existingHiddenTextbox = document.getElementById(linkedField.title);
-                                            if (existingHiddenTextbox) {
-                                                console.log('🔧 [LINKED TEXTBOX] Hidden textbox already exists:', linkedField.title);
-                                                return; // Skip creating duplicate
-                                            }
-                                            
-                                            // Create hidden textbox with title as ID
-                                            const hiddenTextbox = document.createElement('input');
-                                            hiddenTextbox.type = 'text';
-                                            hiddenTextbox.id = linkedField.title;
-                                            hiddenTextbox.name = linkedField.title;
-                                            hiddenTextbox.style.display = 'none';
-                                            hiddenTextbox.value = sourceField.value || '';
-                                            
-                                            console.log('🔧 [LINKED TEXTBOX] Creating hidden textbox:', linkedField.title, 'linked to:', linkedField.nodeId);
-                                            
-                                            // Add to form (append to body or a container)
-                                            document.body.appendChild(hiddenTextbox);
-                                            
-                                            // Sync with source field
-                                            function syncLinkedField() {
-                                                hiddenTextbox.value = sourceField.value || '';
-                                                // Trigger linked field synchronization if updateLinkedFields function exists
-                                                if (typeof updateLinkedFields === 'function') {
-                                                    updateLinkedFields();
-                                                }
-                                            }
-                                            
-                                            // Initial sync
-                                            syncLinkedField();
-                                            
-                                            // Listen for changes on source field
-                                            sourceField.addEventListener('input', syncLinkedField);
-                                            sourceField.addEventListener('change', syncLinkedField);
-                                            
-                                            // Poll periodically to catch any missed updates (especially for autofill)
-                                            const pollInterval = setInterval(function() {
-                                                if (hiddenTextbox.value !== sourceField.value) {
-                                                    syncLinkedField();
-                                                }
-                                            }, 100); // Check every 100ms
-                                            
-                                            // Store references for cleanup
-                                            hiddenTextbox._syncFunction = syncLinkedField;
-                                            hiddenTextbox._sourceField = sourceField;
-                                            hiddenTextbox._pollInterval = pollInterval;
-                                            
-                                            console.log('🔧 [LINKED TEXTBOX] Hidden textbox created and synced:', linkedField.title);
-                                        } else {
-                                            console.log('🔧 [LINKED TEXTBOX] ❌ Source field NOT found with ID:', linkedField.nodeId);
-                                        }
-                                    } else {
-                                        console.log('🔧 [LINKED TEXTBOX] ❌ Invalid linkedField - missing nodeId or title:', linkedField);
-                                    }
-                                });
-                                
-                                // Add PDF entries
-                                pdfEntries.forEach((pdfEntry) =&gt; {
-                                    const triggerNumber = parseInt(pdfEntry.triggerNumber) || 1;
-                                    if (triggerNumber === 1 &amp;&amp; pdfEntry.pdfName &amp;&amp; pdfEntry.pdfFile &amp;&amp; pdfEntry.priceId) {
-                                        if (!window.checkboxPdfEntries) {
-                                            window.checkboxPdfEntries = [];
-                                        }
-                                        const existingEntry = window.checkboxPdfEntries.find(entry =&gt; 
-                                            entry.pdfName === pdfEntry.pdfName &amp;&amp; 
-                                            entry.checkboxId === checkboxId
-                                        );
-                                        if (!existingEntry) {
-                                            window.checkboxPdfEntries.push({
-                                                pdfName: pdfEntry.pdfName,
-                                                pdfFile: pdfEntry.pdfFile,
-                                                priceId: pdfEntry.priceId,
-                                                entryNumber: 1,
-                                                checkboxId: checkboxId
-                                            });
-                                            console.log('🔧 [PDF ENTRY] Added PDF entry (multipleTextboxes):', {
-                                                pdfName: pdfEntry.pdfName,
-                                                pdfFile: pdfEntry.pdfFile,
-                                                priceId: pdfEntry.priceId,
-                                                checkboxId: checkboxId
-                                            });
-                                        }
-                                    }
-                                });
-                            } else {
-                                // Remove linked textboxes
-                                linkedFields.forEach((linkedField) =&gt; {
-                                    if (linkedField.title) {
-                                        const hiddenTextbox = document.getElementById(linkedField.title);
-                                        if (hiddenTextbox) {
-                                            // Remove event listeners
-                                            if (hiddenTextbox._syncFunction &amp;&amp; hiddenTextbox._sourceField) {
-                                                hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
-                                                hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
-                                            }
-                                            // Clear polling interval
-                                            if (hiddenTextbox._pollInterval) {
-                                                clearInterval(hiddenTextbox._pollInterval);
-                                            }
-                                            // Remove the hidden textbox
-                                            hiddenTextbox.remove();
-                                        }
-                                    }
-                                });
-                                
-                                // Update linked fields after removing textboxes
-                                if (typeof updateLinkedFields === 'function') {
-                                    updateLinkedFields();
-                                }
-                                
-                                // Remove PDF entries
-                                if (window.checkboxPdfEntries) {
-                                    window.checkboxPdfEntries = window.checkboxPdfEntries.filter(entry =&gt; 
-                                        entry.checkboxId !== checkboxId
-                                    );
-                                }
-                            }
-                        })();
-                    " style="margin-right: 12px; width: 18px; height: 18px; accent-color: rgb(41, 128, 185); cursor: pointer;"><label for="please_explain_example_one_test1" style="flex: 1 1 0%; cursor: pointer; color: rgb(44, 62, 80); font-size: 15px; font-weight: 500; margin: 0px;">Test1</label></div></div></div><br></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Thirsty?</h3></label><select id="thirsty" name="thirsty"
+                      onchange="dropdownMirror(this, 'thirsty'); updateHiddenLogic('thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_thirsty"></div>
+              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
+                   readonly style="display:none;"></div>
+        <div class="question-nav" data-section-index="1">
+          <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
+          <div class="question-progress">Question <span class="question-current">1</span> of <span class="question-total">2</span></div>
+          <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
+        </div>
+      <br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-3" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">sleepy?</h3></label><select id="sleepy" name="sleepy"
+                      onchange="dropdownMirror(this, 'sleepy'); updateHiddenLogic('sleepy', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option></select><br>
+              <div id="dropdowntext_sleepy"></div>
+              <input type="text" id="sleepy_dropdown" name="sleepy_dropdown"
+                   readonly style="display:none;"></div>
+        <div class="question-nav" data-section-index="2">
+          <button type="button" class="question-nav-btn question-prev" disabled aria-label="Previous question" data-section="2">&larr;</button>
+          <div class="question-progress">Question <span class="question-current">1</span> of <span class="question-total">1</span></div>
+          <button type="button" class="question-nav-btn question-next" disabled aria-label="Next question" data-section="2">&rarr;</button>
+        </div>
+      <br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sectionNodeList = document.querySelectorAll('[id^="section"]');
+      const sectionElements = Array.from(sectionNodeList);
+      const sectionNumbers = sectionElements.map(sectionEl => {
+        const match = sectionEl.id && sectionEl.id.match(/^section(\d+)$/);
+        return match ? parseInt(match[1], 10) : null;
+      });
+      if (!window.questionNavControllers) {
+        window.questionNavControllers = {};
+      }
+
+      sectionElements.forEach(function(sectionEl, sectionIdx) {
+        const questionItems = Array.from(sectionEl.querySelectorAll('.question-container.question-item'));
+        const navWrapper = sectionEl.querySelector('.question-nav');
+        if (!questionItems.length || !navWrapper) {
+          return;
+        }
+
+        const sectionId = sectionEl.id;
+        const currentSectionNumber = sectionNumbers[sectionIdx] || (sectionIdx + 1);
+        const prevBtn = navWrapper.querySelector('.question-prev');
+        const nextBtn = navWrapper.querySelector('.question-next');
+        const progressCurrent = navWrapper.querySelector('.question-current');
+        const progressTotal = navWrapper.querySelector('.question-total');
+
+        function getVisibleIndices() {
+          const indices = [];
+          questionItems.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return indices;
+        }
+
+        function getVisibleIndicesForSectionElement(targetSectionEl) {
+          const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+          const indices = [];
+          items.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return { indices, items };
+        }
+
+        function findNextSectionWithVisibleQuestions() {
+          for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
+            const candidateSection = sectionElements[nextIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: visibleInfo.indices[0]
+              };
+            }
+          }
+          return null;
+        }
+
+        function findPrevSectionWithVisibleQuestions() {
+          for (let prevIdx = sectionIdx - 1; prevIdx >= 0; prevIdx--) {
+            const candidateSection = sectionElements[prevIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[prevIdx] || (prevIdx + 1),
+                lastVisibleIndex: visibleInfo.indices[visibleInfo.indices.length - 1]
+              };
+            }
+          }
+          return null;
+        }
+
+        let activeIndex = -1;
+        let isUpdating = false;
+        let cachedNextSectionInfo = null;
+        let cachedPrevSectionInfo = null;
+
+        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo) {
+          if (prevBtn) {
+            const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
+            prevBtn.disabled = !canGoBack;
+            if (!canGoBack) {
+              prevBtn.dataset.advanceMode = '';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else if (hasPrevQuestion) {
+              prevBtn.dataset.advanceMode = 'question';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else {
+              prevBtn.dataset.advanceMode = 'section';
+              if (prevSectionInfo) {
+                prevBtn.dataset.prevSectionNumber = String(prevSectionInfo.sectionNumber);
+                prevBtn.dataset.prevSectionId = prevSectionInfo.sectionId;
+              }
+            }
+          }
+          if (nextBtn) {
+            const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+            nextBtn.disabled = !canAdvance;
+            if (!canAdvance) {
+              nextBtn.dataset.advanceMode = '';
+              delete nextBtn.dataset.nextSectionNumber;
+              delete nextBtn.dataset.nextSectionId;
+            } else if (canAdvanceWithinSection) {
+              nextBtn.dataset.advanceMode = 'question';
+              delete nextBtn.dataset.nextSectionNumber;
+              delete nextBtn.dataset.nextSectionId;
+            } else {
+              nextBtn.dataset.advanceMode = 'section';
+              if (nextSectionInfo) {
+                nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
+                nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+              }
+            }
+          }
+        }
+
+        function activateIndex(targetIdx) {
+          if (isUpdating) return;
+          isUpdating = true;
+          
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length) {
+            questionItems.forEach(function(item) {
+              item.classList.add('question-step-hidden');
+            });
+            if (progressCurrent) {
+              progressCurrent.textContent = '0';
+            }
+            if (progressTotal) {
+              progressTotal.textContent = String(questionItems.length);
+            }
+            if (prevBtn) {
+              prevBtn.disabled = true;
+            }
+            if (nextBtn) {
+              nextBtn.disabled = true;
+            }
+            activeIndex = -1;
+            isUpdating = false;
+            return;
+          }
+
+          if (visibleIndices.indexOf(targetIdx) === -1) {
+            targetIdx = visibleIndices[0];
+          }
+
+          questionItems.forEach(function(item, idx) {
+            if (idx === targetIdx && !item.classList.contains('hidden')) {
+              item.classList.remove('question-step-hidden');
+            } else {
+              item.classList.add('question-step-hidden');
+            }
+          });
+
+          const currentPos = visibleIndices.indexOf(targetIdx);
+          const position = currentPos + 1;
+          const visibleTotal = visibleIndices.length;
+          const displayTotal = questionItems.length;
+
+          if (progressCurrent) {
+            progressCurrent.textContent = String(position > 0 ? position : 0);
+          }
+          if (progressTotal) {
+            progressTotal.textContent = String(displayTotal);
+          }
+
+          const hasPrevQuestion = currentPos > 0;
+          const canAdvanceWithinSection = currentPos !== -1 && currentPos < visibleTotal - 1;
+          cachedNextSectionInfo = findNextSectionWithVisibleQuestions();
+          cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+          const canAdvanceAcrossSection = !!cachedNextSectionInfo;
+
+          updateButtons(
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo
+          );
+          activeIndex = targetIdx;
+          isUpdating = false;
+        }
+
+        function goToNextSection() {
+          if (!cachedNextSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedNextSectionInfo.sectionId;
+          const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const triggerNavigation = () => {
+            if (typeof validateAndProceed === 'function') {
+              validateAndProceed(currentSectionNumber);
+            } else if (typeof navigateSection === 'function') {
+              navigateSection(targetSectionNumber);
+            }
+          };
+          const updateTargetNav = () => {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId]();
+              }
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+
+        function goToPrevSection() {
+          if (!cachedPrevSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedPrevSectionInfo.sectionId;
+          const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
+          const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          const triggerNavigation = () => {
+            if (typeof navigateSection === 'function') {
+              navigateSection(targetSectionNumber);
+            } else if (typeof validateAndProceed === 'function') {
+              navigateSection(targetSectionNumber);
+            }
+          };
+          const updateTargetNav = () => {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId](targetQuestionIndex);
+              }
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+
+        function shiftQuestion(direction) {
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length || activeIndex === -1) {
+            if (direction > 0 && cachedNextSectionInfo) {
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+              goToPrevSection();
+            }
+            return;
+          }
+          const currentPos = visibleIndices.indexOf(activeIndex);
+          const nextPos = currentPos + direction;
+          if (nextPos < 0 || nextPos >= visibleIndices.length) {
+            if (direction > 0 && cachedNextSectionInfo) {
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+              goToPrevSection();
+            }
+            return;
+          }
+          activateIndex(visibleIndices[nextPos]);
+        }
+
+        function refreshNav(targetIdx) {
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length) {
+            activateIndex(0);
+            return;
+          }
+
+          if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+            const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
+            if (currentVisibleIdx === -1) {
+              activateIndex(visibleIndices[0]);
+            } else {
+              activateIndex(activeIndex);
+            }
+            return;
+          }
+
+          activateIndex(targetIdx);
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            shiftQuestion(-1);
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            shiftQuestion(1);
+          });
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+          if (isUpdating) return;
+          let shouldUpdate = false;
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const oldClasses = mutation.oldValue || '';
+              const newClasses = mutation.target.className || '';
+              if (oldClasses.includes('hidden') !== newClasses.includes('hidden')) {
+                shouldUpdate = true;
+              }
+            }
+          });
+          if (shouldUpdate) {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          }
+        });
+
+        questionItems.forEach(function(item) {
+          observer.observe(item, { 
+            attributes: true, 
+            attributeFilter: ['class'],
+            attributeOldValue: true
+          });
+        });
+
+        document.addEventListener('questionVisibilityChanged', function(evt) {
+          if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
+            refreshNav();
+          }
+        });
+
+        window.questionNavControllers[sectionId] = refreshNav;
+
+        const visibleIndices = getVisibleIndices();
+        if (visibleIndices.length) {
+          activateIndex(visibleIndices[0]);
+        } else {
+          activateIndex(0);
+        }
+      });
+    });
+  </script>
+  <div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -502,10 +736,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"are_you_the_only_person_suing","2":"please_explain"};
-var questionNameIds = {"1":"are_you_the_only_person_suing","2":"please_explain"};
+var questionSlugMap = {"1":"hungry","2":"thirsty","3":"sleepy"};
+var questionNameIds = {"1":"hungry","2":"thirsty","3":"sleepy"};
 var linkedCheckboxes = [];
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"please_explain_name","order":1,"prefill":"adam"},{"type":"checkbox","fieldName":"Example One","selectionType":"multiple","options":[{"text":"Test1","nodeId":"please_explain_example_one_test1","linkedFields":[{"nodeId":"please_explain_name","title":"please_explain_example_one_test1_please_explain_name"}],"pdfEntries":[]}],"order":2}]};
+var unifiedFieldsMap = {};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId, triggerCondition, isMultipleTextboxes) {
     // Default parameters for backward compatibility
@@ -1970,53 +2204,18 @@ function replaceUrlParametersInForm() {
     });
 }
 
-// Function to apply prefill values from unifiedFieldsMap
-function applyPrefillValues() {
-    if (!window.unifiedFieldsMap) return;
-    
-    // Iterate through all questions in unifiedFieldsMap
-    for (const questionId in window.unifiedFieldsMap) {
-        const fields = window.unifiedFieldsMap[questionId];
-        if (!Array.isArray(fields)) continue;
-        
-        // Find each field with a prefill value
-        fields.forEach(field => {
-            if (field.prefill && field.nodeId) {
-                const input = document.getElementById(field.nodeId);
-                // Apply prefill even if container is hidden - the value should be set regardless
-                if (input && (input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || !input.type)) {
-                    // Always apply prefill value from unifiedFieldsMap (it's the source of truth)
-                    // Only set if the field is empty or if we're forcing an update
-                    if (!input.value || input.value.trim() === '' || input.value !== field.prefill) {
-                        input.value = field.prefill;
-                        // Also update the value attribute to ensure it persists
-                        input.setAttribute('value', field.prefill);
-                    }
-                }
-            }
-        });
-    }
-}
-
 // Auto-populate on page load
 if (document.readyState === 'loading') {
     document.addEventListener("DOMContentLoaded", function() {
         populateHiddenFieldsFromUrl();
         setupLinkedFields();
         replaceUrlParametersInForm();
-        // Apply prefill values after a short delay to ensure all elements are ready
-        // Use a longer delay to ensure visibility updates have run first
-        setTimeout(applyPrefillValues, 200);
-        // Also apply again after a bit more time to catch any late updates
-        setTimeout(applyPrefillValues, 400);
     });
 } else {
     // DOM already loaded, run immediately
     populateHiddenFieldsFromUrl();
     setupLinkedFields();
     replaceUrlParametersInForm();
-    // Apply prefill values after a short delay to ensure all elements are ready
-    setTimeout(applyPrefillValues, 100);
 }
 
 // Function to check paragraph limit and create hidden checkbox
@@ -2088,50 +2287,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -2144,6 +2300,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "1";
