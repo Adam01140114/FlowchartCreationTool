@@ -16,7 +16,8 @@ let contextMenu, notesContextMenu, edgeContextMenu, edgeStyleSubmenu, typeSubmen
 let deleteNode, copyNodeButton, jumpNode, yesNoNode, changeType, calcTypeBtn, subtitleTypeBtn, infoTypeBtn, propertiesButton;
 let regularOptionType, imageOptionType, amountOptionType, notesNodeType, alertNodeType, checklistNodeType, endNodeType;
 let notesBoldButton, notesFontButton, notesCopyButton, notesDeleteButton;
-let newSectionButton, untangleEdge, changeEdgeStyle, deleteEdge, edgeStyleCurved, edgeStyleDirect;
+let newSectionButton, untangleEdge, changeEdgeStyle, disableDragEdge, deleteEdge, edgeStyleCurved, edgeStyleDirect;
+let disableDragNode;
 let placeQuestionNode, placeOptionNode, placeSampleQuestionNode, placeMiscellaneousNode;
 
 
@@ -59,9 +60,11 @@ function initializeContextMenuElements() {
   newSectionButton = document.getElementById('newSectionNode');
   untangleEdge = document.getElementById('untangleEdge');
   changeEdgeStyle = document.getElementById('changeEdgeStyle');
+  disableDragEdge = document.getElementById('disableDragEdge');
   deleteEdge = document.getElementById('deleteEdge');
   edgeStyleCurved = document.getElementById('edgeStyleCurved');
   edgeStyleDirect = document.getElementById('edgeStyleDirect');
+  disableDragNode = document.getElementById('disableDragNode');
   
   placeQuestionNode = document.getElementById('placeQuestionNode');
   placeOptionNode = document.getElementById('placeOptionNode');
@@ -102,19 +105,53 @@ function autoSelectConnectingEdges() {
   
   const sel = graph.getSelectionCells();
   const verts = sel.filter(c => c && c.vertex);
-  if (verts.length < 2) return;
-
+  
+  // If there are 2 or more vertices, find edges between them
   const toAdd = [];
-  for (let i = 0; i < verts.length; i++) {
-    for (let j = i + 1; j < verts.length; j++) {
-      const between = graph.getEdgesBetween(verts[i], verts[j], false) || [];
-      for (const e of between) {
-        if (!sel.includes(e) && !toAdd.includes(e)) toAdd.push(e);
+  if (verts.length >= 2) {
+    for (let i = 0; i < verts.length; i++) {
+      for (let j = i + 1; j < verts.length; j++) {
+        // Check edges in both directions
+        const between1 = graph.getEdgesBetween(verts[i], verts[j], false) || [];
+        const between2 = graph.getEdgesBetween(verts[j], verts[i], false) || [];
+        const allBetween = [...between1, ...between2];
+        
+        for (const e of allBetween) {
+          if (!sel.includes(e) && !toAdd.includes(e)) {
+            toAdd.push(e);
+          }
+        }
       }
     }
   }
-  if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
+  
+  // Also find edges that connect any selected vertex to any other selected vertex
+  // This handles cases where edges might connect through intermediate nodes
+  for (const vert of verts) {
+    const outgoingEdges = graph.getOutgoingEdges(vert) || [];
+    const incomingEdges = graph.getIncomingEdges(vert) || [];
+    const allEdges = [...outgoingEdges, ...incomingEdges];
+    
+    for (const edge of allEdges) {
+      const source = edge.source;
+      const target = edge.target;
+      
+      // If both source and target are in the selected vertices, add the edge
+      if (source && target && 
+          verts.includes(source) && verts.includes(target) &&
+          !sel.includes(edge) && !toAdd.includes(edge)) {
+        toAdd.push(edge);
+      }
+    }
+  }
+  
+  if (toAdd.length) {
+    graph.getSelectionModel().addCells(toAdd);
+  }
 }
+
+// Make function available globally
+window.autoSelectConnectingEdges = autoSelectConnectingEdges;
 
 /**
  * Hide all context menus and submenus
@@ -193,6 +230,13 @@ function setupContextMenus(graph) {
           const y = evt.clientY;
           
           if (edgeContextMenu) {
+            // Update "Disable Drag" button text based on current state
+            const edge = selectedCells[0];
+            const isDragDisabled = edge.style && edge.style.includes('dragDisabled=1');
+            if (disableDragEdge) {
+              disableDragEdge.textContent = isDragDisabled ? 'Enable Drag' : 'Disable Drag';
+            }
+            
             edgeContextMenu.style.display = 'block';
             edgeContextMenu.style.left = x + 'px';
             edgeContextMenu.style.top = y + 'px';
@@ -251,6 +295,12 @@ function setupContextMenus(graph) {
                 changeType.style.display = 'block';
                 changeType.textContent = 'Change Type';
               }
+              // Show and update "Disable Drag" button for question nodes
+              if (disableDragNode) {
+                disableDragNode.style.display = 'block';
+                const isDragDisabled = cell.style && cell.style.includes('dragDisabled=1');
+                disableDragNode.textContent = isDragDisabled ? 'Enable Drag' : 'Disable Drag';
+              }
             } else if (getNodeType(cell) === 'options') {
               if (yesNoNode) yesNoNode.style.display = 'none';
               if (changeType) {
@@ -258,9 +308,13 @@ function setupContextMenus(graph) {
                 // Change the text to indicate it's for option types
                 changeType.textContent = 'Change Option Type';
               }
+              // Hide "Disable Drag" button for option nodes
+              if (disableDragNode) disableDragNode.style.display = 'none';
             } else {
               if (yesNoNode) yesNoNode.style.display = 'none';
               if (changeType) changeType.style.display = 'none';
+              // Hide "Disable Drag" button for other node types
+              if (disableDragNode) disableDragNode.style.display = 'none';
             }
           }
         }
@@ -359,6 +413,46 @@ function setupContextMenuEventListeners(graph) {
     }
     hideContextMenu();
   });
+
+  // Disable/Enable drag for question nodes
+  if (disableDragNode) {
+    disableDragNode.addEventListener('click', function() {
+      const selectedCells = graph.getSelectionCells();
+      if (selectedCells.length === 1) {
+        const cell = selectedCells[0];
+        // Only allow for question nodes
+        if (getNodeType(cell) === 'question') {
+          let style = cell.style || "";
+          
+          // Check if drag is currently disabled
+          const isDragDisabled = style.includes('dragDisabled=1');
+          
+          if (isDragDisabled) {
+            // Enable drag - remove dragDisabled
+            style = style.replace(/dragDisabled=1;?/g, '');
+            // Clean up any double semicolons
+            style = style.replace(/;;+/g, ';');
+            if (style.endsWith(';')) {
+              style = style.slice(0, -1);
+            }
+          } else {
+            // Disable drag - add dragDisabled
+            if (!style.includes('dragDisabled=')) {
+              style += (style ? ';' : '') + 'dragDisabled=1';
+            }
+          }
+          
+          graph.getModel().setStyle(cell, style);
+          graph.refresh();
+          
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        }
+      }
+      hideContextMenu();
+    });
+  }
 
   // 'Change Type' -> Show submenu
   if (changeType) changeType.addEventListener("click", () => {
@@ -1072,6 +1166,48 @@ function setupContextMenuEventListeners(graph) {
         edgeStyleSubmenu.style.left = rect.right + "px";
         edgeStyleSubmenu.style.top = rect.top + "px";
       }
+    });
+  }
+
+  if (disableDragEdge) {
+    disableDragEdge.addEventListener('click', function() {
+      const selectedCells = graph.getSelectionCells();
+      if (selectedCells.length === 1 && selectedCells[0].edge) {
+        const edge = selectedCells[0];
+        let style = edge.style || "";
+        
+        // Check if drag is currently disabled
+        const isDragDisabled = style.includes('dragDisabled=1');
+        
+        if (isDragDisabled) {
+          // Enable drag - remove dragDisabled and strokeDasharray
+          style = style.replace(/dragDisabled=1;?/g, '');
+          style = style.replace(/strokeDasharray=[^;]+;?/g, '');
+          // Clean up any double semicolons
+          style = style.replace(/;;+/g, ';');
+          if (style.endsWith(';')) {
+            style = style.slice(0, -1);
+          }
+          disableDragEdge.textContent = 'Disable Drag';
+        } else {
+          // Disable drag - add dragDisabled and make edge dotted
+          if (!style.includes('dragDisabled=')) {
+            style += (style ? ';' : '') + 'dragDisabled=1';
+          }
+          // Add or update strokeDasharray for visual indicator
+          style = style.replace(/strokeDasharray=[^;]+/g, '');
+          style += ';strokeDasharray=5,5';
+          disableDragEdge.textContent = 'Enable Drag';
+        }
+        
+        graph.getModel().setStyle(edge, style);
+        graph.refresh();
+        
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      }
+      hideContextMenu();
     });
   }
 

@@ -262,6 +262,11 @@ function setupGraphEventListeners(graph) {
     // Node IDs should only change when manually edited or reset using the button
     window.lastSelectedCell = graph.getSelectionCell();
     
+    // Auto-select edges between selected nodes
+    if (typeof window.autoSelectConnectingEdges === 'function') {
+      window.autoSelectConnectingEdges();
+    }
+    
     // Highlight the section in the legend if a cell is selected
     const selectedCell = graph.getSelectionCell();
     if (selectedCell) {
@@ -302,15 +307,43 @@ function setupGraphEventListeners(graph) {
       const descendants = new Set();
       const queue = [cell];
       
+      // Check if the source question node has drag disabled
+      const isSourceDragDisabled = cell.style && cell.style.includes('dragDisabled=1');
+      
       while (queue.length > 0) {
         const current = queue.shift();
         const edges = graph.getOutgoingEdges(current) || [];
         
         edges.forEach(edge => {
+          // Skip edges with drag disabled
+          const isEdgeDragDisabled = edge.style && edge.style.includes('dragDisabled=1');
+          if (isEdgeDragDisabled) {
+            return; // Skip this edge - don't follow it
+          }
+          
           const target = edge.target;
-          if (!descendants.has(target) && !movedIds.has(target.id)) {
-            descendants.add(target);
-            queue.push(target);
+          
+          // If source question node has drag disabled, only include directly connected option nodes
+          if (isSourceDragDisabled) {
+            // Only add option nodes that are directly connected (one hop away)
+            // Don't add question nodes or nodes that are not option nodes
+            const isOptionNode = target.style && target.style.includes('nodeType=options');
+            const isQuestionNode = target.style && target.style.includes('nodeType=question');
+            
+            // Only include option nodes, and only if they're directly connected (current is the source cell)
+            if (isOptionNode && current === cell && !descendants.has(target) && !movedIds.has(target.id)) {
+              descendants.add(target);
+              // Don't add to queue - we only want directly connected option nodes
+            } else if (isQuestionNode) {
+              // Don't follow question nodes when drag is disabled
+              return;
+            }
+          } else {
+            // Normal behavior - add all connected nodes
+            if (!descendants.has(target) && !movedIds.has(target.id)) {
+              descendants.add(target);
+              queue.push(target);
+            }
           }
         });
       }
