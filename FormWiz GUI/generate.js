@@ -3871,23 +3871,45 @@ if (s > 1){
           const targetSectionId = cachedPrevSectionInfo.sectionId;
           const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
           const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          
+          // Use goBack() if we have navigation history (stack), otherwise use direct navigation
+          // This ensures jumps are properly handled when going back
           const triggerNavigation = () => {
-            if (typeof navigateSection === 'function') {
-              navigateSection(targetSectionNumber);
-            } else if (typeof validateAndProceed === 'function') {
-              navigateSection(targetSectionNumber);
-            }
-          };
-          const updateTargetNav = () => {
-            const activeSection = document.querySelector('.section.active');
-            if (activeSection && activeSection.id === targetSectionId) {
-              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
-                window.questionNavControllers[targetSectionId](targetQuestionIndex);
+            // Check if we have a stack entry - if so, use goBack() to respect jump history
+            if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack) && sectionStack.length > 0) {
+              console.log('[Nav] goToPrevSection: Using goBack() to respect navigation history');
+              if (typeof goBack === 'function') {
+                goBack();
+                // After going back, update the target navigation if needed
+                setTimeout(() => {
+                  const activeSection = document.querySelector('.section.active');
+                  if (activeSection && activeSection.id === targetSectionId) {
+                    if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                      window.questionNavControllers[targetSectionId](targetQuestionIndex);
+                    }
+                  }
+                }, 100);
               }
+            } else {
+              // No stack history, use direct navigation
+              console.log('[Nav] goToPrevSection: No stack history, using direct navigation');
+              if (typeof navigateSection === 'function') {
+                navigateSection(targetSectionNumber);
+              } else if (typeof validateAndProceed === 'function') {
+                navigateSection(targetSectionNumber);
+              }
+              const updateTargetNav = () => {
+                const activeSection = document.querySelector('.section.active');
+                if (activeSection && activeSection.id === targetSectionId) {
+                  if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                    window.questionNavControllers[targetSectionId](targetQuestionIndex);
+                  }
+                }
+              };
+              setTimeout(updateTargetNav, 0);
             }
           };
           triggerNavigation();
-          setTimeout(updateTargetNav, 0);
         }
 
         function shiftQuestion(direction) {
@@ -9118,20 +9140,28 @@ function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 
-    /* remember the place we're leaving */
+    /* remember the place we're leaving - push BEFORE evaluating jumps */
+    console.log('[NAV DEBUG] handleNext called with currentSection:', currentSection);
+    console.log('[NAV DEBUG] Stack BEFORE push:', JSON.stringify(sectionStack));
     sectionStack.push(currentSection);
+    console.log('[NAV DEBUG] Stack AFTER push:', JSON.stringify(sectionStack));
 
     let nextSection = currentSection + 1;
 
     /* ---------- evaluate jump rules ---------- */
     const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
+    console.log('[NAV DEBUG] Relevant jumps for section', currentSection, ':', relevantJumps.length);
+    let jumpDetected = false;
     for (const jl of relevantJumps){
         const nmId = questionNameIds[jl.questionId] || ('answer'+jl.questionId);
+        console.log('[NAV DEBUG] Checking jump:', { questionId: jl.questionId, jumpOption: jl.jumpOption, jumpTo: jl.jumpTo, nmId });
 
         if (['radio','dropdown','numberedDropdown'].includes(jl.questionType)){
             const el = document.getElementById(nmId);
             if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()){
                 nextSection = jl.jumpTo.toLowerCase();
+                jumpDetected = true;
+                console.log('[NAV DEBUG] JUMP DETECTED! From section', currentSection, 'to', nextSection);
                 break;
             }
         } else if (jl.questionType === 'checkbox'){
@@ -9140,6 +9170,8 @@ function handleNext(currentSection){
                                 .map(cb=>cb.value.trim().toLowerCase());
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
                 nextSection = jl.jumpTo.toLowerCase();
+                jumpDetected = true;
+                console.log('[NAV DEBUG] JUMP DETECTED! From section', currentSection, 'to', nextSection);
                 break;
             }
         }
@@ -9147,12 +9179,15 @@ function handleNext(currentSection){
 
     /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
+        console.log('[NAV DEBUG] Jumping to end');
         processAllPdfs().then(()=>navigateSection('end'));
         return;
     }
 
     nextSection = parseInt(nextSection,10);
     if (isNaN(nextSection)) nextSection = currentSection + 1;
+    console.log('[NAV DEBUG] Navigating from section', currentSection, 'to section', nextSection, '(jump:', jumpDetected, ')');
+    console.log('[NAV DEBUG] Stack state before navigateSection:', JSON.stringify(sectionStack));
     navigateSection(nextSection);
 
     /* recalc hidden fields after navigation */
@@ -9218,7 +9253,9 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
  *  – shows exactly one section (or Thank‑you) and records history
  *-----------------------------------------------------------------*/
 
-function navigateSection(sectionNumber){
+function navigateSection(sectionNumber, isBackNavigation = false){
+    console.log('[NAV DEBUG] navigateSection called:', { sectionNumber, isBackNavigation, currentSectionNumber, stackLength: sectionStack.length, stack: JSON.stringify(sectionStack) });
+    
     const sections  = document.querySelectorAll('.section');
     const form      = document.getElementById('customForm');
     const thankYou  = document.getElementById('thankYouMessage');
@@ -9232,6 +9269,7 @@ function navigateSection(sectionNumber){
         form.style.display   = 'none';
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
+        console.log('[NAV DEBUG] Navigating to end');
         updateProgressBar();
         return;
     }
@@ -9245,7 +9283,10 @@ function navigateSection(sectionNumber){
     const target = document.getElementById('section' + sectionNumber);
     (target || sections[maxSection - 1]).classList.add('active');
 
+    // Update currentSectionNumber
+    const previousSectionNumber = currentSectionNumber;
     currentSectionNumber = sectionNumber;
+    console.log('[NAV DEBUG] Section number updated:', { previous: previousSectionNumber, current: currentSectionNumber, isBackNavigation });
 
     // Reset hidden questions to default values after Firebase autosave
     // BUT NOT during initial autofill to preserve autofilled values
@@ -9261,11 +9302,40 @@ function navigateSection(sectionNumber){
  *  – pops the history stack; falls back to numeric −1 if empty
  *-----------------------------------------------------------------*/
 function goBack(){
+    console.log('[NAV DEBUG] ========== goBack() called ==========');
+    console.log('[NAV DEBUG] Current section:', currentSectionNumber);
+    console.log('[NAV DEBUG] Stack length:', sectionStack.length);
+    console.log('[NAV DEBUG] Stack contents:', JSON.stringify(sectionStack));
+    console.log('[NAV DEBUG] Stack type check:', sectionStack.map(s => ({ value: s, type: typeof s })));
+    
     if (sectionStack.length > 0){
         const prev = sectionStack.pop();
-        navigateSection(prev);
-    }else if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
-        navigateSection(currentSectionNumber - 1);
+        console.log('[NAV DEBUG] Popped from stack:', prev, '(type:', typeof prev, ')');
+        
+        // Ensure prev is a number, not a string
+        const prevSection = typeof prev === 'string' ? parseInt(prev, 10) : prev;
+        console.log('[NAV DEBUG] Parsed prevSection:', prevSection, '(isNaN:', isNaN(prevSection), ')');
+        
+        if (!isNaN(prevSection) && prevSection >= 1) {
+            console.log('[NAV DEBUG] ✅ Navigating to section from stack:', prevSection);
+            console.log('[NAV DEBUG] Stack after pop:', JSON.stringify(sectionStack));
+            navigateSection(prevSection, true);
+        } else {
+            console.warn('[NAV DEBUG] ❌ Invalid stack value:', prevSection, '- using fallback');
+            if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
+                // Fallback only if stack value is invalid
+                console.log('[NAV DEBUG] Fallback: navigating to', currentSectionNumber - 1);
+                navigateSection(currentSectionNumber - 1, true);
+            }
+        }
+    }else {
+        console.log('[NAV DEBUG] ⚠️ Stack is empty - using fallback');
+        if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
+            console.log('[NAV DEBUG] Fallback: navigating to', currentSectionNumber - 1);
+            navigateSection(currentSectionNumber - 1, true);
+        } else {
+            console.warn('[NAV DEBUG] ❌ Cannot go back - stack empty and currentSectionNumber is', currentSectionNumber);
+        }
     }
     updateProgressBar();
 }

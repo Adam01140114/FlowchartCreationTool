@@ -13,8 +13,13 @@
             "conditions": []
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Yes",
+                "to": "3"
+              }
+            ]
           },
           "conditionalPDF": {
             "enabled": false,
@@ -69,19 +74,20 @@
             "width": 0,
             "height": 0
           }
-        },
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Section 2",
+      "questions": [
         {
           "questionId": 2,
           "text": "q2",
           "type": "dropdown",
           "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "No"
-              }
-            ]
+            "enabled": false,
+            "conditions": []
           },
           "jump": {
             "enabled": false,
@@ -140,27 +146,20 @@
             "width": 0,
             "height": 0
           }
-        },
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Section 3",
+      "questions": [
         {
           "questionId": 3,
           "text": "q3",
           "type": "dropdown",
           "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "Yes"
-              },
-              {
-                "prevQuestion": "2",
-                "prevAnswer": "Yes"
-              },
-              {
-                "prevQuestion": "2",
-                "prevAnswer": "No"
-              }
-            ]
+            "enabled": false,
+            "conditions": []
           },
           "jump": {
             "enabled": false,
@@ -225,7 +224,7 @@
   ],
   "groups": [],
   "hiddenFields": [],
-  "sectionCounter": 2,
+  "sectionCounter": 4,
   "questionCounter": 4,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,

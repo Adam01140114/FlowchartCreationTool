@@ -250,27 +250,37 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">q1</h3></label><select id="q1" name="q1"
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">q1</h3></label><select id="q1" name="q1"
                       onchange="dropdownMirror(this, 'q1'); updateHiddenLogic('q1', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_q1"></div>
               <input type="text" id="q1_dropdown" name="q1_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">q2</h3></label><select id="q2" name="q2"
-                      onchange="dropdownMirror(this, 'q2'); updateHiddenLogic('q2', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_q2"></div>
-              <input type="text" id="q2_dropdown" name="q2_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">q3</h3></label><select id="q3" name="q3"
-                      onchange="dropdownMirror(this, 'q3'); updateHiddenLogic('q3', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_q3"></div>
-              <input type="text" id="q3_dropdown" name="q3_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2" data-question-id="2" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">q2</h3></label><select id="q2" name="q2"
+                      onchange="dropdownMirror(this, 'q2'); updateHiddenLogic('q2', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_q2"></div>
+              <input type="text" id="q2_dropdown" name="q2_dropdown"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="2">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">Section 3</h1><div id="question-container-3" data-question-id="3" class="question-container question-item" data-section="3" data-question-index="1"><label><h3 class="question-text">q3</h3></label><select id="q3" name="q3"
+                      onchange="dropdownMirror(this, 'q3'); updateHiddenLogic('q3', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_q3"></div>
+              <input type="text" id="q3_dropdown" name="q3_dropdown"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="3">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
@@ -691,23 +701,45 @@ document.addEventListener("DOMContentLoaded", function() {
           const targetSectionId = cachedPrevSectionInfo.sectionId;
           const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
           const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          
+          // Use goBack() if we have navigation history (stack), otherwise use direct navigation
+          // This ensures jumps are properly handled when going back
           const triggerNavigation = () => {
-            if (typeof navigateSection === 'function') {
-              navigateSection(targetSectionNumber);
-            } else if (typeof validateAndProceed === 'function') {
-              navigateSection(targetSectionNumber);
-            }
-          };
-          const updateTargetNav = () => {
-            const activeSection = document.querySelector('.section.active');
-            if (activeSection && activeSection.id === targetSectionId) {
-              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
-                window.questionNavControllers[targetSectionId](targetQuestionIndex);
+            // Check if we have a stack entry - if so, use goBack() to respect jump history
+            if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack) && sectionStack.length > 0) {
+              console.log('[Nav] goToPrevSection: Using goBack() to respect navigation history');
+              if (typeof goBack === 'function') {
+                goBack();
+                // After going back, update the target navigation if needed
+                setTimeout(() => {
+                  const activeSection = document.querySelector('.section.active');
+                  if (activeSection && activeSection.id === targetSectionId) {
+                    if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                      window.questionNavControllers[targetSectionId](targetQuestionIndex);
+                    }
+                  }
+                }, 100);
               }
+            } else {
+              // No stack history, use direct navigation
+              console.log('[Nav] goToPrevSection: No stack history, using direct navigation');
+              if (typeof navigateSection === 'function') {
+                navigateSection(targetSectionNumber);
+              } else if (typeof validateAndProceed === 'function') {
+                navigateSection(targetSectionNumber);
+              }
+              const updateTargetNav = () => {
+                const activeSection = document.querySelector('.section.active');
+                if (activeSection && activeSection.id === targetSectionId) {
+                  if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                    window.questionNavControllers[targetSectionId](targetQuestionIndex);
+                  }
+                }
+              };
+              setTimeout(updateTargetNav, 0);
             }
           };
           triggerNavigation();
-          setTimeout(updateTargetNav, 0);
         }
 
         function shiftQuestion(direction) {
@@ -2313,7 +2345,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"Yes","jumpTo":"3","section":1}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -2513,152 +2545,6 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("3");
-     } else {
-       
-     }
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "2";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "2";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -5778,20 +5664,28 @@ function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 
-    /* remember the place we're leaving */
+    /* remember the place we're leaving - push BEFORE evaluating jumps */
+    console.log('[NAV DEBUG] handleNext called with currentSection:', currentSection);
+    console.log('[NAV DEBUG] Stack BEFORE push:', JSON.stringify(sectionStack));
     sectionStack.push(currentSection);
+    console.log('[NAV DEBUG] Stack AFTER push:', JSON.stringify(sectionStack));
 
     let nextSection = currentSection + 1;
 
     /* ---------- evaluate jump rules ---------- */
     const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
+    console.log('[NAV DEBUG] Relevant jumps for section', currentSection, ':', relevantJumps.length);
+    let jumpDetected = false;
     for (const jl of relevantJumps){
         const nmId = questionNameIds[jl.questionId] || ('answer'+jl.questionId);
+        console.log('[NAV DEBUG] Checking jump:', { questionId: jl.questionId, jumpOption: jl.jumpOption, jumpTo: jl.jumpTo, nmId });
 
         if (['radio','dropdown','numberedDropdown'].includes(jl.questionType)){
             const el = document.getElementById(nmId);
             if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()){
                 nextSection = jl.jumpTo.toLowerCase();
+                jumpDetected = true;
+                console.log('[NAV DEBUG] JUMP DETECTED! From section', currentSection, 'to', nextSection);
                 break;
             }
         } else if (jl.questionType === 'checkbox'){
@@ -5800,6 +5694,8 @@ function handleNext(currentSection){
                                 .map(cb=>cb.value.trim().toLowerCase());
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
                 nextSection = jl.jumpTo.toLowerCase();
+                jumpDetected = true;
+                console.log('[NAV DEBUG] JUMP DETECTED! From section', currentSection, 'to', nextSection);
                 break;
             }
         }
@@ -5807,12 +5703,15 @@ function handleNext(currentSection){
 
     /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
+        console.log('[NAV DEBUG] Jumping to end');
         processAllPdfs().then(()=>navigateSection('end'));
         return;
     }
 
     nextSection = parseInt(nextSection,10);
     if (isNaN(nextSection)) nextSection = currentSection + 1;
+    console.log('[NAV DEBUG] Navigating from section', currentSection, 'to section', nextSection, '(jump:', jumpDetected, ')');
+    console.log('[NAV DEBUG] Stack state before navigateSection:', JSON.stringify(sectionStack));
     navigateSection(nextSection);
 
     /* recalc hidden fields after navigation */
@@ -5878,7 +5777,9 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
  *  – shows exactly one section (or Thank‑you) and records history
  *-----------------------------------------------------------------*/
 
-function navigateSection(sectionNumber){
+function navigateSection(sectionNumber, isBackNavigation = false){
+    console.log('[NAV DEBUG] navigateSection called:', { sectionNumber, isBackNavigation, currentSectionNumber, stackLength: sectionStack.length, stack: JSON.stringify(sectionStack) });
+    
     const sections  = document.querySelectorAll('.section');
     const form      = document.getElementById('customForm');
     const thankYou  = document.getElementById('thankYouMessage');
@@ -5892,6 +5793,7 @@ function navigateSection(sectionNumber){
         form.style.display   = 'none';
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
+        console.log('[NAV DEBUG] Navigating to end');
         updateProgressBar();
         return;
     }
@@ -5905,7 +5807,10 @@ function navigateSection(sectionNumber){
     const target = document.getElementById('section' + sectionNumber);
     (target || sections[maxSection - 1]).classList.add('active');
 
+    // Update currentSectionNumber
+    const previousSectionNumber = currentSectionNumber;
     currentSectionNumber = sectionNumber;
+    console.log('[NAV DEBUG] Section number updated:', { previous: previousSectionNumber, current: currentSectionNumber, isBackNavigation });
 
     // Reset hidden questions to default values after Firebase autosave
     // BUT NOT during initial autofill to preserve autofilled values
@@ -5921,11 +5826,40 @@ function navigateSection(sectionNumber){
  *  – pops the history stack; falls back to numeric −1 if empty
  *-----------------------------------------------------------------*/
 function goBack(){
+    console.log('[NAV DEBUG] ========== goBack() called ==========');
+    console.log('[NAV DEBUG] Current section:', currentSectionNumber);
+    console.log('[NAV DEBUG] Stack length:', sectionStack.length);
+    console.log('[NAV DEBUG] Stack contents:', JSON.stringify(sectionStack));
+    console.log('[NAV DEBUG] Stack type check:', sectionStack.map(s => ({ value: s, type: typeof s })));
+    
     if (sectionStack.length > 0){
         const prev = sectionStack.pop();
-        navigateSection(prev);
-    }else if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
-        navigateSection(currentSectionNumber - 1);
+        console.log('[NAV DEBUG] Popped from stack:', prev, '(type:', typeof prev, ')');
+        
+        // Ensure prev is a number, not a string
+        const prevSection = typeof prev === 'string' ? parseInt(prev, 10) : prev;
+        console.log('[NAV DEBUG] Parsed prevSection:', prevSection, '(isNaN:', isNaN(prevSection), ')');
+        
+        if (!isNaN(prevSection) && prevSection >= 1) {
+            console.log('[NAV DEBUG] ✅ Navigating to section from stack:', prevSection);
+            console.log('[NAV DEBUG] Stack after pop:', JSON.stringify(sectionStack));
+            navigateSection(prevSection, true);
+        } else {
+            console.warn('[NAV DEBUG] ❌ Invalid stack value:', prevSection, '- using fallback');
+            if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
+                // Fallback only if stack value is invalid
+                console.log('[NAV DEBUG] Fallback: navigating to', currentSectionNumber - 1);
+                navigateSection(currentSectionNumber - 1, true);
+            }
+        }
+    }else {
+        console.log('[NAV DEBUG] ⚠️ Stack is empty - using fallback');
+        if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
+            console.log('[NAV DEBUG] Fallback: navigating to', currentSectionNumber - 1);
+            navigateSection(currentSectionNumber - 1, true);
+        } else {
+            console.warn('[NAV DEBUG] ❌ Cannot go back - stack empty and currentSectionNumber is', currentSectionNumber);
+        }
     }
     updateProgressBar();
 }
