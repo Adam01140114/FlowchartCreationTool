@@ -250,37 +250,31 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">You are suing in [county]?</h3></label><select id="you_are_suing_in_county" name="you_are_suing_in_county"
-                      onchange="dropdownMirror(this, 'you_are_suing_in_county'); updateHiddenLogic('you_are_suing_in_county', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_you_are_suing_in_county"></div>
-              <input type="text" id="you_are_suing_in_county_dropdown" name="you_are_suing_in_county_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Question Two?</h3></label><select id="question_two" name="question_two"
-                      onchange="dropdownMirror(this, 'question_two'); updateHiddenLogic('question_two', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_question_two"></div>
-              <input type="text" id="question_two_dropdown" name="question_two_dropdown"
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">hungry?</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+      <span class="checkbox-inline" id="checkbox-container-hungry_yes">
+        <label class="checkbox-label">
+          <input type="checkbox" id="hungry_yes" name="hungry_yes" value="Yes" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Yes
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-hungry_no">
+        <label class="checkbox-label">
+          <input type="checkbox" id="hungry_no" name="hungry_no" value="No" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          No
+        </label>
+      </span></div><br></div></div><div id="question-container-2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">thirsty?</h3></label><select id="thirsty" name="thirsty"
+                      onchange="dropdownMirror(this, 'thirsty'); updateHiddenLogic('thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option></select><br>
+              <div id="dropdowntext_thirsty"></div>
+              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-3" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Question Three?</h3></label><select id="question_three" name="question_three"
-                      onchange="dropdownMirror(this, 'question_three'); updateHiddenLogic('question_three', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_question_three"></div>
-              <input type="text" id="question_three_dropdown" name="question_three_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">Question Four?</h3></label><select id="question_four" name="question_four"
-                      onchange="dropdownMirror(this, 'question_four'); updateHiddenLogic('question_four', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_question_four"></div>
-              <input type="text" id="question_four_dropdown" name="question_four_dropdown"
-                   readonly style="display:none;"></div>
-      <div class="question-nav" data-section-index="2">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
-      </div>
-    <br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
@@ -365,6 +359,53 @@ document.addEventListener("DOMContentLoaded", function() {
         let cachedNextSectionInfo = null;
         let cachedPrevSectionInfo = null;
 
+        function isElementEligible(el) {
+          if (!el || el.disabled) return false;
+          if (el.type === 'hidden') return false;
+          if (el.closest('.hidden')) return false;
+          if (el.offsetParent === null && el.type !== 'radio' && el.type !== 'checkbox') return false;
+          return true;
+        }
+
+        function isQuestionAnswered(container) {
+          if (!container) return false;
+          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
+          const eligibleElements = elements.filter(isElementEligible);
+          if (!eligibleElements.length) return true;
+
+          let allStandardSatisfied = true;
+          const radioGroups = {};
+          const checkboxGroups = {};
+
+          eligibleElements.forEach(el => {
+            const tag = el.tagName;
+            const type = (el.type || '').toLowerCase();
+            if (tag === 'SELECT') {
+              const value = (el.value || '').trim();
+              if (!value) allStandardSatisfied = false;
+            } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
+              const value = (el.value || '').trim();
+              if (!value) allStandardSatisfied = false;
+            } else if (type === 'radio') {
+              const group = radioGroups[el.name || el.id] || [];
+              group.push(!!el.checked);
+              radioGroups[el.name || el.id] = group;
+            } else if (type === 'checkbox') {
+              const groupKey = el.name || el.id || '__checkbox__';
+              const group = checkboxGroups[groupKey] || [];
+              group.push(!!el.checked);
+              checkboxGroups[groupKey] = group;
+            }
+          });
+
+          const radiosSatisfied = Object.values(radioGroups).every(group => group.some(Boolean));
+          const checkboxesSatisfied = Object.values(checkboxGroups).every(group => group.some(Boolean));
+
+          const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
+          console.log('[Nav] isQuestionAnswered', { containerId: container.id, allStandardSatisfied, radiosSatisfied, checkboxesSatisfied, answered });
+          return answered;
+        }
+
         function answerTriggersEnd(container) {
           console.log('[Nav] answerTriggersEnd: evaluating container', container && container.id);
           if (!container || !Array.isArray(jumpLogics) || !jumpLogics.length) {
@@ -432,6 +473,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
           const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
+          const isAnswered = submitConfig && submitConfig.isAnswered;
           console.log('[Nav] updateButtons', {
             hasPrevQuestion,
             canAdvanceWithinSection,
@@ -461,7 +503,7 @@ document.addEventListener("DOMContentLoaded", function() {
           }
           if (nextBtn) {
             if (shouldSubmit) {
-              nextBtn.disabled = false;
+              nextBtn.disabled = !isAnswered;
               nextBtn.dataset.advanceMode = 'submit';
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
@@ -469,7 +511,7 @@ document.addEventListener("DOMContentLoaded", function() {
               console.log('[Nav] updateButtons: next button now in submit mode');
             } else {
               nextBtn.classList.remove('submit-mode');
-              const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+              const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection);
               nextBtn.disabled = !canAdvance;
               if (!canAdvance) {
                 nextBtn.dataset.advanceMode = '';
@@ -543,18 +585,20 @@ document.addEventListener("DOMContentLoaded", function() {
           const activeContainer = questionItems[targetIdx];
           attachSubmitModeListeners(activeContainer, targetIdx);
           const shouldSubmit = answerTriggersEnd(activeContainer);
+          const isAnswered = isQuestionAnswered(activeContainer);
           console.log('[Nav] activateIndex', {
             sectionId,
             targetIdx,
             questionId: activeContainer && activeContainer.id,
             shouldSubmit,
+            isAnswered,
             visibleIndices,
             cachedNextSectionInfo,
             cachedPrevSectionInfo
           });
 
           const hasPrevQuestion = currentPos > 0;
-          const canAdvanceWithinSection = (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
@@ -565,7 +609,7 @@ document.addEventListener("DOMContentLoaded", function() {
             canAdvanceAcrossSection,
             cachedNextSectionInfo,
             cachedPrevSectionInfo,
-            { shouldSubmit }
+            { shouldSubmit, isAnswered }
           );
           activeIndex = targetIdx;
           isUpdating = false;
@@ -633,6 +677,13 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
           }
           const currentPos = visibleIndices.indexOf(activeIndex);
+          if (direction > 0) {
+            const activeContainer = questionItems[activeIndex];
+            if (activeContainer && !isQuestionAnswered(activeContainer)) {
+              console.warn('[Nav] shiftQuestion blocked: current question unanswered');
+              return;
+            }
+          }
           const nextPos = currentPos + direction;
           if (nextPos < 0 || nextPos >= visibleIndices.length) {
             if (direction > 0 && cachedNextSectionInfo) {
@@ -870,8 +921,8 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"you_are_suing_in_county","2":"question_two","3":"question_three","4":"question_four"};
-var questionNameIds = {"1":"you_are_suing_in_county","2":"question_two","3":"question_three","4":"question_four"};
+var questionSlugMap = {"1":"hungry","2":"thirsty"};
+var questionNameIds = {"1":"hungry","2":"thirsty"};
 var linkedCheckboxes = [];
 var unifiedFieldsMap = {};
 
@@ -2197,7 +2248,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"3","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2},{"questionId":"4","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":2},{"questionId":"4","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -2403,7 +2454,26 @@ var hiddenTextCalculations = [];
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="dropdown";
+    var cPrevType="checkbox";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
     var cPrevAns="no";
     var cPrevQNum="1";
     if(cPrevType==="checkbox"){
@@ -2440,58 +2510,16 @@ var hiddenTextCalculations = [];
   }
 }
  (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-4");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("4");
-     } else {
-       
-     }
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
  (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
