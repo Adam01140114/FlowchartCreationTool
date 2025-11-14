@@ -346,6 +346,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }',
     '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 567px; }',
     '        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }',
+    '        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }',
     '        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }',
     '        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }',
     '        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }',
@@ -3595,7 +3596,81 @@ if (s > 1){
         let cachedNextSectionInfo = null;
         let cachedPrevSectionInfo = null;
 
-        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo) {
+        function answerTriggersEnd(container) {
+          console.log('[Nav] answerTriggersEnd: evaluating container', container && container.id);
+          if (!container || !Array.isArray(jumpLogics) || !jumpLogics.length) {
+            console.log('[Nav] answerTriggersEnd: missing container or jumpLogics');
+            return false;
+          }
+          const containerId = ((container.id || '') + '').trim();
+          let questionId = null;
+          if (containerId.startsWith('question-container-')) {
+            questionId = containerId.substring('question-container-'.length).trim();
+          }
+          console.log('[Nav] answerTriggersEnd: resolved container/question ids', { containerId, questionId });
+          if (!questionId) {
+            console.log('[Nav] answerTriggersEnd: unable to resolve questionId from container id', { containerId });
+            return false;
+          }
+
+          const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
+          console.log('[Nav] answerTriggersEnd: relevant jumps', relevantJumps);
+          if (!relevantJumps.length) return false;
+
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          const currentAnswers = [];
+          interactiveElements.forEach(el => {
+            if (el.tagName === 'SELECT') {
+              if (el.value) currentAnswers.push(el.value);
+            } else if (el.type === 'radio') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            } else if (el.type === 'checkbox') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            }
+          });
+
+          if (!currentAnswers.length) {
+            console.log('[Nav] answerTriggersEnd: no current answers found');
+            return false;
+          }
+
+          const normalizedAnswers = currentAnswers.map(val => String(val).trim().toLowerCase());
+          console.log('[Nav] answerTriggersEnd: normalized answers', normalizedAnswers);
+          for (const jl of relevantJumps) {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            if (jumpOption && normalizedAnswers.includes(jumpOption)) {
+              console.log('[Nav] answerTriggersEnd: match found', { questionId, jumpOption });
+              return true;
+            }
+          }
+
+          console.log('[Nav] answerTriggersEnd: no jump-to-end match');
+          return false;
+        }
+
+        function attachSubmitModeListeners(container, containerIdx) {
+          if (!container || container.dataset.submitModeListenersAttached === 'true') return;
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          interactiveElements.forEach(el => {
+            el.addEventListener('change', function() {
+              console.log('[Nav] change detected -> refreshing nav', { field: el.name || el.id, value: el.value, checked: el.checked });
+              refreshNav(containerIdx);
+            });
+          });
+          container.dataset.submitModeListenersAttached = 'true';
+          console.log('[Nav] attachSubmitModeListeners: attached', container.id);
+        }
+
+        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
+          const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
+          console.log('[Nav] updateButtons', {
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            nextSectionInfo,
+            prevSectionInfo,
+            submitConfig
+          });
           if (prevBtn) {
             const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
             prevBtn.disabled = !canGoBack;
@@ -3616,21 +3691,31 @@ if (s > 1){
             }
           }
           if (nextBtn) {
-            const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
-            nextBtn.disabled = !canAdvance;
-            if (!canAdvance) {
-              nextBtn.dataset.advanceMode = '';
+            if (shouldSubmit) {
+              nextBtn.disabled = false;
+              nextBtn.dataset.advanceMode = 'submit';
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
-            } else if (canAdvanceWithinSection) {
-              nextBtn.dataset.advanceMode = 'question';
-              delete nextBtn.dataset.nextSectionNumber;
-              delete nextBtn.dataset.nextSectionId;
+              nextBtn.classList.add('submit-mode');
+              console.log('[Nav] updateButtons: next button now in submit mode');
             } else {
-              nextBtn.dataset.advanceMode = 'section';
-              if (nextSectionInfo) {
-                nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
-                nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+              nextBtn.classList.remove('submit-mode');
+              const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+              nextBtn.disabled = !canAdvance;
+              if (!canAdvance) {
+                nextBtn.dataset.advanceMode = '';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else if (canAdvanceWithinSection) {
+                nextBtn.dataset.advanceMode = 'question';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else {
+                nextBtn.dataset.advanceMode = 'section';
+                if (nextSectionInfo) {
+                  nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
+                  nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+                }
               }
             }
           }
@@ -3686,18 +3771,32 @@ if (s > 1){
             progressTotal.textContent = String(displayTotal);
           }
 
+          const activeContainer = questionItems[targetIdx];
+          attachSubmitModeListeners(activeContainer, targetIdx);
+          const shouldSubmit = answerTriggersEnd(activeContainer);
+          console.log('[Nav] activateIndex', {
+            sectionId,
+            targetIdx,
+            questionId: activeContainer && activeContainer.id,
+            shouldSubmit,
+            visibleIndices,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo
+          });
+
           const hasPrevQuestion = currentPos > 0;
-          const canAdvanceWithinSection = currentPos !== -1 && currentPos < visibleTotal - 1;
-          cachedNextSectionInfo = findNextSectionWithVisibleQuestions();
+          const canAdvanceWithinSection = (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
-          const canAdvanceAcrossSection = !!cachedNextSectionInfo;
+          const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
 
           updateButtons(
             hasPrevQuestion,
             canAdvanceWithinSection,
             canAdvanceAcrossSection,
             cachedNextSectionInfo,
-            cachedPrevSectionInfo
+            cachedPrevSectionInfo,
+            { shouldSubmit }
           );
           activeIndex = targetIdx;
           isUpdating = false;
@@ -3805,6 +3904,19 @@ if (s > 1){
 
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
+            if (nextBtn.dataset.advanceMode === 'submit') {
+              console.log('[Nav] next button click → submit mode');
+              const formEl = document.getElementById('customForm');
+              if (formEl) {
+                if (typeof formEl.requestSubmit === 'function') {
+                  formEl.requestSubmit();
+                } else {
+                  formEl.submit();
+                }
+              }
+              return;
+            }
+            console.log('[Nav] next button click → navigate mode');
             shiftQuestion(1);
           });
         }
@@ -3843,11 +3955,8 @@ if (s > 1){
         window.questionNavControllers[sectionId] = refreshNav;
 
         const visibleIndices = getVisibleIndices();
-        if (visibleIndices.length) {
-          activateIndex(visibleIndices[0]);
-        } else {
-          activateIndex(0);
-        }
+        const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
+        activateIndex(initialIndex);
       });
     });
   </script>

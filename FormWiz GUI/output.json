@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Hungry?",
+          "text": "You are suing in [county]?",
           "type": "dropdown",
           "logic": {
             "enabled": false,
@@ -63,7 +63,7 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "hungry",
+          "nameId": "you_are_suing_in_county",
           "placeholder": "",
           "hiddenLogic": {
             "enabled": false,
@@ -72,7 +72,7 @@
         },
         {
           "questionId": 2,
-          "text": "Thirsty?",
+          "text": "Question Two?",
           "type": "dropdown",
           "logic": {
             "enabled": true,
@@ -134,7 +134,7 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "thirsty",
+          "nameId": "question_two",
           "placeholder": "",
           "hiddenLogic": {
             "enabled": false,
@@ -149,15 +149,20 @@
       "questions": [
         {
           "questionId": 3,
-          "text": "sleepy?",
+          "text": "Question Three?",
           "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
           },
           "jump": {
-            "enabled": false,
-            "conditions": []
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Yes",
+                "to": "end"
+              }
+            ]
           },
           "conditionalPDF": {
             "enabled": false,
@@ -192,7 +197,10 @@
             "enabled": false,
             "text": ""
           },
-          "options": [],
+          "options": [
+            "Yes",
+            "No"
+          ],
           "labels": [],
           "linking": {
             "enabled": false,
@@ -203,7 +211,87 @@
             "width": 0,
             "height": 0
           },
-          "nameId": "sleepy",
+          "nameId": "question_three",
+          "placeholder": "",
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          }
+        },
+        {
+          "questionId": 4,
+          "text": "Question Four?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "3",
+                "prevAnswer": "No"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "No",
+                "to": "end"
+              },
+              {
+                "option": "Yes",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          },
+          "nameId": "question_four",
           "placeholder": "",
           "hiddenLogic": {
             "enabled": false,
@@ -216,7 +304,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 3,
-  "questionCounter": 4,
+  "questionCounter": 5,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",

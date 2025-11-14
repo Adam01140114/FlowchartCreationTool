@@ -9,15 +9,23 @@
     <link rel="stylesheet" href="generate2.css">
     <style>
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
-        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 24px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 700px; width: 100%; }
+        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 567px; width: 100%; }
         .question-container .question-text { margin-top: 0; }
         .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .question-nav { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 12px auto 0; max-width: 700px; }
-        .question-nav-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: linear-gradient(135deg, #4da3ff, #1c7ed6); color: #ffffff; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 14px rgba(30,73,150,0.18); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 567px; }
+        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
+        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
         .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
         .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
         .question-step-hidden { display: none !important; }
+        #box { padding-top: 100px; margin: 50px; }
+        @media (max-width: 600px) {
+            body { padding: 0 !important; }
+            #box { margin: 12px !important; max-width: none !important; }
+            .question-container { margin: 6px auto !important; padding: 20px 18px !important; }
+            .question-nav { margin: 40px auto 0 !important; }
+        }
         .address-field { margin: 4px auto; }
         .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
         .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
@@ -242,34 +250,37 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">You are suing in [county]?</h3></label><select id="you_are_suing_in_county" name="you_are_suing_in_county"
+                      onchange="dropdownMirror(this, 'you_are_suing_in_county'); updateHiddenLogic('you_are_suing_in_county', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Thirsty?</h3></label><select id="thirsty" name="thirsty"
-                      onchange="dropdownMirror(this, 'thirsty'); updateHiddenLogic('thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+              <div id="dropdowntext_you_are_suing_in_county"></div>
+              <input type="text" id="you_are_suing_in_county_dropdown" name="you_are_suing_in_county_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Question Two?</h3></label><select id="question_two" name="question_two"
+                      onchange="dropdownMirror(this, 'question_two'); updateHiddenLogic('question_two', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_thirsty"></div>
-              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
+              <div id="dropdowntext_question_two"></div>
+              <input type="text" id="question_two_dropdown" name="question_two_dropdown"
                    readonly style="display:none;"></div>
-        <div class="question-nav" data-section-index="1">
-          <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
-          <div class="question-progress">Question <span class="question-current">1</span> of <span class="question-total">2</span></div>
-          <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
-        </div>
-      <br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-3" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">sleepy?</h3></label><select id="sleepy" name="sleepy"
-                      onchange="dropdownMirror(this, 'sleepy'); updateHiddenLogic('sleepy', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option></select><br>
-              <div id="dropdowntext_sleepy"></div>
-              <input type="text" id="sleepy_dropdown" name="sleepy_dropdown"
+      <div class="question-nav" data-section-index="1">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-3" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Question Three?</h3></label><select id="question_three" name="question_three"
+                      onchange="dropdownMirror(this, 'question_three'); updateHiddenLogic('question_three', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_question_three"></div>
+              <input type="text" id="question_three_dropdown" name="question_three_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-4" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">Question Four?</h3></label><select id="question_four" name="question_four"
+                      onchange="dropdownMirror(this, 'question_four'); updateHiddenLogic('question_four', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_question_four"></div>
+              <input type="text" id="question_four_dropdown" name="question_four_dropdown"
                    readonly style="display:none;"></div>
-        <div class="question-nav" data-section-index="2">
-          <button type="button" class="question-nav-btn question-prev" disabled aria-label="Previous question" data-section="2">&larr;</button>
-          <div class="question-progress">Question <span class="question-current">1</span> of <span class="question-total">1</span></div>
-          <button type="button" class="question-nav-btn question-next" disabled aria-label="Next question" data-section="2">&rarr;</button>
-        </div>
-      <br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+      <div class="question-nav" data-section-index="2">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
@@ -354,7 +365,81 @@ document.addEventListener("DOMContentLoaded", function() {
         let cachedNextSectionInfo = null;
         let cachedPrevSectionInfo = null;
 
-        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo) {
+        function answerTriggersEnd(container) {
+          console.log('[Nav] answerTriggersEnd: evaluating container', container && container.id);
+          if (!container || !Array.isArray(jumpLogics) || !jumpLogics.length) {
+            console.log('[Nav] answerTriggersEnd: missing container or jumpLogics');
+            return false;
+          }
+          const containerId = ((container.id || '') + '').trim();
+          let questionId = null;
+          if (containerId.startsWith('question-container-')) {
+            questionId = containerId.substring('question-container-'.length).trim();
+          }
+          console.log('[Nav] answerTriggersEnd: resolved container/question ids', { containerId, questionId });
+          if (!questionId) {
+            console.log('[Nav] answerTriggersEnd: unable to resolve questionId from container id', { containerId });
+            return false;
+          }
+
+          const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
+          console.log('[Nav] answerTriggersEnd: relevant jumps', relevantJumps);
+          if (!relevantJumps.length) return false;
+
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          const currentAnswers = [];
+          interactiveElements.forEach(el => {
+            if (el.tagName === 'SELECT') {
+              if (el.value) currentAnswers.push(el.value);
+            } else if (el.type === 'radio') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            } else if (el.type === 'checkbox') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            }
+          });
+
+          if (!currentAnswers.length) {
+            console.log('[Nav] answerTriggersEnd: no current answers found');
+            return false;
+          }
+
+          const normalizedAnswers = currentAnswers.map(val => String(val).trim().toLowerCase());
+          console.log('[Nav] answerTriggersEnd: normalized answers', normalizedAnswers);
+          for (const jl of relevantJumps) {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            if (jumpOption && normalizedAnswers.includes(jumpOption)) {
+              console.log('[Nav] answerTriggersEnd: match found', { questionId, jumpOption });
+              return true;
+            }
+          }
+
+          console.log('[Nav] answerTriggersEnd: no jump-to-end match');
+          return false;
+        }
+
+        function attachSubmitModeListeners(container, containerIdx) {
+          if (!container || container.dataset.submitModeListenersAttached === 'true') return;
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          interactiveElements.forEach(el => {
+            el.addEventListener('change', function() {
+              console.log('[Nav] change detected -> refreshing nav', { field: el.name || el.id, value: el.value, checked: el.checked });
+              refreshNav(containerIdx);
+            });
+          });
+          container.dataset.submitModeListenersAttached = 'true';
+          console.log('[Nav] attachSubmitModeListeners: attached', container.id);
+        }
+
+        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
+          const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
+          console.log('[Nav] updateButtons', {
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            nextSectionInfo,
+            prevSectionInfo,
+            submitConfig
+          });
           if (prevBtn) {
             const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
             prevBtn.disabled = !canGoBack;
@@ -375,21 +460,31 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           }
           if (nextBtn) {
-            const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
-            nextBtn.disabled = !canAdvance;
-            if (!canAdvance) {
-              nextBtn.dataset.advanceMode = '';
+            if (shouldSubmit) {
+              nextBtn.disabled = false;
+              nextBtn.dataset.advanceMode = 'submit';
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
-            } else if (canAdvanceWithinSection) {
-              nextBtn.dataset.advanceMode = 'question';
-              delete nextBtn.dataset.nextSectionNumber;
-              delete nextBtn.dataset.nextSectionId;
+              nextBtn.classList.add('submit-mode');
+              console.log('[Nav] updateButtons: next button now in submit mode');
             } else {
-              nextBtn.dataset.advanceMode = 'section';
-              if (nextSectionInfo) {
-                nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
-                nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+              nextBtn.classList.remove('submit-mode');
+              const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+              nextBtn.disabled = !canAdvance;
+              if (!canAdvance) {
+                nextBtn.dataset.advanceMode = '';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else if (canAdvanceWithinSection) {
+                nextBtn.dataset.advanceMode = 'question';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else {
+                nextBtn.dataset.advanceMode = 'section';
+                if (nextSectionInfo) {
+                  nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
+                  nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+                }
               }
             }
           }
@@ -445,18 +540,32 @@ document.addEventListener("DOMContentLoaded", function() {
             progressTotal.textContent = String(displayTotal);
           }
 
+          const activeContainer = questionItems[targetIdx];
+          attachSubmitModeListeners(activeContainer, targetIdx);
+          const shouldSubmit = answerTriggersEnd(activeContainer);
+          console.log('[Nav] activateIndex', {
+            sectionId,
+            targetIdx,
+            questionId: activeContainer && activeContainer.id,
+            shouldSubmit,
+            visibleIndices,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo
+          });
+
           const hasPrevQuestion = currentPos > 0;
-          const canAdvanceWithinSection = currentPos !== -1 && currentPos < visibleTotal - 1;
-          cachedNextSectionInfo = findNextSectionWithVisibleQuestions();
+          const canAdvanceWithinSection = (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
-          const canAdvanceAcrossSection = !!cachedNextSectionInfo;
+          const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
 
           updateButtons(
             hasPrevQuestion,
             canAdvanceWithinSection,
             canAdvanceAcrossSection,
             cachedNextSectionInfo,
-            cachedPrevSectionInfo
+            cachedPrevSectionInfo,
+            { shouldSubmit }
           );
           activeIndex = targetIdx;
           isUpdating = false;
@@ -564,6 +673,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
+            if (nextBtn.dataset.advanceMode === 'submit') {
+              console.log('[Nav] next button click → submit mode');
+              const formEl = document.getElementById('customForm');
+              if (formEl) {
+                if (typeof formEl.requestSubmit === 'function') {
+                  formEl.requestSubmit();
+                } else {
+                  formEl.submit();
+                }
+              }
+              return;
+            }
+            console.log('[Nav] next button click → navigate mode');
             shiftQuestion(1);
           });
         }
@@ -602,11 +724,8 @@ document.addEventListener("DOMContentLoaded", function() {
         window.questionNavControllers[sectionId] = refreshNav;
 
         const visibleIndices = getVisibleIndices();
-        if (visibleIndices.length) {
-          activateIndex(visibleIndices[0]);
-        } else {
-          activateIndex(0);
-        }
+        const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
+        activateIndex(initialIndex);
       });
     });
   </script>
@@ -621,7 +740,22 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
-</div></form>
+</div>
+  <script>
+    window.showLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    };
+    window.hideLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+  </form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
@@ -639,7 +773,7 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
         <div class="pro-footer-col nav-col">
             <div class="pro-footer-title">Navigation</div>
-            <a href="../Pages/index.html">Home</a>
+            <a href="index.html">Home</a>
             <a href="../Pages/FreeForm.html">Forms</a>
             <a href="../Pages/FAQ.html">FAQ</a>
             <a href="../Pages/about.html">About Us</a>
@@ -736,8 +870,8 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"hungry","2":"thirsty","3":"sleepy"};
-var questionNameIds = {"1":"hungry","2":"thirsty","3":"sleepy"};
+var questionSlugMap = {"1":"you_are_suing_in_county","2":"question_two","3":"question_three","4":"question_four"};
+var questionNameIds = {"1":"you_are_suing_in_county","2":"question_two","3":"question_three","4":"question_four"};
 var linkedCheckboxes = [];
 var unifiedFieldsMap = {};
 
@@ -2059,11 +2193,11 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     return namePart;
 }
 
-      let isUserLoggedIn = false;
+      let isUserLoggedIn = true;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"3","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2},{"questionId":"4","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":2},{"questionId":"4","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -2307,6 +2441,55 @@ var hiddenTextCalculations = [];
 }
  (function(){
    var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("4");
+     } else {
+       
+     }
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "3";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -6529,8 +6712,11 @@ if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
     if (!isUserLoggedIn) {
-      showLoginRequiredModal();
-      return;
+      var loginModal = document.getElementById('loginRequiredModal');
+      if (loginModal && typeof showLoginRequiredModal === 'function') {
+        showLoginRequiredModal();
+        return;
+      }
     }
     originalHandleNext(currentSection);
   };
@@ -7789,7 +7975,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = '../Pages/index.html';
+                        window.location.href = 'index.html';
                     }).catch(function(error) {
 
                     });
