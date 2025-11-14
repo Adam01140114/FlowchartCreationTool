@@ -3497,7 +3497,7 @@ formHTML += `</div><br></div>`;
     `;
 
     // Section nav
-    formHTML += '<br><br><div class="navigation-buttons">';
+    formHTML += '<br><br><div class="navigation-buttons" style="display:none;">';
 if (s > 1){
     /* OLD:  <button type="button" onclick="navigateSection('+ (s-1) +')">Back</button> */
     formHTML += '<button type="button" onclick="goBack()">Back</button>';
