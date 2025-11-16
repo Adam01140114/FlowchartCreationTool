@@ -250,37 +250,106 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">q1</h3></label><select id="q1" name="q1"
-                      onchange="dropdownMirror(this, 'q1'); updateHiddenLogic('q1', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handlePdfPreview1(this.value)">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_q1"></div>
-              <input type="text" id="q1_dropdown" name="q1_dropdown"
-                   readonly style="display:none;"></div>
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;">
+              <div id="pdfPreview1" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #f0fff4 0%, #e8f5e9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #2e7d32; font-size: 18px; font-weight: 600; text-align: center;">Here is what it looks like:</h4>
+                <div id="pdfPreviewLoading1" style="text-align: center; padding: 20px; display: none;">
+                  <p style="color: #2e7d32; font-size: 16px;">Loading preview...</p>
+                </div>
+                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
+                  <iframe id="pdfPreviewIframe1" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                </div>
+              </div>
+              <script>
+                async function handlePdfPreview1(value) {
+                  const previewDiv = document.getElementById('pdfPreview1');
+                  const iframe = document.getElementById('pdfPreviewIframe1');
+                  const loadingDiv = document.getElementById('pdfPreviewLoading1');
+                  
+                  if (value === 'Yes') {
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    
+                    // Fetch the filled PDF from the server
+                    try {
+                      const form = document.getElementById('customForm');
+                      const fd = new FormData();
+                      
+                      // Collect all form data
+                      const formElements = form.querySelectorAll('input, textarea, select');
+                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                      const allFormElements = [...formElements, ...externalFormElements];
+                      
+                      allFormElements.forEach(element => {
+                        if (element.name && !element.disabled) {
+                          if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                              fd.append(element.name, 'on');
+                            }
+                          } else {
+                            let value = element.value;
+                            if (element.type === 'date' && value) {
+                              value = formatDateForServer(value);
+                            }
+                            if (value && value.trim() !== '') {
+                              fd.append(element.name, value);
+                            }
+                          }
+                        }
+                      });
+                      
+                      // Send to server
+                      const baseName = 'sc500.pdf'.replace(/\.pdf$/i, '');
+                      const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+                      
+                      const res = await fetch(endpoint, { 
+                        method: 'POST', 
+                        body: fd 
+                      });
+                      
+                      if (!res.ok) {
+                        throw new Error('Failed to generate PDF preview');
+                      }
+                      
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      
+                      // Display in iframe
+                      iframe.src = url;
+                      loadingDiv.style.display = 'none';
+                      iframe.style.display = 'block';
+                      
+                      // Store URL for cleanup
+                      iframe.dataset.blobUrl = url;
+                      
+                    } catch (error) {
+                      console.error('PDF preview error:', error);
+                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to load preview. Please try again.</p>';
+                      iframe.style.display = 'none';
+                    }
+                  } else {
+                    previewDiv.style.display = 'none';
+                    // Clean up blob URL
+                    if (iframe.dataset.blobUrl) {
+                      URL.revokeObjectURL(iframe.dataset.blobUrl);
+                      iframe.dataset.blobUrl = '';
+                      iframe.src = '';
+                    }
+                  }
+                }
+              </script>
+            </div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2" data-question-id="2" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">q2</h3></label><select id="q2" name="q2"
-                      onchange="dropdownMirror(this, 'q2'); updateHiddenLogic('q2', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_q2"></div>
-              <input type="text" id="q2_dropdown" name="q2_dropdown"
-                   readonly style="display:none;"></div>
-      <div class="question-nav" data-section-index="2">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
-      </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">Section 3</h1><div id="question-container-3" data-question-id="3" class="question-container question-item" data-section="3" data-question-index="1"><label><h3 class="question-text">q3</h3></label><select id="q3" name="q3"
-                      onchange="dropdownMirror(this, 'q3'); updateHiddenLogic('q3', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_q3"></div>
-              <input type="text" id="q3_dropdown" name="q3_dropdown"
-                   readonly style="display:none;"></div>
-      <div class="question-nav" data-section-index="3">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button>
-      </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
@@ -1018,8 +1087,8 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"q1","2":"q2","3":"q3"};
-var questionNameIds = {"1":"q1","2":"q2","3":"q3"};
+var questionSlugMap = {"1":"hungry"};
+var questionNameIds = {"1":"hungry"};
 var linkedCheckboxes = [];
 var unifiedFieldsMap = {};
 
@@ -2345,7 +2414,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"Yes","jumpTo":"3","section":1}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];

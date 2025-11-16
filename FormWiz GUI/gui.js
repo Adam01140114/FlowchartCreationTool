@@ -735,6 +735,20 @@ function addQuestion(sectionId, questionId = null) {
             <textarea id="infoBoxText${currentQuestionId}" placeholder="Enter information for tooltip/popup" rows="3" style="width: 100%;"></textarea>
         </div><br>
 
+        <!-- PDF Preview Feature -->
+        <label>Enable PDF Preview: </label>
+        <input type="checkbox" id="enablePdfPreview${currentQuestionId}" onchange="togglePdfPreview(${currentQuestionId})">
+        <div id="pdfPreviewBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Preview Trigger:</label>
+            <select id="pdfPreviewTrigger${currentQuestionId}">
+                <option value="">Select an option...</option>
+            </select><br><br>
+            <label>PDF Preview Title:</label>
+            <input type="text" id="pdfPreviewTitle${currentQuestionId}" placeholder="Enter PDF preview title"><br><br>
+            <label>PDF Preview File:</label>
+            <input type="text" id="pdfPreviewFile${currentQuestionId}" placeholder="Enter PDF file name or URL">
+        </div><br>
+
         <!-- Conditional Logic -->
         <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
@@ -2273,6 +2287,9 @@ function addDropdownOption(questionId) {
 
     const optionInput = optionDiv.querySelector('input[type="text"]');
     optionInput.addEventListener('input', () => {
+        // Update PDF preview trigger options
+        updatePdfPreviewTriggerOptions(questionId);
+        
         // Update all jump conditions for this question
         const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
         jumpConditions.forEach(condition => {
@@ -4752,6 +4769,48 @@ function toggleInfoBox(questionId) {
     const infoBoxEnabled = document.getElementById(`enableInfoBox${questionId}`).checked;
     const infoBoxBlock = document.getElementById(`infoBoxBlock${questionId}`);
     infoBoxBlock.style.display = infoBoxEnabled ? 'block' : 'none';
+}
+
+// New function for PDF Preview feature
+function togglePdfPreview(questionId) {
+    const pdfPreviewEnabled = document.getElementById(`enablePdfPreview${questionId}`).checked;
+    const pdfPreviewBlock = document.getElementById(`pdfPreviewBlock${questionId}`);
+    pdfPreviewBlock.style.display = pdfPreviewEnabled ? 'block' : 'none';
+    
+    // Populate the preview trigger dropdown with options
+    if (pdfPreviewEnabled) {
+        updatePdfPreviewTriggerOptions(questionId);
+    }
+}
+
+// Function to populate PDF preview trigger dropdown with question options
+function updatePdfPreviewTriggerOptions(questionId) {
+    const triggerSelect = document.getElementById(`pdfPreviewTrigger${questionId}`);
+    if (!triggerSelect) return;
+    
+    // Save the currently selected value
+    const currentValue = triggerSelect.value;
+    
+    // Clear existing options (except the placeholder)
+    triggerSelect.innerHTML = '<option value="">Select an option...</option>';
+    
+    // Get all dropdown options for this question
+    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+    if (dropdownOptionsDiv) {
+        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+        optionInputs.forEach((input) => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                if (optionText === currentValue) {
+                    option.selected = true;
+                }
+                triggerSelect.appendChild(option);
+            }
+        });
+    }
 }
 
 function deleteDropdownImage(questionId) {

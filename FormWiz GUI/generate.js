@@ -1150,7 +1150,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
 
         // 2) The <select> itself
         formHTML += `<select id="${ddNm}" name="${ddNm}"
-                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
+                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handlePdfPreview${questionId}(this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -1165,6 +1165,115 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
               <div id="dropdowntext_${ddNm}"></div>
               <input type="text" id="${ddNm}_dropdown" name="${ddNm}_dropdown"
                    readonly style="display:none;">`;
+        
+        // Handle PDF Preview
+        const pdfPreviewEnabledEl = qBlock.querySelector(`#enablePdfPreview${questionId}`);
+        const pdfPreviewEnabled = pdfPreviewEnabledEl && pdfPreviewEnabledEl.checked;
+        
+        if (pdfPreviewEnabled) {
+          const pdfPreviewTriggerEl = qBlock.querySelector(`#pdfPreviewTrigger${questionId}`);
+          const pdfPreviewTitleEl = qBlock.querySelector(`#pdfPreviewTitle${questionId}`);
+          const pdfPreviewFileEl = qBlock.querySelector(`#pdfPreviewFile${questionId}`);
+          
+          const pdfPreviewTrigger = pdfPreviewTriggerEl ? pdfPreviewTriggerEl.value : "";
+          const pdfPreviewTitle = pdfPreviewTitleEl ? pdfPreviewTitleEl.value : "PDF Preview";
+          const pdfPreviewFile = pdfPreviewFileEl ? pdfPreviewFileEl.value : "";
+          
+          if (pdfPreviewTrigger && pdfPreviewFile) {
+            // Add PDF preview div (initially hidden)
+            formHTML += `
+              <div id="pdfPreview${questionId}" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #2196F3; border-radius: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #1976D2; font-size: 18px; font-weight: 600; text-align: center;">${pdfPreviewTitle}</h4>
+                <div id="pdfPreviewLoading${questionId}" style="text-align: center; padding: 20px; display: none;">
+                  <p style="color: #1976D2; font-size: 16px;">Loading preview...</p>
+                </div>
+                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
+                  <iframe id="pdfPreviewIframe${questionId}" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                </div>
+              </div>
+              <script>
+                async function handlePdfPreview${questionId}(value) {
+                  const previewDiv = document.getElementById('pdfPreview${questionId}');
+                  const iframe = document.getElementById('pdfPreviewIframe${questionId}');
+                  const loadingDiv = document.getElementById('pdfPreviewLoading${questionId}');
+                  
+                  if (value === '${pdfPreviewTrigger}') {
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    
+                    // Fetch the filled PDF from the server
+                    try {
+                      const form = document.getElementById('customForm');
+                      const fd = new FormData();
+                      
+                      // Collect all form data
+                      const formElements = form.querySelectorAll('input, textarea, select');
+                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                      const allFormElements = [...formElements, ...externalFormElements];
+                      
+                      allFormElements.forEach(element => {
+                        if (element.name && !element.disabled) {
+                          if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                              fd.append(element.name, 'on');
+                            }
+                          } else {
+                            let value = element.value;
+                            if (element.type === 'date' && value) {
+                              value = formatDateForServer(value);
+                            }
+                            if (value && value.trim() !== '') {
+                              fd.append(element.name, value);
+                            }
+                          }
+                        }
+                      });
+                      
+                      // Send to server
+                      const baseName = '${pdfPreviewFile}'.replace(/\\.pdf$/i, '');
+                      const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+                      
+                      const res = await fetch(endpoint, { 
+                        method: 'POST', 
+                        body: fd 
+                      });
+                      
+                      if (!res.ok) {
+                        throw new Error('Failed to generate PDF preview');
+                      }
+                      
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      
+                      // Display in iframe
+                      iframe.src = url;
+                      loadingDiv.style.display = 'none';
+                      iframe.style.display = 'block';
+                      
+                      // Store URL for cleanup
+                      iframe.dataset.blobUrl = url;
+                      
+                    } catch (error) {
+                      console.error('PDF preview error:', error);
+                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to load preview. Please try again.</p>';
+                      iframe.style.display = 'none';
+                    }
+                  } else {
+                    previewDiv.style.display = 'none';
+                    // Clean up blob URL
+                    if (iframe.dataset.blobUrl) {
+                      URL.revokeObjectURL(iframe.dataset.blobUrl);
+                      iframe.dataset.blobUrl = '';
+                      iframe.src = '';
+                    }
+                  }
+                }
+              </script>
+            `;
+          }
+        }
+        
         // handle PDF logic
         if (pdfEnabled) {
           conditionalPDFs.push({

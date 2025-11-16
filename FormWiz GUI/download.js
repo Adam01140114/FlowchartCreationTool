@@ -474,6 +474,30 @@ function loadFormData(formData) {
                         if (typeof updateAllChecklistLogicDropdowns === 'function') {
                             setTimeout(updateAllChecklistLogicDropdowns, 100);
                         }
+                        
+                        // -- Restore PDF preview if present (AFTER options are added to DOM) --
+                        if (question.pdfPreview && question.pdfPreview.enabled) {
+                            const pdfPreviewCheckbox = questionBlock.querySelector(`#enablePdfPreview${question.questionId}`);
+                            const pdfPreviewTriggerSelect = questionBlock.querySelector(`#pdfPreviewTrigger${question.questionId}`);
+                            const pdfPreviewTitleInput = questionBlock.querySelector(`#pdfPreviewTitle${question.questionId}`);
+                            const pdfPreviewFileInput = questionBlock.querySelector(`#pdfPreviewFile${question.questionId}`);
+                            
+                            if (pdfPreviewCheckbox) {
+                                pdfPreviewCheckbox.checked = true;
+                                togglePdfPreview(question.questionId); // This populates the trigger dropdown with options from DOM
+                                
+                                // Set the trigger value after the dropdown is populated
+                                if (pdfPreviewTriggerSelect && question.pdfPreview.trigger) {
+                                    pdfPreviewTriggerSelect.value = question.pdfPreview.trigger;
+                                }
+                                if (pdfPreviewTitleInput && question.pdfPreview.title) {
+                                    pdfPreviewTitleInput.value = question.pdfPreview.title;
+                                }
+                                if (pdfPreviewFileInput && question.pdfPreview.file) {
+                                    pdfPreviewFileInput.value = question.pdfPreview.file;
+                                }
+                            }
+                        }
                     }
                     // Also restore Name/ID and Placeholder
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
@@ -723,12 +747,12 @@ function loadFormData(formData) {
                                             field.options.forEach((option, optionIndex) => {
                                                 console.log('🔧 [IMPORT DEBUG] Adding option', optionIndex + 1, ':', option);
                                                 
-                                                if (typeof addDropdownOption !== 'function') {
-                                                    console.error('🔧 [IMPORT DEBUG] addDropdownOption function not available!');
+                                                if (typeof addDropdownFieldOption !== 'function') {
+                                                    console.error('🔧 [IMPORT DEBUG] addDropdownFieldOption function not available!');
                                                     return;
                                                 }
                                                 
-                                                addDropdownOption(question.questionId, fieldOrder);
+                                                addDropdownFieldOption(question.questionId, fieldOrder);
                                                 
                                                 // Set the option values
                                                 const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
@@ -1394,12 +1418,12 @@ function loadFormData(formData) {
                                         field.options.forEach((option, optionIndex) => {
                                             console.log('🔧 [IMPORT DEBUG] Adding option', optionIndex + 1, ':', option);
                                             
-                                            if (typeof addDropdownOption !== 'function') {
-                                                console.error('🔧 [IMPORT DEBUG] addDropdownOption function not available!');
+                                            if (typeof addDropdownFieldOption !== 'function') {
+                                                console.error('🔧 [IMPORT DEBUG] addDropdownFieldOption function not available!');
                                                 return;
                                             }
                                             
-                                            addDropdownOption(question.questionId, fieldOrder);
+                                            addDropdownFieldOption(question.questionId, fieldOrder);
                                             
                                             // Set the option values
                                             const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
@@ -2914,6 +2938,12 @@ function exportForm() {
                 infoBox: {
                     enabled: questionBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false,
                     text: questionBlock.querySelector(`#infoBoxText${questionId}`)?.value || ""
+                },
+                pdfPreview: {
+                    enabled: questionBlock.querySelector(`#enablePdfPreview${questionId}`)?.checked || false,
+                    trigger: questionBlock.querySelector(`#pdfPreviewTrigger${questionId}`)?.value || "",
+                    title: questionBlock.querySelector(`#pdfPreviewTitle${questionId}`)?.value || "",
+                    file: questionBlock.querySelector(`#pdfPreviewFile${questionId}`)?.value || ""
                 },
                 options: [],
                 labels: []

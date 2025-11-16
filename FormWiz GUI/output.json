@@ -6,208 +6,65 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "q1",
+          "text": "Hungry?",
           "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
           },
           "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
             "enabled": true,
-            "conditions": [
-              {
-                "option": "Yes",
-                "to": "3"
-              }
-            ]
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
+            "trigger": "Yes",
+            "title": "Here is what it looks like:",
+            "file": "sc500.pdf"
           },
           "options": [
             "Yes",
             "No"
           ],
           "labels": [],
-          "nameId": "q1",
-          "placeholder": "",
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          }
-        }
-      ]
-    },
-    {
-      "sectionId": 2,
-      "sectionName": "Section 2",
-      "questions": [
-        {
-          "questionId": 2,
-          "text": "q2",
-          "type": "dropdown",
-          "logic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "options": [
-            "Yes",
-            "No"
-          ],
-          "labels": [],
-          "nameId": "q2",
-          "placeholder": "",
-          "linking": {
-            "enabled": false,
-            "targetId": ""
-          },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          }
-        }
-      ]
-    },
-    {
-      "sectionId": 3,
-      "sectionName": "Section 3",
-      "questions": [
-        {
-          "questionId": 3,
-          "text": "q3",
-          "type": "dropdown",
-          "logic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "options": [
-            "Yes",
-            "No"
-          ],
-          "labels": [],
-          "nameId": "q3",
+          "nameId": "hungry",
           "placeholder": "",
           "linking": {
             "enabled": false,
@@ -224,8 +81,8 @@
   ],
   "groups": [],
   "hiddenFields": [],
-  "sectionCounter": 4,
-  "questionCounter": 4,
+  "sectionCounter": 2,
+  "questionCounter": 2,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
