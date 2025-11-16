@@ -2594,6 +2594,7 @@ function addTextboxLabel(questionId) {
     fieldDiv.className = `unified-field field-${fieldCount}`;
     fieldDiv.setAttribute('data-type', 'label');
     fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.setAttribute('data-prefill', ''); // Initialize prefill attribute
     fieldDiv.innerHTML = `
         <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
             <div style="font-weight: bold; color: #333;">Label: <span id="labelText${questionId}_${fieldCount}">Label ${fieldCount}</span></div>
@@ -5146,15 +5147,6 @@ function saveUnifiedField(questionId, fieldOrder) {
         fieldDiv.removeAttribute('data-prefill');
     }
     
-    // Update display elements
-    const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
-    const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
-    const typeTextEl = document.getElementById('typeText' + questionId + '_' + fieldOrder);
-    
-    labelTextEl.textContent = newLabel;
-    nodeIdTextEl.textContent = newNodeId;
-    typeTextEl.textContent = newType;
-    
     // Update the display text based on type
     const displayDiv = fieldDiv.querySelector('div');
     if (newType === 'label') {
@@ -5164,6 +5156,15 @@ function saveUnifiedField(questionId, fieldOrder) {
     } else if (newType === 'date') {
         displayDiv.querySelector('div:first-child').innerHTML = 'Date: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
     }
+    
+    // Update display elements (after they've been created by innerHTML)
+    const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
+    const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
+    const typeTextEl = document.getElementById('typeText' + questionId + '_' + fieldOrder);
+    
+    if (labelTextEl) labelTextEl.textContent = newLabel;
+    if (nodeIdTextEl) nodeIdTextEl.textContent = newNodeId;
+    if (typeTextEl) typeTextEl.textContent = newType;
     
     // Remove any existing event listeners to prevent duplicates
     if (displayDiv._dblclickHandler) {

@@ -6,8 +6,8 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Hungry?",
-          "type": "dropdown",
+          "text": "How many extra defendants",
+          "type": "numberedDropdown",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -54,27 +54,25 @@
             "text": ""
           },
           "pdfPreview": {
-            "enabled": true,
-            "trigger": "Yes",
-            "title": "Here is what it looks like:",
-            "file": "sc500.pdf"
-          },
-          "options": [
-            "Yes",
-            "No"
-          ],
-          "labels": [],
-          "nameId": "hungry",
-          "placeholder": "",
-          "linking": {
             "enabled": false,
-            "targetId": ""
+            "trigger": "",
+            "title": "",
+            "file": ""
           },
-          "image": {
-            "url": "",
-            "width": 0,
-            "height": 0
-          }
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_extra_defendants",
+          "min": "1",
+          "max": "3",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_extra_defendants_name",
+              "order": 1,
+              "prefill": "Adam"
+            }
+          ]
         }
       ]
     }

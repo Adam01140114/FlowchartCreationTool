@@ -101,6 +101,16 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
 
+    console.log('🔍 [PREFILL DEBUG 5] createAddressInput called:', {
+        id,
+        label,
+        index,
+        type,
+        prefill,
+        valueAttr,
+        hasPrefill: !!prefill
+    });
+
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
@@ -1255,7 +1265,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                       iframe.dataset.blobUrl = url;
                       
                     } catch (error) {
-                      console.error('PDF preview error:', error);
+
                       loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to load preview. Please try again.</p>';
                       iframe.style.display = 'none';
                     }
@@ -3069,14 +3079,33 @@ formHTML += `</div><br></div>`;
           } else if (labelTextEl && nodeIdTextEl) {
             const labelText = labelTextEl.textContent.trim();
             const nodeIdText = nodeIdTextEl.textContent.trim();
+            const prefillValue = field.getAttribute('data-prefill') || '';
+
+            console.log('🔧 [BUILD TIME DEBUG] Reading field during HTML generation:', {
+                questionId,
+                fieldOrder,
+                fieldType,
+                labelText,
+                nodeIdText,
+                prefillValue,
+                hasPrefillAttr: field.hasAttribute('data-prefill')
+            });
 
             // Add to allFieldsInOrder for unified order
-            allElements.push({
+            const fieldData = {
                 type: fieldType,
                 label: labelText,
                 nodeId: nodeIdText,
                 order: parseInt(fieldOrder)
-            });
+            };
+            
+            // Include prefill for label fields
+            if (fieldType === 'label') {
+                fieldData.prefill = prefillValue;
+                console.log('🔧 [BUILD TIME DEBUG] Added prefill to unifiedFieldsMap:', fieldData);
+            }
+            
+            allElements.push(fieldData);
 
             if (fieldType === 'label') {
               labelVals.push(labelText);
@@ -3688,24 +3717,13 @@ if (s > 1){
           const checkboxesSatisfied = !hasCheckbox || checkboxAnyChecked;
 
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
-          console.log('[Nav] isQuestionAnswered', {
-            containerId: container.id,
-            eligibleCount: eligibleElements.length,
-            allStandardSatisfied,
-            radiosSatisfied,
-            hasCheckbox,
-            checkboxAnyChecked,
-            answered
-          });
+
           return answered;
         }
 
         function answerTriggersEnd(container) {
           if (!container || !Array.isArray(jumpLogics) || !jumpLogics.length) {
-            console.log('[Nav] answerTriggersEnd skipped', {
-              hasContainer: !!container,
-              jumpLogicCount: Array.isArray(jumpLogics) ? jumpLogics.length : 0
-            });
+
             return false;
           }
           const containerId = ((container.id || '') + '').trim();
@@ -3716,19 +3734,11 @@ if (s > 1){
           }
 
           if (!questionId) {
-            console.warn('[Nav] answerTriggersEnd unresolved question id', {
-              containerId,
-              dataQuestionId
-            });
+
             return false;
           }
 
           const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
-          console.log('[Nav] answerTriggersEnd jump scan', {
-            questionId,
-            relevantJumpCount: relevantJumps.length,
-            relevantJumps
-          });
 
           if (!relevantJumps.length) return false;
 
@@ -3745,71 +3755,40 @@ if (s > 1){
           });
 
           if (!currentAnswers.length) {
-            console.log('[Nav] answerTriggersEnd no answers', {
-              questionId
-            });
+
             return false;
           }
 
           const normalizedAnswers = currentAnswers.map(val => String(val).trim().toLowerCase());
-          console.log('[Nav] answerTriggersEnd answers', {
-            questionId,
-            currentAnswers,
-            normalizedAnswers
-          });
 
           for (const jl of relevantJumps) {
             const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
             if (jumpOption && normalizedAnswers.includes(jumpOption)) {
-              console.log('[Nav] answerTriggersEnd matched', {
-                questionId,
-                jumpOption
-              });
+
               return true;
             }
           }
 
-          console.log('[Nav] answerTriggersEnd no match', { questionId });
           return false;
         }
 
         function attachSubmitModeListeners(container, containerIdx) {
           if (!container || container.dataset.submitModeListenersAttached === 'true') return;
           const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
-          console.log('[Nav] attachSubmitModeListeners', {
-            containerId: container.id,
-            index: containerIdx,
-            interactiveCount: interactiveElements.length
-          });
+
           interactiveElements.forEach(el => {
             el.addEventListener('change', function() {
-              console.log('[Nav] input change detected', {
-                containerId: container.id,
-                name: el.name || el.id,
-                type: el.type,
-                value: el.value,
-                checked: el.checked
-              });
+
               refreshNav(containerIdx);
             });
           });
           container.dataset.submitModeListenersAttached = 'true';
-          console.log('[Nav] submit listeners attached', { containerId: container.id });
+
         }
 
         function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
           const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
           const isAnswered = submitConfig && submitConfig.isAnswered;
-          console.log('[Nav] updateButtons state', {
-            sectionId,
-            hasPrevQuestion,
-            canAdvanceWithinSection,
-            canAdvanceAcrossSection,
-            nextSectionInfo,
-            prevSectionInfo,
-            shouldSubmit,
-            isAnswered
-          });
 
           if (prevBtn) {
             const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
@@ -3837,7 +3816,7 @@ if (s > 1){
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
               nextBtn.classList.add('submit-mode');
-              console.log('[Nav] next button submit mode', { sectionId, isAnswered });
+
             } else {
               nextBtn.classList.remove('submit-mode');
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection);
@@ -3857,12 +3836,7 @@ if (s > 1){
                   nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
                 }
               }
-              console.log('[Nav] next button navigation mode', {
-                sectionId,
-                canAdvance,
-                mode: nextBtn.dataset.advanceMode,
-                targetSection: nextBtn.dataset.nextSectionId || null
-              });
+
             }
           }
         }
@@ -3921,14 +3895,6 @@ if (s > 1){
           attachSubmitModeListeners(activeContainer, targetIdx);
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
-          console.log('[Nav] activateIndex result', {
-            sectionId,
-            targetIdx,
-            currentPos,
-            visibleTotal,
-            shouldSubmit,
-            isAnswered
-          });
 
           const hasPrevQuestion = currentPos > 0;
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
@@ -3986,7 +3952,7 @@ if (s > 1){
           const triggerNavigation = () => {
             // Check if we have a stack entry - if so, use goBack() to respect jump history
             if (typeof sectionStack !== 'undefined' && Array.isArray(sectionStack) && sectionStack.length > 0) {
-              console.log('[Nav] goToPrevSection: Using goBack() to respect navigation history');
+
               if (typeof goBack === 'function') {
                 goBack();
                 // After going back, update the target navigation if needed
@@ -4001,7 +3967,7 @@ if (s > 1){
               }
             } else {
               // No stack history, use direct navigation
-              console.log('[Nav] goToPrevSection: No stack history, using direct navigation');
+
               if (typeof navigateSection === 'function') {
                 navigateSection(targetSectionNumber);
               } else if (typeof validateAndProceed === 'function') {
@@ -4035,11 +4001,7 @@ if (s > 1){
           if (direction > 0) {
             const activeContainer = questionItems[activeIndex];
             if (activeContainer && !isQuestionAnswered(activeContainer)) {
-              console.warn('[Nav] shiftQuestion prevented advance', {
-                sectionId,
-                activeIndex,
-                containerId: activeContainer.id
-              });
+
               return;
             }
           }
@@ -4052,23 +4014,13 @@ if (s > 1){
             }
             return;
           }
-          console.log('[Nav] shiftQuestion moving', {
-            sectionId,
-            fromIndex: activeIndex,
-            toIndex: visibleIndices[nextPos],
-            direction
-          });
+
           activateIndex(visibleIndices[nextPos]);
         }
 
         function refreshNav(targetIdx) {
           const visibleIndices = getVisibleIndices();
-          console.log('[Nav] refreshNav', {
-            sectionId,
-            requestedIdx: targetIdx,
-            visibleIndices,
-            activeIndex
-          });
+
           if (!visibleIndices.length) {
             activateIndex(0);
             return;
@@ -4089,7 +4041,7 @@ if (s > 1){
 
         if (prevBtn) {
           prevBtn.addEventListener('click', function() {
-            console.log('[Nav] prev button clicked', { sectionId, currentIndex: activeIndex });
+
             shiftQuestion(-1);
           });
         }
@@ -4097,7 +4049,7 @@ if (s > 1){
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
             if (nextBtn.dataset.advanceMode === 'submit') {
-              console.log('[Nav] next button submit triggered', { sectionId });
+
               const formEl = document.getElementById('customForm');
               if (formEl) {
                 if (typeof formEl.requestSubmit === 'function') {
@@ -4108,11 +4060,7 @@ if (s > 1){
               }
               return;
             }
-            console.log('[Nav] next button clicked', {
-              sectionId,
-              currentIndex: activeIndex,
-              advanceMode: nextBtn.dataset.advanceMode
-            });
+
             shiftQuestion(1);
           });
         }
@@ -5536,6 +5484,17 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
     const inputType = (type === 'number') ? 'number' : 'text';
     const placeholder = label;
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+    
+    console.log('🔍 [PREFILL DEBUG 6] window.createAddressInput called:', {
+        id,
+        label,
+        index,
+        type,
+        prefill,
+        valueAttr,
+        hasPrefill: !!prefill
+    });
+    
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
@@ -7517,6 +7476,12 @@ let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
 
+    console.log('🔍 [PREFILL DEBUG 0] showTextboxLabels called:', {
+        questionId,
+        count,
+        isCreatingFields
+    });
+
     // 🔧 NEW: Check if we're already creating fields
     if (isCreatingFields) {
         return;
@@ -7584,14 +7549,34 @@ function showTextboxLabels(questionId, count){
                 const fieldOrder = parseInt(el.getAttribute('data-order'));
                 const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
                 const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                const prefillValue = el.getAttribute('data-prefill') || '';
+
+                console.log('🔍 [PREFILL DEBUG 1] Reading field from DOM:', {
+                    questionId,
+                    fieldOrder,
+                    fieldType,
+                    label: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
+                    nodeId: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A',
+                    prefillValue,
+                    hasPrefillAttr: el.hasAttribute('data-prefill'),
+                    rawPrefillAttr: el.getAttribute('data-prefill')
+                });
 
                 if (labelTextEl && nodeIdTextEl) {
-                    allElements.push({
+                    const fieldData = {
                         type: fieldType,
                         label: labelTextEl.textContent.trim(),
                         nodeId: nodeIdTextEl.textContent.trim(),
                         order: fieldOrder
-                    });
+                    };
+                    
+                    // Include prefill for label fields
+                    if (fieldType === 'label') {
+                        fieldData.prefill = prefillValue;
+                        console.log('🔍 [PREFILL DEBUG 2] Added prefill to fieldData:', fieldData);
+                    }
+                    
+                    allElements.push(fieldData);
                 }
             });
 
@@ -7755,6 +7740,16 @@ function showTextboxLabels(questionId, count){
                 entryContainer.appendChild(locationFieldDiv);
             } else if (field.type === 'label') {
                 const fieldId = field.nodeId + "_" + j;
+                const prefillValue = field.prefill || '';
+                
+                console.log('🔍 [PREFILL DEBUG 3] Creating label field:', {
+                    fieldId,
+                    label: field.label,
+                    prefillValue,
+                    entryNumber: j,
+                    fullField: field
+                });
+                
                 if (field.label === 'State') {
                     // Use dropdown for State field
                     const dropdownDiv = document.createElement('div');
@@ -7763,7 +7758,9 @@ function showTextboxLabels(questionId, count){
                 } else {
                     // Use regular input for other fields
                     const inputDiv = document.createElement('div');
-                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                    const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
+                    console.log('🔍 [PREFILL DEBUG 4] Generated input HTML:', inputHTML.substring(0, 200));
+                    inputDiv.innerHTML = inputHTML;
                     entryContainer.appendChild(inputDiv.firstElementChild);
                 }
             } else if (field.type === 'amount') {
@@ -8638,14 +8635,34 @@ function getFieldsInOrderForQuestion(questionId) {
                 const fieldOrder = parseInt(el.getAttribute('data-order'));
                 const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
                 const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                const prefillValue = el.getAttribute('data-prefill') || '';
+
+                console.log('🔍 [PREFILL DEBUG 1] Reading field from DOM:', {
+                    questionId,
+                    fieldOrder,
+                    fieldType,
+                    label: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
+                    nodeId: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A',
+                    prefillValue,
+                    hasPrefillAttr: el.hasAttribute('data-prefill'),
+                    rawPrefillAttr: el.getAttribute('data-prefill')
+                });
 
                 if (labelTextEl && nodeIdTextEl) {
-                    allElements.push({
+                    const fieldData = {
                         type: fieldType,
                         label: labelTextEl.textContent.trim(),
                         nodeId: nodeIdTextEl.textContent.trim(),
                         order: fieldOrder
-                    });
+                    };
+                    
+                    // Include prefill for label fields
+                    if (fieldType === 'label') {
+                        fieldData.prefill = prefillValue;
+                        console.log('🔍 [PREFILL DEBUG 2] Added prefill to fieldData:', fieldData);
+                    }
+                    
+                    allElements.push(fieldData);
                 }
             });
 
@@ -9250,27 +9267,25 @@ function handleNext(currentSection){
     runAllHiddenTextCalculations();
 
     /* remember the place we're leaving - push BEFORE evaluating jumps */
-    console.log('[NAV DEBUG] handleNext called with currentSection:', currentSection);
-    console.log('[NAV DEBUG] Stack BEFORE push:', JSON.stringify(sectionStack));
+
+
     sectionStack.push(currentSection);
-    console.log('[NAV DEBUG] Stack AFTER push:', JSON.stringify(sectionStack));
 
     let nextSection = currentSection + 1;
 
     /* ---------- evaluate jump rules ---------- */
     const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
-    console.log('[NAV DEBUG] Relevant jumps for section', currentSection, ':', relevantJumps.length);
+
     let jumpDetected = false;
     for (const jl of relevantJumps){
         const nmId = questionNameIds[jl.questionId] || ('answer'+jl.questionId);
-        console.log('[NAV DEBUG] Checking jump:', { questionId: jl.questionId, jumpOption: jl.jumpOption, jumpTo: jl.jumpTo, nmId });
 
         if (['radio','dropdown','numberedDropdown'].includes(jl.questionType)){
             const el = document.getElementById(nmId);
             if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()){
                 nextSection = jl.jumpTo.toLowerCase();
                 jumpDetected = true;
-                console.log('[NAV DEBUG] JUMP DETECTED! From section', currentSection, 'to', nextSection);
+
                 break;
             }
         } else if (jl.questionType === 'checkbox'){
@@ -9280,7 +9295,7 @@ function handleNext(currentSection){
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
                 nextSection = jl.jumpTo.toLowerCase();
                 jumpDetected = true;
-                console.log('[NAV DEBUG] JUMP DETECTED! From section', currentSection, 'to', nextSection);
+
                 break;
             }
         }
@@ -9288,15 +9303,15 @@ function handleNext(currentSection){
 
     /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
-        console.log('[NAV DEBUG] Jumping to end');
+
         processAllPdfs().then(()=>navigateSection('end'));
         return;
     }
 
     nextSection = parseInt(nextSection,10);
     if (isNaN(nextSection)) nextSection = currentSection + 1;
-    console.log('[NAV DEBUG] Navigating from section', currentSection, 'to section', nextSection, '(jump:', jumpDetected, ')');
-    console.log('[NAV DEBUG] Stack state before navigateSection:', JSON.stringify(sectionStack));
+
+
     navigateSection(nextSection);
 
     /* recalc hidden fields after navigation */
@@ -9363,8 +9378,7 @@ function resetHiddenQuestionsToDefaults(sectionNumber) {
  *-----------------------------------------------------------------*/
 
 function navigateSection(sectionNumber, isBackNavigation = false){
-    console.log('[NAV DEBUG] navigateSection called:', { sectionNumber, isBackNavigation, currentSectionNumber, stackLength: sectionStack.length, stack: JSON.stringify(sectionStack) });
-    
+
     const sections  = document.querySelectorAll('.section');
     const form      = document.getElementById('customForm');
     const thankYou  = document.getElementById('thankYouMessage');
@@ -9378,7 +9392,7 @@ function navigateSection(sectionNumber, isBackNavigation = false){
         form.style.display   = 'none';
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
-        console.log('[NAV DEBUG] Navigating to end');
+
         updateProgressBar();
         return;
     }
@@ -9395,7 +9409,6 @@ function navigateSection(sectionNumber, isBackNavigation = false){
     // Update currentSectionNumber
     const previousSectionNumber = currentSectionNumber;
     currentSectionNumber = sectionNumber;
-    console.log('[NAV DEBUG] Section number updated:', { previous: previousSectionNumber, current: currentSectionNumber, isBackNavigation });
 
     // Reset hidden questions to default values after Firebase autosave
     // BUT NOT during initial autofill to preserve autofilled values
@@ -9411,39 +9424,36 @@ function navigateSection(sectionNumber, isBackNavigation = false){
  *  – pops the history stack; falls back to numeric −1 if empty
  *-----------------------------------------------------------------*/
 function goBack(){
-    console.log('[NAV DEBUG] ========== goBack() called ==========');
-    console.log('[NAV DEBUG] Current section:', currentSectionNumber);
-    console.log('[NAV DEBUG] Stack length:', sectionStack.length);
-    console.log('[NAV DEBUG] Stack contents:', JSON.stringify(sectionStack));
-    console.log('[NAV DEBUG] Stack type check:', sectionStack.map(s => ({ value: s, type: typeof s })));
-    
+
+
+
+
+
     if (sectionStack.length > 0){
         const prev = sectionStack.pop();
-        console.log('[NAV DEBUG] Popped from stack:', prev, '(type:', typeof prev, ')');
-        
+
         // Ensure prev is a number, not a string
         const prevSection = typeof prev === 'string' ? parseInt(prev, 10) : prev;
-        console.log('[NAV DEBUG] Parsed prevSection:', prevSection, '(isNaN:', isNaN(prevSection), ')');
-        
+
         if (!isNaN(prevSection) && prevSection >= 1) {
-            console.log('[NAV DEBUG] ✅ Navigating to section from stack:', prevSection);
-            console.log('[NAV DEBUG] Stack after pop:', JSON.stringify(sectionStack));
+
+
             navigateSection(prevSection, true);
         } else {
-            console.warn('[NAV DEBUG] ❌ Invalid stack value:', prevSection, '- using fallback');
+
             if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
                 // Fallback only if stack value is invalid
-                console.log('[NAV DEBUG] Fallback: navigating to', currentSectionNumber - 1);
+
                 navigateSection(currentSectionNumber - 1, true);
             }
         }
     }else {
-        console.log('[NAV DEBUG] ⚠️ Stack is empty - using fallback');
+
         if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
-            console.log('[NAV DEBUG] Fallback: navigating to', currentSectionNumber - 1);
+
             navigateSection(currentSectionNumber - 1, true);
         } else {
-            console.warn('[NAV DEBUG] ❌ Cannot go back - stack empty and currentSectionNumber is', currentSectionNumber);
+
         }
     }
     updateProgressBar();
@@ -11947,16 +11957,27 @@ if (typeof handleNext === 'function') {
     });
 
 // Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text') {
+function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
+    const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+
+    console.log('🔍 [PREFILL DEBUG 7] Final createAddressInput called:', {
+        id,
+        label,
+        index,
+        type,
+        prefill,
+        valueAttr,
+        hasPrefill: !!prefill
+    });
 
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input">' +
+           'class="address-input"' + valueAttr + '>' +
            '</div>';
 }
 

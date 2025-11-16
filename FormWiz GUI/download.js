@@ -582,7 +582,9 @@ function loadFormData(formData) {
                                         // Set prefill value (always set it, even if empty, to ensure it's preserved)
                                         if (field.prefill !== undefined) {
                                             lastField.setAttribute('data-prefill', field.prefill || '');
-                                            console.log('🔧 [IMPORT DEBUG] Set prefill for field:', field.label, 'prefill:', field.prefill);
+                                            console.log('🔧 [IMPORT DEBUG] Set prefill for field:', field.label, 'prefill:', field.prefill, 'attribute value:', lastField.getAttribute('data-prefill'));
+                                        } else {
+                                            console.log('🔧 [IMPORT DEBUG] No prefill defined for field:', field.label);
                                         }
                                     }
                                 } else if (field.type === 'amount') {
@@ -1242,6 +1244,14 @@ function loadFormData(formData) {
                                     const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                     if (labelTextEl) labelTextEl.textContent = field.label;
                                     if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    
+                                    // Set prefill value (always set it, even if empty, to ensure it's preserved)
+                                    if (field.prefill !== undefined) {
+                                        lastField.setAttribute('data-prefill', field.prefill || '');
+                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] Set prefill for field:', field.label, 'prefill:', field.prefill, 'attribute value:', lastField.getAttribute('data-prefill'));
+                                    } else {
+                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] No prefill defined for field:', field.label);
+                                    }
                                 }
                             } else if (field.type === 'amount') {
                                 // Add an amount field
@@ -3640,9 +3650,9 @@ function exportForm() {
                             // Handle regular fields (label, amount, etc.)
                         const labelText = labelTextEl.textContent.trim();
                         const nodeIdText = nodeIdTextEl.textContent.trim();
-                        const prefillValue = el.getAttribute('data-prefill') || '';
+                        const prefillValue = field.getAttribute('data-prefill') || '';
                         
-                        console.log('🔧 [EXPORT DEBUG] Field:', { fieldType, labelText, nodeIdText, prefillValue, hasAttribute: el.hasAttribute('data-prefill') });
+                        console.log('🔧 [EXPORT DEBUG] Field:', { fieldType, labelText, nodeIdText, prefillValue, hasAttribute: field.hasAttribute('data-prefill') });
                         
                         const fieldData = {
                             type: fieldType,
