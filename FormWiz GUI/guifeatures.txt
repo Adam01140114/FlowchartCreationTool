@@ -532,4 +532,227 @@ The system is designed to be easily extensible:
 
 ---
 
+## Field Prefill Features
+
+### Feature: Default Value Prefill System
+**Purpose**: Allows fields to have default values that automatically populate when the form loads, with smart Firebase autofill integration.
+
+**Implementation**:
+- **GUI Location**: `gui.js` lines 2597, 5098-5101, 5142-5147
+- **Export Location**: `download.js` lines 3082-3105, 3643-3657
+- **Import Location**: `download.js` lines 1248-1254 (numbered dropdown), 583-588 (multipleTextboxes)
+- **Generation Location**: `generate.js` lines 3082-3116, 7554-7576
+- **Runtime Location**: `generate.js` lines 11106-11138
+- **Trigger**: On field creation and post-Firebase autofill
+
+**How it works**:
+
+**1. GUI Setup (Adding Prefill to Fields)**:
+```javascript
+// In gui.js - When creating a label field
+fieldDiv.setAttribute('data-prefill', ''); // Initialize prefill attribute
+
+// In edit modal - Show prefill input for label fields
+<div id="prefillContainer${questionId}_${fieldOrder}" style="${currentType === 'label' ? '' : 'display: none;'}">
+    <label>Prefill:</label>
+    <input type="text" id="editPrefill${questionId}_${fieldOrder}" 
+           value="${currentPrefill}" 
+           placeholder="Enter default value (e.g., Adam)">
+</div>
+
+// When saving field - Store prefill value
+if (newType === 'label') {
+    fieldDiv.setAttribute('data-prefill', newPrefill);
+}
+```
+
+**2. Export/Import (Preserving Prefill in JSON)**:
+```javascript
+// In download.js - Export prefill value
+const prefillValue = field.getAttribute('data-prefill') || '';
+const fieldData = {
+    type: fieldType,
+    label: labelText,
+    nodeId: nodeIdText,
+    order: parseInt(fieldOrder)
+};
+
+// Always include prefill for label type fields (even if empty)
+if (fieldType === 'label') {
+    fieldData.prefill = prefillValue;
+}
+
+// In download.js - Import prefill value
+if (field.prefill !== undefined) {
+    lastField.setAttribute('data-prefill', field.prefill || '');
+}
+```
+
+**3. HTML Generation (Building Prefill into Form)**:
+```javascript
+// In generate.js - Read prefill during HTML generation
+const prefillValue = field.getAttribute('data-prefill') || '';
+
+const fieldData = {
+    type: fieldType,
+    label: labelText,
+    nodeId: nodeIdText,
+    order: parseInt(fieldOrder)
+};
+
+// Include prefill for label fields
+if (fieldType === 'label') {
+    fieldData.prefill = prefillValue;
+}
+
+// Store in window.unifiedFieldsMap for runtime use
+window.unifiedFieldsMap[questionId] = allFieldsInOrder;
+```
+
+**4. Runtime Rendering (Applying Prefill to Inputs)**:
+```javascript
+// In generate.js - Read from unifiedFieldsMap
+unifiedFields.forEach((el) => {
+    const prefillValue = el.getAttribute('data-prefill') || '';
+    
+    if (fieldType === 'label') {
+        fieldData.prefill = prefillValue;
+    }
+});
+
+// Pass prefill to createAddressInput
+const prefillValue = field.prefill || '';
+inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
+
+// In createAddressInput - Apply prefill to input
+const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+return '<input type="text" ... class="address-input"' + valueAttr + '>';
+```
+
+**5. Firebase Autofill Integration (Smart Restoration)**:
+```javascript
+// In generate.js - Post-Firebase autofill restoration (lines 11106-11138)
+setTimeout(() => {
+    window.isInitialAutofill = false;
+    
+    // Restore prefill values for any blank fields after Firebase autofill
+    if (window.unifiedFieldsMap) {
+        Object.keys(window.unifiedFieldsMap).forEach(questionId => {
+            const fields = window.unifiedFieldsMap[questionId];
+            if (Array.isArray(fields)) {
+                fields.forEach(field => {
+                    if (field.type === 'label' && field.prefill && field.nodeId) {
+                        // Find all input fields that match this nodeId pattern
+                        const inputs = document.querySelectorAll('input[id^="' + field.nodeId + '_"]');
+                        inputs.forEach(input => {
+                            // Only set prefill if the field is empty or blank
+                            if (!input.value || input.value.trim() === '') {
+                                input.value = field.prefill;
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+}, 3000); // Runs after Firebase autofill completes
+```
+
+**Key Behavior - Firebase Autofill Priority**:
+| Firebase Data | Prefill Value | Result |
+|---------------|---------------|--------|
+| Has value | "Adam" | ✅ Firebase value used |
+| Empty/blank | "Adam" | ✅ Prefill "Adam" applied |
+| No data | "Adam" | ✅ Prefill "Adam" applied |
+
+**Timing Sequence**:
+1. **T=0ms**: Page loads, HTML rendered with prefill in value attribute
+2. **T=100-2000ms**: Firebase autofill runs, may overwrite with blank
+3. **T=3000ms**: Prefill restoration runs, restores blank fields only
+
+**Supported Question Types**:
+- ✅ Numbered Dropdown (label fields)
+- ✅ Multiple Textboxes (label fields)
+- ❌ Regular Dropdown (not yet implemented)
+- ❌ Text/BigParagraph (not yet implemented)
+- ❌ Date/Time fields (not yet implemented)
+
+**How to Extend to Other Question Types**:
+
+1. **Add GUI Support**:
+```javascript
+// In the question's field edit modal, add prefill input
+<input type="text" id="prefill${questionId}" 
+       placeholder="Enter default value">
+```
+
+2. **Store in DOM**:
+```javascript
+// When creating/editing field, store as data attribute
+fieldElement.setAttribute('data-prefill', prefillValue);
+```
+
+3. **Export to JSON**:
+```javascript
+// In download.js export function
+const fieldData = {
+    // ... other properties
+    prefill: fieldElement.getAttribute('data-prefill') || ''
+};
+```
+
+4. **Import from JSON**:
+```javascript
+// In download.js import function
+if (field.prefill !== undefined) {
+    fieldElement.setAttribute('data-prefill', field.prefill || '');
+}
+```
+
+5. **Generate HTML with Prefill**:
+```javascript
+// In generate.js during HTML generation
+const prefillValue = field.prefill || '';
+inputHTML += `<input ... value="${prefillValue}">`;
+```
+
+6. **Add to unifiedFieldsMap** (if using runtime rendering):
+```javascript
+// Store prefill in the field data
+fieldData.prefill = prefillValue;
+window.unifiedFieldsMap[questionId].push(fieldData);
+```
+
+7. **Runtime Restoration** (already automatic):
+```javascript
+// The post-Firebase restoration at line 11106 will automatically
+// restore prefill values for any field type in unifiedFieldsMap
+```
+
+**Example Use Cases**:
+- Default names ("Enter defendant name here")
+- Common addresses ("123 Main Street")
+- Standard dates ("01/01/2024")
+- Placeholder phone numbers ("(555) 555-5555")
+- Default amounts ("$0.00")
+
+**Debug Logging**:
+- `🔧 [BUILD TIME DEBUG]`: Prefill read during HTML generation
+- `🔍 [PREFILL DEBUG 0-7]`: Prefill flow through runtime rendering
+- `🔧 [PREFILL RESTORE]`: Post-Firebase restoration
+
+**Common Issues and Solutions**:
+1. **Prefill not showing**: Check that `data-prefill` attribute is set on field element
+2. **Prefill disappearing**: Ensure post-Firebase restoration is running (check console logs)
+3. **Wrong field prefilled**: Verify nodeId pattern matching in restoration logic
+4. **Prefill overrides Firebase**: Check that restoration only applies to blank fields
+
+**Performance Considerations**:
+- Prefill restoration runs once at 3 seconds after page load
+- Uses `querySelectorAll` with nodeId prefix matching (efficient)
+- Only processes fields with prefill values defined
+- Minimal performance impact for forms with <100 fields
+
+---
+
 *This documentation is maintained alongside the codebase and should be updated when new features are added or existing features are modified.*

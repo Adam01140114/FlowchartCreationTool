@@ -100,15 +100,14 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
-
-    console.log('🔍 [PREFILL DEBUG 5] createAddressInput called:', {
-        id,
-        label,
-        index,
-        type,
-        prefill,
-        valueAttr,
-        hasPrefill: !!prefill
+    
+    console.log('🔧 [CREATE INPUT DEBUG - Node.js] Creating address input:', {
+        id: id,
+        label: label,
+        index: index,
+        type: type,
+        prefill: prefill,
+        valueAttr: valueAttr
     });
 
     return '<div class="address-field">' +
@@ -1175,20 +1174,20 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
               <div id="dropdowntext_${ddNm}"></div>
               <input type="text" id="${ddNm}_dropdown" name="${ddNm}_dropdown"
                    readonly style="display:none;">`;
-        
+
         // Handle PDF Preview
         const pdfPreviewEnabledEl = qBlock.querySelector(`#enablePdfPreview${questionId}`);
         const pdfPreviewEnabled = pdfPreviewEnabledEl && pdfPreviewEnabledEl.checked;
-        
+
         if (pdfPreviewEnabled) {
           const pdfPreviewTriggerEl = qBlock.querySelector(`#pdfPreviewTrigger${questionId}`);
           const pdfPreviewTitleEl = qBlock.querySelector(`#pdfPreviewTitle${questionId}`);
           const pdfPreviewFileEl = qBlock.querySelector(`#pdfPreviewFile${questionId}`);
-          
+
           const pdfPreviewTrigger = pdfPreviewTriggerEl ? pdfPreviewTriggerEl.value : "";
           const pdfPreviewTitle = pdfPreviewTitleEl ? pdfPreviewTitleEl.value : "PDF Preview";
           const pdfPreviewFile = pdfPreviewFileEl ? pdfPreviewFileEl.value : "";
-          
+
           if (pdfPreviewTrigger && pdfPreviewFile) {
             // Add PDF preview div (initially hidden)
             formHTML += `
@@ -1206,22 +1205,22 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                   const previewDiv = document.getElementById('pdfPreview${questionId}');
                   const iframe = document.getElementById('pdfPreviewIframe${questionId}');
                   const loadingDiv = document.getElementById('pdfPreviewLoading${questionId}');
-                  
+
                   if (value === '${pdfPreviewTrigger}') {
                     previewDiv.style.display = 'block';
                     loadingDiv.style.display = 'block';
                     iframe.style.display = 'none';
-                    
+
                     // Fetch the filled PDF from the server
                     try {
                       const form = document.getElementById('customForm');
                       const fd = new FormData();
-                      
+
                       // Collect all form data
                       const formElements = form.querySelectorAll('input, textarea, select');
                       const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
                       const allFormElements = [...formElements, ...externalFormElements];
-                      
+
                       allFormElements.forEach(element => {
                         if (element.name && !element.disabled) {
                           if (element.type === 'checkbox' || element.type === 'radio') {
@@ -1239,31 +1238,31 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                           }
                         }
                       });
-                      
+
                       // Send to server
                       const baseName = '${pdfPreviewFile}'.replace(/\\.pdf$/i, '');
                       const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
-                      
+
                       const res = await fetch(endpoint, { 
                         method: 'POST', 
                         body: fd 
                       });
-                      
+
                       if (!res.ok) {
                         throw new Error('Failed to generate PDF preview');
                       }
-                      
+
                       const blob = await res.blob();
                       const url = URL.createObjectURL(blob);
-                      
+
                       // Display in iframe
                       iframe.src = url;
                       loadingDiv.style.display = 'none';
                       iframe.style.display = 'block';
-                      
+
                       // Store URL for cleanup
                       iframe.dataset.blobUrl = url;
-                      
+
                     } catch (error) {
 
                       loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to load preview. Please try again.</p>';
@@ -1283,7 +1282,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
             `;
           }
         }
-        
+
         // handle PDF logic
         if (pdfEnabled) {
           conditionalPDFs.push({
@@ -3081,16 +3080,6 @@ formHTML += `</div><br></div>`;
             const nodeIdText = nodeIdTextEl.textContent.trim();
             const prefillValue = field.getAttribute('data-prefill') || '';
 
-            console.log('🔧 [BUILD TIME DEBUG] Reading field during HTML generation:', {
-                questionId,
-                fieldOrder,
-                fieldType,
-                labelText,
-                nodeIdText,
-                prefillValue,
-                hasPrefillAttr: field.hasAttribute('data-prefill')
-            });
-
             // Add to allFieldsInOrder for unified order
             const fieldData = {
                 type: fieldType,
@@ -3098,13 +3087,13 @@ formHTML += `</div><br></div>`;
                 nodeId: nodeIdText,
                 order: parseInt(fieldOrder)
             };
-            
+
             // Include prefill for label fields
             if (fieldType === 'label') {
                 fieldData.prefill = prefillValue;
-                console.log('🔧 [BUILD TIME DEBUG] Added prefill to unifiedFieldsMap:', fieldData);
+
             }
-            
+
             allElements.push(fieldData);
 
             if (fieldType === 'label') {
@@ -3946,7 +3935,7 @@ if (s > 1){
           const targetSectionId = cachedPrevSectionInfo.sectionId;
           const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
           const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
-          
+
           // Use goBack() if we have navigation history (stack), otherwise use direct navigation
           // This ensures jumps are properly handled when going back
           const triggerNavigation = () => {
@@ -5484,17 +5473,7 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
     const inputType = (type === 'number') ? 'number' : 'text';
     const placeholder = label;
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
-    
-    console.log('🔍 [PREFILL DEBUG 6] window.createAddressInput called:', {
-        id,
-        label,
-        index,
-        type,
-        prefill,
-        valueAttr,
-        hasPrefill: !!prefill
-    });
-    
+
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
@@ -5740,7 +5719,13 @@ if (document.readyState === 'loading') {
   formHTML += '// Function to get URL parameters\n' +
 'function getUrlParameter(name) {\n' +
 '    const urlParams = new URLSearchParams(window.location.search);\n' +
-'    return urlParams.get(name);\n' +
+'    const value = urlParams.get(name);\n' +
+'    console.log(\'🔧 [URL PARAM DEBUG] Getting URL parameter:\', {\n' +
+'        paramName: name,\n' +
+'        value: value,\n' +
+'        fullURL: window.location.search\n' +
+'    });\n' +
+'    return value;\n' +
 '}\n\n' +
 '// Function to populate hidden fields from URL parameters\n' +
 'function populateHiddenFieldsFromUrl() {\n' +
@@ -5772,13 +5757,27 @@ if (document.readyState === 'loading') {
 '}\n\n' +
 '// Function to replace URL parameter placeholders in text\n' +
 'function replaceUrlParametersInText(text) {\n' +
-'    if (!text || typeof text !== \'string\') return text;\n' +
+'    if (!text || typeof text !== \'string\') {\n' +
+'        console.log(\'🔧 [REPLACE URL DEBUG] Invalid input:\', { text: text, type: typeof text });\n' +
+'        return text;\n' +
+'    }\n' +
+'    \n' +
+'    console.log(\'🔧 [REPLACE URL DEBUG] Input text:\', text);\n' +
 '    \n' +
 '    // Replace [paramName] with URL parameter value\n' +
-'    return text.replace(/\\[([^\\]]+)\\]/g, function(match, paramName) {\n' +
+'    const result = text.replace(/\\[([^\\]]+)\\]/g, function(match, paramName) {\n' +
 '        const value = getUrlParameter(paramName);\n' +
+'        console.log(\'🔧 [REPLACE URL DEBUG] Found placeholder:\', {\n' +
+'            match: match,\n' +
+'            paramName: paramName,\n' +
+'            value: value,\n' +
+'            willReplace: !!value\n' +
+'        });\n' +
 '        return value || match; // Return the value if found, otherwise keep the placeholder\n' +
 '    });\n' +
+'    \n' +
+'    console.log(\'🔧 [REPLACE URL DEBUG] Output text:\', result);\n' +
+'    return result;\n' +
 '}\n\n' +
 '// Function to replace URL parameters in all question text, section names, etc.\n' +
 'function replaceUrlParametersInForm() {\n' +
@@ -5824,18 +5823,44 @@ if (document.readyState === 'loading') {
 '        }\n' +
 '    });\n' +
 '}\n\n' +
+'// Function to replace URL parameters in prefill values\n' +
+'function replaceUrlParametersInPrefillValues() {\n' +
+'    if (!window.unifiedFieldsMap) return;\n' +
+'    \n' +
+'    Object.keys(window.unifiedFieldsMap).forEach(function(questionId) {\n' +
+'        const fields = window.unifiedFieldsMap[questionId];\n' +
+'        if (Array.isArray(fields)) {\n' +
+'            fields.forEach(function(field) {\n' +
+'                if (field.type === \'label\' && field.prefill && field.nodeId) {\n' +
+'                    // Find all input fields that match this nodeId pattern\n' +
+'                    const inputs = document.querySelectorAll(\'input[id^="\' + field.nodeId + \'_"]\')\n' +
+'                    inputs.forEach(function(input) {\n' +
+'                        // Replace URL parameters in the prefill value\n' +
+'                        const processedPrefill = replaceUrlParametersInText(field.prefill);\n' +
+'                        if (processedPrefill && processedPrefill !== field.prefill) {\n' +
+'                            input.value = processedPrefill;\n' +
+'                            \n' +
+'                        }\n' +
+'                    });\n' +
+'                }\n' +
+'            });\n' +
+'        }\n' +
+'    });\n' +
+'}\n\n' +
 '// Auto-populate on page load\n' +
 'if (document.readyState === \'loading\') {\n' +
 '    document.addEventListener("DOMContentLoaded", function() {\n' +
 '        populateHiddenFieldsFromUrl();\n' +
 '        setupLinkedFields();\n' +
 '        replaceUrlParametersInForm();\n' +
+'        replaceUrlParametersInPrefillValues();\n' +
 '    });\n' +
 '} else {\n' +
 '    // DOM already loaded, run immediately\n' +
 '    populateHiddenFieldsFromUrl();\n' +
 '    setupLinkedFields();\n' +
 '    replaceUrlParametersInForm();\n' +
+'    replaceUrlParametersInPrefillValues();\n' +
 '}\n\n' +
 '// Function to check paragraph limit and create hidden checkbox\n' +
 'function checkParagraphLimit(textareaId, paragraphLimit) {\n' +
@@ -7475,11 +7500,12 @@ document.addEventListener('DOMContentLoaded', function() {
 let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
-
-    console.log('🔍 [PREFILL DEBUG 0] showTextboxLabels called:', {
-        questionId,
-        count,
-        isCreatingFields
+    
+    console.log('🔧 [SHOW TEXTBOX DEBUG] Called showTextboxLabels:', {
+        questionId: questionId,
+        count: count,
+        unifiedFieldsMapExists: !!window.unifiedFieldsMap,
+        unifiedFieldsForQuestion: window.unifiedFieldsMap ? window.unifiedFieldsMap[questionId] : 'N/A'
     });
 
     // 🔧 NEW: Check if we're already creating fields
@@ -7549,17 +7575,16 @@ function showTextboxLabels(questionId, count){
                 const fieldOrder = parseInt(el.getAttribute('data-order'));
                 const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
                 const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                const prefillValue = el.getAttribute('data-prefill') || '';
-
-                console.log('🔍 [PREFILL DEBUG 1] Reading field from DOM:', {
-                    questionId,
-                    fieldOrder,
-                    fieldType,
-                    label: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
-                    nodeId: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A',
-                    prefillValue,
-                    hasPrefillAttr: el.hasAttribute('data-prefill'),
-                    rawPrefillAttr: el.getAttribute('data-prefill')
+                const rawPrefillValue = el.getAttribute('data-prefill') || '';
+                
+                // 🔧 IMPORTANT: Process URL parameters in prefill value when reading from DOM
+                const prefillValue = rawPrefillValue ? replaceUrlParametersInText(rawPrefillValue) : '';
+                
+                console.log('🔧 [DOM PREFILL READ] Reading prefill from DOM element:', {
+                    questionId: questionId,
+                    fieldOrder: fieldOrder,
+                    rawPrefillValue: rawPrefillValue,
+                    processedPrefillValue: prefillValue
                 });
 
                 if (labelTextEl && nodeIdTextEl) {
@@ -7569,13 +7594,13 @@ function showTextboxLabels(questionId, count){
                         nodeId: nodeIdTextEl.textContent.trim(),
                         order: fieldOrder
                     };
-                    
+
                     // Include prefill for label fields
                     if (fieldType === 'label') {
                         fieldData.prefill = prefillValue;
-                        console.log('🔍 [PREFILL DEBUG 2] Added prefill to fieldData:', fieldData);
+
                     }
-                    
+
                     allElements.push(fieldData);
                 }
             });
@@ -7590,7 +7615,26 @@ function showTextboxLabels(questionId, count){
     if (allFieldsInOrder.length === 0) {
         // Try unified fields map first
         if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-            allFieldsInOrder = window.unifiedFieldsMap[questionId];
+            // Clone the data and process URL parameters in prefill values
+            allFieldsInOrder = window.unifiedFieldsMap[questionId].map(field => {
+                const clonedField = {...field};
+                if (clonedField.type === 'label' && clonedField.prefill) {
+                    const rawPrefill = clonedField.prefill;
+                    const processedPrefill = replaceUrlParametersInText(rawPrefill);
+                    clonedField.prefill = processedPrefill;
+                    console.log('🔧 [UNIFIED FIELDS MAP] Processing prefill from map:', {
+                        questionId: questionId,
+                        fieldLabel: clonedField.label,
+                        rawPrefill: rawPrefill,
+                        processedPrefill: processedPrefill
+                    });
+                }
+                return clonedField;
+            });
+            console.log('🔧 [UNIFIED FIELDS MAP] Using unified fields map data:', {
+                questionId: questionId,
+                fields: allFieldsInOrder
+            });
         } else {
             // Fallback to old arrays
             const theseLabels = labelMap[questionId] || [];
@@ -7740,16 +7784,18 @@ function showTextboxLabels(questionId, count){
                 entryContainer.appendChild(locationFieldDiv);
             } else if (field.type === 'label') {
                 const fieldId = field.nodeId + "_" + j;
+                // Prefill has already been processed through replaceUrlParametersInText when building allFieldsInOrder
                 const prefillValue = field.prefill || '';
                 
-                console.log('🔍 [PREFILL DEBUG 3] Creating label field:', {
-                    fieldId,
+                console.log('🔧 [PREFILL URL DEBUG 1] Using prefill for label field:', {
+                    questionId: questionId,
+                    fieldId: fieldId,
                     label: field.label,
-                    prefillValue,
-                    entryNumber: j,
-                    fullField: field
+                    nodeId: field.nodeId,
+                    prefillValue: prefillValue,
+                    hasBrackets: prefillValue.includes('[')
                 });
-                
+
                 if (field.label === 'State') {
                     // Use dropdown for State field
                     const dropdownDiv = document.createElement('div');
@@ -7759,9 +7805,56 @@ function showTextboxLabels(questionId, count){
                     // Use regular input for other fields
                     const inputDiv = document.createElement('div');
                     const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
-                    console.log('🔍 [PREFILL DEBUG 4] Generated input HTML:', inputHTML.substring(0, 200));
+                    
+                    console.log('🔧 [PREFILL URL DEBUG 2] Created input HTML:', {
+                        fieldId: fieldId,
+                        inputHTML: inputHTML.substring(0, 200) + '...'
+                    });
+
                     inputDiv.innerHTML = inputHTML;
                     entryContainer.appendChild(inputDiv.firstElementChild);
+                    
+                    // Verify the input was created with correct value (after a slight delay)
+                    setTimeout(() => {
+                        const createdInput = document.getElementById(fieldId);
+                        console.log('🔧 [PREFILL URL DEBUG 3] Input in DOM after creation:', {
+                            fieldId: fieldId,
+                            exists: !!createdInput,
+                            value: createdInput ? createdInput.value : 'NOT FOUND',
+                            placeholder: createdInput ? createdInput.placeholder : 'N/A'
+                        });
+                        
+                        // Add a watcher to see if/when the value changes
+                        if (createdInput) {
+                            const originalValue = createdInput.value;
+                            const observer = new MutationObserver(() => {
+                                if (createdInput.value !== originalValue) {
+                                    console.log('🚨 [VALUE CHANGED!] Input value was modified:', {
+                                        fieldId: fieldId,
+                                        originalValue: originalValue,
+                                        newValue: createdInput.value,
+                                        stackTrace: new Error().stack
+                                    });
+                                }
+                            });
+                            
+                            // Watch for attribute changes
+                            observer.observe(createdInput, { attributes: true, attributeFilter: ['value'] });
+                            
+                            // Also watch for direct value property changes
+                            let lastValue = createdInput.value;
+                            setInterval(() => {
+                                if (createdInput.value !== lastValue) {
+                                    console.log('🚨 [VALUE CHANGED VIA PROPERTY!]:', {
+                                        fieldId: fieldId,
+                                        oldValue: lastValue,
+                                        newValue: createdInput.value
+                                    });
+                                    lastValue = createdInput.value;
+                                }
+                            }, 100);
+                        }
+                    }, 100);
                 }
             } else if (field.type === 'amount') {
                 const fieldId = field.nodeId + "_" + j;
@@ -8637,17 +8730,6 @@ function getFieldsInOrderForQuestion(questionId) {
                 const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
                 const prefillValue = el.getAttribute('data-prefill') || '';
 
-                console.log('🔍 [PREFILL DEBUG 1] Reading field from DOM:', {
-                    questionId,
-                    fieldOrder,
-                    fieldType,
-                    label: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
-                    nodeId: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A',
-                    prefillValue,
-                    hasPrefillAttr: el.hasAttribute('data-prefill'),
-                    rawPrefillAttr: el.getAttribute('data-prefill')
-                });
-
                 if (labelTextEl && nodeIdTextEl) {
                     const fieldData = {
                         type: fieldType,
@@ -8655,13 +8737,13 @@ function getFieldsInOrderForQuestion(questionId) {
                         nodeId: nodeIdTextEl.textContent.trim(),
                         order: fieldOrder
                     };
-                    
+
                     // Include prefill for label fields
                     if (fieldType === 'label') {
                         fieldData.prefill = prefillValue;
-                        console.log('🔍 [PREFILL DEBUG 2] Added prefill to fieldData:', fieldData);
+
                     }
-                    
+
                     allElements.push(fieldData);
                 }
             });
@@ -9268,7 +9350,6 @@ function handleNext(currentSection){
 
     /* remember the place we're leaving - push BEFORE evaluating jumps */
 
-
     sectionStack.push(currentSection);
 
     let nextSection = currentSection + 1;
@@ -9310,7 +9391,6 @@ function handleNext(currentSection){
 
     nextSection = parseInt(nextSection,10);
     if (isNaN(nextSection)) nextSection = currentSection + 1;
-
 
     navigateSection(nextSection);
 
@@ -9425,10 +9505,6 @@ function navigateSection(sectionNumber, isBackNavigation = false){
  *-----------------------------------------------------------------*/
 function goBack(){
 
-
-
-
-
     if (sectionStack.length > 0){
         const prev = sectionStack.pop();
 
@@ -9436,7 +9512,6 @@ function goBack(){
         const prevSection = typeof prev === 'string' ? parseInt(prev, 10) : prev;
 
         if (!isNaN(prevSection) && prevSection >= 1) {
-
 
             navigateSection(prevSection, true);
         } else {
@@ -11103,6 +11178,32 @@ if (typeof handleNext === 'function') {
         setTimeout(() => {
             window.isInitialAutofill = false;
 
+            // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
+            if (window.unifiedFieldsMap) {
+                Object.keys(window.unifiedFieldsMap).forEach(questionId => {
+                    const fields = window.unifiedFieldsMap[questionId];
+                    if (Array.isArray(fields)) {
+                        fields.forEach(field => {
+                            if (field.type === 'label' && field.prefill && field.nodeId) {
+                                // Find all input fields that match this nodeId pattern
+                                const inputs = document.querySelectorAll('input[id^="' + field.nodeId + '_"]');
+                                inputs.forEach(input => {
+                                    // Only set prefill if the field is empty or blank
+                                    if (!input.value || input.value.trim() === '') {
+                                        // Replace URL parameters in prefill value
+                                        const processedPrefill = replaceUrlParametersInText(field.prefill);
+
+                                        input.value = processedPrefill;
+                                    } else {
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
             // 🔧 NEW: Update all hidden address fields after autofill completes
             if (typeof updateAllHiddenAddressFields === 'function') {
                 updateAllHiddenAddressFields();
@@ -11961,15 +12062,14 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
-
-    console.log('🔍 [PREFILL DEBUG 7] Final createAddressInput called:', {
-        id,
-        label,
-        index,
-        type,
-        prefill,
-        valueAttr,
-        hasPrefill: !!prefill
+    
+    console.log('🔧 [CREATE INPUT DEBUG - Generated HTML] Creating address input:', {
+        id: id,
+        label: label,
+        index: index,
+        type: type,
+        prefill: prefill,
+        valueAttr: valueAttr
     });
 
     return '<div class="address-field">' +
