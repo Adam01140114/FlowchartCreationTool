@@ -5099,6 +5099,14 @@ function editUnifiedField(questionId, fieldOrder) {
         <div id="prefillContainer${questionId}_${fieldOrder}" style="margin-bottom: 15px; ${currentType === 'label' ? '' : 'display: none;'}">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Prefill:</label>
             <input type="text" id="editPrefill${questionId}_${fieldOrder}" value="${currentPrefill}" placeholder="Enter default value (e.g., Adam)" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+            
+            <div style="margin-top: 15px;">
+                <button type="button" onclick="addConditionalPrefill(${questionId}, ${fieldOrder})" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">+ Add Conditional Prefill</button>
+            </div>
+            
+            <div id="conditionalPrefillContainer${questionId}_${fieldOrder}" style="margin-top: 15px;">
+                <!-- Conditional prefills will be added here -->
+            </div>
         </div>
         <div style="text-align: center; margin-top: 15px;">
             <button type="button" onclick="saveUnifiedField(${questionId}, ${fieldOrder})" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 10px; font-size: 14px; font-weight: 500; display: inline-block;">Save</button>
@@ -5109,6 +5117,82 @@ function editUnifiedField(questionId, fieldOrder) {
     // Replace the field with the edit form
     fieldDiv.style.display = 'none';
     fieldDiv.parentNode.insertBefore(editForm, fieldDiv.nextSibling);
+    
+    // Load existing conditional prefills if any
+    loadExistingConditionalPrefills(questionId, fieldOrder, fieldDiv);
+}
+
+// Load existing conditional prefills for a field
+function loadExistingConditionalPrefills(questionId, fieldOrder, fieldDiv) {
+    const conditionalPrefillsData = fieldDiv.getAttribute('data-conditional-prefills');
+    if (conditionalPrefillsData) {
+        try {
+            const conditionalPrefills = JSON.parse(conditionalPrefillsData);
+            conditionalPrefills.forEach(cp => {
+                addConditionalPrefill(questionId, fieldOrder, cp.trigger, cp.value);
+            });
+        } catch (e) {
+            console.error('Error loading conditional prefills:', e);
+        }
+    }
+}
+
+// Add a conditional prefill entry
+function addConditionalPrefill(questionId, fieldOrder, triggerValue = '', prefillValue = '') {
+    const container = document.getElementById(`conditionalPrefillContainer${questionId}_${fieldOrder}`);
+    if (!container) return;
+    
+    // Get the numbered dropdown range for this question
+    const rangeStart = document.getElementById(`numberRangeStart${questionId}`);
+    const rangeEnd = document.getElementById(`numberRangeEnd${questionId}`);
+    
+    if (!rangeStart || !rangeEnd) {
+        alert('Could not find numbered dropdown range for this question');
+        return;
+    }
+    
+    const min = parseInt(rangeStart.value) || 1;
+    const max = parseInt(rangeEnd.value) || 10;
+    
+    // Create unique ID for this entry
+    const entryId = `conditionalPrefill_${questionId}_${fieldOrder}_${Date.now()}`;
+    
+    // Build options for the dropdown
+    let optionsHTML = '<option value="">Select trigger value...</option>';
+    for (let i = min; i <= max; i++) {
+        const selected = (triggerValue == i) ? 'selected' : '';
+        optionsHTML += `<option value="${i}" ${selected}>${i}</option>`;
+    }
+    
+    // Create the entry HTML
+    const entryDiv = document.createElement('div');
+    entryDiv.id = entryId;
+    entryDiv.style.cssText = 'margin-bottom: 10px; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 8px;';
+    entryDiv.innerHTML = `
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label style="display: block; font-size: 12px; margin-bottom: 3px; font-weight: 500;">Trigger:</label>
+                <select class="conditional-prefill-trigger" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+                    ${optionsHTML}
+                </select>
+            </div>
+            <div style="flex: 2;">
+                <label style="display: block; font-size: 12px; margin-bottom: 3px; font-weight: 500;">Prefill Value:</label>
+                <input type="text" class="conditional-prefill-value" value="${prefillValue}" placeholder="Enter prefill value" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+            </div>
+        </div>
+        <button type="button" onclick="removeConditionalPrefill('${entryId}')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%;">Remove</button>
+    `;
+    
+    container.appendChild(entryDiv);
+}
+
+// Remove a conditional prefill entry
+function removeConditionalPrefill(entryId) {
+    const entry = document.getElementById(entryId);
+    if (entry) {
+        entry.remove();
+    }
 }
 
 // Toggle prefill field visibility based on type
@@ -5143,8 +5227,45 @@ function saveUnifiedField(questionId, fieldOrder) {
     if (newType === 'label') {
         fieldDiv.setAttribute('data-prefill', newPrefill);
         console.log('🔧 [SAVE DEBUG] Set data-prefill for label field:', { questionId, fieldOrder, newPrefill, attributeValue: fieldDiv.getAttribute('data-prefill') });
+        
+        // Collect conditional prefills
+        const conditionalPrefillContainer = document.getElementById(`conditionalPrefillContainer${questionId}_${fieldOrder}`);
+        console.log('🔧 [SAVE CONDITIONAL PREFILL] Container found:', !!conditionalPrefillContainer);
+        if (conditionalPrefillContainer) {
+            const conditionalPrefills = [];
+            const entries = conditionalPrefillContainer.querySelectorAll('[id^="conditionalPrefill_"]');
+            console.log('🔧 [SAVE CONDITIONAL PREFILL] Found entries:', entries.length);
+            entries.forEach(entry => {
+                const triggerSelect = entry.querySelector('.conditional-prefill-trigger');
+                const valueInput = entry.querySelector('.conditional-prefill-value');
+                if (triggerSelect && valueInput) {
+                    const trigger = triggerSelect.value;
+                    const value = valueInput.value;
+                    console.log('🔧 [SAVE CONDITIONAL PREFILL] Entry:', { trigger, value });
+                    if (trigger && value) {
+                        conditionalPrefills.push({ trigger: trigger, value: value });
+                    }
+                }
+            });
+            
+            console.log('🔧 [SAVE CONDITIONAL PREFILL] Collected conditional prefills:', conditionalPrefills);
+            
+            // Save conditional prefills as JSON attribute
+            if (conditionalPrefills.length > 0) {
+                const jsonString = JSON.stringify(conditionalPrefills);
+                fieldDiv.setAttribute('data-conditional-prefills', jsonString);
+                console.log('🔧 [SAVE CONDITIONAL PREFILL] Saved to attribute:', jsonString);
+                console.log('🔧 [SAVE CONDITIONAL PREFILL] Verified attribute value:', fieldDiv.getAttribute('data-conditional-prefills'));
+            } else {
+                fieldDiv.removeAttribute('data-conditional-prefills');
+                console.log('🔧 [SAVE CONDITIONAL PREFILL] Removed attribute (no prefills)');
+            }
+        } else {
+            console.log('🔧 [SAVE CONDITIONAL PREFILL] Container not found!');
+        }
     } else {
         fieldDiv.removeAttribute('data-prefill');
+        fieldDiv.removeAttribute('data-conditional-prefills');
     }
     
     // Update the display text based on type

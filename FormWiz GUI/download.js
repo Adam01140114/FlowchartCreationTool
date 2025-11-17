@@ -586,6 +586,12 @@ function loadFormData(formData) {
                                         } else {
                                             console.log('🔧 [IMPORT DEBUG] No prefill defined for field:', field.label);
                                         }
+                                        
+                                        // Set conditional prefills if they exist
+                                        if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                            lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+                                            console.log('🔧 [IMPORT DEBUG] Set conditional prefills for field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+                                        }
                                     }
                                 } else if (field.type === 'amount') {
                                     // Add an amount field
@@ -599,6 +605,12 @@ function loadFormData(formData) {
                                         const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                         if (labelTextEl) labelTextEl.textContent = field.label;
                                         if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                        
+                                        // Set conditional prefills if they exist
+                                        if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                            lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+                                            console.log('🔧 [IMPORT DEBUG] Set conditional prefills for amount field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+                                        }
                                     }
                                 } else if (field.type === 'checkbox') {
                                     // Add a checkbox field
@@ -1252,6 +1264,12 @@ function loadFormData(formData) {
                                     } else {
                                         console.log('🔧 [IMPORT DEBUG - NUMBERED] No prefill defined for field:', field.label);
                                     }
+                                    
+                                    // Set conditional prefills if they exist
+                                    if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                        lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] Set conditional prefills for field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+                                    }
                                 }
                             } else if (field.type === 'amount') {
                                 // Add an amount field
@@ -1265,6 +1283,12 @@ function loadFormData(formData) {
                                     const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                     if (labelTextEl) labelTextEl.textContent = field.label;
                                     if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    
+                                    // Set conditional prefills if they exist
+                                    if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                        lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] Set conditional prefills for amount field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+                                    }
                                 }
                             } else if (field.type === 'checkbox') {
                                 // Add a checkbox field
@@ -3664,6 +3688,26 @@ function exportForm() {
                         // Always include prefill for label type fields (even if empty)
                         if (fieldType === 'label') {
                             fieldData.prefill = prefillValue;
+                        }
+                        
+                        // Export conditional prefills for both label and amount fields
+                        if (fieldType === 'label' || fieldType === 'amount') {
+                            const conditionalPrefillsData = field.getAttribute('data-conditional-prefills');
+                            console.log('🔧 [EXPORT CONDITIONAL PREFILL] Field:', fieldData.label, 'Has attribute:', !!conditionalPrefillsData);
+                            if (conditionalPrefillsData) {
+                                console.log('🔧 [EXPORT CONDITIONAL PREFILL] Raw attribute value:', conditionalPrefillsData);
+                                try {
+                                    fieldData.conditionalPrefills = JSON.parse(conditionalPrefillsData);
+                                    console.log('🔧 [EXPORT CONDITIONAL PREFILL] Parsed conditional prefills:', fieldData.conditionalPrefills);
+                                } catch (e) {
+                                    console.error('🔧 [EXPORT CONDITIONAL PREFILL] Error parsing conditional prefills:', e);
+                                }
+                            } else {
+                                console.log('🔧 [EXPORT CONDITIONAL PREFILL] No conditional prefills attribute found');
+                            }
+                        }
+                        
+                        if (fieldType === 'label') {
                             console.log('🔧 [EXPORT DEBUG] Added prefill to fieldData:', fieldData);
                         }
                         
@@ -4195,6 +4239,18 @@ function exportForm() {
                             // Always include prefill for label type fields (even if empty)
                             if (fieldType === 'label') {
                                 fieldData.prefill = prefillValue;
+                            }
+                            
+                            // Export conditional prefills for both label and amount fields
+                            if (fieldType === 'label' || fieldType === 'amount') {
+                                const conditionalPrefillsData = el.getAttribute('data-conditional-prefills');
+                                if (conditionalPrefillsData) {
+                                    try {
+                                        fieldData.conditionalPrefills = JSON.parse(conditionalPrefillsData);
+                                    } catch (e) {
+                                        console.error('Error parsing conditional prefills:', e);
+                                    }
+                                }
                             }
                             
                             console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Field data:', fieldData);

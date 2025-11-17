@@ -416,13 +416,13 @@ function setQuestionType(cell, newType) {
         break;
       case 'multipleTextboxes':
         cell._questionText = preservedText || '';
-        cell._textboxes = [{ nameId:'', placeholder:'Enter value' }];
+        cell._textboxes = [{ nameId:'', placeholder:'Enter value', prefill: '' }];
         updateMultipleTextboxesCell(cell);
         break;
       case 'multipleDropdownType':
         cell._questionText = preservedText || '';
         cell._twoNumbers = { first:'0', second:'0' };
-        cell._textboxes = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
+        cell._textboxes = [{ nameId:'', placeholder:'Enter value', isAmountOption:false, prefill: '' }];
         updatemultipleDropdownTypeCell(cell);
         break;
       default:
@@ -569,7 +569,7 @@ function updateSimpleQuestionCell(cell) {
 // Multiple Textboxes Functions
 function renderTextboxes(cell) {
   if (!cell._textboxes) {
-    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' }];
   }
 
   let html = "";
@@ -1070,7 +1070,8 @@ function addOptionInReorderModal(cellId, questionType) {
     const newEntry = {
       nameId: `New Option ${cell._textboxes.length + 1}`,
       placeholder: `New Option ${cell._textboxes.length + 1}`,
-      isAmount: false
+      isAmount: false,
+      prefill: ''
     };
     
     cell._textboxes.push(newEntry);
@@ -1560,11 +1561,37 @@ window.showNumberedDropdownProperties = function(cell) {
   ]);
   modalContent.appendChild(questionSection);
   
+  // Function to update all conditional prefill dropdowns when range changes
+  const updateConditionalPrefillDropdowns = () => {
+    const rangeStart = cell._twoNumbers?.first ? parseInt(cell._twoNumbers.first) : 1;
+    const rangeEnd = cell._twoNumbers?.second ? parseInt(cell._twoNumbers.second) : 1;
+    
+    // Find all conditional prefill trigger selects in the modal
+    const allTriggerSelects = modalContent.querySelectorAll('[data-conditional-prefill-trigger]');
+    allTriggerSelects.forEach(select => {
+      const currentValue = select.value;
+      // Clear existing options
+      select.innerHTML = '';
+      // Populate with new range
+      for (let i = rangeStart; i <= rangeEnd; i++) {
+        const optionEl = document.createElement('option');
+        optionEl.value = i.toString();
+        optionEl.textContent = i.toString();
+        select.appendChild(optionEl);
+      }
+      // Restore previous value if it's still valid
+      if (currentValue && parseInt(currentValue) >= rangeStart && parseInt(currentValue) <= rangeEnd) {
+        select.value = currentValue;
+      }
+    });
+  };
+  
   // Number Range Section
   const rangeSection = createFieldSection('Number Range', [
     createNumberField('From', cell._twoNumbers?.first || '0', (value) => {
       if (!cell._twoNumbers) cell._twoNumbers = { first: '0', second: '0' };
       cell._twoNumbers.first = value;
+      updateConditionalPrefillDropdowns();
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
@@ -1572,6 +1599,7 @@ window.showNumberedDropdownProperties = function(cell) {
     createNumberField('To', cell._twoNumbers?.second || '0', (value) => {
       if (!cell._twoNumbers) cell._twoNumbers = { first: '0', second: '0' };
       cell._twoNumbers.second = value;
+      updateConditionalPrefillDropdowns();
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
@@ -2725,7 +2753,7 @@ function createOptionsContainer(cell) {
     margin-top: 10px;
   `;
   addBtn.onclick = () => {
-    const newOption = { nameId: '', placeholder: 'Enter value', isAmountOption: false };
+    const newOption = { nameId: '', placeholder: 'Enter value', isAmountOption: false, prefill: '', conditionalPrefills: [] };
     if (!cell._textboxes) cell._textboxes = [];
     cell._textboxes.push(newOption);
     
@@ -9449,7 +9477,7 @@ function createOptionField(option, index, cell, parentContainer) {
   const optionContainer = document.createElement('div');
   optionContainer.style.cssText = `
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
     padding: 10px;
     background: white;
@@ -9471,6 +9499,14 @@ function createOptionField(option, index, cell, parentContainer) {
     optionContainer.style.backgroundColor = 'white';
     optionContainer.style.borderColor = '#ddd';
   });
+  
+  // Top row: Drag handle, Option text input, Amount checkbox, Copy ID, Delete
+  const topRow = document.createElement('div');
+  topRow.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  `;
   
   // Drag handle
   const dragHandle = document.createElement('div');
@@ -9564,13 +9600,234 @@ function createOptionField(option, index, cell, parentContainer) {
     }
   };
   
-  optionContainer.appendChild(dragHandle);
-  optionContainer.appendChild(textInput);
-  optionContainer.appendChild(amountLabel);
-  optionContainer.appendChild(copyBtn);
-  optionContainer.appendChild(deleteBtn);
+  // Second row: Option Prefill input
+  const prefillRow = document.createElement('div');
+  prefillRow.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  `;
+  
+  const prefillLabel = document.createElement('label');
+  prefillLabel.textContent = 'Option Prefill:';
+  prefillLabel.style.cssText = `
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 500;
+    min-width: 100px;
+  `;
+  
+  const prefillInput = document.createElement('input');
+  prefillInput.type = 'text';
+  prefillInput.value = option.prefill || '';
+  prefillInput.placeholder = 'Enter prefill value (optional)';
+  prefillInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  prefillInput.onblur = () => {
+    option.prefill = prefillInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Initialize prefill property if it doesn't exist
+  if (option.prefill === undefined) {
+    option.prefill = '';
+  }
+  
+  // Initialize conditionalPrefills array if it doesn't exist
+  if (!option.conditionalPrefills || !Array.isArray(option.conditionalPrefills)) {
+    option.conditionalPrefills = [];
+  }
+  
+  // Conditional Prefill button
+  const conditionalPrefillBtn = document.createElement('button');
+  conditionalPrefillBtn.textContent = 'Conditional Prefill';
+  conditionalPrefillBtn.style.cssText = `
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px;
+    align-self: flex-start;
+  `;
+  conditionalPrefillBtn.onclick = () => {
+    // Create new conditional prefill entry
+    const newConditionalPrefill = { trigger: '', value: '' };
+    option.conditionalPrefills.push(newConditionalPrefill);
+    
+    // Create and add the conditional prefill entry UI
+    const conditionalPrefillEntry = createConditionalPrefillEntry(newConditionalPrefill, option.conditionalPrefills.length - 1, option, cell, conditionalPrefillsContainer);
+    conditionalPrefillsContainer.appendChild(conditionalPrefillEntry);
+    
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Container for conditional prefill entries
+  const conditionalPrefillsContainer = document.createElement('div');
+  conditionalPrefillsContainer.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  `;
+  
+  // Create existing conditional prefill entries
+  if (option.conditionalPrefills && option.conditionalPrefills.length > 0) {
+    option.conditionalPrefills.forEach((conditionalPrefill, cpIndex) => {
+      const entry = createConditionalPrefillEntry(conditionalPrefill, cpIndex, option, cell, conditionalPrefillsContainer);
+      conditionalPrefillsContainer.appendChild(entry);
+    });
+  }
+  
+  // Assemble top row
+  topRow.appendChild(dragHandle);
+  topRow.appendChild(textInput);
+  topRow.appendChild(amountLabel);
+  topRow.appendChild(copyBtn);
+  topRow.appendChild(deleteBtn);
+  
+  // Assemble prefill row
+  prefillRow.appendChild(prefillLabel);
+  prefillRow.appendChild(prefillInput);
+  
+  // Add rows to container
+  optionContainer.appendChild(topRow);
+  optionContainer.appendChild(prefillRow);
+  optionContainer.appendChild(conditionalPrefillBtn);
+  optionContainer.appendChild(conditionalPrefillsContainer);
   
   return optionContainer;
+}
+
+// Helper function to create a conditional prefill entry
+function createConditionalPrefillEntry(conditionalPrefill, index, option, cell, parentContainer) {
+  const entryContainer = document.createElement('div');
+  entryContainer.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  `;
+  
+  // Get number range from cell
+  const rangeStart = cell._twoNumbers?.first ? parseInt(cell._twoNumbers.first) : 1;
+  const rangeEnd = cell._twoNumbers?.second ? parseInt(cell._twoNumbers.second) : 1;
+  
+  // Trigger dropdown label
+  const triggerLabel = document.createElement('label');
+  triggerLabel.textContent = 'Trigger:';
+  triggerLabel.style.cssText = `
+    font-size: 12px;
+    color: #2c3e50;
+    font-weight: 500;
+    min-width: 60px;
+  `;
+  
+  // Trigger dropdown
+  const triggerSelect = document.createElement('select');
+  triggerSelect.dataset.conditionalPrefillTrigger = 'true';
+  triggerSelect.style.cssText = `
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    min-width: 80px;
+  `;
+  
+  // Populate dropdown with range values
+  for (let i = rangeStart; i <= rangeEnd; i++) {
+    const optionEl = document.createElement('option');
+    optionEl.value = i.toString();
+    optionEl.textContent = i.toString();
+    triggerSelect.appendChild(optionEl);
+  }
+  
+  triggerSelect.value = conditionalPrefill.trigger || '';
+  triggerSelect.onchange = () => {
+    conditionalPrefill.trigger = triggerSelect.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Prefill value label
+  const valueLabel = document.createElement('label');
+  valueLabel.textContent = 'Prefill Value:';
+  valueLabel.style.cssText = `
+    font-size: 12px;
+    color: #2c3e50;
+    font-weight: 500;
+    min-width: 90px;
+  `;
+  
+  // Prefill value input
+  const valueInput = document.createElement('input');
+  valueInput.type = 'text';
+  valueInput.value = conditionalPrefill.value || '';
+  valueInput.placeholder = 'Enter prefill value';
+  valueInput.style.cssText = `
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+  `;
+  valueInput.onblur = () => {
+    conditionalPrefill.value = valueInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Remove button
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.style.cssText = `
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  removeBtn.onclick = () => {
+    option.conditionalPrefills.splice(index, 1);
+    entryContainer.remove();
+    // Re-render all entries to update indices
+    const existingEntries = parentContainer.querySelectorAll('[data-conditional-prefill-index]');
+    existingEntries.forEach(entry => entry.remove());
+    option.conditionalPrefills.forEach((cp, cpIndex) => {
+      const newEntry = createConditionalPrefillEntry(cp, cpIndex, option, cell, parentContainer);
+      parentContainer.appendChild(newEntry);
+    });
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  entryContainer.dataset.conditionalPrefillIndex = index;
+  entryContainer.appendChild(triggerLabel);
+  entryContainer.appendChild(triggerSelect);
+  entryContainer.appendChild(valueLabel);
+  entryContainer.appendChild(valueInput);
+  entryContainer.appendChild(removeBtn);
+  
+  return entryContainer;
 }
 
 // Helper function to create mini checkbox option entry
@@ -11462,7 +11719,7 @@ function createTextboxOptionsContainer(cell) {
     margin-top: 10px;
   `;
   addBtn.onclick = () => {
-    const newTextbox = { nameId: '', placeholder: 'Enter value', isAmountOption: false };
+    const newTextbox = { nameId: '', placeholder: 'Enter value', isAmountOption: false, prefill: '' };
     if (!cell._textboxes) cell._textboxes = [];
     cell._textboxes.push(newTextbox);
     
@@ -13316,12 +13573,12 @@ window.pickTypeForCell = function(cellId, val) {
     // Only handle special cases for multi types
     if (val === "multipleTextboxes") {
       c._questionText = "Enter question text";
-      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' }];
       updateMultipleTextboxesCell(c);
     } else if (val === "multipleDropdownType") {
       c._questionText = "Enter question text";
       c._twoNumbers = { first: "0", second: "0" };
-      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' }];
       updatemultipleDropdownTypeCell(c);
     }
     // For all other types, setQuestionType handles rendering

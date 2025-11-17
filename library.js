@@ -358,7 +358,9 @@ window.exportGuiJson = function(download = true) {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
-              order: orderIndex + 1
+              order: orderIndex + 1,
+              prefill: tb.prefill || '',
+              conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
             });
           } else if (item.type === 'location') {
             // Create a single location entry instead of expanding into individual fields
@@ -928,7 +930,9 @@ window.exportGuiJson = function(download = true) {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
-              order: index + 1
+              order: index + 1,
+              prefill: tb.prefill || '',
+              conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
             });
           });
         }
@@ -1447,7 +1451,9 @@ window.exportGuiJson = function(download = true) {
                 type: fieldType,
                 label: labelName,
                 nodeId: fieldNodeId,
-                order: orderIndex + 1
+                order: orderIndex + 1,
+                prefill: tb.prefill || '',
+                conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
               });
             } else if (item.type === 'location') {
               // Create a single location entry instead of expanding into individual fields
@@ -2002,7 +2008,9 @@ window.exportGuiJson = function(download = true) {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
-              order: index + 1
+              order: index + 1,
+              prefill: tb.prefill || '',
+              conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
             });
           });
           

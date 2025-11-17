@@ -67,10 +67,16 @@
           "allFieldsInOrder": [
             {
               "type": "label",
-              "label": "County?",
+              "label": "Name",
               "nodeId": "how_many_extra_defendants_name",
               "order": 1,
-              "prefill": "[county]"
+              "prefill": "",
+              "conditionalPrefills": [
+                {
+                  "trigger": "1",
+                  "value": "[county]"
+                }
+              ]
             }
           ]
         }

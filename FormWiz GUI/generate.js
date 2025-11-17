@@ -100,15 +100,6 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
-    
-    console.log('🔧 [CREATE INPUT DEBUG - Node.js] Creating address input:', {
-        id: id,
-        label: label,
-        index: index,
-        type: type,
-        prefill: prefill,
-        valueAttr: valueAttr
-    });
 
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
@@ -1908,7 +1899,18 @@ formHTML += `</div><br></div>`;
                 // For multipleTextboxes, use the base nodeId without numbering
                 const fieldId = field.nodeId;
                 const inputDiv = document.createElement('div');
-                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                let prefillValue = '';
+                
+                // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        // Use conditional prefill value (process URL parameters if needed)
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                }
+                
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue);
                 entryContainer.appendChild(inputDiv.firstElementChild);
 
                 // Add a <br> after the Zip input only if there are more fields after it
@@ -3088,10 +3090,21 @@ formHTML += `</div><br></div>`;
                 order: parseInt(fieldOrder)
             };
 
-            // Include prefill for label fields
-            if (fieldType === 'label') {
-                fieldData.prefill = prefillValue;
-
+            // Include prefill for label and amount fields
+            if (fieldType === 'label' || fieldType === 'amount') {
+                if (fieldType === 'label') {
+                    fieldData.prefill = prefillValue;
+                }
+                
+                // Also include conditional prefills if they exist
+                const conditionalPrefillsData = field.getAttribute('data-conditional-prefills');
+                if (conditionalPrefillsData) {
+                    try {
+                        fieldData.conditionalPrefills = JSON.parse(conditionalPrefillsData);
+                    } catch (e) {
+                        // If parsing fails, ignore it
+                    }
+                }
             }
 
             allElements.push(fieldData);
@@ -3120,6 +3133,19 @@ formHTML += `</div><br></div>`;
         // Store unified field data for use in showTextboxLabels function
         window.unifiedFieldsMap = window.unifiedFieldsMap || {};
         window.unifiedFieldsMap[questionId] = allFieldsInOrder;
+        
+        // Debug: Log conditional prefills stored in unifiedFieldsMap
+        console.log('🔧 [UNIFIED FIELDS MAP] Storing fields for questionId:', questionId);
+        allFieldsInOrder.forEach(field => {
+            if ((field.type === 'label' || field.type === 'amount') && field.conditionalPrefills) {
+                console.log('🔧 [UNIFIED FIELDS MAP] Field with conditional prefills stored:', {
+                    type: field.type,
+                    label: field.label,
+                    nodeId: field.nodeId,
+                    conditionalPrefills: field.conditionalPrefills
+                });
+            }
+        });
 
         // Process trigger sequence PDFs and create PDF logic entries
         allFieldsInOrder.forEach(field => {
@@ -5720,11 +5746,7 @@ if (document.readyState === 'loading') {
 'function getUrlParameter(name) {\n' +
 '    const urlParams = new URLSearchParams(window.location.search);\n' +
 '    const value = urlParams.get(name);\n' +
-'    console.log(\'🔧 [URL PARAM DEBUG] Getting URL parameter:\', {\n' +
-'        paramName: name,\n' +
-'        value: value,\n' +
-'        fullURL: window.location.search\n' +
-'    });\n' +
+'    \n' +
 '    return value;\n' +
 '}\n\n' +
 '// Function to populate hidden fields from URL parameters\n' +
@@ -5758,25 +5780,20 @@ if (document.readyState === 'loading') {
 '// Function to replace URL parameter placeholders in text\n' +
 'function replaceUrlParametersInText(text) {\n' +
 '    if (!text || typeof text !== \'string\') {\n' +
-'        console.log(\'🔧 [REPLACE URL DEBUG] Invalid input:\', { text: text, type: typeof text });\n' +
+'        \n' +
 '        return text;\n' +
 '    }\n' +
 '    \n' +
-'    console.log(\'🔧 [REPLACE URL DEBUG] Input text:\', text);\n' +
+'    \n' +
 '    \n' +
 '    // Replace [paramName] with URL parameter value\n' +
 '    const result = text.replace(/\\[([^\\]]+)\\]/g, function(match, paramName) {\n' +
 '        const value = getUrlParameter(paramName);\n' +
-'        console.log(\'🔧 [REPLACE URL DEBUG] Found placeholder:\', {\n' +
-'            match: match,\n' +
-'            paramName: paramName,\n' +
-'            value: value,\n' +
-'            willReplace: !!value\n' +
-'        });\n' +
+'        \n' +
 '        return value || match; // Return the value if found, otherwise keep the placeholder\n' +
 '    });\n' +
 '    \n' +
-'    console.log(\'🔧 [REPLACE URL DEBUG] Output text:\', result);\n' +
+'    \n' +
 '    return result;\n' +
 '}\n\n' +
 '// Function to replace URL parameters in all question text, section names, etc.\n' +
@@ -7500,13 +7517,6 @@ document.addEventListener('DOMContentLoaded', function() {
 let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
-    
-    console.log('🔧 [SHOW TEXTBOX DEBUG] Called showTextboxLabels:', {
-        questionId: questionId,
-        count: count,
-        unifiedFieldsMapExists: !!window.unifiedFieldsMap,
-        unifiedFieldsForQuestion: window.unifiedFieldsMap ? window.unifiedFieldsMap[questionId] : 'N/A'
-    });
 
     // 🔧 NEW: Check if we're already creating fields
     if (isCreatingFields) {
@@ -7576,16 +7586,9 @@ function showTextboxLabels(questionId, count){
                 const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
                 const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
                 const rawPrefillValue = el.getAttribute('data-prefill') || '';
-                
+
                 // 🔧 IMPORTANT: Process URL parameters in prefill value when reading from DOM
                 const prefillValue = rawPrefillValue ? replaceUrlParametersInText(rawPrefillValue) : '';
-                
-                console.log('🔧 [DOM PREFILL READ] Reading prefill from DOM element:', {
-                    questionId: questionId,
-                    fieldOrder: fieldOrder,
-                    rawPrefillValue: rawPrefillValue,
-                    processedPrefillValue: prefillValue
-                });
 
                 if (labelTextEl && nodeIdTextEl) {
                     const fieldData = {
@@ -7595,10 +7598,21 @@ function showTextboxLabels(questionId, count){
                         order: fieldOrder
                     };
 
-                    // Include prefill for label fields
+                    // Include prefill for label fields, and conditional prefills for both label and amount fields
                     if (fieldType === 'label') {
                         fieldData.prefill = prefillValue;
-
+                    }
+                    
+                    // Include conditional prefills for both label and amount fields
+                    if (fieldType === 'label' || fieldType === 'amount') {
+                        const conditionalPrefillsData = el.getAttribute('data-conditional-prefills');
+                        if (conditionalPrefillsData) {
+                            try {
+                                fieldData.conditionalPrefills = JSON.parse(conditionalPrefillsData);
+                            } catch (e) {
+                                // If parsing fails, ignore it
+                            }
+                        }
                     }
 
                     allElements.push(fieldData);
@@ -7622,19 +7636,19 @@ function showTextboxLabels(questionId, count){
                     const rawPrefill = clonedField.prefill;
                     const processedPrefill = replaceUrlParametersInText(rawPrefill);
                     clonedField.prefill = processedPrefill;
-                    console.log('🔧 [UNIFIED FIELDS MAP] Processing prefill from map:', {
-                        questionId: questionId,
-                        fieldLabel: clonedField.label,
-                        rawPrefill: rawPrefill,
-                        processedPrefill: processedPrefill
-                    });
                 }
+                
+                // Also process URL parameters in conditional prefill values for both label and amount fields
+                if ((clonedField.type === 'label' || clonedField.type === 'amount') && clonedField.conditionalPrefills && Array.isArray(clonedField.conditionalPrefills)) {
+                    clonedField.conditionalPrefills = clonedField.conditionalPrefills.map(cp => ({
+                        trigger: cp.trigger,
+                        value: replaceUrlParametersInText(cp.value || '')
+                    }));
+                }
+                
                 return clonedField;
             });
-            console.log('🔧 [UNIFIED FIELDS MAP] Using unified fields map data:', {
-                questionId: questionId,
-                fields: allFieldsInOrder
-            });
+
         } else {
             // Fallback to old arrays
             const theseLabels = labelMap[questionId] || [];
@@ -7785,16 +7799,43 @@ function showTextboxLabels(questionId, count){
             } else if (field.type === 'label') {
                 const fieldId = field.nodeId + "_" + j;
                 // Prefill has already been processed through replaceUrlParametersInText when building allFieldsInOrder
-                const prefillValue = field.prefill || '';
+                let prefillValue = field.prefill || '';
                 
-                console.log('🔧 [PREFILL URL DEBUG 1] Using prefill for label field:', {
+                console.log('🔧 [FIELD CREATION] Creating label field:', {
                     questionId: questionId,
                     fieldId: fieldId,
-                    label: field.label,
-                    nodeId: field.nodeId,
-                    prefillValue: prefillValue,
-                    hasBrackets: prefillValue.includes('[')
+                    entryNumber: j,
+                    fieldLabel: field.label,
+                    fieldNodeId: field.nodeId,
+                    regularPrefill: field.prefill,
+                    hasConditionalPrefills: !!(field.conditionalPrefills && field.conditionalPrefills.length > 0),
+                    conditionalPrefills: field.conditionalPrefills
                 });
+                
+                // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    console.log('🔧 [FIELD CREATION] Checking conditional prefills:', {
+                        entryNumber: j,
+                        conditionalPrefills: field.conditionalPrefills,
+                        matchingConditional: matchingConditional
+                    });
+                    if (matchingConditional && matchingConditional.value) {
+                        // Use conditional prefill value (process URL parameters if needed)
+                        const rawConditionalValue = matchingConditional.value;
+                        prefillValue = replaceUrlParametersInText(rawConditionalValue);
+                        console.log('🔧 [FIELD CREATION] Using conditional prefill:', {
+                            fieldId: fieldId,
+                            trigger: matchingConditional.trigger,
+                            rawValue: rawConditionalValue,
+                            processedValue: prefillValue
+                        });
+                    } else {
+                        console.log('🔧 [FIELD CREATION] No matching conditional prefill for entry:', j);
+                    }
+                } else {
+                    console.log('🔧 [FIELD CREATION] No conditional prefills, using regular prefill:', prefillValue);
+                }
 
                 if (field.label === 'State') {
                     // Use dropdown for State field
@@ -7805,51 +7846,43 @@ function showTextboxLabels(questionId, count){
                     // Use regular input for other fields
                     const inputDiv = document.createElement('div');
                     const inputHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
-                    
-                    console.log('🔧 [PREFILL URL DEBUG 2] Created input HTML:', {
-                        fieldId: fieldId,
-                        inputHTML: inputHTML.substring(0, 200) + '...'
-                    });
 
+                    console.log('🔧 [FIELD CREATION] Creating input HTML with prefill:', {
+                        fieldId: fieldId,
+                        prefillValue: prefillValue,
+                        inputHTML: inputHTML.substring(0, 200)
+                    });
+                    
                     inputDiv.innerHTML = inputHTML;
                     entryContainer.appendChild(inputDiv.firstElementChild);
-                    
+
                     // Verify the input was created with correct value (after a slight delay)
                     setTimeout(() => {
                         const createdInput = document.getElementById(fieldId);
-                        console.log('🔧 [PREFILL URL DEBUG 3] Input in DOM after creation:', {
+                        console.log('🔧 [FIELD CREATION] Input created in DOM:', {
                             fieldId: fieldId,
                             exists: !!createdInput,
                             value: createdInput ? createdInput.value : 'NOT FOUND',
-                            placeholder: createdInput ? createdInput.placeholder : 'N/A'
+                            expectedValue: prefillValue
                         });
-                        
+
                         // Add a watcher to see if/when the value changes
                         if (createdInput) {
                             const originalValue = createdInput.value;
                             const observer = new MutationObserver(() => {
                                 if (createdInput.value !== originalValue) {
-                                    console.log('🚨 [VALUE CHANGED!] Input value was modified:', {
-                                        fieldId: fieldId,
-                                        originalValue: originalValue,
-                                        newValue: createdInput.value,
-                                        stackTrace: new Error().stack
-                                    });
+
                                 }
                             });
-                            
+
                             // Watch for attribute changes
                             observer.observe(createdInput, { attributes: true, attributeFilter: ['value'] });
-                            
+
                             // Also watch for direct value property changes
                             let lastValue = createdInput.value;
                             setInterval(() => {
                                 if (createdInput.value !== lastValue) {
-                                    console.log('🚨 [VALUE CHANGED VIA PROPERTY!]:', {
-                                        fieldId: fieldId,
-                                        oldValue: lastValue,
-                                        newValue: createdInput.value
-                                    });
+
                                     lastValue = createdInput.value;
                                 }
                             }, 100);
@@ -7859,7 +7892,18 @@ function showTextboxLabels(questionId, count){
             } else if (field.type === 'amount') {
                 const fieldId = field.nodeId + "_" + j;
                 const inputDiv = document.createElement('div');
-                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                let prefillValue = '';
+                
+                // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        // Use conditional prefill value (process URL parameters if needed)
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                }
+                
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue);
                 entryContainer.appendChild(inputDiv.firstElementChild);
 
                 // Add a <br> after the Zip input only if there are more fields after it
@@ -8487,7 +8531,21 @@ function showTextboxLabels(questionId, count){
                             }
                         }
                     } else {
+                        const previousValue = field.value;
+                        console.log('🔧 [FIREBASE AUTOFILL] Setting field value:', {
+                            fieldId: fieldId,
+                            fieldName: field.name,
+                            previousValue: previousValue,
+                            autofillValue: autofillValue,
+                            isBlank: autofillValue === '' || autofillValue === null
+                        });
+                        
                         field.value = autofillValue;
+                        
+                        console.log('🔧 [FIREBASE AUTOFILL] After setting value:', {
+                            fieldId: fieldId,
+                            newValue: field.value
+                        });
 
                         // Dispatch input and change events for text inputs to trigger linked textbox syncing
                         if (field.tagName === 'INPUT' && (field.type === 'text' || field.type === 'number' || !field.type)) {
@@ -11179,29 +11237,93 @@ if (typeof handleNext === 'function') {
             window.isInitialAutofill = false;
 
             // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
+            console.log('🔧 [PREFILL RESTORE] Starting post-Firebase prefill restoration...');
             if (window.unifiedFieldsMap) {
                 Object.keys(window.unifiedFieldsMap).forEach(questionId => {
                     const fields = window.unifiedFieldsMap[questionId];
+                    console.log('🔧 [PREFILL RESTORE] Processing questionId:', questionId, 'fields:', fields.length);
                     if (Array.isArray(fields)) {
                         fields.forEach(field => {
-                            if (field.type === 'label' && field.prefill && field.nodeId) {
+                            console.log('🔧 [PREFILL RESTORE] Processing field:', {
+                                type: field.type,
+                                label: field.label,
+                                nodeId: field.nodeId,
+                                hasPrefill: !!field.prefill,
+                                hasConditionalPrefills: !!(field.conditionalPrefills && field.conditionalPrefills.length > 0),
+                                conditionalPrefills: field.conditionalPrefills
+                            });
+                            
+                            // Handle both label and amount fields
+                            if ((field.type === 'label' || field.type === 'amount') && field.nodeId) {
                                 // Find all input fields that match this nodeId pattern
                                 const inputs = document.querySelectorAll('input[id^="' + field.nodeId + '_"]');
+                                console.log('🔧 [PREFILL RESTORE] Found', inputs.length, 'inputs for nodeId:', field.nodeId);
+                                
                                 inputs.forEach(input => {
+                                    // Extract entry number from input ID (e.g., "how_many_extra_defendants_name_1" → "1")
+                                    const entryNumberMatch = input.id.match(new RegExp('^' + field.nodeId + '_(\\d+)$'));
+                                    const entryNumber = entryNumberMatch ? entryNumberMatch[1] : null;
+                                    
+                                    console.log('🔧 [PREFILL RESTORE] Processing input:', {
+                                        inputId: input.id,
+                                        entryNumber: entryNumber,
+                                        currentValue: input.value,
+                                        isEmpty: !input.value || input.value.trim() === ''
+                                    });
+                                    
                                     // Only set prefill if the field is empty or blank
                                     if (!input.value || input.value.trim() === '') {
-                                        // Replace URL parameters in prefill value
-                                        const processedPrefill = replaceUrlParametersInText(field.prefill);
-
-                                        input.value = processedPrefill;
+                                        let prefillValue = null;
+                                        
+                                        // First, check for conditional prefills
+                                        if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills) && entryNumber) {
+                                            const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == entryNumber);
+                                            if (matchingConditional && matchingConditional.value) {
+                                                prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                                                console.log('🔧 [PREFILL RESTORE] Using conditional prefill:', {
+                                                    inputId: input.id,
+                                                    trigger: matchingConditional.trigger,
+                                                    rawValue: matchingConditional.value,
+                                                    processedValue: prefillValue
+                                                });
+                                            }
+                                        }
+                                        
+                                        // If no conditional prefill matched, use regular prefill (only for label fields)
+                                        if (!prefillValue && field.type === 'label' && field.prefill) {
+                                            prefillValue = replaceUrlParametersInText(field.prefill);
+                                            console.log('🔧 [PREFILL RESTORE] Using regular prefill:', {
+                                                inputId: input.id,
+                                                rawPrefill: field.prefill,
+                                                processedPrefill: prefillValue
+                                            });
+                                        }
+                                        
+                                        // Apply the prefill value if we found one
+                                        if (prefillValue) {
+                                            console.log('🔧 [PREFILL RESTORE] Setting prefill value:', {
+                                                inputId: input.id,
+                                                prefillValue: prefillValue,
+                                                beforeValue: input.value
+                                            });
+                                            input.value = prefillValue;
+                                            console.log('🔧 [PREFILL RESTORE] After setting value:', input.value);
+                                        } else {
+                                            console.log('🔧 [PREFILL RESTORE] No prefill value found for input:', input.id);
+                                        }
                                     } else {
-
+                                        console.log('🔧 [PREFILL RESTORE] Skipping input (has value):', {
+                                            inputId: input.id,
+                                            currentValue: input.value
+                                        });
                                     }
                                 });
                             }
                         });
                     }
                 });
+            } else {
+                console.log('🔧 [PREFILL RESTORE] window.unifiedFieldsMap is not available');
             }
 
             // 🔧 NEW: Update all hidden address fields after autofill completes
@@ -12062,15 +12184,6 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
-    
-    console.log('🔧 [CREATE INPUT DEBUG - Generated HTML] Creating address input:', {
-        id: id,
-        label: label,
-        index: index,
-        type: type,
-        prefill: prefill,
-        valueAttr: valueAttr
-    });
 
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
