@@ -43,6 +43,9 @@ window.createNode = function(nodeType, x, y) {
       case 'pdfNode':
         vertex = createPdfNode(x, y);
         break;
+      case 'pdfPreview':
+        vertex = createPdfPreviewNode(x, y);
+        break;
       case 'amountOption':
         vertex = createAmountNode(x, y);
         break;
@@ -230,6 +233,26 @@ function createPdfNode(x, y) {
 }
 
 /**
+ * Create a PDF preview node
+ */
+function createPdfPreviewNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=pdfPreview;section=1;');
+  
+  // Set default properties
+  vertex._pdfPreviewTitle = "PDF Preview";
+  vertex._pdfPreviewFile = "";
+  
+  // Update the display to show the preview title
+  if (typeof window.updatePdfPreviewNodeCell === 'function') {
+    window.updatePdfPreviewNodeCell(vertex);
+  }
+  
+  return vertex;
+}
+
+/**
  * Create an amount node
  */
 function createAmountNode(x, y) {
@@ -362,6 +385,10 @@ window.isHiddenCheckbox = function(cell) {
  */
 window.isHiddenTextbox = function(cell) {
   return cell && cell.style && cell.style.includes("nodeType=hiddenTextbox");
+};
+
+window.isPdfPreviewNode = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=pdfPreview");
 };
 
 /**

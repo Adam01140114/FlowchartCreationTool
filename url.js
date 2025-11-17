@@ -203,7 +203,10 @@ window.exportFlowchartJson = function(download = true) {
   const cells = graph.getChildCells(parent, true, true);
   
   // Use the same serialization logic as the existing export function
+  console.log('🔍 [URL.JS EXPORT DEBUG] Starting export, total cells:', cells.length);
   const simplifiedCells = cells.map(cell => {
+    console.log('🔍 [URL.JS EXPORT DEBUG] Processing cell:', cell.id, 'vertex:', cell.vertex, 'edge:', cell.edge);
+    
     const cellData = {
       id: cell.id,
       vertex: cell.vertex,
@@ -278,6 +281,29 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
     if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
     if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+    // PDF preview node properties - always include if the node is a PDF preview node
+    if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+      console.log('🔍 [URL.JS EXPORT DEBUG] PDF Preview Node found:', cell.id);
+      console.log('🔍 [URL.JS EXPORT DEBUG] _pdfPreviewTitle value:', cell._pdfPreviewTitle);
+      console.log('🔍 [URL.JS EXPORT DEBUG] _pdfPreviewTitle type:', typeof cell._pdfPreviewTitle);
+      console.log('🔍 [URL.JS EXPORT DEBUG] _pdfPreviewFile value:', cell._pdfPreviewFile);
+      console.log('🔍 [URL.JS EXPORT DEBUG] _pdfPreviewFile type:', typeof cell._pdfPreviewFile);
+      console.log('🔍 [URL.JS EXPORT DEBUG] All cell properties:', Object.keys(cell).filter(k => k.startsWith('_')));
+      
+      cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
+      cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
+      
+      console.log('🔍 [URL.JS EXPORT DEBUG] Exported _pdfPreviewTitle:', cellData._pdfPreviewTitle);
+      console.log('🔍 [URL.JS EXPORT DEBUG] Exported _pdfPreviewFile:', cellData._pdfPreviewFile);
+    } else if (cell._pdfPreviewTitle !== undefined) {
+      // Include even if not a PDF preview node (for backward compatibility)
+      console.log('🔍 [URL.JS EXPORT DEBUG] PDF Preview properties found on non-preview node:', cell.id);
+      cellData._pdfPreviewTitle = cell._pdfPreviewTitle;
+    }
+    if (cell._pdfPreviewFile !== undefined) {
+      console.log('🔍 [URL.JS EXPORT DEBUG] _pdfPreviewFile found on non-preview node:', cell.id, cell._pdfPreviewFile);
+      cellData._pdfPreviewFile = cell._pdfPreviewFile;
+    }
     // Legacy PDF properties for backward compatibility
     if (cell._pdfUrl) cellData._pdfUrl = cell._pdfUrl;
     if (cell._priceId) cellData._priceId = cell._priceId;
@@ -299,6 +325,15 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
     if (cell._bigParagraphPdfFile !== undefined) cellData._bigParagraphPdfFile = cell._bigParagraphPdfFile;
     if (cell._bigParagraphPdfPrice !== undefined) cellData._bigParagraphPdfPrice = cell._bigParagraphPdfPrice;
+    // Final verification for PDF preview nodes
+    if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+      console.log('🔍 [URL.JS EXPORT DEBUG] Final check for PDF Preview Node:', cell.id);
+      console.log('🔍 [URL.JS EXPORT DEBUG] Final cellData._pdfPreviewTitle:', cellData._pdfPreviewTitle);
+      console.log('🔍 [URL.JS EXPORT DEBUG] Final cellData._pdfPreviewFile:', cellData._pdfPreviewFile);
+      console.log('🔍 [URL.JS EXPORT DEBUG] Final cell._pdfPreviewTitle:', cell._pdfPreviewTitle);
+      console.log('🔍 [URL.JS EXPORT DEBUG] Final cell._pdfPreviewFile:', cell._pdfPreviewFile);
+    }
+    
     if (cell._checklistText) cellData._checklistText = cell._checklistText;
     if (cell._alertText) cellData._alertText = cell._alertText;
     if (cell._calcTitle) cellData._calcTitle = cell._calcTitle;
@@ -348,8 +383,20 @@ window.exportFlowchartJson = function(download = true) {
     formName: formName,
     edgeStyle: currentEdgeStyle
   };
+  
+  console.log('🔍 [URL.JS EXPORT DEBUG] Final output structure:');
+  console.log('🔍 [URL.JS EXPORT DEBUG] Total cells in export:', output.cells.length);
+  output.cells.forEach((cell, index) => {
+    if (cell.style && cell.style.includes('nodeType=pdfPreview')) {
+      console.log(`🔍 [URL.JS EXPORT DEBUG] Cell ${index} (${cell.id}) is PDF Preview Node:`);
+      console.log('🔍 [URL.JS EXPORT DEBUG]   _pdfPreviewTitle:', cell._pdfPreviewTitle);
+      console.log('🔍 [URL.JS EXPORT DEBUG]   _pdfPreviewFile:', cell._pdfPreviewFile);
+      console.log('🔍 [URL.JS EXPORT DEBUG]   Full cell data:', JSON.stringify(cell, null, 2));
+    }
+  });
 
   const jsonStr = JSON.stringify(output, null, 2);
+  console.log('🔍 [URL.JS EXPORT DEBUG] Final JSON length:', jsonStr.length);
   
   if (download) {
     // Download the file

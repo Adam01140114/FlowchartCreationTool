@@ -655,6 +655,13 @@ function setupDraggableShapes(graph) {
           if (typeof window.initializeCalculationNode === 'function') {
             window.initializeCalculationNode(newVertex);
           }
+        } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(newVertex)) {
+          // Initialize PDF preview node properties
+          newVertex._pdfPreviewTitle = "PDF Preview";
+          newVertex._pdfPreviewFile = "";
+          if (typeof window.updatePdfPreviewNodeCell === 'function') {
+            window.updatePdfPreviewNodeCell(newVertex);
+          }
         }
         
         // Select the new vertex

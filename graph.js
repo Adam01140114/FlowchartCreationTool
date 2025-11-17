@@ -324,6 +324,15 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // Show properties popup for PDF preview nodes
+        if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+          console.log("🎯 PDF preview node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
         // Show properties popup for hidden checkbox nodes
         if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
           console.log("🎯 Hidden checkbox node detected, showing properties popup");
@@ -543,6 +552,8 @@ function showPropertiesPopup(cell) {
   // Use different title for different node types
   if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
     title.textContent = 'PDF Node Properties';
+  } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+    title.textContent = 'PDF Preview Node Properties';
   } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
     title.textContent = 'Hidden Checkbox Properties';
   } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
@@ -888,6 +899,25 @@ function showPropertiesPopup(cell) {
       { label: 'PDF Name', value: pdfNameValue, id: 'propPdfName', editable: true },
       { label: 'PDF File', value: pdfFileValue, id: 'propPdfFile', editable: true },
       { label: 'PDF Price', value: pdfPriceValue, id: 'propPdfPrice', editable: true }
+    ];
+  } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+    console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Opening PDF preview properties popup for cell:', cell.id);
+    console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Current cell PDF preview properties:', {
+      _pdfPreviewTitle: cell._pdfPreviewTitle,
+      _pdfPreviewFile: cell._pdfPreviewFile
+    });
+    
+    const pdfPreviewTitleValue = cell._pdfPreviewTitle || 'PDF Preview';
+    const pdfPreviewFileValue = cell._pdfPreviewFile || '';
+    
+    console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Setting properties array with values:', {
+      pdfPreviewTitle: pdfPreviewTitleValue,
+      pdfPreviewFile: pdfPreviewFileValue
+    });
+    
+    properties = [
+      { label: 'Preview Title', value: pdfPreviewTitleValue, id: 'propPdfPreviewTitle', editable: true },
+      { label: 'Preview File', value: pdfPreviewFileValue, id: 'propPdfPreviewFile', editable: true }
     ];
   } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
     // For hidden checkbox nodes, only show Node ID
@@ -2730,6 +2760,17 @@ function showPropertiesPopup(cell) {
             });
           }
           
+          // Special debugging for PDF preview properties
+          if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile') {
+            console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Creating input for', prop.id, {
+              propValue: prop.value,
+              inputValue: input.value,
+              cellProperty: prop.id === 'propPdfPreviewTitle' ? cell._pdfPreviewTitle : 
+                           prop.id === 'propPdfPreviewFile' ? cell._pdfPreviewFile : 'unknown',
+              cellId: cell.id
+            });
+          }
+          
           if (isNodeText) {
             input.style.cssText = `
               width: 100%;
@@ -2782,10 +2823,13 @@ function showPropertiesPopup(cell) {
               });
             }
             
-            // For PDF Logic fields, keep the input element so it can be found by the save function
+            // For PDF Logic fields and PDF Preview fields, keep the input element so it can be found by the save function
             const isPdfLogicField = prop.id && prop.id.startsWith('propPdf');
-            if (!isPdfLogicField && input && input.parentNode) {
+            const isPdfPreviewField = prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile';
+            if (!isPdfLogicField && !isPdfPreviewField && input && input.parentNode) {
               input.remove();
+            } else if (isPdfPreviewField) {
+              console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Keeping input element for', prop.id, 'so it can be found on close');
             }
             
             // Update cell property
@@ -3006,6 +3050,42 @@ function showPropertiesPopup(cell) {
                   window.requestAutosave();
                 }
                 console.log('🔍 [PDF PROPERTIES DEBUG] After saving propPdfPrice, cell._pdfPrice =', cell._pdfPrice);
+                break;
+              case 'propPdfPreviewTitle':
+                console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Saving propPdfPreviewTitle:', {
+                  oldValue: cell._pdfPreviewTitle,
+                  newValue: newValue,
+                  cellId: cell.id
+                });
+                cell._pdfPreviewTitle = newValue;
+                // Update PDF preview node display if function exists
+                if (typeof window.updatePdfPreviewNodeCell === 'function') {
+                  console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Calling updatePdfPreviewNodeCell');
+                  window.updatePdfPreviewNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] After saving propPdfPreviewTitle, cell._pdfPreviewTitle =', cell._pdfPreviewTitle);
+                break;
+              case 'propPdfPreviewFile':
+                console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Saving propPdfPreviewFile:', {
+                  oldValue: cell._pdfPreviewFile,
+                  newValue: newValue,
+                  cellId: cell.id
+                });
+                cell._pdfPreviewFile = newValue;
+                // Update PDF preview node display if function exists
+                if (typeof window.updatePdfPreviewNodeCell === 'function') {
+                  console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Calling updatePdfPreviewNodeCell');
+                  window.updatePdfPreviewNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] After saving propPdfPreviewFile, cell._pdfPreviewFile =', cell._pdfPreviewFile);
                 break;
             }
             
@@ -3346,6 +3426,60 @@ function showPropertiesPopup(cell) {
       // Trigger autosave after saving PDF properties
       if (typeof window.requestAutosave === 'function') {
         console.log('🔍 [PDF PROPERTIES DEBUG] Triggering autosave');
+        window.requestAutosave();
+      }
+    }
+    
+    // Save any PDF preview properties that might be in input fields but not yet saved
+    if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+      console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] This is a PDF preview node, checking for unsaved values');
+      
+      // Check for Preview Title input
+      const pdfPreviewTitleInput = document.getElementById('propPdfPreviewTitle_input');
+      if (pdfPreviewTitleInput) {
+        const pdfPreviewTitleValue = pdfPreviewTitleInput.value.trim();
+        console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Found propPdfPreviewTitle_input with value:', pdfPreviewTitleValue);
+        if (pdfPreviewTitleValue !== cell._pdfPreviewTitle) {
+          console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Saving propPdfPreviewTitle on close:', {
+            oldValue: cell._pdfPreviewTitle,
+            newValue: pdfPreviewTitleValue
+          });
+          cell._pdfPreviewTitle = pdfPreviewTitleValue;
+          if (typeof window.updatePdfPreviewNodeCell === 'function') {
+            window.updatePdfPreviewNodeCell(cell);
+          }
+        }
+      } else {
+        console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] propPdfPreviewTitle_input not found');
+      }
+      
+      // Check for Preview File input
+      const pdfPreviewFileInput = document.getElementById('propPdfPreviewFile_input');
+      if (pdfPreviewFileInput) {
+        const pdfPreviewFileValue = pdfPreviewFileInput.value.trim();
+        console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Found propPdfPreviewFile_input with value:', pdfPreviewFileValue);
+        if (pdfPreviewFileValue !== cell._pdfPreviewFile) {
+          console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Saving propPdfPreviewFile on close:', {
+            oldValue: cell._pdfPreviewFile,
+            newValue: pdfPreviewFileValue
+          });
+          cell._pdfPreviewFile = pdfPreviewFileValue;
+          if (typeof window.updatePdfPreviewNodeCell === 'function') {
+            window.updatePdfPreviewNodeCell(cell);
+          }
+        }
+      } else {
+        console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] propPdfPreviewFile_input not found');
+      }
+      
+      console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Cell properties after close save:', {
+        _pdfPreviewTitle: cell._pdfPreviewTitle,
+        _pdfPreviewFile: cell._pdfPreviewFile
+      });
+      
+      // Trigger autosave after saving PDF preview properties
+      if (typeof window.requestAutosave === 'function') {
+        console.log('🔍 [PDF PREVIEW PROPERTIES DEBUG] Triggering autosave');
         window.requestAutosave();
       }
     }

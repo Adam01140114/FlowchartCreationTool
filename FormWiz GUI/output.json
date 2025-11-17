@@ -6,8 +6,8 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "How many extra defendants",
-          "type": "numberedDropdown",
+          "text": "Example",
+          "type": "multipleTextboxes",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -61,22 +61,14 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "how_many_extra_defendants",
-          "min": "1",
-          "max": "3",
+          "nodeId": "example",
           "allFieldsInOrder": [
             {
               "type": "label",
               "label": "Name",
-              "nodeId": "how_many_extra_defendants_name",
+              "nodeId": "example_name",
               "order": 1,
-              "prefill": "",
-              "conditionalPrefills": [
-                {
-                  "trigger": "1",
-                  "value": "[county]"
-                }
-              ]
+              "prefill": "test"
             }
           ]
         }

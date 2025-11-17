@@ -255,6 +255,12 @@ window.exportGuiJson = function(download = true) {
         enabled: false,
         text: ""
       },
+      pdfPreview: {
+        enabled: false,
+        trigger: "",
+        title: "",
+        file: ""
+      },
       options: [],
       labels: [],
       linking: {
@@ -382,8 +388,8 @@ window.exportGuiJson = function(download = true) {
             const checkbox = cell._checkboxes[item.index];
             const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
               const optionObj = {
-                text: option.checkboxText || option.text || "",
-                nodeId: option.nodeId || ""
+              text: option.checkboxText || option.text || "",
+              nodeId: option.nodeId || ""
               };
               
               // Add linked fields if they exist
@@ -967,8 +973,8 @@ window.exportGuiJson = function(download = true) {
           cell._checkboxes.forEach((checkbox, checkboxIndex) => {
             const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
               const optionObj = {
-                text: option.checkboxText || option.text || "",
-                nodeId: option.nodeId || ""
+              text: option.checkboxText || option.text || "",
+              nodeId: option.nodeId || ""
               };
               
               // Add linked fields if they exist
@@ -2321,6 +2327,61 @@ window.exportGuiJson = function(download = true) {
     }
     // --- END PDF Logic PATCH ---
     
+    // --- PATCH: Add PDF Preview detection ---
+    // Check if any option is connected to a PDF preview node
+    if (exportType === "dropdown" && outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const optionCell = edge.target;
+        if (optionCell && isOptions(optionCell)) {
+          // Check if this option leads to a PDF preview node
+          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const pdfPreviewCell = optionEdge.target;
+              if (pdfPreviewCell && typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(pdfPreviewCell)) {
+                // This question's option leads to a PDF preview node
+                console.log('🔍 [GUI EXPORT DEBUG] PDF Preview Node found connected to option:', optionCell.id);
+                
+                // Extract the option text
+                let optionText = optionCell.value || "";
+                // Clean HTML from option text
+                if (optionText) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = optionText;
+                  optionText = temp.textContent || temp.innerText || optionText;
+                  optionText = optionText.trim();
+                }
+                
+                // Get PDF preview properties
+                const previewTitle = pdfPreviewCell._pdfPreviewTitle || "";
+                const previewFile = pdfPreviewCell._pdfPreviewFile || "";
+                
+                console.log('🔍 [GUI EXPORT DEBUG] PDF Preview properties:', {
+                  trigger: optionText,
+                  title: previewTitle,
+                  file: previewFile
+                });
+                
+                // Set PDF preview properties
+                question.pdfPreview.enabled = true;
+                question.pdfPreview.trigger = optionText;
+                question.pdfPreview.title = previewTitle;
+                question.pdfPreview.file = previewFile;
+                
+                // Only one PDF preview per question, so break after finding one
+                break;
+              }
+            }
+          }
+        }
+        // Break outer loop if PDF preview was found
+        if (question.pdfPreview.enabled) {
+          break;
+        }
+      }
+    }
+    // --- END PDF Preview PATCH ---
+    
     // --- PATCH: Add Alert Logic detection ---
     // Check if this question is connected to an alert node through its options
     if (outgoingEdges) {
@@ -2736,7 +2797,10 @@ window.exportBothJson = function() {
     const cells = graph.getChildCells(parent, true, true);
 
     // Map cells, keeping only needed properties
+    console.log('🔍 [EXPORT DEBUG] Starting export, total cells:', cells.length);
     const simplifiedCells = cells.map(cell => {
+      console.log('🔍 [EXPORT DEBUG] Processing cell:', cell.id, 'vertex:', cell.vertex, 'edge:', cell.edge);
+      
       // Basic info about the cell
       const cellData = {
         id: cell.id,
@@ -2783,6 +2847,41 @@ window.exportBothJson = function() {
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+      // PDF preview node properties - always include if the node is a PDF preview node
+      if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+        console.log('🔍 [EXPORT DEBUG] PDF Preview Node found:', cell.id);
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewTitle value:', cell._pdfPreviewTitle);
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewTitle type:', typeof cell._pdfPreviewTitle);
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewTitle !== undefined:', cell._pdfPreviewTitle !== undefined);
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile value:', cell._pdfPreviewFile);
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile type:', typeof cell._pdfPreviewFile);
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile !== undefined:', cell._pdfPreviewFile !== undefined);
+        console.log('🔍 [EXPORT DEBUG] All cell properties:', Object.keys(cell).filter(k => k.startsWith('_')));
+        
+        cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
+        cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
+        
+        console.log('🔍 [EXPORT DEBUG] Exported _pdfPreviewTitle:', cellData._pdfPreviewTitle);
+        console.log('🔍 [EXPORT DEBUG] Exported _pdfPreviewFile:', cellData._pdfPreviewFile);
+      } else if (cell._pdfPreviewTitle !== undefined) {
+        // Include even if not a PDF preview node (for backward compatibility)
+        console.log('🔍 [EXPORT DEBUG] PDF Preview properties found on non-preview node:', cell.id);
+        cellData._pdfPreviewTitle = cell._pdfPreviewTitle;
+      }
+      if (cell._pdfPreviewFile !== undefined) {
+        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile found on non-preview node:', cell.id, cell._pdfPreviewFile);
+        cellData._pdfPreviewFile = cell._pdfPreviewFile;
+      }
+      
+      // Final verification for PDF preview nodes
+      if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+        console.log('🔍 [EXPORT DEBUG] Final check for PDF Preview Node:', cell.id);
+        console.log('🔍 [EXPORT DEBUG] Final cellData._pdfPreviewTitle:', cellData._pdfPreviewTitle);
+        console.log('🔍 [EXPORT DEBUG] Final cellData._pdfPreviewFile:', cellData._pdfPreviewFile);
+        console.log('🔍 [EXPORT DEBUG] Final cell._pdfPreviewTitle:', cell._pdfPreviewTitle);
+        console.log('🔍 [EXPORT DEBUG] Final cell._pdfPreviewFile:', cell._pdfPreviewFile);
+      }
+      
       if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
       if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
       if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
@@ -2878,7 +2977,19 @@ window.exportBothJson = function() {
       edgeStyle: currentEdgeStyle
     };
 
+    console.log('🔍 [EXPORT DEBUG] Final flowchartExportObj structure:');
+    console.log('🔍 [EXPORT DEBUG] Total cells in export:', flowchartExportObj.cells.length);
+    flowchartExportObj.cells.forEach((cell, index) => {
+      if (cell.style && cell.style.includes('nodeType=pdfPreview')) {
+        console.log(`🔍 [EXPORT DEBUG] Cell ${index} (${cell.id}) is PDF Preview Node:`);
+        console.log('🔍 [EXPORT DEBUG]   _pdfPreviewTitle:', cell._pdfPreviewTitle);
+        console.log('🔍 [EXPORT DEBUG]   _pdfPreviewFile:', cell._pdfPreviewFile);
+        console.log('🔍 [EXPORT DEBUG]   Full cell data:', JSON.stringify(cell, null, 2));
+      }
+    });
+
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
+    console.log('🔍 [EXPORT DEBUG] Final JSON length:', flowchartJson.length);
     
     // Get GUI JSON (without downloading)
     const guiJson = exportGuiJson(false);
@@ -4315,6 +4426,8 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         if (item._pdfName !== undefined) newCell._pdfName = item._pdfName;
         if (item._pdfFile !== undefined) newCell._pdfFile = item._pdfFile;
         if (item._pdfPrice !== undefined) newCell._pdfPrice = item._pdfPrice;
+        if (item._pdfPreviewTitle !== undefined) newCell._pdfPreviewTitle = item._pdfPreviewTitle;
+        if (item._pdfPreviewFile !== undefined) newCell._pdfPreviewFile = item._pdfPreviewFile;
         // Legacy PDF properties for backward compatibility
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
@@ -4509,6 +4622,15 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           updateAlertNodeCell(cell);
         } else if (isPdfNode(cell)) {
           updatePdfNodeCell(cell);
+        } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+          // Use the _pdfPreviewTitle property if available, otherwise use default
+          if (!cell._pdfPreviewTitle && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._pdfPreviewTitle = cleanValue || "PDF Preview";
+          }
+          if (typeof window.updatePdfPreviewNodeCell === 'function') {
+            window.updatePdfPreviewNodeCell(cell);
+          }
         } else if (isCalculationNode(cell)) {
           updateCalculationNodeCell(cell);
         } else if (isSubtitleNode(cell)) {

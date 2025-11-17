@@ -1373,6 +1373,9 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
           } else if (nodeType === 'pdfNode') {
       style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfNode;spacing=6;fontSize=16;";
         label = "PDF Node";
+      } else if (nodeType === 'pdfPreview') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfPreview;spacing=6;fontSize=16;";
+        label = "PDF Preview";
       } else if (nodeType === 'amountOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
         label = "Amount Option";
@@ -1441,6 +1444,12 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         cell._pdfFile = "";
         cell._pdfPrice = "";
         updatePdfNodeCell(cell);
+      } else if (nodeType === 'pdfPreview') {
+        cell._pdfPreviewTitle = "PDF Preview";
+        cell._pdfPreviewFile = "";
+        if (typeof window.updatePdfPreviewNodeCell === 'function') {
+          window.updatePdfPreviewNodeCell(cell);
+        }
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
       }
@@ -2086,6 +2095,13 @@ function updateInfoNodeCell(cell) {
   if (!cell) return;
   cell._infoText = cell._infoText || "Add information text";
   cell.value = `<span style="font-size: 14px; color: #555;">${escapeHtml(cell._infoText)}</span>`;
+  colorCell(cell);
+}
+
+function updatePdfPreviewNodeCell(cell) {
+  if (!cell || !(typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell))) return;
+  cell._pdfPreviewTitle = cell._pdfPreviewTitle || "PDF Preview";
+  cell.value = escapeHtml(cell._pdfPreviewTitle);
   colorCell(cell);
 }
 
@@ -3531,6 +3547,7 @@ function setOptionType(cell, newType) {
   // Export other functions needed by context menus
   window.updateSubtitleNodeCell = updateSubtitleNodeCell;
   window.updateInfoNodeCell = updateInfoNodeCell;
+  window.updatePdfPreviewNodeCell = updatePdfPreviewNodeCell;
   window.updateNotesNodeCell = updateNotesNodeCell;
   window.updateChecklistNodeCell = updateChecklistNodeCell;
   window.updateImageOptionCell = updateImageOptionCell;
@@ -5708,6 +5725,8 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+      if (cell._pdfPreviewTitle !== undefined) cellData._pdfPreviewTitle = cell._pdfPreviewTitle;
+      if (cell._pdfPreviewFile !== undefined) cellData._pdfPreviewFile = cell._pdfPreviewFile;
       if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
       if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
       
