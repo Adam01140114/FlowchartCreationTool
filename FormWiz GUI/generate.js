@@ -4380,6 +4380,226 @@ if (s > 1){
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
   formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
+  formHTML += `
+  // Address helper functions (must exist before conditional logic runs)
+  function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
+      const hasLocationFields = allFieldsInOrder.some(field =>
+          ['Street', 'City', 'State', 'Zip'].includes(field.label)
+      );
+      if (!hasLocationFields) {
+          return;
+      }
+      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      for (let i = 1; i <= 10; i++) {
+          const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
+          if (existingAddress && existingAddress.type === 'text' && existingAddress.style.display === 'none') {
+              existingAddress.remove();
+          }
+      }
+      for (let i = 1; i <= count; i++) {
+          const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
+          const addressInput = document.createElement('input');
+          addressInput.type = 'text';
+          addressInput.id = addressId;
+          addressInput.name = addressId;
+          addressInput.style.display = 'none';
+          const hiddenContainer = document.getElementById('hidden_pdf_fields');
+          if (hiddenContainer) {
+              hiddenContainer.appendChild(addressInput);
+          }
+          setTimeout(() => {
+              setupAddressUpdateListeners(questionId, i, baseFieldName, allFieldsInOrder, count);
+          }, 1000);
+      }
+  }
+
+  function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, allFieldsInOrder, count = 1) {
+      const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
+      const addressInput = document.getElementById(addressId);
+      if (!addressInput) return;
+      const updateAddress = () => {
+          const streetFieldId = count === 1 ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
+          const cityFieldId = count === 1 ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
+          const stateFieldId = count === 1 ? baseFieldName + '_state' : baseFieldName + '_state_' + entryNumber;
+          const zipFieldId = count === 1 ? baseFieldName + '_zip' : baseFieldName + '_zip_' + entryNumber;
+          const stateShortFieldId = count === 1 ? baseFieldName + '_state_short' : baseFieldName + '_state_short_' + entryNumber;
+          const streetField = document.getElementById(streetFieldId);
+          const cityField = document.getElementById(cityFieldId);
+          const stateField = document.getElementById(stateFieldId);
+          const zipField = document.getElementById(zipFieldId);
+          const stateShortField = document.getElementById(stateShortFieldId);
+          const street = streetField ? streetField.value.trim() : '';
+          const city = cityField ? cityField.value.trim() : '';
+          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+          const zip = zipField ? zipField.value.trim() : '';
+          const addressParts = [street, city, state, zip].filter(part => part !== '');
+          const fullAddress = addressParts.join(', ');
+          addressInput.value = fullAddress;
+      };
+      const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+      locationFields.forEach(fieldType => {
+          const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
+          const field = document.getElementById(fieldId);
+          if (field) {
+              field.addEventListener('input', updateAddress);
+              field.addEventListener('change', updateAddress);
+          }
+      });
+      setTimeout(updateAddress, 500);
+      setTimeout(updateAddress, 2000);
+  }
+
+  // Set up number input listeners for PDF logic
+  document.addEventListener('DOMContentLoaded', function() {
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+      input.addEventListener('input', function() {
+        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
+          const questionId = input.id.replace(/^answer/, '');
+          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
+          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
+            if (typeof updateCartCountBadge === 'function') {
+              updateCartCountBadge();
+            }
+          }
+        }
+      });
+
+      input.addEventListener('change', function() {
+        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
+          const questionId = input.id.replace(/^answer/, '');
+          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
+          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
+            if (typeof updateCartCountBadge === 'function') {
+              updateCartCountBadge();
+            }
+          }
+        }
+      });
+    });
+  });
+
+  // Set up address listeners for multipleTextboxes questions
+  document.addEventListener('DOMContentLoaded', function() {
+    const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
+    multipleTextboxesQuestions.forEach(container => {
+      const questionId = container.id.replace('labelContainer', '');
+      const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : {};
+      const baseFieldName = questionNameIdsMap[questionId] || 'answer' + questionId;
+      const addressField = document.getElementById(baseFieldName + '_address');
+      if (addressField) {
+        const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+        locationFields.forEach(fieldType => {
+          const fieldId = baseFieldName + '_' + fieldType;
+          const field = document.getElementById(fieldId);
+          if (field) {
+            const updateAddress = () => {
+              const streetField = document.getElementById(baseFieldName + '_street');
+              const cityField = document.getElementById(baseFieldName + '_city');
+              const stateField = document.getElementById(baseFieldName + '_state');
+              const zipField = document.getElementById(baseFieldName + '_zip');
+              const stateShortField = document.getElementById(baseFieldName + '_state_short');
+              const street = streetField ? streetField.value.trim() : '';
+              const city = cityField ? cityField.value.trim() : '';
+              const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+              const zip = zipField ? zipField.value.trim() : '';
+              const addressParts = [street, city, state, zip].filter(part => part !== '');
+              const fullAddress = addressParts.join(', ');
+              addressField.value = fullAddress;
+            };
+            field.addEventListener('input', updateAddress);
+            field.addEventListener('change', updateAddress);
+          }
+        });
+        setTimeout(() => {
+          const streetField = document.getElementById(baseFieldName + '_street');
+          const cityField = document.getElementById(baseFieldName + '_city');
+          const stateField = document.getElementById(baseFieldName + '_state');
+          const zipField = document.getElementById(baseFieldName + '_zip');
+          const stateShortField = document.getElementById(baseFieldName + '_state_short');
+          const street = streetField ? streetField.value.trim() : '';
+          const city = cityField ? cityField.value.trim() : '';
+          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+          const zip = zipField ? zipField.value.trim() : '';
+          const addressParts = [street, city, state, zip].filter(part => part !== '');
+          const fullAddress = addressParts.join(', ');
+          addressField.value = fullAddress;
+        }, 1000);
+      }
+    });
+  });
+
+  // Set up linked checkbox listeners after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+    if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
+      return;
+    }
+    function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
+      const linkedCheckbox = document.getElementById(linkedCheckboxId);
+      if (!linkedCheckbox) {
+        return;
+      }
+      let anyChecked = false;
+      checkboxIds.forEach(checkboxId => {
+        const sourceCheckbox = document.getElementById(checkboxId);
+        if (sourceCheckbox && sourceCheckbox.checked) {
+          anyChecked = true;
+        }
+      });
+      linkedCheckbox.checked = anyChecked;
+    }
+    linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
+      const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+      const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+      if (!linkedCheckboxId || checkboxIds.length === 0) {
+        return;
+      }
+      checkboxIds.forEach(checkboxId => {
+        const sourceCheckbox = document.getElementById(checkboxId);
+        if (sourceCheckbox) {
+          sourceCheckbox.addEventListener('change', function() {
+            updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+          });
+          sourceCheckbox.addEventListener('click', function() {
+            setTimeout(() => {
+              updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+            }, 0);
+          });
+        }
+      });
+      setTimeout(() => {
+        updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+      }, 500);
+    });
+    window.updateAllLinkedCheckboxes = function() {
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
+        return;
+      }
+      linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
+        const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+        const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+        if (!linkedCheckboxId || checkboxIds.length === 0) {
+          return;
+        }
+        const linkedCheckbox = document.getElementById(linkedCheckboxId);
+        if (!linkedCheckbox) {
+          return;
+        }
+        let anyChecked = false;
+        checkboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox && sourceCheckbox.checked) {
+            anyChecked = true;
+          }
+        });
+        linkedCheckbox.checked = anyChecked;
+      });
+    };
+  });
+  `;
+  formHTML += `var isCreatingFields = false;\n`;
 
   // Add createTriggerFieldsContainer function early so it's available for numbered dropdown code
   formHTML += `
@@ -7673,9 +7893,6 @@ document.addEventListener('DOMContentLoaded', function() {
         subtree: true
     });
 });
-
-// 🔧 NEW: Global flag to prevent duplicate function calls
-let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
 
@@ -13363,366 +13580,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
-
-</body>
-</html>
 `;
 
   // Add script to set up address listeners for multipleTextboxes after DOM loads
-  formHTML += `
-  <script>
-  // Include the generateHiddenAddressTextboxes function and helpers in the runtime
-  function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
-
-      // Check if this question has location fields (Street, City, State, Zip)
-      const hasLocationFields = allFieldsInOrder.some(field => 
-          ['Street', 'City', 'State', 'Zip'].includes(field.label)
-      );
-
-      if (!hasLocationFields) {
-
-          return;
-      }
-
-      // Get the base field name from the question
-      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-
-      // Remove existing hidden address textboxes for this question
-      for (let i = 1; i <= 10; i++) { // Check up to 10 entries
-          const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
-          if (existingAddress && existingAddress.type === 'text' && existingAddress.style.display === 'none') {
-              existingAddress.remove();
-          }
-      }
-
-      // Generate hidden address textboxes for the selected count
-      for (let i = 1; i <= count; i++) {
-          // For single-entry questions (like multipleTextboxes), don't add number suffix
-          const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
-          const addressInput = document.createElement('input');
-          addressInput.type = 'text';
-          addressInput.id = addressId;
-          addressInput.name = addressId;
-          addressInput.style.display = 'none';
-
-          // Add to hidden fields container
-          const hiddenContainer = document.getElementById('hidden_pdf_fields');
-          if (hiddenContainer) {
-              hiddenContainer.appendChild(addressInput);
-          }
-
-          // Set up event listeners to update the address when location fields change
-          // Delay this to ensure location fields are created first
-          setTimeout(() => {
-              setupAddressUpdateListeners(questionId, i, baseFieldName, allFieldsInOrder, count);
-          }, 1000); // 1 second delay to ensure fields are created
-      }
-  }
-
-  function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, allFieldsInOrder, count = 1) {
-      // For single-entry questions (like multipleTextboxes), don't add number suffix
-      const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
-      const addressInput = document.getElementById(addressId);
-
-      if (!addressInput) return;
-
-      // Function to update the address field
-      const updateAddress = () => {
-          // For single-entry questions, don't add number suffix to field IDs
-          const streetFieldId = count === 1 ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
-          const cityFieldId = count === 1 ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
-          const stateFieldId = count === 1 ? baseFieldName + '_state' : baseFieldName + '_state_' + entryNumber;
-          const zipFieldId = count === 1 ? baseFieldName + '_zip' : baseFieldName + '_zip_' + entryNumber;
-          const stateShortFieldId = count === 1 ? baseFieldName + '_state_short' : baseFieldName + '_state_short_' + entryNumber;
-
-          const streetField = document.getElementById(streetFieldId);
-          const cityField = document.getElementById(cityFieldId);
-          const stateField = document.getElementById(stateFieldId);
-          const zipField = document.getElementById(zipFieldId);
-          const stateShortField = document.getElementById(stateShortFieldId);
-
-          // Debug: Log what fields we're looking for and what we found
-
-          const street = streetField ? streetField.value.trim() : '';
-          const city = cityField ? cityField.value.trim() : '';
-          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
-          const zip = zipField ? zipField.value.trim() : '';
-
-          // Build the full address
-          const addressParts = [street, city, state, zip].filter(part => part !== '');
-          const fullAddress = addressParts.join(', ');
-
-          addressInput.value = fullAddress;
-      };
-
-      // Set up listeners for all location fields
-      const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
-
-      locationFields.forEach(fieldType => {
-          // For single-entry questions, don't add number suffix to field IDs
-          const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
-          const field = document.getElementById(fieldId);
-
-          if (field) {
-              // Listen for input changes
-              field.addEventListener('input', updateAddress);
-              field.addEventListener('change', updateAddress);
-          } else {
-
-          }
-      });
-
-      // Initial update with longer delay to ensure fields are created
-      setTimeout(updateAddress, 500);
-
-      // Also trigger update after autofill completes (additional safety)
-      setTimeout(updateAddress, 2000);
-  }
-
-  // Set up number input listeners for PDF logic after DOM loads
-  document.addEventListener('DOMContentLoaded', function() {
-    // Find all number input fields and add PDF logic listeners
-    const numberInputs = document.querySelectorAll('input[type="number"]');
-    numberInputs.forEach(input => {
-      input.addEventListener('input', function() {
-        // Trigger PDF logic check when number input changes
-        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
-          // Find the question ID for this input
-          const questionId = input.id.replace(/^answer/, '');
-          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
-
-          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
-            // Trigger cart update to check PDF logic
-            if (typeof updateCartCountBadge === 'function') {
-              updateCartCountBadge();
-            }
-          }
-        }
-      });
-
-      input.addEventListener('change', function() {
-        // Also trigger on change event
-        if (typeof window.pdfLogicPDFs !== 'undefined' && window.pdfLogicPDFs.length > 0) {
-          const questionId = input.id.replace(/^answer/, '');
-          const matchingPdfLogic = window.pdfLogicPDFs.find(pdf => pdf.questionId === questionId);
-
-          if (matchingPdfLogic && matchingPdfLogic.numberTrigger && matchingPdfLogic.numberValue) {
-            if (typeof updateCartCountBadge === 'function') {
-              updateCartCountBadge();
-            }
-          }
-        }
-      });
-    });
-  });
-
-  // Set up address listeners for multipleTextboxes questions after DOM loads
-  document.addEventListener('DOMContentLoaded', function() {
-    // Find all multipleTextboxes questions with location fields
-    const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
-    multipleTextboxesQuestions.forEach(container => {
-      const questionId = container.id.replace('labelContainer', '');
-      const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : {};
-      const baseFieldName = questionNameIdsMap[questionId] || 'answer' + questionId;
-      const addressField = document.getElementById(baseFieldName + '_address');
-
-      if (addressField) {
-
-        // Set up listeners for location fields
-        const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
-        locationFields.forEach(fieldType => {
-          const fieldId = baseFieldName + '_' + fieldType;
-          const field = document.getElementById(fieldId);
-
-          if (field) {
-            const updateAddress = () => {
-              const streetField = document.getElementById(baseFieldName + '_street');
-              const cityField = document.getElementById(baseFieldName + '_city');
-              const stateField = document.getElementById(baseFieldName + '_state');
-              const zipField = document.getElementById(baseFieldName + '_zip');
-              const stateShortField = document.getElementById(baseFieldName + '_state_short');
-
-              const street = streetField ? streetField.value.trim() : '';
-              const city = cityField ? cityField.value.trim() : '';
-              const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
-              const zip = zipField ? zipField.value.trim() : '';
-
-              const addressParts = [street, city, state, zip].filter(part => part !== '');
-              const fullAddress = addressParts.join(', ');
-
-              addressField.value = fullAddress;
-
-            };
-
-            field.addEventListener('input', updateAddress);
-            field.addEventListener('change', updateAddress);
-          } else {
-
-          }
-        });
-
-        // Initial update
-        setTimeout(() => {
-          const streetField = document.getElementById(baseFieldName + '_street');
-          const cityField = document.getElementById(baseFieldName + '_city');
-          const stateField = document.getElementById(baseFieldName + '_state');
-          const zipField = document.getElementById(baseFieldName + '_zip');
-          const stateShortField = document.getElementById(baseFieldName + '_state_short');
-
-          const street = streetField ? streetField.value.trim() : '';
-          const city = cityField ? cityField.value.trim() : '';
-          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
-          const zip = zipField ? zipField.value.trim() : '';
-
-          const addressParts = [street, city, state, zip].filter(part => part !== '');
-          const fullAddress = addressParts.join(', ');
-
-          addressField.value = fullAddress;
-
-        }, 1000);
-      }
-    });
-  });
-
-  // Set up linked checkbox listeners after DOM loads
-  document.addEventListener('DOMContentLoaded', function() {
-
-    const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
-
-    if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
-
-      return;
-    }
-
-    // Function to update a linked checkbox based on its source checkboxes
-    function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
-
-      const linkedCheckbox = document.getElementById(linkedCheckboxId);
-      if (!linkedCheckbox) {
-
-        return;
-      }
-
-      // Check if ANY of the source checkboxes are checked (OR logic)
-      let anyChecked = false;
-      checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
-        if (sourceCheckbox) {
-
-          if (sourceCheckbox.checked) {
-          anyChecked = true;
-          }
-        } else {
-
-        }
-      });
-
-      // Update the linked checkbox state
-      linkedCheckbox.checked = anyChecked;
-
-    }
-
-    // Set up listeners for each linked checkbox group
-    linkedCheckboxesArray.forEach((linkedCheckboxGroup, groupIndex) => {
-
-      const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
-      const checkboxIds = linkedCheckboxGroup.checkboxes || [];
-
-      if (!linkedCheckboxId || checkboxIds.length === 0) {
-
-        return;
-      }
-
-      // Set up event listeners on each source checkbox
-      checkboxIds.forEach(checkboxId => {
-
-        const sourceCheckbox = document.getElementById(checkboxId);
-        if (sourceCheckbox) {
-
-          // Add change event listener to update linked checkbox
-          sourceCheckbox.addEventListener('change', function() {
-
-            updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
-          });
-
-          // Also listen for click events (some checkboxes might trigger on click)
-          sourceCheckbox.addEventListener('click', function() {
-
-            // Use setTimeout to ensure checked state is updated
-            setTimeout(() => {
-              updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
-            }, 0);
-          });
-        } else {
-
-        }
-      });
-
-      // Initial update to set correct state
-      setTimeout(() => {
-        updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
-      }, 500);
-    });
-
-    // Global function to update all linked checkboxes (called after autofill)
-    window.updateAllLinkedCheckboxes = function() {
-
-      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
-      if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
-
-        return;
-      }
-
-      linkedCheckboxesArray.forEach((linkedCheckboxGroup, index) => {
-        const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
-        const checkboxIds = linkedCheckboxGroup.checkboxes || [];
-
-        if (!linkedCheckboxId || checkboxIds.length === 0) {
-
-          return;
-        }
-
-        const linkedCheckbox = document.getElementById(linkedCheckboxId);
-        if (!linkedCheckbox) {
-
-          return;
-        }
-
-        let anyChecked = false;
-        checkboxIds.forEach(checkboxId => {
-          const sourceCheckbox = document.getElementById(checkboxId);
-          if (sourceCheckbox) {
-
-            if (sourceCheckbox.checked) {
-            anyChecked = true;
-            }
-          } else {
-
-            // Debug: Search for similar checkbox IDs to see if there's a format mismatch
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-            const matchingCheckboxes = Array.from(allCheckboxes).filter(cb => 
-              cb.id && (cb.id.includes(checkboxId) || checkboxId.includes(cb.id))
-            );
-            if (matchingCheckboxes.length > 0) {
-
-            } else {
-
-              const partialMatches = Array.from(allCheckboxes).filter(cb => 
-                cb.id && cb.id.includes(checkboxId.split('_').slice(-2).join('_'))
-              );
-              if (partialMatches.length > 0) {
-
-              }
-            }
-          }
-        });
-
-        linkedCheckbox.checked = anyChecked;
-
-      });
-    };
-  });
-  </script>`;
 
   // Add helper functions for trigger checkbox radio button behavior before returning
   formHTML += `
@@ -13769,6 +13629,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>`;
+
+  // Close out the HTML document
+  formHTML += `
+</body>
+</html>
+`;
 
   // Finally, return the assembled HTML
 
