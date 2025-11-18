@@ -100,13 +100,14 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+    const styleAttr = ' style="text-align: center;"';
 
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + valueAttr + '>' +
+           'class="address-input"' + styleAttr + valueAttr + '>' +
            '</div>';
 }
 
@@ -3796,6 +3797,22 @@ if (s > 1){
           if (!container) return false;
           const elements = Array.from(container.querySelectorAll('select, textarea, input'));
           const eligibleElements = elements.filter(isElementEligible);
+          const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
+          const questionTextEl = container.querySelector('.question-text');
+          const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+          const debugElements = eligibleElements.map(el => ({
+            id: el.id || null,
+            tag: el.tagName,
+            type: (el.type || '').toLowerCase(),
+            value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
+            display: el.style && el.style.display ? el.style.display : null
+          }));
+          console.log('🛰️ [QUESTION ANSWER DEBUG] Evaluating question state', {
+            questionId,
+            questionText,
+            eligibleCount: eligibleElements.length,
+            elements: debugElements
+          });
           if (!eligibleElements.length) return true;
 
           let allStandardSatisfied = true;
@@ -3828,6 +3845,15 @@ if (s > 1){
           const checkboxesSatisfied = !hasCheckbox || checkboxAnyChecked;
 
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
+
+          console.log('🛰️ [QUESTION ANSWER DEBUG] Result', {
+            questionId,
+            questionText,
+            answered,
+            allStandardSatisfied,
+            radiosSatisfied,
+            checkboxesSatisfied
+          });
 
           return answered;
         }
@@ -3885,11 +3911,22 @@ if (s > 1){
 
         function attachSubmitModeListeners(container, containerIdx) {
           if (!container || container.dataset.submitModeListenersAttached === 'true') return;
-          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          const interactiveElements = container.querySelectorAll('select, textarea, input[type="radio"], input[type="checkbox"], input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"]');
+
+          const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
+          const questionTextEl = container.querySelector('.question-text');
+          const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
 
           interactiveElements.forEach(el => {
-            el.addEventListener('change', function() {
-
+            const eventType = (el.tagName === 'SELECT' || el.type === 'radio' || el.type === 'checkbox') ? 'change' : 'input';
+            el.addEventListener(eventType, function(event) {
+              console.log('🛰️ [NAV DEBUG] Input detected for question', {
+                questionId,
+                questionText,
+                elementId: el.id || null,
+                elementType: el.type || el.tagName,
+                eventType
+              });
               refreshNav(containerIdx);
             });
           });
@@ -3900,6 +3937,20 @@ if (s > 1){
         function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
           const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
           const isAnswered = submitConfig && submitConfig.isAnswered;
+          const currentQuestionId = submitConfig && submitConfig.questionId;
+          const currentQuestionText = submitConfig && submitConfig.questionText;
+
+          console.log('🛰️ [NAV DEBUG] updateButtons invoked', {
+            questionId: currentQuestionId,
+            questionText: currentQuestionText,
+            shouldSubmit,
+            isAnswered,
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            nextSectionInfo,
+            prevSectionInfo
+          });
 
           if (prevBtn) {
             const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
@@ -3927,11 +3978,24 @@ if (s > 1){
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
               nextBtn.classList.add('submit-mode');
+              console.log('🛰️ [NAV DEBUG] Submit mode next button state', {
+                questionId: currentQuestionId,
+                questionText: currentQuestionText,
+                isAnswered,
+                disabled: nextBtn.disabled
+              });
 
             } else {
               nextBtn.classList.remove('submit-mode');
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection);
               nextBtn.disabled = !canAdvance;
+              console.log('🛰️ [NAV DEBUG] Next button state', {
+                questionId: currentQuestionId,
+                questionText: currentQuestionText,
+                canAdvance,
+                disabled: nextBtn.disabled,
+                advanceMode: nextBtn.dataset.advanceMode || ''
+              });
               if (!canAdvance) {
                 nextBtn.dataset.advanceMode = '';
                 delete nextBtn.dataset.nextSectionNumber;
@@ -4003,9 +4067,20 @@ if (s > 1){
           }
 
           const activeContainer = questionItems[targetIdx];
+          const activeQuestionId = activeContainer ? (activeContainer.getAttribute('data-question-id') || activeContainer.id || 'unknown') : 'unknown';
+          const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
+          const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
           attachSubmitModeListeners(activeContainer, targetIdx);
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
+          console.log('🛰️ [NAV DEBUG] activateIndex', {
+            targetIdx,
+            activeQuestionId,
+            activeQuestionText,
+            shouldSubmit,
+            isAnswered,
+            visibleCount: visibleIndices.length
+          });
 
           const hasPrevQuestion = currentPos > 0;
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
@@ -4019,7 +4094,7 @@ if (s > 1){
             canAdvanceAcrossSection,
             cachedNextSectionInfo,
             cachedPrevSectionInfo,
-            { shouldSubmit, isAnswered }
+            { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText }
           );
           activeIndex = targetIdx;
           isUpdating = false;
