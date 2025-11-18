@@ -2,15 +2,120 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Section 1",
+      "sectionName": "Introduction",
       "questions": [
         {
           "questionId": 1,
-          "text": "Example",
-          "type": "multipleTextboxes",
+          "text": "Please explain why you are suing at this location",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Where the plaintiff’s property was damaged."
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "options": [
+            {
+              "label": "Where the plaintiff’s property was damaged.",
+              "nameId": "please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Where the defendant lives",
+              "nameId": "please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Where the plaintiff was injured.",
+              "nameId": "please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured.",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Where a contract was made, signed, performed, or broken by the defendant",
+              "nameId": "please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made,_signed,_performed,_or_broken_by_the_defendant",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "Other",
+              "nameId": "please_explain_why_you_are_suing_at_this_location_other",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "markOnlyOne": false
+        },
+        {
+          "questionId": 2,
+          "text": "Please explain why you're filing at this courthouse?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Other"
+              }
+            ]
           },
           "jump": {
             "enabled": false,
@@ -61,67 +166,97 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "example",
-          "allFieldsInOrder": [
-            {
-              "type": "amount",
-              "label": "Name",
-              "nodeId": "example_name",
-              "order": 1
-            },
-            {
-              "type": "dropdown",
-              "fieldName": "Dropdown1",
-              "options": [
-                {
-                  "text": "Yes",
-                  "nodeId": "dropdown1_yes"
-                },
-                {
-                  "text": "No",
-                  "nodeId": "dropdown1_no"
-                }
-              ],
-              "triggerSequences": [
-                {
-                  "condition": "Yes",
-                  "fields": [
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Dropdown2",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Dropdown3",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ],
-                      "conditionalLogic": {
-                        "enabled": true,
-                        "conditions": [
-                          "dropdown2_yes"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ],
-              "order": 2
-            }
-          ]
+          "nameId": "please_explain_why_youre_filing_at_this_courthouse",
+          "placeholder": ""
+        },
+        {
+          "questionId": 3,
+          "text": "Is your claim about an agreement or contract for personal, family, or household goods, services, or loans?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Where the plaintiff’s property was damaged."
+              },
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Where the defendant lives"
+              },
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Where the plaintiff was injured."
+              },
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Where a contract was made, signed, performed, or broken by the defendant"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
         }
       ]
     }
@@ -129,7 +264,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 2,
+  "questionCounter": 4,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",

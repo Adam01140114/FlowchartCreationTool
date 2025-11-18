@@ -250,94 +250,94 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Example</h3></label><div id="labelContainer1"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="number" id="example_name" name="example_name" placeholder="Name" class="address-input"></div><br><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(33, 150, 243); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(227, 242, 253) 100%); box-shadow: rgba(33, 150, 243, 0.15) 0px 2px 8px;"><script>
-                  function handleMultipleTextboxesDropdown_1_2(select) {
-                    try {
-                      const fieldData = JSON.parse(select.getAttribute('data-field-data') || '{}');
-                      const questionId = parseInt(select.getAttribute('data-question-id') || '0');
-                      const j = parseInt(select.getAttribute('data-entry-number') || '1');
-                      const selectedValue = (select.value || '').trim().toLowerCase();
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." value="Where the plaintiff’s property was damaged." 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where the plaintiff’s property was damaged.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where the defendant lives
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." value="Where the plaintiff was injured." 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where the plaintiff was injured.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made,_signed,_performed,_or_broken_by_the_defendant">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made,_signed,_performed,_or_broken_by_the_defendant" name="please_explain_why_you_are_suing_at_this_location_where_a_contract_was_made,_signed,_performed,_or_broken_by_the_defendant" value="Where a contract was made, signed, performed, or broken by the defendant" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Where a contract was made, signed, performed, or broken by the defendant
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Other
+        </label>
+      </span></div><br></div></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Please explain why you're filing at this courthouse?</h3></label>
+            <div class="text-input-container">
+              <textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('please_explain_why_youre_filing_at_this_courthouse', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
 
-                      // Handle trigger sequences
-                      if (fieldData.triggerSequences && fieldData.triggerSequences.length > 0) {
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
 
-                        fieldData.triggerSequences.forEach(function(sequence, sequenceIndex) {
-                          const conditionValue = (sequence.condition || '').trim().toLowerCase();
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
 
-                          if (conditionValue === selectedValue) {
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
 
-                            const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
-                            if (triggerFieldsContainer) {
-
-                              triggerFieldsContainer.style.display = 'block';
-                            } else {
-
-                              const triggerTitle = sequence.title || 'Additional Information';
-                              const parentDropdownBaseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
-
-                              if (sequence.fields) {
-                                sequence.fields.forEach(function(f, idx) {
-
-                                });
-                              }
-                              if (typeof createTriggerFieldsContainer === 'function') {
-                                const dropdownFieldDiv = select.closest('div[style*="border: 2px solid #2196F3"]') || select.parentElement;
-                                if (dropdownFieldDiv) {
-
-                                  createTriggerFieldsContainer(questionId, j, sequenceIndex, sequence.fields, dropdownFieldDiv, fieldData.fieldName, triggerTitle, parentDropdownBaseNodeId, conditionValue, true);
-
-                                } else {
-
-                                }
-                              } else {
-
-                              }
-                            }
-                          } else {
-
-                            const triggerFieldsContainer = document.getElementById('triggerFields_' + questionId + '_' + j + '_' + sequenceIndex);
-                            if (triggerFieldsContainer) {
-                              triggerFieldsContainer.style.display = 'none';
-                            }
-                          }
-                        });
-                      } else {
-
-                      }
-
-                      // Call dropdownMirror to create hidden checkboxes
-                      if (typeof dropdownMirror === 'function') {
-                        dropdownMirror(select, select.id);
-                      }
-                      // Update hidden logic if needed
-                      if (typeof updateHiddenLogic === 'function') {
-                        updateHiddenLogic(select.id, select.value);
-                      }
-                    } catch (e) {
-
-                    }
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
                   }
 
-                  // Check on load
-                  setTimeout(function() {
-                    const select = document.getElementById('dropdown1');
-                    if (select && select.value) {
-                      handleMultipleTextboxesDropdown_1_2(select);
-                    }
-                  }, 100);
-                  setTimeout(function() {
-                    const select = document.getElementById('dropdown1');
-                    if (select && select.value) {
-                      handleMultipleTextboxesDropdown_1_2(select);
-                    }
-                  }, 500);
-                  setTimeout(function() {
-                    const select = document.getElementById('dropdown1');
-                    if (select && select.value) {
-                      handleMultipleTextboxesDropdown_1_2(select);
-                    }
-                  }, 1000);
-                </script><h4 style="margin: 0px 0px 15px; color: rgb(25, 118, 210); font-size: 18px; font-weight: 600; text-align: center;">Dropdown1</h4><select id="dropdown1" name="dropdown1" data-field-data="{&quot;questionId&quot;:&quot;1&quot;,&quot;fieldName&quot;:&quot;Dropdown1&quot;,&quot;triggerSequences&quot;:[{&quot;condition&quot;:&quot;Yes&quot;,&quot;title&quot;:&quot;Additional Information&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Dropdown2&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Dropdown3&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}],&quot;conditionalLogic&quot;:{&quot;enabled&quot;:true,&quot;conditions&quot;:[&quot;dropdown2_yes&quot;]}}]}],&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;,&quot;nodeId&quot;:&quot;dropdown1_yes&quot;},{&quot;text&quot;:&quot;No&quot;,&quot;nodeId&quot;:&quot;dropdown1_no&quot;}]}" data-question-id="1" data-entry-number="1" onchange="handleMultipleTextboxesDropdown_1_2(this)" style="width: 100%; padding: 12px; border: 1px solid rgb(33, 150, 243); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); cursor: pointer; transition: 0.2s;"><option value="" disabled="">Select an option...</option><option value="Yes" data-node-id="dropdown1_yes">Yes</option><option value="No" data-node-id="dropdown1_no">No</option></select><div id="dropdowntext_dropdown1" style="display: none;"><input type="text" id="dropdown1_dropdown" name="dropdown1_dropdown" style="display: none;"></div></div></div><br></div>
+                  hiddenInput.value = lineText;
+                }
+
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Is your claim about an agreement or contract for personal, family, or household goods, services, or loans?</h3></label><select id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"
+                      onchange="dropdownMirror(this, 'is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans'); updateHiddenLogic('is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handlePdfPreview3(this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"></div>
+              <input type="text" id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown"
+                   readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
@@ -999,10 +999,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"example"};
-var questionNameIds = {"1":"example"};
+var questionSlugMap = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"};
+var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_youre_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"};
 var linkedCheckboxes = [];
-var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_name","order":1},{"type":"dropdown","fieldName":"Dropdown1","options":[{"text":"Yes","nodeId":"dropdown1_yes"},{"text":"No","nodeId":"dropdown1_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"dropdown","fieldName":"Dropdown2","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Dropdown3","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["dropdown2_yes"]}}]}],"order":2}]};
+var unifiedFieldsMap = {};
 
   function createTriggerFieldsContainer(questionId, entryNumber, sequenceIndex, fields, parentContainer, dropdownFieldName, triggerTitleText, parentDropdownNodeId, triggerCondition, isMultipleTextboxes) {
     // Default parameters for backward compatibility
@@ -1030,24 +1030,8 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
     const sanitizedDropdownName = sanitizeForId(dropdownFieldName);
     const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
 
-    console.log('🔍 [CREATE TRIGGER FIELDS] Creating trigger fields container:', {
-      questionId: questionId,
-      entryNumber: entryNumber,
-      sequenceIndex: sequenceIndex,
-      fields: fields,
-      fieldsLength: fields.length,
-      isMultipleTextboxes: isMultipleTextboxes
-    });
-
     fields.forEach((triggerField, fieldIndex) => {
-      console.log('🔍 [CREATE TRIGGER FIELDS] Processing trigger field:', {
-        fieldIndex: fieldIndex,
-        fieldType: triggerField.type,
-        fieldName: triggerField.fieldName || triggerField.label,
-        hasConditionalLogic: !!triggerField.conditionalLogic,
-        conditionalLogic: triggerField.conditionalLogic,
-        fullField: triggerField
-      });
+
       if (triggerField.type === 'label') {
         const fieldDiv = document.createElement('div');
 
@@ -1504,23 +1488,9 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
       } else if (triggerField.type === 'dropdown') {
         const dropdownFieldDiv = document.createElement('div');
 
-        console.log('🔍 [DROPDOWN FIELD CREATION] Creating dropdown field:', {
-          fieldName: triggerField.fieldName,
-          hasConditionalLogicProperty: !!triggerField.conditionalLogic,
-          conditionalLogic: triggerField.conditionalLogic,
-          triggerField: triggerField
-        });
-
         // Check if conditional logic is enabled
         const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
         const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
-        
-        console.log('🔍 [DROPDOWN FIELD CREATION] Conditional logic check:', {
-          fieldName: triggerField.fieldName,
-          hasConditionalLogic: hasConditionalLogic,
-          conditionalConditions: conditionalConditions,
-          conditionalConditionsLength: conditionalConditions.length
-        });
 
         // Initially hide if conditional logic is enabled
         if (hasConditionalLogic) {
@@ -1595,19 +1565,10 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
 
         // Add change event listener to call dropdownMirror
         select.addEventListener('change', function() {
-          console.log('🔍 [DROPDOWN CHANGE] Dropdown changed:', {
-            selectId: this.id,
-            selectValue: this.value,
-            entryNumber: entryNumber,
-            questionId: questionId,
-            isMultipleTextboxes: isMultipleTextboxes,
-            sanitizedDropdownName: sanitizedDropdownName,
-            sanitizedTriggerCondition: sanitizedTriggerCondition
-          });
 
           if (typeof dropdownMirror === 'function') {
             dropdownMirror(this, this.id);
-            console.log('🔍 [DROPDOWN CHANGE] Called dropdownMirror for:', this.id);
+
           }
           // Also update hidden logic if needed
           if (typeof updateHiddenLogic === 'function') {
@@ -1627,7 +1588,7 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
                 selectValue: this.value
               }
             });
-            console.log('🔍 [DROPDOWN CHANGE] Dispatching triggerDropdownChanged event:', recheckEvent.detail);
+
             window.dispatchEvent(recheckEvent);
           }, 100);
         });
@@ -1638,33 +1599,13 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
 
         // Add conditional logic if enabled
         if (hasConditionalLogic && conditionalConditions.length > 0) {
-          console.log('🔍 [CONDITIONAL LOGIC SETUP] Setting up conditional logic for dropdown:', {
-            fieldName: triggerField.fieldName,
-            hasConditionalLogic: hasConditionalLogic,
-            conditionalConditions: conditionalConditions,
-            questionId: questionId,
-            entryNumber: entryNumber,
-            isMultipleTextboxes: isMultipleTextboxes,
-            sanitizedDropdownName: sanitizedDropdownName,
-            sanitizedTriggerCondition: sanitizedTriggerCondition
-          });
-          
+
           // CRITICAL: Ensure field is hidden immediately after appending
           dropdownFieldDiv.style.display = 'none';
 
           // Function to check if any condition is met
           const checkConditionalLogic = () => {
             let anyMatch = false;
-
-            console.log('🔍 [CONDITIONAL LOGIC CHECK] Starting check for Dropdown3:', {
-              questionId: questionId,
-              entryNumber: entryNumber,
-              isMultipleTextboxes: isMultipleTextboxes,
-              sanitizedDropdownName: sanitizedDropdownName,
-              sanitizedTriggerCondition: sanitizedTriggerCondition,
-              conditionalConditions: conditionalConditions,
-              parentDropdownNodeId: parentDropdownNodeId
-            });
 
             // Use the parent dropdown's nodeId (same as the select.id base)
             const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
@@ -1674,7 +1615,7 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
 
               let checkboxId;
               let radioId;
-              
+
               // For multipleTextboxes trigger dropdowns, checkbox IDs use format: {dropdownName}_{triggerCondition}_{fieldName}_{option}
               // The condition might be just "{fieldName}_{option}" (e.g., "dropdown2_yes")
               // So we need to construct: {sanitizedDropdownName}_{sanitizedTriggerCondition}_{conditionNodeId}
@@ -1682,22 +1623,14 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
                 // For multipleTextboxes, the checkbox ID is: {dropdownName}_{triggerCondition}_{conditionNodeId}
                 checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + conditionNodeId;
                 radioId = checkboxId + '_radio';
-                console.log('🔍 [CONDITIONAL LOGIC CHECK] MultipleTextboxes format:', {
-                  conditionNodeId: conditionNodeId,
-                  constructedCheckboxId: checkboxId,
-                  constructedRadioId: radioId
-                });
+
               } else {
                 // For numberedDropdown, use the standard format
                 const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
                 const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
                 checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
                 radioId = conditionNodeId + "_" + entryNumber + "_radio";
-                console.log('🔍 [CONDITIONAL LOGIC CHECK] NumberedDropdown format:', {
-                  conditionNodeId: conditionNodeId,
-                  constructedCheckboxId: checkboxId,
-                  constructedRadioId: radioId
-                });
+
               }
 
               // First try to find a radio button (for "Mark only one")
@@ -1721,73 +1654,45 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
 
               // Try to find a regular checkbox or hidden checkbox
               let checkbox = document.getElementById(checkboxId);
-              
-              console.log('🔍 [CONDITIONAL LOGIC CHECK] Looking for checkbox:', {
-                checkboxId: checkboxId,
-                found: !!checkbox,
-                checkboxType: checkbox ? checkbox.type : 'NOT FOUND',
-                checkboxChecked: checkbox ? checkbox.checked : 'N/A'
-              });
 
               // For numberedDropdown, also try simple pattern as fallback
               if (!checkbox && !isMultipleTextboxes) {
                 const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
                 checkbox = document.getElementById(simpleCheckboxId);
-                console.log('🔍 [CONDITIONAL LOGIC CHECK] Trying simple pattern:', {
-                  simpleCheckboxId: simpleCheckboxId,
-                  found: !!checkbox
-                });
+
               }
 
               if (checkbox && checkbox.type === 'checkbox') {
-                console.log('🔍 [CONDITIONAL LOGIC CHECK] Found checkbox, checking state:', {
-                  checkboxId: checkbox.id,
-                  checked: checkbox.checked,
-                  display: checkbox.style.display
-                });
-                
+
                 if (checkbox.checked === true) {
                   // Double-check: if this is a hidden checkbox for a radio, verify the radio is checked
                   const correspondingRadio = document.getElementById(radioId);
                   if (correspondingRadio) {
-                    console.log('🔍 [CONDITIONAL LOGIC CHECK] Found corresponding radio:', {
-                      radioId: radioId,
-                      radioChecked: correspondingRadio.checked
-                    });
+
                     if (correspondingRadio.checked === true) {
                       anyMatch = true;
-                      console.log('🔍 [CONDITIONAL LOGIC CHECK] ✅ MATCH FOUND (radio checked)');
+
                       return;
                     }
                   } else {
                     // This is a regular checkbox or hidden checkbox from dropdown
                     anyMatch = true;
-                    console.log('🔍 [CONDITIONAL LOGIC CHECK] ✅ MATCH FOUND (checkbox checked, no radio)');
+
                     return;
                   }
                 } else {
-                  console.log('🔍 [CONDITIONAL LOGIC CHECK] ❌ Checkbox found but not checked');
+
                 }
               } else {
-                console.log('🔍 [CONDITIONAL LOGIC CHECK] ❌ Checkbox not found or wrong type');
-                
+
                 // Debug: List all checkboxes in the document to see what exists
                 const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-                console.log('🔍 [CONDITIONAL LOGIC CHECK] All checkboxes in document:', Array.from(allCheckboxes).map(cb => ({
-                  id: cb.id,
-                  checked: cb.checked,
-                  display: cb.style.display
-                })).filter(cb => cb.id.includes('dropdown') || cb.id.includes('yes')));
+
               }
             });
 
             // Show or hide the dropdown field based on match
-            console.log('🔍 [CONDITIONAL LOGIC CHECK] Final result:', {
-              anyMatch: anyMatch,
-              willShow: anyMatch,
-              dropdownFieldDivId: dropdownFieldDiv.id
-            });
-            
+
             if (anyMatch) {
               dropdownFieldDiv.style.display = 'block';
             } else {
@@ -1811,14 +1716,7 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
 
           // Listen for trigger dropdown changes to re-evaluate conditional logic
           const triggerDropdownHandler = function(event) {
-            console.log('🔍 [CONDITIONAL LOGIC EVENT] triggerDropdownChanged event received for:', triggerField.fieldName, {
-              eventDetail: event.detail,
-              entryNumber: entryNumber,
-              questionId: questionId,
-              isMultipleTextboxes: isMultipleTextboxes,
-              conditionalConditions: conditionalConditions
-            });
-            
+
             const eventEntryNumber = event.detail && event.detail.entryNumber;
             const eventQuestionId = event.detail && event.detail.questionId;
             const eventCheckboxId = event.detail && event.detail.checkboxId;
@@ -1831,12 +1729,12 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
             if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && 
                 eventQuestionId != null && String(eventQuestionId) === String(questionId)) {
               shouldRecheck = true;
-              console.log('🔍 [CONDITIONAL LOGIC EVENT] Should recheck: same entry and question');
+
             } else if (eventEntryNumber != null && String(eventEntryNumber) === String(entryNumber) && eventCheckboxId) {
               // Check if the created/removed checkbox matches any of our conditions
               conditionalConditions.forEach((conditionNodeId) => {
                 if (!conditionNodeId) return;
-                
+
                 let expectedCheckboxId;
                 if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
                   // For multipleTextboxes, checkbox ID is: {dropdownName}_{triggerCondition}_{conditionNodeId}
@@ -1846,37 +1744,25 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
                   const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
                   expectedCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
                 }
-                
-                console.log('🔍 [CONDITIONAL LOGIC EVENT] Comparing checkbox IDs:', {
-                  eventCheckboxId: eventCheckboxId,
-                  expectedCheckboxId: expectedCheckboxId,
-                  matches: eventCheckboxId === expectedCheckboxId
-                });
-                
+
                 if (eventCheckboxId === expectedCheckboxId) {
                   shouldRecheck = true;
-                  console.log('🔍 [CONDITIONAL LOGIC EVENT] Should recheck: checkbox ID matches condition');
+
                 }
               });
             }
 
             if (shouldRecheck) {
-              console.log('🔍 [CONDITIONAL LOGIC EVENT] Rechecking conditional logic...');
+
               // Use a delay to ensure dropdownMirror has finished creating/removing checkboxes
               setTimeout(() => {
                 checkConditionalLogic();
               }, 150);
             } else {
-              console.log('🔍 [CONDITIONAL LOGIC EVENT] Not rechecking (conditions not met)');
+
             }
           };
           window.addEventListener('triggerDropdownChanged', triggerDropdownHandler);
-          console.log('🔍 [CONDITIONAL LOGIC SETUP] Event listener attached for dropdown:', triggerField.fieldName, {
-            questionId: questionId,
-            entryNumber: entryNumber,
-            conditionalConditions: conditionalConditions,
-            selectId: select.id
-          });
 
           // Set up listeners for each condition checkbox/radio
           conditionalConditions.forEach((conditionNodeId) => {
@@ -1884,7 +1770,7 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
 
             let checkboxId;
             let radioId;
-            
+
             // For multipleTextboxes trigger dropdowns, checkbox IDs use format: {dropdownName}_{triggerCondition}_{fieldName}_{option}
             if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
               checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + conditionNodeId;
@@ -1930,16 +1816,16 @@ var unifiedFieldsMap = {"1":[{"type":"amount","label":"Name","nodeId":"example_n
             // Start trying to attach listener
             attachListener();
           });
-          
+
           // Initial check after a delay to ensure all checkboxes are created
           setTimeout(() => {
-            console.log('🔍 [CONDITIONAL LOGIC INIT] Running initial check for Dropdown3');
+
             checkConditionalLogic();
           }, 500);
-          
+
           // Also check after a longer delay for autofilled dropdowns
           setTimeout(() => {
-            console.log('🔍 [CONDITIONAL LOGIC INIT] Running delayed check for Dropdown3');
+
             checkConditionalLogic();
           }, 2000);
         }
@@ -2744,6 +2630,181 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="other";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff’s property was damaged.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the defendant lives";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff was injured.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where a contract was made, signed, performed, or broken by the defendant";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("3");
+     } else {
+       
+     }
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*

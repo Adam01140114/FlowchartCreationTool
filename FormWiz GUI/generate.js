@@ -1161,9 +1161,27 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           formHTML += `<br><img src="${imageUrl}" alt="Dropdown Image" width="${imageWidth}" height="${imageHeight}"><br>`;
         }
 
+        // Handle PDF Preview - check before generating select
+        const pdfPreviewEnabledEl = qBlock.querySelector(`#enablePdfPreview${questionId}`);
+        const pdfPreviewEnabled = pdfPreviewEnabledEl && pdfPreviewEnabledEl.checked;
+        
+        let pdfPreviewHandlerCall = '';
+        if (pdfPreviewEnabled) {
+          const pdfPreviewTriggerEl = qBlock.querySelector(`#pdfPreviewTrigger${questionId}`);
+          const pdfPreviewFileEl = qBlock.querySelector(`#pdfPreviewFile${questionId}`);
+          
+          const pdfPreviewTrigger = pdfPreviewTriggerEl ? pdfPreviewTriggerEl.value : "";
+          const pdfPreviewFile = pdfPreviewFileEl ? pdfPreviewFileEl.value : "";
+          
+          // Only include handler call if both trigger and file are set (function will be generated)
+          if (pdfPreviewTrigger && pdfPreviewFile) {
+            pdfPreviewHandlerCall = ` handlePdfPreview${questionId}(this.value)`;
+          }
+        }
+
         // 2) The <select> itself
         formHTML += `<select id="${ddNm}" name="${ddNm}"
-                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handlePdfPreview${questionId}(this.value)">
+                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -1180,9 +1198,6 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                    readonly style="display:none;">`;
 
         // Handle PDF Preview
-        const pdfPreviewEnabledEl = qBlock.querySelector(`#enablePdfPreview${questionId}`);
-        const pdfPreviewEnabled = pdfPreviewEnabledEl && pdfPreviewEnabledEl.checked;
-
         if (pdfPreviewEnabled) {
           const pdfPreviewTriggerEl = qBlock.querySelector(`#pdfPreviewTrigger${questionId}`);
           const pdfPreviewTitleEl = qBlock.querySelector(`#pdfPreviewTitle${questionId}`);
