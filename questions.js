@@ -4705,7 +4705,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               const locationContainer = document.createElement('div');
               locationContainer.draggable = true;
               locationContainer.dataset.type = 'location';
-              locationContainer.dataset.triggerIndex = triggerIndex;
+              locationContainer.dataset.triggerIndex = triggerIndex >= 0 ? triggerIndex : 0;
               locationContainer.style.cssText = `
                 margin: 8px 0;
                 padding: 8px;
@@ -4866,6 +4866,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addPdfBtn.onclick = () => {
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
+          }
+          
           // Create new PDF entry
           const newPdf = {
             triggerNumber: '',
@@ -4876,6 +4881,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           if (!triggerSequence.pdfs) triggerSequence.pdfs = [];
           triggerSequence.pdfs.push(newPdf);
           
+          // Calculate triggerIndex by finding the index of this triggerSequence in the dropdown's triggerSequences array
+          const triggerIndex = dropdown.triggerSequences.findIndex(trigger => trigger.id === triggerSequence.id);
+          
           // Update the actions list for this trigger sequence
           const triggerDiv = addPdfBtn.closest('.trigger-sequence');
           if (triggerDiv) {
@@ -4885,7 +4893,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               const pdfContainer = document.createElement('div');
               pdfContainer.draggable = true;
               pdfContainer.dataset.type = 'pdf';
-              pdfContainer.dataset.triggerIndex = triggerIndex;
+              pdfContainer.dataset.triggerIndex = triggerIndex >= 0 ? triggerIndex : 0;
               pdfContainer.style.cssText = `
                 margin-bottom: 10px;
                 padding: 8px;
@@ -5063,6 +5071,11 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           font-size: 11px;
         `;
         addDropdownBtn.onclick = () => {
+          // Ensure dropdown.triggerSequences exists
+          if (!dropdown.triggerSequences) {
+            dropdown.triggerSequences = [];
+          }
+          
           // Create new dropdown entry
           const newDropdown = {
             fieldName: '',
@@ -5070,6 +5083,9 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           };
           if (!triggerSequence.dropdowns) triggerSequence.dropdowns = [];
           triggerSequence.dropdowns.push(newDropdown);
+          
+          // Calculate triggerIndex by finding the index of this triggerSequence in the dropdown's triggerSequences array
+          const triggerIndex = dropdown.triggerSequences.findIndex(trigger => trigger.id === triggerSequence.id);
           
           // Update the actions list for this trigger sequence
           const triggerDiv = addDropdownBtn.closest('.trigger-sequence');
@@ -5080,7 +5096,7 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               const dropdownContainer = document.createElement('div');
               dropdownContainer.draggable = true;
               dropdownContainer.dataset.type = 'dropdown';
-              dropdownContainer.dataset.triggerIndex = triggerIndex;
+              dropdownContainer.dataset.triggerIndex = triggerIndex >= 0 ? triggerIndex : 0;
               dropdownContainer.style.cssText = `
                 margin-bottom: 10px;
                 padding: 8px;
@@ -12042,7 +12058,7 @@ function createTextboxField(textbox, index, cell, parentContainer) {
   textboxContainer.dataset.index = index;
   textboxContainer.style.cssText = `
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
     padding: 10px;
     background: white;
@@ -12050,6 +12066,15 @@ function createTextboxField(textbox, index, cell, parentContainer) {
     border-radius: 6px;
     cursor: move;
     position: relative;
+  `;
+  
+  // Create top row for drag handle and main inputs
+  const topRow = document.createElement('div');
+  topRow.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
   `;
   
   // Drag handle
@@ -12061,9 +12086,8 @@ function createTextboxField(textbox, index, cell, parentContainer) {
     font-size: 14px;
     user-select: none;
     padding: 2px;
-    margin-right: 5px;
   `;
-  textboxContainer.appendChild(dragHandle);
+  topRow.appendChild(dragHandle);
   
   // Textbox name input
   const nameInput = document.createElement('input');
@@ -12164,11 +12188,60 @@ function createTextboxField(textbox, index, cell, parentContainer) {
     }
   };
   
-  textboxContainer.appendChild(nameInput);
-  textboxContainer.appendChild(placeholderInput);
-  textboxContainer.appendChild(amountLabel);
-  textboxContainer.appendChild(copyBtn);
-  textboxContainer.appendChild(deleteBtn);
+  // Add inputs to top row
+  topRow.appendChild(nameInput);
+  topRow.appendChild(placeholderInput);
+  topRow.appendChild(amountLabel);
+  topRow.appendChild(copyBtn);
+  topRow.appendChild(deleteBtn);
+  
+  // Create prefill row
+  const prefillRow = document.createElement('div');
+  prefillRow.style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+  `;
+  
+  const prefillLabel = document.createElement('label');
+  prefillLabel.textContent = 'Prefill:';
+  prefillLabel.style.cssText = `
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 500;
+    min-width: 100px;
+  `;
+  
+  const prefillInput = document.createElement('input');
+  prefillInput.type = 'text';
+  prefillInput.value = textbox.prefill || '';
+  prefillInput.placeholder = 'Enter prefill value (optional)';
+  prefillInput.style.cssText = `
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  `;
+  prefillInput.onblur = () => {
+    textbox.prefill = prefillInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+  
+  // Initialize prefill property if it doesn't exist
+  if (textbox.prefill === undefined) {
+    textbox.prefill = '';
+  }
+  
+  prefillRow.appendChild(prefillLabel);
+  prefillRow.appendChild(prefillInput);
+  
+  textboxContainer.appendChild(topRow);
+  textboxContainer.appendChild(prefillRow);
   
   // Add hover effect
   textboxContainer.addEventListener('mouseenter', () => {
@@ -12928,10 +13001,10 @@ window.addMultipleTextboxHandler = function(cellId) {
       // If there's a location indicator, add the new option after it
       if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
         // Location is at the end, just add normally
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' });
       } else {
         // Add the new option
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' });
         
         // If there's a location indicator before the end, shift it down
         if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {

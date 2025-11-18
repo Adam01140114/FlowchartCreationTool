@@ -64,11 +64,62 @@
           "nodeId": "example",
           "allFieldsInOrder": [
             {
-              "type": "label",
+              "type": "amount",
               "label": "Name",
               "nodeId": "example_name",
-              "order": 1,
-              "prefill": "test"
+              "order": 1
+            },
+            {
+              "type": "dropdown",
+              "fieldName": "Dropdown1",
+              "options": [
+                {
+                  "text": "Yes",
+                  "nodeId": "dropdown1_yes"
+                },
+                {
+                  "text": "No",
+                  "nodeId": "dropdown1_no"
+                }
+              ],
+              "triggerSequences": [
+                {
+                  "condition": "Yes",
+                  "fields": [
+                    {
+                      "type": "dropdown",
+                      "fieldName": "Dropdown2",
+                      "options": [
+                        {
+                          "text": "Yes"
+                        },
+                        {
+                          "text": "No"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "dropdown",
+                      "fieldName": "Dropdown3",
+                      "options": [
+                        {
+                          "text": "Yes"
+                        },
+                        {
+                          "text": "No"
+                        }
+                      ],
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": [
+                          "dropdown2_yes"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ],
+              "order": 2
             }
           ]
         }
