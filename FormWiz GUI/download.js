@@ -1565,12 +1565,12 @@ function loadFormData(formData) {
                                         field.options.forEach((option, optionIndex) => {
                                             console.log('🔧 [IMPORT DEBUG] Adding option', optionIndex + 1, ':', option);
                                             
-                                            if (typeof addDropdownFieldOption !== 'function') {
-                                                console.error('🔧 [IMPORT DEBUG] addDropdownFieldOption function not available!');
+                                        if (typeof addDropdownOption !== 'function') {
+                                            console.error('🔧 [IMPORT DEBUG] addDropdownOption function not available!');
                                                 return;
                                             }
                                             
-                                            addDropdownFieldOption(question.questionId, fieldOrder);
+                                        addDropdownOption(question.questionId, fieldOrder);
                                             
                                             // Set the option values
                                             const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
