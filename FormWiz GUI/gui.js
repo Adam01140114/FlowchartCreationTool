@@ -2737,6 +2737,13 @@ function addCheckboxField(questionId) {
                     <option value="single">Select only one</option>
                 </select>
             </div>
+            <div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Required?</div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <select id="checkboxRequired${questionId}_${fieldCount}" style="width: 80%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin: 0 auto; display: block;" onchange="updateCheckboxRequired(${questionId}, ${fieldCount})">
+                    <option value="required">Required</option>
+                    <option value="optional">Optional</option>
+                </select>
+            </div>
             <div style="text-align: center; margin-top: 10px;">
                 <button type="button" onclick="addCheckboxOption(${questionId}, ${fieldCount})" style="margin: 5px auto; padding: 6px 12px; border: none; border-radius: 6px; background-color: #9C27B0; color: white; cursor: pointer; font-size: 12px; display: block;">Add checkbox option</button>
             </div>
@@ -3026,6 +3033,13 @@ function updateCheckboxSelectionType(questionId, fieldCount) {
     const selectionTypeSelect = document.getElementById(`checkboxSelectionType${questionId}_${fieldCount}`);
     if (selectionTypeSelect) {
         console.log('🔧 [CHECKBOX SELECTION TYPE] Updated selection type:', selectionTypeSelect.value);
+    }
+}
+
+function updateCheckboxRequired(questionId, fieldCount) {
+    const requiredSelect = document.getElementById(`checkboxRequired${questionId}_${fieldCount}`);
+    if (requiredSelect) {
+        console.log('🔧 [CHECKBOX REQUIRED] Updated required flag:', requiredSelect.value);
     }
 }
 

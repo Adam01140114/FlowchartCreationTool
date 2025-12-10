@@ -4019,7 +4019,53 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   window.requestAutosave();
                 }
               };
-              
+
+              // Required type dropdown
+              const requiredTypeLabel = document.createElement('label');
+              requiredTypeLabel.textContent = 'Required Type:';
+              requiredTypeLabel.style.cssText = `
+                display: block;
+                font-size: 12px;
+                font-weight: bold;
+                margin-bottom: 4px;
+                color: #333;
+              `;
+
+              const requiredTypeSelect = document.createElement('select');
+              requiredTypeSelect.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+                background: white;
+              `;
+
+              const requiredOption = document.createElement('option');
+              requiredOption.value = 'required';
+              requiredOption.textContent = 'Required';
+
+              const optionalOption = document.createElement('option');
+              optionalOption.value = 'optional';
+              optionalOption.textContent = 'Optional';
+
+              requiredTypeSelect.appendChild(requiredOption);
+              requiredTypeSelect.appendChild(optionalOption);
+
+              // Initialize required type
+              if (!newCheckbox.required) {
+                newCheckbox.required = 'required';
+              }
+              requiredTypeSelect.value = newCheckbox.required;
+
+              requiredTypeSelect.onchange = () => {
+                newCheckbox.required = requiredTypeSelect.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+
               // Add checkbox option button
               const addCheckboxOptionBtn = document.createElement('button');
               addCheckboxOptionBtn.textContent = 'Add checkbox option';
@@ -4243,6 +4289,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               contentContainer.appendChild(fieldNameInput);
               contentContainer.appendChild(selectionTypeLabel);
               contentContainer.appendChild(selectionTypeSelect);
+              contentContainer.appendChild(requiredTypeLabel);
+              contentContainer.appendChild(requiredTypeSelect);
               contentContainer.appendChild(addCheckboxOptionBtn);
               contentContainer.appendChild(deleteCheckboxBtn);
               checkboxContainer.appendChild(contentContainer);
@@ -5953,6 +6001,52 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               window.requestAutosave();
             }
           };
+
+          // Required type dropdown
+          const requiredTypeLabel = document.createElement('label');
+          requiredTypeLabel.textContent = 'Required Type:';
+          requiredTypeLabel.style.cssText = `
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #333;
+          `;
+
+          const requiredTypeSelect = document.createElement('select');
+          requiredTypeSelect.style.cssText = `
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            background: white;
+          `;
+
+          const requiredOption = document.createElement('option');
+          requiredOption.value = 'required';
+          requiredOption.textContent = 'Required';
+
+          const optionalOption = document.createElement('option');
+          optionalOption.value = 'optional';
+          optionalOption.textContent = 'Optional';
+
+          requiredTypeSelect.appendChild(requiredOption);
+          requiredTypeSelect.appendChild(optionalOption);
+
+          // Initialize required type
+          if (!newCheckbox.required) {
+            newCheckbox.required = 'required';
+          }
+          requiredTypeSelect.value = newCheckbox.required;
+
+          requiredTypeSelect.onchange = () => {
+            newCheckbox.required = requiredTypeSelect.value;
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
           
           // Add checkbox option button
           const addCheckboxOptionBtn = document.createElement('button');
@@ -6076,6 +6170,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           contentContainer.appendChild(fieldNameInput);
           contentContainer.appendChild(selectionTypeLabel);
           contentContainer.appendChild(selectionTypeSelect);
+          contentContainer.appendChild(requiredTypeLabel);
+          contentContainer.appendChild(requiredTypeSelect);
           contentContainer.appendChild(addCheckboxOptionBtn);
           contentContainer.appendChild(deleteCheckboxBtn);
           checkboxContainer.appendChild(contentContainer);
@@ -7675,6 +7771,52 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             window.requestAutosave();
           }
         };
+
+        // Required type dropdown
+        const requiredTypeLabel = document.createElement('label');
+        requiredTypeLabel.textContent = 'Required Type:';
+        requiredTypeLabel.style.cssText = `
+          display: block;
+          font-size: 12px;
+          font-weight: bold;
+          margin-bottom: 4px;
+          color: #333;
+        `;
+
+        const requiredTypeSelect = document.createElement('select');
+        requiredTypeSelect.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+          background: white;
+        `;
+
+        const requiredOption = document.createElement('option');
+        requiredOption.value = 'required';
+        requiredOption.textContent = 'Required';
+
+        const optionalOption = document.createElement('option');
+        optionalOption.value = 'optional';
+        optionalOption.textContent = 'Optional';
+
+        requiredTypeSelect.appendChild(requiredOption);
+        requiredTypeSelect.appendChild(optionalOption);
+
+        // Initialize required type
+        if (!checkbox.required) {
+          checkbox.required = 'required';
+        }
+        requiredTypeSelect.value = checkbox.required;
+
+        requiredTypeSelect.onchange = () => {
+          checkbox.required = requiredTypeSelect.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
         
         // Add checkbox option button (should be after field name, before options)
         const addCheckboxOptionBtn = document.createElement('button');
@@ -7891,6 +8033,8 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         contentContainer.appendChild(fieldNameInput);
         contentContainer.appendChild(selectionTypeLabel);
         contentContainer.appendChild(selectionTypeSelect);
+        contentContainer.appendChild(requiredTypeLabel);
+        contentContainer.appendChild(requiredTypeSelect);
         contentContainer.appendChild(addCheckboxOptionBtn);
         
         // Add existing checkbox options BEFORE the delete button
@@ -11049,11 +11193,60 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
       window.requestAutosave();
     }
   };
-  
+
+  // Required type dropdown
+  const requiredTypeLabel = document.createElement('label');
+  requiredTypeLabel.textContent = 'Required Type:';
+  requiredTypeLabel.style.cssText = `
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    margin-top: 8px;
+    color: #333;
+  `;
+
+  const requiredTypeSelect = document.createElement('select');
+  requiredTypeSelect.style.cssText = `
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    background: white;
+  `;
+
+  const requiredOption = document.createElement('option');
+  requiredOption.value = 'required';
+  requiredOption.textContent = 'Required';
+
+  const optionalOption = document.createElement('option');
+  optionalOption.value = 'optional';
+  optionalOption.textContent = 'Optional';
+
+  requiredTypeSelect.appendChild(requiredOption);
+  requiredTypeSelect.appendChild(optionalOption);
+
+  // Initialize required type
+  if (!checkbox.required) {
+    checkbox.required = 'required';
+  }
+  requiredTypeSelect.value = checkbox.required;
+
+  requiredTypeSelect.onchange = () => {
+    checkbox.required = requiredTypeSelect.value;
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+  };
+
   // Assemble checkbox container
   checkboxContainer.appendChild(topRow);
   checkboxContainer.appendChild(selectionTypeLabel);
   checkboxContainer.appendChild(selectionTypeSelect);
+  checkboxContainer.appendChild(requiredTypeLabel);
+  checkboxContainer.appendChild(requiredTypeSelect);
   
   // Add existing mini checkbox options BEFORE the "Add checkbox option" button
   if (checkbox.options && checkbox.options.length > 0) {

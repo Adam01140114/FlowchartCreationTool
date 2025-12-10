@@ -392,6 +392,12 @@ function loadFormData(formData) {
                             checkboxOptionsDiv.appendChild(optionDiv);
                         });
                         
+                        // Restore required/optional select (defaults to required)
+                        const requiredSelect = questionBlock.querySelector(`[id^="checkboxRequired${question.questionId}_"]`);
+                        if (requiredSelect) {
+                            requiredSelect.value = (question.required === false) ? 'optional' : 'required';
+                        }
+
                         // Add the "None of the above" checkbox if it exists in the data
                         if (hasNoneOption) {
                             // Find the container for the "None of the above" option
@@ -622,6 +628,7 @@ function loadFormData(formData) {
                                         const fieldOrder = lastField.getAttribute('data-order');
                                         const fieldNameEl = lastField.querySelector('#checkboxFieldName' + question.questionId + '_' + fieldOrder);
                                         const selectionTypeEl = lastField.querySelector('#checkboxSelectionType' + question.questionId + '_' + fieldOrder);
+                                        const requiredEl = lastField.querySelector('#checkboxRequired' + question.questionId + '_' + fieldOrder);
                                         
                                         if (fieldNameEl && field.fieldName) {
                                             fieldNameEl.value = field.fieldName;
@@ -629,6 +636,10 @@ function loadFormData(formData) {
                                         
                                         if (selectionTypeEl && field.selectionType) {
                                             selectionTypeEl.value = field.selectionType;
+                                        }
+                                        
+                                        if (requiredEl && field.required) {
+                                            requiredEl.value = field.required;
                                         }
                                         
                                         // Add checkbox options
@@ -3134,6 +3145,10 @@ function exportForm() {
                     });
                 });
 
+                // Required/optional flag (defaults to required)
+                const requiredSelect = questionBlock.querySelector(`[id^="checkboxRequired${questionId}_"]`);
+                questionData.required = !(requiredSelect && requiredSelect.value === 'optional');
+
                 // Check if user included "None of the above"
                 const noneOfTheAboveCheckbox = questionBlock.querySelector(`#noneOfTheAbove${questionId}`);
                 if (noneOfTheAboveCheckbox && noneOfTheAboveCheckbox.checked) {
@@ -3249,6 +3264,7 @@ function exportForm() {
                         // Handle checkbox fields
                         const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
                         const selectionTypeEl = field.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+                        const requiredEl = field.querySelector('#checkboxRequired' + questionId + '_' + fieldOrder);
                         const optionsContainer = field.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
                         
                         if (fieldNameEl) {
@@ -3307,10 +3323,12 @@ function exportForm() {
                                 });
                             }
                             
+                            const requiredValue = requiredEl ? requiredEl.value : 'required';
                             allFieldsInOrder.push({
                                 type: fieldType,
                                 fieldName: fieldNameEl.value.trim(),
                                 selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                                required: requiredValue,
                                 options: checkboxOptions,
                                 order: parseInt(fieldOrder)
                             });
@@ -3921,6 +3939,8 @@ function exportForm() {
                         if (fieldType === 'checkbox') {
                             // Handle checkbox fields
                             const fieldNameEl = el.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+                            const selectionTypeEl = el.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+                            const requiredEl = el.querySelector('#checkboxRequired' + questionId + '_' + fieldOrder);
                             const optionsContainer = el.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
                             
                             if (fieldNameEl) {
@@ -3979,9 +3999,12 @@ function exportForm() {
                                     });
                                 }
                                 
+                                const requiredValue = requiredEl ? requiredEl.value : 'required';
                                 const fieldData = {
                                     type: fieldType,
                                     fieldName: fieldNameEl.value.trim(),
+                                    selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                                    required: requiredValue,
                                     options: checkboxOptions,
                                     order: fieldOrder
                                 };

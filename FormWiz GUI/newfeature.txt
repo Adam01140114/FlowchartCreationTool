@@ -1,0 +1,295 @@
+================================================================================
+HOW TO IMPLEMENT NEW FEATURES IN FORMWIZ GUI
+================================================================================
+
+This guide breaks down the process of adding new features to the FormWiz form builder.
+The workflow consists of 3 key steps that must be completed in order.
+
+================================================================================
+STEP 1: ADD UI ELEMENT IN gui.js
+================================================================================
+
+Purpose: Allow users to configure the new feature through the GUI interface.
+
+What to do:
+-----------
+1. Locate the appropriate function that creates the UI for your field type.
+   - For checkbox fields: Look for `addCheckboxField()` function
+   - For dropdown fields: Look for `addDropdownField()` function
+   - For text fields: Look for `addTextboxLabel()` or similar functions
+   - For unified fields: Look for functions like `addCheckboxField()`, `addDateField()`, etc.
+
+2. Add your new UI element (input, select, checkbox, etc.) in the appropriate location.
+   - Use a consistent ID naming pattern: `{fieldType}{PropertyName}{questionId}_{fieldCount}`
+   - Example: `checkboxRequired${questionId}_${fieldCount}`
+   - Add an `onchange` handler if needed: `onchange="update{PropertyName}(${questionId}, ${fieldCount})"`
+
+3. Create an update function to handle changes (if needed).
+   - Function name pattern: `update{PropertyName}(questionId, fieldCount)`
+   - Example: `function updateCheckboxRequired(questionId, fieldCount) { ... }`
+   - This function can be used for validation, logging, or real-time updates
+
+Example from checkbox required/optional feature:
+------------------------------------------------
+In `addCheckboxField()` function, we added:
+```javascript
+<div style="font-weight: bold; color: #333; text-align: center; margin-bottom: 10px;">Required:</div>
+<div style="text-align: center; margin-bottom: 10px;">
+    <select id="checkboxRequired${questionId}_${fieldCount}" 
+            style="..." 
+            onchange="updateCheckboxRequired(${questionId}, ${fieldCount})">
+        <option value="required">Required</option>
+        <option value="optional">Optional</option>
+    </select>
+</div>
+```
+
+And created the update function:
+```javascript
+function updateCheckboxRequired(questionId, fieldCount) {
+    const requiredSelect = document.getElementById(`checkboxRequired${questionId}_${fieldCount}`);
+    if (requiredSelect) {
+        console.log('🔧 [CHECKBOX REQUIRED] Updated required setting:', requiredSelect.value);
+    }
+}
+```
+
+================================================================================
+STEP 2: PRESERVE IN EXPORT/IMPORT (download.js)
+================================================================================
+
+Purpose: Ensure the user's configuration is saved to JSON and restored when loading.
+
+What to do:
+-----------
+A. EXPORT FUNCTION (saving to JSON):
+   1. Locate where your field type is processed in the export function.
+      - Look for `exportForm()` function
+      - Find the section that processes your field type (e.g., `if (fieldType === 'checkbox')`)
+
+   2. Read the value from your UI element.
+      - Use `querySelector()` or `getElementById()` to get the element
+      - Get its value: `element.value` or `element.checked` etc.
+
+   3. Add the property to the field object being pushed to `allFieldsInOrder`.
+      - Example: `required: requiredEl ? requiredEl.value : 'required'`
+      - Always provide a sensible default value for backward compatibility
+
+B. IMPORT FUNCTION (loading from JSON):
+   1. Locate where your field type is restored in the import function.
+      - Look for `loadFormData()` function
+      - Find the section that handles your field type (e.g., `else if (field.type === 'checkbox')`)
+
+   2. Find the UI element after the field is created.
+      - Usually after calling `add{FieldType}Field(questionId)`
+      - Get the last field: `const lastField = unifiedFieldsDiv.lastElementChild;`
+
+   3. Restore the value from the JSON data.
+      - Use `querySelector()` or `getElementById()` to find your UI element
+      - Set its value: `element.value = field.propertyName`
+      - Provide a default if the property doesn't exist in old JSON files
+
+Example from checkbox required/optional feature:
+------------------------------------------------
+EXPORT (in exportForm function):
+```javascript
+if (fieldType === 'checkbox') {
+    const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+    const selectionTypeEl = field.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+    const requiredEl = field.querySelector('#checkboxRequired' + questionId + '_' + fieldOrder);  // NEW
+    
+    // ... process options ...
+    
+    allFieldsInOrder.push({
+        type: fieldType,
+        fieldName: fieldNameEl.value.trim(),
+        selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+        required: requiredEl ? requiredEl.value : 'required',  // NEW - with default
+        options: checkboxOptions,
+        order: parseInt(fieldOrder)
+    });
+}
+```
+
+IMPORT (in loadFormData function):
+```javascript
+else if (field.type === 'checkbox') {
+    addCheckboxField(question.questionId);
+    
+    const lastField = unifiedFieldsDiv.lastElementChild;
+    if (lastField) {
+        const fieldOrder = lastField.getAttribute('data-order');
+        const fieldNameEl = lastField.querySelector('#checkboxFieldName' + question.questionId + '_' + fieldOrder);
+        const selectionTypeEl = lastField.querySelector('#checkboxSelectionType' + question.questionId + '_' + fieldOrder);
+        const requiredEl = lastField.querySelector('#checkboxRequired' + question.questionId + '_' + fieldOrder);  // NEW
+        
+        if (fieldNameEl && field.fieldName) {
+            fieldNameEl.value = field.fieldName;
+        }
+        
+        if (selectionTypeEl && field.selectionType) {
+            selectionTypeEl.value = field.selectionType;
+        }
+        
+        if (requiredEl && field.required) {  // NEW
+            requiredEl.value = field.required;
+        } else if (requiredEl) {
+            requiredEl.value = 'required';  // Default for backward compatibility
+        }
+    }
+}
+```
+
+IMPORTANT NOTES:
+- Always check if the element exists before accessing it
+- Provide default values for backward compatibility with old JSON files
+- The import function may have multiple places where your field type is handled (e.g., in trigger sequences)
+- Make sure to update ALL import locations, not just one
+
+================================================================================
+STEP 3: IMPLEMENT IN generate.js
+================================================================================
+
+Purpose: Extract the user's configuration and apply it to the generated HTML form.
+
+What to do:
+-----------
+A. EXTRACT THE VALUE:
+   1. Locate where your field type is processed during HTML generation.
+      - Look for `getFormHTML()` function
+      - Find where `allFieldsInOrder` is built or where fields are processed
+      - Look for sections like: `if (fieldType === 'checkbox')` or `else if (field.type === 'checkbox')`
+
+   2. Read the value from the UI element (same as export step).
+      - Use `querySelector()` to get your UI element
+      - Extract its value
+
+   3. Add the property to the field object in `allElements` or `allFieldsInOrder`.
+      - This makes the value available when rendering the HTML
+
+B. APPLY THE VALUE:
+   1. Locate where your field type is rendered in the HTML.
+      - Look for where the actual HTML/DOM elements are created
+      - For checkbox fields: Look for `else if (field.type === 'checkbox')` in the rendering section
+      - This is usually in a different part of the code from extraction
+
+   2. Use the value to modify the generated HTML/behavior.
+      - Add data attributes: `element.setAttribute('data-property-name', value)`
+      - Modify styling: `element.style.property = value`
+      - Add classes: `element.className += ' ' + value`
+      - Conditionally render elements: `if (field.property === 'value') { ... }`
+
+   3. Update validation logic if needed.
+      - Find validation functions like `isQuestionAnswered()`
+      - Use the data attributes or field properties to determine if validation should apply
+      - Example: Check `data-checkbox-required` attribute to see if checkbox is required
+
+Example from checkbox required/optional feature:
+------------------------------------------------
+EXTRACTION (in getFormHTML function, building allElements):
+```javascript
+if (fieldType === 'checkbox') {
+    const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
+    const selectionTypeEl = field.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+    const requiredEl = field.querySelector('#checkboxRequired' + questionId + '_' + fieldOrder);  // NEW
+    
+    // ... process options ...
+    
+    allElements.push({
+        type: fieldType,
+        label: fieldNameEl.value.trim(),
+        nodeId: '',
+        selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+        required: requiredEl ? requiredEl.value : 'required',  // NEW
+        options: checkboxOptions,
+        order: parseInt(fieldOrder)
+    });
+}
+```
+
+APPLICATION (in rendering section):
+```javascript
+else if (field.type === 'checkbox') {
+    const checkboxFieldDiv = document.createElement('div');
+    checkboxFieldDiv.style.cssText = '...';
+    
+    // Store required setting as data attribute for validation
+    const isRequired = (field.required === 'required' || field.required === undefined || field.required === null);
+    checkboxFieldDiv.setAttribute('data-checkbox-required', isRequired ? 'true' : 'false');  // NEW
+    
+    // ... rest of rendering code ...
+}
+```
+
+VALIDATION UPDATE (in isQuestionAnswered function):
+```javascript
+} else if (type === 'checkbox') {
+    // Find the parent checkbox field div
+    const checkboxFieldDiv = el.closest('[data-checkbox-required]');
+    if (checkboxFieldDiv) {
+        const isRequired = checkboxFieldDiv.getAttribute('data-checkbox-required') === 'true';
+        // ... group checkboxes and validate based on isRequired ...
+    }
+}
+```
+
+================================================================================
+QUICK REFERENCE CHECKLIST
+================================================================================
+
+When implementing a new feature, use this checklist:
+
+□ STEP 1: UI Element (gui.js)
+  □ Added UI element (input/select/etc.) with proper ID naming
+  □ Added onchange handler if needed
+  □ Created update function if needed
+
+□ STEP 2: Export/Import (download.js)
+  □ EXPORT: Added code to read UI element value
+  □ EXPORT: Added property to field object in allFieldsInOrder
+  □ EXPORT: Provided default value for backward compatibility
+  □ IMPORT: Added code to find UI element after field creation
+  □ IMPORT: Added code to restore value from JSON
+  □ IMPORT: Checked ALL locations where field type is imported (main + trigger sequences)
+
+□ STEP 3: Implementation (generate.js)
+  □ EXTRACTION: Added code to read UI element value during HTML generation
+  □ EXTRACTION: Added property to field object in allElements/allFieldsInOrder
+  □ APPLICATION: Added code to use the value when rendering HTML
+  □ APPLICATION: Added data attributes, styling, or conditional logic as needed
+  □ VALIDATION: Updated validation functions if the feature affects form completion
+
+================================================================================
+COMMON PATTERNS AND TIPS
+================================================================================
+
+1. ID NAMING CONVENTION:
+   - Pattern: `{fieldType}{PropertyName}{questionId}_{fieldCount}`
+   - Examples: `checkboxRequired1_1`, `dropdownFieldName2_3`
+   - This ensures uniqueness and makes elements easy to find
+
+2. DEFAULT VALUES:
+   - Always provide sensible defaults for backward compatibility
+   - Old JSON files won't have new properties, so defaults prevent errors
+   - Example: `required: requiredEl ? requiredEl.value : 'required'`
+
+3. DATA ATTRIBUTES FOR VALIDATION:
+   - Use `data-{property-name}` attributes to store values on DOM elements
+   - Validation functions can then query these attributes
+   - Example: `data-checkbox-required="true"`
+
+4. MULTIPLE IMPORT LOCATIONS:
+   - Some field types appear in multiple places (main fields, trigger sequences)
+   - Always search for ALL occurrences of your field type in download.js
+   - Update each location to ensure consistency
+
+5. TESTING:
+   - Test with a new form (to verify UI works)
+   - Test export/import (to verify data is preserved)
+   - Test with old JSON files (to verify backward compatibility)
+   - Test the generated HTML (to verify the feature works in output)
+
+================================================================================
+END OF GUIDE
+================================================================================
+

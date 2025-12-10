@@ -23,6 +23,7 @@ const linkedDropdowns = []; // For storing linked dropdown pairs
 const hiddenLogicConfigs = []; // For storing hidden logic configurations
 const linkedFields = []; // For storing linked field configurations
 const linkedCheckboxes = []; // For storing linked checkbox configurations
+const checkboxRequiredMap = {}; // questionId -> boolean required
 
 // Cart functions are now included in the generated HTML
 
@@ -399,9 +400,9 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
       '</div>'
     ]),
     "<header>",
-    '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'index.html\';">',
+    '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'../index.html\';">',
     "    <nav>",
-    '        <a href="index.html">Home',
+    '        <a href="../index.html">Home',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
     '        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">',
@@ -1165,15 +1166,15 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         // Handle PDF Preview - check before generating select
         const pdfPreviewEnabledEl = qBlock.querySelector(`#enablePdfPreview${questionId}`);
         const pdfPreviewEnabled = pdfPreviewEnabledEl && pdfPreviewEnabledEl.checked;
-        
+
         let pdfPreviewHandlerCall = '';
         if (pdfPreviewEnabled) {
           const pdfPreviewTriggerEl = qBlock.querySelector(`#pdfPreviewTrigger${questionId}`);
           const pdfPreviewFileEl = qBlock.querySelector(`#pdfPreviewFile${questionId}`);
-          
+
           const pdfPreviewTrigger = pdfPreviewTriggerEl ? pdfPreviewTriggerEl.value : "";
           const pdfPreviewFile = pdfPreviewFileEl ? pdfPreviewFileEl.value : "";
-          
+
           // Only include handler call if both trigger and file are set (function will be generated)
           if (pdfPreviewTrigger && pdfPreviewFile) {
             pdfPreviewHandlerCall = ` handlePdfPreview${questionId}(this.value)`;
@@ -1358,6 +1359,13 @@ const cboxOptions = [];
 /* Use the slug as the base prefix (and store it for helpers) */
 const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
 questionNameIds[questionId] = qSlug;      // so helpers know the base
+
+/* Required/optional flag (defaults to required) */
+const requiredSelect = qBlock.querySelector(`[id^="checkboxRequired${questionId}_"]`);
+const isCheckboxRequired = !(requiredSelect && requiredSelect.value === 'optional');
+checkboxRequiredMap[questionId] = isCheckboxRequired;
+console.log('🛰️ [GEN DEBUG] Checkbox required map set (standard)', { questionId, isCheckboxRequired, fieldName: qBlock.querySelector(`#checkboxFieldName${questionId}_1`)?.value });
+logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; console.log('🛰️ [HTML INIT] checkboxRequiredMap set (standard)', { questionId: ${questionId}, required: ${isCheckboxRequired ? 'true' : 'false'} });\n`;
 
 /* ── check for "Mark only one" option ─────────────────────────── */
 const markOnlyOneEl = qBlock.querySelector(`#markOnlyOne${questionId}`);
@@ -1701,6 +1709,7 @@ formHTML += `</div><br></div>`;
 
               const fieldNameEl = el.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
               const selectionTypeEl = el.querySelector('#checkboxSelectionType' + questionId + '_' + fieldOrder);
+              const requiredEl = el.querySelector('#checkboxRequired' + questionId + '_' + fieldOrder);
               const optionsContainer = el.querySelector('#checkboxOptions' + questionId + '_' + fieldOrder);
 
               if (fieldNameEl) {
@@ -1763,6 +1772,7 @@ formHTML += `</div><br></div>`;
                   type: 'checkbox',
                   fieldName: fieldNameEl.value.trim(),
                   selectionType: selectionTypeEl ? selectionTypeEl.value : 'multiple',
+                  required: requiredEl ? requiredEl.value : 'required',
                   options: checkboxOptions,
                   order: fieldOrder
                 };
@@ -1918,7 +1928,7 @@ formHTML += `</div><br></div>`;
                         input.id = locPrefix + '_' + f.nodeId;
                         input.name = input.id;
                         input.placeholder = f.label;
-                        input.style.cssText = 'width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease;';
+                        input.style.cssText = 'width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease; text-align: center;';
                         locationFieldDiv.appendChild(input);
                     }
                 });
@@ -2250,6 +2260,10 @@ formHTML += `</div><br></div>`;
                 // Get checkbox options from the field data
                 const checkboxOptions = field.options || [];
                 const selectionType = field.selectionType || 'multiple';
+                const isCheckboxRequired = field.required !== 'optional';
+                checkboxRequiredMap[questionId] = isCheckboxRequired;
+                console.log('🛰️ [GEN DEBUG] Checkbox required map set (MTB)', { questionId, isCheckboxRequired, fieldName: field.fieldName });
+                logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; console.log('🛰️ [HTML INIT] checkboxRequiredMap set (MTB)', { questionId: ${questionId}, required: ${isCheckboxRequired ? 'true' : 'false'} });\n`;
 
                 // Create checkbox/radio options
                 checkboxOptions.forEach((option, optionIndex) => {
@@ -3789,6 +3803,18 @@ if (s > 1){
           if (!el || el.disabled) return false;
           if (el.type === 'hidden') return false;
           if (el.closest('.hidden')) return false;
+
+          // Check if element or any parent has display: none
+          let current = el;
+          while (current && current !== document.body) {
+            const style = window.getComputedStyle(current);
+            if (style.display === 'none') {
+              return false;
+            }
+            current = current.parentElement;
+          }
+
+          // Also check offsetParent for elements that are not radio/checkbox
           if (el.offsetParent === null && el.type !== 'radio' && el.type !== 'checkbox') return false;
           return true;
         }
@@ -3807,12 +3833,7 @@ if (s > 1){
             value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
             display: el.style && el.style.display ? el.style.display : null
           }));
-          console.log('🛰️ [QUESTION ANSWER DEBUG] Evaluating question state', {
-            questionId,
-            questionText,
-            eligibleCount: eligibleElements.length,
-            elements: debugElements
-          });
+
           if (!eligibleElements.length) return true;
 
           let allStandardSatisfied = true;
@@ -3842,18 +3863,39 @@ if (s > 1){
           });
 
           const radiosSatisfied = Object.values(radioGroups).every(group => group.some(Boolean));
-          const checkboxesSatisfied = !hasCheckbox || checkboxAnyChecked;
+          const checkboxRequired = checkboxRequiredMap[questionId] !== false; // default required unless explicitly optional
+          const checkboxesSatisfied = !hasCheckbox || !checkboxRequired || checkboxAnyChecked;
+
+          // Additional check: if any trigger sequence container is visible, its fields become required
+          const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
+          if (visibleTriggerContainers.length > 0) {
+            visibleTriggerContainers.forEach(tc => {
+              const triggerInputs = tc.querySelectorAll('select, textarea, input');
+              triggerInputs.forEach(inp => {
+                if (!isElementEligible(inp)) return;
+                const tag = inp.tagName;
+                const type = (inp.type || '').toLowerCase();
+                if (tag === 'SELECT') {
+                  const value = (inp.value || '').trim();
+                  if (!value) allStandardSatisfied = false;
+                } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
+                  const value = (inp.value || '').trim();
+                  if (!value) allStandardSatisfied = false;
+                } else if (type === 'radio') {
+                  const group = radioGroups[inp.name || inp.id] || [];
+                  group.push(!!inp.checked);
+                  radioGroups[inp.name || inp.id] = group;
+                } else if (type === 'checkbox') {
+                  hasCheckbox = true;
+                  if (inp.checked) {
+                    checkboxAnyChecked = true;
+                  }
+                }
+              });
+            });
+          }
 
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
-
-          console.log('🛰️ [QUESTION ANSWER DEBUG] Result', {
-            questionId,
-            questionText,
-            answered,
-            allStandardSatisfied,
-            radiosSatisfied,
-            checkboxesSatisfied
-          });
 
           return answered;
         }
@@ -3911,25 +3953,37 @@ if (s > 1){
 
         function attachSubmitModeListeners(container, containerIdx) {
           if (!container || container.dataset.submitModeListenersAttached === 'true') return;
-          const interactiveElements = container.querySelectorAll('select, textarea, input[type="radio"], input[type="checkbox"], input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"]');
 
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
           const questionTextEl = container.querySelector('.question-text');
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
 
-          interactiveElements.forEach(el => {
-            const eventType = (el.tagName === 'SELECT' || el.type === 'radio' || el.type === 'checkbox') ? 'change' : 'input';
-            el.addEventListener(eventType, function(event) {
-              console.log('🛰️ [NAV DEBUG] Input detected for question', {
-                questionId,
-                questionText,
-                elementId: el.id || null,
-                elementType: el.type || el.tagName,
-                eventType
-              });
-              refreshNav(containerIdx);
-            });
+          // Use event delegation - attach listeners to container to catch events from dynamically created fields
+          container.addEventListener('change', function(event) {
+            const target = event.target;
+            // Only handle interactive elements
+            if (target.tagName === 'SELECT' || target.type === 'radio' || target.type === 'checkbox') {
+              // Make sure the element is within this container
+              if (container.contains(target)) {
+
+                refreshNav(containerIdx);
+              }
+            }
           });
+
+          container.addEventListener('input', function(event) {
+            const target = event.target;
+            // Only handle text-like inputs
+            if (target.tagName === 'TEXTAREA' || 
+                (target.tagName === 'INPUT' && ['text', 'email', 'tel', 'url', 'number', 'date', 'time', 'datetime-local'].includes(target.type))) {
+              // Make sure the element is within this container
+              if (container.contains(target)) {
+
+                refreshNav(containerIdx);
+              }
+            }
+          });
+
           container.dataset.submitModeListenersAttached = 'true';
 
         }
@@ -3939,18 +3993,6 @@ if (s > 1){
           const isAnswered = submitConfig && submitConfig.isAnswered;
           const currentQuestionId = submitConfig && submitConfig.questionId;
           const currentQuestionText = submitConfig && submitConfig.questionText;
-
-          console.log('🛰️ [NAV DEBUG] updateButtons invoked', {
-            questionId: currentQuestionId,
-            questionText: currentQuestionText,
-            shouldSubmit,
-            isAnswered,
-            hasPrevQuestion,
-            canAdvanceWithinSection,
-            canAdvanceAcrossSection,
-            nextSectionInfo,
-            prevSectionInfo
-          });
 
           if (prevBtn) {
             const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
@@ -3978,24 +4020,12 @@ if (s > 1){
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
               nextBtn.classList.add('submit-mode');
-              console.log('🛰️ [NAV DEBUG] Submit mode next button state', {
-                questionId: currentQuestionId,
-                questionText: currentQuestionText,
-                isAnswered,
-                disabled: nextBtn.disabled
-              });
 
             } else {
               nextBtn.classList.remove('submit-mode');
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection);
               nextBtn.disabled = !canAdvance;
-              console.log('🛰️ [NAV DEBUG] Next button state', {
-                questionId: currentQuestionId,
-                questionText: currentQuestionText,
-                canAdvance,
-                disabled: nextBtn.disabled,
-                advanceMode: nextBtn.dataset.advanceMode || ''
-              });
+
               if (!canAdvance) {
                 nextBtn.dataset.advanceMode = '';
                 delete nextBtn.dataset.nextSectionNumber;
@@ -4073,14 +4103,6 @@ if (s > 1){
           attachSubmitModeListeners(activeContainer, targetIdx);
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
-          console.log('🛰️ [NAV DEBUG] activateIndex', {
-            targetIdx,
-            activeQuestionId,
-            activeQuestionText,
-            shouldSubmit,
-            isAnswered,
-            visibleCount: visibleIndices.length
-          });
 
           const hasPrevQuestion = currentPos > 0;
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
@@ -4454,6 +4476,7 @@ if (s > 1){
   formHTML += `var questionSlugMap = ${JSON.stringify(questionSlugMap || {})};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
   formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
+  formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
   formHTML += `
   // Address helper functions (must exist before conditional logic runs)
@@ -5888,6 +5911,7 @@ if (s > 1){
             input.name = input.id;
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
+            input.style.textAlign = 'center'; // Ensure text is centered
           }
 
           // Wrap each input in an .address-field div so margins apply
@@ -8242,6 +8266,7 @@ function showTextboxLabels(questionId, count){
                         input.name = input.id;
                         input.placeholder = f.label; // Street, City, Zip
                         input.className = 'address-input';
+                        input.style.textAlign = 'center'; // Ensure text is centered
                     }
                     const fieldWrap = document.createElement('div');
                     fieldWrap.className = 'address-field';
@@ -8823,6 +8848,26 @@ function showTextboxLabels(questionId, count){
                                 }
                             }
                         });
+
+                        // 🔧 NEW: Trigger navigation refresh after showing/hiding trigger fields
+                        // This ensures the Next button state updates correctly
+                        setTimeout(() => {
+                            const questionContainer = document.getElementById('question-container-' + questionId);
+                            if (questionContainer) {
+                                const sectionEl = questionContainer.closest('.section');
+                                if (sectionEl && window.questionNavControllers) {
+                                    const sectionId = sectionEl.id;
+                                    const navController = window.questionNavControllers[sectionId];
+                                    if (typeof navController === 'function') {
+                                        // Trigger navigation refresh by dispatching a custom event
+                                        const refreshEvent = new CustomEvent('refreshNavigation', { 
+                                            detail: { questionId: questionId } 
+                                        });
+                                        questionContainer.dispatchEvent(refreshEvent);
+                                    }
+                                }
+                            }
+                        }, 150);
                     }
                 }
 
@@ -8909,6 +8954,40 @@ function showTextboxLabels(questionId, count){
 
     // Update linked fields after creating new textboxes
     updateLinkedFields();
+
+    // 🔧 NEW: Trigger navigation refresh after fields are created so Next button updates
+    // Find the question container and trigger navigation refresh
+    const questionContainer = document.getElementById('question-container-' + questionId);
+    if (questionContainer) {
+        // Use setTimeout to ensure DOM is fully updated
+        setTimeout(() => {
+            // Find which section this question is in
+            const sectionEl = questionContainer.closest('.section');
+            if (sectionEl) {
+                // Find all question containers in this section
+                const questionItems = Array.from(sectionEl.querySelectorAll('.question-container.question-item'));
+                const containerIdx = questionItems.indexOf(questionContainer);
+
+                if (containerIdx !== -1 && window.questionNavControllers) {
+                    const sectionId = sectionEl.id;
+                    // Get the navigation controller function
+                    const navController = window.questionNavControllers[sectionId];
+                    if (typeof navController === 'function') {
+                        // The navigation controller has access to refreshNav - we need to trigger it
+                        // Dispatch a custom event that the navigation code can listen for
+                        const refreshEvent = new CustomEvent('refreshNavigation', { 
+                            detail: { questionId: questionId, containerIdx: containerIdx } 
+                        });
+                        questionContainer.dispatchEvent(refreshEvent);
+
+                        // Also try to directly call refreshNav if it's accessible
+                        // We'll rely on the event delegation listeners to catch user input
+                        // and the mutation observer to catch DOM changes
+                    }
+                }
+            }
+        }, 100);
+    }
 
     // 🔧 NEW: Immediately autofill newly created fields if Firebase data is available
     // This ensures fields are autofilled instantly instead of waiting for delayed passes
@@ -12277,7 +12356,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = 'index.html';
+                        window.location.href = '../index.html';
                     }).catch(function(error) {
 
                     });
@@ -12680,56 +12759,8 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// Tab key navigation - automatically press next button, submit, or download PDFs
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Tab') {
-    e.preventDefault(); // Prevent default tab behavior
-
-    // Check if we're on the thank you screen
-    const thankYouMessage = document.getElementById('thankYouMessage');
-    if (thankYouMessage && thankYouMessage.style.display !== 'none') {
-      // On thank you screen, press download PDFs button
-      const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
-      if (downloadButton) {
-        downloadButton.click();
-        return;
-      }
-    }
-
-    // Look for the next button in the current section
-    const nextButton = document.querySelector('.next-button:not([style*="display: none"])');
-    if (nextButton) {
-      nextButton.click();
-      return;
-    }
-
-    // Look for submit button
-    const submitButton = document.querySelector('button[type="submit"]:not([style*="display: none"])');
-    if (submitButton) {
-      submitButton.click();
-      return;
-    }
-
-    // Look for any button with "submit" in its text or onclick
-    const submitButtons = document.querySelectorAll('button');
-    for (let button of submitButtons) {
-      if (button.style.display !== 'none' && 
-          (button.textContent.toLowerCase().includes('submit') || 
-           button.onclick && button.onclick.toString().includes('submit'))) {
-        button.click();
-        return;
-      }
-    }
-
-    // If no submit button found, look for download PDFs button
-    const downloadPdfButton = document.querySelector('button[onclick*="downloadAllPdfs"]');
-    if (downloadPdfButton) {
-      downloadPdfButton.click();
-      return;
-    }
-
-  }
-});
+// Tab key navigation - REMOVED: This was causing unwanted form submission when users tried to tab between fields
+// Tab key now works normally for navigating between form inputs
 
 // Removed click-outside-to-close functionality - user must use X button
 

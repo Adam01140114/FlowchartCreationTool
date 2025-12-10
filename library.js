@@ -426,6 +426,7 @@ window.exportGuiJson = function(download = true) {
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
               selectionType: checkbox.selectionType || "multiple",
+              required: checkbox.required || "required",
               options: checkboxOptions,
               order: orderIndex + 1
             });
@@ -538,6 +539,7 @@ window.exportGuiJson = function(download = true) {
                           type: "checkbox",
                           fieldName: checkbox.fieldName || "",
                           selectionType: checkbox.selectionType || "multiple",
+                          required: checkbox.required || "required",
                           options: checkboxOptions
                         });
                       }
@@ -701,6 +703,7 @@ window.exportGuiJson = function(download = true) {
                             type: "checkbox",
                             fieldName: checkbox.fieldName || "",
                             selectionType: checkbox.selectionType || "multiple",
+                            required: checkbox.required || "required",
                             options: checkboxOptions
                           });
                         }
@@ -828,6 +831,7 @@ window.exportGuiJson = function(download = true) {
                         type: "checkbox",
                         fieldName: checkbox.fieldName || "",
                         selectionType: checkbox.selectionType || "multiple",
+                        required: checkbox.required || "required",
                         options: checkboxOptions
                       });
                     });
@@ -1619,6 +1623,7 @@ window.exportGuiJson = function(download = true) {
                             type: "checkbox",
                             fieldName: checkbox.fieldName || "",
                             selectionType: checkbox.selectionType || "multiple",
+                            required: checkbox.required || "required",
                             options: checkboxOptions
                           });
                         }
@@ -1909,6 +1914,7 @@ window.exportGuiJson = function(download = true) {
                           type: "checkbox",
                           fieldName: checkbox.fieldName || "",
                           selectionType: checkbox.selectionType || "multiple",
+                          required: checkbox.required || "required",
                           options: checkboxOptions
                         });
                       });
