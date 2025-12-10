@@ -304,6 +304,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   <option value="dropdown">Dropdown</option>
                   <option value="checkbox">Checkbox</option>
                   <option value="number">Number</option>
+                  <option value="currency">Currency</option>
                   <option value="date">Date</option>
                   <option value="bigParagraph">Big Paragraph</option>
                   <option value="multipleTextboxes">Multiple Textboxes</option>

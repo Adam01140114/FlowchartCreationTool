@@ -3,7 +3,11 @@ HOW TO IMPLEMENT NEW FEATURES IN FORMWIZ GUI
 ================================================================================
 
 This guide breaks down the process of adding new features to the FormWiz form builder.
-The workflow consists of 3 key steps that must be completed in order.
+The workflow consists of key steps that must be completed in order.
+
+================================================================================
+PART 1: GUI BUILDER (Classic Interface)
+================================================================================
 
 ================================================================================
 STEP 1: ADD UI ELEMENT IN gui.js
@@ -234,6 +238,128 @@ VALIDATION UPDATE (in isQuestionAnswered function):
 ```
 
 ================================================================================
+PART 2: FLOWCHART TOOL INTEGRATION (Visual Editor)
+================================================================================
+
+================================================================================
+STEP 4: ADD UI ELEMENT IN FLOWCHART TOOL (questions.js)
+================================================================================
+
+Purpose: Allow users to configure the feature visually inside the flowchart node editor.
+
+What to do:
+-----------
+1. Locate the UI construction logic for your field type.
+   - For checkbox options in triggers: Look for `createMiniCheckboxOption` or `addCheckboxOptionBtn.onclick`.
+   - For main node properties: Look for `showProperties` or specific node creation functions.
+
+2. Create the DOM elements.
+   - Create Label: `document.createElement('label')`
+   - Create Input/Select: `document.createElement('select')` or `input`
+   - Style it to match existing UI.
+
+3. Bind the Data Model.
+   - *CRITICAL*: Bind the input's value to the underlying JavaScript object (e.g., `newCheckbox` or `trigger`).
+   - Add event listeners (`onchange`, `oninput`, `onblur`) to update the model immediately.
+   - Example:
+     ```javascript
+     mySelect.onchange = () => {
+         dataObject.myProperty = mySelect.value;
+         if (typeof window.requestAutosave === 'function') window.requestAutosave();
+     };
+     ```
+
+Example from checkbox Required/Optional:
+----------------------------------------
+```javascript
+// In questions.js, inside the checkbox creation logic:
+
+// 1. Create Dropdown
+const requiredTypeSelect = document.createElement('select');
+// ... styling ...
+const reqOpt = document.createElement('option'); reqOpt.value = 'required'; reqOpt.text = 'Required';
+const optOpt = document.createElement('option'); optOpt.value = 'optional'; optOpt.text = 'Optional';
+requiredTypeSelect.add(reqOpt);
+requiredTypeSelect.add(optOpt);
+
+// 2. Bind Data Model
+requiredTypeSelect.value = newCheckbox.required || 'required'; // Set initial value
+
+requiredTypeSelect.onchange = () => {
+    newCheckbox.required = requiredTypeSelect.value; // Update model
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave(); // Trigger save
+    }
+};
+
+// 3. Append to Container
+contentContainer.appendChild(requiredTypeSelect);
+```
+
+================================================================================
+STEP 5: PRESERVE IN FLOWCHART SAVING/LOADING
+================================================================================
+
+Purpose: Ensure the configuration persists through Autosave, Firebase, and Flowchart JSON Export/Import.
+
+What to do:
+-----------
+1. Autosave & Firebase:
+   - This is usually handled automatically IF you updated the data object in Step 4.
+   - *Verify*: Check that `window.requestAutosave()` is called when your setting changes.
+
+2. Flowchart JSON Export/Import:
+   - *Persistence*: Ensure that when the flowchart is reloaded (Import), the UI initialization logic reads your saved property.
+   - In `questions.js` (or wherever the UI is rebuilt), ensure initialization checks the existing data.
+
+Example:
+```javascript
+// In the UI creation function (Step 4 logic):
+// Check if the data object already has the property (from a saved file)
+if (!newCheckbox.required) {
+    newCheckbox.required = 'required'; // Default if missing
+}
+// Set the UI element to match the saved data
+requiredTypeSelect.value = newCheckbox.required;
+```
+
+================================================================================
+STEP 6: INFLUENCE GUI JSON EXPORT (library.js)
+================================================================================
+
+Purpose: Ensure that the Visual Flowchart configuration correctly exports to the `gui.json` format used by the FormWiz GUI/Generator.
+
+What to do:
+-----------
+1. Locate `window.exportGuiJson` in `library.js`.
+2. Find the loop that processes your node/field type.
+   - Look for `if (orderItem.type === 'checkbox')` or similar.
+3. Extract the property from the source object.
+4. Push it into the target `fields` array.
+
+Example from checkbox Required/Optional:
+----------------------------------------
+```javascript
+// In library.js -> window.exportGuiJson:
+
+if (orderItem.type === 'checkbox') {
+    const checkbox = checkboxMap.get(orderItem.identifier);
+    if (checkbox) {
+        fields.push({
+            type: "checkbox",
+            fieldName: checkbox.fieldName || "",
+            selectionType: checkbox.selectionType || "multiple",
+            
+            // NEW: Export the property we added in Step 4
+            required: checkbox.required || "required", 
+            
+            options: checkboxOptions
+        });
+    }
+}
+```
+
+================================================================================
 QUICK REFERENCE CHECKLIST
 ================================================================================
 
@@ -258,6 +384,18 @@ When implementing a new feature, use this checklist:
   □ APPLICATION: Added code to use the value when rendering HTML
   □ APPLICATION: Added data attributes, styling, or conditional logic as needed
   □ VALIDATION: Updated validation functions if the feature affects form completion
+
+□ STEP 4: Flowchart UI (questions.js)
+  □ Created DOM elements for the setting in the Visual Editor
+  □ Bound the input value to the data model object
+  □ Added autosave trigger on change
+
+□ STEP 5: Flowchart Persistence
+  □ Verified initialization logic reads saved data values
+  □ Verified defaults are set if data is missing
+
+□ STEP 6: Flowchart -> GUI Export (library.js)
+  □ Updated `exportGuiJson` to include the new property in the output JSON
 
 ================================================================================
 COMMON PATTERNS AND TIPS
@@ -292,4 +430,3 @@ COMMON PATTERNS AND TIPS
 ================================================================================
 END OF GUIDE
 ================================================================================
-

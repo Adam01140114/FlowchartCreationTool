@@ -369,7 +369,7 @@ function getQuestionType(cell) {
 function isSimpleHtmlQuestion(cell) {
   if (!cell || !cell.style) return false;
   const qt = getQuestionType(cell);
-  return qt === 'text' || qt === 'number' || qt === 'date' || qt === 'email' || qt === 'phone' || qt === 'bigParagraph';
+  return qt === 'text' || qt === 'number' || qt === 'currency' || qt === 'date' || qt === 'email' || qt === 'phone' || qt === 'bigParagraph';
 }
 
 // Question Type Switching
@@ -397,7 +397,7 @@ function setQuestionType(cell, newType) {
   graph.getModel().beginUpdate();
   try {
     switch (newType) {
-      case 'text': case 'date': case 'number': case 'bigParagraph':
+      case 'text': case 'date': case 'number': case 'currency': case 'bigParagraph':
       case 'dateRange': case 'email': case 'phone':
         // Preserve the text content
         cell._questionText = preservedText || '';
@@ -541,6 +541,7 @@ function updateSimpleQuestionCell(cell) {
           <option value="dropdown">Dropdown</option>
           <option value="checkbox">Checkbox</option>
           <option value="number">Number</option>
+          <option value="currency">Currency</option>
           <option value="date">Date</option>
           <option value="bigParagraph">Big Paragraph</option>
           <option value="multipleTextboxes">Multiple Textboxes</option>
@@ -12959,6 +12960,7 @@ function setupQuestionTypeEventListeners() {
   const checkboxTypeBtn = document.getElementById("checkboxType");
   const textTypeBtn = document.getElementById("textType");
   const moneyTypeBtn = document.getElementById("moneyType");
+  const currencyTypeBtn = document.getElementById("currencyType");
   const dateTypeBtn = document.getElementById("dateType");
   const dateRangeTypeBtn = document.getElementById("dateRangeType");
   const emailTypeBtn = document.getElementById("emailType");
@@ -13009,6 +13011,18 @@ function setupQuestionTypeEventListeners() {
     moneyTypeBtn.addEventListener("click", () => {
       if (window.selectedCell && isQuestion(window.selectedCell)) {
         setQuestionType(window.selectedCell, "number");
+        getRefreshAllCells()();
+      }
+      if (typeof window.hideContextMenu === 'function') {
+        window.hideContextMenu();
+      }
+    });
+  }
+
+  if (currencyTypeBtn) {
+    currencyTypeBtn.addEventListener("click", () => {
+      if (window.selectedCell && isQuestion(window.selectedCell)) {
+        setQuestionType(window.selectedCell, "currency");
         getRefreshAllCells()();
       }
       if (typeof window.hideContextMenu === 'function') {

@@ -53,6 +53,24 @@ function sanitizeQuestionText (str){
                       .replace(/^_+|_+$/g, "");
 }
 
+// Phone formatter: formats to (123)-456-7890 as user types
+window.formatPhoneInput = function(inputEl) {
+    if (!inputEl) return;
+    const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+    let formatted = "";
+    if (digits.length > 0) {
+        formatted += "(" + digits.slice(0, Math.min(3, digits.length));
+        if (digits.length >= 3) formatted += ")";
+    }
+    if (digits.length > 3) {
+        formatted += "-" + digits.slice(3, Math.min(6, digits.length));
+    }
+    if (digits.length > 6) {
+        formatted += "-" + digits.slice(6, 10);
+    }
+    inputEl.value = formatted;
+};
+
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
@@ -384,6 +402,25 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        .address-field:last-child { margin-bottom: 2px; }',
     '        .hidden { display: none !important; }',
     '    </style>',
+    '    <script>',
+    '      // Phone formatter: (123)-456-7890',
+    '      window.formatPhoneInput = window.formatPhoneInput || function(inputEl) {',
+    '        if (!inputEl) return;',
+    '        const digits = (inputEl.value || "").replace(/\\D/g, "").slice(0, 10);',
+    '        let formatted = "";',
+    '        if (digits.length > 0) {',
+    '          formatted += "(" + digits.slice(0, Math.min(3, digits.length));',
+    '          if (digits.length >= 3) formatted += ")";',
+    '        }',
+    '        if (digits.length > 3) {',
+    '          formatted += "-" + digits.slice(3, Math.min(6, digits.length));',
+    '        }',
+    '        if (digits.length > 6) {',
+    '          formatted += "-" + digits.slice(6, 10);',
+    '        }',
+    '        inputEl.value = formatted;',
+    '      };',
+    '    </script>',
     "</head>",
     "<body>",
     // Insert modal HTML right after <body> (only if not in test mode)
@@ -1031,6 +1068,29 @@ questionSlugMap[questionId] = slug;
         const mnPh = mnPhEl && mnPhEl.value ? mnPhEl.value : "Enter amount";
         questionNameIds[questionId] = mnName;
         formHTML += `<div class="text-input-container"><input type="number" id="${mnName}" name="${mnName}" min="0" step="0.01" placeholder="${mnPh}"></div>`;
+      } else if (questionType === "currency") {
+        const curNmEl = qBlock.querySelector("#textboxName" + questionId);
+        const curPhEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
+        const curName =
+          curNmEl && curNmEl.value ? curNmEl.value : "answer" + questionId;
+        const curPh = curPhEl && curPhEl.value ? curPhEl.value : "Enter amount";
+        questionNameIds[questionId] = curName;
+        formHTML += `<div class="text-input-container"><input type="text" id="${curName}" name="${curName}" inputmode="decimal" placeholder="${curPh}" oninput="formatCurrencyInput(this)"></div>`;
+        formHTML += `<script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\\d)/, '');
+            parts[0] = parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            input.value = parts[0] + decimal;
+          };
+        </script>`;
       } else if (questionType === "date") {
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
@@ -1364,8 +1424,8 @@ questionNameIds[questionId] = qSlug;      // so helpers know the base
 const requiredSelect = qBlock.querySelector(`[id^="checkboxRequired${questionId}_"]`);
 const isCheckboxRequired = !(requiredSelect && requiredSelect.value === 'optional');
 checkboxRequiredMap[questionId] = isCheckboxRequired;
-console.log('🛰️ [GEN DEBUG] Checkbox required map set (standard)', { questionId, isCheckboxRequired, fieldName: qBlock.querySelector(`#checkboxFieldName${questionId}_1`)?.value });
-logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; console.log('🛰️ [HTML INIT] checkboxRequiredMap set (standard)', { questionId: ${questionId}, required: ${isCheckboxRequired ? 'true' : 'false'} });\n`;
+
+logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; \n`;
 
 /* ── check for "Mark only one" option ─────────────────────────── */
 const markOnlyOneEl = qBlock.querySelector(`#markOnlyOne${questionId}`);
@@ -1961,7 +2021,7 @@ formHTML += `</div><br></div>`;
                     }
                 }
 
-                if (field.label === 'State') {
+              if (field.label === 'State') {
                   // Use dropdown for State field
                   const dropdownDiv = document.createElement('div');
                   dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
@@ -1980,7 +2040,7 @@ formHTML += `</div><br></div>`;
 
                   }, 100);
                 }
-              } else if (field.type === 'amount') {
+            } else if (field.type === 'amount') {
                 // For multipleTextboxes, use the base nodeId without numbering
                 const fieldId = field.nodeId;
                 const inputDiv = document.createElement('div');
@@ -2004,6 +2064,17 @@ formHTML += `</div><br></div>`;
                   const brElement = document.createElement('br');
                   entryContainer.appendChild(brElement);
                 }
+            } else if (field.type === 'phone') {
+              const fieldId = field.nodeId;
+              const inputDiv = document.createElement('div');
+              const inputHTML = `
+                <label for="${fieldId}" style="display:block;margin-bottom:4px;font-weight:600;color:#333;">${field.label || 'Phone'}</label>
+                <input type="tel" id="${fieldId}" name="${fieldId}" placeholder="(123)-456-7890" style="width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease; text-align: center;" oninput="formatPhoneInput(this)">
+              `;
+              inputDiv.innerHTML = inputHTML;
+              // Append all children (label + input) to ensure input renders
+              Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
+              console.log('🔍 [MTB PHONE RENDER] Added phone field', { questionId, fieldId, label: field.label });
               } else if (field.type === 'dropdown') {
 
                 // Add line break above dropdown field
@@ -2262,8 +2333,8 @@ formHTML += `</div><br></div>`;
                 const selectionType = field.selectionType || 'multiple';
                 const isCheckboxRequired = field.required !== 'optional';
                 checkboxRequiredMap[questionId] = isCheckboxRequired;
-                console.log('🛰️ [GEN DEBUG] Checkbox required map set (MTB)', { questionId, isCheckboxRequired, fieldName: field.fieldName });
-                logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; console.log('🛰️ [HTML INIT] checkboxRequiredMap set (MTB)', { questionId: ${questionId}, required: ${isCheckboxRequired ? 'true' : 'false'} });\n`;
+
+                logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; \n`;
 
                 // Create checkbox/radio options
                 checkboxOptions.forEach((option, optionIndex) => {
@@ -3179,8 +3250,8 @@ formHTML += `</div><br></div>`;
                 order: parseInt(fieldOrder)
             };
 
-            // Include prefill for label and amount fields
-            if (fieldType === 'label' || fieldType === 'amount') {
+            // Include prefill / extras for label-like fields
+            if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone') {
                 if (fieldType === 'label') {
                     fieldData.prefill = prefillValue;
                 }
@@ -4012,6 +4083,7 @@ if (s > 1){
                 prevBtn.dataset.prevSectionId = prevSectionInfo.sectionId;
               }
             }
+
           }
           if (nextBtn) {
             if (shouldSubmit) {

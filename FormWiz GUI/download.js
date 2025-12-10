@@ -618,6 +618,21 @@ function loadFormData(formData) {
                                             console.log('🔧 [IMPORT DEBUG] Set conditional prefills for amount field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
                                         }
                                     }
+                                } else if (field.type === 'phone') {
+                                    // Add a phone field (reuse label UI and mark as phone)
+                                    addTextboxLabel(question.questionId);
+                                    
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        // Mark the unified field as phone
+                                        lastField.setAttribute('data-type', 'phone');
+                                        
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
                                 } else if (field.type === 'checkbox') {
                                     // Add a checkbox field
                                     addCheckboxField(question.questionId);
@@ -2115,6 +2130,7 @@ function loadFormData(formData) {
                     question.type === 'text' ||
                     question.type === 'radio' ||
                     question.type === 'money' ||
+                    question.type === 'currency' ||
                     question.type === 'date' ||
                     question.type === 'email' ||
                     question.type === 'phone' ||
@@ -2206,7 +2222,7 @@ function loadFormData(formData) {
                         const conditionId = index + 1;
                         
                         // Update options for the dropdown based on question type (skip for textbox and date questions)
-                        const isTextboxQuestion = question.type === 'text' || question.type === 'bigParagraph' || question.type === 'money' || question.type === 'date' || question.type === 'dateRange';
+                        const isTextboxQuestion = question.type === 'text' || question.type === 'bigParagraph' || question.type === 'money' || question.type === 'currency' || question.type === 'date' || question.type === 'dateRange';
                         
                         if (!isTextboxQuestion) {
                             if (question.type === 'dropdown') {
@@ -2775,7 +2791,7 @@ function exportForm() {
                     const jumpTo = condDiv.querySelector(`#jumpTo${questionId}_${conditionId}`)?.value || '';
 
                     // For textbox and date questions, we only need the jumpTo field (no dropdown)
-                    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+                    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange';
                     
                     if (isTextboxQuestion && jumpTo) {
                         // For textbox and date questions, use "Any Text" as the option
@@ -3830,7 +3846,7 @@ function exportForm() {
                         }
                         
                         // Export conditional prefills for both label and amount fields
-                        if (fieldType === 'label' || fieldType === 'amount') {
+                        if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone') {
                             const conditionalPrefillsData = field.getAttribute('data-conditional-prefills');
                             console.log('🔧 [EXPORT CONDITIONAL PREFILL] Field:', fieldData.label, 'Has attribute:', !!conditionalPrefillsData);
                             if (conditionalPrefillsData) {
@@ -4435,7 +4451,7 @@ function exportForm() {
                             }
                             
                             // Export conditional prefills for both label and amount fields
-                            if (fieldType === 'label' || fieldType === 'amount') {
+                            if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone') {
                                 const conditionalPrefillsData = el.getAttribute('data-conditional-prefills');
                                 if (conditionalPrefillsData) {
                                     try {
@@ -4498,6 +4514,7 @@ function exportForm() {
                 questionType === 'text' ||
                 questionType === 'radio' ||
                 questionType === 'money' ||
+                questionType === 'currency' ||
                 questionType === 'date' ||
                 questionType === 'email' ||
                 questionType === 'phone' ||

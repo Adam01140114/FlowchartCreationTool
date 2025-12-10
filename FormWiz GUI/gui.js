@@ -463,7 +463,7 @@ function addJumpCondition(questionId) {
     // Check if this is a textbox or date question type
     const questionTypeSelect = document.getElementById(`questionType${questionId}`);
     const questionType = questionTypeSelect ? questionTypeSelect.value : '';
-    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+    const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange';
     
     const conditionDiv = document.createElement('div');
     conditionDiv.className = 'jump-condition';
@@ -596,7 +596,8 @@ function addQuestion(sectionId, questionId = null) {
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
             <option value="multipleTextboxes">Multiple Textboxes</option>
-            <option value="money">Money</option>
+            <option value="money">Number</option>
+            <option value="currency">Currency</option>
             <option value="date">Date</option>
             <option value="dateRange">Date Range</option>
             <option value="email">Email</option>
@@ -1225,6 +1226,7 @@ function toggleOptions(questionId) {
             break;
 
         case 'money':
+        case 'currency':
             textboxOptionsBlock.style.display = 'block';
             // Update existing jump conditions to use simplified format for textbox questions
             updateJumpConditionsForTextbox(questionId);
@@ -1690,7 +1692,7 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
                 answerSelect.appendChild(optionEl);
             }
         }
-    } else if (questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange') {
+    } else if (questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange') {
         // For textbox, money, and date questions, hide the answer dropdown since they don't have predefined options
         answerSelect.style.display = 'none';
         
@@ -1732,7 +1734,7 @@ function toggleJumpLogic(questionId) {
             addJumpCondition(questionId); // Add first condition automatically
             
             // Make sure options are populated based on question type (skip for textbox and date questions)
-            const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'date' || questionType === 'dateRange';
+            const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange';
             if (!isTextboxQuestion) {
                 if (questionType === 'numberedDropdown') {
                     updateJumpOptionsForNumberedDropdown(questionId);
@@ -5108,6 +5110,7 @@ function editUnifiedField(questionId, fieldOrder) {
                 <option value="label" ${currentType === 'label' ? 'selected' : ''}>Label</option>
                 <option value="amount" ${currentType === 'amount' ? 'selected' : ''}>Amount</option>
                 <option value="date" ${currentType === 'date' ? 'selected' : ''}>Date</option>
+                <option value="phone" ${currentType === 'phone' ? 'selected' : ''}>Phone</option>
             </select>
         </div>
         <div id="prefillContainer${questionId}_${fieldOrder}" style="margin-bottom: 15px; ${currentType === 'label' ? '' : 'display: none;'}">
@@ -6428,7 +6431,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                     console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
                     console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
                     
-                    if (fieldType && (fieldType === 'label' || fieldType === 'amount')) {
+                    if (fieldType && (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone')) {
                         // Get the field data from the spans
                         const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
                         const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
@@ -6513,7 +6516,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                     console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
                     console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
                     
-                    if (fieldType && (fieldType === 'label' || fieldType === 'amount')) {
+                    if (fieldType && (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone')) {
                         // Get the field data from the spans
                         const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
                         const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);

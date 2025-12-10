@@ -6,7 +6,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Who are you suing?",
+          "text": "",
           "type": "multipleTextboxes",
           "logic": {
             "enabled": false,
@@ -61,286 +61,18 @@
           },
           "options": [],
           "labels": [],
-          "nodeId": "who_are_you_suing",
           "allFieldsInOrder": [
             {
-              "type": "label",
-              "label": "Name",
-              "nodeId": "who_are_you_suing_name",
-              "order": 1,
-              "prefill": "[defendantName]"
+              "type": "phone",
+              "label": "Label 1",
+              "nodeId": "label_1",
+              "order": 1
             },
             {
               "type": "amount",
-              "label": "Phone Number",
-              "nodeId": "who_are_you_suing_phone_number",
+              "label": "Amount 2",
+              "nodeId": "amount_2",
               "order": 2
-            },
-            {
-              "type": "location",
-              "fieldName": "Location Data",
-              "nodeId": "location_data",
-              "order": 3
-            },
-            {
-              "type": "checkbox",
-              "fieldName": "Military Status",
-              "selectionType": "multiple",
-              "required": "optional",
-              "options": [
-                {
-                  "text": "Is this defendant on active military duty?",
-                  "nodeId": "who_are_you_suing_military_status_is_this_defendant_on_active_military_duty",
-                  "linkedFields": [],
-                  "pdfEntries": []
-                }
-              ],
-              "order": 4
-            },
-            {
-              "type": "dropdown",
-              "fieldName": "Are they a business or public entity??",
-              "options": [
-                {
-                  "text": "Yes",
-                  "nodeId": "are_they_a_business_or_public_entity_yes"
-                },
-                {
-                  "text": "No",
-                  "nodeId": "are_they_a_business_or_public_entity_no"
-                }
-              ],
-              "triggerSequences": [
-                {
-                  "condition": "Yes",
-                  "fields": [
-                    {
-                      "type": "label",
-                      "label": "Name",
-                      "nodeId": "sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_name"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Job Title",
-                      "nodeId": "sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_job_title"
-                    },
-                    {
-                      "type": "location",
-                      "fieldName": "Work Address",
-                      "nodeId": "location_data"
-                    },
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Are they a public entity?",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Have you filed a written claim against them?",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "date",
-                      "label": "When did you file it?",
-                      "nodeId": "sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_it"
-                    }
-                  ]
-                }
-              ],
-              "order": 5
-            }
-          ]
-        },
-        {
-          "questionId": 2,
-          "text": "How many people are you suing in total?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": ""
-          },
-          "options": [],
-          "labels": [],
-          "nodeId": "how_many_people_are_you_suing_in_total",
-          "min": "1",
-          "max": "3",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Name",
-              "nodeId": "how_many_people_are_you_suing_in_total_name",
-              "order": 1,
-              "prefill": "",
-              "conditionalPrefills": [
-                {
-                  "trigger": "1",
-                  "value": "[defendantName]"
-                }
-              ]
-            },
-            {
-              "type": "label",
-              "label": "Phone",
-              "nodeId": "how_many_people_are_you_suing_in_total_phone",
-              "order": 2,
-              "prefill": ""
-            },
-            {
-              "type": "location",
-              "fieldName": "Location Data",
-              "nodeId": "location_data",
-              "order": 3
-            },
-            {
-              "type": "checkbox",
-              "fieldName": "Military Status",
-              "selectionType": "multiple",
-              "required": "required",
-              "options": [
-                {
-                  "text": "Check here if the defendant is on military duty",
-                  "nodeId": "sc_100_how_many_people_are_you_suing_in_total_military_status_check_here_if_the_defendant_is_on_military_duty",
-                  "linkedFields": [],
-                  "pdfEntries": [
-                    {
-                      "triggerNumber": "2",
-                      "pdfName": "MC-031 (Military)",
-                      "pdfFile": "mc-031-military.pdf",
-                      "priceId": "price_1SHdb4FJeSRMFQ8XEsxSKU7E"
-                    },
-                    {
-                      "triggerNumber": "3",
-                      "pdfName": "MC-031 (Military)",
-                      "pdfFile": "mc-031-military.pdf",
-                      "priceId": "price_1SHdb4FJeSRMFQ8XEsxSKU7E"
-                    }
-                  ]
-                }
-              ],
-              "order": 4
-            },
-            {
-              "type": "dropdown",
-              "fieldName": "Are they a business or public entity?",
-              "options": [
-                {
-                  "text": "Yes",
-                  "nodeId": "are_they_a_business_or_public_entity_yes"
-                },
-                {
-                  "text": "No",
-                  "nodeId": "are_they_a_business_or_public_entity_no"
-                }
-              ],
-              "triggerSequences": [
-                {
-                  "condition": "Yes",
-                  "title": "Additional Information",
-                  "fields": [
-                    {
-                      "type": "label",
-                      "label": "Name",
-                      "nodeId": "sc100_how_many_people_are_you_suing_in_total_are_they_a_business_or_public_entity_yes_name"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Job Title",
-                      "nodeId": "sc100_how_many_people_are_you_suing_in_total_are_they_a_business_or_public_entity_yes_job_title"
-                    },
-                    {
-                      "type": "location",
-                      "fieldName": "Work Address",
-                      "nodeId": "location_data"
-                    },
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Are they a public entity?",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "dropdown",
-                      "fieldName": "Have you filed a written claim against them?",
-                      "options": [
-                        {
-                          "text": "Yes"
-                        },
-                        {
-                          "text": "No"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "order": 5
             }
           ]
         }
@@ -350,7 +82,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 3,
+  "questionCounter": 2,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
