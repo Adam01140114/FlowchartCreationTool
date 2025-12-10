@@ -3,12 +3,9 @@
  **************************************************/
 // Firebase configuration moved to config.js module
 // const db and currentUser are now available from config.js
-
   // Colors moved to config.js module
-
 // TEST: Script.js is loading!
 // Script loading
-
 /**************************************************
  *            GLOBAL  TYPING  HELPER              *
  **************************************************/
@@ -21,36 +18,26 @@ function isUserTyping (evt = null) {
   // Something nested inside a foreignObject? walk up the DOM
   return !!el.closest('input, textarea, [contenteditable="true"]');
 }
-
   // Context menu functions moved to context-menus.js module
-
   // updateEndNodeCell function moved inside DOMContentLoaded event listener
   // colorPreferences moved to config.js module
-
   // Section preferences moved to config.js module
-
   // currentFlowchartName moved to config.js module
-
   // updateLegendColors function moved to config.js module
-
 const loginOverlay = document.getElementById("loginOverlay");
 const loginButton = document.getElementById("loginButton");
 const signupButton = document.getElementById("signupButton");
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
 const loginError = document.getElementById("loginError");
-
 const flowchartListOverlay = document.getElementById("flowchartListOverlay");
 const flowchartListDiv = document.getElementById("flowchartList");
 const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
-
 const logoutBtn = document.getElementById("logoutBtn");
-
 // Close flowchart list overlay
 closeFlowchartListBtn.addEventListener("click", function() {
   document.getElementById("flowchartListOverlay").style.display = "none";
 });
-
 // Add click-outside-to-close for library overlay
 document.getElementById("flowchartListOverlay").addEventListener("click", function(event) {
   if (event.target === this) {
@@ -58,18 +45,14 @@ document.getElementById("flowchartListOverlay").addEventListener("click", functi
     this.style.display = "none";
   }
 });
-
   // Authentication functions have been moved to auth.js
-
 /**************************************************
  ************ Section Preferences & Legend ********
  **************************************************/
 // Section-related functions have been moved to legend.js
-
 // Add these functions at the top level
 // Section-related functions have been moved to legend.js
 let selectedSectionForColor = null;
-
 /**************************************************
  ************  GRAPH, NODES, CONTEXT MENU, etc. ********
  **************************************************/
@@ -79,16 +62,12 @@ let currentMouseEvent = null;
 let lastSelectedCell = null;
 let jumpModeNode = null;
   // jumpBorderStyle moved to config.js module
-
   // Mouse position tracking moved to events.js module
-
   // Graph-dependent functions will be defined after graph initialization
-
   // Helper function to get the current graph safely
   function getCurrentGraph() {
     return window.graph || graph;
   }
-
   // Override the global graph variable to ensure it's always available
   Object.defineProperty(window, 'graph', {
     get: function() {
@@ -98,28 +77,21 @@ let jumpModeNode = null;
       graph = value;
       // Also update the local variable
       if (value) {
-
       }
     }
   });
-
   // cleanStyle function moved to config.js module
-
 // loadFlowchartData function removed - using the one from library.js instead
 // The library.js version properly handles groups data and all other functionality
-
 document.addEventListener("DOMContentLoaded", function() {
   checkForSavedLogin();
-
   // autoLogin has been moved to auth.js
-
   const container = document.getElementById("graphContainer");
   const contextMenu = document.getElementById("contextMenu");
   const notesContextMenu = document.getElementById("notesContextMenu");
   const edgeContextMenu = document.getElementById("edgeContextMenu");
   const edgeStyleSubmenu = document.getElementById("edgeStyleSubmenu");
   const deleteNodeButton = document.getElementById("deleteNode");
-
   // Add event listener for location IDs popup close button
   const closeLocationIdsPopupBtn = document.getElementById("closeLocationIdsPopup");
   if (closeLocationIdsPopupBtn) {
@@ -132,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const propertiesButton = document.getElementById("propertiesButton");
   const yesNoNodeButton = document.getElementById("yesNoNode");
   const newSectionButton = document.getElementById("newSectionNode");
-
   const typeSubmenu = document.getElementById("typeSubmenu");
   const calcSubmenu = document.getElementById("calcSubmenu");
   const optionTypeSubmenu = document.getElementById("optionTypeSubmenu");
@@ -140,34 +111,25 @@ document.addEventListener("DOMContentLoaded", function() {
   const subtitleTypeBtn = document.getElementById("subtitleType");
   const infoTypeBtn = document.getElementById("infoType");
       // Question type buttons moved to questions.js module
-
     // Properties panel elements moved to properties.js module
-
   const resetBtn = document.getElementById("resetBtn");
-
     // Graph initialization moved to graph.js module
     if (typeof initializeGraph === 'function') {
       graph = initializeGraph();
-
       // Set up zoom sensitivity for the new graph
       if (typeof window.setupZoomSensitivityForGraph === 'function') {
         window.setupZoomSensitivityForGraph(graph);
       }
     } else {
-
       // Fallback: create graph directly
   graph = new mxGraph(container);
-
       // Set up zoom sensitivity for the fallback graph
       if (typeof window.setupZoomSensitivityForGraph === 'function') {
         window.setupZoomSensitivityForGraph(graph);
       }
     }
-
     // Mouse event listeners moved to events.js module
-
     // Graph-dependent event handler functions moved to events.js module
-
     // Define updateEndNodeCell function after graph initialization
     window.updateEndNodeCell = function(cell) {
       if (graph) {
@@ -181,70 +143,55 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       }
     };
-
     // Define refreshAllCells and performRefreshAllCells functions after graph initialization
     window.refreshAllCells = function(selectedCells = null) {
       if (!graph) return;
-
       // Prevent multiple simultaneous calls
       if (window.isRefreshing) {
         return;
       }
-
       // Throttle rapid successive calls
       if (window.refreshAllCellsTimeout) {
         clearTimeout(window.refreshAllCellsTimeout);
       }
-
       // Dynamic throttle delay based on cell count for better performance
       const cellCount = graph.getModel().getChildCount(graph.getDefaultParent());
       const throttleDelay = cellCount > 100 ? 300 : (cellCount > 50 ? 200 : 150);
-
       window.refreshAllCellsTimeout = setTimeout(() => {
         window.performRefreshAllCells(selectedCells);
       }, throttleDelay);
     };
-
     window.performRefreshAllCells = function(selectedCells = null) {
       if (!graph || window.isRefreshing) return;
-
       window.isRefreshing = true;
       const startTime = performance.now();
-
       try {
         const parent = graph.getDefaultParent();
         let vertices;
-
         // If specific cells are provided, only refresh those
         if (selectedCells && selectedCells.length > 0) {
           vertices = selectedCells;
         } else {
           vertices = graph.getChildVertices(parent);
         }
-
         // Skip refresh if no cells to process
         if (!vertices || vertices.length === 0) {
           return;
         }
-
         // Batch updates for better performance
         graph.getModel().beginUpdate();
-
         // Use for...of for better performance with large arrays
         for (const cell of vertices) {
           // Skip cells that don't need updates (optimization for large flowcharts)
           if (cell._skipRefresh) {
             continue;
           }
-
           if (window.colorCell) {
             window.colorCell(cell);
           }
-
           if (isEndNode(cell)) {
             window.updateEndNodeCell(cell);
           }
-
           // Handle different option node types
           if (isOptions(cell)) {
             const questionType = getQuestionType(cell);
@@ -262,16 +209,13 @@ document.addEventListener("DOMContentLoaded", function() {
               // Regular option nodes
               if (window.updateOptionNodeCell) window.updateOptionNodeCell(cell);
             }
-
             // DISABLED: Automatic Node ID regeneration during text editing
             // Node IDs will only change when manually edited or reset using the button
           }
-
           // Handle PDF nodes
           if (isPdfNode(cell)) {
             if (window.updatePdfNodeCell) window.updatePdfNodeCell(cell);
           }
-
           // If it's a dropdown node, make sure we update _questionText from value
           if (isQuestion(cell) && getQuestionType(cell) === "dropdown") {
             // Extract text from HTML value if present
@@ -282,7 +226,6 @@ document.addEventListener("DOMContentLoaded", function() {
               }
             }
           }
-
           // If newly dropped question node is just placeholder or has empty value
           if (isQuestion(cell) && (!cell.value || /^\s*$/.test(cell.value) || cell.value === "question node" || cell.value === "Question Node")) {
             cell.value = `
@@ -310,17 +253,13 @@ document.addEventListener("DOMContentLoaded", function() {
               </div>`;
           }
         }
-
         graph.getModel().endUpdate();
-
         // Clear cell text cache when refreshing all cells
         if (window.cellTextCache) {
           window.cellTextCache.clear();
         }
-
         // Renumber question IDs automatically based on Y position
         renumberQuestionIds();
-
         // Performance monitoring
         const endTime = performance.now();
         const refreshTime = endTime - startTime;
@@ -330,28 +269,22 @@ document.addEventListener("DOMContentLoaded", function() {
           window.performanceMetrics.cellCount = vertices.length;
           window.performanceMetrics.averageRefreshTime = 
             (window.performanceMetrics.averageRefreshTime * (window.performanceMetrics.refreshCount - 1) + refreshTime) / window.performanceMetrics.refreshCount;
-
           // Log performance warning for slow refreshes (adjusted thresholds for large flowcharts)
           const warningThreshold = vertices.length > 100 ? 500 : (vertices.length > 50 ? 200 : 100);
           if (refreshTime > warningThreshold && vertices.length > 20) {
-
           }
         }
-
       } finally {
         window.isRefreshing = false;
       }
     };
-
     // Optimized function to refresh only specific cells
     window.refreshSpecificCells = function(cells) {
       if (!graph || !cells || cells.length === 0) return;
-
       // Prevent multiple simultaneous calls
       if (window.isRefreshing) {
         return;
       }
-
       // Mark cells as needing refresh
       cells.forEach(cell => {
         if (cell) {
@@ -359,23 +292,18 @@ document.addEventListener("DOMContentLoaded", function() {
           cell._skipRefresh = false;
         }
       });
-
       // Throttle rapid successive calls
       if (window.refreshAllCellsTimeout) {
         clearTimeout(window.refreshAllCellsTimeout);
       }
-
       window.refreshAllCellsTimeout = setTimeout(() => {
         window.performRefreshAllCells(cells);
       }, 100); // Faster throttle for specific cells
     };
-
     /*****************************************************************
    * SHOW-ONLY-THE-TEXT   (hides the wrapper while the user edits)
    *****************************************************************/
-
   // isSimpleHtmlQuestion function moved to questions.js module
-
   /* ----------  a) what the in-place editor should display  ---------- */
   const origGetEditingValue = graph.getEditingValue.bind(graph);
   graph.getEditingValue = function (cell, evt) {
@@ -389,27 +317,21 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     return origGetEditingValue(cell, evt);
   };
-
   // Label changed event listener moved to events.js module
-
       // Double-click behavior moved to graph.js module
     // Custom double-click handling for specific node types
     if (typeof window.setupCustomDoubleClickBehavior === 'function') {
       try {
         window.setupCustomDoubleClickBehavior(graph);
       } catch (error) {
-
       }
     }
-
   // Let mxGraph render cell labels as HTML
   graph.setHtmlLabels(true);
-
   // Force all vertex labels to be interpreted as HTML
   graph.isHtmlLabel = function(cell) {
     return true;
   };
-
   // Disable built-in label editing if it's multipleTextboxes or multipleDropdownType
   // ----------  AFTER  ----------
 graph.isCellEditable = function (cell) {
@@ -442,32 +364,25 @@ graph.isCellEditable = function (cell) {
   }
   return true;
 };
-
   // Enter => newline
   graph.setEnterStopsCellEditing(false);
-
   // Set up proper panning with left button
   graph.setPanning(true);
   graph.panningHandler.useLeftButtonForPanning = true;
-
     // Cell editing listener moved to events.js module
-
   // Comment out the line that disables the context menu on the graph container
   // mxEvent.disableContextMenu(container);   // comment this out
   graph.setCellsMovable(true);
   graph.setConnectable(true);
   graph.setCellsResizable(true);
-
   // We'll focus just on making right-click work properly
   // Customize rubberband handling (we'll skip selection box for now)
   const rubberband = new mxRubberband(graph);
-
   // Function to auto-select connecting edges
   function autoSelectConnectingEdges() {
     const sel = graph.getSelectionCells();
     const verts = sel.filter(c => c && c.vertex);
     if (verts.length < 2) return;
-
     const toAdd = [];
     for (let i = 0; i < verts.length; i++) {
       for (let j = i + 1; j < verts.length; j++) {
@@ -479,7 +394,6 @@ graph.isCellEditable = function (cell) {
     }
     if (toAdd.length) graph.getSelectionModel().addCells(toAdd);
   }
-
   // Add resize listener for notes nodes to update font size dynamically
   graph.getModel().addListener(mxEvent.CHANGE, function(sender, evt) {
     const changes = evt.getProperty('edit').changes;
@@ -491,7 +405,6 @@ graph.isCellEditable = function (cell) {
           updateNotesNodeCell(change.cell);
         }, 10); // Small delay to ensure geometry is updated
       }
-
       // Check for geometry changes (resize/move) on calculation nodes
       if (change instanceof mxGeometryChange && change.cell && typeof window.isCalculationNode === 'function' && window.isCalculationNode(change.cell)) {
         // Calculation node was resized - alert disabled
@@ -499,62 +412,48 @@ graph.isCellEditable = function (cell) {
       }
     });
   });
-
     // Selection change listener moved to events.js module
-
     // Cells moved event listener moved to events.js module
-
     // Custom click and double-click handlers moved to events.js module
-
     // Context menu handling moved to context-menus.js module
     if (typeof window.initializeContextMenusModule === 'function') {
       window.initializeContextMenusModule(graph);
     }
-
     // Properties panel handling moved to properties.js module
     if (typeof window.initializePropertiesPanelModule === 'function') {
       window.initializePropertiesPanelModule();
     }
-
     // Event handlers moved to events.js module
     if (typeof window.initializeEventHandlersModule === 'function') {
       window.initializeEventHandlersModule(graph);
     }
-
     // Global click listener for hiding menus moved to context-menus.js module
-
   // Slight style tweaks to move label text away from top
   const style = graph.getStylesheet().getDefaultVertexStyle();
   style[mxConstants.STYLE_VERTICAL_ALIGN] = "top";
   style[mxConstants.STYLE_VERTICAL_LABEL_POSITION] = "middle";
   style[mxConstants.STYLE_SPACING_TOP] = 10;
-
   // Ensure vertices (nodes) are always displayed in front of edges (connectors)
   style[mxConstants.STYLE_Z_INDEX] = 1;
-
   // Set edge z-index to be behind vertices
   const edgeStyle = graph.getStylesheet().getDefaultEdgeStyle();
   edgeStyle[mxConstants.STYLE_Z_INDEX] = 0;
-
   // Zoom with mouse wheel
   mxEvent.addMouseWheelListener(function(evt, up) {
     if (!mxEvent.isConsumed(evt)) {
       // Get zoom sensitivity from settings (default to 0.01 if not set)
       const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-
       // Apply custom zoom based on sensitivity
       const currentScale = graph.view.scale;
       const baseZoomFactor = 1.02; // Much smaller base zoom factor
       const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
       const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
-
       let newScale;
       if (up) {
         newScale = currentScale * zoomFactor;
       } else {
         newScale = currentScale / zoomFactor;
       }
-
       // Limit zoom range - maximum range for better usability
       if (newScale >= 0.01 && newScale <= 20.0) {
         // Get mouse position relative to the container
@@ -562,38 +461,27 @@ graph.isCellEditable = function (cell) {
         const rect = container.getBoundingClientRect();
         const mouseX = evt.clientX - rect.left;
         const mouseY = evt.clientY - rect.top;
-
         // Get current view state
         const currentTranslate = graph.view.translate;
         const currentScale = graph.view.scale;
-
         // Calculate the point in graph coordinates that the mouse is over
         const graphX = (mouseX / currentScale) - currentTranslate.x;
         const graphY = (mouseY / currentScale) - currentTranslate.y;
-
         // Set the new scale
         graph.view.setScale(newScale);
-
         // Calculate the new translation to keep the mouse point in the same screen position
         const newTranslateX = (mouseX / newScale) - graphX;
         const newTranslateY = (mouseY / newScale) - graphY;
-
         // Apply the new translation
         graph.view.setTranslate(newTranslateX, newTranslateY);
       }
-
       mxEvent.consume(evt);
     }
   }, container);
-
     // Keyboard shortcuts and selection tracking moved to events.js module
-
     // Draggable shapes setup moved to events.js module
-
     // MOVE_CELLS event listener moved to events.js module
-
     // Delete node event handler moved to context-menus.js module
-
   // Mark/unmark jump node
   jumpNodeButton.addEventListener("click", () => {
     if (selectedCell) {
@@ -605,7 +493,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   // Create yes/no child options
   yesNoNodeButton.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
@@ -613,7 +500,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   // 'Change Type' -> Show submenu
   changeTypeButton.addEventListener("click", () => {
     const rect = contextMenu.getBoundingClientRect();
@@ -637,15 +523,12 @@ graph.isCellEditable = function (cell) {
       optionTypeSubmenu.style.display = "none";
     }
   });
-
     // Question type event handlers moved to questions.js module
-
   // Calc submenu buttons
   calcTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
         // Extract and preserve the current text content
         const preservedText = extractTextFromCell(selectedCell);
-
       // Convert to calculation node
       graph.getModel().beginUpdate();
       try {
@@ -659,12 +542,10 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   subtitleTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
         // Extract and preserve the current text content
         const preservedText = extractTextFromCell(selectedCell);
-
       // Convert to subtitle node
       graph.getModel().beginUpdate();
       try {
@@ -678,12 +559,10 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   infoTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
         // Extract and preserve the current text content
         const preservedText = extractTextFromCell(selectedCell);
-
       // Convert to info node
       graph.getModel().beginUpdate();
       try {
@@ -697,9 +576,7 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
     // Multiple textboxes and dropdown event handlers moved to questions.js module
-
   // Option type submenu event handlers
   const regularOptionTypeBtn = document.getElementById("regularOptionType");
   const imageOptionTypeBtn = document.getElementById("imageOptionType");
@@ -708,7 +585,6 @@ graph.isCellEditable = function (cell) {
   const alertNodeTypeBtn = document.getElementById("alertNodeType");
   const checklistNodeTypeBtn = document.getElementById("checklistNodeType");
   const endNodeTypeBtn = document.getElementById("endNodeType");
-
   regularOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "dropdown");
@@ -716,7 +592,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   imageOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "imageOption");
@@ -724,7 +599,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   amountOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "amountOption");
@@ -732,7 +606,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   notesNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "notesNode");
@@ -740,7 +613,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   checklistNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "checklistNode");
@@ -748,7 +620,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   alertNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "alertNode");
@@ -756,7 +627,6 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   endNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "end");
@@ -764,10 +634,8 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
   // Notes context menu event handlers are now handled in context-menus.js
   // Removed duplicate event listeners to prevent conflicts
-
   // Increase the "section number" for a question
   newSectionButton.addEventListener("click", () => {
     if (selectedCell) {
@@ -779,20 +647,15 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-
     // Properties menu function moved to properties.js module
-
     // Properties button event listener moved to properties.js module
-
     // Editable field function moved to properties.js module
-
     // Properties panel functions moved to properties.js module
 /**************************************************
  *              KEYBOARD  SHORTCUTS               *
  **************************************************/
 // Use document event listener instead of mxKeyHandler to avoid duplicate bindings
 if (!window.flowchartKeyboardInitialized) {
-
   document.addEventListener('keydown', function(event) {
     // Handle Ctrl+C
     if ((event.key === 'c' || event.key === 'C') && (event.ctrlKey || event.metaKey)) {
@@ -800,25 +663,20 @@ if (!window.flowchartKeyboardInitialized) {
       event.preventDefault();
       copySelectedNodeAsJson();
     }
-
     // Handle Ctrl+V
     if ((event.key === 'v' || event.key === 'V') && (event.ctrlKey || event.metaKey)) {
-
       if (isUserTyping(event)) return;
       event.preventDefault();
       const mousePos = graph.getPointForEvent(graph.lastEvent);
       window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
                         mousePos ? mousePos.y : undefined);
     }
-
     // Handle Ctrl+S
     if ((event.key === 's' || event.key === 'S') && (event.ctrlKey || event.metaKey)) {
-
       if (isUserTyping(event)) return;
       event.preventDefault();
       // Call saveFlowchart function directly if it exists
       if (typeof window.saveFlowchart === 'function') {
-
         window.saveFlowchart();
       } else {
         // Fallback: try to find and click save button
@@ -826,55 +684,39 @@ if (!window.flowchartKeyboardInitialized) {
         if (saveButton) {
           saveButton.click();
         } else {
-
         }
       }
     }
   });
-
   // Mark that keyboard shortcuts have been initialized
   window.flowchartKeyboardInitialized = true;
 } else {
-
 }
-
 /* Ctrl + Shift – reset all PDF and node IDs */
 document.addEventListener('keydown', function(event) {
   if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey) {
     // Only trigger on the initial keydown, not on key repeats
     if (event.repeat) return;
-
     if (isUserTyping()) return; // Don't trigger if user is typing
-
     // Proceed without confirmation dialog
-
     // Reset PDF inheritance for all nodes FIRST
     if (typeof window.resetAllPdfInheritance === 'function') {
       window.resetAllPdfInheritance();
-
     } else {
-
     }
-
     // Reset all Node IDs SECOND (after PDF inheritance is fixed)
     if (typeof resetAllNodeIds === 'function') {
       resetAllNodeIds();
-
     } else {
-
     }
-
     event.preventDefault();
   }
 });
-
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
-
     copySelectedNodeAsJson();
     hideContextMenu();
   });
-
   // Add listener for paste here button
   document.getElementById('pasteHereButton').addEventListener('click', function() {
     if (window.emptySpaceClickX !== undefined && window.emptySpaceClickY !== undefined) {
@@ -886,7 +728,6 @@ document.addEventListener('keydown', function(event) {
     }
     hideContextMenu();
   });
-
   // Edge context menu event listeners
   document.getElementById('untangleEdge').addEventListener('click', function() {
     const selectedCells = graph.getSelectionCells();
@@ -899,14 +740,12 @@ document.addEventListener('keydown', function(event) {
     }
     hideContextMenu();
   });
-
   document.getElementById('changeEdgeStyle').addEventListener('click', function() {
     const rect = edgeContextMenu.getBoundingClientRect();
     edgeStyleSubmenu.style.display = "block";
     edgeStyleSubmenu.style.left = rect.right + "px";
     edgeStyleSubmenu.style.top = rect.top + "px";
   });
-
   document.getElementById('deleteEdge').addEventListener('click', function() {
     const selectedCells = graph.getSelectionCells();
     if (selectedCells.length === 1 && selectedCells[0].edge) {
@@ -915,7 +754,6 @@ document.addEventListener('keydown', function(event) {
     }
     hideContextMenu();
   });
-
   // Edge style submenu event listeners
   document.getElementById('edgeStyleCurved').addEventListener('click', function() {
     const selectedCells = graph.getSelectionCells();
@@ -936,7 +774,6 @@ document.addEventListener('keydown', function(event) {
     }
     hideContextMenu();
   });
-
   document.getElementById('edgeStyleDirect').addEventListener('click', function() {
     const selectedCells = graph.getSelectionCells();
     if (selectedCells.length === 1 && selectedCells[0].edge) {
@@ -956,22 +793,17 @@ document.addEventListener('keydown', function(event) {
     }
     hideContextMenu();
   });
-
   graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
     const changes = evt.getProperty("changes");
     if (!changes) return;
-
     const modifiedQuestionCells = new Set();
-
     changes.forEach(change => {
       if (change.constructor.name === "mxValueChange") {
         const { cell, value } = change;
-
         // Track modified question cells
         if (isQuestion(cell)) {
           modifiedQuestionCells.add(cell);
         }
-
         if (value && typeof value === "string") {
           // If a label ends with "?", treat as question
           if (value.trim().endsWith("?")) {
@@ -986,51 +818,41 @@ document.addEventListener('keydown', function(event) {
         }
       }
     });
-
     // Update calculation nodes that depend on modified questions
     modifiedQuestionCells.forEach(questionCell => {
       updateAllCalcNodesOnQuestionChange(questionCell, false);
     });
-
     refreshAllCells();
   });
-
 // Function to propagate PDF properties downstream through the flowchart
 function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new Set()) {
     if (!startCell || visited.has(startCell.id)) return;
     visited.add(startCell.id);
-
     const graph = window.graph;
     if (!graph) return;
-
     // Get all outgoing edges from the start cell
     const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
-
     for (const edge of outgoingEdges) {
         const targetCell = edge.target;
         if (targetCell && !visited.has(targetCell.id)) {
             // Check if target doesn't already have PDF properties
             if (!targetCell._pdfName && !targetCell._pdfFilename && !targetCell._pdfUrl && 
                 !(typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell))) {
-
                 // Copy PDF properties from source to target
                 if (sourceCell._pdfName) targetCell._pdfName = sourceCell._pdfName;
                 if (sourceCell._pdfFilename) targetCell._pdfFilename = sourceCell._pdfFilename;
                 if (sourceCell._pdfUrl) targetCell._pdfUrl = sourceCell._pdfUrl;
                 if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
                 if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
-
                 // Recursively propagate to further downstream nodes
                 propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
             }
         }
     }
 }
-
   graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
     const edge = evt.getProperty("cell");
     if (!edge) return;
-
     // Apply current edge style setting to manually created edges
     let edgeStyle;
     if (currentEdgeStyle === 'curved') {
@@ -1043,22 +865,18 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
     }
     graph.getModel().setStyle(edge, edgeStyle);
-
     const source = graph.getModel().getTerminal(edge, true);
     const target = graph.getModel().getTerminal(edge, false);
-
     if (source && target) {
         // When connecting an option to a question, the option and its descendants
         // should adopt the question's section only if it's a higher section number.
         if (isOptions(source) && isQuestion(target)) {
             const questionSection = getSection(target);
             const sourceSection = getSection(source);
-
             // Only update if the question's section is greater.
             // A null section can be treated as 0 for comparison.
             if (questionSection !== null && questionSection > (sourceSection || 0)) {
                 setSection(source, questionSection);
-
                 // Also apply to all downstream cells from this source, with the same condition.
                 const downstreamCells = getConnectedDescendants(source); // Assuming getConnectedDescendants exists
                 downstreamCells.forEach(cell => {
@@ -1074,38 +892,32 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         else if (isQuestion(source) && isOptions(target)) {
             const optionSection = getSection(target);
             const questionSection = getSection(source);
-
             if (optionSection !== null && optionSection > (questionSection || 0)) {
                 setSection(source, optionSection);
             }
         }
-
         // PDF Property Inheritance: Propagate PDF properties from source to target
         // This ensures PDF properties flow through the entire flowchart chain
         if (source && target) {
             // Check if source has PDF properties
             const sourceHasPdfProperties = source._pdfName || source._pdfFilename || source._pdfUrl || 
                                          (typeof window.isPdfNode === 'function' && window.isPdfNode(source));
-
             if (sourceHasPdfProperties) {
                 // Propagate PDF properties to target if it doesn't already have them
                 if (!target._pdfName && !target._pdfFilename && !target._pdfUrl && 
                     !(typeof window.isPdfNode === 'function' && window.isPdfNode(target))) {
-
                     // Copy PDF properties from source to target
                     if (source._pdfName) target._pdfName = source._pdfName;
                     if (source._pdfFilename) target._pdfFilename = source._pdfFilename;
                     if (source._pdfUrl) target._pdfUrl = source._pdfUrl;
                     if (source._priceId) target._priceId = source._priceId;
                     if (source._characterLimit) target._characterLimit = source._characterLimit;
-
                     // Also propagate to all downstream nodes from the target
                     propagatePdfPropertiesDownstream(target, source);
                 }
             }
         }
       }
-
       // Update PDF nodes when connections change (to show/hide character limit field)
       const allCells = graph.getModel().cells;
       for (const cellId in allCells) {
@@ -1114,42 +926,34 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
           updatePdfNodeCell(cell);
         }
     }
-
     // DISABLED: Automatic Node ID regeneration has been completely disabled
     // Node IDs will only change when manually edited or reset using the button
     // This prevents Node IDs from changing when connections change or structure changes
     // Users will set all Node IDs at the end when the structure is complete
-
     refreshAllCells();
 });
-
   resetBtn.addEventListener("click", () => {
     colorPreferences = { ...defaultColors };
     updateLegendColors();
     refreshAllCells();
     saveUserColorPrefs();
   });
-
   updateLegendColors();
   // updateSectionLegend is defined in legend.js
   updateSectionLegend();
-
   // Add event listeners for empty space menu buttons
   document.getElementById('placeQuestionNode').addEventListener('click', function() {
     placeNodeAtClickLocation('question');
     hideContextMenu();
   });
-
   document.getElementById('placeOptionNode').addEventListener('click', function() {
     placeNodeAtClickLocation('options');
     hideContextMenu();
   });
-
     // Calculation node placement now handled by calc.js
     if (typeof window.setupCalculationNodeEventListeners === 'function') {
       window.setupCalculationNodeEventListeners();
     }
-
   const placeNotesNode = document.getElementById('placeNotesNode');
   if (placeNotesNode) {
     placeNotesNode.addEventListener('click', function() {
@@ -1157,7 +961,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placeChecklistNode = document.getElementById('placeChecklistNode');
   if (placeChecklistNode) {
     placeChecklistNode.addEventListener('click', function() {
@@ -1165,7 +968,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placeSubtitleNode = document.getElementById('placeSubtitleNode');
   if (placeSubtitleNode) {
     placeSubtitleNode.addEventListener('click', function() {
@@ -1173,7 +975,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placeInfoNode = document.getElementById('placeInfoNode');
   if (placeInfoNode) {
     placeInfoNode.addEventListener('click', function() {
@@ -1181,7 +982,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placeImageNode = document.getElementById('placeImageNode');
   if (placeImageNode) {
     placeImageNode.addEventListener('click', function() {
@@ -1189,7 +989,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placePdfNode = document.getElementById('placePdfNode');
   if (placePdfNode) {
     placePdfNode.addEventListener('click', function() {
@@ -1197,7 +996,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placeAmountNode = document.getElementById('placeAmountNode');
   if (placeAmountNode) {
     placeAmountNode.addEventListener('click', function() {
@@ -1205,7 +1003,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   const placeEndNode = document.getElementById('placeEndNode');
   if (placeEndNode) {
     placeEndNode.addEventListener('click', function() {
@@ -1213,33 +1010,27 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       hideContextMenu();
     });
   }
-
   // Settings menu event listeners
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
   if (closeSettingsBtn) {
     closeSettingsBtn.addEventListener('click', hideSettingsMenu);
   }
-
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
   if (saveSettingsBtn) {
     saveSettingsBtn.addEventListener('click', saveSettings);
   }
-
   const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
   if (cancelSettingsBtn) {
     cancelSettingsBtn.addEventListener('click', hideSettingsMenu);
   }
-
   const resetAllNodeIdsBtn = document.getElementById('resetAllNodeIdsBtn');
   if (resetAllNodeIdsBtn) {
     resetAllNodeIdsBtn.addEventListener('click', resetAllNodeIds);
   }
-
   const resetAllPdfBtn = document.getElementById('resetAllPdfBtn');
   if (resetAllPdfBtn) {
     resetAllPdfBtn.addEventListener('click', window.resetAllPdfInheritance);
   }
-
   // Load settings on startup
   function loadSettingsWhenReady() {
     if (typeof window.loadSettingsFromLocalStorage === 'function') {
@@ -1248,21 +1039,17 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         if (result && typeof result.then === 'function') {
           result.then(() => {
           }).catch(error => {
-
           });
         } else {
         }
       } catch (error) {
-
       }
     } else {
       // Try again after a short delay if the function isn't available yet
       setTimeout(loadSettingsWhenReady, 100);
     }
   }
-
   loadSettingsWhenReady();
-
   // Load zoom sensitivity from Firebase after page loads
   setTimeout(async () => {
     try {
@@ -1270,7 +1057,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         const user = firebase.auth().currentUser;
         const db = firebase.firestore();
         const doc = await db.collection('userSettings').doc(user.uid).get();
-
         if (doc.exists) {
           const data = doc.data();
           if (data.zoomSensitivity !== undefined) {
@@ -1278,15 +1064,12 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
             if (window.userSettings) {
               window.userSettings.zoomSensitivity = data.zoomSensitivity;
             }
-
             // Update the UI
             const input = document.getElementById('zoomSensitivityInput');
             const displaySpan = document.getElementById('zoomSensitivityValue');
-
             if (input) {
               input.value = data.zoomSensitivity;
             }
-
             if (displaySpan) {
               displaySpan.textContent = data.zoomSensitivity;
             }
@@ -1294,16 +1077,12 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         }
       }
     } catch (error) {
-
     }
   }, 1000);
-
   // Initialize search functionality
   initializeSearch();
-
   function placeNodeAtClickLocation(nodeType) {
     if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
-
     const parent = graph.getDefaultParent();
     graph.getModel().beginUpdate();
     let cell;
@@ -1312,7 +1091,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       let label = "";
       let width = 160;
       let height = 80;
-
       if (nodeType === 'question') {
         // Use default style for question, but do not set a static label or questionType
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
@@ -1362,7 +1140,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;";
         label = "END";
       }
-
       // Create cell with appropriate width/height based on type
       if (nodeType === 'calculation') {
         width = 300;
@@ -1371,7 +1148,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         width = 120;
         height = 60;
       }
-
       cell = graph.insertVertex(
         parent, 
         null, 
@@ -1382,7 +1158,6 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         height,
         style
       );
-
       // Set IDs and section
       if (nodeType === 'question') {
         // Set a temporary ID that will be updated when the user enters text
@@ -1391,9 +1166,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       } else if (nodeType === 'options') {
         setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
       }
-
       setSection(cell, "1");
-
         // Special handling for calculation nodes - now handled by calc.js
       if (nodeType === 'calculation') {
           if (typeof window.handleCalculationNodePlacement === 'function') {
@@ -1432,25 +1205,18 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
       }
-
     } finally {
       graph.getModel().endUpdate();
     }
-
     // Apply coloring and show dropdown for question nodes
     refreshAllCells();
-
     // Clear the click location
     window.emptySpaceClickX = undefined;
     window.emptySpaceClickY = undefined;
   }
-
     // Keyboard event listeners moved to events.js module
-
     // Global keydown event listener moved to events.js module
-
 });
-
 /*******************************************************
  ********** RENUMBERING QUESTIONS BY POSITION **********
  *******************************************************/
@@ -1458,7 +1224,6 @@ function renumberQuestionIds() {
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const questions = vertices.filter(cell => isQuestion(cell));
-
   // Sort questions by vertical position (Y coordinate)
   questions.sort((a, b) => {
     const aY = a.geometry.y;
@@ -1468,18 +1233,15 @@ function renumberQuestionIds() {
     }
     return aY - bY;
   });
-
   // Assign sequential IDs based on vertical position
   questions.forEach((cell, index) => {
     cell._questionId = index + 1;
   });
-
   // If properties menu is open for a selected question, update displayed ID
   if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
     document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
   }
 }
-
 /*******************************************************
  ********** MULTIPLE TEXTBOXES: RENDERING & EDITS ******
  *******************************************************/
@@ -1496,15 +1258,12 @@ function escapeAttr(str) {
   if (!str) return "";
   return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
-
 // Helper function to render textboxes for multiple textboxes question
 function renderTextboxes(cell) {
   if (!cell._textboxes) {
     cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
-
   let html = '';
-
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph = tb.placeholder || "Enter value";
@@ -1520,17 +1279,13 @@ function renderTextboxes(cell) {
         </label>
       </div>`;
   });
-
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleTextboxes')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>`;
-
   return html;
 }
-
   // Multiple textboxes functions moved to questions.js module
-
 /*******************************************************
  ********** multipleDropdownType: RENDER & EDITS *******
  *******************************************************/
@@ -1551,7 +1306,6 @@ function updatemultipleDropdownTypeCell(cell) {
     const val = tb.nameId || '';
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
-
     // Add location indicator before this option if it's at the location index
     if (index === locationIndex) {
       html += `
@@ -1562,7 +1316,6 @@ function updatemultipleDropdownTypeCell(cell) {
           <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
-
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
         <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">Field:</div>
@@ -1575,7 +1328,6 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
-
   // Add location indicator at the end if location index is beyond the current options
   if (locationIndex >= cell._textboxes.length) {
     html += `
@@ -1586,7 +1338,6 @@ function updatemultipleDropdownTypeCell(cell) {
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
-
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
       <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
@@ -1594,7 +1345,6 @@ function updatemultipleDropdownTypeCell(cell) {
     </div>
     </div>
   </div>`;
-
   // Add drop zone event listeners
   html = html.replace('class="multiple-textboxes-container"', 'class="multiple-textboxes-container" ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, \'' + cell.id + '\')"');
   graph.getModel().beginUpdate();
@@ -1608,7 +1358,6 @@ function updatemultipleDropdownTypeCell(cell) {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
-
   // Force a refresh to ensure the new HTML is rendered
   setTimeout(() => {
     if (graph.getModel().getCell(cell.id)) {
@@ -1616,7 +1365,6 @@ function updatemultipleDropdownTypeCell(cell) {
     }
   }, 10);
 }
-
 window.updatemultipleDropdownTypeTextHandler = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
@@ -1629,7 +1377,6 @@ window.updatemultipleDropdownTypeTextHandler = function(cellId, text) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.updatemultipleDropdownTypeNumber = function(cellId, which, value) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
@@ -1649,7 +1396,6 @@ window.updatemultipleDropdownTypeNumber = function(cellId, which, value) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.updatemultipleDropdownTypeHandler = function(cellId, index, value) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
@@ -1666,14 +1412,12 @@ window.updatemultipleDropdownTypeHandler = function(cellId, index, value) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.addmultipleDropdownTypeHandler = function(cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
     graph.getModel().beginUpdate();
     try {
       if (!cell._textboxes) cell._textboxes = [];
-
       // If there's a location indicator, add the new option after it
       if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
         // Location is at the end, just add normally
@@ -1681,7 +1425,6 @@ window.addmultipleDropdownTypeHandler = function(cellId) {
       } else {
         // Add the new option
         cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
-
         // If there's a location indicator before the end, shift it down
         if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
           cell._locationIndex++;
@@ -1693,14 +1436,12 @@ window.addmultipleDropdownTypeHandler = function(cellId) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.deletemultipleDropdownTypeHandler = function(cellId, index) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
     graph.getModel().beginUpdate();
     try {
       cell._textboxes.splice(index, 1);
-
       // Adjust location index if needed
       if (cell._locationIndex !== undefined) {
         if (index < cell._locationIndex) {
@@ -1718,76 +1459,49 @@ window.deletemultipleDropdownTypeHandler = function(cellId, index) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
-
   const cell = graph.getModel().getCell(cellId);
-
   if (cell) {
     const questionType = getQuestionType(cell);
-
     if (cell._textboxes && cell._textboxes[index]) {
-
     }
   }
-
   if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
-
     graph.getModel().beginUpdate();
     try {
       const oldValue = cell._textboxes[index].isAmountOption;
       cell._textboxes[index].isAmountOption = checked;
-
     } finally {
       graph.getModel().endUpdate();
-
     }
-
     updatemultipleDropdownTypeCell(cell);
-
     // Trigger autosave to ensure the change is persisted
-
     if (typeof window.requestAutosave === 'function') {
-
       window.requestAutosave();
-
     } else {
-
     }
   } else {
-
   }
-
 };
-
 // Toggle amount option for multiple textboxes
 window.toggleMultipleTextboxAmount = function(cellId, index, checked) {
-
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleTextboxes" && cell._textboxes) {
-
     graph.getModel().beginUpdate();
     try {
       cell._textboxes[index].isAmountOption = checked;
-
     } finally {
       graph.getModel().endUpdate();
     }
     updateMultipleTextboxesCell(cell);
-
     // Trigger autosave to ensure the change is persisted
     if (typeof window.requestAutosave === 'function') {
-
       window.requestAutosave();
     } else {
-
     }
   } else {
-
   }
-
 };
-
 window.addMultipleDropdownLocationHandler = function(cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
@@ -1801,7 +1515,6 @@ window.addMultipleDropdownLocationHandler = function(cellId) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.removeMultipleDropdownLocationHandler = function(cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
@@ -1815,7 +1528,6 @@ window.removeMultipleDropdownLocationHandler = function(cellId) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-
 window.updateMultipleDropdownLocationTitle = function(cellId, title) {
   const cell = graph.getModel().getCell(cellId);
   if (cell && getQuestionType(cell) === "multipleDropdownType") {
@@ -1830,7 +1542,6 @@ window.updateMultipleDropdownLocationTitle = function(cellId, title) {
     }
   }
 };
-
 function fallbackCopyToClipboard(text) {
   const textArea = document.createElement('textarea');
   textArea.value = text;
@@ -1840,44 +1551,35 @@ function fallbackCopyToClipboard(text) {
   document.body.appendChild(textArea);
   textArea.focus();
   textArea.select();
-
   try {
     document.execCommand('copy');
   } catch (err) {
     // Silent fail - user can manually copy if needed
   }
-
   document.body.removeChild(textArea);
 }
-
 // Drag and Drop functionality for reordering entries
 window.handleDragStart = function(event, cellId, index) {
   // Prevent the event from bubbling up to the cell's drag handlers
   event.stopPropagation();
   event.stopImmediatePropagation();
-
   event.dataTransfer.setData('text/plain', JSON.stringify({ cellId, index }));
   event.dataTransfer.effectAllowed = 'move';
-
   // Add visual feedback
   event.target.style.opacity = '0.5';
   event.target.parentElement.style.backgroundColor = '#f0f0f0';
-
   // Store the dragged element for reference
   window.draggedElement = event.target.parentElement;
-
   // Prevent the cell from being dragged
   const cell = graph.getModel().getCell(cellId);
   if (cell) {
     cell.setConnectable(false);
   }
 };
-
 window.handleDragEnd = function(event) {
   // Prevent the event from bubbling up
   event.stopPropagation();
   event.stopImmediatePropagation();
-
   // Remove visual feedback
   if (event.target) {
     event.target.style.opacity = '1';
@@ -1885,7 +1587,6 @@ window.handleDragEnd = function(event) {
       event.target.parentElement.style.backgroundColor = '';
     }
   }
-
   // Re-enable cell dragging
   const cellId = event.target.getAttribute('data-cell-id') || 
                  (event.target.parentElement && event.target.parentElement.getAttribute('data-cell-id'));
@@ -1895,48 +1596,39 @@ window.handleDragEnd = function(event) {
       cell.setConnectable(true);
     }
   }
-
   // Clear dragged element reference
   window.draggedElement = null;
 };
-
 window.handleDragOver = function(event) {
   event.preventDefault();
   event.stopPropagation();
   event.dataTransfer.dropEffect = 'move';
-
   // Add visual feedback for drop zones
   const dropZone = event.currentTarget;
   const rect = dropZone.getBoundingClientRect();
   const y = event.clientY - rect.top;
-
   // Find the closest entry element
   const entries = dropZone.querySelectorAll('.textbox-entry');
   let closestEntry = null;
   let closestDistance = Infinity;
-
   entries.forEach(entry => {
     const entryRect = entry.getBoundingClientRect();
     const entryY = entryRect.top - rect.top + (entryRect.height / 2);
     const distance = Math.abs(y - entryY);
-
     if (distance < closestDistance) {
       closestDistance = distance;
       closestEntry = entry;
     }
   });
-
   // Remove previous drop indicators
   dropZone.querySelectorAll('.drop-indicator').forEach(indicator => {
     indicator.remove();
   });
-
   // Add drop indicator
   if (closestEntry && window.draggedElement && closestEntry !== window.draggedElement) {
     const indicator = document.createElement('div');
     indicator.className = 'drop-indicator';
     indicator.style.cssText = 'height: 2px; background-color: #4CAF50; margin: 2px 0; border-radius: 1px;';
-
     if (y < closestEntry.getBoundingClientRect().top - rect.top + (closestEntry.getBoundingClientRect().height / 2)) {
       closestEntry.parentNode.insertBefore(indicator, closestEntry);
     } else {
@@ -1944,51 +1636,40 @@ window.handleDragOver = function(event) {
     }
   }
 };
-
 window.handleDrop = function(event, cellId) {
   event.preventDefault();
   event.stopPropagation();
-
   try {
     const data = JSON.parse(event.dataTransfer.getData('text/plain'));
     const sourceCellId = data.cellId;
     const sourceIndex = data.index;
-
     if (sourceCellId !== cellId) {
       return; // Can only reorder within the same cell
     }
-
     const dropZone = event.currentTarget;
     const rect = dropZone.getBoundingClientRect();
     const y = event.clientY - rect.top;
-
     // Find the target position
     const entries = Array.from(dropZone.querySelectorAll('.textbox-entry'));
     let targetIndex = entries.length; // Default to end
-
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
       const entryRect = entry.getBoundingClientRect();
       const entryY = entryRect.top - rect.top + (entryRect.height / 2);
-
       if (y < entryY) {
         targetIndex = i;
         break;
       }
     }
-
     // Adjust target index if dropping after the source
     if (targetIndex > sourceIndex) {
       targetIndex--;
     }
-
     // Reorder the entries
     if (sourceIndex !== targetIndex) {
       reorderMultipleDropdownEntries(sourceCellId, sourceIndex, targetIndex);
     }
-
   } catch (error) {
-
   } finally {
     // Clean up visual feedback
     dropZone.querySelectorAll('.drop-indicator').forEach(indicator => {
@@ -1996,66 +1677,53 @@ window.handleDrop = function(event, cellId) {
     });
   }
 };
-
 function reorderMultipleDropdownEntries(cellId, sourceIndex, targetIndex) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || getQuestionType(cell) !== "multipleDropdownType" || !cell._textboxes) {
     return;
   }
-
   graph.getModel().beginUpdate();
   try {
     // Remove the item from source position
     const [movedItem] = cell._textboxes.splice(sourceIndex, 1);
-
     // Insert it at target position
     cell._textboxes.splice(targetIndex, 0, movedItem);
-
     // Re-render the cell to reflect the new order
     updatemultipleDropdownTypeCell(cell);
-
   } finally {
     graph.getModel().endUpdate();
   }
 }
-
 /*******************************************************
  ************ Subtitle and Info Nodes: RENDER & EDITS *********
  *******************************************************/
 // isCalculationNode is now in calc.js but referenced here
 // function isCalculationNode(cell) is defined in calc.js
-
 function isSubtitleNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=subtitle");
 }
-
 function isInfoNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=info");
 }
-
 function updateSubtitleNodeCell(cell) {
   if (!cell) return;
   cell._subtitleText = cell._subtitleText || "Add subtitle text";
   cell.value = `<span style="font-size: 14px; font-style: italic;">${escapeHtml(cell._subtitleText)}</span>`;
   colorCell(cell);
 }
-
 function updateInfoNodeCell(cell) {
   if (!cell) return;
   cell._infoText = cell._infoText || "Add information text";
   cell.value = `<span style="font-size: 14px; color: #555;">${escapeHtml(cell._infoText)}</span>`;
   colorCell(cell);
 }
-
 function updatePdfPreviewNodeCell(cell) {
   if (!cell || !(typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell))) return;
   cell._pdfPreviewTitle = cell._pdfPreviewTitle || "PDF Preview";
   cell.value = escapeHtml(cell._pdfPreviewTitle);
   colorCell(cell);
 }
-
 // The calculation node functions have been moved to calc.js
-
 /*******************************************************
  ************  HELPER / STYLING / JSON Exports  ********
  *******************************************************/
@@ -2072,51 +1740,38 @@ function isOptions(cell) {
     cell.style.includes("questionType=imageOption")
   );
 }
-
 function isAmountOption(cell) {
   return cell && cell.style && cell.style.includes("questionType=amountOption");
 }
-
 function setNodeId(cell, nodeId) {
   // Debug mode - set to true only when debugging node ID issues
   const DEBUG_NODE_ID = false;
-
   if (DEBUG_NODE_ID) {
-
   }
-
   // DISABLED: PDF prefix logic has been completely disabled
   // Node IDs will only be set when manually edited or reset using the button
   // Users will set all Node IDs at the end when the structure is complete
   let finalNodeId = nodeId;
-
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
   style += `;nodeId=${encodeURIComponent(finalNodeId)};`;
-
   if (DEBUG_NODE_ID) {
-
   }
   graph.getModel().setStyle(cell, style);
-
   if (DEBUG_NODE_ID) {
-
   }
 }
 // Local getNodeId function removed - now using global window.getNodeId function
 // which includes PDF name prefixing logic
-
 function refreshNodeIdFromLabel(cell) {
   // DISABLED: Automatic Node ID regeneration has been completely disabled
   // Node IDs will only change when manually edited or reset using the button
   return;
 }
-
 function generateUniqueNodeId(baseNodeId, currentCell) {
   // Get all cells in the graph
   const allCells = graph.getModel().cells;
   const existingNodeIds = new Set();
-
   // Collect all existing node IDs except the current cell
   for (let id in allCells) {
     if (id === "0" || id === "1") continue; // Skip root cells
@@ -2128,60 +1783,44 @@ function generateUniqueNodeId(baseNodeId, currentCell) {
       }
     }
   }
-
   // If the base ID is unique, use it
   if (!existingNodeIds.has(baseNodeId)) {
     return baseNodeId;
   }
-
   // If not unique, add numbering
   let counter = 1;
   let uniqueId = `${baseNodeId}_${counter}`;
-
   while (existingNodeIds.has(uniqueId)) {
     counter++;
     uniqueId = `${baseNodeId}_${counter}`;
   }
-
   return uniqueId;
 }
-
 function refreshOptionNodeId(cell) {
   // DISABLED: Automatic Node ID regeneration has been completely disabled
   // Node IDs will only change when manually edited or reset using the button
   return;
 }
-
 // Function to refresh all option node IDs in the graph
 function refreshAllOptionNodeIds() {
-
   if (!graph) {
-
     return;
   }
-
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
-
   let updatedCount = 0;
   vertices.forEach(cell => {
-
     if (isOptions(cell)) {
-
       // DISABLED: Automatic Node ID regeneration
       // refreshOptionNodeId(cell);
       updatedCount++;
     }
   });
-
   // Refresh the graph to show changes
   if (window.refreshAllCells) {
-
     window.refreshAllCells();
   }
-
 }
-
 function addSkipReassign(cell) {
   if (!cell) return;
   let style = cell.style || "";
@@ -2208,9 +1847,7 @@ function addJumpStyling(cell) {
   style += jumpBorderStyle;
   graph.getModel().setStyle(cell, style);
 }
-
   // getQuestionType function moved to questions.js module
-
 /**
  * Define pickTypeForCell globally
  */
@@ -2222,13 +1859,11 @@ window.pickTypeForCell = function(cellId, val) {
   if (!c) {
     return;
   }
-
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
     // DISABLED: Automatic Node ID generation when changing question type
     // Node IDs will only change when manually edited or reset using the button
-
     if (!c._placeholder) {
       c._placeholder = "";
     }
@@ -2247,12 +1882,10 @@ window.pickTypeForCell = function(cellId, val) {
   } finally {
     graph.getModel().endUpdate();
   }
-
   graph.setSelectionCell(c);
   graph.startEditingAtCell(c);
   refreshAllCells();
 };
-
 /******************************************************************
  * 1) Universal key-down guard â€“ put this in your global helpers  *
  ******************************************************************/
@@ -2269,7 +1902,6 @@ window.handleTitleInputKeydown = function (evt) {
     evt.target.blur();
   }
 };
-
 /******************************************************************
  * 2) renderTextboxes() â€“ used by multiple-textboxes questions     *
  *    (full replacement)                                          *
@@ -2278,15 +1910,12 @@ function renderTextboxes(cell) {
   if (!cell._textboxes) {
     cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
-
   let html = "";
   const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
-
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph  = tb.placeholder || "Enter value";
     const isAmountOption = tb.isAmountOption || false;
-
     // Add location indicator before this option if it's at the location index
     if (index === locationIndex) {
       html += `
@@ -2297,7 +1926,6 @@ function renderTextboxes(cell) {
           <button onclick="window.showLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
-
     html += `
       <div class="textbox-entry" style="margin-bottom:8px;text-align:center; display: flex; align-items: center; gap: 4px;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" style="flex: 1;" />
@@ -2309,7 +1937,6 @@ function renderTextboxes(cell) {
         </label>
       </div>`;
   });
-
   // Add location indicator at the end if location index is beyond the current options
   if (locationIndex >= cell._textboxes.length) {
     html += `
@@ -2320,33 +1947,27 @@ function renderTextboxes(cell) {
         <button onclick="window.showLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
-
   html += `
     <div style="text-align:center;margin-top:8px;">
       <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
       <button onclick="window.addMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleTextboxes')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>`;
-
   return html;
 }
-
 // Location IDs Popup Functions
 window.showLocationIdsPopup = function(cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
-
   // Get the question text and convert it to a valid prefix
   const questionText = cell._questionText || 'enter_info';
   const sanitizedQuestion = questionText.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .trim();
-
   // Check if this question has a PDF property
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
-
   // Build the prefix with PDF name if available
   let prefix;
   if (sanitizedPdfName) {
@@ -2354,7 +1975,6 @@ window.showLocationIdsPopup = function(cellId) {
   } else {
     prefix = sanitizedQuestion;
   }
-
   // Generate dynamic entries based on the prefix
   const locationIds = [
     `${prefix}_street`,
@@ -2363,7 +1983,6 @@ window.showLocationIdsPopup = function(cellId) {
     `${prefix}_state_short`,
     `${prefix}_zip`
   ];
-
   // Update the popup content
   const popup = document.getElementById('locationIdsPopup');
   if (popup) {
@@ -2372,7 +1991,6 @@ window.showLocationIdsPopup = function(cellId) {
     const content = popup.querySelector('.location-ids-content');
     if (content) {
       content.innerHTML = '';
-
       // Add search bar
       const searchBar = document.createElement('input');
       searchBar.type = 'text';
@@ -2388,11 +2006,9 @@ window.showLocationIdsPopup = function(cellId) {
         outline: none;
       `;
       content.appendChild(searchBar);
-
       // Create container for location items
       const itemsContainer = document.createElement('div');
       itemsContainer.className = 'location-items-container';
-
       locationIds.forEach(locationId => {
         const item = document.createElement('div');
         item.className = 'location-id-item';
@@ -2404,26 +2020,20 @@ window.showLocationIdsPopup = function(cellId) {
         `;
         itemsContainer.appendChild(item);
       });
-
       content.appendChild(itemsContainer);
-
       // Add search functionality
       searchBar.addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         const items = itemsContainer.querySelectorAll('.location-id-item');
-
         items.forEach(item => {
           const locationId = item.getAttribute('data-id');
-
           // Normalize both the search text and the location ID for comparison
           // Replace underscores with spaces in location ID for matching
           const normalizedLocationId = locationId.toLowerCase().replace(/_/g, ' ');
           const normalizedSearchText = searchText.replace(/_/g, ' ');
-
           // Check if either version matches
           const matchesWithSpaces = normalizedLocationId.includes(normalizedSearchText);
           const matchesWithUnderscores = locationId.toLowerCase().includes(searchText);
-
           if (matchesWithSpaces || matchesWithUnderscores) {
             item.style.display = '';
           } else {
@@ -2432,12 +2042,9 @@ window.showLocationIdsPopup = function(cellId) {
         });
       });
     }
-
     popup.style.display = 'block';
-
     // Make popup draggable
     makePopupDraggable(popup);
-
     // Add click outside to close functionality
     const handleClickOutside = (event) => {
       // Check if the click is outside the popup and not on any other popup/modal
@@ -2450,7 +2057,6 @@ window.showLocationIdsPopup = function(cellId) {
         document.removeEventListener('mousedown', handleClickOutside);
       }
     };
-
     // Add both click and mousedown listeners for better coverage
     // Add the event listeners after a short delay to prevent immediate closing
     setTimeout(() => {
@@ -2459,7 +2065,6 @@ window.showLocationIdsPopup = function(cellId) {
     }, 100);
   }
 };
-
 window.copyLocationId = function(locationId) {
   // Copy the location ID to clipboard
   navigator.clipboard.writeText(locationId).then(() => {
@@ -2473,7 +2078,6 @@ window.copyLocationId = function(locationId) {
         btn.textContent = 'Copy';
       }
     });
-
     // Add copied indicator to the clicked item
     const clickedItem = document.querySelector(`[data-id="${locationId}"]`);
     if (clickedItem) {
@@ -2484,7 +2088,6 @@ window.copyLocationId = function(locationId) {
         btn.textContent = 'Copied!';
       }
     }
-
     // Remove the copied indicator after 2 seconds
     setTimeout(() => {
       if (clickedItem) {
@@ -2497,7 +2100,6 @@ window.copyLocationId = function(locationId) {
       }
     }, 2000);
   }).catch(err => {
-
     // Fallback for older browsers
     const textArea = document.createElement('textarea');
     textArea.value = locationId;
@@ -2507,7 +2109,6 @@ window.copyLocationId = function(locationId) {
     document.body.removeChild(textArea);
   });
 };
-
 // Close popup function
 window.closeLocationIdsPopup = function() {
   const popup = document.getElementById('locationIdsPopup');
@@ -2515,7 +2116,6 @@ window.closeLocationIdsPopup = function() {
     popup.style.display = 'none';
   }
 };
-
 // Function to make popup draggable
 function makePopupDraggable(popup) {
   let isDragging = false;
@@ -2523,86 +2123,68 @@ function makePopupDraggable(popup) {
   let startY;
   let initialX;
   let initialY;
-
   const header = popup.querySelector('.location-ids-header');
   if (!header) return;
-
   // Remove the initial centering transform and set absolute positioning
   popup.style.top = '50%';
   popup.style.left = '50%';
   popup.style.transform = 'translate(-50%, -50%)';
-
   header.addEventListener('mousedown', dragStart);
   document.addEventListener('mousemove', drag);
   document.addEventListener('mouseup', dragEnd);
-
   function dragStart(e) {
     if (e.target.classList.contains('close-btn')) return; // Don't drag when clicking close button
-
     isDragging = true;
     header.style.cursor = 'grabbing';
-
     // Get the current position of the popup
     const rect = popup.getBoundingClientRect();
     initialX = rect.left;
     initialY = rect.top;
-
     // Get the mouse position relative to the popup
     startX = e.clientX - initialX;
     startY = e.clientY - initialY;
-
     // Remove the centering transform and set absolute positioning
     popup.style.top = initialY + 'px';
     popup.style.left = initialX + 'px';
     popup.style.transform = 'none';
   }
-
   function drag(e) {
     if (isDragging) {
       e.preventDefault();
-
       const newX = e.clientX - startX;
       const newY = e.clientY - startY;
-
       popup.style.left = newX + 'px';
       popup.style.top = newY + 'px';
     }
   }
-
   function dragEnd(e) {
     isDragging = false;
     header.style.cursor = 'move';
   }
 }
-
 // Dropdown Location IDs Popup Functions
 window.showDropdownLocationIdsPopup = function(cellId) {
   const graph = getGraph();
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
-
   const twoNums = cell._twoNumbers || { first: '0', second: '0' };
   const firstNum = parseInt(twoNums.first) || 1;
   const secondNum = parseInt(twoNums.second) || 1;
-
   // Get the question text and convert it to a valid prefix
   const questionText = cell._questionText || 'how_many';
   const sanitizedQuestion = questionText.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .trim();
-
   // Check if this question has a PDF property
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
-
   // Get location title and sanitize it
   const locationTitle = cell._locationTitle || '';
   const sanitizedLocationTitle = locationTitle.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .trim();
-
   // Build the prefix with PDF name if available
   let prefix;
   if (sanitizedPdfName) {
@@ -2610,34 +2192,26 @@ window.showDropdownLocationIdsPopup = function(cellId) {
   } else {
     prefix = sanitizedQuestion;
   }
-
   // Add location title to prefix if available
   if (sanitizedLocationTitle) {
     prefix = `${prefix}_${sanitizedLocationTitle}`;
   }
-
   // Generate dynamic entries based on range
   const locationIds = [];
   const locationFields = ['street', 'city', 'state', 'state_short', 'zip', 'address'];
-
   for (let i = firstNum; i <= secondNum; i++) {
     locationFields.forEach(field => {
       locationIds.push(`${prefix}_${field}_${i}`);
     });
   }
-
   // Update the popup content
   const popup = document.getElementById('locationIdsPopup');
-
   if (popup) {
-
     // Add a class to identify this popup
     popup.classList.add('popup');
     const content = popup.querySelector('.location-ids-content');
-
     if (content) {
       content.innerHTML = '';
-
       // Add search bar
       const searchBar = document.createElement('input');
       searchBar.type = 'text';
@@ -2653,11 +2227,9 @@ window.showDropdownLocationIdsPopup = function(cellId) {
         outline: none;
       `;
       content.appendChild(searchBar);
-
       // Create container for location items
       const itemsContainer = document.createElement('div');
       itemsContainer.className = 'location-items-container';
-
       locationIds.forEach(locationId => {
         const item = document.createElement('div');
         item.className = 'location-id-item';
@@ -2669,26 +2241,20 @@ window.showDropdownLocationIdsPopup = function(cellId) {
         `;
         itemsContainer.appendChild(item);
       });
-
       content.appendChild(itemsContainer);
-
       // Add search functionality
       searchBar.addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         const items = itemsContainer.querySelectorAll('.location-id-item');
-
         items.forEach(item => {
           const locationId = item.getAttribute('data-id');
-
           // Normalize both the search text and the location ID for comparison
           // Replace underscores with spaces in location ID for matching
           const normalizedLocationId = locationId.toLowerCase().replace(/_/g, ' ');
           const normalizedSearchText = searchText.replace(/_/g, ' ');
-
           // Check if either version matches
           const matchesWithSpaces = normalizedLocationId.includes(normalizedSearchText);
           const matchesWithUnderscores = locationId.toLowerCase().includes(searchText);
-
           if (matchesWithSpaces || matchesWithUnderscores) {
             item.style.display = '';
           } else {
@@ -2697,12 +2263,9 @@ window.showDropdownLocationIdsPopup = function(cellId) {
         });
       });
     }
-
     popup.style.display = 'block';
-
     // Make popup draggable
     makePopupDraggable(popup);
-
     // Add click outside to close functionality
     const handleClickOutside = (event) => {
       // Check if the click is outside the popup and not on any other popup/modal
@@ -2715,7 +2278,6 @@ window.showDropdownLocationIdsPopup = function(cellId) {
         document.removeEventListener('mousedown', handleClickOutside);
       }
     };
-
     // Add both click and mousedown listeners for better coverage
     // Add the event listeners after a short delay to prevent immediate closing
     setTimeout(() => {
@@ -2724,46 +2286,38 @@ window.showDropdownLocationIdsPopup = function(cellId) {
     }, 100);
   }
 };
-
 // Show popup for trigger sequence location IDs
 window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, triggerOption, locationTitle) {
   const graph = getGraph();
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
-
   const twoNums = cell._twoNumbers || { first: '0', second: '0' };
   const firstNum = parseInt(twoNums.first) || 1;
   const secondNum = parseInt(twoNums.second) || 1;
-
   // Get the question text and convert it to a valid prefix
   const questionText = cell._questionText || 'how_many';
   const sanitizedQuestion = questionText.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '') // Remove special characters
     .replace(/\s+/g, '_') // Replace spaces with underscores
     .trim();
-
   // Sanitize dropdown name
   const sanitizedDropdownName = (dropdownName || '').toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '_')
     .trim();
-
   // Sanitize trigger option
   const sanitizedTriggerOption = (triggerOption || '').toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '_')
     .trim();
-
   // Sanitize location title
   const sanitizedLocationTitle = (locationTitle || '').toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '_')
     .trim();
-
   // Check if this question has a PDF property
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
-
   // Build the prefix with PDF name if available
   let prefix;
   if (sanitizedPdfName) {
@@ -2771,7 +2325,6 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
   } else {
     prefix = sanitizedQuestion;
   }
-
   // Add dropdown name, trigger option, and location title to prefix
   if (sanitizedDropdownName) {
     prefix = `${prefix}_${sanitizedDropdownName}`;
@@ -2782,17 +2335,14 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
   if (sanitizedLocationTitle) {
     prefix = `${prefix}_${sanitizedLocationTitle}`;
   }
-
   // Generate dynamic entries based on range
   const locationIds = [];
   const locationFields = ['street', 'city', 'state', 'state_short', 'zip', 'address'];
-
   for (let i = firstNum; i <= secondNum; i++) {
     locationFields.forEach(field => {
       locationIds.push(`${prefix}_${field}_${i}`);
     });
   }
-
   // Update the popup content (reuse the same popup element)
   const popup = document.getElementById('locationIdsPopup');
   if (popup) {
@@ -2800,7 +2350,6 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
     const content = popup.querySelector('.location-ids-content');
     if (content) {
       content.innerHTML = '';
-
       // Add search bar
       const searchBar = document.createElement('input');
       searchBar.type = 'text';
@@ -2816,11 +2365,9 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
         outline: none;
       `;
       content.appendChild(searchBar);
-
       // Create container for location items
       const itemsContainer = document.createElement('div');
       itemsContainer.className = 'location-items-container';
-
       locationIds.forEach(locationId => {
         const item = document.createElement('div');
         item.className = 'location-id-item';
@@ -2832,24 +2379,18 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
         `;
         itemsContainer.appendChild(item);
       });
-
       content.appendChild(itemsContainer);
-
       // Add search functionality
       searchBar.addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         const items = itemsContainer.querySelectorAll('.location-id-item');
-
         items.forEach(item => {
           const locationId = item.getAttribute('data-id');
-
           // Normalize both the search text and the location ID for comparison
           const normalizedLocationId = locationId.toLowerCase().replace(/_/g, ' ');
           const normalizedSearchText = searchText.replace(/_/g, ' ');
-
           const matchesWithSpaces = normalizedLocationId.includes(normalizedSearchText);
           const matchesWithUnderscores = locationId.toLowerCase().includes(searchText);
-
           if (matchesWithSpaces || matchesWithUnderscores) {
             item.style.display = 'block';
           } else {
@@ -2858,12 +2399,9 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
         });
       });
     }
-
     popup.style.display = 'block';
-
     // Make popup draggable
     makePopupDraggable(popup);
-
     // Add click outside to close functionality
     const handleClickOutside = (event) => {
       if (!popup.contains(event.target) && 
@@ -2875,30 +2413,24 @@ window.showTriggerSequenceLocationIdsPopup = function(cellId, dropdownName, trig
         document.removeEventListener('mousedown', handleClickOutside);
       }
     };
-
     setTimeout(() => {
       document.addEventListener('click', handleClickOutside);
       document.addEventListener('mousedown', handleClickOutside);
     }, 100);
   }
 };
-
 // Copy ID function for multiple textboxes
 window.copyMultipleTextboxId = function(cellId, index) {
   const cell = getGraph().getModel().getCell(cellId);
   if (!cell || !cell._textboxes || !cell._textboxes[index]) return;
-
   const questionText = cell._questionText || '';
   const entryText = cell._textboxes[index].nameId || '';
-
   // Check if this question has a PDF property (only for nodes that should have PDF properties)
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
-
   // Sanitize the text: convert to lowercase, replace non-alphanumeric with underscores
   const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   const sanitizedEntry = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-
   // Build the final ID with PDF name if available
   let idToCopy;
   if (sanitizedPdfName) {
@@ -2906,7 +2438,6 @@ window.copyMultipleTextboxId = function(cellId, index) {
   } else {
     idToCopy = `${sanitizedQuestion}_${sanitizedEntry}`;
   }
-
   // Copy to clipboard
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(idToCopy).catch(() => {
@@ -2928,15 +2459,12 @@ window.copyMultipleTextboxId = function(cellId, index) {
     document.body.removeChild(textArea);
   }
 };
-
 // Reorder Modal Functions
 window.showReorderModal = function(cellId, questionType) {
   const cell = getGraph().getModel().getCell(cellId);
   if (!cell) return;
-
   let entries = [];
   let questionText = '';
-
   if (questionType === 'multipleTextboxes') {
     entries = cell._textboxes || [];
     questionText = cell._questionText || 'Multiple Textboxes';
@@ -2944,12 +2472,10 @@ window.showReorderModal = function(cellId, questionType) {
     entries = cell._textboxes || [];
     questionText = cell._questionText || 'Multiple Dropdown';
   }
-
   if (entries.length === 0) {
     alert('No entries to reorder');
     return;
   }
-
   // Create modal overlay
   const modalOverlay = document.createElement('div');
   modalOverlay.id = 'reorderModalOverlay';
@@ -2966,7 +2492,6 @@ window.showReorderModal = function(cellId, questionType) {
     justify-content: center;
     font-family: Arial, sans-serif;
   `;
-
   // Create modal content
   const modalContent = document.createElement('div');
   modalContent.style.cssText = `
@@ -2980,7 +2505,6 @@ window.showReorderModal = function(cellId, questionType) {
     overflow-y: auto;
     position: relative;
   `;
-
   // Create header
   const header = document.createElement('div');
   header.style.cssText = `
@@ -2991,7 +2515,6 @@ window.showReorderModal = function(cellId, questionType) {
     padding-bottom: 12px;
     border-bottom: 2px solid #e0e0e0;
   `;
-
   const title = document.createElement('h3');
   title.textContent = `Reorder: ${questionText}`;
   title.style.cssText = `
@@ -3000,7 +2523,6 @@ window.showReorderModal = function(cellId, questionType) {
     font-size: 18px;
     font-weight: 600;
   `;
-
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = 'Ã—';
   closeBtn.style.cssText = `
@@ -3021,10 +2543,8 @@ window.showReorderModal = function(cellId, questionType) {
   closeBtn.onmouseover = () => closeBtn.style.backgroundColor = '#f0f0f0';
   closeBtn.onmouseout = () => closeBtn.style.backgroundColor = 'transparent';
   closeBtn.onclick = () => modalOverlay.remove();
-
   header.appendChild(title);
   header.appendChild(closeBtn);
-
   // Create instructions
   const instructions = document.createElement('div');
   instructions.textContent = 'Drag and drop the items below to reorder them:';
@@ -3033,14 +2553,12 @@ window.showReorderModal = function(cellId, questionType) {
     margin-bottom: 16px;
     font-size: 14px;
   `;
-
   // Create sortable list
   const sortableList = document.createElement('div');
   sortableList.id = 'reorderSortableList';
   sortableList.style.cssText = `
     margin-bottom: 20px;
   `;
-
   // Create list items
   entries.forEach((entry, index) => {
     const listItem = document.createElement('div');
@@ -3060,7 +2578,6 @@ window.showReorderModal = function(cellId, questionType) {
       transition: all 0.2s ease;
       user-select: none;
     `;
-
     // Add hover effects
     listItem.onmouseover = () => {
       listItem.style.backgroundColor = '#e3f2fd';
@@ -3074,7 +2591,6 @@ window.showReorderModal = function(cellId, questionType) {
       listItem.style.transform = 'translateY(0)';
       listItem.style.boxShadow = 'none';
     };
-
     // Create content
     const content = document.createElement('div');
     content.style.cssText = `
@@ -3082,7 +2598,6 @@ window.showReorderModal = function(cellId, questionType) {
       align-items: center;
       flex: 1;
     `;
-
     const dragHandle = document.createElement('div');
     dragHandle.innerHTML = 'Field:';
     dragHandle.style.cssText = `
@@ -3091,14 +2606,12 @@ window.showReorderModal = function(cellId, questionType) {
       margin-right: 12px;
       cursor: move;
     `;
-
     const entryText = document.createElement('span');
     entryText.textContent = entry.nameId || `Entry ${index + 1}`;
     entryText.style.cssText = `
       font-weight: 500;
       color: #333;
     `;
-
     const placeholder = document.createElement('span');
     if (entry.placeholder) {
       placeholder.textContent = ` (${entry.placeholder})`;
@@ -3108,11 +2621,9 @@ window.showReorderModal = function(cellId, questionType) {
         margin-left: 8px;
       `;
     }
-
     content.appendChild(dragHandle);
     content.appendChild(entryText);
     content.appendChild(placeholder);
-
     // Create position indicator
     const position = document.createElement('div');
     position.textContent = `#${index + 1}`;
@@ -3128,41 +2639,33 @@ window.showReorderModal = function(cellId, questionType) {
       font-size: 12px;
       font-weight: bold;
     `;
-
     listItem.appendChild(content);
     listItem.appendChild(position);
-
     // Add drag event listeners
     listItem.ondragstart = (e) => {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/html', listItem.outerHTML);
       listItem.style.opacity = '0.5';
     };
-
     listItem.ondragend = (e) => {
       listItem.style.opacity = '1';
     };
-
     listItem.ondragover = (e) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
     };
-
     listItem.ondrop = (e) => {
       e.preventDefault();
       const draggedIndex = parseInt(e.dataTransfer.getData('text/plain') || e.target.dataset.index);
       const targetIndex = parseInt(listItem.dataset.index);
-
       if (draggedIndex !== targetIndex) {
         reorderEntries(cellId, questionType, draggedIndex, targetIndex);
         modalOverlay.remove();
         showReorderModal(cellId, questionType); // Refresh modal
       }
     };
-
     sortableList.appendChild(listItem);
   });
-
   // Create buttons
   const buttonContainer = document.createElement('div');
   buttonContainer.style.cssText = `
@@ -3172,7 +2675,6 @@ window.showReorderModal = function(cellId, questionType) {
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
   `;
-
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
   cancelBtn.style.cssText = `
@@ -3188,7 +2690,6 @@ window.showReorderModal = function(cellId, questionType) {
   cancelBtn.onmouseover = () => cancelBtn.style.backgroundColor = '#5a6268';
   cancelBtn.onmouseout = () => cancelBtn.style.backgroundColor = '#6c757d';
   cancelBtn.onclick = () => modalOverlay.remove();
-
   const saveBtn = document.createElement('button');
   saveBtn.textContent = 'Save Order';
   saveBtn.style.cssText = `
@@ -3208,27 +2709,22 @@ window.showReorderModal = function(cellId, questionType) {
     saveReorderChanges(cellId, questionType);
     modalOverlay.remove();
   };
-
   buttonContainer.appendChild(cancelBtn);
   buttonContainer.appendChild(saveBtn);
-
   // Assemble modal
   modalContent.appendChild(header);
   modalContent.appendChild(instructions);
   modalContent.appendChild(sortableList);
   modalContent.appendChild(buttonContainer);
   modalOverlay.appendChild(modalContent);
-
   // Add to document
   document.body.appendChild(modalOverlay);
-
   // Close on overlay click
   modalOverlay.onclick = (e) => {
     if (e.target === modalOverlay) {
       modalOverlay.remove();
     }
   };
-
   // Close on Escape key
   const escapeHandler = (e) => {
     if (e.key === 'Escape') {
@@ -3238,16 +2734,13 @@ window.showReorderModal = function(cellId, questionType) {
   };
   document.addEventListener('keydown', escapeHandler);
 };
-
 // Helper function to reorder entries
 function reorderEntries(cellId, questionType, fromIndex, toIndex) {
   const cell = getGraph().getModel().getCell(cellId);
   if (!cell || !cell._textboxes) return;
-
   const entries = cell._textboxes;
   const item = entries.splice(fromIndex, 1)[0];
   entries.splice(toIndex, 0, item);
-
   // Update the cell
   getGraph().getModel().beginUpdate();
   try {
@@ -3258,25 +2751,21 @@ function reorderEntries(cellId, questionType, fromIndex, toIndex) {
     getGraph().getModel().endUpdate();
   }
 }
-
 // Helper function to save reorder changes
 function saveReorderChanges(cellId, questionType) {
   // The reordering is already applied in real-time, so this just refreshes the display
   getRefreshAllCells()();
   getRequestAutosave()();
 }
-
 /******************************************************************
  * 3) updatemultipleDropdownTypeCell() â€“ full replacement          *
  ******************************************************************/
 function updatemultipleDropdownTypeCell(cell) {
   const qText   = cell._questionText || "";
   const twoNums = cell._twoNumbers   || { first: "0", second: "0" };
-
   if (!cell._textboxes) {
     cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
-
   let html = `
     <div class="multiple-textboxes-node"
          style="display:flex;flex-direction:column;align-items:center;">
@@ -3287,7 +2776,6 @@ function updatemultipleDropdownTypeCell(cell) {
              onkeydown="window.handleTitleInputKeydown(event)"
              onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)"
              style="margin-bottom:8px;width:90%;text-align:center;" />
-
       <div class="two-number-container"
            style="display:flex;justify-content:center;gap:10px;margin-top:8px;width:100%;">
         <input type="number"
@@ -3299,17 +2787,13 @@ function updatemultipleDropdownTypeCell(cell) {
                onkeydown="window.handleTitleInputKeydown(event)"
                onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)" />
       </div>
-
       <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
-
   // Check if there's a location indicator position
   const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
-
   cell._textboxes.forEach((tb, index) => {
     const val      = tb.nameId      || "";
     const ph       = tb.placeholder || "Enter value";
     const checked  = tb.isAmountOption ? "checked" : "";
-
     // Add location indicator before this option if it's at the location index
     if (index === locationIndex) {
       html += `
@@ -3320,7 +2804,6 @@ function updatemultipleDropdownTypeCell(cell) {
           <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
-
     html += `
       <div class="textbox-entry" style="margin-bottom:4px;text-align:center;">
         <input type="text"value="${escapeAttr(val)}"data-index="${index}"placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" />
@@ -3332,7 +2815,6 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
-
   // Add location indicator at the end if location index is beyond the current options
   if (locationIndex >= cell._textboxes.length) {
     html += `
@@ -3343,7 +2825,6 @@ function updatemultipleDropdownTypeCell(cell) {
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
-
   html += `
         <div style="text-align:center;margin-top:8px;">
           <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
@@ -3352,11 +2833,9 @@ function updatemultipleDropdownTypeCell(cell) {
         </div>
       </div>
     </div>`;
-
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
-
     // make sure the style keeps pointer events enabled
     let st = cell.style || "";
     if (!/pointerEvents=/.test(st)) {
@@ -3369,10 +2848,8 @@ function updatemultipleDropdownTypeCell(cell) {
   } finally {
     graph.getModel().endUpdate();
   }
-
   graph.updateCellSize(cell);
 }
-
 /**************************************************
  *                setQuestionType                 *
  *  â€“ now stores plain text for the simple types  *
@@ -3382,22 +2859,16 @@ function updatemultipleDropdownTypeCell(cell) {
  **************************************************/
 /* ----------  REPLACE ENTIRE FUNCTION  ---------- */
   // setQuestionType function moved to questions.js module
-
   // extractTextFromCell function moved to questions.js module
-
 // Function to set option type for option nodes
 function setOptionType(cell, newType) {
   if (!cell || !isOptions(cell)) return;
-
     // Extract and preserve the current text content
     const preservedText = extractTextFromCell(cell);
-
   /* â€”â€” 1. update style â€”â€” */
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
   st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
-
   graph.getModel().setStyle(cell, st);
-
   /* â€”â€” 2. update internals â€”â€” */
   graph.getModel().beginUpdate();
   try {
@@ -3478,10 +2949,8 @@ function setOptionType(cell, newType) {
   refreshAllCells();
 }
 /* ----------  END OF REPLACEMENT  #2 ------------- */
-
   // Export setOptionType to global scope
   window.setOptionType = setOptionType;
-
   // Export other functions needed by context menus
   window.updateSubtitleNodeCell = updateSubtitleNodeCell;
   window.updateInfoNodeCell = updateInfoNodeCell;
@@ -3496,63 +2965,45 @@ function setOptionType(cell, newType) {
   window.refreshAllOptionNodeIds = refreshAllOptionNodeIds;
   window.refreshNodeIdFromLabel = refreshNodeIdFromLabel;
   window.updateSimpleQuestionCell = updateSimpleQuestionCell;
-
   // Debug function to test node ID retrieval
   window.debugNodeId = function(cellId) {
     const cell = graph.getModel().getCell(cellId);
     if (!cell) {
-
       return;
     }
-
     // Test different getNodeId functions
-
     // Test style parsing manually
     const style = cell.style || "";
     const match = style.match(/nodeId=([^;]+)/);
-
     if (match) {
-
     }
   };
-
   // Function to refresh all question node IDs in the graph
   window.refreshAllQuestionNodeIds = function() {
-
     if (!graph) {
-
       return;
     }
-
     const parent = graph.getDefaultParent();
     const vertices = graph.getChildVertices(parent);
-
     let updatedCount = 0;
     vertices.forEach(cell => {
-
       if (isQuestion(cell)) {
-
         // DISABLED: Automatic Node ID generation
         // Node IDs will only change when manually edited or reset using the button
         updatedCount++;
       }
     });
-
     // Refresh the graph to show changes
     if (window.refreshAllCells) {
-
       window.refreshAllCells();
     }
-
   };
-
 /**************************************************
  *           COLORING & REFRESHING CELLS          *
  **************************************************/
 function colorCell(cell) {
   if (!cell.vertex) return;
   let fillColor = "#ADD8E6"; // fallback
-
   if (isEndNode(cell)) {
     fillColor = "#CCCCCC";
     const st = cell.style || "";
@@ -3561,7 +3012,6 @@ function colorCell(cell) {
     }
     return;
   }
-
   if (isQuestion(cell)) {
     const qType = getQuestionType(cell);
     switch (qType) {
@@ -3600,7 +3050,6 @@ function colorCell(cell) {
     // You can pick a distinct color for calculation nodes
     fillColor = "#FFDDAA";
   }
-
   const fontColor = colorPreferences.textColor;
   const sec = getSection(cell) || "1";
   const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -3612,17 +3061,13 @@ function colorCell(cell) {
   style += `;fillColor=${fillColor};fontColor=${fontColor};strokeColor=${borderColor};`;
   graph.getModel().setStyle(cell, style);
 }
-
 // Performance optimization: prevent excessive refreshAllCells calls
   // refreshAllCellsTimeout and isRefreshing moved to config.js module
-
   // refreshAllCells and performRefreshAllCells functions moved inside DOMContentLoaded event listener
-
 /*******************************************************
  ************ Export/Import Flowchart JSON  ************
  *******************************************************/
 // downloadJson, exportFlowchartJson, and importFlowchartJson have been moved to library.js
-
 /*******************************************************
  ************ BFS + Export GUI JSON (with BFS) *********
  *******************************************************/
@@ -3632,7 +3077,6 @@ function isJumpNode(cell) {
          style.includes("strokeColor=#ff0000") &&
          style.includes("dashed=1");
 }
-
 /**
  * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple questionâ†’question).
  */
@@ -3640,7 +3084,6 @@ function findAllUpstreamOptions(questionCell) {
   const results = [];
   const visited = new Set();
   const queue = [];
-
   const incomings = graph.getIncomingEdges(questionCell) || [];
   incomings.forEach(edge => {
     const src = edge.source;
@@ -3660,12 +3103,10 @@ function findAllUpstreamOptions(questionCell) {
       queue.push(src);
     }
   });
-
   while (queue.length > 0) {
     const currentQ = queue.shift();
     if (!currentQ || visited.has(currentQ.id)) continue;
     visited.add(currentQ.id);
-
     const qIncomings = graph.getIncomingEdges(currentQ) || [];
     qIncomings.forEach(edge => {
       const src = edge.source;
@@ -3686,31 +3127,22 @@ function findAllUpstreamOptions(questionCell) {
       }
     });
   }
-
   return results;
 }
-
 function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   const jumps = [];
   const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-
   const cellSection = parseInt(getSection(cell) || "1", 10);
-
   for (const edge of outgoingEdges) {
     const targetCell = edge.target;
     if (!targetCell || !isOptions(targetCell)) continue;
-
     const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-
     const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-
     for (const optionEdge of optionOutgoingEdges) {
       const targetQuestionCell = optionEdge.target;
       if (!targetQuestionCell || !isQuestion(targetQuestionCell)) continue;
-
       const sourceSection = parseInt(getSection(cell) || "1", 10);
       const targetSection = parseInt(getSection(targetQuestionCell) || "1", 10);
-
       // If target section is more than 1 section away
       if (Math.abs(targetSection - sourceSection) > 1) {
         const targetQuestionId = questionIdMap.get(targetQuestionCell.id);
@@ -3727,10 +3159,8 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
       }
     }
   }
-
   return jumps;
 }
-
 /**************************************************
  ************  CREATE YES/NO  OPTIONS  ************
  **************************************************/
@@ -3741,7 +3171,6 @@ function createYesNoOptions(parentCell) {
   graph.getModel().beginUpdate();
   try {
     const parentSection = getSection(parentCell) || "1";
-
     const noX = geo.x + geo.width - 50;
     const noY = geo.y + geo.height + 50;
     let noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
@@ -3764,7 +3193,6 @@ function createYesNoOptions(parentCell) {
       edgeStyle = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
     }
     graph.getModel().setStyle(noEdge, edgeStyle);
-
     const yesX = geo.x - 40;
     const yesY = geo.y + geo.height + 50;
     let yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
@@ -3777,31 +3205,24 @@ function createYesNoOptions(parentCell) {
     const yesEdge = graph.insertEdge(parent, null, "", parentCell, yesNode);
     // Apply current edge style
     graph.getModel().setStyle(yesEdge, edgeStyle);
-
     // Make sure the option nodes are properly formatted
     updateOptionNodeCell(noNode);
     updateOptionNodeCell(yesNode);
-
   } finally {
     graph.getModel().endUpdate();
   }
   refreshAllCells();
 }
-
 // Add a function to directly import a JSON string
 window.importFlowchartJsonDirectly = function(jsonString) {
   try {
     if (!jsonString) {
       throw new Error("No data provided");
     }
-
     // Check if the string starts and ends with quotes
     if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
-
       jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-
     }
-
     // Try to parse the JSON
     let jsonData;
     try {
@@ -3810,19 +3231,15 @@ window.importFlowchartJsonDirectly = function(jsonString) {
       // Fallback approach for handling complex cases
       jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
     }
-
     // Check if this is a GUI JSON instead of a flowchart JSON
     if (jsonData.sections && Array.isArray(jsonData.sections) && !jsonData.cells) {
       throw new Error("You are trying to import a GUI JSON. Please import a flowchart JSON that has a 'cells' property.");
     }
-
     // Validate the JSON data
     if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
       throw new Error("Invalid flowchart data: missing cells array");
     }
-
     // Debug: Log the sectionPrefs before passing to loadFlowchartData
-
     loadFlowchartData(jsonData);
     currentFlowchartName = null;
     return true;
@@ -3831,13 +3248,11 @@ window.importFlowchartJsonDirectly = function(jsonString) {
     return false;
   }
 };
-
 // Add a UI element to import JSON directly
 document.addEventListener('DOMContentLoaded', function() {
   // Create keyboard navigation help tooltip
   // createKeyboardNavigationHelp(); // Disabled keyboard navigation popup
 });
-
 /**
  * Creates a small tooltip in the bottom corner showing keyboard navigation instructions
  */
@@ -3862,7 +3277,6 @@ function createKeyboardNavigationHelp() {
   `;
   document.body.appendChild(helpDiv);
 }
-
 /**************************************************
  ********** KEYBOARD NAVIGATION CONTROLS **********
  **************************************************/
@@ -3879,7 +3293,6 @@ const keysPressed = {
   upFast: false,
   downFast: false
 };
-
 // Double-tap detection vars
 const doubleTapTime = 300; // ms between taps to count as double-tap
 const keyLastPressed = {
@@ -3888,26 +3301,20 @@ const keyLastPressed = {
   up: 0,
   down: 0
 };
-
 // Animation frame request ID for smooth movement
 let animationFrameId = null;
-
 // Speed and smoothness settings
 const MOVEMENT_SPEED = 2; // pixels per frame (much slower for single tap)
 const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
   const BASE_ZOOM_FACTOR = 1.005; // base zoom factor per frame
-
 // Handle key down events - start movement
 document.addEventListener('keydown', function(evt) {
   // Skip if user is typing in a text field
   if (isUserTyping(evt)) return;
-
   // Skip if modifier keys are pressed (to avoid interfering with browser shortcuts)
   if (evt.ctrlKey || evt.altKey || evt.metaKey) return;
-
   const now = Date.now();
   let keyHandled = true;
-
   switch (evt.key) {
     // Arrow keys and WASD for panning
     case 'ArrowLeft':
@@ -3917,7 +3324,6 @@ document.addEventListener('keydown', function(evt) {
       if (!keysPressed.left) {
         const lastPress = keyLastPressed.left;
         keyLastPressed.left = now;
-
         // Check for double-tap (if pressed twice within doubleTapTime ms)
         if (now - lastPress < doubleTapTime) {
           keysPressed.leftFast = true;
@@ -3931,7 +3337,6 @@ document.addEventListener('keydown', function(evt) {
       if (!keysPressed.right) {
         const lastPress = keyLastPressed.right;
         keyLastPressed.right = now;
-
         if (now - lastPress < doubleTapTime) {
           keysPressed.rightFast = true;
         }
@@ -3944,7 +3349,6 @@ document.addEventListener('keydown', function(evt) {
       if (!keysPressed.up) {
         const lastPress = keyLastPressed.up;
         keyLastPressed.up = now;
-
         if (now - lastPress < doubleTapTime) {
           keysPressed.upFast = true;
         }
@@ -3957,14 +3361,12 @@ document.addEventListener('keydown', function(evt) {
       if (!keysPressed.down) {
         const lastPress = keyLastPressed.down;
         keyLastPressed.down = now;
-
         if (now - lastPress < doubleTapTime) {
           keysPressed.downFast = true;
         }
       }
       keysPressed.down = true;
       break;
-
     // Z/X keys for zooming
     case 'z':
     case 'Z':
@@ -3977,7 +3379,6 @@ document.addEventListener('keydown', function(evt) {
     default:
       keyHandled = false;
   }
-
   if (keyHandled) {
     evt.preventDefault();
     // Start the animation if not already running
@@ -3986,7 +3387,6 @@ document.addEventListener('keydown', function(evt) {
     }
   }
 });
-
 // Handle key up events - stop movement
 document.addEventListener('keyup', function(evt) {
   switch (evt.key) {
@@ -4021,7 +3421,6 @@ document.addEventListener('keyup', function(evt) {
       keysPressed.zoom = 0;
       break;
   }
-
   // If no keys are pressed, cancel the animation frame
   if (!keysPressed.left && !keysPressed.right && !keysPressed.up && !keysPressed.down && keysPressed.zoom === 0) {
     if (animationFrameId) {
@@ -4030,13 +3429,11 @@ document.addEventListener('keyup', function(evt) {
     }
   }
 });
-
 // Animation function to update the canvas position
 function updateCanvasPosition() {
   const translator = graph.view.getTranslate();
   let dx = 0;
   let dy = 0;
-
   // Calculate the translation change, applying speed multiplier for fast movement
   if (keysPressed.left) {
     dx += keysPressed.leftFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
@@ -4050,12 +3447,10 @@ function updateCanvasPosition() {
   if (keysPressed.down) {
     dy -= keysPressed.downFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
   }
-
   // Apply translation change if needed
   if (dx !== 0 || dy !== 0) {
     graph.view.setTranslate(translator.x + dx / graph.view.scale, translator.y + dy / graph.view.scale);
   }
-
   // Apply zoom change if needed (centered on mouse)
   if (keysPressed.zoom !== 0) {
     const container = graph.container;
@@ -4097,7 +3492,6 @@ function updateCanvasPosition() {
     const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
     const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
     const zoomFactor = 1 + (BASE_ZOOM_FACTOR - 1) * sensitivityFactor;
-
     // New scale
     let newScale;
     if (keysPressed.zoom > 0) {
@@ -4111,12 +3505,10 @@ function updateCanvasPosition() {
     graph.view.setScale(newScale);
     graph.view.setTranslate(newTx, newTy);
   }
-
   // Refresh the graph if any changes were made
   if (dx !== 0 || dy !== 0 || keysPressed.zoom !== 0) {
     graph.view.refresh();
   }
-
   // Continue the animation if any key is still pressed
   if (keysPressed.left || keysPressed.right || keysPressed.up || keysPressed.down || keysPressed.zoom !== 0) {
     animationFrameId = requestAnimationFrame(updateCanvasPosition);
@@ -4124,10 +3516,8 @@ function updateCanvasPosition() {
     animationFrameId = null;
   }
 }
-
 // Fix the case sensitivity issue with the prevAnswer in logic conditions
 // Add this code at the end of the sixth pass, just before creating the final JSON object
-
 // Ensure checkbox options are properly capitalized in both the options and the conditions
 // Access the 'sections' variable from the exportGuiJson function scope
 window.fixCapitalizationInJumps = function() {
@@ -4137,21 +3527,18 @@ window.fixCapitalizationInJumps = function() {
     return;
   }
   const sections = window.exportGuiJson.sections;
-
   for (const section of sections) {
     for (const question of section.questions) {
       // Fix capitalization of checkbox options
       if (question.type === "checkbox" && Array.isArray(question.options)) {
         // Create a mapping of lowercase option text to properly capitalized option text
         const optionCapitalizationMap = {};
-
         // Special handling for checkbox questions and their options
         if (Array.isArray(question.options)) {
           for (const option of question.options) {
             if (typeof option === 'object' && option.label) {
               // Store both the lowercase and original versions
               optionCapitalizationMap[option.label.toLowerCase()] = option.label;
-
               // Special case for "maybe" to ensure it's always properly capitalized
               if (option.label.toLowerCase() === "maybe") {
                 optionCapitalizationMap["maybe"] = "Maybe";
@@ -4159,7 +3546,6 @@ window.fixCapitalizationInJumps = function() {
             }
           }
         }
-
         // Apply the capitalization fix to logic conditions
         for (const section2 of sections) {
           for (const question2 of section2.questions) {
@@ -4170,17 +3556,14 @@ window.fixCapitalizationInJumps = function() {
                   // Special case for "maybe"
                   if (condition.prevAnswer && condition.prevAnswer.toLowerCase() === "maybe") {
                     condition.prevAnswer = "Maybe";
-
                   }
                   // General case
                   else if (condition.prevAnswer && optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
                     condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
-
                   }
                 }
               }
             }
-
             // Also check jump conditions that might reference options
             if (question2.jump && question2.jump.conditions) {
               for (const jumpCondition of question2.jump.conditions) {
@@ -4199,20 +3582,16 @@ window.fixCapitalizationInJumps = function() {
     }
   }
 }
-
 // Call the function to fix capitalization
 window.fixCapitalizationInJumps();
-
 // Final check - look for any remaining issues in our resulting logic constraints
 let stillHaveIssues = true;
 let fixIteration = 0;
 const maxIterations = 10; // Define maxIterations here instead of assuming it's already defined
-
 while (stillHaveIssues && fixIteration < maxIterations) {
   stillHaveIssues = false;
   fixIteration++;
 }
-
 // --- PATCH START: sanitize option nameId generation ---
 // Preserves forward slashes "/" in the name
 function sanitizeNameId(str) {
@@ -4223,13 +3602,10 @@ function sanitizeNameId(str) {
     .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
 }
 // --- PATCH END ---
-
 // Calculation node dependency management functions have been moved to calc.js
-
 /**************************************************
  *           COLORING & REFRESHING CELLS          *
  **************************************************/
-
 /**
  * Create a cell for dropdown - a textbox that functions like a dropdown but 
  * has better text editing capabilities
@@ -4247,14 +3623,12 @@ function updateText2Cell(cell) {
     </div>`;
   graph.getModel().setValue(cell, html);
 }
-
 /**
  * Handler for dropdown question text changes
  */
 window.updateText2Handler = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || getQuestionType(cell) !== "dropdown") return;
-
       graph.getModel().beginUpdate();
       try {
     cell._questionText = text.trim() || "Enter dropdown question";
@@ -4262,36 +3636,29 @@ window.updateText2Handler = function(cellId, text) {
       } finally {
         graph.getModel().endUpdate();
       }
-
   // DISABLED: Automatic Node ID generation
   // Node IDs will only change when manually edited or reset using the button
 };
-
 /**
  * Create or update a standard option node cell
  * This ensures option nodes have consistent styling and behavior
  */
 function updateOptionNodeCell(cell) {
   if (!cell || !isOptions(cell)) return;
-
   // Skip image and amount options as they have their own handlers
   const qt = getQuestionType(cell);
   if (qt === "imageOption" || qt === "amountOption") return;
-
   // Get the current label text
   const currentValue = cell.value || "Option";
   let labelText = currentValue;
-
   // If it's an HTML string, extract the text
   if (typeof currentValue === 'string' && currentValue.includes('<')) {
     const tmp = document.createElement('div');
     tmp.innerHTML = currentValue;
     labelText = (tmp.textContent || tmp.innerText || "Option").trim();
   }
-
   // Create a simple centered div with the text
   const html = `<div style="text-align:center;">${escapeHtml(labelText)}</div>`;
-
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
@@ -4299,17 +3666,14 @@ function updateOptionNodeCell(cell) {
     graph.getModel().endUpdate();
   }
 }
-
 document.addEventListener('DOMContentLoaded', function() {
   // Force refresh of the type submenu
   const typeSubmenu = document.getElementById("typeSubmenu");
-
   // Make sure all type buttons are visible
   const allButtons = typeSubmenu.querySelectorAll("button");
   allButtons.forEach(button => {
     button.style.display = "block";
   });
-
   // Double-check specific buttons
   ["dateRangeType", "emailType", "phoneType"].forEach(id => {
     const btn = document.getElementById(id);
@@ -4318,14 +3682,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-
 // --- Standardized Question Title Input (for all question types) ---
-
 // Helper: Render a single-line contenteditable div for simple question types
 function renderSimpleQuestionTitle(cell, placeholder) {
   const text = cell._questionText || '';
   const questionType = getQuestionType(cell);
-
   // For date range nodes, add a copy ID button
   if (questionType === 'dateRange') {
     return `<div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
@@ -4333,67 +3694,53 @@ function renderSimpleQuestionTitle(cell, placeholder) {
       <button onclick="window.showDateRangeCopyDialog('${cell.id}')" style="margin-top: 8px; padding: 4px 8px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;" title="Copy ID">Copy ID</button>
     </div>`;
   }
-
   // Remove all inline styles, only use the class
   return `<div class="question-title-input"  onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${escapeHtml(text) || placeholder}</div>`;
 }
-
 // Helper: Render a real <input> for multi-textbox/multi-dropdown types
 function renderInputQuestionTitle(cell, placeholder) {
   const text = cell._questionText || '';
   // Remove all inline styles, only use the class
   return `<input class="question-title-input" type="text" value="${escapeAttr(text)}" placeholder="${placeholder}" oninput="window.updateInputQuestionTitle('${cell.id}', this.value)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')" />`;
 }
-
 // Update for simple question types
 window.updateSimpleQuestionTitle = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
-
   // Debug logging for big paragraph nodes
   if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-
   }
-
   graph.getModel().beginUpdate();
   try {
     cell._questionText = text.replace(/<[^>]+>/g, '').trim() || '';
-
     // Debug logging after update
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-
     }
   } finally {
     graph.getModel().endUpdate();
   }
   // Only re-render on blur, not on every input
   updateSimpleQuestionCell(cell);
-
   // Only refresh Node ID if it's not a custom one
   const existingNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
   const hasCustomNodeId = existingNodeId && existingNodeId !== "unnamed_node" && 
                          !existingNodeId.startsWith("node_") && 
                          !existingNodeId.match(/^[a-z]+_question_node$/);
-
   if (!hasCustomNodeId) {
     // DISABLED: Automatic Node ID generation
   // Node IDs will only change when manually edited or reset using the button
   }
 };
-
 // Show dialog for date range copy ID functionality
 window.showDateRangeCopyDialog = function(cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
-
   // Get the question text and sanitize it
   const questionText = cell._questionText || '';
   const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-
   // Check if this question has a PDF property
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
-
   // Create the base ID
   let baseId;
   if (sanitizedPdfName) {
@@ -4401,10 +3748,8 @@ window.showDateRangeCopyDialog = function(cellId) {
   } else {
     baseId = sanitizedQuestionText;
   }
-
   // Show the dialog
   const choice = confirm('Copy ID for:\n\nOK = Start Date (_1)\nCancel = Finish Date (_2)');
-
   let idToCopy;
   if (choice) {
     // Start date
@@ -4413,7 +3758,6 @@ window.showDateRangeCopyDialog = function(cellId) {
     // Finish date
     idToCopy = `${baseId}_2`;
   }
-
   // Copy to clipboard
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(idToCopy).then(() => {
@@ -4430,7 +3774,6 @@ window.showDateRangeCopyDialog = function(cellId) {
     showCopyFeedback(idToCopy);
   }
 };
-
 // Show visual feedback for copy operations
 function showCopyFeedback(copiedText) {
   // Create a temporary notification
@@ -4452,9 +3795,7 @@ function showCopyFeedback(copiedText) {
     word-wrap: break-word;
   `;
   notification.textContent = `Copied: ${copiedText}`;
-
   document.body.appendChild(notification);
-
   // Remove after 3 seconds
   setTimeout(() => {
     if (notification.parentNode) {
@@ -4462,7 +3803,6 @@ function showCopyFeedback(copiedText) {
     }
   }, 3000);
 }
-
 // Update for input-based question types
 window.updateInputQuestionTitle = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
@@ -4482,7 +3822,6 @@ window.updateInputQuestionTitle = function(cellId, text) {
   // DISABLED: Automatic Node ID generation
   // Node IDs will only change when manually edited or reset using the button
 };
-
 // Handle Enter key: blur on Enter
 window.handleTitleInputKeydown = function(event, cellId) {
   if (event.key === 'Enter') {
@@ -4491,7 +3830,6 @@ window.handleTitleInputKeydown = function(event, cellId) {
   }
   // Do not stop propagation for copy/cut/paste
 };
-
 // Update rendering for simple question types
 function updateSimpleQuestionCell(cell) {
   const placeholder = getQuestionType(cell).charAt(0).toUpperCase() + getQuestionType(cell).slice(1) + ' question node';
@@ -4504,7 +3842,6 @@ function updateSimpleQuestionCell(cell) {
   </div>`;
   graph.getModel().setValue(cell, html);
 }
-
 // Patch updateMultipleTextboxesCell to use <input> for title
 function updateMultipleTextboxesCell(cell) {
   graph.getModel().beginUpdate();
@@ -4519,7 +3856,6 @@ function updateMultipleTextboxesCell(cell) {
   }
   graph.updateCellSize(cell);
 }
-
 // Patch updatemultipleDropdownTypeCell to use <input> for title
 function updatemultipleDropdownTypeCell(cell) {
   const qText = cell._questionText || '';
@@ -4537,12 +3873,10 @@ function updatemultipleDropdownTypeCell(cell) {
   // Check if there's a location indicator position
   // Only show location if _locationIndex is defined, not null, and >= 0
   const locationIndex = (cell._locationIndex !== undefined && cell._locationIndex !== null && cell._locationIndex >= 0) ? cell._locationIndex : -1;
-
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || '';
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
-
     // Add location indicator before this option if it's at the location index
     if (index === locationIndex) {
       html += `
@@ -4553,7 +3887,6 @@ function updatemultipleDropdownTypeCell(cell) {
           <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
         </div>`;
     }
-
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
         <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">Field:</div>
@@ -4566,7 +3899,6 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
-
   // Add location indicator at the end if location index is beyond the current options
   if (locationIndex >= cell._textboxes.length) {
     html += `
@@ -4577,7 +3909,6 @@ function updatemultipleDropdownTypeCell(cell) {
         <button onclick="window.showDropdownLocationIdsPopup('${cell.id}')" style="margin-left: 8px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Copy ID's</button>
       </div>`;
   }
-
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
       <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
@@ -4585,7 +3916,6 @@ function updatemultipleDropdownTypeCell(cell) {
     </div>
     </div>
   </div>`;
-
   // Add drop zone event listeners
   html = html.replace('class="multiple-textboxes-container"', 'class="multiple-textboxes-container" ondragover="window.handleDragOver(event)" ondrop="window.handleDrop(event, \'' + cell.id + '\')"');
   graph.getModel().beginUpdate();
@@ -4599,7 +3929,6 @@ function updatemultipleDropdownTypeCell(cell) {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
-
   // Force a refresh to ensure the new HTML is rendered
   setTimeout(() => {
     if (graph.getModel().getCell(cell.id)) {
@@ -4608,12 +3937,9 @@ function updatemultipleDropdownTypeCell(cell) {
   }, 10);
 }
 // ... existing code ...
-
 // Add this in the DOMContentLoaded event listener
-
 document.addEventListener("DOMContentLoaded", function() {
   // ... existing code ...
-
   // Prevent browser context menu on empty space (graph background),
   // but allow it inside input, textarea, or contenteditable elements
   const container = document.getElementById("graphContainer");
@@ -4622,10 +3948,8 @@ document.addEventListener("DOMContentLoaded", function() {
     if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
     e.preventDefault();
   });
-
   // Add left-click handler for canvas with capture phase to intercept before graph handlers
   container.addEventListener("click", function(e) {
-
     // Handle left-clicks (button 0) on the canvas or nodes
     if (e.button === 0 && container.contains(e.target)) {
       // Check if this is on empty canvas (not on a node)
@@ -4634,49 +3958,38 @@ document.addEventListener("DOMContentLoaded", function() {
         // Additional check: make sure we're not clicking on any interactive elements
         const interactiveElement = e.target.closest('input, button, select, textarea, [contenteditable], [draggable="true"]');
         if (interactiveElement) {
-
           return;
         }
-
         // This is a click on empty canvas - check for double left-click
-
         const currentTime = Date.now();
         const timeSinceLastClick = currentTime - lastLeftClickTime;
-
         // If we're currently in square creation mode, cancel it
         if (rightClickDragging) {
         resetSquareCreationState();
           return;
         }
-
         // Check if this is a double left-click (within 500ms)
         if (timeSinceLastClick < 500) {
           leftClickCount++;
-
           // Clear any existing timeout
           if (leftClickTimeout) {
             clearTimeout(leftClickTimeout);
             leftClickTimeout = null;
           }
-
           // Start square creation
           rightClickDragging = true;
           rightClickStartPos = { x: e.clientX, y: e.clientY };
           startSquareCreationTimeout();
-
           // Reset the counter
           leftClickCount = 0;
           lastLeftClickTime = 0;
-
           // Prevent default behavior
           e.preventDefault();
           return false;
         } else {
           // Single left-click - start counting
-
           leftClickCount = 1;
           lastLeftClickTime = currentTime;
-
           // Set a timeout to reset the counter if no second click comes
           leftClickTimeout = setTimeout(() => {
             leftClickCount = 0;
@@ -4685,22 +3998,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       } else {
         // Click is on a node - end any ongoing square creation process
-
       if (typeof resetSquareCreationState === 'function') {
         resetSquareCreationState();
       }
     }
     }
   }, true); // Use capture phase to intercept before graph handlers
-
   // Global click handler removed - now handled by container click handler above
-
   // Experimental feature: Right-click drag detection for "square initiated" alert
   // Setting up right-click drag detection
-
   let rightClickDragging = false;
   let rightClickStartPos = null;
-
   container.addEventListener("mousedown", function(e) {
     // Check if it's a right-click (button 2)
     if (e.button === 2) {
@@ -4708,7 +4016,6 @@ document.addEventListener("DOMContentLoaded", function() {
       rightClickStartPos = { x: e.clientX, y: e.clientY };
     }
   }, true); // Use capture phase to intercept events before other handlers
-
   container.addEventListener("mousemove", function(e) {
     if (rightClickDragging && rightClickStartPos) {
       // Check if mouse has moved a significant distance (threshold of 10 pixels)
@@ -4716,28 +4023,23 @@ document.addEventListener("DOMContentLoaded", function() {
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
-
       if (distance > 10) {
         // Distance threshold exceeded - square creation initiated
         // Don't reset state yet - we need to track until mouseup to determine final size
       }
     }
   });
-
   container.addEventListener("mouseup", function(e) {
     if (e.button === 2) {
       rightClickDragging = false;
       rightClickStartPos = null;
     }
   });
-
   // Also handle mouse leave to reset state (but be less aggressive)
   container.addEventListener("mouseleave", function(e) {
     // Don't reset state immediately - let the timeout or mouseup handle it
   });
-
   // All event listeners added successfully
-
   document.addEventListener("mousemove", function(e) {
     if (rightClickDragging && rightClickStartPos) {
       // Check if mouse has moved a significant distance (threshold of 10 pixels)
@@ -4745,23 +4047,19 @@ document.addEventListener("DOMContentLoaded", function() {
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
-
       if (distance > 10) {
         // Distance threshold exceeded - square creation initiated
         // Don't reset state yet - we need to track until mouseup to determine final size
       }
     }
   }, true);
-
   document.addEventListener("mouseup", function(e) {
     if (e.button === 2) {
       rightClickDragging = false;
       rightClickStartPos = null;
     }
   }, true);
-
   // All global backup listeners added successfully
-
   // Add window-level listeners as ultimate backup
   window.addEventListener("mousedown", function(e) {
     // Only process if it's inside our container and a right-click
@@ -4770,7 +4068,6 @@ document.addEventListener("DOMContentLoaded", function() {
       rightClickStartPos = { x: e.clientX, y: e.clientY };
     }
   }, true);
-
   window.addEventListener("mousemove", function(e) {
     if (rightClickDragging && rightClickStartPos) {
       // Check if mouse has moved a significant distance (threshold of 10 pixels)
@@ -4778,193 +4075,149 @@ document.addEventListener("DOMContentLoaded", function() {
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
-
       if (distance > 10) {
         // Distance threshold exceeded - square creation initiated
         // Don't reset state yet - we need to track until mouseup to determine final size
       }
     }
   }, true);
-
   window.addEventListener("mouseup", function(e) {
     if (e.button === 2) {
       rightClickDragging = false;
       rightClickStartPos = null;
     }
   }, true);
-
   // All window-level listeners added successfully
   // Test listeners removed
-
   // Test listeners added
   container.onclick = function(e) {
   };
-
   container.onmousedown = function(e) {
   };
-
   // First contextmenu handler removed - using the one with timeout below
-
   // Also try adding to the body element
   document.body.onclick = function(e) {
   };
-
   document.body.onmousedown = function(e) {
   };
-
   // Test div removed - no longer needed
-
   // Add a more aggressive mousemove detection that works independently
   let lastMousePos = null;
   let rightClickActive = false;
-
   // Track mouse position continuously
   document.addEventListener("mousemove", function(e) {
     lastMousePos = { x: e.clientX, y: e.clientY };
     // Update the last mouse move time
     lastMouseMoveTime = Date.now();
-
     // If we're in right-click drag mode, check distance
     if (rightClickDragging && rightClickStartPos) {
-
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
-
       if (distance > 10) {
-
         // Create or update the temporary selection box
         updateTemporarySelectionBox(rightClickStartPos, lastMousePos);
         // Don't reset state yet - we need to track until mouseup to determine final size
       }
     }
   }, true);
-
   // Also try to detect right-click by monitoring contextmenu events
   // Global context menu listener removed - using double right-click detection instead
-
   // Add mouseup detection to complete the square creation
   document.addEventListener("mouseup", function(e) {
-
     // Check if this is a left-click - end any ongoing square creation
     if (e.button === 0 && rightClickDragging) {
       resetSquareCreationState();
       return;
     }
-
     if (rightClickDragging && rightClickStartPos) {
       const endPos = { x: e.clientX, y: e.clientY };
-
       // Calculate square dimensions
       const width = Math.abs(endPos.x - rightClickStartPos.x);
       const height = Math.abs(endPos.y - rightClickStartPos.y);
       const left = Math.min(rightClickStartPos.x, endPos.x);
       const top = Math.min(rightClickStartPos.y, endPos.y);
-
       // Remove the temporary selection box
       removeTemporarySelectionBox();
-
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
         // createBlueSquare(left, top, width, height); // DISABLED - user doesn't want solid blue squares
       }
-
       // Cancel timeout since we're handling it here
       cancelSquareCreationTimeout();
-
       // Reset state
       resetSquareCreationState();
     }
   }, true);
-
   // Add window-level mouseup listener as backup
   window.addEventListener("mouseup", function(e) {
-
     // Check if this is a left-click - end any ongoing square creation
     if (e.button === 0 && rightClickDragging) {
       resetSquareCreationState();
       return;
     }
-
     if (rightClickDragging && rightClickStartPos) {
       const endPos = { x: e.clientX, y: e.clientY };
-
       // Calculate square dimensions
       const width = Math.abs(endPos.x - rightClickStartPos.x);
       const height = Math.abs(endPos.y - rightClickStartPos.y);
       const left = Math.min(rightClickStartPos.x, endPos.x);
       const top = Math.min(rightClickStartPos.y, endPos.y);
-
       // Remove the temporary selection box
       removeTemporarySelectionBox();
-
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
         // createBlueSquare(left, top, width, height); // DISABLED - user doesn't want solid blue squares
       }
-
       // Cancel timeout since we're handling it here
       cancelSquareCreationTimeout();
-
       // Reset state
       resetSquareCreationState();
     }
   }, true);
-
   // Add inline mousedown handler to body to detect left-clicks (for cancellation)
   document.body.onmousedown = function(e) {
-
     // Check if this is a left-click - end any ongoing square creation
     if (e.button === 0 && rightClickDragging) {
       resetSquareCreationState();
       return;
     }
   };
-
   // Add double right-click detection system
   let rightClickCount = 0;
   let rightClickTimeout = null;
   let lastRightClickTime = 0;
-
   // Add double left-click detection system
   let leftClickCount = 0;
   let leftClickTimeout = null;
   let lastLeftClickTime = 0;
-
   // Add inline contextmenu handler to body to detect double right-clicks
   document.body.oncontextmenu = function(e) {
-
     // Check if this is a right-click on the canvas
     if (container.contains(e.target)) {
       const currentTime = Date.now();
       const timeSinceLastClick = currentTime - lastRightClickTime;
-
        // If we're currently in square creation mode, cancel it
        if (rightClickDragging) {
          resetSquareCreationState();
          return;
        }
-
       // Check if this is a double right-click (within 500ms)
       if (timeSinceLastClick < 500) {
         rightClickCount++;
-
         // Clear any existing timeout
         if (rightClickTimeout) {
           clearTimeout(rightClickTimeout);
           rightClickTimeout = null;
         }
-
         // Start square creation
         rightClickDragging = true;
         rightClickStartPos = { x: e.clientX, y: e.clientY };
         startSquareCreationTimeout();
-
         // Reset the counter
         rightClickCount = 0;
         lastRightClickTime = 0;
-
         // Prevent the context menu from appearing
         e.preventDefault();
         return false;
@@ -4972,7 +4225,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Single right-click - start counting
         rightClickCount = 1;
         lastRightClickTime = currentTime;
-
         // Set a timeout to reset the counter if no second click comes
         rightClickTimeout = setTimeout(() => {
           rightClickCount = 0;
@@ -4981,75 +4233,58 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   };
-
   // Add inline mousemove handler to body to track drag
   document.body.onmousemove = function(e) {
     // Track global mouse position for timeout fallback
     lastMousePos = { x: e.clientX, y: e.clientY };
     // Update the last mouse move time
     lastMouseMoveTime = Date.now();
-
     if (rightClickDragging && rightClickStartPos) {
-
       const distance = Math.sqrt(
         Math.pow(e.clientX - rightClickStartPos.x, 2) + 
         Math.pow(e.clientY - rightClickStartPos.y, 2)
       );
-
       if (distance > 10) {
-
         // Create or update the temporary selection box
         updateTemporarySelectionBox(rightClickStartPos, lastMousePos);
       }
     }
   };
-
   // Add inline mouseup handler to body as ultimate backup
   document.body.onmouseup = function(e) {
-
     if (rightClickDragging && rightClickStartPos) {
       const endPos = { x: e.clientX, y: e.clientY };
-
       // Calculate square dimensions
       const width = Math.abs(endPos.x - rightClickStartPos.x);
       const height = Math.abs(endPos.y - rightClickStartPos.y);
       const left = Math.min(rightClickStartPos.x, endPos.x);
       const top = Math.min(rightClickStartPos.y, endPos.y);
-
       // Remove the temporary selection box
       removeTemporarySelectionBox();
-
       // Only create square if it has meaningful size
       if (width > 5 && height > 5) {
         // createBlueSquare(left, top, width, height); // DISABLED - user doesn't want solid blue squares
       }
-
       // Cancel timeout since we're handling it here
       cancelSquareCreationTimeout();
-
       // Reset state
       resetSquareCreationState();
     }
   };
-
   // Global variable to track the temporary selection box
   let temporarySelectionBox = null;
-
   // Function to create or update the temporary selection box during drag
   function updateTemporarySelectionBox(startPos, currentPos) {
-
     // Calculate dimensions
     const width = Math.abs(currentPos.x - startPos.x);
     const height = Math.abs(currentPos.y - startPos.y);
     const left = Math.min(startPos.x, currentPos.x);
     const top = Math.min(startPos.y, currentPos.y);
-
     // Remove existing temporary selection box if it exists
     if (temporarySelectionBox) {
       temporarySelectionBox.remove();
       temporarySelectionBox = null;
     }
-
     // Create new temporary selection box
     temporarySelectionBox = document.createElement('div');
     temporarySelectionBox.id = 'temporarySelectionBox';
@@ -5065,15 +4300,12 @@ document.addEventListener("DOMContentLoaded", function() {
       pointer-events: none;
       opacity: 0.8;
     `;
-
     document.body.appendChild(temporarySelectionBox);
-
     // Update selection in real-time during drag (only if we have a meaningful size)
     if (width > 10 && height > 10) {
       selectNodesInSquareArea(left, top, width, height);
     }
   }
-
   // Function to remove the temporary selection box
   function removeTemporarySelectionBox() {
     if (temporarySelectionBox) {
@@ -5081,69 +4313,54 @@ document.addEventListener("DOMContentLoaded", function() {
       temporarySelectionBox = null;
     }
   }
-
   // Function to select nodes that overlap with the square area
   function selectNodesInSquareArea(left, top, width, height) {
-
     // Get the graph container to convert screen coordinates to graph coordinates
     const container = document.getElementById('graphContainer');
     if (!container) {
       return [];
     }
-
     // Get the graph's view to convert coordinates
     const view = graph.getView();
     const scale = view.getScale();
     const translate = view.getTranslate();
-
     // Convert screen coordinates to graph coordinates
     const containerRect = container.getBoundingClientRect();
     const graphLeft = (left - containerRect.left) / scale - translate.x;
     const graphTop = (top - containerRect.top) / scale - translate.y;
     const graphWidth = width / scale;
     const graphHeight = height / scale;
-
     // Get all vertex cells (nodes) from the graph
     const vertices = graph.getChildVertices(graph.getDefaultParent());
     const selectedNodes = [];
-
     vertices.forEach(cell => {
       // Get the cell's position and size
       const geometry = cell.getGeometry();
       if (!geometry) return;
-
       const cellLeft = geometry.x;
       const cellTop = geometry.y;
       const cellWidth = geometry.width || 100; // Default width if not specified
       const cellHeight = geometry.height || 50; // Default height if not specified
-
       // Check if the cell overlaps with the square area (using graph coordinates)
       const overlaps = !(cellLeft + cellWidth < graphLeft || 
                         cellLeft > graphLeft + graphWidth || 
                         cellTop + cellHeight < graphTop || 
                         cellTop > graphTop + graphHeight);
-
       if (overlaps) {
         selectedNodes.push(cell);
       }
     });
-
     // Select the overlapping nodes using the same method as section selection
     if (selectedNodes.length > 0) {
       // Clear current selection first
       graph.clearSelection();
-
       // Select all overlapping nodes at once (like section selection does)
       graph.addSelectionCells(selectedNodes);
-
     }
-
     return selectedNodes;
   }
-
   // Function to create the blue square
   function createBlueSquare(left, top, width, height) {
-
     // Create the square element
     const square = document.createElement('div');
     square.style.cssText = `
@@ -5158,130 +4375,96 @@ document.addEventListener("DOMContentLoaded", function() {
       pointer-events: none;
       opacity: 0.7;
     `;
-
     // Add a unique ID for tracking
     const squareId = 'blueSquare_' + Date.now();
     square.id = squareId;
     square.setAttribute('data-created', new Date().toISOString());
-
     // Add a class to identify this as a blue square for event handling
     square.classList.add('blue-selection-square');
-
     // Add to document
     document.body.appendChild(square);
-
     // Add click handler to remove the square
     square.style.pointerEvents = 'auto';
     square.style.cursor = 'pointer';
     square.title = 'Click to remove this square';
-
     square.addEventListener('click', function(e) {
-
       // Prevent event propagation to avoid interference from other handlers
       e.stopPropagation();
       e.preventDefault();
-
       // Get the current selection before removing the square
       const currentSelection = graph.getSelectionCells();
-
       // Remove the square
       e.target.remove();
-
       // Restore the selection after a brief delay to ensure the square is fully removed
       setTimeout(() => {
         if (currentSelection.length > 0) {
-
           graph.clearSelection();
           graph.addSelectionCells(currentSelection);
-
           // Verify the selection was actually restored
           const restoredSelection = graph.getSelectionCells();
-
         }
       }, 10);
     });
-
     // Force a repaint to ensure visibility
     square.style.display = 'block';
     square.offsetHeight; // Force reflow
-
     // Select nodes that overlap with the square area
     selectNodesInSquareArea(left, top, width, height);
-
     // Add a test to see if we can find the square in the DOM
     setTimeout(() => {
       const foundSquare = document.getElementById(squareId);
-
       if (foundSquare) {
-
       }
     }, 100);
   }
-
   // Add timeout-based fallback for square creation
   // This will create a square after a delay if mouseup events are blocked
   let squareCreationTimeout = null;
   let lastMouseMoveTime = 0;
-
   // Function to start timeout-based square creation
   function startSquareCreationTimeout() {
     if (squareCreationTimeout) {
       clearTimeout(squareCreationTimeout);
     }
-
     // Reset the last mouse move time
     lastMouseMoveTime = Date.now();
-
     squareCreationTimeout = setTimeout(() => {
       if (rightClickDragging && rightClickStartPos) {
         // Check if there's been recent mouse movement
         const timeSinceLastMove = Date.now() - lastMouseMoveTime;
-
         // Only create square if there's been no mouse movement for 3 seconds
         if (timeSinceLastMove > 3000) {
-
           // Try to get current mouse position for better sizing
           let endPos = rightClickStartPos; // fallback to start position
           try {
             // Get the last known mouse position from the global mouse tracking
             if (lastMousePos) {
               endPos = lastMousePos;
-
             } else {
-
             }
           } catch (e) {
-
           }
-
           // Calculate square dimensions based on start and end positions
           const width = Math.abs(endPos.x - rightClickStartPos.x);
           const height = Math.abs(endPos.y - rightClickStartPos.y);
           const left = Math.min(rightClickStartPos.x, endPos.x);
           const top = Math.min(rightClickStartPos.y, endPos.y);
-
           // Ensure minimum size
           const finalWidth = Math.max(width, 20);
           const finalHeight = Math.max(height, 20);
-
           // Remove the temporary selection box
           removeTemporarySelectionBox();
-
           // createBlueSquare(left, top, finalWidth, finalHeight); // DISABLED - user doesn't want solid blue squares
-
           // Reset state - but keep rightClickDragging true so user can still cancel
           // rightClickDragging = false; // REMOVED - keep dragging state active
           rightClickStartPos = null;
-
         } else {
-
           // Restart the timeout
           startSquareCreationTimeout();
         }
       }
     }, 5000); // 5 second timeout - check every 5 seconds
   }
-
   // Function to cancel timeout-based square creation
   function cancelSquareCreationTimeout() {
     if (squareCreationTimeout) {
@@ -5289,7 +4472,6 @@ document.addEventListener("DOMContentLoaded", function() {
       squareCreationTimeout = null;
     }
   }
-
   // Function to properly reset square creation state
   function resetSquareCreationState() {
     rightClickDragging = false;
@@ -5309,55 +4491,42 @@ document.addEventListener("DOMContentLoaded", function() {
     cancelSquareCreationTimeout();
     removeTemporarySelectionBox();
   }
-
   // Modify the contextmenu handler to start the timeout
   // Container context menu handler removed - using double right-click detection instead
-
   // Add test function to verify createBlueSquare works
   window.testCreateBlueSquare = function() {
-
     // createBlueSquare(100, 100, 100, 100); // DISABLED - user doesn't want solid blue squares
   };
-
   // Add CTRL key listener to remove light blue square
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Control' || e.ctrlKey) {
-
       removeTemporarySelectionBox();
       // Also reset the square creation state when CTRL is pressed
       resetSquareCreationState();
     }
   });
-
   // Test square function removed - no longer needed
-
   // Immediate test square creation removed - no longer needed
-
   // ... existing code ...
 });
 // ... existing code ...
-
 /**
  * Define pickTypeForCell globally
  */
 window.pickTypeForCell = function(cellId, val) {
   // DEBUG
   if (!val) {
-
     return; // Do nothing if no type selected
   }
   const c = graph.getModel().getCell(cellId);
   if (!c) {
-
     return;
   }
-
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
     // DISABLED: Automatic Node ID generation when changing question type
     // Node IDs will only change when manually edited or reset using the button
-
     if (!c._placeholder) {
       c._placeholder = "";
     }
@@ -5376,28 +4545,21 @@ window.pickTypeForCell = function(cellId, val) {
   } finally {
     graph.getModel().endUpdate();
   }
-
   graph.setSelectionCell(c);
   graph.startEditingAtCell(c);
   refreshAllCells();
-
 };
-
 // Function to refresh all existing multiple dropdown cells with drag handles
 window.refreshAllMultipleDropdownCells = function() {
   if (!graph) return;
-
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
-
   vertices.forEach(cell => {
     if (getQuestionType(cell) === "multipleDropdownType") {
-
       updatemultipleDropdownTypeCell(cell);
     }
   });
 };
-
 // --- Ensure event handler is attached for all .question-type-dropdown selects (event delegation) ---
 document.addEventListener('change', function(e) {
   if (e.target && e.target.classList.contains('question-type-dropdown')) {
@@ -5411,7 +4573,6 @@ document.addEventListener('change', function(e) {
     }
   }
 });
-
 // Refresh existing multiple dropdown cells after page load
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
@@ -5420,12 +4581,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }, 1000);
 });
-
 document.addEventListener('contextmenu', function(e) {
   if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
   e.preventDefault();
 });
-
 document.addEventListener('DOMContentLoaded', function() {
   // Map legend color box IDs to color picker IDs and colorPreferences keys
   const colorMap = [
@@ -5440,7 +4599,6 @@ document.addEventListener('DOMContentLoaded', function() {
     { box: 'colorEmail', picker: 'colorPickerText', key: 'text' },     // Email uses text color
     { box: 'colorPhone', picker: 'colorPickerText', key: 'text' }      // Phone uses text color
   ];
-
   colorMap.forEach(({ box, picker, key }) => {
     const boxEl = document.getElementById(box);
     const pickerEl = document.getElementById(picker);
@@ -5458,27 +4616,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-
 function previewForm() {
   // Automatically reset PDF inheritance and Node IDs before previewing
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
-
   } else {
-
   }
-
   // Reset all Node IDs SECOND (after PDF inheritance is fixed)
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
-
   } else {
-
   }
-
   // Generate the GUI JSON string (do not download)
   let guiJsonStr = "";
   if (typeof window.exportGuiJson === "function") {
@@ -5489,17 +4639,14 @@ function previewForm() {
       guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
     }
   }
-
   if (guiJsonStr) {
       // Encode the JSON for URL transmission
       const encodedJson = encodeURIComponent(guiJsonStr);
       const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
-
       // Still copy to clipboard for manual use if needed
     navigator.clipboard.writeText(guiJsonStr).then(() => {
       // Optionally, show a message: copied!
     });
-
       // Open the GUI preview in a new tab with the JSON in the URL
       window.open(guiUrl, '_blank');
     } else {
@@ -5507,15 +4654,12 @@ function previewForm() {
   window.open('FormWiz%20GUI/gui.html', '_blank');
     }
 }
-
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE
 // --- AUTOSAVE CONSTANTS ---
   // AUTOSAVE_KEY moved to config.js module
-
 // --- AUTOSAVE CORE FUNCTIONS (localStorage version) ---
 // Cache for autosave data to avoid unnecessary processing
   // lastAutosaveData and autosaveDataHash moved to config.js module
-
 function autosaveFlowchartToLocalStorage() {
   try {
     if (!graph) {
@@ -5523,22 +4667,18 @@ function autosaveFlowchartToLocalStorage() {
     }
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
-
     // Quick check if data has actually changed
     const currentHash = JSON.stringify({
       cellCount: cells.length,
       sectionPrefs: sectionPrefs,
       groups: groups
     });
-
     if (currentHash === autosaveDataHash && lastAutosaveData) {
       // Data hasn't changed, skip autosave
       return;
     }
-
     const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
     const sectionPrefsCopy = JSON.parse(JSON.stringify(currentSectionPrefs));
-
     // Use the same safe serialization logic as exportFlowchartJson
     const simplifiedCells = cells.map(cell => {
       // Basic info about the cell
@@ -5549,7 +4689,6 @@ function autosaveFlowchartToLocalStorage() {
         value: cell.value,
         style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
       };
-
       // Handle geometry 
       if (cell.geometry) {
         cellData.geometry = {
@@ -5559,12 +4698,10 @@ function autosaveFlowchartToLocalStorage() {
           height: cell.geometry.height,
         };
       }
-
       // Add source and target for edges
       if (cell.edge && cell.source && cell.target) {
         cellData.source = cell.source.id;
         cellData.target = cell.target.id;
-
         // Save edge geometry (articulation points) if it exists
         if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
           cellData.edgeGeometry = {
@@ -5575,7 +4712,6 @@ function autosaveFlowchartToLocalStorage() {
           };
         }
       }
-
       // Custom fields for specific nodes
       if (cell._textboxes) {
         cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
@@ -5587,7 +4723,6 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._questionId) cellData._questionId = cell._questionId;
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
-
       // checkbox properties
       if (cell._checkboxes) {
         cellData._checkboxes = JSON.parse(JSON.stringify(cell._checkboxes));
@@ -5601,14 +4736,11 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._dropdowns) {
         cellData._dropdowns = JSON.parse(JSON.stringify(cell._dropdowns));
       }
-
       // textbox properties
       if (cell._amountName) cellData._amountName = cell._amountName;
       if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
-
       // image option
       if (cell._image) cellData._image = cell._image;
-
       // PDF node properties
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
@@ -5617,22 +4749,17 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._pdfPreviewFile !== undefined) cellData._pdfPreviewFile = cell._pdfPreviewFile;
       if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
       if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
-
       // Notes node properties
       if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
       if (cell._notesBold !== undefined) cellData._notesBold = cell._notesBold;
       if (cell._notesFontSize !== undefined) cellData._notesFontSize = cell._notesFontSize;
-
       // Checklist node properties
       if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
-
       // Alert node properties
       if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
-
       // Hidden node properties - always save these if they exist on the cell
       if (cell.hasOwnProperty('_hiddenNodeId')) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
-
       // Linked logic node properties - always save these if they exist on the cell
       if (cell.hasOwnProperty('_linkedLogicNodeId')) {
         cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
@@ -5647,13 +4774,11 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_linkedCheckboxOptions')) {
         cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
       }
-
       // Special handling for hidden textbox nodes - always save _defaultText even if empty
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
         // Always save _defaultText for hidden textbox nodes, even if undefined or empty
         cellData._defaultText = cell._defaultText !== undefined ? cell._defaultText : "";
       }
-
       // calculation node properties
         // Calculation node data export now handled by calc.js
         if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
@@ -5661,22 +4786,17 @@ function autosaveFlowchartToLocalStorage() {
             window.exportCalculationNodeData(cell, cellData);
           }
         }
-
       // subtitle & info nodes
       if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
       if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
-
       // checkbox availability
       if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
-
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
       if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
-
       return cellData;
     });
-
     // Get current groups data without updating from DOM
     const groupsArray = [];
     Object.keys(groups).forEach(groupId => {
@@ -5687,17 +4807,13 @@ function autosaveFlowchartToLocalStorage() {
         sections: groups[groupId].sections
       });
     });
-
     // Get default PDF properties
     const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
       window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
-
     // Get form name
     const formName = document.getElementById('formNameInput')?.value || '';
-
     // Get current library flowchart name (if any)
     const libraryFlowchartName = window.currentFlowchartName || null;
-
     // Get current camera/viewport position
     const view = graph.getView();
     const translate = view.getTranslate();
@@ -5707,7 +4823,6 @@ function autosaveFlowchartToLocalStorage() {
       translateY: translate.y,
       scale: scale
     };
-
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
@@ -5718,23 +4833,19 @@ function autosaveFlowchartToLocalStorage() {
       edgeStyle: currentEdgeStyle,
       viewportPosition: viewportPosition
     };
-
     // Cache the data and hash for next comparison
     lastAutosaveData = data;
     autosaveDataHash = currentHash;
-
     const json = JSON.stringify(data);
     localStorage.setItem(AUTOSAVE_KEY, json);
   } catch (e) {
     // Silently handle errors to avoid performance impact
   }
 }
-
 function clearAutosaveLocalStorage() {
   localStorage.removeItem(AUTOSAVE_KEY);
   // Removed: 
 }
-
 function getAutosaveFlowchartFromLocalStorage() {
   const raw = localStorage.getItem(AUTOSAVE_KEY);
   // Removed: 
@@ -5755,73 +4866,51 @@ function getAutosaveFlowchartFromLocalStorage() {
     return null;
   }
 }
-
 // --- AUTOSAVE HOOKS ---
   // autosaveTimeout, autosaveThrottleDelay, lastAutosaveTime, and autosaveMinInterval moved to config.js module
-
 // Test function to check current cell state
 window.testCellState = function(cellId) {
-
   const cell = graph.getModel().getCell(cellId);
   if (cell) {
-
     if (cell._textboxes && cell._textboxes[0]) {
-
     }
   } else {
-
   }
 };
-
 // Test function to manually toggle amount option
 window.testToggleAmount = function(cellId, index, checked) {
-
   if (typeof window.toggleMultipleDropdownAmount === 'function') {
     window.toggleMultipleDropdownAmount(cellId, index, checked);
   } else {
-
   }
 };
-
 window.testToggleTextboxAmount = function(cellId, index, checked) {
-
   if (typeof window.toggleMultipleTextboxAmount === 'function') {
     window.toggleMultipleTextboxAmount(cellId, index, checked);
   } else {
-
   }
 };
-
 // Test function to check if functions are available
 window.testFunctionAvailability = function() {
-
 };
-
 // Global click handler to debug checkbox clicks
 document.addEventListener('click', function(e) {
-
   if (e.target.type === 'checkbox') {
-
     if (e.target.closest('.textbox-entry')) {
-
       // Try to extract cell ID and index from the onclick attribute
       const onclick = e.target.getAttribute('onclick');
-
       if (onclick && onclick.includes('toggleMultipleDropdownAmount')) {
         // Extract cell ID and index using regex
         const match = onclick.match(/toggleMultipleDropdownAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
         if (match) {
           const cellId = match[1];
           const index = parseInt(match[2]);
-
           // Check current state before toggling
           window.testCellState(cellId);
-
           // Manually call the function
           if (typeof window.toggleMultipleDropdownAmount === 'function') {
             window.toggleMultipleDropdownAmount(cellId, index, e.target.checked);
           }
-
           // Check state after toggling
           setTimeout(() => {
             window.testCellState(cellId);
@@ -5831,72 +4920,57 @@ document.addEventListener('click', function(e) {
     }
   }
 });
-
 // Also add a mousedown listener to catch checkbox interactions earlier
 document.addEventListener('mousedown', function(e) {
   if (e.target.type === 'checkbox') {
-
   }
 });
-
 // Add a change listener to catch checkbox state changes
 document.addEventListener('change', function(e) {
   if (e.target.type === 'checkbox') {
-
     // If this is an amount checkbox, manually call the function
     if (e.target.closest('.textbox-entry')) {
       const onclick = e.target.getAttribute('onclick');
       if (onclick && onclick.includes('toggleMultipleDropdownAmount')) {
-
         try {
           // Extract and call the function manually
           const match = onclick.match(/toggleMultipleDropdownAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
           if (match) {
             const cellId = match[1];
             const index = parseInt(match[2]);
-
             if (typeof window.toggleMultipleDropdownAmount === 'function') {
               window.toggleMultipleDropdownAmount(cellId, index, e.target.checked);
             } else {
-
             }
           }
         } catch (error) {
-
         }
       } else if (onclick && onclick.includes('toggleMultipleTextboxAmount')) {
-
         try {
           // Extract and call the function manually
           const match = onclick.match(/toggleMultipleTextboxAmount\('([^']+)',\s*(\d+),\s*this\.checked\)/);
           if (match) {
             const cellId = match[1];
             const index = parseInt(match[2]);
-
             if (typeof window.toggleMultipleTextboxAmount === 'function') {
               window.toggleMultipleTextboxAmount(cellId, index, e.target.checked);
             } else {
-
             }
           }
         } catch (error) {
-
         }
       }
     }
   }
 });
-
 // Global helper to request a throttled autosave from anywhere (including Groups UI)
 function requestAutosave() {
   try {
     const now = Date.now();
-
     // Prevent too frequent autosaves
     if (now - lastAutosaveTime < autosaveMinInterval) {
       return;
     }
-
     if (autosaveTimeout) {
       clearTimeout(autosaveTimeout);
     }
@@ -5911,44 +4985,36 @@ function requestAutosave() {
     lastAutosaveTime = Date.now();
   }
 }
-
 function setupAutosaveHooks() {
   if (!graph) return;
-
   // Throttled autosave function - optimized for large flowcharts
   function throttledAutosave() {
     if (autosaveTimeout) {
       clearTimeout(autosaveTimeout);
     }
-
     // Use longer delay for large flowcharts
     const cellCount = graph.getChildVertices(graph.getDefaultParent()).length;
     const delay = cellCount > 50 ? autosaveThrottleDelay * 1.5 : autosaveThrottleDelay;
-
     autosaveTimeout = setTimeout(() => {
       autosaveFlowchartToLocalStorage();
       autosaveTimeout = null;
     }, delay);
   }
-
   // Save after any model change (throttled)
   graph.getModel().addListener(mxEvent.CHANGE, function() {
     throttledAutosave();
   });
-
   // Save after refreshAllCells (in case of programmatic changes) - throttled
   const origRefreshAllCells = window.refreshAllCells;
   window.refreshAllCells = function() {
     origRefreshAllCells.apply(this, arguments);
     throttledAutosave();
   };
-
   // Save after loadFlowchartData (delayed to ensure groups are loaded)
   const origLoadFlowchartData = window.loadFlowchartData;
   window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallback) {
     // Set flag to prevent automatic Node ID regeneration during loading
     window._isLoadingFlowchart = true;
-
     // Wrap the callback to reset the flag after loading
     const wrappedCallback = () => {
       if (typeof onCompleteCallback === 'function') {
@@ -5956,33 +5022,24 @@ function setupAutosaveHooks() {
       }
       window._isLoadingFlowchart = false;
     };
-
     origLoadFlowchartData.call(this, data, libraryFlowchartName, wrappedCallback);
-
     // Apply groups from imported JSON if present
     if (data && Array.isArray(data.groups)) {
       if (typeof window.loadGroupsFromData === 'function') {
         window.loadGroupsFromData(data.groups);
-
       } else {
         window.pendingGroupsData = data.groups;
       }
     }
-
     // Ensure section legend is updated after import
     if (data && data.sectionPrefs) {
-
       setTimeout(() => {
-
         if (typeof window.updateSectionLegend === 'function') {
           window.updateSectionLegend();
-
         } else {
-
         }
       }, 100); // Small delay to ensure DOM is ready
     }
-
     // Automatically reset PDF inheritance and Node IDs after flowchart loading
     // Note: This runs after the internal loadFlowchartData processes:
     // - 500ms: PDF properties propagation
@@ -5994,16 +5051,13 @@ function setupAutosaveHooks() {
       if (typeof window.resetAllPdfInheritance === 'function') {
         window.resetAllPdfInheritance();
       }
-
       // Reset all Node IDs SECOND (after PDF inheritance is fixed)
       if (typeof resetAllNodeIds === 'function') {
         resetAllNodeIds();
       }
     }, 3000); // Increased delay to ensure all internal loading processes are complete
-
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
-
       // Get library flowchart name from global variable (set by loadFlowchartData)
       const libraryName = window._loadingLibraryFlowchartName;
       // Set currentFlowchartName before autosave if we're loading from library
@@ -6014,16 +5068,13 @@ function setupAutosaveHooks() {
       // Clear the global variable after autosave
       window._loadingLibraryFlowchartName = null;
     }, 1000); // Increased delay to ensure groups are fully processed
-
     // Clear the loading flag after all loading processes are complete
     setTimeout(() => {
       window._isLoadingFlowchart = false;
     }, 4000); // Clear flag after all loading processes (including the 3000ms automatic reset)
   };
-
   // Removed: 
 }
-
 // --- AUTOSAVE RESTORE PROMPT ---
 function showAutosaveRestorePrompt() {
   let modal = document.createElement('div');
@@ -6038,7 +5089,6 @@ function showAutosaveRestorePrompt() {
   modal.style.alignItems = 'center';
   modal.style.justifyContent = 'center';
   modal.style.zIndex = '9999';
-
   let box = document.createElement('div');
   box.style.background = '#fff';
   box.style.padding = '32px 40px';
@@ -6046,7 +5096,6 @@ function showAutosaveRestorePrompt() {
   box.style.boxShadow = '0 4px 32px rgba(0,0,0,0.18)';
   box.style.textAlign = 'center';
   box.innerHTML = `<h2>Pick up where you left off?</h2><p>We found an autosaved flowchart. Would you like to continue editing it?</p>`;
-
   let yesBtn = document.createElement('button');
   yesBtn.textContent = 'Yes';
   yesBtn.style.margin = '12px 24px 0 0';
@@ -6057,7 +5106,6 @@ function showAutosaveRestorePrompt() {
   yesBtn.style.color = '#fff';
   yesBtn.style.border = 'none';
   yesBtn.style.cursor = 'pointer';
-
   let noBtn = document.createElement('button');
   noBtn.textContent = 'No';
   noBtn.style.margin = '12px 0 0 0';
@@ -6068,24 +5116,18 @@ function showAutosaveRestorePrompt() {
   noBtn.style.color = '#222';
   noBtn.style.border = 'none';
   noBtn.style.cursor = 'pointer';
-
   yesBtn.onclick = function() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
-
       // Check if this was a library flowchart and handle it specially
       if (data.libraryFlowchartName && typeof window.openSavedFlowchart === 'function') {
-
         // Show alert to user
         alert(`Opening ${data.libraryFlowchartName} from library`);
-
         // Set the current flowchart name first
         window.currentFlowchartName = data.libraryFlowchartName;
-
         // Store viewport position before opening (since openSavedFlowchart will load from library)
         const savedViewportPosition = data.viewportPosition;
-
         // Create callback to restore viewport after flowchart loads
         const restoreViewportCallback = () => {
           if (savedViewportPosition && graph) {
@@ -6100,14 +5142,11 @@ function showAutosaveRestorePrompt() {
                 graph.refresh();
               }
             } catch (e) {
-
             }
           }
         };
-
         // Open the library flowchart directly with completion callback
         window.openSavedFlowchart(data.libraryFlowchartName, restoreViewportCallback);
-
         // Wait for groups to be loaded before setting up autosave hooks
         setTimeout(safeSetupAutosaveHooks, 1000);
       } else {
@@ -6126,14 +5165,11 @@ function showAutosaveRestorePrompt() {
                 graph.refresh();
               }
             } catch (e) {
-
             }
           }
         };
-
         // Load flowchart data with completion callback
         window.loadFlowchartData(data, null, restoreViewportCallback);
-
         // Restore form name if it exists
         if (data.formName) {
           const formNameInput = document.getElementById('formNameInput');
@@ -6141,7 +5177,6 @@ function showAutosaveRestorePrompt() {
             formNameInput.value = data.formName;
           }
         }
-
         // Wait for groups to be loaded before setting up autosave hooks
         setTimeout(safeSetupAutosaveHooks, 1000);
       }
@@ -6155,12 +5190,10 @@ function showAutosaveRestorePrompt() {
     window.location.reload();
     // Removed: 
   };
-
   box.appendChild(yesBtn);
   box.appendChild(noBtn);
   modal.appendChild(box);
   document.body.appendChild(modal);
-
   // Add click outside to close functionality
   modal.addEventListener('click', function(event) {
     if (event.target === modal) {
@@ -6170,10 +5203,8 @@ function showAutosaveRestorePrompt() {
       window.location.reload();
     }
   });
-
   // Removed: 
 }
-
 // --- INIT AUTOSAVE ON PAGE LOAD ---
 let autosaveHooksSetup = false;
 function safeSetupAutosaveHooks() {
@@ -6190,53 +5221,39 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(safeSetupAutosaveHooks, 1000);
   }
 });
-
 // --- COPY/PASTE NODE AS JSON ---
   // flowchartClipboard, FLOWCHART_CLIPBOARD_KEY, and FLOWCHART_CLIPBOARD_TIMESTAMP_KEY moved to config.js module
-
 function copySelectedNodeAsJson() {
   // Add debugging to track duplicate calls
   const stack = new Error().stack;
-
   try {
     const cells = graph.getSelectionCells();
     if (!cells || cells.length === 0) {
-
       return;
     }
-
     // Separate vertices (nodes) and edges
     const nodes = cells.filter(cell => cell.vertex);
     let edges = cells.filter(cell => cell.edge);
-
     // If no nodes are selected, we can't copy anything meaningful
     if (nodes.length === 0) {
-
       return;
     }
-
     // Get all node IDs for edge detection
     const selectedNodeIds = new Set(nodes.map(node => node.id));
-
     // Find all edges that connect selected nodes (even if not explicitly selected)
     const allEdges = graph.getModel().getEdges();
-
     const connectingEdges = allEdges.filter(edge => {
       const sourceId = edge.source ? edge.source.id : null;
       const targetId = edge.target ? edge.target.id : null;
       const connectsSelected = selectedNodeIds.has(sourceId) && selectedNodeIds.has(targetId);
       if (connectsSelected) {
-
       }
       return connectsSelected;
     });
-
     // Debug logging for edge detection
-
     // Combine explicitly selected edges with connecting edges
     const allSelectedEdges = new Set([...edges, ...connectingEdges]);
     edges = Array.from(allSelectedEdges);
-
     // Calculate the bounding box of all selected nodes to determine the center
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     nodes.forEach(cell => {
@@ -6247,18 +5264,14 @@ function copySelectedNodeAsJson() {
         maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
       }
     });
-
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
-
     // Create a map of old IDs to new IDs for edge reconstruction
     const idMap = {};
     const newIds = [];
-
     // Prepare node data with relative positioning
     const nodeData = nodes.map(cell => {
       const cellData = {};
-
       // Only copy specific properties we need, avoiding circular references
       const safeProperties = [
         'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
@@ -6267,13 +5280,11 @@ function copySelectedNodeAsJson() {
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
       '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_linkedCheckboxNodeId', '_linkedCheckboxOptions', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice', '_locationIndex', '_checkboxes', '_itemOrder', '_times', '_dropdowns'
       ];
-
       safeProperties.forEach(prop => {
         if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
           cellData[prop] = cell[prop];
         }
       });
-
       // Store the original ID for edge mapping
       const originalId = cell.id;
       const newId = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + newIds.length;
@@ -6281,7 +5292,6 @@ function copySelectedNodeAsJson() {
       newIds.push(newId);
       cellData.originalId = originalId;
       cellData.newId = newId;
-
       // Calculate relative position from center
       if (cell.geometry) {
         cellData.geometry = {
@@ -6293,22 +5303,18 @@ function copySelectedNodeAsJson() {
       }
       return cellData;
     });
-
     // Prepare edge data with updated source/target IDs
     const edgeData = edges.map(cell => {
       const cellData = {};
-
       // Only copy specific edge properties we need, avoiding circular references
       const safeEdgeProperties = [
         'id', 'value', 'style', 'geometry'
       ];
-
       safeEdgeProperties.forEach(prop => {
         if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
           cellData[prop] = cell[prop];
         }
       });
-
       // Update source and target IDs to use the new node IDs
       if (cell.source && idMap[cell.source.id]) {
         cellData.sourceId = idMap[cell.source.id];
@@ -6316,10 +5322,8 @@ function copySelectedNodeAsJson() {
       if (cell.target && idMap[cell.target.id]) {
         cellData.targetId = idMap[cell.target.id];
       }
-
       return cellData;
     });
-
     // Collect section preferences from the copied nodes
     const copiedSectionPrefs = {};
     const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -6332,7 +5336,6 @@ function copySelectedNodeAsJson() {
         };
       }
     });
-
     // Create the complete clipboard data
     const clipboardData = {
       nodes: nodeData,
@@ -6342,52 +5345,40 @@ function copySelectedNodeAsJson() {
       isMultiCopy: true,
       sectionPrefs: copiedSectionPrefs
     };
-
     const jsonData = JSON.stringify(clipboardData);
     const timestamp = Date.now();
-
     // Store in localStorage for cross-tab functionality
     localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, jsonData);
     localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
-
     // Also keep in memory for same-tab functionality
     flowchartClipboard = jsonData;
-
     // Copy to system clipboard as well
     if (navigator.clipboard) {
       navigator.clipboard.writeText(jsonData).then(() => {
-
       }).catch(err => {
-
       });
     }
-
     // Show feedback to user
     const nodeCount = nodes.length;
     const edgeCount = edges.length;
     showCopyFeedback(nodeCount, edgeCount);
   } catch (error) {
-
     throw error;
   }
 }
-
 window.pasteNodeFromJson = function(x, y) {
   // Prevent multiple simultaneous paste operations
   if (window._isPasting) {
     return;
   }
   window._isPasting = true;
-
   // Try to get data from localStorage first (for cross-tab functionality)
   let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
   let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
-
   // If no localStorage data, fall back to memory clipboard
   if (!clipboardData && flowchartClipboard) {
     clipboardData = flowchartClipboard;
   }
-
   if (!clipboardData) {
     // Try to get from system clipboard as last resort
     navigator.clipboard.readText().then(text => {
@@ -6404,10 +5395,8 @@ window.pasteNodeFromJson = function(x, y) {
     });
     return;
   }
-
   pasteNodeFromJsonData(clipboardData, x, y);
 }
-
 function pasteNodeFromJsonData(clipboardData, x, y) {
   let data;
   try {
@@ -6417,49 +5406,39 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
     window._isPasting = false; // Clear flag on error
     return;
   }
-
   const parent = graph.getDefaultParent();
   graph.getModel().beginUpdate();
-
   try {
     // Handle new multi-copy format
     if (data.isMultiCopy && data.nodes) {
       // Use provided position or default to center of viewport
       const pasteX = typeof x === "number" ? x : (data.centerX || 100);
       const pasteY = typeof y === "number" ? y : (data.centerY || 100);
-
       // Create a map to store new cell instances
       const newCells = {};
-
       // First, create all nodes
       data.nodes.forEach((nodeData) => {
         // Calculate absolute position based on relative position and paste location
         const absX = pasteX + (nodeData.geometry?.x || 0);
         const absY = pasteY + (nodeData.geometry?.y || 0);
-
         const geo = new mxGeometry(
           absX, 
           absY, 
           nodeData.geometry?.width || 160, 
           nodeData.geometry?.height || 80
         );
-
         const newCell = new mxCell(nodeData.value, geo, nodeData.style);
         newCell.vertex = true;
         newCell.id = nodeData.newId;
-
         // Copy custom fields
         ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
-
         // Section
         if (nodeData.section !== undefined) newCell.section = nodeData.section;
-
         // Insert into graph
         graph.addCell(newCell, parent);
         newCells[nodeData.newId] = newCell;
-
         // Update rendering for special node types
         if (getQuestionType(newCell) === "imageOption") {
           updateImageOptionCell(newCell);
@@ -6477,7 +5456,6 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
         }
-
         // Handle hidden node copy/paste
         if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(newCell)) {
           // Update hidden checkbox node display
@@ -6501,18 +5479,14 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           }
         }
       });
-
       // Then, create all edges
       if (data.edges) {
-
         data.edges.forEach((edgeData, index) => {
           const sourceCell = newCells[edgeData.sourceId];
           const targetCell = newCells[edgeData.targetId];
-
           if (sourceCell && targetCell) {
             // Use the proper insertEdge method instead of manual creation
             const newEdge = graph.insertEdge(parent, null, edgeData.value || "", sourceCell, targetCell, edgeData.style);
-
             // Apply current edge style if no style is provided
             if (!edgeData.style || edgeData.style === "") {
               let edgeStyle;
@@ -6527,7 +5501,6 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
               }
               graph.getModel().setStyle(newEdge, edgeStyle);
             }
-
             // Copy edge properties if they exist
             if (edgeData.geometry) {
               newEdge.geometry = new mxGeometry(
@@ -6537,15 +5510,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
                 edgeData.geometry.height || 0
               );
             }
-
           } else {
-
           }
         });
       } else {
-
       }
-
       // Merge section preferences from clipboard with current ones
       if (data.sectionPrefs) {
         const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -6563,22 +5532,18 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else {
           window.sectionPrefs = currentSectionPrefs;
         }
-
         // Update the section legend to reflect the new sections
         if (typeof updateSectionLegend === 'function') {
           updateSectionLegend();
         }
       }
-
       // Show feedback with counts
       const nodeCount = data.nodes.length;
       const edgeCount = data.edges ? data.edges.length : 0;
       showPasteFeedback(nodeCount, edgeCount);
-
     } else {
       // Handle legacy single-node format (backward compatibility)
       let legacyData = Array.isArray(data) ? data : [data];
-
       legacyData.forEach((cellData, idx) => {
         // Assign a new ID
         cellData.id = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + idx;
@@ -6618,7 +5583,6 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
             window.handleCalculationNodeCopyPaste(newCell);
           }
         }
-
         // Handle hidden node copy/paste
         if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(newCell)) {
           // Update hidden checkbox node display
@@ -6642,7 +5606,6 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           }
         }
       });
-
       // Merge section preferences from clipboard with current ones (for legacy format)
       if (data.sectionPrefs) {
         const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -6660,33 +5623,26 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else {
           window.sectionPrefs = currentSectionPrefs;
         }
-
         // Update the section legend to reflect the new sections
         if (typeof updateSectionLegend === 'function') {
           updateSectionLegend();
         }
       }
-
       showPasteFeedback(legacyData.length, 0);
     }
-
   } finally {
     graph.getModel().endUpdate();
   }
-
   // Clear the paste flag
   window._isPasting = false;
-
   // Correct Node IDs for pasted nodes to follow proper naming scheme
   setTimeout(() => {
     if (typeof window.correctNodeIdsAfterImport === 'function') {
       window.correctNodeIdsAfterImport();
     }
   }, 100);
-
   refreshAllCells();
 }
-
 // Add visual feedback for copy/paste operations
 function showCopyFeedback(nodeCount = 1, edgeCount = 0) {
   const feedback = document.createElement('div');
@@ -6700,7 +5656,6 @@ function showCopyFeedback(nodeCount = 1, edgeCount = 0) {
   } else {
     message = 'Selection copied! Available in other tabs.';
   }
-
   feedback.textContent = message;
   feedback.style.cssText = `
     position: fixed;
@@ -6715,15 +5670,12 @@ function showCopyFeedback(nodeCount = 1, edgeCount = 0) {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     animation: slideIn 0.3s ease-out;
   `;
-
   document.body.appendChild(feedback);
-
   setTimeout(() => {
     feedback.style.animation = 'slideOut 0.3s ease-in';
     setTimeout(() => feedback.remove(), 300);
   }, 2000);
 }
-
 function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
   const feedback = document.createElement('div');
   let message = '';
@@ -6736,7 +5688,6 @@ function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
   } else {
     message = 'Selection pasted successfully!';
   }
-
   feedback.textContent = message;
   feedback.style.cssText = `
     position: fixed;
@@ -6751,26 +5702,20 @@ function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     animation: slideIn 0.3s ease-out;
   `;
-
   document.body.appendChild(feedback);
-
   setTimeout(() => {
     feedback.style.animation = 'slideOut 0.3s ease-in';
     setTimeout(() => feedback.remove(), 300);
   }, 2000);
 }
-
 // CSS animations are now in style.css
-
 // Listen for storage events to detect when data is copied in other tabs
 window.addEventListener('storage', function(e) {
   if (e.key === FLOWCHART_CLIPBOARD_KEY && e.newValue) {
     // Update the memory clipboard when data is copied in another tab
     flowchartClipboard = e.newValue;
-
   }
 });
-
 // --- UPDATE IMAGE OPTION NODE ---
 function updateImageOptionCell(cell) {
   if (!cell || !isOptions(cell) || getQuestionType(cell) !== "imageOption") return;
@@ -6781,7 +5726,6 @@ function updateImageOptionCell(cell) {
   let imgUrl = cell._image.url || "";
   let imgWidth = cell._image.width || "100";
   let imgHeight = cell._image.height || "100";
-
   // --- FOCUS PRESERVATION PATCH ---
   // Find the currently focused input (if any) and its cursor position
   let focusField = null, cursorPos = null, selectionEnd = null;
@@ -6795,7 +5739,6 @@ function updateImageOptionCell(cell) {
       selectionEnd = active.selectionEnd;
     }
   }
-
   // Render image preview and three textboxes
   const html = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
@@ -6814,7 +5757,6 @@ function updateImageOptionCell(cell) {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
-
   // --- RESTORE FOCUS AND CURSOR POSITION ---
   if (focusField) {
     setTimeout(() => {
@@ -6839,7 +5781,6 @@ function updateImageOptionCell(cell) {
     }, 0);
   }
 }
-
 // Handler for updating image node fields
 window.updateImageNodeField = function(cellId, field, value) {
   const cell = graph.getModel().getCell(cellId);
@@ -6852,15 +5793,12 @@ window.updateImageNodeField = function(cellId, field, value) {
   cell._image[field] = value;
   updateImageOptionCell(cell);
 };
-
 // PDF Node functions
 function isPdfNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=pdfNode");
 }
-
 function updatePdfNodeCell(cell) {
   if (!cell || !isPdfNode(cell)) return;
-
   // Ensure the 3 required properties exist
   if (!cell._pdfName) {
     cell._pdfName = "PDF Document";
@@ -6871,7 +5809,6 @@ function updatePdfNodeCell(cell) {
   if (!cell._pdfPrice) {
     cell._pdfPrice = "";
   }
-
   // Render PDF node with the 3 required fields
   let html = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
@@ -6882,7 +5819,6 @@ function updatePdfNodeCell(cell) {
       </div>
     </div>
   `;
-
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
@@ -6891,28 +5827,23 @@ function updatePdfNodeCell(cell) {
   }
   graph.updateCellSize(cell);
 }
-
 // Handler for updating PDF Name field
 window.updatePdfNameField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isPdfNode(cell)) return;
-
   const oldPdfName = cell._pdfName;
   cell._pdfName = value;
-
   // DISABLED: Automatic Node ID updates when PDF names change
   // Node IDs will only change when manually edited or reset using the button
   // if (oldPdfName && oldPdfName !== value) {
   //   updateAllNodeIdsForPdfChange(oldPdfName, value);
   // }
-
   // Trigger autosave
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
-
 /**
  * Update all Node IDs when a PDF name changes
  */
@@ -6920,13 +5851,10 @@ function updateAllNodeIdsForPdfChange(oldPdfName, newPdfName) {
   // DISABLED: Automatic Node ID updates have been completely disabled
   // Node IDs will only change when manually edited or reset using the button
   // Users will set all Node IDs at the end when the structure is complete
-
   return;
 }
-
 // Export the function to window object
 window.updateAllNodeIdsForPdfChange = updateAllNodeIdsForPdfChange;
-
 // Handler for updating PDF File field
 window.updatePdfFileField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
@@ -6938,7 +5866,6 @@ window.updatePdfFileField = function(cellId, value) {
   }
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
-
 // Handler for updating PDF Price field
 window.updatePdfPriceField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
@@ -6950,14 +5877,11 @@ window.updatePdfPriceField = function(cellId, value) {
   }
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
-
   // Function to check if a PDF node is connected to a Big Paragraph node
   function checkIfPdfConnectedToBigParagraph(pdfCell) {
     if (!pdfCell || !isPdfNode(pdfCell)) return false;
-
     // Get all incoming edges to this PDF node
     const incomingEdges = graph.getIncomingEdges(pdfCell) || [];
-
     for (const edge of incomingEdges) {
       const sourceCell = edge.source;
       if (sourceCell && isQuestion(sourceCell)) {
@@ -6968,55 +5892,44 @@ window.updatePdfPriceField = function(cellId, value) {
         }
       }
     }
-
     return false;
   }
-
 // Notes Node functions
 function isNotesNode(cell) {
   return cell && cell.style && cell.style.includes("questionType=notesNode");
 }
-
 function updateNotesNodeCell(cell) {
   if (!cell || !isNotesNode(cell)) return;
-
   // Ensure _notesText property exists
   if (!cell._notesText) {
     cell._notesText = "Notes text";
   }
-
   // Get current cell dimensions
   const geometry = cell.getGeometry();
   const cellWidth = geometry.width;
   const cellHeight = geometry.height;
-
   // Calculate dynamic font size based on cell dimensions
   // Base font size from user setting, but scale based on cell size
   const baseFontSize = parseInt(cell._notesFontSize, 10) || 14;
   const minFontSize = 8;
   const maxFontSize = 200; // Increased from 48 to allow much larger font sizes
-
   // Scale font size based on cell area (width * height)
   const cellArea = cellWidth * cellHeight;
   const baseArea = 200 * 100; // Default notes node size
   const scaleFactor = Math.sqrt(cellArea / baseArea);
   const dynamicFontSize = Math.max(minFontSize, Math.min(maxFontSize, Math.round(baseFontSize * scaleFactor)));
-
   const isBold = !!cell._notesBold;
   const text = escapeHtml(cell._notesText || "Notes text");
-
   // Inline styles so they win against theme CSS
   const html =
     `<div class="notes-body" style="font-size:${dynamicFontSize}px !important;` +
     `font-weight:${isBold ? 700 : 400}; line-height:1.35; white-space:pre-wrap; text-align:left;` +
     `cursor: pointer; user-select: text; width: 100%; height: 100%; box-sizing: border-box; padding: 8px;" ondblclick="window.editNotesNodeText('${cell.id}')">` +
     `${text}</div>`;
-
   graph.getModel().beginUpdate();
   try {
     // Render HTML
     graph.getModel().setValue(cell, html);
-
     // Also set mxGraph container fontSize to match
     let st = cell.style || "";
     st = st.replace(/fontSize=\d+;?/, "");
@@ -7025,12 +5938,10 @@ function updateNotesNodeCell(cell) {
   } finally {
     graph.getModel().endUpdate();
   }
-
   colorCell(cell);          // keep your border and fill logic
   // Remove automatic resizing to allow manual resizing
   // graph.updateCellSize(cell);
 }
-
 // Handler for updating notes node field (called when user finishes editing)
 window.updateNotesNodeField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
@@ -7039,15 +5950,12 @@ window.updateNotesNodeField = function(cellId, value) {
   // Update the cell with proper formatting
   updateNotesNodeCell(cell);
 };
-
 // Handler for editing notes node text on double-click
 window.editNotesNodeText = function(cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isNotesNode(cell)) return;
-
   const currentText = cell._notesText || "Notes text";
   const newText = prompt("Edit notes text:", currentText);
-
   if (newText !== null && newText !== currentText) {
     cell._notesText = newText;
     updateNotesNodeCell(cell);
@@ -7055,20 +5963,16 @@ window.editNotesNodeText = function(cellId) {
     autosaveFlowchartToLocalStorage();
   }
 };
-
 // Checklist Node functions
 function isChecklistNode(cell) {
   return cell && cell.style && cell.style.includes("questionType=checklistNode");
 }
-
 function updateChecklistNodeCell(cell) {
   if (!cell || !isChecklistNode(cell)) return;
-
   // Ensure _checklistText property exists
   if (!cell._checklistText) {
     cell._checklistText = "Checklist text";
   }
-
   // Set the cell value directly to the checklist text
   graph.getModel().beginUpdate();
   try {
@@ -7078,7 +5982,6 @@ function updateChecklistNodeCell(cell) {
   }
   graph.updateCellSize(cell);
 }
-
 // Handler for updating checklist node field (called when user finishes editing)
 window.updateChecklistNodeField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
@@ -7087,29 +5990,23 @@ window.updateChecklistNodeField = function(cellId, value) {
   // Update the cell value to reflect the new text
   graph.getModel().setValue(cell, value);
 };
-
 // Alert Node functions
 function isAlertNode(cell) {
   return cell && cell.style && cell.style.includes("questionType=alertNode");
 }
-
 function updateAlertNodeCell(cell) {
   if (!cell || !isAlertNode(cell)) return;
-
   // Ensure _alertText property exists
   if (!cell._alertText) {
     cell._alertText = "Alert message";
   }
-
   // Create the alert node display with editable input field
   // Use _questionText as primary source, fallback to _alertText
   const alertText = cell._questionText || cell._alertText;
-
   let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
   htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">âš ï¸ ALERT</div>';
   htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
   htmlContent += '</div>';
-
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, htmlContent);
@@ -7118,7 +6015,6 @@ function updateAlertNodeCell(cell) {
   }
   graph.updateCellSize(cell);
 }
-
 // Handler for updating alert node field (called when user finishes editing)
 window.updateAlertNodeField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
@@ -7128,45 +6024,33 @@ window.updateAlertNodeField = function(cellId, value) {
   cell._alertText = value;
   // Don't call updateAlertNodeCell here to avoid re-rendering while typing
 };
-
   // Groups functionality moved to groups.js module
-
 /**
  * Settings functionality
  */
   // currentEdgeStyle moved to config.js module
-
 // Settings menu functions are now handled by ui.js module
-
 // Save settings
 function saveSettings() {
   const edgeStyleToggle = document.getElementById('edgeStyleToggle');
   const newEdgeStyle = edgeStyleToggle.value;
-
   if (newEdgeStyle !== currentEdgeStyle) {
     currentEdgeStyle = newEdgeStyle;
     updateEdgeStyle();
     saveSettingsToLocalStorage();
   }
-
   hideSettingsMenu();
 }
-
 // Reset all node IDs to match naming convention
 function resetAllNodeIds() {
   if (!window.graph) {
-
     return;
   }
-
   // Proceed without confirmation dialog
-
   const graph = window.graph;
   const parent = graph.getDefaultParent();
   const cells = graph.getChildVertices(parent);
-
   let resetCount = 0;
-
   // Process each cell
   cells.forEach(cell => {
     // Skip hidden nodes - they should keep their custom Node IDs
@@ -7179,13 +6063,11 @@ function resetAllNodeIds() {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
       return; // Skip linked logic nodes
     }
-
     if (typeof window.generateCorrectNodeId === 'function') {
       const correctNodeId = window.generateCorrectNodeId(cell);
       if (correctNodeId) {
         // Clear the manually edited flag since we're resetting to automatic generation
         cell._manuallyEditedNodeId = false;
-
         // Update the cell's Node ID
         if (typeof window.setNodeId === 'function') {
           window.setNodeId(cell, correctNodeId);
@@ -7194,21 +6076,17 @@ function resetAllNodeIds() {
       }
     }
   });
-
   // Refresh all cells to update the display
   if (typeof window.refreshAllCells === 'function') {
     window.refreshAllCells();
   }
-
   // Trigger autosave
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
-
   // Close settings menu
   hideSettingsMenu();
 }
-
 // Update edge style based on current setting
 function updateEdgeStyle() {
   // Update graph default edge style
@@ -7225,13 +6103,11 @@ function updateEdgeStyle() {
     graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ROUNDED] = false;
     graph.getStylesheet().getDefaultEdgeStyle()[mxConstants.STYLE_ORTHOGONAL_LOOP] = false;
   }
-
   // Update existing edges
   const edges = graph.getChildEdges(graph.getDefaultParent());
   edges.forEach(edge => {
     const currentStyle = edge.style || "";
     let newStyle;
-
     if (currentEdgeStyle === 'curved') {
       newStyle = currentStyle.replace(/edgeStyle=[^;]+/g, 'edgeStyle=orthogonalEdgeStyle');
       newStyle = newStyle.replace(/rounded=0/g, 'rounded=1');
@@ -7261,14 +6137,11 @@ function updateEdgeStyle() {
         newStyle += ';orthogonalLoop=0';
       }
     }
-
     graph.getModel().setStyle(edge, newStyle);
   });
-
   // Refresh the display
   graph.refresh();
 }
-
 // Save settings to localStorage
 function saveSettingsToLocalStorage() {
   const settings = {
@@ -7276,7 +6149,6 @@ function saveSettingsToLocalStorage() {
   };
   localStorage.setItem('flowchartSettings', JSON.stringify(settings));
 }
-
 // Load settings from localStorage
 function loadSettingsFromLocalStorage() {
   const settingsStr = localStorage.getItem('flowchartSettings');
@@ -7288,35 +6160,28 @@ function loadSettingsFromLocalStorage() {
         updateEdgeStyle();
       }
     } catch (e) {
-
     }
   }
 }
-
 /**
  * Node Search Functionality
  */
   // searchTimeout moved to config.js module
-
 // Initialize search functionality
 function initializeSearch() {
   const searchBox = document.getElementById('nodeSearchBox');
   const clearBtn = document.getElementById('clearSearchBtn');
-
   if (searchBox) {
     searchBox.addEventListener('input', function() {
       const searchTerm = this.value.trim().toLowerCase();
-
       // Clear previous timeout
       if (searchTimeout) {
         clearTimeout(searchTimeout);
       }
-
       // Debounce the search to avoid excessive processing
       searchTimeout = setTimeout(() => {
         performNodeSearch(searchTerm);
       }, 200); // Reduced from 300ms for better responsiveness
-
       // Show/hide clear button
       if (searchTerm.length > 0) {
         clearBtn.classList.add('show');
@@ -7325,7 +6190,6 @@ function initializeSearch() {
         clearSearch();
       }
     });
-
     // Handle Enter key to select first result
     searchBox.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -7337,7 +6201,6 @@ function initializeSearch() {
       }
     });
   }
-
   if (clearBtn) {
     clearBtn.addEventListener('click', function() {
       searchBox.value = '';
@@ -7347,10 +6210,8 @@ function initializeSearch() {
     });
   }
 }
-
 // Cache for cell text to avoid repeated DOM operations
   // cellTextCache and lastCacheClear moved to config.js module
-
 // Clear cache periodically to prevent memory leaks
 function clearCellTextCache() {
   const now = Date.now();
@@ -7359,17 +6220,13 @@ function clearCellTextCache() {
     lastCacheClear = now;
   }
 }
-
 // Get cell text with caching for performance
 function getCellText(cell) {
   const cacheKey = `${cell.id}_${cell.value}_${cell._questionText}_${cell._subtitleText}_${cell._infoText}_${cell._notesText}_${cell._checklistText}_${cell._alertText}_${cell._calcTitle}`;
-
   if (cellTextCache.has(cacheKey)) {
     return cellTextCache.get(cacheKey);
   }
-
   let cellText = '';
-
   // Get text from different node types
   if (isQuestion(cell)) {
     cellText = cell._questionText || cell.value || '';
@@ -7395,76 +6252,60 @@ function getCellText(cell) {
   } else {
     cellText = cell.value || '';
   }
-
   // Clean HTML tags from text (only if needed)
   if (cellText.includes('<')) {
     const temp = document.createElement('div');
     temp.innerHTML = cellText;
     cellText = temp.textContent || temp.innerText || cellText;
   }
-
   cellTextCache.set(cacheKey, cellText);
   return cellText;
 }
-
 // Perform the actual search with optimizations
 function performNodeSearch(searchTerm) {
   if (!searchTerm || searchTerm.length === 0) {
     clearSearch();
     return;
   }
-
   // Clear cache periodically
   clearCellTextCache();
-
   const vertices = graph.getChildVertices(graph.getDefaultParent());
   const matchingCells = [];
   const searchTermLower = searchTerm.toLowerCase();
-
   // Use for...of for better performance with large arrays
   for (const cell of vertices) {
     const cellText = getCellText(cell);
-
     // Check if search term is found in the text
     if (cellText.toLowerCase().includes(searchTermLower)) {
       matchingCells.push(cell);
     }
   }
-
   // Highlight matching cells
   highlightSearchResults(matchingCells, searchTerm);
 }
-
 // Highlight search results
 function highlightSearchResults(matchingCells, searchTerm) {
   // Clear existing selection first
   graph.clearSelection();
-
   if (matchingCells.length === 0) {
     return;
   }
-
   // Use the same selection mechanism as section highlighting
   graph.addSelectionCells(matchingCells);
-
   // Show search results count
   showSearchResultsCount(matchingCells.length);
-
   // Center view on first result if there are results
   if (matchingCells.length > 0) {
     centerOnCell(matchingCells[0]);
   }
 }
-
 // Clear search highlights
 function clearSearch() {
   // Simply clear the selection - this will remove the neon green highlighting
   graph.clearSelection();
-
   // Hide search results count
   hideSearchResultsCount();
 }
-
 // Show search results count
 function showSearchResultsCount(count) {
   let countElement = document.getElementById('searchResultsCount');
@@ -7485,11 +6326,9 @@ function showSearchResultsCount(count) {
     `;
     document.body.appendChild(countElement);
   }
-
   countElement.textContent = `${count} result${count !== 1 ? 's' : ''} found`;
   countElement.style.display = 'block';
 }
-
 // Hide search results count
 function hideSearchResultsCount() {
   const countElement = document.getElementById('searchResultsCount');
@@ -7497,59 +6336,46 @@ function hideSearchResultsCount() {
     countElement.style.display = 'none';
   }
 }
-
 // Center view on a specific cell with performance optimization
 function centerOnCell(cell) {
   if (!cell || !cell.geometry) return;
-
   const centerX = cell.geometry.x + cell.geometry.width / 2;
   const centerY = cell.geometry.y + cell.geometry.height / 2;
-
   const containerWidth = graph.container.clientWidth;
   const containerHeight = graph.container.clientHeight;
   const scale = graph.view.scale;
-
   const tx = (containerWidth / 2 - centerX * scale);
   const ty = (containerHeight / 2 - centerY * scale);
-
   // Batch view updates for better performance
   graph.view.setTranslate(tx / scale, ty / scale);
-
   // Use requestAnimationFrame for smooth scrolling
   requestAnimationFrame(() => {
     graph.view.refresh();
   });
 }
-
 // Select first search result
 function selectFirstSearchResult(searchTerm) {
   const vertices = graph.getChildVertices(graph.getDefaultParent());
   const matchingCells = [];
   const searchTermLower = searchTerm.toLowerCase();
-
   // Use for...of for better performance with large arrays
   for (const cell of vertices) {
     const cellText = getCellText(cell);
-
     if (cellText.toLowerCase().includes(searchTermLower)) {
       matchingCells.push(cell);
     }
   }
-
   if (matchingCells.length > 0) {
     // Select the first matching cell
     graph.getSelectionModel().setCell(matchingCells[0]);
     centerOnCell(matchingCells[0]);
   }
 }
-
 // Helper function to find PDF name for a question node
 function findPdfNameForQuestion(cell) {
   if (!cell) return null;
-
   const graph = getGraph();
   if (!graph) return null;
-
   // Use breadth-first search to find the closest PDF node
   const findClosestPdfProperties = (startCell) => {
     // Check if this node has direct PDF properties (distance 0)
@@ -7562,7 +6388,6 @@ function findPdfNameForQuestion(cell) {
         distance: 0
       };
     }
-
     // Check if this is a PDF node (distance 0)
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(startCell)) {
       return {
@@ -7573,11 +6398,9 @@ function findPdfNameForQuestion(cell) {
         distance: 0
       };
     }
-
     // Special handling for numbered dropdown questions - check connected option nodes first
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(startCell) === 'multipleDropdownType') {
     const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
-
       // Look for option nodes connected to this numbered dropdown question
       for (const edge of outgoingEdges) {
       const target = edge.target;
@@ -7611,22 +6434,18 @@ function findPdfNameForQuestion(cell) {
         }
       }
     }
-
     // BFS to find closest PDF node
     const visited = new Set();
     const queue = [{ cell: startCell, distance: 0 }];
     visited.add(startCell.id);
-
     while (queue.length > 0) {
       const { cell: currentCell, distance } = queue.shift();
-
       // Check outgoing edges (distance + 1)
       const outgoingEdges = graph.getOutgoingEdges(currentCell) || [];
       for (const edge of outgoingEdges) {
         const target = edge.target;
         if (target && !visited.has(target.id)) {
           visited.add(target.id);
-
           // Check if target has PDF properties
           if (target._pdfName || target._pdfFile || target._pdfUrl) {
       return {
@@ -7637,7 +6456,6 @@ function findPdfNameForQuestion(cell) {
               distance: distance + 1
             };
           }
-
           // Check if target is a PDF node
           if (typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
           return {
@@ -7648,19 +6466,16 @@ function findPdfNameForQuestion(cell) {
               distance: distance + 1
             };
           }
-
           // Add to queue for further exploration
           queue.push({ cell: target, distance: distance + 1 });
         }
       }
-
       // Check incoming edges (distance + 1)
       const incomingEdges = graph.getIncomingEdges(currentCell) || [];
       for (const edge of incomingEdges) {
         const source = edge.source;
         if (source && !visited.has(source.id)) {
           visited.add(source.id);
-
           // Check if source has PDF properties
           if (source._pdfName || source._pdfFile || source._pdfUrl) {
           return {
@@ -7671,7 +6486,6 @@ function findPdfNameForQuestion(cell) {
               distance: distance + 1
             };
           }
-
           // Check if source is a PDF node
           if (typeof window.isPdfNode === 'function' && window.isPdfNode(source)) {
             return {
@@ -7682,45 +6496,34 @@ function findPdfNameForQuestion(cell) {
               distance: distance + 1
             };
           }
-
           // Add to queue for further exploration
           queue.push({ cell: source, distance: distance + 1 });
         }
       }
     }
-
     return null;
   };
-
   const pdfProperties = findClosestPdfProperties(cell);
-
   // Only return the PDF name if we found actual PDF properties (same as Node Properties dialog)
   if (pdfProperties && pdfProperties.filename) {
     return pdfProperties.filename;
   }
-
   return null;
 }
-
 // Helper function to sanitize PDF name for use in IDs
 function sanitizePdfName(pdfName) {
   if (!pdfName) return '';
-
   // Remove file extension if present
   const nameWithoutExt = pdfName.replace(/\.[^/.]+$/, '');
-
   // Sanitize the name: convert to lowercase, replace non-alphanumeric with underscores
   return nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
 }
-
 // Make helper functions globally accessible
 window.findPdfNameForQuestion = findPdfNameForQuestion;
 window.sanitizePdfName = sanitizePdfName;
-
 /**************************************************
  ************ Flowchart Details Modal *************
  **************************************************/
-
 // Show the flowchart details modal
 window.showFlowchartDetailsModal = function() {
   const modal = document.getElementById('flowchartDetailsModal');

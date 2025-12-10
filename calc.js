@@ -4,13 +4,11 @@
 function isCalculationNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=calculation");
 }
-
 /**
  * Initialize a new calculation node with default values
  */
 function initializeCalculationNode(cell) {
   if (!cell) return;
-
   cell._calcTitle = "Calculation Title";
   cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
   cell._calcOperator = "=";
@@ -18,21 +16,17 @@ function initializeCalculationNode(cell) {
   cell._calcFinalText = "";
   cell._calcFinalOutputType = "textbox";
   cell._calcFinalCheckboxChecked = false;
-
   // For backward compatibility
   if (cell._calcAmountLabel !== undefined) {
     cell._calcTerms[0].amountLabel = cell._calcAmountLabel;
   }
-
   updateCalculationNodeCell(cell);
 }
-
 /**
  * Convert an existing cell to a calculation node
  */
 function convertToCalculationNode(cell, preservedText = null) {
   if (!cell) return;
-
   cell.style = cell.style.replace(/nodeType=[^;]+/, "nodeType=calculation");
   cell._calcTitle = preservedText || "Calculation Title";
   cell._calcAmountLabel = "";
@@ -42,20 +36,16 @@ function convertToCalculationNode(cell, preservedText = null) {
   cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
   cell._calcFinalOutputType = "textbox";
   cell._calcFinalCheckboxChecked = false;
-
   updateCalculationNodeCell(cell);
 }
-
 /**
  * Handle calculation node title updates
  */
 function updateCalculationNodeTitle(cell, newText) {
   if (!cell || !isCalculationNode(cell)) return;
-
   cell._calcTitle = newText.trim();
   updateCalculationNodeCell(cell);
 }
-
 /**
  * Get calculation node style and label for node placement
  */
@@ -65,13 +55,11 @@ function getCalculationNodeStyle() {
     label: "Calculation node"
   };
 }
-
 /**
  * Export calculation node data for save/export operations
  */
 function exportCalculationNodeData(cell, cellData) {
   if (!cell || !isCalculationNode(cell)) return;
-
   if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
   if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
   if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
@@ -81,27 +69,22 @@ function exportCalculationNodeData(cell, cellData) {
   if (cell._calcFinalOutputType !== undefined) cellData._calcFinalOutputType = cell._calcFinalOutputType;
   if (cell._calcFinalCheckboxChecked !== undefined) cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
 }
-
 /**
  * Get calculation node text for display and search
  */
 function getCalculationNodeText(cell) {
   if (!cell || !isCalculationNode(cell)) return '';
-
   return cell._calcTitle || cell.value || '';
 }
-
 /**
  * Handle calculation node copy/paste operations
  */
 function handleCalculationNodeCopyPaste(newCell) {
   if (!newCell || !isCalculationNode(newCell)) return;
-
   if (typeof updateCalculationNodeCell === "function") {
     updateCalculationNodeCell(newCell);
   }
 }
-
 /**
  * Setup calculation node event listeners
  */
@@ -116,22 +99,18 @@ function setupCalculationNodeEventListeners() {
     });
   }
 }
-
 /**
  * Handle calculation node placement
  */
 function handleCalculationNodePlacement(cell) {
   if (!cell || !isCalculationNode(cell)) return;
-
   initializeCalculationNode(cell);
 }
-
 /**
  * Get calculation node properties for display in properties panel
  */
 function getCalculationNodeProperties(cell) {
   if (!cell || !isCalculationNode(cell)) return null;
-
   return {
     nodeType: "calculation",
     title: cell._calcTitle || "Calculation Title",
@@ -141,7 +120,6 @@ function getCalculationNodeProperties(cell) {
     terms: cell._calcTerms || []
   };
 }
-
 /**
  * Update calculation nodes when questions change
  */
@@ -149,49 +127,39 @@ function updateCalculationNodesOnQuestionChange(questionCell, isDeleted = false,
   if (isDeleted && !oldNodeId) {
     return;
   }
-
   const graph = window.graph;
   if (!graph) return;
-
   const questionId = isDeleted ? oldNodeId : ((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "");
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-
   // For direct references to number/money fields, we need to extract the question ID
   const directQuestionId = isDeleted ? 
     (oldNodeId.split('_').pop() || "") : 
     (questionCell._questionId || (questionId.split('_').pop() || ""));
-
   // If the question was deleted, find and delete any calc nodes that depend on it
   if (isDeleted) {
     // Gather a list of calc nodes to delete
     const calcNodesToDelete = [];
-
     calculationNodes.forEach(calcNode => {
       if (!calcNode._calcTerms) return;
-
       let dependsOnDeletedQuestion = false;
       calcNode._calcTerms.forEach(term => {
         if (!term.amountLabel) return;
-
         // Check for direct references to the question ID
         if (term.amountLabel.toLowerCase().includes(oldNodeId.toLowerCase())) {
           dependsOnDeletedQuestion = true;
         }
-
         // Check for direct answer references (money/number types)
         const answerPattern = `answer${directQuestionId}`;
         if (term.amountLabel === answerPattern) {
           dependsOnDeletedQuestion = true;
         }
       });
-
       if (dependsOnDeletedQuestion) {
         calcNodesToDelete.push(calcNode);
       }
     });
-
     // Delete the dependent calc nodes
     if (calcNodesToDelete.length > 0) {
       graph.getModel().beginUpdate();
@@ -218,7 +186,6 @@ function updateCalculationNodesOnQuestionChange(questionCell, isDeleted = false,
     }
   }
 }
-
 /**
  * Build a list of all "amount" labels from numbered dropdown questions.
  * We'll gather them in the format:
@@ -230,10 +197,8 @@ function gatherAllAmountLabels() {
   const labels = [];
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
-
   // First collect all calculation nodes
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-
   vertices.forEach(cell => {
     if (isCalculationNode(cell)) {
       // Add calculation node titles as potential sources
@@ -271,23 +236,18 @@ function gatherAllAmountLabels() {
         // Add number/money type questions directly
         const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
         const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
-
         // Use answer{questionId} format for consistent JSON export
         const questionId = cell._questionId || nodeId.split('_').pop() || "";
         const label = `answer${questionId}`;
-
         // Add the question text as label for better user identification
         const displayLabel = `${cleanQuestionName} (${label})`;
-
         // Store with a special prefix to identify it's a direct question value
         labels.push(`question_value:${label}:${displayLabel}`);
       }
     }
   });
-
   return labels;
 }
-
 /**
  * Renders the Calculation Node as HTML:
  * - Title (editable)
@@ -305,28 +265,22 @@ function updateCalculationNodeCell(cell) {
   if (cell._calcFinalText === undefined) cell._calcFinalText = "";
   if (cell._calcFinalOutputType === undefined) cell._calcFinalOutputType = "textbox";
   if (cell._calcFinalCheckboxChecked === undefined) cell._calcFinalCheckboxChecked = false;
-
   // For backward compatibility
   if (cell._calcAmountLabel !== undefined && cell._calcTerms.length === 1 && !cell._calcTerms[0].amountLabel) {
     cell._calcTerms[0].amountLabel = cell._calcAmountLabel;
   }
-
   // Gather possible "amount" labels
   const allAmountLabels = gatherAllAmountLabels();
-
   // Build the HTML for all calculation terms
   let calcTermsHtml = '';
-
   cell._calcTerms.forEach((term, index) => {
     // Build dropdown of amount labels for this term
     let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
     allAmountLabels.forEach(lbl => {
       // Check if this is a direct question value (number/money type)
       const isQuestionValue = lbl.startsWith('question_value:');
-
       let value = lbl;
       let displayName = lbl;
-
       if (isQuestionValue) {
         // Format: question_value:label:displayName
         const parts = lbl.split(':');
@@ -339,18 +293,15 @@ function updateCalculationNodeCell(cell) {
         // Strip out common artifacts like delete_amount, add_option etc.
         displayName = displayName.replace(/delete_amount_/g, "");
         displayName = displayName.replace(/add_option_/g, "");
-
         // Find the last instance of the question name + underscore
         const lastUnderscoreIndex = displayName.lastIndexOf("_");
         if (lastUnderscoreIndex !== -1) {
           const questionPart = displayName.substring(0, lastUnderscoreIndex);
           const amountPart = displayName.substring(lastUnderscoreIndex + 1);
-
           // Format: "how_many_cars_do_you_have + car_value"
           displayName = `${questionPart}_${amountPart}`;
         }
       }
-
       // Check if this option should be selected
       let selected = "";
       if (isQuestionValue) {
@@ -364,10 +315,8 @@ function updateCalculationNodeCell(cell) {
           selected = "selected";
         }
       }
-
       amountOptionsHtml += `<option value="${escapeAttr(value)}" ${selected}>${displayName}</option>`;
     });
-
     // For the first term, don't show a math operator
     if (index === 0) {
       calcTermsHtml += `
@@ -387,7 +336,6 @@ function updateCalculationNodeCell(cell) {
         const selected = (op === term.mathOperator) ? "selected" : "";
         mathOperatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
       });
-
       calcTermsHtml += `
         <div class="calc-term" data-index="${index}">
           <label>Math Operator:</label>
@@ -404,14 +352,12 @@ function updateCalculationNodeCell(cell) {
       `;
     }
   });
-
   // Add button for adding more terms
   calcTermsHtml += `
     <div style="margin-bottom:15px;">
       <button onclick="window.addCalcNodeTerm('${cell.id}')">Add More</button>
     </div>
   `;
-
   // Operator dropdown
   const operators = ["=", ">", "<"];
   let operatorOptionsHtml = "";
@@ -419,7 +365,6 @@ function updateCalculationNodeCell(cell) {
     const selected = (op === cell._calcOperator) ? "selected" : "";
     operatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
   });
-
   // Create a simple display for the calculation node
   const termsText = cell._calcTerms.map((term, index) => {
     if (index === 0) {
@@ -428,11 +373,9 @@ function updateCalculationNodeCell(cell) {
       return `${term.mathOperator || '+'} ${term.amountLabel || 'No amount selected'}`;
     }
   }).join(' ');
-
   const finalOutputText = cell._calcFinalOutputType === 'textbox' 
     ? `Text: "${cell._calcFinalText || 'No text set'}"`
     : `Checkbox: ${cell._calcFinalCheckboxChecked ? 'Checked' : 'Unchecked'} by default`;
-
   const html = `
     <div style="padding:15px; text-align:center; font-family: Arial, sans-serif;">
       <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #1976d2;">
@@ -452,7 +395,6 @@ function updateCalculationNodeCell(cell) {
       </div>
     </div>
   `;
-
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
@@ -471,7 +413,6 @@ function updateCalculationNodeCell(cell) {
       st += "html=1;";
     }
     graph.getModel().setStyle(cell, st);
-
     // Set fixed size for the calculation node
     const geo = cell.geometry;
     if (geo) {
@@ -482,30 +423,25 @@ function updateCalculationNodeCell(cell) {
   } finally {
     graph.getModel().endUpdate();
   }
-
   // Note: Removed graph.updateCellSize(cell) to prevent unwanted cell movement
   // The cell size should already be appropriate from the initial creation
 }
-
 // Calculation node field updates
 window.updateCalcNodeTitle = (cellId, title) => {
   const cell = graph.model.getCell(cellId);
   if (!cell) return;
-
   cell._calcTitle = title;
   updateCalculationNodeCell(cell);
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
 };
-
 window.updateCalcNodeAmountLabel = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
   graph.getModel().beginUpdate();
   try {
     cell._calcAmountLabel = value.trim();
-
     // Also update _calcTerms for backward compatibility
     if (!cell._calcTerms || cell._calcTerms.length === 0) {
       cell._calcTerms = [{
@@ -523,7 +459,6 @@ window.updateCalcNodeAmountLabel = function(cellId, value) {
     window.requestAutosave();
   }
 };
-
 window.updateCalcNodeOperator = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
@@ -538,7 +473,6 @@ window.updateCalcNodeOperator = function(cellId, value) {
     window.requestAutosave();
   }
 };
-
 window.updateCalcNodeThreshold = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
@@ -553,22 +487,18 @@ window.updateCalcNodeThreshold = function(cellId, value) {
     window.requestAutosave();
   }
 };
-
 window.updateCalcNodeFinalText = (cellId, text) => {
   const cell = graph.model.getCell(cellId);
   if (!cell) return;
-
   cell._calcFinalText = text;
   updateCalculationNodeCell(cell);
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
 };
-
 window.updateCalcNodeFinalOutputType = (cellId, outputType) => {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
-
   graph.getModel().beginUpdate();
   try {
     cell._calcFinalOutputType = outputType;
@@ -580,11 +510,9 @@ window.updateCalcNodeFinalOutputType = (cellId, outputType) => {
     window.requestAutosave();
   }
 };
-
 window.updateCalcNodeFinalCheckboxChecked = (cellId, checked) => {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
-
   graph.getModel().beginUpdate();
   try {
     cell._calcFinalCheckboxChecked = checked;
@@ -596,23 +524,19 @@ window.updateCalcNodeFinalCheckboxChecked = (cellId, checked) => {
     window.requestAutosave();
   }
 };
-
 /**
  * Show calculation node properties popup
  */
 window.showCalculationNodeProperties = function(cell) {
   if (!cell || !isCalculationNode(cell)) return;
-
   // Prevent multiple popups
   if (window.__calcPropertiesPopupOpen) {
     return;
   }
   window.__calcPropertiesPopupOpen = true;
-
   // Clean up any existing popups
   const existingPopups = document.querySelectorAll('.calc-properties-modal');
   existingPopups.forEach(n => n.remove());
-
   // Create popup container
   const popup = document.createElement('div');
   popup.className = 'calc-properties-modal';
@@ -635,7 +559,6 @@ window.showCalculationNodeProperties = function(cell) {
     max-height: 80vh;
     overflow-y: auto;
   `;
-
   // Create header
   const header = document.createElement('div');
   header.style.cssText = `
@@ -646,7 +569,6 @@ window.showCalculationNodeProperties = function(cell) {
     padding-bottom: 12px;
     border-bottom: 1px solid #e0e0e0;
   `;
-
   const title = document.createElement('h3');
   title.textContent = 'Calculation Node Properties';
   title.style.cssText = `
@@ -655,7 +577,6 @@ window.showCalculationNodeProperties = function(cell) {
     font-size: 18px;
     font-weight: 600;
   `;
-
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '×';
   closeBtn.style.cssText = `
@@ -671,15 +592,12 @@ window.showCalculationNodeProperties = function(cell) {
     align-items: center;
     justify-content: center;
   `;
-
   closeBtn.onclick = () => {
     popup.remove();
     window.__calcPropertiesPopupOpen = false;
   };
-
   header.appendChild(title);
   header.appendChild(closeBtn);
-
   // Create content container
   const content = document.createElement('div');
   content.style.cssText = `
@@ -687,28 +605,23 @@ window.showCalculationNodeProperties = function(cell) {
     flex-direction: column;
     gap: 16px;
   `;
-
   // Calculation Title
   const titleField = createField('Calculation Title', cell._calcTitle || 'Calculation Title', (value) => {
     cell._calcTitle = value;
     updateCalculationNodeCell(cell);
   });
-
   // Calculation Terms
   const termsContainer = createCalculationTermsContainer(cell);
-
   // Comparison Operator
   const operatorField = createDropdownField('Comparison Operator', cell._calcOperator || '=', ['=', '>', '<'], (value) => {
     cell._calcOperator = value;
     updateCalculationNodeCell(cell);
   });
-
   // Threshold Number
   const thresholdField = createField('Number', cell._calcThreshold || '0', (value) => {
     cell._calcThreshold = value;
     updateCalculationNodeCell(cell);
   });
-
   // Final Output Type
   const outputTypeField = createDropdownField('Final Output Type', cell._calcFinalOutputType || 'textbox', ['textbox', 'checkbox'], (value) => {
     cell._calcFinalOutputType = value;
@@ -720,11 +633,9 @@ window.showCalculationNodeProperties = function(cell) {
       showCalculationNodeProperties(cell);
     }, 100);
   });
-
   // Conditional Final Output Field
   const finalOutputContainer = document.createElement('div');
   finalOutputContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
-
   if (cell._calcFinalOutputType === 'textbox') {
     const finalTextField = createField('Final Text', cell._calcFinalText || '', (value) => {
       cell._calcFinalText = value;
@@ -738,7 +649,6 @@ window.showCalculationNodeProperties = function(cell) {
     });
     finalOutputContainer.appendChild(checkboxField);
   }
-
   // Assemble content
   content.appendChild(titleField);
   content.appendChild(termsContainer);
@@ -746,7 +656,6 @@ window.showCalculationNodeProperties = function(cell) {
   content.appendChild(thresholdField);
   content.appendChild(outputTypeField);
   content.appendChild(finalOutputContainer);
-
   // Create footer with buttons
   const footer = document.createElement('div');
   footer.style.cssText = `
@@ -757,7 +666,6 @@ window.showCalculationNodeProperties = function(cell) {
     padding-top: 16px;
     border-top: 1px solid #e0e0e0;
   `;
-
   const saveBtn = document.createElement('button');
   saveBtn.textContent = 'Save & Close';
   saveBtn.style.cssText = `
@@ -777,17 +685,13 @@ window.showCalculationNodeProperties = function(cell) {
       window.requestAutosave();
     }
   };
-
   footer.appendChild(saveBtn);
-
   // Assemble popup
   popup.appendChild(header);
   popup.appendChild(content);
   popup.appendChild(footer);
-
   // Add to document
   document.body.appendChild(popup);
-
   // Close on escape key
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
@@ -798,16 +702,13 @@ window.showCalculationNodeProperties = function(cell) {
   };
   document.addEventListener('keydown', handleEscape);
 };
-
 // Helper functions for creating form fields
 function createField(label, value, onChange) {
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
-
   const labelEl = document.createElement('label');
   labelEl.textContent = label + ':';
   labelEl.style.cssText = 'font-weight: 500; color: #333;';
-
   const input = document.createElement('input');
   input.type = 'text';
   input.value = value;
@@ -818,20 +719,16 @@ function createField(label, value, onChange) {
     font-size: 14px;
   `;
   input.onblur = () => onChange(input.value);
-
   container.appendChild(labelEl);
   container.appendChild(input);
   return container;
 }
-
 function createDropdownField(label, value, options, onChange) {
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
-
   const labelEl = document.createElement('label');
   labelEl.textContent = label + ':';
   labelEl.style.cssText = 'font-weight: 500; color: #333;';
-
   const select = document.createElement('select');
   select.style.cssText = `
     padding: 8px 12px;
@@ -839,7 +736,6 @@ function createDropdownField(label, value, options, onChange) {
     border-radius: 6px;
     font-size: 14px;
   `;
-
   options.forEach(option => {
     const optionEl = document.createElement('option');
     optionEl.value = option;
@@ -847,48 +743,38 @@ function createDropdownField(label, value, options, onChange) {
     if (option === value) optionEl.selected = true;
     select.appendChild(optionEl);
   });
-
   select.onchange = () => onChange(select.value);
-
   container.appendChild(labelEl);
   container.appendChild(select);
   return container;
 }
-
 function createCheckboxField(label, checked, onChange) {
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; align-items: center; gap: 8px;';
-
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.checked = checked;
   checkbox.onchange = () => onChange(checkbox.checked);
-
   const labelEl = document.createElement('label');
   labelEl.textContent = label;
   labelEl.style.cssText = 'font-weight: 500; color: #333; margin: 0;';
-
   container.appendChild(checkbox);
   container.appendChild(labelEl);
   return container;
 }
-
 function createCalculationTermsContainer(cell) {
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; flex-direction: column; gap: 12px;';
-
   const label = document.createElement('label');
   label.textContent = 'Calculation Terms:';
   label.style.cssText = 'font-weight: 500; color: #333;';
   container.appendChild(label);
-
   // Create terms
   const terms = cell._calcTerms || [{amountLabel: "", mathOperator: ""}];
   terms.forEach((term, index) => {
     const termContainer = createCalculationTermField(cell, term, index);
     container.appendChild(termContainer);
   });
-
   // Add More button
   const addMoreBtn = document.createElement('button');
   addMoreBtn.textContent = 'Add More';
@@ -917,10 +803,8 @@ function createCalculationTermsContainer(cell) {
     }, 100);
   };
   container.appendChild(addMoreBtn);
-
   return container;
 }
-
 function createCalculationTermField(cell, term, index) {
   const container = document.createElement('div');
   container.style.cssText = `
@@ -932,12 +816,10 @@ function createCalculationTermField(cell, term, index) {
     border-radius: 6px;
     background: #f9f9f9;
   `;
-
   const termLabel = document.createElement('label');
   termLabel.textContent = `Calc ${index + 1}:`;
   termLabel.style.cssText = 'font-weight: 500; color: #333;';
   container.appendChild(termLabel);
-
   // Amount Label dropdown
   const amountSelect = document.createElement('select');
   amountSelect.style.cssText = `
@@ -947,22 +829,18 @@ function createCalculationTermField(cell, term, index) {
     font-size: 14px;
     width: 100%;
   `;
-
   // Function to populate dropdown options
   const populateDropdown = () => {
     // Clear existing options
     amountSelect.innerHTML = '';
-
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = '-- pick an amount label --';
     amountSelect.appendChild(defaultOption);
-
     const allAmountLabels = gatherAllAmountLabels();
     allAmountLabels.forEach(lbl => {
       const option = document.createElement('option');
       option.value = lbl;
-
       // Extract clean display name
       let displayName = lbl;
       if (lbl.startsWith('question_value:')) {
@@ -975,28 +853,22 @@ function createCalculationTermField(cell, term, index) {
         // For regular labels, just use as-is
         displayName = lbl;
       }
-
       option.textContent = displayName;
       if (lbl === term.amountLabel) option.selected = true;
       amountSelect.appendChild(option);
     });
   };
-
   // Populate dropdown initially
   populateDropdown();
-
   // Refresh dropdown when clicked
   amountSelect.onmousedown = () => {
     populateDropdown();
   };
-
   amountSelect.onchange = () => {
     term.amountLabel = amountSelect.value;
     updateCalculationNodeCell(cell);
   };
-
   container.appendChild(amountSelect);
-
   // Math Operator dropdown (only for terms after the first)
   if (index > 0) {
     const operatorSelect = document.createElement('select');
@@ -1007,7 +879,6 @@ function createCalculationTermField(cell, term, index) {
       font-size: 14px;
       width: 100px;
     `;
-
     const operators = ['+', '-', '*', '/'];
     operators.forEach(op => {
       const option = document.createElement('option');
@@ -1016,24 +887,19 @@ function createCalculationTermField(cell, term, index) {
       if (op === term.mathOperator) option.selected = true;
       operatorSelect.appendChild(option);
     });
-
     operatorSelect.onchange = () => {
       term.mathOperator = operatorSelect.value;
       updateCalculationNodeCell(cell);
     };
-
     const operatorContainer = document.createElement('div');
     operatorContainer.style.cssText = 'display: flex; align-items: center; gap: 8px;';
-
     const operatorLabel = document.createElement('label');
     operatorLabel.textContent = 'Math Operator:';
     operatorLabel.style.cssText = 'font-weight: 500; color: #333; white-space: nowrap;';
-
     operatorContainer.appendChild(operatorLabel);
     operatorContainer.appendChild(operatorSelect);
     container.appendChild(operatorContainer);
   }
-
   // Remove button (only for terms after the first)
   if (index > 0) {
     const removeBtn = document.createElement('button');
@@ -1063,27 +929,22 @@ function createCalculationTermField(cell, term, index) {
     };
     container.appendChild(removeBtn);
   }
-
   return container;
 }
-
 // New function to handle updating calculation terms
 window.updateCalcNodeTerm = (cellId, termIndex, property, value) => {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
-
   graph.getModel().beginUpdate();
   try {
     // Initialize terms array if it doesn't exist
     if (!cell._calcTerms) {
       cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
     }
-
     // Ensure the term exists
     if (termIndex >= 0 && termIndex < cell._calcTerms.length) {
       // Update the specified property
       cell._calcTerms[termIndex][property] = value;
-
       // For backward compatibility, also update _calcAmountLabel if this is the first term
       if (termIndex === 0 && property === 'amountLabel') {
         cell._calcAmountLabel = value;
@@ -1092,22 +953,18 @@ window.updateCalcNodeTerm = (cellId, termIndex, property, value) => {
   } finally {
     graph.getModel().endUpdate();
   }
-
   updateCalculationNodeCell(cell);
 };
-
 // Add a new calculation term
 window.addCalcNodeTerm = (cellId) => {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
-
   graph.getModel().beginUpdate();
   try {
     // Initialize terms array if it doesn't exist
     if (!cell._calcTerms) {
       cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
     }
-
     // Add a new term with default values
     cell._calcTerms.push({
       amountLabel: "",
@@ -1116,15 +973,12 @@ window.addCalcNodeTerm = (cellId) => {
   } finally {
     graph.getModel().endUpdate();
   }
-
   updateCalculationNodeCell(cell);
 };
-
 // Remove a calculation term
 window.removeCalcNodeTerm = (cellId, termIndex) => {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isCalculationNode(cell)) return;
-
   graph.getModel().beginUpdate();
   try {
     // Ensure we have terms and the index is valid
@@ -1135,10 +989,8 @@ window.removeCalcNodeTerm = (cellId, termIndex) => {
   } finally {
     graph.getModel().endUpdate();
   }
-
   updateCalculationNodeCell(cell);
 };
-
 /**
  * Finds all calculation nodes that depend on the given question node.
  * A calculation node depends on a question if it uses an amount value 
@@ -1149,36 +1001,28 @@ window.removeCalcNodeTerm = (cellId, termIndex) => {
  */
 function findCalcNodesDependentOnQuestion(questionCell) {
   if (!questionCell || !isQuestion(questionCell)) return [];
-
   const dependentCalcNodes = [];
   const questionId = (typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "";
   const questionText = questionCell._questionText || questionCell.value || "";
   const cleanQuestionName = sanitizeNameId(questionText);
-
   // Also get the questionId directly if available
   const directQuestionId = questionCell._questionId || (questionId.split('_').pop() || "");
-
   // Get all calculation nodes in the graph
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-
   // For each calculation node, check if it depends on this question
   calculationNodes.forEach(calcNode => {
     if (!calcNode._calcTerms) return;
-
     let isDependentNode = false;
-
     // Check each calculation term
     calcNode._calcTerms.forEach(term => {
       if (!term.amountLabel) return;
-
       // Check if this term references the question directly by name or nodeId
       if (term.amountLabel.toLowerCase().includes(questionId.toLowerCase()) ||
           term.amountLabel.toLowerCase().includes(cleanQuestionName.toLowerCase())) {
         isDependentNode = true;
       }
-
       // Check if this is a direct answer reference for money/number type questions
       if (getQuestionType(questionCell) === "money" || getQuestionType(questionCell) === "number") {
         // Format for direct question references: answer{questionId}
@@ -1187,7 +1031,6 @@ function findCalcNodesDependentOnQuestion(questionCell) {
           isDependentNode = true;
         }
       }
-
       // For multiple dropdown questions, check if term references any of its amounts
       if (getQuestionType(questionCell) === "multipleDropdownType" && questionCell._textboxes) {
         questionCell._textboxes.forEach(tb => {
@@ -1199,7 +1042,6 @@ function findCalcNodesDependentOnQuestion(questionCell) {
           }
         });
       }
-
       // For checkbox questions, check for matching option nodes
       if (getQuestionType(questionCell) === "checkbox") {
         const outgoingEdges = graph.getOutgoingEdges(questionCell) || [];
@@ -1215,15 +1057,12 @@ function findCalcNodesDependentOnQuestion(questionCell) {
         }
       }
     });
-
     if (isDependentNode) {
       dependentCalcNodes.push(calcNode);
     }
   });
-
   return dependentCalcNodes;
 }
-
 /**
  * Updates or deletes calculation nodes when a question node changes or is deleted.
  * 
@@ -1235,46 +1074,37 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
   if (isDeleted && !oldNodeId) {
     return;
   }
-
   const questionId = isDeleted ? oldNodeId : ((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || "");
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-
   // For direct references to number/money fields, we need to extract the question ID
   const directQuestionId = isDeleted ? 
     (oldNodeId.split('_').pop() || "") : 
     (questionCell._questionId || (questionId.split('_').pop() || ""));
-
   // If the question was deleted, find and delete any calc nodes that depend on it
   if (isDeleted) {
     // Gather a list of calc nodes to delete
     const calcNodesToDelete = [];
-
     calculationNodes.forEach(calcNode => {
       if (!calcNode._calcTerms) return;
-
       let dependsOnDeletedQuestion = false;
       calcNode._calcTerms.forEach(term => {
         if (!term.amountLabel) return;
-
         // Check for direct references to the question ID
         if (term.amountLabel.toLowerCase().includes(oldNodeId.toLowerCase())) {
           dependsOnDeletedQuestion = true;
         }
-
         // Check for direct answer references (money/number types)
         const answerPattern = `answer${directQuestionId}`;
         if (term.amountLabel === answerPattern) {
           dependsOnDeletedQuestion = true;
         }
       });
-
       if (dependsOnDeletedQuestion) {
         calcNodesToDelete.push(calcNode);
       }
     });
-
     // Delete the dependent calc nodes
     if (calcNodesToDelete.length > 0) {
       graph.getModel().beginUpdate();
@@ -1301,11 +1131,9 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
     }
   }
 } 
-
 /**************************************************
  ************ Module Exports **********************
  **************************************************/
-
 // Export all functions to window object for global access
 window.calc = {
   isCalculationNode,
@@ -1325,7 +1153,6 @@ window.calc = {
   findCalcNodesDependentOnQuestion,
   updateAllCalcNodesOnQuestionChange
 };
-
 // Export individual functions for backward compatibility
 window.isCalculationNode = isCalculationNode;
 window.initializeCalculationNode = initializeCalculationNode;

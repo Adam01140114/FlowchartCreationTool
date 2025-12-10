@@ -10,14 +10,11 @@ const firebaseConfig = {
   appId: "1:546103281533:web:ae719cdbde727dcd94ee14",
   measurementId: "G-8VSXRFREY9"
 };
-
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
 // Global user state
 let currentUser = null;
-
 /**************************************************
  ************ Default Colors & Preferences ********
  **************************************************/
@@ -32,10 +29,8 @@ const defaultColors = {
   bigParagraph: "#2196f3",// Big Paragraph
   textColor: "#1976d2"    // Text Color
 };
-
 // User color preferences (can be overridden by user settings)
 var colorPreferences = colorPreferences || { ...defaultColors };
-
 /**************************************************
  ************ Global Constants & Settings ********
  **************************************************/
@@ -43,41 +38,31 @@ var colorPreferences = colorPreferences || { ...defaultColors };
 const AUTOSAVE_KEY = 'flowchart_autosave_json';
 const FLOWCHART_CLIPBOARD_KEY = 'flowchart_clipboard_data';
 const FLOWCHART_CLIPBOARD_TIMESTAMP_KEY = 'flowchart_clipboard_timestamp';
-
 // Autosave settings - optimized for large flowcharts
 let autosaveTimeout = null;
 let autosaveThrottleDelay = 5000; // 5 seconds for better performance with large flowcharts
 let lastAutosaveTime = 0;
 let autosaveMinInterval = 2000; // Minimum 2 seconds between autosaves
-
 // Edge style settings
 let currentEdgeStyle = 'curved'; // Default to curved
-
 // Jump mode styling
 const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
-
 // Performance optimization settings
 let refreshAllCellsTimeout = null;
 let isRefreshing = false;
-
 // Search functionality settings
 let searchTimeout = null;
-
 // Groups functionality
 let groupCounter = 1;
 let groups = {};
-
 // Cache for autosave data to avoid unnecessary processing
 let lastAutosaveData = null;
 let autosaveDataHash = null;
-
 // Clipboard functionality
 let flowchartClipboard = null;
-
 // Cell text cache for performance
 const cellTextCache = new Map();
 let lastCacheClear = Date.now();
-
 // Performance monitoring
 let performanceMetrics = {
   refreshCount: 0,
@@ -85,7 +70,6 @@ let performanceMetrics = {
   averageRefreshTime: 0,
   cellCount: 0
 };
-
 /**************************************************
  ************ Utility Functions *******************
  **************************************************/
@@ -107,20 +91,17 @@ function getDefaultSectionColor(sectionNumber) {
   ];
   return colors[(sectionNumber - 1) % colors.length];
 }
-
 /**
  * Clean up redundant semicolons in style string
  */
 function cleanStyle(style) {
   if (!style) return "";
-
   return style
     .replace(/;+$/, "")     // Remove trailing semicolons
     .replace(/;+;/g, ";")   // Replace double semicolons
     .replace(/;{2,}/g, ";") // Replace multiple semicolons with a single one
     .replace(/;+$/, "");    // Clean trailing semicolons again (in case the previous operation created them)
 }
-
 /**
  * Updates the legend squares to reflect current colorPreferences.
  */
@@ -137,7 +118,6 @@ function updateLegendColors() {
     "colorBigParagraph": colorPreferences.bigParagraph,
     "colorTextColor": colorPreferences.textColor
   };
-
   Object.entries(elements).forEach(([id, color]) => {
     const element = document.getElementById(id);
     if (element) {
@@ -145,13 +125,11 @@ function updateLegendColors() {
     }
   });
 }
-
 /**
  * Load user color preferences from Firebase
  */
 function loadUserColorPrefs() {
   if (!window.currentUser || window.currentUser.isGuest) return;
-
   db.collection("users")
     .doc(window.currentUser.uid)
     .collection("preferences")
@@ -177,20 +155,17 @@ function loadUserColorPrefs() {
       // Error loading color preferences handled silently
     });
 }
-
 /**
  * Save user color preferences to Firebase
  */
 function saveUserColorPrefs() {
   if (!window.currentUser || window.currentUser.isGuest) return Promise.resolve();
-
   return db.collection("users")
     .doc(window.currentUser.uid)
     .collection("preferences")
     .doc("colors")
     .set(colorPreferences, { merge: true });
 }
-
 /**
  * Reset colors to default values
  */
@@ -202,7 +177,6 @@ function resetColorsToDefault() {
   }
   saveUserColorPrefs();
 }
-
 /**
  * Save settings to localStorage
  */
@@ -212,7 +186,6 @@ function saveSettingsToLocalStorage() {
   };
   localStorage.setItem('flowchartSettings', JSON.stringify(settings));
 }
-
 /**
  * Load settings from localStorage
  */
@@ -228,11 +201,9 @@ function loadSettingsFromLocalStorage() {
         }
       }
     } catch (e) {
-
     }
   }
 }
-
 /**
  * Clear cell text cache periodically to prevent memory leaks
  */
@@ -243,7 +214,6 @@ function clearCellTextCache() {
     lastCacheClear = now;
   }
 }
-
 /**
  * Get performance metrics for debugging
  */
@@ -255,17 +225,14 @@ function getPerformanceMetrics() {
     refreshThrottle: 150
   };
 }
-
 /**************************************************
  ************ Section Preferences & Legend ********
  **************************************************/
 // Section preferences: mapping section numbers to { borderColor, name }
 // Initialize after getDefaultSectionColor is defined
 var sectionPrefs = sectionPrefs || {};
-
 // If user has opened a flowchart by name, store it here
 let currentFlowchartName = null;
-
 /**
  * Initialize section preferences with default values
  */
@@ -274,10 +241,8 @@ function initializeSectionPrefs() {
     "1": { borderColor: getDefaultSectionColor(1), name: "Enter Name" }
   };
 }
-
 // Initialize section preferences
 initializeSectionPrefs();
-
 /**************************************************
  ************ Export Configuration ****************
  **************************************************/
@@ -287,20 +252,16 @@ window.flowchartConfig = {
   firebaseConfig,
   db,
   currentUser,
-
   // Colors
   defaultColors,
   colorPreferences,
-
   // Sections
   sectionPrefs,
   currentFlowchartName,
-
   // Constants
   AUTOSAVE_KEY,
   FLOWCHART_CLIPBOARD_KEY,
   FLOWCHART_CLIPBOARD_TIMESTAMP_KEY,
-
   // Settings
   autosaveTimeout,
   autosaveThrottleDelay,
@@ -319,7 +280,6 @@ window.flowchartConfig = {
   cellTextCache,
   lastCacheClear,
   performanceMetrics,
-
   // Functions
   getDefaultSectionColor,
   cleanStyle,
@@ -333,14 +293,12 @@ window.flowchartConfig = {
   initializeSectionPrefs,
   getPerformanceMetrics
 };
-
 // Also export individual items for backward compatibility
 Object.entries(window.flowchartConfig).forEach(([key, value]) => {
   if (typeof value !== 'function') {
     window[key] = value;
   }
 });
-
 // Export functions globally
 window.getDefaultSectionColor = getDefaultSectionColor;
 window.cleanStyle = cleanStyle;

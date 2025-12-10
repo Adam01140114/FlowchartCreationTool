@@ -4,7 +4,6 @@
  *   1) Hidden checkbox fields (If eq => checked/unchecked)
  *   2) Hidden text fields   (If eq => fill with some text)
  ************************************************/
-
 /**
  * Initializes the hidden PDF fields module on page load.
  * Inserts the "Add Hidden Field" button so user can do so from scratch.
@@ -12,14 +11,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     initializeHiddenPDFFieldsModule();
 });
-
 /**
  * Creates a container for hidden fields, plus 'Add Hidden Field' button.
  */
 function initializeHiddenPDFFieldsModule() {
     var formBuilder = document.getElementById('formBuilder');
     if (!formBuilder) return;
-
     var hiddenFieldsModule = document.createElement('div');
     hiddenFieldsModule.id = 'hiddenFieldsModule';
     hiddenFieldsModule.innerHTML = `
@@ -35,22 +32,18 @@ function initializeHiddenPDFFieldsModule() {
     `;
     formBuilder.appendChild(hiddenFieldsModule);
 }
-
 var hiddenFieldCounter = 1; // track globally
 var groupCounter = 1; // track groups globally
-
 /**
  * Adds a new empty hidden field block
  */
 function addHiddenField() {
     var hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     if(!hiddenFieldsContainer) return;
-
     var currentHiddenFieldId = hiddenFieldCounter++;
     var block = document.createElement('div');
     block.className = 'hidden-field-block';
     block.id = 'hiddenFieldBlock' + currentHiddenFieldId;
-
     block.innerHTML = `
         <label>Hidden Field ${currentHiddenFieldId}: </label>
         <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
@@ -65,11 +58,9 @@ function addHiddenField() {
     `;
     hiddenFieldsContainer.appendChild(block);
     toggleHiddenFieldOptions(currentHiddenFieldId);
-    
     // After adding a new hidden field, update all calculation dropdowns
     setTimeout(updateAllCalculationDropdowns, 100);
 }
-
 /**
  * Removes a hidden field block by ID
  */
@@ -77,24 +68,19 @@ function removeHiddenField(hiddenFieldId) {
     var block = document.getElementById('hiddenFieldBlock' + hiddenFieldId);
     if(block) block.remove();
 }
-
 // ============================================
 // ===========  GROUP FUNCTIONS  ==============
 // ============================================
-
 /**
  * Adds a new empty group block
  */
 function addGroup(groupId = null) {
     var groupsContainer = document.getElementById('groupsContainer');
     if(!groupsContainer) return;
-
     var currentGroupId = groupId || groupCounter;
-    
     var block = document.createElement('div');
     block.className = 'group-block';
     block.id = 'groupBlock' + currentGroupId;
-
     block.innerHTML = `
         <h3>Group ${currentGroupId}</h3>
         <label>Group Name: </label>
@@ -108,13 +94,11 @@ function addGroup(groupId = null) {
         <hr>
     `;
     groupsContainer.appendChild(block);
-
     // Increment groupCounter only if not loading from JSON
     if (!groupId) {
         groupCounter++;
     }
 }
-
 /**
  * Removes a group block by ID
  */
@@ -123,7 +107,6 @@ function removeGroup(groupId) {
     if(block) block.remove();
     updateGroupLabels();
 }
-
 /**
  * Updates the group name display
  */
@@ -134,19 +117,16 @@ function updateGroupName(groupId) {
         groupHeader.textContent = groupNameInput.value;
     }
 }
-
 /**
  * Adds a section to a group
  */
 function addSectionToGroup(groupId, sectionName = '') {
     var groupSectionsDiv = document.getElementById('groupSections' + groupId);
     if(!groupSectionsDiv) return;
-
     var sectionCount = groupSectionsDiv.querySelectorAll('.group-section-item').length + 1;
     var sectionItem = document.createElement('div');
     sectionItem.className = 'group-section-item';
     sectionItem.id = 'groupSection' + groupId + '_' + sectionCount;
-
     // Get ALL section names from the form (not just available ones)
     var allSections = [];
     var sectionBlocks = document.querySelectorAll('.section-block');
@@ -157,10 +137,8 @@ function addSectionToGroup(groupId, sectionName = '') {
             allSections.push(sectionNameInput.value.trim());
         }
     });
-    
     // Get currently selected sections to filter them out
     var selectedSections = getSelectedSections();
-    
     var dropdownOptions = '<option value="">-- Select a section --</option>';
     allSections.forEach(function(section) {
         // Only include sections that are not already selected in other groups
@@ -170,7 +148,6 @@ function addSectionToGroup(groupId, sectionName = '') {
             dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
         }
     });
-
     sectionItem.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px; margin: 5px 0;">
             <select id="groupSectionName${groupId}_${sectionCount}" 
@@ -183,7 +160,6 @@ function addSectionToGroup(groupId, sectionName = '') {
         </div>
     `;
     groupSectionsDiv.appendChild(sectionItem);
-
     // --- Fix: Ensure dropdown is set to sectionName after adding ---
     if (sectionName) {
         var select = sectionItem.querySelector('select');
@@ -195,7 +171,6 @@ function addSectionToGroup(groupId, sectionName = '') {
         }
     }
 }
-
 /**
  * Removes a section from a group
  */
@@ -207,43 +182,36 @@ function removeSectionFromGroup(groupId, sectionNumber) {
         if (select) {
             removedValue = select.value;
         }
-        
         sectionItem.remove();
         // Reindex remaining sections
         updateGroupSectionNumbers(groupId);
-        
         // If a section was removed, add it back to other groups' dropdowns
         if (removedValue) {
             addSectionToOtherGroupsDropdowns(removedValue);
         }
     }
 }
-
 /**
  * Updates section numbers after removal
  */
 function updateGroupSectionNumbers(groupId) {
     var groupSectionsDiv = document.getElementById('groupSections' + groupId);
     if(!groupSectionsDiv) return;
-
     var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
     sectionItems.forEach((item, index) => {
         var newNumber = index + 1;
         var oldId = item.id;
         item.id = 'groupSection' + groupId + '_' + newNumber;
-        
         var select = item.querySelector('select');
         if(select) {
             select.id = 'groupSectionName' + groupId + '_' + newNumber;
         }
-        
         var button = item.querySelector('button');
         if(button) {
             button.setAttribute('onclick', `removeSectionFromGroup(${groupId}, ${newNumber})`);
         }
     });
 }
-
 /**
  * Re-label groups after moves/removals
  */
@@ -256,7 +224,6 @@ function updateGroupLabels() {
         }
     });
 }
-
 /**
  * Handles changes to group section dropdowns
  */
@@ -266,11 +233,9 @@ function updateGroupLabels() {
 function getSelectedSections() {
     var selectedSections = new Set();
     var groupBlocks = document.querySelectorAll('.group-block');
-    
     groupBlocks.forEach(function(groupBlock) {
         var groupId = groupBlock.id.replace('groupBlock', '');
         var groupSectionsDiv = document.getElementById('groupSections' + groupId);
-        
         if (groupSectionsDiv) {
             var sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
             sectionItems.forEach(function(sectionItem) {
@@ -281,21 +246,17 @@ function getSelectedSections() {
             });
         }
     });
-    
     return selectedSections;
 }
-
 function handleGroupSectionChange() {
     // Get the current dropdown that changed
     var changedSelect = event.target;
     var selectedValue = changedSelect.value;
-    
     if (selectedValue) {
         // Update dropdowns in other groups to remove this selection from their options
         updateOtherGroupsDropdowns(changedSelect, selectedValue);
     }
 }
-
 /**
  * Updates dropdowns in other groups to remove a selected section from their options
  */
@@ -304,7 +265,6 @@ function updateOtherGroupsDropdowns(changedSelect, selectedValue) {
     var changedGroupItem = changedSelect.closest('.group-section-item');
     var changedGroupBlock = changedGroupItem.closest('.group-block');
     var changedGroupId = changedGroupBlock.id.replace('groupBlock', '');
-    
     // Get all other groups
     var otherGroupBlocks = document.querySelectorAll('.group-block');
     otherGroupBlocks.forEach(function(groupBlock) {
@@ -334,7 +294,6 @@ function updateOtherGroupsDropdowns(changedSelect, selectedValue) {
         }
     });
 }
-
 /**
  * Adds a section back to other groups' dropdowns when it's removed from a group
  */
@@ -357,7 +316,6 @@ function addSectionToOtherGroupsDropdowns(sectionName) {
                             isAlreadyInGroup = true;
                         }
                     });
-                    
                     // If not already in this group, add it to the dropdown
                     if (!isAlreadyInGroup) {
                         var option = document.createElement('option');
@@ -370,14 +328,12 @@ function addSectionToOtherGroupsDropdowns(sectionName) {
         }
     });
 }
-
 /**
  * Gets all available section names that are not already in any group
  */
 function getAvailableSectionNames() {
     var availableSections = [];
     var allSections = [];
-    
     // Get all section names from the form
     var sectionBlocks = document.querySelectorAll('.section-block');
     sectionBlocks.forEach(function(sectionBlock) {
@@ -387,7 +343,6 @@ function getAvailableSectionNames() {
             allSections.push(sectionNameInput.value.trim());
         }
     });
-    
     // Get all sections that are already in groups
     var usedSections = [];
     var groupBlocks = document.querySelectorAll('.group-block');
@@ -404,21 +359,17 @@ function getAvailableSectionNames() {
             });
         }
     });
-    
     // Return sections that are not used
     availableSections = allSections.filter(function(section) {
         return usedSections.indexOf(section) === -1;
     });
-    
     return availableSections;
 }
-
 /**
  * Gets available section names for a specific group (excluding already selected ones in that group)
  */
 function getAvailableSectionNamesForGroup(groupId) {
     var allSections = [];
-    
     // Get all section names from the form
     var sectionBlocks = document.querySelectorAll('.section-block');
     sectionBlocks.forEach(function(sectionBlock) {
@@ -428,7 +379,6 @@ function getAvailableSectionNamesForGroup(groupId) {
             allSections.push(sectionNameInput.value.trim());
         }
     });
-    
     // Get sections already selected in this specific group
     var usedInThisGroup = [];
     var groupSectionsDiv = document.getElementById('groupSections' + groupId);
@@ -441,13 +391,11 @@ function getAvailableSectionNamesForGroup(groupId) {
             }
         });
     }
-    
     // Return sections that are not used in this group
     return allSections.filter(function(section) {
         return usedInThisGroup.indexOf(section) === -1;
     });
 }
-
 /**
  * Updates all group section dropdowns to reflect current available sections
  */
@@ -462,9 +410,7 @@ function updateGroupSectionDropdowns() {
             allSections.push(sectionNameInput.value.trim());
         }
     });
-    
     var groupBlocks = document.querySelectorAll('.group-block');
-    
     groupBlocks.forEach(function(groupBlock) {
         var groupId = groupBlock.id.replace('groupBlock', '');
         var groupSectionsDiv = document.getElementById('groupSections' + groupId);
@@ -490,28 +436,23 @@ function updateGroupSectionDropdowns() {
         }
     });
 }
-
 /**
  * When loading from JSON, we call addGroupWithData
  */
 function addGroupWithData(group) {
     console.log('Loading group:', group); // Debug log
-    
     var currentGroupId = group.groupId;
     addGroup(currentGroupId);
-    
     // Update groupCounter to ensure it's higher than any loaded group
     if (currentGroupId >= groupCounter) {
         groupCounter = currentGroupId + 1;
     }
-    
     // Set group name
     var groupNameInput = document.getElementById('groupName' + currentGroupId);
     if(groupNameInput) {
         groupNameInput.value = group.name || 'Group ' + currentGroupId;
         updateGroupName(currentGroupId);
     }
-    
     // Add sections to group
     if(group.sections && group.sections.length > 0) {
         console.log('Adding sections to group:', group.sections); // Debug log
@@ -520,25 +461,20 @@ function addGroupWithData(group) {
         });
     }
 }
-
 /**
  * Toggles between text vs. checkbox sub-options
  */
 function toggleHiddenFieldOptions(hiddenFieldId) {
     var fieldType = document.getElementById('hiddenFieldType' + hiddenFieldId).value;
     var optsDiv = document.getElementById('hiddenFieldOptions' + hiddenFieldId);
-
     optsDiv.innerHTML = '';
-
     if(fieldType === 'text') {
         optsDiv.innerHTML = `
             <label>Name/ID:</label>
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
-
             <!-- Multi-term Calculation for text fields -->
             <button type="button" onclick="addCalculationForText(${hiddenFieldId})">Add Calculation</button>
             <div id="textCalculationBlock${hiddenFieldId}"></div><br>
-
             <label>Conditional Autofill Logic:</label><br>
             <div id="conditionalAutofill${hiddenFieldId}"></div>
             <button type="button" onclick="addConditionalAutofill(${hiddenFieldId})">Add Conditional Logic</button><br><br>
@@ -548,34 +484,27 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
         optsDiv.innerHTML = `
             <label>Name/ID:</label>
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
-
             <button type="button" onclick="addCalculationForCheckbox(${hiddenFieldId})">Add Calculation</button>
             <div id="calculationBlock${hiddenFieldId}"></div><br>
-
             <label>Checked by default:</label>
             <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}"><br><br>
-
             <label>Conditional Autofill Logic:</label><br>
             <div id="conditionalAutofillForCheckbox${hiddenFieldId}"></div>
             <button type="button" onclick="addConditionalAutofillForCheckbox(${hiddenFieldId})">Add Conditional Logic</button><br><br>
         `;
     }
-    
     // Update all calculation dropdowns whenever we toggle options
     setTimeout(updateAllCalculationDropdowns, 100);
 }
-
 /**
  * When loading from JSON, we call addHiddenFieldWithData
  */
 function addHiddenFieldWithData(hiddenField) {
     var hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     var currentHiddenFieldId = hiddenField.hiddenFieldId;
-
     var block = document.createElement('div');
     block.className = 'hidden-field-block';
     block.id = 'hiddenFieldBlock' + currentHiddenFieldId;
-
     block.innerHTML = `
         <label>Hidden Field ${currentHiddenFieldId}: </label>
         <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
@@ -588,17 +517,13 @@ function addHiddenFieldWithData(hiddenField) {
         <hr>
     `;
     hiddenFieldsContainer.appendChild(block);
-
     toggleHiddenFieldOptions(currentHiddenFieldId);
-
     // Fill name
     var nm = document.getElementById('hiddenFieldName' + currentHiddenFieldId);
     if(nm) nm.value = hiddenField.name || '';
-
     if(hiddenField.type==='checkbox'){
         var chkDef = document.getElementById('hiddenFieldChecked' + currentHiddenFieldId);
         if(chkDef) chkDef.checked = !!hiddenField.checked;
-
         // Conditions
         if(hiddenField.conditions && hiddenField.conditions.length>0){
             for(var i=0; i<hiddenField.conditions.length; i++){
@@ -608,31 +533,26 @@ function addHiddenFieldWithData(hiddenField) {
                 var qSel = document.getElementById('conditionQuestion'+currentHiddenFieldId+'_'+condId);
                 var ansSel = document.getElementById('conditionAnswer'+currentHiddenFieldId+'_'+condId);
                 var valSel = document.getElementById('conditionValue'+currentHiddenFieldId+'_'+condId);
-
                 if(qSel) qSel.value = cond.questionId;
                 updateConditionAnswers(currentHiddenFieldId, condId);
                 if(ansSel) ansSel.value = cond.answerValue;
                 if(valSel) valSel.value = cond.autofillValue;
             }
         }
-
         // Multi-term calculations (calcRows)
         if(hiddenField.calculations && hiddenField.calculations.length>0){
             for(var c=0; c<hiddenField.calculations.length; c++){
                 addCalculationForCheckbox(currentHiddenFieldId);
                 var calcIndex=c+1;
                 var cObj = hiddenField.calculations[c];
-
                 // remove the default single term from eq container
                 var eqContainer = document.getElementById('equationContainer'+currentHiddenFieldId+'_'+calcIndex);
                 eqContainer.innerHTML='';
-
                 // re-create each term
                 for(var t=0; t<cObj.terms.length; t++){
                     addEquationTermCheckbox(currentHiddenFieldId, calcIndex);
                     var termNumber = t+1;
                     var termObj = cObj.terms[t];
-
                     // operator
                     if(termNumber>1){
                         var opSel = document.getElementById('calcTermOperator'+currentHiddenFieldId+'_'+calcIndex+'_'+termNumber);
@@ -643,7 +563,6 @@ function addHiddenFieldWithData(hiddenField) {
                     var qSelEl = document.getElementById(qSelId);
                     if(qSelEl) qSelEl.value = termObj.questionNameId || '';
                 }
-
                 // compare operator
                 var cmpOp = document.getElementById('calcCompareOperator'+currentHiddenFieldId+'_'+calcIndex);
                 if(cmpOp) cmpOp.value = cObj.compareOperator||'=';
@@ -666,7 +585,6 @@ function addHiddenFieldWithData(hiddenField) {
                 var qS2= document.getElementById('conditionQuestion'+currentHiddenFieldId+'_'+condId2);
                 var aS2= document.getElementById('conditionAnswer'+currentHiddenFieldId+'_'+condId2);
                 var vS2= document.getElementById('conditionValue'+currentHiddenFieldId+'_'+condId2);
-
                 if(qS2){
                     qS2.value=c2.questionId;
                     updateConditionAnswers(currentHiddenFieldId, condId2);
@@ -675,7 +593,6 @@ function addHiddenFieldWithData(hiddenField) {
                 if(vS2) vS2.value=c2.autofillValue;
             }
         }
-
         // Multi-term calculations for text
         if(hiddenField.calculations && hiddenField.calculations.length>0){
             for(var z=0; z<hiddenField.calculations.length; z++){
@@ -685,7 +602,6 @@ function addHiddenFieldWithData(hiddenField) {
                 // remove the default single term
                 var eqCont2 = document.getElementById('textEquationContainer'+currentHiddenFieldId+'_'+calcIdx);
                 eqCont2.innerHTML='';
-
                 for(var t2=0; t2<cObj2.terms.length; t2++){
                     addEquationTermText(currentHiddenFieldId, calcIdx);
                     var termNumber2 = t2+1;
@@ -699,15 +615,12 @@ function addHiddenFieldWithData(hiddenField) {
                     var qSel2= document.getElementById('textTermQuestion'+currentHiddenFieldId+'_'+calcIdx+'_'+termNumber2);
                     if(qSel2) qSel2.value=termObj2.questionNameId||'';
                 }
-
                 // compareOp
                 var cmpOp2 = document.getElementById('textCompareOperator'+currentHiddenFieldId+'_'+calcIdx);
                 if(cmpOp2) cmpOp2.value= cObj2.compareOperator||'=';
-
                 // threshold
                 var thr2 = document.getElementById('textThreshold'+currentHiddenFieldId+'_'+calcIdx);
                 if(thr2) thr2.value=cObj2.threshold||'';
-
                 // fillValue
                 var fillEl = document.getElementById('textFillValue'+currentHiddenFieldId+'_'+calcIdx);
                 if(fillEl) fillEl.value=cObj2.fillValue||'';
@@ -715,15 +628,12 @@ function addHiddenFieldWithData(hiddenField) {
         }
     }
 }
-
 /***************************************************
  * Conditional Autofill for text / checkbox fields
  ***************************************************/
-
 function addConditionalAutofill(hiddenFieldId) {
     var parentDiv = document.getElementById('conditionalAutofill'+hiddenFieldId);
     var condId = parentDiv.children.length+1;
-
     var condDiv = document.createElement('div');
     condDiv.className='condition';
     condDiv.id='condition'+hiddenFieldId+'_'+condId;
@@ -745,16 +655,13 @@ function addConditionalAutofill(hiddenFieldId) {
     `;
     parentDiv.appendChild(condDiv);
 }
-
 function removeConditionalAutofill(hiddenFieldId, condId) {
     var div= document.getElementById('condition'+hiddenFieldId+'_'+condId);
     if(div) div.remove();
 }
-
 function addConditionalAutofillForCheckbox(hiddenFieldId) {
     var parentDiv = document.getElementById('conditionalAutofillForCheckbox'+hiddenFieldId);
     var condId = parentDiv.children.length+1;
-
     var condDiv = document.createElement('div');
     condDiv.className='condition'+condId;
     condDiv.id='condition'+hiddenFieldId+'_'+condId;
@@ -779,22 +686,17 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     `;
     parentDiv.appendChild(condDiv);
 }
-
 function updateConditionAnswers(hiddenFieldId, condId) {
     var qSel = document.getElementById('conditionQuestion'+hiddenFieldId+'_'+condId);
     var ansSel= document.getElementById('conditionAnswer'+hiddenFieldId+'_'+condId);
     if(!qSel || !ansSel) return;
-
     ansSel.innerHTML='<option value="">-- Select an answer --</option>';
-
     var prevQId= qSel.value;
     var qBlock = document.getElementById('questionBlock'+prevQId);
     if(!qBlock) return;
-    
     // FIX: Make sure we get the correct question type selector
     var sel= qBlock.querySelector('select#questionType'+prevQId);
     var qType= sel? sel.value:'text';
-
     if(qType==='radio'){
         ansSel.innerHTML += `
             <option value="Yes">Yes</option>
@@ -823,11 +725,9 @@ function updateConditionAnswers(hiddenFieldId, condId) {
         // Handle numbered dropdown by getting min/max range
         var rangeStartEl = qBlock.querySelector('#numberRangeStart'+prevQId);
         var rangeEndEl = qBlock.querySelector('#numberRangeEnd'+prevQId);
-        
         if(rangeStartEl && rangeEndEl){
             var min = parseInt(rangeStartEl.value, 10) || 1;
             var max = parseInt(rangeEndEl.value, 10) || min;
-            
             // Add each number in the range as an option
             for(var j=min; j<=max; j++){
                 ansSel.innerHTML += '<option value="'+j+'">'+j+'</option>';
@@ -841,7 +741,6 @@ function updateConditionAnswers(hiddenFieldId, condId) {
     else if(qType==='money'){
         // For money questions, add an "Any Amount" option
         ansSel.innerHTML += '<option value="Any Amount">Any Amount</option>';
-        
         // Debug to console
         console.log('Money question detected, adding "Any Amount" option');
     }
@@ -850,27 +749,21 @@ function updateConditionAnswers(hiddenFieldId, condId) {
         ansSel.innerHTML += '<option value="Any Date">Any Date</option>';
     }
 }
-
 /*******************************************************
  * Calculation logic for hidden checkbox fields 
  *   "If eq => checked/unchecked"
  *******************************************************/
-
 function addCalculationForCheckbox(hiddenFieldId) {
     var calcBlock = document.getElementById('calculationBlock'+hiddenFieldId);
     var calcIndex = calcBlock.children.length+1;
-
     var row = document.createElement('div');
     row.className='calculation'+calcIndex;
     row.id='calculationRow'+hiddenFieldId+'_'+calcIndex;
-
     row.innerHTML=`
         <label>Calculation ${calcIndex}:</label><br>
-
         <div id="equationContainer${hiddenFieldId}_${calcIndex}"></div>
         <button type="button" onclick="addEquationTermCheckbox(${hiddenFieldId}, ${calcIndex})">Add Another Term</button>
         <br><br>
-
         <select id="calcCompareOperator${hiddenFieldId}_${calcIndex}">
             <option value="=">=</option>
             <option value="<"><</option>
@@ -882,31 +775,24 @@ function addCalculationForCheckbox(hiddenFieldId) {
             <option value="checked">Checked</option>
             <option value="unchecked">Unchecked</option>
         </select>
-
         <button type="button" onclick="removeCalculationForCheckbox(${hiddenFieldId}, ${calcIndex})">Remove</button>
         <hr>
     `;
-
     calcBlock.appendChild(row);
-
     // Add the first term by default
     addEquationTermCheckbox(hiddenFieldId, calcIndex);
 }
-
 /**
  * Adds a single "term" to the equation for a hidden checkbox
  */
 function addEquationTermCheckbox(hiddenFieldId, calcIndex) {
     var eqContainer = document.getElementById('equationContainer'+hiddenFieldId+'_'+calcIndex);
     if(!eqContainer) return;
-
     var existingTermCount = eqContainer.querySelectorAll('.equation-term-cb').length;
     var termNumber = existingTermCount+1;
-
     var div = document.createElement('div');
     div.className='equation-term-cb';
     div.id='equationTermCb'+hiddenFieldId+'_'+calcIndex+'_'+termNumber;
-
     var operatorHTML='';
     if(termNumber>1){
         operatorHTML=`
@@ -918,7 +804,6 @@ function addEquationTermCheckbox(hiddenFieldId, calcIndex) {
             </select>
         `;
     }
-
     div.innerHTML=`
         ${operatorHTML}
         <select id="calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" style="width:200px;">
@@ -928,14 +813,12 @@ function addEquationTermCheckbox(hiddenFieldId, calcIndex) {
     `;
     eqContainer.appendChild(div);
 }
-
 /**
  * Removes entire calculation row for hidden checkbox
  */
 function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
     var row = document.getElementById('calculationRow'+hiddenFieldId+'_'+calcIndex);
     if(row) row.remove();
-
     // re-label
     var calcBlock = document.getElementById('calculationBlock'+hiddenFieldId);
     var rows= calcBlock.querySelectorAll('div[id^="calculationRow'+hiddenFieldId+'_"]');
@@ -945,35 +828,26 @@ function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
         r.className='calculation'+newIndex;
         var oldId = r.id; 
         r.id='calculationRow'+hiddenFieldId+'_'+newIndex;
-
         var label= r.querySelector('label');
         if(label) label.textContent='Calculation '+newIndex+':';
-
         var eqCont= r.querySelector('[id^="equationContainer"]');
         if(eqCont) eqCont.id= 'equationContainer'+hiddenFieldId+'_'+newIndex;
-
         var addBtn= r.querySelector('button[onclick^="addEquationTermCheckbox"]');
         addBtn.setAttribute('onclick', `addEquationTermCheckbox(${hiddenFieldId}, ${newIndex})`);
-
         var removeBtn= r.querySelector('button[onclick^="removeCalculationForCheckbox"]');
         removeBtn.setAttribute('onclick', `removeCalculationForCheckbox(${hiddenFieldId}, ${newIndex})`);
-
         var cmpSel= r.querySelector('[id^="calcCompareOperator"]');
         if(cmpSel) cmpSel.id= 'calcCompareOperator'+hiddenFieldId+'_'+newIndex;
-
         var thrEl= r.querySelector('[id^="calcThreshold"]');
         if(thrEl) thrEl.id= 'calcThreshold'+hiddenFieldId+'_'+newIndex;
-
         var resEl= r.querySelector('[id^="calcResult"]');
         if(resEl) resEl.id= 'calcResult'+hiddenFieldId+'_'+newIndex;
-
         // also re-label the .equation-term-cb if needed
         var termDivs = r.querySelectorAll('.equation-term-cb');
         for(var t=0;t<termDivs.length;t++){
             var td=termDivs[t];
             var newTermIndex=t+1;
             td.id='equationTermCb'+hiddenFieldId+'_'+newIndex+'_'+newTermIndex;
-
             var opSel= td.querySelector('[id^="calcTermOperator"]');
             if(opSel){
                 opSel.id='calcTermOperator'+hiddenFieldId+'_'+newIndex+'_'+newTermIndex;
@@ -985,12 +859,10 @@ function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
         }
     }
 }
-
 /*******************************************************
  * Calculation logic for hidden text fields
  *   "If eq => fill with some text"
  *******************************************************/
-
 /**
  * Update all calculation dropdowns to ensure they show all available money questions
  * and all hidden field options
@@ -1007,25 +879,20 @@ function updateAllCalculationDropdowns() {
         if (selectedValue) dropdown.value = selectedValue;
     });
 }
-
 /**
  * Adds a new calculation for a text field
  */
 function addCalculationForText(hiddenFieldId) {
     var textCalcBlock = document.getElementById('textCalculationBlock'+hiddenFieldId);
     var calcIndex = textCalcBlock.children.length+1;
-
     var row= document.createElement('div');
     row.className='text-calc'+calcIndex;
     row.id='textCalculationRow'+hiddenFieldId+'_'+calcIndex;
-
     row.innerHTML=`
         <label>Calculation ${calcIndex} (Text):</label><br>
-
         <div id="textEquationContainer${hiddenFieldId}_${calcIndex}"></div>
         <button type="button" onclick="addEquationTermText(${hiddenFieldId}, ${calcIndex})">Add Another Term</button>
         <br><br>
-
         <select id="textCompareOperator${hiddenFieldId}_${calcIndex}">
             <option value="=">=</option>
             <option value="<"><</option>
@@ -1034,33 +901,26 @@ function addCalculationForText(hiddenFieldId) {
         <input type="number" id="textThreshold${hiddenFieldId}_${calcIndex}" placeholder="Enter number" style="width:80px;">
         <label> then fill with: </label>
         <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" placeholder="Enter value or use ##FIELDNAME## to reference a field" style="width:230px;">
-
         <button type="button" onclick="removeCalculationForText(${hiddenFieldId}, ${calcIndex})">Remove</button>
         <hr>
     `;
     textCalcBlock.appendChild(row);
-
     // Add the first term
     addEquationTermText(hiddenFieldId, calcIndex);
-    
     // Make sure all dropdowns show all options
     updateAllCalculationDropdowns();
 }
-
 /**
  * Adds one term to the text equation
  */
 function addEquationTermText(hiddenFieldId, calcIndex) {
     var eqContainer = document.getElementById('textEquationContainer'+hiddenFieldId+'_'+calcIndex);
     if(!eqContainer) return;
-
     var existingTerms = eqContainer.querySelectorAll('.equation-term-text').length;
     var termNumber = existingTerms + 1;
-
     var div = document.createElement('div');
     div.className = 'equation-term-text';
     div.id = 'equationTermText'+hiddenFieldId+'_'+calcIndex+'_'+termNumber;
-
     var operatorHTML = '';
     if(termNumber > 1) {
         operatorHTML = `
@@ -1072,7 +932,6 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
             </select>
         `;
     }
-
     // Get all checkbox questions to determine correct indices
     const checkboxQuestions = {};
     document.querySelectorAll('.question-block').forEach(qBlock => {
@@ -1083,7 +942,6 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
             checkboxQuestions[qId] = options.length;
         }
     });
-
     div.innerHTML = `
         ${operatorHTML}
         <select id="textTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" 
@@ -1094,37 +952,30 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
         </select><br><br>
     `;
     eqContainer.appendChild(div);
-    
     // Force update all dropdowns to ensure consistent options
     updateAllCalculationDropdowns();
 }
-
 // Add this new function to handle index updates
 function updateAmountFieldIndex(selectEl, checkboxQuestions) {
     const value = selectEl.value;
     if (!value) return;
-
     // Check if this is a checkbox amount field
     const match = value.match(/^amount_(.+?)_(\d+)_(\d+)$/);
     if (!match) return;
-
     const [, baseId, questionNum, optionNum] = match;
     const maxOptions = checkboxQuestions[questionNum] || 0;
-    
     if (optionNum > maxOptions) {
         // Correct the index to be within bounds
         const correctedValue = `amount_${baseId}_${questionNum}_${Math.min(optionNum, maxOptions)}`;
         selectEl.value = correctedValue;
     }
 }
-
 /**
  * Remove entire text calculation row
  */
 function removeCalculationForText(hiddenFieldId, calcIndex) {
     var row = document.getElementById('textCalculationRow'+hiddenFieldId+'_'+calcIndex);
     if(row) row.remove();
-
     // re-label
     var textCalcBlock= document.getElementById('textCalculationBlock'+hiddenFieldId);
     var rows= textCalcBlock.querySelectorAll('div[id^="textCalculationRow"]');
@@ -1134,35 +985,26 @@ function removeCalculationForText(hiddenFieldId, calcIndex) {
         r.className='text-calc'+newIndex;
         var oldId= r.id;
         r.id='textCalculationRow'+hiddenFieldId+'_'+newIndex;
-
         var label= r.querySelector('label');
         if(label) label.textContent='Calculation '+newIndex+' (Text):';
-
         var eqCont= r.querySelector('[id^="textEquationContainer"]');
         if(eqCont) eqCont.id='textEquationContainer'+hiddenFieldId+'_'+newIndex;
-
         var addBtn = r.querySelector('button[onclick^="addEquationTermText"]');
         addBtn.setAttribute('onclick', `addEquationTermText(${hiddenFieldId}, ${newIndex})`);
-
         var removeBtn= r.querySelector('button[onclick^="removeCalculationForText"]');
         removeBtn.setAttribute('onclick', `removeCalculationForText(${hiddenFieldId}, ${newIndex})`);
-
         var cmpOp= r.querySelector('[id^="textCompareOperator"]');
         if(cmpOp) cmpOp.id='textCompareOperator'+hiddenFieldId+'_'+newIndex;
-
         var thr= r.querySelector('[id^="textThreshold"]');
         if(thr) thr.id='textThreshold'+hiddenFieldId+'_'+newIndex;
-
         var fillEl= r.querySelector('[id^="textFillValue"]');
         if(fillEl) fillEl.id='textFillValue'+hiddenFieldId+'_'+newIndex;
-
         // also re-label the .equation-term-text if needed
         var termDivs= r.querySelectorAll('.equation-term-text');
         for(var t=0;t<termDivs.length;t++){
             var td= termDivs[t];
             var newTermIndex = t+1;
             td.id='equationTermText'+hiddenFieldId+'_'+newIndex+'_'+newTermIndex;
-
             var opSel= td.querySelector('[id^="textTermOperator"]');
             if(opSel){
                 opSel.id='textTermOperator'+hiddenFieldId+'_'+newIndex+'_'+newTermIndex;
@@ -1174,11 +1016,9 @@ function removeCalculationForText(hiddenFieldId, calcIndex) {
         }
     }
 }
-
 /*****************************************************
  * Helper functions to generate question lists
  *****************************************************/
-
 function generateQuestionOptions() {
     var optionsHTML = '';
     var questionBlocks = document.querySelectorAll('.question-block');
@@ -1188,7 +1028,6 @@ function generateQuestionOptions() {
         var questionText = txtEl? txtEl.value : ('Question '+qId);
         var selEl= qBlock.querySelector('select');
         var qType= selEl? selEl.value:'text';
-
         if(['text','bigParagraph','money','date','radio','dropdown'].indexOf(qType)!==-1){
             optionsHTML += '<option value="'+qId+'">Question '+qId+': '+questionText+'</option>';
         }
@@ -1205,7 +1044,6 @@ function generateQuestionOptions() {
     });
     return optionsHTML;
 }
-
 function generateAllQuestionOptions() {
     var optionsHTML='';
     var qBlocks= document.querySelectorAll('.question-block');
@@ -1215,14 +1053,12 @@ function generateAllQuestionOptions() {
         var questionText= txtEl? txtEl.value:('Question '+qId);
         var selEl= qBlock.querySelector('select');
         var qType= selEl? selEl.value:'text';
-
         if(['dropdown','radio','checkbox','numberedDropdown'].indexOf(qType)!==-1){
             optionsHTML+='<option value="'+qId+'">Question '+qId+': '+questionText+'</option>';
         }
     });
     return optionsHTML;
 }
-
 /**
  * UPDATED to include ALL hidden fields as numeric references
  * And use question text instead of just ID in the display
@@ -1231,19 +1067,15 @@ function generateAllQuestionOptions() {
 function generateMoneyQuestionOptions() {
     let optionsHTML = '';
     const qBlocks = document.querySelectorAll('.question-block');
-
     qBlocks.forEach(qBlock => {
         const qId = qBlock.id.replace('questionBlock','');
         const selEl = qBlock.querySelector('select#questionType' + qId);
         if (!selEl) return;
-
         // e.g. 'numberedDropdown', 'money', etc.
         const qType = selEl.value;
-        
         // Get the question text for display
         const txtEl = qBlock.querySelector(`#question${qId}`);
         const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
-        
         if (qType === 'money') {
             // If it's a money question, we can reference it directly
             const nmEl = qBlock.querySelector('#textboxName' + qId);
@@ -1256,7 +1088,6 @@ function generateMoneyQuestionOptions() {
             const enEl = qBlock.querySelector('#numberRangeEnd' + qId);
             const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
             const ddMax = enEl ? parseInt(enEl.value, 10) : ddMin;
-
             // 3) Gather the "amount labels" from #textboxAmounts. 
             const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
             const amountLabels = [];
@@ -1266,7 +1097,6 @@ function generateMoneyQuestionOptions() {
             });
             // If no labels were entered, skip
             if (amountLabels.length === 0) return;
-
             // 4) For each label, produce a line for i in [ddMin..ddMax].
             amountLabels.forEach((rawLabel) => {
                 const sanitized = rawLabel.replace(/\s+/g, "_").toLowerCase();
@@ -1282,12 +1112,10 @@ function generateMoneyQuestionOptions() {
             if (checkboxOptionsDiv) {
                 // Use a more robust selector that finds all divs inside checkboxOptionsDiv
                 const options = checkboxOptionsDiv.querySelectorAll('div');
-                
                 options.forEach((option, index) => {
                     // Get the option text for display
                     const optionTextEl = option.querySelector(`input[id^="checkboxOptionText${qId}_"]`);
                     const optionText = optionTextEl ? optionTextEl.value.trim() : `Option ${index + 1}`;
-                    
                     // Get the nameId (this exists for all checkbox options)
                     const nameIdEl = option.querySelector(`input[id^="checkboxOptionName${qId}_"]`);
                     let nameId = '';
@@ -1298,7 +1126,6 @@ function generateMoneyQuestionOptions() {
                         const sanitizedText = optionText.replace(/\W+/g, "_").toLowerCase();
                         nameId = `answer${qId}_${sanitizedText}`;
                     }
-                    
                     // Find if this checkbox has an amount field
                     const hasAmountCheckbox = option.querySelector(`input[id^="checkboxOptionHasAmount${qId}_"]`);
                     if (hasAmountCheckbox && hasAmountCheckbox.checked) {
@@ -1312,7 +1139,6 @@ function generateMoneyQuestionOptions() {
             }
         }
     });
-
     // Include all hidden fields as references
     const hiddenBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenBlocks.forEach((block) => {
@@ -1324,20 +1150,15 @@ function generateMoneyQuestionOptions() {
         if (!fNameEl) return;
         const fName = fNameEl.value.trim();
         if (!fName) return;
-
         optionsHTML += `<option value="${fName}">(Hidden ${fType}) ${fName}</option>`;
     });
-
     return optionsHTML;
 }
-
-
 function updateAutofillOptions() {
     var hiddenBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenBlocks.forEach(function(block){
         var hid= block.id.replace('hiddenFieldBlock','');
         var ft= document.getElementById('hiddenFieldType'+hid).value;
-
         // if text => refresh conditions
         if(ft==='text'){
             var condDiv= document.getElementById('conditionalAutofill'+hid);
