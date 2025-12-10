@@ -5,11 +5,11 @@
 function loadAIConfig() {
   // Try to get API key from environment or use fallback
   const apiKey = window.OPENAI_API_KEY || 'YOUR_API_KEY_HERE';
-  
+
   if (apiKey === 'YOUR_API_KEY_HERE') {
     throw new Error('OpenAI API key not configured. Please set window.OPENAI_API_KEY or update the config.');
   }
-  
+
   return {
     apiKey: apiKey,
     model: 'gpt-4o-mini', // Use a more capable model for flowchart generation
@@ -22,7 +22,7 @@ function loadAIConfig() {
 async function generateFlowchartFromDescription(description) {
   try {
     const aiConfig = loadAIConfig();
-    
+
     const systemPrompt = `You are a flowchart generator. Based on the user's description, generate a valid flowchart JSON that can be imported into a flowchart creation tool.
 
 CRITICAL: You must generate EXACTLY the correct JSON structure with ALL required nodes and connections. Here's the precise format:
@@ -151,9 +151,6 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
 
     const userPrompt = `Create a flowchart based on this description: ${description}`;
 
-    console.log('Making API request with model:', aiConfig.model);
-    console.log('API Key present:', !!aiConfig.apiKey);
-
     // Call ChatGPT API
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -180,7 +177,7 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API Error Response:', errorText);
+
       throw new Error(`API request failed: ${response.status} ${response.statusText}. Details: ${errorText}`);
     }
 
@@ -200,14 +197,11 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
     try {
       flowchartData = JSON.parse(jsonString);
     } catch (parseError) {
-      console.error('Error parsing ChatGPT response:', parseError);
-      console.error('Raw ChatGPT response:', generatedContent);
-      console.error('Extracted JSON string:', jsonString);
-      
+
       // Store the raw response for debugging
       window.lastFailedChatResponse = generatedContent;
       window.lastFailedJsonString = jsonString;
-      
+
       // Create a downloadable file with the raw response
       const blob = new Blob([generatedContent], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
@@ -218,7 +212,7 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       throw new Error('Failed to parse generated JSON: ' + parseError.message + '. Raw response downloaded for debugging.');
     }
 
@@ -253,7 +247,7 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
         // Clear all cells
         const cells = window.graph.getChildCells(window.graph.getDefaultParent(), true, true);
         window.graph.removeCells(cells);
-        
+
         // Set default edge style to match user preference
         const defaultEdgeStyle = window.graph.getStylesheet().getDefaultEdgeStyle();
         if (userEdgeStyle === 'curved') {
@@ -269,7 +263,7 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
           defaultEdgeStyle.rounded = '0';
           defaultEdgeStyle.orthogonalLoop = '0';
         }
-        
+
         // Load the new flowchart data
         if (typeof loadFlowchartData === 'function') {
           loadFlowchartData(flowchartData);
@@ -283,10 +277,10 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
 
     // Store the generated JSON for download
     window.lastGeneratedFlowchartJSON = JSON.stringify(flowchartData, null, 2);
-    
+
     // Show the download button
     document.getElementById('downloadGeneratedJsonBtn').style.display = 'inline-block';
-    
+
     // Force update all edge styles after loading to ensure they match user preference
     setTimeout(() => {
       if (typeof updateEdgeStyle === 'function') {
@@ -315,7 +309,7 @@ CRITICAL: Generate the COMPLETE JSON structure. Do not truncate or cut off the r
 
     return flowchartData;
   } catch (error) {
-    console.error('Error generating flowchart:', error);
+
     throw error;
   }
 }
@@ -362,50 +356,50 @@ async function processPdfFile() {
     fileInput.click(); // Trigger file input if no file selected
     return;
   }
-  
+
   const file = fileInput.files[0];
   const statusDiv = document.getElementById('pdfProcessingStatus');
   const previewDiv = document.getElementById('pdfPreview');
   const imagesContainer = document.getElementById('pdfImagesContainer');
-  
+
   try {
     // Show processing status
     statusDiv.style.display = 'block';
     statusDiv.innerHTML = '<p>Processing PDF...</p>';
-    
+
     // Load PDF.js
     if (typeof pdfjsLib === 'undefined') {
       throw new Error('PDF.js library not loaded');
     }
-    
+
     // Set PDF.js worker source
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-    
+
     const imageDataUrls = [];
     const imagesContainer = document.getElementById('pdfImagesContainer');
     imagesContainer.innerHTML = ''; // Clear previous images
-    
+
     // Convert each page to image
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const viewport = page.getViewport({ scale: 2.0 });
-      
+
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-      
+
       await page.render({
         canvasContext: context,
         viewport: viewport
       }).promise;
-      
+
       const imageDataUrl = canvas.toDataURL('image/png');
       imageDataUrls.push(imageDataUrl);
-      
+
       // Add to preview
       const img = document.createElement('img');
       img.src = imageDataUrl;
@@ -414,32 +408,32 @@ async function processPdfFile() {
       img.style.border = '1px solid #ccc';
       imagesContainer.appendChild(img);
     }
-    
+
     // Show preview
     previewDiv.style.display = 'block';
-    
+
     // Combine all images into one
     const combinedImageDataUrl = await combineImages(imageDataUrls);
-    
+
     // Analyze with ChatGPT
     statusDiv.innerHTML = '<p>Analyzing document with AI...</p>';
     const analysis = await analyzePdfWithChatGPT(combinedImageDataUrl);
-    
+
      // Store the analysis
      window.lastPdfAnalysis = analysis;
-     
+
      // Convert analysis to structured JSON using ChatGPT
      statusDiv.innerHTML = '<p>Converting analysis to structured JSON...</p>';
      const structuredData = await convertAnalysisToJSON(analysis);
      window.lastPdfAnalysisJSON = structuredData;
-     
+
      // Show success and download buttons
      statusDiv.innerHTML = '<p style="color: green;">Analysis complete! Click "Download Analysis" to get the text output, or "Download JSON" for structured data.</p>';
      document.getElementById('downloadPdfAnalysisBtn').style.display = 'inline-block';
      document.getElementById('downloadPdfAnalysisJsonBtn').style.display = 'inline-block';
-    
+
   } catch (error) {
-    console.error('Error processing PDF:', error);
+
     statusDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
   }
 }
@@ -449,13 +443,13 @@ async function combineImages(imageDataUrls) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Load all images
     const images = [];
     let loadedCount = 0;
     let totalHeight = 0;
     let maxWidth = 0;
-    
+
     imageDataUrls.forEach((dataUrl, index) => {
       const img = new Image();
       img.onload = () => {
@@ -463,18 +457,18 @@ async function combineImages(imageDataUrls) {
         totalHeight += img.height;
         maxWidth = Math.max(maxWidth, img.width);
         loadedCount++;
-        
+
         if (loadedCount === imageDataUrls.length) {
           // All images loaded, combine them
           canvas.width = maxWidth;
           canvas.height = totalHeight;
-          
+
           let currentY = 0;
           images.forEach(img => {
             ctx.drawImage(img, 0, currentY);
             currentY += img.height;
           });
-          
+
           resolve(canvas.toDataURL('image/png'));
         }
       };
@@ -486,7 +480,7 @@ async function combineImages(imageDataUrls) {
 // Analyze PDF with ChatGPT (vision model)
 async function analyzePdfWithChatGPT(imageDataUrl) {
   const aiConfig = loadAIConfig();
-  
+
   const systemPrompt = `You are an expert at analyzing forms and documents to extract their structure. 
 
 Your task is to analyze the provided document image and break it down into a structured format that can be used to create a flowchart.
@@ -606,7 +600,7 @@ Be thorough and identify all form elements, fields, and interactive components i
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('API Error Response:', errorText);
+
     throw new Error(`API request failed: ${response.status} ${response.statusText}. Details: ${errorText}`);
   }
 
@@ -617,7 +611,7 @@ Be thorough and identify all form elements, fields, and interactive components i
 // Convert analysis text to structured JSON using ChatGPT
 async function convertAnalysisToJSON(analysisText) {
   const aiConfig = loadAIConfig();
-  
+
   const systemPrompt = `You are a data conversion expert. Your task is to convert the provided form analysis text into a structured JSON format.
 
 Convert the analysis text into this EXACT JSON structure:
@@ -699,13 +693,13 @@ Convert the provided analysis text now.`;
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('JSON Conversion API Error Response:', errorText);
+
     throw new Error(`JSON conversion failed: ${response.status} ${response.statusText}. Details: ${errorText}`);
   }
 
   const data = await response.json();
   const jsonString = data.choices[0].message.content;
-  
+
   // Clean up the response (remove any markdown formatting)
   let cleanJson = jsonString.trim();
   if (cleanJson.includes('```json')) {
@@ -713,13 +707,11 @@ Convert the provided analysis text now.`;
   } else if (cleanJson.includes('```')) {
     cleanJson = cleanJson.split('```')[1].split('```')[0].trim();
   }
-  
+
   try {
     return JSON.parse(cleanJson);
   } catch (parseError) {
-    console.error('Error parsing converted JSON:', parseError);
-    console.error('Raw ChatGPT response:', jsonString);
-    console.error('Cleaned JSON string:', cleanJson);
+
     throw new Error('Failed to parse converted JSON: ' + parseError.message);
   }
 }
@@ -730,10 +722,10 @@ function parseAnalysisToJSON(analysisText) {
   const lines = analysisText.split('\n');
   let currentSection = null;
   let currentQuestion = null;
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    
+
     // Check for section header
     if (line.startsWith('### Section')) {
       if (currentSection) {
@@ -793,12 +785,12 @@ function parseAnalysisToJSON(analysisText) {
       }
     }
   }
-  
+
   // Add the last section
   if (currentSection) {
     sections.push(currentSection);
   }
-  
+
   return {
     documentType: 'form',
     analysisDate: new Date().toISOString(),
@@ -848,7 +840,7 @@ function initializeAIFeatures() {
   if (uploadFlowchartBtn) {
     uploadFlowchartBtn.addEventListener('click', showFlowchartDetailsModal);
   }
-  
+
   const closeFlowchartModal = document.getElementById('closeFlowchartDetailsModal');
   if (closeFlowchartModal) {
     closeFlowchartModal.addEventListener('click', hideFlowchartDetailsModal);
@@ -858,23 +850,23 @@ function initializeAIFeatures() {
     generateBtn.addEventListener('click', async () => {
     const descriptionInput = document.getElementById('flowchartDetailsInput');
     if (!descriptionInput) {
-      console.error('Flowchart description input not found');
+
       return;
     }
-    
+
     const description = descriptionInput.value;
     if (!description.trim()) {
       alert('Please enter a flowchart description');
       return;
     }
-    
+
      try {
        // Show loading state
        const generateBtn = document.getElementById('generateFlowchartBtn');
        const originalText = generateBtn.textContent;
        generateBtn.textContent = 'Generating...';
        generateBtn.disabled = true;
-       
+
        // Add loading indicator to modal
        const modal = document.getElementById('flowchartDetailsModal');
        const loadingDiv = document.createElement('div');
@@ -882,7 +874,7 @@ function initializeAIFeatures() {
        loadingDiv.innerHTML = '<div style="text-align: center; padding: 20px; background: #f0f0f0; margin: 10px 0; border-radius: 5px;"><div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div><br><span>Generating flowchart...</span></div>';
        loadingDiv.style.cssText = 'position: relative; z-index: 1000;';
        modal.querySelector('.modal-body').appendChild(loadingDiv);
-       
+
        // Add CSS animation for spinner
        if (!document.getElementById('spinnerCSS')) {
          const style = document.createElement('style');
@@ -890,9 +882,9 @@ function initializeAIFeatures() {
          style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
          document.head.appendChild(style);
        }
-       
+
        await generateFlowchartFromDescription(description);
-       
+
        // Show success message
        const successDiv = document.createElement('div');
        successDiv.textContent = 'Flowchart generated successfully!';
@@ -901,7 +893,7 @@ function initializeAIFeatures() {
        setTimeout(() => {
          document.body.removeChild(successDiv);
        }, 3000);
-       
+
      } catch (error) {
        alert('Error generating flowchart: ' + error.message);
      } finally {
@@ -909,7 +901,7 @@ function initializeAIFeatures() {
        const generateBtn = document.getElementById('generateFlowchartBtn');
        generateBtn.textContent = 'Generate Flowchart';
        generateBtn.disabled = false;
-       
+
        // Remove loading indicator
        const loadingIndicator = document.getElementById('flowchartLoadingIndicator');
        if (loadingIndicator) {
@@ -918,44 +910,44 @@ function initializeAIFeatures() {
      }
     });
   }
-  
+
   // Download generated JSON when clicking Download button
   const downloadJsonBtn = document.getElementById('downloadGeneratedJsonBtn');
   if (downloadJsonBtn) {
     downloadJsonBtn.addEventListener('click', downloadGeneratedJSON);
   }
-  
+
   // PDF Modal event listeners
   const uploadPdfBtn = document.getElementById('uploadDocumentPdfBtn');
   if (uploadPdfBtn) {
     uploadPdfBtn.addEventListener('click', showDocumentPdfModal);
   }
-  
+
   const closePdfModal = document.getElementById('closeDocumentPdfModal');
   if (closePdfModal) {
     closePdfModal.addEventListener('click', hideDocumentPdfModal);
   }
-  
+
   const processPdfBtn = document.getElementById('processPdfBtn');
   if (processPdfBtn) {
     processPdfBtn.addEventListener('click', processPdfFile);
   }
-  
+
    const downloadPdfBtn = document.getElementById('downloadPdfAnalysisBtn');
    if (downloadPdfBtn) {
      downloadPdfBtn.addEventListener('click', downloadPdfAnalysis);
    }
-   
+
    const downloadPdfJsonBtn = document.getElementById('downloadPdfAnalysisJsonBtn');
    if (downloadPdfJsonBtn) {
      downloadPdfJsonBtn.addEventListener('click', downloadPdfAnalysisJSON);
    }
-  
+
   const cancelPdfBtn = document.getElementById('cancelDocumentPdfBtn');
   if (cancelPdfBtn) {
     cancelPdfBtn.addEventListener('click', hideDocumentPdfModal);
   }
-  
+
   // File input change event
   const pdfFileInput = document.getElementById('pdfFileInput');
   if (pdfFileInput) {

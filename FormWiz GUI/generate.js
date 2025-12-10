@@ -2074,7 +2074,7 @@ formHTML += `</div><br></div>`;
               inputDiv.innerHTML = inputHTML;
               // Append all children (label + input) to ensure input renders
               Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
-              console.log('🔍 [MTB PHONE RENDER] Added phone field', { questionId, fieldId, label: field.label });
+
               } else if (field.type === 'dropdown') {
 
                 // Add line break above dropdown field

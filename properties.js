@@ -26,19 +26,19 @@ function initializePropertiesPanelElements() {
 // Utility: make <span> text editable on double-click
 function makeEditableField(spanEl, onChangeCb) {
   if (!spanEl) return;
-  
+
   spanEl.addEventListener("dblclick", e => {
     e.stopPropagation();
     e.preventDefault();
     spanEl.contentEditable = "true";
     spanEl.focus();
   });
-  
+
   spanEl.addEventListener("blur", () => {
     spanEl.contentEditable = "false";
     if (onChangeCb) onChangeCb(spanEl.textContent);
   });
-  
+
   spanEl.addEventListener("keydown", evt => {
     if (evt.key === "Delete" || evt.key === "Backspace") {
       evt.stopPropagation();
@@ -54,14 +54,14 @@ function makeEditableField(spanEl, onChangeCb) {
 function onNodeTextFieldChange(newText) {
   const selectedCell = window.selectedCell;
   if (!selectedCell) return;
-  
+
   // Store the old nodeId before making changes (for tracking calculation dependencies)
   const oldNodeId = (typeof window.isQuestion === 'function' && window.isQuestion(selectedCell)) ? 
     (typeof window.getNodeId === 'function' ? window.getNodeId(selectedCell) : null) : null;
-  
+
   const graph = window.graph;
   if (!graph) return;
-  
+
   graph.getModel().beginUpdate();
   try {
     if (typeof window.isQuestion === 'function' && window.isQuestion(selectedCell)) {
@@ -80,10 +80,10 @@ function onNodeTextFieldChange(newText) {
       } else {
         selectedCell.value = newText.trim();
       }
-      
+
       // DISABLED: Automatic Node ID generation when editing node text
       // Node IDs will only change when manually edited or reset using the button
-      
+
       // Update dependent calculation nodes if the text changed 
       // (which would change the nodeId)
       if (oldNodeId && oldNodeId !== (typeof window.getNodeId === 'function' ? window.getNodeId(selectedCell) : null)) {
@@ -129,7 +129,7 @@ function onNodeTextFieldChange(newText) {
   } finally {
     graph.getModel().endUpdate();
   }
-  
+
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
@@ -139,13 +139,13 @@ function onNodeTextFieldChange(newText) {
 function onNodeIdFieldChange(newId) {
   const selectedCell = window.selectedCell;
   if (!selectedCell) return;
-  
+
   const graph = window.graph;
   if (!graph) return;
-  
+
   // Store the old nodeId before making changes (for tracking calculation dependencies)
   const oldNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(selectedCell) : null);
-  
+
   graph.getModel().beginUpdate();
   try {
     if (typeof window.isQuestion === 'function' && window.isQuestion(selectedCell)) {
@@ -153,7 +153,7 @@ function onNodeIdFieldChange(newId) {
       if (typeof window.refreshAllCells === 'function') {
         window.refreshAllCells();
       }
-      
+
       // Update dependent calculation nodes if the nodeId changed
       if (oldNodeId && oldNodeId !== newId.trim()) {
         if (typeof window.updateAllCalcNodesOnQuestionChange === 'function') {
@@ -164,7 +164,7 @@ function onNodeIdFieldChange(newId) {
   } finally {
     graph.getModel().endUpdate();
   }
-  
+
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
@@ -174,10 +174,10 @@ function onNodeIdFieldChange(newId) {
 function onNodeSectionFieldChange(newSection) {
   const selectedCell = window.selectedCell;
   if (!selectedCell) return;
-  
+
   const graph = window.graph;
   if (!graph) return;
-  
+
   graph.getModel().beginUpdate();
   try {
     if (typeof window.setSection === 'function') {
@@ -189,7 +189,7 @@ function onNodeSectionFieldChange(newSection) {
   } finally {
     graph.getModel().endUpdate();
   }
-  
+
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
@@ -199,12 +199,12 @@ function onNodeSectionFieldChange(newSection) {
 function onSectionNameFieldChange(newName) {
   const selectedCell = window.selectedCell;
   if (!selectedCell) return;
-  
+
   const graph = window.graph;
   if (!graph) return;
-  
+
   const section = typeof window.getSection === 'function' ? window.getSection(selectedCell) : "1";
-  
+
   graph.getModel().beginUpdate();
   try {
     if (typeof window.setSectionName === 'function') {
@@ -216,7 +216,7 @@ function onSectionNameFieldChange(newName) {
   } finally {
     graph.getModel().endUpdate();
   }
-  
+
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
@@ -232,80 +232,79 @@ function setupPropertiesPanelEventListeners() {
 function setupResetNodeIdButton() {
   const resetBtn = document.getElementById('resetNodeIdBtn');
   if (!resetBtn) {
-    console.warn("Reset Node ID button not found");
+
     return;
   }
-  
+
   resetBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const selectedCell = window.selectedCell;
     if (!selectedCell) {
-      console.warn("No cell selected for reset");
+
       return;
     }
-    
+
     // Generate the correct Node ID using the naming convention
     let correctNodeId = '';
     if (typeof window.generateCorrectNodeId === 'function') {
       correctNodeId = window.generateCorrectNodeId(selectedCell);
     } else {
-      console.warn("generateCorrectNodeId function not available");
+
       return;
     }
-    
+
     if (!correctNodeId) {
-      console.warn("Could not generate correct Node ID");
+
       return;
     }
-    
+
     // Update the Node ID field display
     if (propNodeId) {
       propNodeId.textContent = correctNodeId;
     }
-    
+
     // Update the actual cell's Node ID
     if (typeof window.setNodeId === 'function') {
       window.setNodeId(selectedCell, correctNodeId);
     } else {
-      console.warn("setNodeId function not available");
+
       return;
     }
-    
+
     // Refresh all cells to update the display
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
-    
+
     // Trigger autosave
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
-    
-    console.log("Node ID reset to:", correctNodeId);
+
   });
 }
 
 // Setup Editable Fields
 function setupEditableFields() {
   if (!propNodeText || !propNodeId || !propNodeSection || !propSectionName) {
-    console.warn("Properties panel elements not found, skipping editable field setup");
+
     return;
   }
-  
+
   makeEditableField(propNodeText, onNodeTextFieldChange);
   makeEditableField(propNodeId, onNodeIdFieldChange);
   makeEditableField(propNodeSection, onNodeSectionFieldChange);
   makeEditableField(propSectionName, onSectionNameFieldChange);
-  
+
   // Setup reset button for Node ID
   setupResetNodeIdButton();
 
   // For amount fields
   const propAmountName = document.getElementById("propAmountName");
   const propAmountPlaceholder = document.getElementById("propAmountPlaceholder");
-  
+
   if (propAmountName) {
     makeEditableField(propAmountName, (newName) => {
       if (window.selectedCell && 
@@ -318,7 +317,7 @@ function setupEditableFields() {
       }
     });
   }
-  
+
   if (propAmountPlaceholder) {
     makeEditableField(propAmountPlaceholder, (newPh) => {
       if (window.selectedCell && 
@@ -337,10 +336,10 @@ function setupEditableFields() {
 function initializePropertiesPanelModule() {
   // Initialize DOM elements
   initializePropertiesPanelElements();
-  
+
   // Setup event listeners
   setupPropertiesPanelEventListeners();
-  
+
   // Setup editable fields
   setupEditableFields();
 }
@@ -349,18 +348,18 @@ function initializePropertiesPanelModule() {
 window.properties = {
   // Core functions
   makeEditableField,
-  
+
   // Change handlers
   onNodeTextFieldChange,
   onNodeIdFieldChange,
   onNodeSectionFieldChange,
   onSectionNameFieldChange,
-  
+
   // Setup functions
   setupPropertiesPanelEventListeners,
   setupEditableFields,
   setupResetNodeIdButton,
-  
+
   // Initialization
   initializePropertiesPanelModule
 };

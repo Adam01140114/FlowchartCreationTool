@@ -60,7 +60,7 @@ function hideLoginOverlay() {
 function checkForSavedLogin() {
   // Check for saved user ID in cookie
   const savedUid = getCookie("flowchart_uid");
-  
+
   if (savedUid) {
     // Try to restore user session
     firebase.auth().onAuthStateChanged((user) => {
@@ -68,7 +68,7 @@ function checkForSavedLogin() {
         // User is already authenticated
         window.currentUser = user;
         hideLoginOverlay();
-        
+
         // Load user preferences
         if (typeof loadUserColorPrefs === 'function') {
           loadUserColorPrefs();
@@ -98,7 +98,7 @@ function setupAuthListeners() {
   const logoutBtn = document.getElementById("logoutBtn");
 
   if (!loginButton || !signupButton || !loginEmail || !loginPassword || !loginError || !logoutBtn) {
-    console.warn("Some authentication elements not found");
+
     return;
   }
 
@@ -106,7 +106,7 @@ function setupAuthListeners() {
   loginButton.addEventListener("click", () => {
     const email = loginEmail.value.trim();
     const pass = loginPassword.value.trim();
-    
+
     if (!email || !pass) {
       loginError.textContent = "Please enter both email and password.";
       return;
@@ -117,12 +117,12 @@ function setupAuthListeners() {
         window.currentUser = cred.user;
         setCookie("flowchart_uid", window.currentUser.uid, 7);
         hideLoginOverlay();
-        
+
         // Load user color preferences
         if (typeof loadUserColorPrefs === 'function') {
           loadUserColorPrefs();
         }
-        
+
         loginError.textContent = "";
       })
       .catch(err => {
@@ -134,7 +134,7 @@ function setupAuthListeners() {
   signupButton.addEventListener("click", () => {
     const email = loginEmail.value.trim();
     const pass = loginPassword.value.trim();
-    
+
     if (!email || !pass) {
       loginError.textContent = "Please enter both email and password.";
       return;
@@ -150,12 +150,12 @@ function setupAuthListeners() {
         window.currentUser = cred.user;
         setCookie("flowchart_uid", window.currentUser.uid, 7);
         hideLoginOverlay();
-        
+
         // Save and load user color preferences
         if (typeof saveUserColorPrefs === 'function' && typeof loadUserColorPrefs === 'function') {
           saveUserColorPrefs().then(() => loadUserColorPrefs());
         }
-        
+
         loginError.textContent = "";
       })
       .catch(err => {
@@ -169,7 +169,7 @@ function setupAuthListeners() {
       alert("No user is logged in.");
       return;
     }
-    
+
     firebase.auth().signOut()
       .then(() => {
         setCookie("flowchart_uid", "", -1);
@@ -196,13 +196,13 @@ function setupAuthListeners() {
  */
 function loadUserColorPrefs() {
   if (!window.currentUser || window.currentUser.isGuest) return;
-  
+
   // Access db from config
   if (typeof window.flowchartConfig !== 'undefined' && window.flowchartConfig.db) {
     const db = window.flowchartConfig.db;
     const colorPreferences = window.flowchartConfig.colorPreferences;
     const defaultColors = window.flowchartConfig.defaultColors;
-    
+
     db.collection("users")
       .doc(window.currentUser.uid)
       .collection("preferences")
@@ -219,12 +219,12 @@ function loadUserColorPrefs() {
             }
           }
         }
-        
+
         // Update legend colors
         if (typeof updateLegendColors === 'function') {
           updateLegendColors();
         }
-        
+
         // Refresh all cells
         if (typeof refreshAllCells === 'function') {
           refreshAllCells();
@@ -241,19 +241,19 @@ function loadUserColorPrefs() {
  */
 function saveUserColorPrefs() {
   if (!window.currentUser || window.currentUser.isGuest) return Promise.resolve();
-  
+
   // Access db from config
   if (typeof window.flowchartConfig !== 'undefined' && window.flowchartConfig.db) {
     const db = window.flowchartConfig.db;
     const colorPreferences = window.flowchartConfig.colorPreferences;
-    
+
     return db.collection("users")
       .doc(window.currentUser.uid)
       .collection("preferences")
       .doc("colors")
       .set(colorPreferences, { merge: true });
   }
-  
+
   return Promise.resolve();
 }
 
@@ -264,12 +264,12 @@ function autoLogin() {
   const loginEmail = document.getElementById("loginEmail");
   const loginPassword = document.getElementById("loginPassword");
   const loginButton = document.getElementById("loginButton");
-  
+
   if (loginEmail && loginPassword && loginButton) {
     // Set default credentials (can be customized)
     loginEmail.value = "defaultemail0114@gmail.com";
     loginPassword.value = "adam0114";
-    
+
     // Add a small delay to ensure the form is filled before clicking
     setTimeout(() => {
       loginButton.click();
@@ -287,7 +287,7 @@ function initializeAuth() {
       // User is signed in
       window.currentUser = user;
       hideLoginOverlay();
-      
+
       // Load user preferences
       loadUserColorPrefs();
     } else {
@@ -299,7 +299,7 @@ function initializeAuth() {
 
   // Set up event listeners
   setupAuthListeners();
-  
+
   // Check for saved login
   checkForSavedLogin();
 }
@@ -320,7 +320,7 @@ window.auth = {
   saveUserColorPrefs,
   autoLogin,
   initializeAuth,
-  
+
   // State
   currentUser: null
 };

@@ -113,7 +113,7 @@ function getDefaultSectionColor(sectionNumber) {
  */
 function cleanStyle(style) {
   if (!style) return "";
-  
+
   return style
     .replace(/;+$/, "")     // Remove trailing semicolons
     .replace(/;+;/g, ";")   // Replace double semicolons
@@ -151,7 +151,7 @@ function updateLegendColors() {
  */
 function loadUserColorPrefs() {
   if (!window.currentUser || window.currentUser.isGuest) return;
-  
+
   db.collection("users")
     .doc(window.currentUser.uid)
     .collection("preferences")
@@ -183,7 +183,7 @@ function loadUserColorPrefs() {
  */
 function saveUserColorPrefs() {
   if (!window.currentUser || window.currentUser.isGuest) return Promise.resolve();
-  
+
   return db.collection("users")
     .doc(window.currentUser.uid)
     .collection("preferences")
@@ -228,7 +228,7 @@ function loadSettingsFromLocalStorage() {
         }
       }
     } catch (e) {
-      console.error('Error loading settings:', e);
+
     }
   }
 }
@@ -287,20 +287,20 @@ window.flowchartConfig = {
   firebaseConfig,
   db,
   currentUser,
-  
+
   // Colors
   defaultColors,
   colorPreferences,
-  
+
   // Sections
   sectionPrefs,
   currentFlowchartName,
-  
+
   // Constants
   AUTOSAVE_KEY,
   FLOWCHART_CLIPBOARD_KEY,
   FLOWCHART_CLIPBOARD_TIMESTAMP_KEY,
-  
+
   // Settings
   autosaveTimeout,
   autosaveThrottleDelay,
@@ -319,7 +319,7 @@ window.flowchartConfig = {
   cellTextCache,
   lastCacheClear,
   performanceMetrics,
-  
+
   // Functions
   getDefaultSectionColor,
   cleanStyle,

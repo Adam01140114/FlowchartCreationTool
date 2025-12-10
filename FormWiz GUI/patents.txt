@@ -1,0 +1,24 @@
+Goal: Provide clear, detailed explanations of how complex features were implemented so this knowledge is compartmentalized and can be translated to other menus, screens, or pages when needed.
+
+Feature: Radio buttons with toggle-to-neutral behavior (Amount/Phone)
+- Context: In the Multiple Textbox Properties modal, Amount and Phone were radios that needed mutual exclusivity plus the ability to unselect (return to neutral/label) when clicking an already selected option.
+- Implementation details:
+  - Each radio keeps an explicit value (`amount`, `phone`), and the current entry type is stored on the underlying data object (`textbox.type`), with a helper `syncRadios(newType)` to mirror state into the DOM immediately.
+  - Toggling: a pointerdown handler intercepts before the browser default, calls `preventDefault`, `stopPropagation`, and `stopImmediatePropagation`, then applies custom logic:
+      - If the clicked radio’s type is already active, set type to `label` (neutral) and uncheck both radios.
+      - Otherwise, set type to the clicked radio’s type and uncheck the opposite radio.
+  - Change handlers also re-sync radios when the type is neutral, ensuring the UI reflects the data even if native change events fire after our custom handling.
+  - Autosave: after setting the type, autosave is requested so state persists.
+  - Logging hooks (optional for debugging): pointer/change logs were added to verify event flow when clicks were being swallowed; these can be kept during troubleshooting and removed afterward.
+- Why this works:
+  - Using pointerdown with full event cancellation prevents the browser from rechecking the radio after we programmatically uncheck it.
+  - Explicit sync keeps DOM state aligned with data state, avoiding flicker back to the previous selection.
+  - Neutral “label” state acts as the deselected state for both radios.
+
+How to adapt this elsewhere
+- Add explicit values to radios and store the selected type on your data model.
+- Provide a `syncRadios(selectedType)` helper to set `checked` based on model state.
+- Handle `pointerdown` (or `mousedown`) to fully control toggling; cancel default behavior before applying custom logic.
+- Define the neutral state (e.g., `label` or `none`) and set both radios unchecked when toggling off.
+- Optionally add change-log hooks during debugging to confirm event flow in complex UIs.
+

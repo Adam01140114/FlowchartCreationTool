@@ -54,10 +54,10 @@ function handleDropdownFocus(event, cellId) {
   if (graph) {
     const cell = graph.getModel().getCell(cellId);
     if (!cell) return;
-    
+
     // Initialize text editing capabilities
     initDropdownTextEditing(event.target.parentElement);
-    
+
     if (event.target.innerText === "Enter dropdown question") {
       event.target.innerText = "";
     }
@@ -72,10 +72,10 @@ function handleDropdownMouseDown(event) {
 // Helper to make text selection in dropdown nodes work
 function initDropdownTextEditing(element) {
   if (!element) return;
-  
+
   const textDiv = element.querySelector('.question-text');
   if (!textDiv) return;
-  
+
   // Override any parent styles that might interfere with text editing
   textDiv.style.userSelect = 'text';
   textDiv.style.webkitUserSelect = 'text';
@@ -83,26 +83,26 @@ function initDropdownTextEditing(element) {
   textDiv.style.mozUserSelect = 'text';
   textDiv.style.pointerEvents = 'auto';
   textDiv.style.cursor = 'text';
-  
+
   // Remove any event handlers that might interfere
   textDiv.onmousedown = null;
   textDiv.onmousemove = null;
   textDiv.onmouseup = null;
-  
+
   // Prevent the default mxGraph handlers from running when clicking inside the text
   textDiv.addEventListener('mousedown', function(e) {
     e.stopPropagation();
   });
-  
+
   // Allow normal clipboard operations
   textDiv.addEventListener('copy', function(e) {
     e.stopPropagation();
   });
-  
+
   textDiv.addEventListener('cut', function(e) {
     e.stopPropagation();
   });
-  
+
   textDiv.addEventListener('paste', function(e) {
     e.stopPropagation();
   });
@@ -119,14 +119,14 @@ function handleTitleInputKeydown(event, cellId) {
 // Setup Mouse Event Listeners
 function setupMouseEventListeners(graph) {
   if (!graph) return;
-  
+
   // When the user starts panning/dragging the canvas, hide any open menus.
   graph.addListener(mxEvent.PAN, function(sender, evt) {
     if (typeof window.hideContextMenu === 'function') {
       window.hideContextMenu();
     }
   });
-  
+
   // Add mouse move event listener for tracking mouse position
   document.addEventListener('mousemove', function(e) {
     if (graph) {
@@ -136,9 +136,9 @@ function setupMouseEventListeners(graph) {
       currentMouseY = pt.y;
     }
   });
-  
+
   // Mouse wheel zoom is handled in script.js with proper directional zoom logic
-  
+
   // Add global event listeners to prevent graph interference with dropdowns
   document.addEventListener('mousedown', function(e) {
     // If clicking on a dropdown, form element, or blue selection square, prevent graph from handling it
@@ -151,7 +151,7 @@ function setupMouseEventListeners(graph) {
       e.stopPropagation();
     }
   }, true); // Use capture phase to intercept before graph handlers
-  
+
   document.addEventListener('click', function(e) {
     // If clicking on a dropdown, form element, or blue selection square, prevent graph from handling it
     if (e.target.closest('.question-type-dropdown') || 
@@ -168,24 +168,24 @@ function setupMouseEventListeners(graph) {
 // Setup Graph Event Listeners
 function setupGraphEventListeners(graph) {
   if (!graph) return;
-  
+
   // Label changed event
   graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
     const cell = evt.getProperty("cell");
     let value = evt.getProperty("value");   // plain text the user typed
-    
+
     if (typeof window.isSimpleHtmlQuestion === 'function' && window.isSimpleHtmlQuestion(cell)) {
       value = mxUtils.htmlEntities(value || "");           // escape <>&
       graph.getModel().setValue(
         cell,
         `<div style="text-align:center;">${value}</div>`
       );
-      
+
       // For text2 cells, also update _questionText for export
       if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === "text2") {
         cell._questionText = value;
       }
-      
+
       evt.consume();   // stop mxGraph from writing the raw text
     } else if (typeof window.isOptions === 'function' && window.isOptions(cell) && 
                typeof window.getQuestionType === 'function' && 
@@ -199,7 +199,7 @@ function setupGraphEventListeners(graph) {
         // Wrap the plain text in a centered div, escaping any HTML
         value = `<div style="text-align:center;">${mxUtils.htmlEntities(value)}</div>`;
         graph.getModel().setValue(cell, value);
-        
+
         // Update the option node ID based on the new label
         if (typeof window.refreshOptionNodeId === 'function') {
           window.refreshOptionNodeId(cell);
@@ -207,7 +207,7 @@ function setupGraphEventListeners(graph) {
       } finally {
         graph.getModel().endUpdate();
       }
-      
+
       if (typeof window.refreshAllCells === 'function') {
         window.refreshAllCells();
       }
@@ -219,7 +219,7 @@ function setupGraphEventListeners(graph) {
         // Save the plain text in the _subtitleText property
         value = value.trim() || "Subtitle text";
         cell._subtitleText = value;
-        
+
         // Update the display value with the appropriate styling
         if (typeof window.updateSubtitleNodeCell === 'function') {
           window.updateSubtitleNodeCell(cell);
@@ -227,7 +227,7 @@ function setupGraphEventListeners(graph) {
       } finally {
         graph.getModel().endUpdate();
       }
-      
+
       evt.consume();
     } else if (typeof window.isInfoNode === 'function' && window.isInfoNode(cell)) {
       // Update info node
@@ -236,7 +236,7 @@ function setupGraphEventListeners(graph) {
         // Save the plain text in the _infoText property
         value = value.trim() || "Information text";
         cell._infoText = value;
-        
+
         // Update the display value with the appropriate styling
         if (typeof window.updateInfoNodeCell === 'function') {
           window.updateInfoNodeCell(cell);
@@ -244,29 +244,29 @@ function setupGraphEventListeners(graph) {
       } finally {
         graph.getModel().endUpdate();
       }
-      
+
       evt.consume();
     }
   });
-  
+
   // Model change event
   graph.getModel().addListener(mxEvent.CHANGE, function(sender, evt) {
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
   });
-  
+
   // Selection change event
   graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
     // DO NOT auto-update Node IDs when selection changes
     // Node IDs should only change when manually edited or reset using the button
     window.lastSelectedCell = graph.getSelectionCell();
-    
+
     // Auto-select edges between selected nodes
     if (typeof window.autoSelectConnectingEdges === 'function') {
       window.autoSelectConnectingEdges();
     }
-    
+
     // Highlight the section in the legend if a cell is selected
     const selectedCell = graph.getSelectionCell();
     if (selectedCell) {
@@ -284,52 +284,52 @@ function setupGraphEventListeners(graph) {
       });
     }
   });
-  
+
   // Cells moved event
   graph.addListener(mxEvent.CELLS_MOVED, function(sender, evt) {
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
   });
-  
+
   // Move cells event - implement hierarchical dragging for dropdown nodes
   graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
     const movedCells = evt.getProperty('cells');
     const dx = evt.getProperty('dx');
     const dy = evt.getProperty('dy');
-    
+
     if (!movedCells || movedCells.length === 0) return;
 
     const movedIds = new Set(movedCells.map(c => c.id));
-    
+
     // Function to get all connected descendants
     const getConnectedDescendants = (cell) => {
       const descendants = new Set();
       const queue = [cell];
-      
+
       // Check if the source question node has drag disabled
       const isSourceDragDisabled = cell.style && cell.style.includes('dragDisabled=1');
-      
+
       while (queue.length > 0) {
         const current = queue.shift();
         const edges = graph.getOutgoingEdges(current) || [];
-        
+
         edges.forEach(edge => {
           // Skip edges with drag disabled
           const isEdgeDragDisabled = edge.style && edge.style.includes('dragDisabled=1');
           if (isEdgeDragDisabled) {
             return; // Skip this edge - don't follow it
           }
-          
+
           const target = edge.target;
-          
+
           // If source question node has drag disabled, only include directly connected option nodes
           if (isSourceDragDisabled) {
             // Only add option nodes that are directly connected (one hop away)
             // Don't add question nodes or nodes that are not option nodes
             const isOptionNode = target.style && target.style.includes('nodeType=options');
             const isQuestionNode = target.style && target.style.includes('nodeType=question');
-            
+
             // Only include option nodes, and only if they're directly connected (current is the source cell)
             if (isOptionNode && current === cell && !descendants.has(target) && !movedIds.has(target.id)) {
               descendants.add(target);
@@ -356,20 +356,17 @@ function setupGraphEventListeners(graph) {
       const isCheckboxQuestion = cell.style && cell.style.includes('questionType=checkbox') && cell.style.includes('nodeType=question');
       const isMultipleDropdownQuestion = cell.style && cell.style.includes('questionType=multipleDropdown') && cell.style.includes('nodeType=question');
       const isMultipleTextboxQuestion = cell.style && cell.style.includes('questionType=multipleTextboxes') && cell.style.includes('nodeType=question');
-      
+
       if (isDropdownQuestion || isCheckboxQuestion || isMultipleDropdownQuestion || isMultipleTextboxQuestion) {
         let questionType = 'unknown';
         if (isDropdownQuestion) questionType = 'dropdown';
         else if (isCheckboxQuestion) questionType = 'checkbox';
         else if (isMultipleDropdownQuestion) questionType = 'multipleDropdown';
         else if (isMultipleTextboxQuestion) questionType = 'multipleTextboxes';
-        
-        console.log('🎯 [HIERARCHICAL DRAG]', questionType, 'question node detected');
-        
+
         // When dragging a question node, move all connected descendants
         const descendants = getConnectedDescendants(cell);
-        console.log('🎯 [HIERARCHICAL DRAG] Moving', descendants.length, 'connected descendants');
-        
+
         descendants.forEach(descendant => {
           const geo = descendant.geometry;
           if (geo) {
@@ -381,7 +378,7 @@ function setupGraphEventListeners(graph) {
         });
       }
     });
-    
+
     // Renumber question IDs based on new Y positions
     if (typeof window.renumberQuestionIds === 'function') {
       window.renumberQuestionIds();
@@ -389,14 +386,13 @@ function setupGraphEventListeners(graph) {
   });
 }
 
-
 // Setup Keyboard Event Listeners
 function setupKeyboardEventListeners(graph) {
   if (!graph) return;
-  
+
   // Keyboard shortcuts for copy/paste are handled in script.js using keyHandler.bindControlKey
   // Removed duplicate event listeners to prevent double copy-paste behavior
-  
+
   // Additional keyboard event listeners
   document.addEventListener('keydown', function(event) {
     // Only handle Delete key for node deletion, not Backspace
@@ -404,13 +400,13 @@ function setupKeyboardEventListeners(graph) {
     if (event.key === 'Delete') {
       // Check if user is typing in an input field
       if (typeof window.isUserTyping === 'function' && window.isUserTyping(event)) return;
-      
+
       if (typeof window.deleteSelectedNode === 'function') {
         window.deleteSelectedNode();
       }
     }
   });
-  
+
   document.addEventListener('keyup', function(event) {
     if (event.key === 'Delete') {
       if (typeof window.refreshAllCells === 'function') {
@@ -418,7 +414,7 @@ function setupKeyboardEventListeners(graph) {
       }
     }
   });
-  
+
   document.addEventListener('keydown', function(event) {
     if (event.ctrlKey && event.key === 'z') {
       event.preventDefault();
@@ -437,13 +433,13 @@ function setupKeyboardEventListeners(graph) {
 // Setup Custom Click and Double-Click Handlers
 function setupCustomClickHandlers(graph) {
   if (!graph) return;
-  
+
   // Override the click handler to ensure proper behavior
   const baseClick = graph.click.bind(graph);
   graph.click = function(me) {
     const cell = me.getCell();
     const evt = me.getEvent();
-    
+
     // Check if the click is on a dropdown or other interactive element
     if (evt && evt.target) {
       // Don't process clicks on dropdowns, inputs, other form elements, or blue selection squares
@@ -456,7 +452,7 @@ function setupCustomClickHandlers(graph) {
         return; // Let the element handle its own events
       }
     }
-    
+
     // Handle Ctrl/Shift+click manually
     // Use the event object properties to check modifier keys
     if (evt && (evt.ctrlKey || evt.metaKey || evt.shiftKey)) {
@@ -479,35 +475,34 @@ function setupCustomClickHandlers(graph) {
         return;
       }
     }
-    
+
     // Call the original click handler for normal clicks
     return baseClick(me);
   };
-  
+
   // Proper double-click handler that handles all cases
   const baseDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
     // Check for Shift+double-click on numbered dropdown nodes (always show custom properties)
     if (cell && evt && evt.shiftKey && typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleDropdownType') {
-      console.log('🔍 [DEBUG] Shift+double-click on numbered dropdown, showing custom properties');
-      console.log('🔍 [DEBUG] Cell details:', cell.id, 'Style:', cell.style);
+
       if (typeof window.showNumberedDropdownProperties === 'function') {
         window.showNumberedDropdownProperties(cell);
       } else {
-        console.log('🔍 [DEBUG] showNumberedDropdownProperties function not found');
+
       }
       mxEvent.consume(evt);
       return;
     }
-    
+
     // Debug: Log the cell and its type
     if (cell) {
-      console.log('🔍 [DEBUG] Double-click on cell:', cell.id, 'Style:', cell.style);
+
       if (typeof window.getQuestionType === 'function') {
-        console.log('🔍 [DEBUG] Question type:', window.getQuestionType(cell));
+
       }
     }
-    
+
     // a1) Multiple textbox node double-click = show multiple textbox properties (check this FIRST)
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleTextboxes') {
       if (typeof window.showMultipleTextboxProperties === 'function') {
@@ -516,19 +511,19 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // a2) Numbered dropdown node double-click = show numbered dropdown properties
     if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'multipleDropdownType') {
-      console.log('🔍 [DEBUG] Numbered dropdown double-click detected, showing custom properties');
+
       if (typeof window.showNumberedDropdownProperties === 'function') {
         window.showNumberedDropdownProperties(cell);
       } else {
-        console.log('🔍 [DEBUG] showNumberedDropdownProperties function not found');
+
       }
       mxEvent.consume(evt);
       return;
     }
-    
+
     // a) Question double-click = show properties popup
     if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {
@@ -537,7 +532,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // b) Options double-click = show properties popup
     if (typeof window.isOptions === 'function' && window.isOptions(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {
@@ -546,7 +541,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // c) Calculation node double-click = show calculation properties
     if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
       if (typeof window.showCalculationNodeProperties === 'function') {
@@ -555,7 +550,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // d) PDF node double-click = show properties popup
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {
@@ -564,7 +559,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // e) Hidden checkbox node double-click = show properties popup
     if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {
@@ -573,7 +568,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // f) Hidden textbox node double-click = show properties popup
     if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {
@@ -582,7 +577,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // g) Edge double-click = reset geometry
     if (cell && cell.edge) {
       const geo = new mxGeometry();
@@ -590,7 +585,7 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
-    
+
     // e) Default behavior
     return baseDblClick(evt, cell);
   };
@@ -599,7 +594,7 @@ function setupCustomClickHandlers(graph) {
 // Setup Draggable Shapes
 function setupDraggableShapes(graph) {
   if (!graph) return;
-  
+
   // Draggable shapes (including new Calculation Node)
   const toolbarShapes = document.querySelectorAll(".shape");
   toolbarShapes.forEach(shapeEl => {
@@ -617,12 +612,12 @@ function setupDraggableShapes(graph) {
           if (!styleWithPointer.includes("pointerEvents=")) {
             styleWithPointer += "pointerEvents=1;overflow=fill;";
           }
-          
+
           let width = 160;
           if (shapeEl.dataset.type === 'question') {
             width = 280; // Wider for questions to fit dropdown
           }
-          
+
           newVertex = graph.insertVertex(
             parent,
             null,
@@ -636,7 +631,7 @@ function setupDraggableShapes(graph) {
         } finally {
           graph.getModel().endUpdate();
         }
-        
+
         // If question
         if (typeof window.isQuestion === 'function' && window.isQuestion(newVertex)) {
           // Only set type if there is a questionType in the style
@@ -663,10 +658,10 @@ function setupDraggableShapes(graph) {
             window.updatePdfPreviewNodeCell(newVertex);
           }
         }
-        
+
         // Select the new vertex
         graph.setSelectionCell(newVertex);
-        
+
         // Request autosave
         if (typeof window.requestAutosave === 'function') {
           window.requestAutosave();
@@ -679,7 +674,7 @@ function setupDraggableShapes(graph) {
 // Initialize the Event Handlers Module
 function initializeEventHandlersModule(graph) {
   if (!graph) return;
-  
+
   // Setup all event listeners
   setupMouseEventListeners(graph);
   setupGraphEventListeners(graph);
@@ -698,14 +693,14 @@ window.events = {
   handleDropdownMouseDown,
   initDropdownTextEditing,
   handleTitleInputKeydown,
-  
+
   // Setup functions
   setupMouseEventListeners,
   setupGraphEventListeners,
   setupKeyboardEventListeners,
   setupCustomClickHandlers,
   setupDraggableShapes,
-  
+
   // Initialization
   initializeEventHandlersModule
 };

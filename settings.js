@@ -36,30 +36,30 @@ window.loadSettingsFromLocalStorage = async function() {
   try {
     // Load user settings
     const savedSettings = localStorage.getItem('flowchart_user_settings');
-    
+
     if (savedSettings) {
       const parsedSettings = JSON.parse(savedSettings);
       const oldZoomSensitivity = userSettings.zoomSensitivity;
-      
+
       // Update settings
       Object.assign(userSettings, parsedSettings);
-      
+
       // Load from Firebase if available
       if (typeof loadZoomSensitivityFromFirebase === 'function') {
         await loadZoomSensitivityFromFirebase();
       }
     }
-    
+
     // Update window reference
     if (window.userSettings) {
       window.userSettings.zoomSensitivity = userSettings.zoomSensitivity;
     }
-    
+
     // Update UI
     updateSettingsUI();
-    
+
   } catch (error) {
-    console.error('Error loading settings:', error);
+
   }
 };
 
@@ -69,13 +69,13 @@ window.loadSettingsFromLocalStorage = async function() {
 window.saveSettings = function() {
   try {
     localStorage.setItem('flowchart_user_settings', JSON.stringify(userSettings));
-    
+
     // Save to Firebase if available
     if (typeof saveZoomSensitivityToFirebase === 'function') {
       saveZoomSensitivityToFirebase(userSettings.zoomSensitivity);
     }
   } catch (error) {
-    console.error('Error saving settings:', error);
+
   }
 };
 
@@ -85,11 +85,11 @@ window.saveSettings = function() {
 function updateSettingsUI() {
   const zoomSensitivityInput = document.getElementById('zoomSensitivityInput');
   const zoomSensitivityValue = document.getElementById('zoomSensitivityValue');
-  
+
   if (zoomSensitivityInput) {
     zoomSensitivityInput.value = userSettings.zoomSensitivity;
   }
-  
+
   if (zoomSensitivityValue) {
     zoomSensitivityValue.textContent = userSettings.zoomSensitivity;
   }
@@ -100,20 +100,20 @@ function updateSettingsUI() {
  */
 window.updateZoomSensitivity = function(value) {
   userSettings.zoomSensitivity = parseFloat(value);
-  
+
   if (window.userSettings) {
     window.userSettings.zoomSensitivity = userSettings.zoomSensitivity;
   }
-  
+
   // Update display
   const displaySpan = document.getElementById('zoomSensitivityValue');
   if (displaySpan) {
     displaySpan.textContent = value;
   }
-  
+
   // Save settings
   saveSettings();
-  
+
   // Apply to graph
   applyZoomSensitivity();
 }
@@ -126,14 +126,14 @@ window.saveZoomSensitivityToFirebase = async function(value) {
     if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
-      
+
       await db.collection('userSettings').doc(user.uid).set({
         zoomSensitivity: parseFloat(value),
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
     }
   } catch (error) {
-    console.error('Error saving to Firebase:', error);
+
   }
 };
 
@@ -146,31 +146,31 @@ window.loadZoomSensitivityFromFirebase = async function() {
       const user = firebase.auth().currentUser;
       const db = firebase.firestore();
       const doc = await db.collection('userSettings').doc(user.uid).get();
-      
+
       if (doc.exists) {
         const data = doc.data();
         if (data.zoomSensitivity !== undefined) {
           userSettings.zoomSensitivity = data.zoomSensitivity;
-          
+
           // Update UI elements
           const input = document.getElementById('zoomSensitivityInput');
           const displaySpan = document.getElementById('zoomSensitivityValue');
-          
+
           if (input) {
             input.value = data.zoomSensitivity;
           }
-          
+
           if (displaySpan) {
             displaySpan.textContent = data.zoomSensitivity;
           }
-          
+
           // Apply to graph
           applyZoomSensitivity();
         }
       }
     }
   } catch (error) {
-    console.error('Error loading from Firebase:', error);
+
   }
 };
 
@@ -191,10 +191,10 @@ window.setupZoomSensitivityForGraph = function(graph) {
   if (!graph) {
     return;
   }
-  
+
   // Store the zoom sensitivity in the graph's user data for persistence
   graph.zoomSensitivity = userSettings.zoomSensitivity;
-  
+
   // Apply the zoom sensitivity to the graph's mouse wheel handler
   if (graph.mouseWheelHandler) {
     graph.mouseWheelHandler.zoomSensitivity = userSettings.zoomSensitivity;

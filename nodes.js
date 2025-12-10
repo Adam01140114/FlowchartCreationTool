@@ -7,13 +7,13 @@
  */
 window.createNode = function(nodeType, x, y) {
   if (!graph) {
-    console.error('Graph not initialized');
+
     return null;
   }
-  
+
   const parent = graph.getDefaultParent();
   let vertex = null;
-  
+
   try {
     switch (nodeType) {
       case 'question':
@@ -65,23 +65,23 @@ window.createNode = function(nodeType, x, y) {
         vertex = createLinkedCheckboxNode(x, y);
         break;
       default:
-        console.error('Unknown node type:', nodeType);
+
         return null;
     }
-    
+
     if (vertex) {
       // Set default section
       setSection(vertex, "1");
-      
+
       // Update the cell display
       if (window.updateCellDisplay) {
         window.updateCellDisplay(vertex);
       }
     }
-    
+
     return vertex;
   } catch (error) {
-    console.error('Error creating node:', error);
+
     return null;
   }
 };
@@ -93,19 +93,19 @@ function createQuestionNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=text;section=1;');
-  
+
   // Set default properties
   vertex._questionText = "Enter question text";
   vertex._questionId = generateQuestionId();
-  
+
   // Set default _nameId using naming convention
   vertex._nameId = "enter_question_text";
-  
+
   // Set the Node ID in the style to ensure it's properly saved
   if (typeof window.setNodeId === 'function') {
     window.setNodeId(vertex, "enter_question_text");
   }
-  
+
   return vertex;
 }
 
@@ -116,10 +116,10 @@ function createOptionsNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=options;section=1;');
-  
+
   // Set default properties
   vertex.value = "Option";
-  
+
   return vertex;
 }
 
@@ -130,14 +130,14 @@ function createCalculationNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 400, 450, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=calculation;section=1;');
-  
+
   // Set default properties
   vertex._calcTitle = "Calculation Title";
   vertex._calcTerms = [{amountLabel: "", mathOperator: ""}];
   vertex._calcOperator = "=";
   vertex._calcThreshold = "0";
   vertex._calcFinalText = "";
-  
+
   return vertex;
 }
 
@@ -148,15 +148,15 @@ function createNotesNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=notesNode;section=1;');
-  
+
   // Set default properties
   vertex._notesText = "Enter notes here";
   vertex._notesBold = false;
   vertex._notesFontSize = "14";
-  
+
   // Initialize the notes node with proper styling
   updateNotesNodeCell(vertex);
-  
+
   return vertex;
 }
 
@@ -167,10 +167,10 @@ function createChecklistNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 120, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=checklistNode;section=1;');
-  
+
   // Set default properties
   vertex._checklistText = "Checklist Item";
-  
+
   return vertex;
 }
 
@@ -181,10 +181,10 @@ function createSubtitleNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 40, 
     'rounded=0;whiteSpace=wrap;html=1;nodeType=subtitle;section=1;');
-  
+
   // Set default properties
   vertex.value = "Subtitle";
-  
+
   return vertex;
 }
 
@@ -195,10 +195,10 @@ function createInfoNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 180, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=info;section=1;');
-  
+
   // Set default properties
   vertex.value = "Information";
-  
+
   return vertex;
 }
 
@@ -209,10 +209,10 @@ function createImageNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 120, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=imageOption;section=1;');
-  
+
   // Set default properties
   vertex._image = "";
-  
+
   return vertex;
 }
 
@@ -223,12 +223,12 @@ function createPdfNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=pdfNode;section=1;');
-  
+
   // Set default properties for the 3 required fields
   vertex._pdfName = "PDF Document";
   vertex._pdfFile = "";
   vertex._pdfPrice = "";
-  
+
   return vertex;
 }
 
@@ -239,16 +239,16 @@ function createPdfPreviewNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=pdfPreview;section=1;');
-  
+
   // Set default properties
   vertex._pdfPreviewTitle = "PDF Preview";
   vertex._pdfPreviewFile = "";
-  
+
   // Update the display to show the preview title
   if (typeof window.updatePdfPreviewNodeCell === 'function') {
     window.updatePdfPreviewNodeCell(vertex);
   }
-  
+
   return vertex;
 }
 
@@ -259,11 +259,11 @@ function createAmountNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=amountOption;section=1;');
-  
+
   // Set default properties
   vertex._amountName = "Amount";
   vertex._amountPlaceholder = "Enter amount";
-  
+
   return vertex;
 }
 
@@ -274,10 +274,10 @@ function createEndNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 80, 80, 
     'ellipse;whiteSpace=wrap;html=1;nodeType=end;section=1;');
-  
+
   // Set default properties
   vertex.value = "END";
-  
+
   return vertex;
 }
 
@@ -288,11 +288,11 @@ function createHiddenCheckboxNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=hiddenCheckbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;');
-  
+
   // Set default properties
   vertex.value = "Hidden Checkbox";
   vertex._hiddenNodeId = "hidden_checkbox";
-  
+
   return vertex;
 }
 
@@ -303,12 +303,12 @@ function createHiddenTextboxNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=hiddenTextbox;section=1;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;');
-  
+
   // Set default properties
   vertex.value = "Hidden Textbox";
   vertex._hiddenNodeId = "hidden_textbox";
   vertex._defaultText = "";
-  
+
   return vertex;
 }
 
@@ -316,12 +316,12 @@ function createLinkedLogicNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=linkedLogic;section=1;fillColor=#DDA0DD;strokeColor=#9370DB;');
-  
+
   // Set default properties
   vertex.value = "Linked Logic";
   vertex._linkedLogicNodeId = "linked_logic";
   vertex._linkedFields = []; // Array to store linked field IDs
-  
+
   return vertex;
 }
 
@@ -329,12 +329,12 @@ function createLinkedCheckboxNode(x, y) {
   const parent = graph.getDefaultParent();
   const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
     'rounded=1;whiteSpace=wrap;html=1;nodeType=linkedCheckbox;section=1;fillColor=#FFB6C1;strokeColor=#FF69B4;');
-  
+
   // Set default properties
   vertex.value = "Linked Checkbox";
   vertex._linkedCheckboxNodeId = "linked_checkbox";
   vertex._linkedCheckboxOptions = []; // Array to store linked checkbox option IDs
-  
+
   return vertex;
 }
 
@@ -410,11 +410,11 @@ window.isLinkedCheckboxNode = function(cell) {
  */
 window.updateLinkedLogicNodeCell = function(cell) {
   if (!cell) return;
-  
+
   // Update the display value with the Node ID
   const nodeId = cell._linkedLogicNodeId || 'linked_logic';
   cell.value = nodeId;
-  
+
   // Update the graph display
   if (window.graph) {
     window.graph.refresh(cell);
@@ -426,11 +426,11 @@ window.updateLinkedLogicNodeCell = function(cell) {
  */
 window.updateLinkedCheckboxNodeCell = function(cell) {
   if (!cell) return;
-  
+
   // Update the display value with the Node ID
   const nodeId = cell._linkedCheckboxNodeId || 'linked_checkbox';
   cell.value = nodeId;
-  
+
   // Update the graph display
   if (window.graph) {
     window.graph.refresh(cell);
@@ -442,11 +442,11 @@ window.updateLinkedCheckboxNodeCell = function(cell) {
  */
 window.updateHiddenCheckboxNodeCell = function(cell) {
   if (!cell) return;
-  
+
   const text = cell._hiddenNodeId || "Hidden Checkbox";
   const html = `<div style="text-align:center;padding:8px;">${text}</div>`;
   cell.value = html;
-  
+
   // Update the graph display
   if (window.graph) {
     window.graph.refresh(cell);
@@ -458,11 +458,11 @@ window.updateHiddenCheckboxNodeCell = function(cell) {
  */
 window.updateHiddenTextboxNodeCell = function(cell) {
   if (!cell) return;
-  
+
   const text = cell._hiddenNodeId || "Hidden Textbox";
   const html = `<div style="text-align:center;padding:8px;">${text}</div>`;
   cell.value = html;
-  
+
   // Update the graph display
   if (window.graph) {
     window.graph.refresh(cell);
@@ -474,7 +474,7 @@ window.updateHiddenTextboxNodeCell = function(cell) {
  */
 window.getQuestionType = function(cell) {
   if (!isQuestion(cell)) return null;
-  
+
   const style = cell.style || "";
   const match = style.match(/questionType=([^;]+)/);
   return match ? match[1] : "text";
@@ -486,15 +486,11 @@ window.getQuestionType = function(cell) {
 window.getNodeId = function(cell) {
   // Debug mode - set to true only when debugging node ID issues
   const DEBUG_NODE_ID = false;
-  
+
   if (DEBUG_NODE_ID) {
-    console.log("🌐 WINDOW GET NODE ID DEBUG START");
-    console.log("Cell:", cell);
-    console.log("Cell._nameId:", cell._nameId);
-    console.log("Cell.style:", cell.style);
-    console.log("Cell.id:", cell.id);
+
   }
-  
+
   // PRIORITY 1: Return existing Node ID from style if it exists (most reliable)
   if (cell.style) {
     const styleMatch = cell.style.match(/nodeId=([^;]+)/);
@@ -510,7 +506,7 @@ window.getNodeId = function(cell) {
       }
     }
   }
-  
+
   // PRIORITY 2: Return _nameId if it exists and is not temporary/default
   if (cell._nameId && 
       cell._nameId !== 'new_question' && 
@@ -519,7 +515,7 @@ window.getNodeId = function(cell) {
       cell._nameId !== 'N/A') {
     return cell._nameId;
   }
-  
+
   // PRIORITY 3: Return cell.id if it's not temporary/default
   if (cell.id && 
       cell.id !== 'new_question' && 
@@ -528,7 +524,7 @@ window.getNodeId = function(cell) {
       cell.id !== 'N/A') {
     return cell.id;
   }
-  
+
   // If this Node ID has been manually edited, return the existing Node ID without modification
   if (cell._manuallyEditedNodeId) {
     // Return the existing Node ID from style or _nameId without applying PDF naming convention
@@ -543,13 +539,13 @@ window.getNodeId = function(cell) {
     }
     return cell.id || '';
   }
-  
+
   // Use the global function for reading PDF names from HTML inputs
 
   // Helper function to get PDF name from cell (now reads dynamically from PDF nodes)
   const getPdfName = (cell, visited = new Set()) => {
     if (DEBUG_NODE_ID) {
-      console.log("🔍 GET PDF NAME DEBUG START for cell:", cell.id);
+
     }
     // Check for PDF properties in various formats - only if they're not empty and not default values
     if (cell._pdfName && cell._pdfName.trim() && cell._pdfName.trim() !== "PDF Document") return cell._pdfName.trim();
@@ -562,7 +558,7 @@ window.getNodeId = function(cell) {
       const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
       return cleanFilename || null; // Return null if filename is empty after cleaning
     }
-    
+
     // Check if this node is connected to a PDF node (either directly or through flow path)
     const graph = window.graph;
     if (graph) {
@@ -573,7 +569,7 @@ window.getNodeId = function(cell) {
           const currentPdfName = window.getCurrentPdfNameFromHtml(targetCell);
           if (currentPdfName) return currentPdfName;
         }
-        
+
         // Fallback to stored properties for non-PDF nodes
         if (targetCell._pdfName && targetCell._pdfName.trim() && targetCell._pdfName.trim() !== "PDF Document") return targetCell._pdfName.trim();
         if (targetCell._pdfFilename && targetCell._pdfFilename.trim()) return targetCell._pdfFilename.trim();
@@ -584,59 +580,52 @@ window.getNodeId = function(cell) {
           const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
           return cleanFilename || null; // Return null if filename is empty after cleaning
         }
-        
+
         return null;
       };
-      
+
       // Check direct connections first - look for PDF nodes
       const outgoingEdges = graph.getOutgoingEdges(cell) || [];
       let pdfNode = outgoingEdges.find(edge => {
         const target = edge.target;
         return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
       });
-      
+
       if (pdfNode) {
         const pdfName = extractPdfName(pdfNode.target);
         if (pdfName) return pdfName;
       }
-      
+
       // PDF inheritance flows both ways: from incoming edges (downstream) and to outgoing edges (upstream)
-      
+
       // Check incoming edges for PDF properties (nodes that point to this node)
       const incomingEdges = graph.getIncomingEdges(cell) || [];
       if (DEBUG_NODE_ID) {
-        console.log("🔍 Checking incoming edges for cell:", cell.id, "incoming edges:", incomingEdges.length);
+
       }
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
         if (sourceCell && !visited.has(sourceCell.id)) {
           visited.add(sourceCell.id);
-          
+
           if (DEBUG_NODE_ID) {
-            console.log("🔍 Checking source cell:", sourceCell.id, "for PDF properties");
-            console.log("🔍 Source cell PDF properties:", {
-              _pdfName: sourceCell._pdfName,
-              _pdfFilename: sourceCell._pdfFilename,
-              _pdfUrl: sourceCell._pdfUrl,
-              isPdfNode: typeof window.isPdfNode === 'function' ? window.isPdfNode(sourceCell) : 'function not available'
-            });
-            
+
             // Also check if the source cell has outgoing edges to PDF nodes
             const sourceOutgoingEdges = graph.getOutgoingEdges(sourceCell) || [];
-            console.log("🔍 Source cell outgoing edges:", sourceOutgoingEdges.length);
+
             for (const edge of sourceOutgoingEdges) {
               const target = edge.target;
               if (target && typeof window.isPdfNode === 'function' && window.isPdfNode(target)) {
-                console.log("🔍 Source cell connects to PDF node:", target.id);
+
                 const pdfName = extractPdfName(target);
                 if (pdfName) {
-                  console.log("🔍 Found PDF name from source cell's PDF connection:", pdfName);
+
                   return pdfName;
                 }
               }
             }
           }
-          
+
           // Check if the source node has PDF properties (PDF inheritance)
           if ((sourceCell._pdfName && sourceCell._pdfName.trim() && sourceCell._pdfName.trim() !== "PDF Document") || 
               (sourceCell._pdfFilename && sourceCell._pdfFilename.trim()) || 
@@ -645,44 +634,44 @@ window.getNodeId = function(cell) {
             const pdfName = extractPdfName(sourceCell);
             if (pdfName) {
               if (DEBUG_NODE_ID) {
-                console.log("🔍 Found PDF inheritance from source cell:", pdfName);
+
               }
               return pdfName;
             }
           }
-          
+
           // Check if the source node is a PDF node
           if (typeof window.isPdfNode === 'function' && window.isPdfNode(sourceCell)) {
             const pdfName = extractPdfName(sourceCell);
             if (pdfName) {
               if (DEBUG_NODE_ID) {
-                console.log("🔍 Found PDF name from source cell isPdfNode:", pdfName);
+
               }
               return pdfName;
             }
           }
         }
       }
-      
+
       // PDF inheritance only flows downstream (from incoming edges), not upstream (outgoing edges)
     }
-    
+
     return null;
   };
-  
+
   // Get the base node ID
   let baseNodeId = '';
-  
+
   // PRIORITY 1: Check for nodeId in the style string (set by setNodeId function)
   // This should take precedence over _nameId since it's the most current value
   if (cell.style) {
     const styleMatch = cell.style.match(/nodeId=([^;]+)/);
     if (DEBUG_NODE_ID) {
-      console.log("Style match:", styleMatch);
+
     }
     if (styleMatch) {
       let styleNodeId = decodeURIComponent(styleMatch[1]);
-      
+
       // Remove any existing PDF prefix from the style nodeId to get the base ID
       // This prevents double-prefixing when the style already contains a PDF prefix
       const pdfPrefixMatch = styleNodeId.match(/^([^_]+)_(.+)$/);
@@ -692,7 +681,7 @@ window.getNodeId = function(cell) {
         if (potentialPdfName.match(/^(form|sc|pdf|document)\d*$/i)) {
           baseNodeId = pdfPrefixMatch[2]; // Use the part after the PDF prefix
           if (DEBUG_NODE_ID) {
-            console.log("Removed PDF prefix from style nodeId:", potentialPdfName, "-> base:", baseNodeId);
+
           }
         } else {
           baseNodeId = styleNodeId; // No PDF prefix detected, use as-is
@@ -700,21 +689,21 @@ window.getNodeId = function(cell) {
       } else {
         baseNodeId = styleNodeId; // No underscore found, use as-is
       }
-      
+
       if (DEBUG_NODE_ID) {
-        console.log("Base nodeId from style (after PDF prefix removal):", baseNodeId);
+
       }
     }
   }
-  
+
   // PRIORITY 2: For question nodes, use _nameId as fallback
   if (!baseNodeId && cell._nameId) {
     baseNodeId = cell._nameId;
     if (DEBUG_NODE_ID) {
-      console.log("Base nodeId from _nameId:", baseNodeId);
+
     }
   }
-  
+
   // PRIORITY 3: Generate base Node ID from node text if we don't have a good one
   if (!baseNodeId || baseNodeId.match(/^\d+$/)) {
     // Extract text from the node
@@ -727,42 +716,41 @@ window.getNodeId = function(cell) {
       tempDiv.innerHTML = cell.value;
       nodeText = tempDiv.textContent || tempDiv.innerText || '';
     }
-    
+
     if (nodeText) {
       baseNodeId = nodeText.toLowerCase()
         .replace(/[^a-z0-9\s]/g, '') // Remove special characters
         .replace(/\s+/g, '_') // Replace spaces with underscores
         .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
         ; // No length limit
-      
+
       if (DEBUG_NODE_ID) {
-        console.log("Generated base nodeId from text:", baseNodeId);
+
       }
     }
   }
-  
+
   // PRIORITY 4: Fallback to cell.id
   if (!baseNodeId) {
     baseNodeId = cell.id || "";
     if (DEBUG_NODE_ID) {
-      console.log("Base nodeId from cell.id:", baseNodeId);
+
     }
   }
-  
+
   // DISABLED: PDF naming convention application has been completely disabled
   // Node IDs will only be set when manually edited or reset using the button
   // Users will set all Node IDs at the end when the structure is complete
-  
+
   let finalNodeId = baseNodeId;
-  
+
   // DISABLED: PDF naming convention application
   // All PDF naming convention logic has been disabled
   // Node IDs will only be set when manually edited or reset using the button
   finalNodeId = baseNodeId;
-  
+
   if (DEBUG_NODE_ID) {
-    console.log("Returning final nodeId:", finalNodeId);
-    console.log("🌐 WINDOW GET NODE ID DEBUG END");
+
   }
   return finalNodeId;
 };
@@ -786,7 +774,3 @@ window.setSection = function(cell, sectionNum) {
     window.setSection(cell, sectionNum);
   }
 };
-
-
-
-

@@ -19,7 +19,7 @@ function addGroup(groupId = null) {
   const groupCounter = getGroupCounter();
   const groups = getGroups();
   const currentGroupId = groupId || groupCounter;
-  
+
   const block = document.createElement('div');
   block.className = 'group-block';
   block.id = 'groupBlock' + currentGroupId;
@@ -45,7 +45,7 @@ function addGroup(groupId = null) {
       window.groupCounter++;
     }
   }
-  
+
   // Update in-memory model and trigger autosave
   if (!groups[currentGroupId]) groups[currentGroupId] = { name: 'Group ' + currentGroupId, sections: [] };
   const requestAutosave = getRequestAutosave();
@@ -62,7 +62,7 @@ function removeGroup(groupId) {
   const block = document.getElementById('groupBlock' + groupId);
   if (block) block.remove();
   delete groups[groupId];
-  
+
   const requestAutosave = getRequestAutosave();
   if (requestAutosave) {
     requestAutosave();
@@ -103,10 +103,10 @@ function addSectionToGroup(groupId, sectionName = '') {
       allSections.push(sectionName.trim());
     }
   });
-  
+
   // Get currently selected sections to filter them out
   const selectedSections = getSelectedSections();
-  
+
   let dropdownOptions = '<option value="">-- Select a section --</option>';
   allSections.forEach(section => {
     // Only include sections that are not already selected in other groups
@@ -137,7 +137,7 @@ function addSectionToGroup(groupId, sectionName = '') {
       select.value = sectionName;
     }
   }
-  
+
   // Reflect in-memory groups and autosave
   updateGroupsObject();
   const requestAutosave = getRequestAutosave();
@@ -156,10 +156,10 @@ function removeSectionFromGroup(groupId, sectionNumber) {
     // Reindex remaining sections
     updateGroupSectionNumbers(groupId);
     updateGroupsObject();
-    
+
     // Refresh all group dropdowns to make removed section available again
     updateGroupDropdowns();
-    
+
     const requestAutosave = getRequestAutosave();
     if (requestAutosave) {
       requestAutosave();
@@ -178,12 +178,12 @@ function updateGroupSectionNumbers(groupId) {
   sectionItems.forEach((item, index) => {
     const newNumber = index + 1;
     item.id = 'groupSection' + groupId + '_' + newNumber;
-    
+
     const select = item.querySelector('select');
     if (select) {
       select.id = 'groupSectionName' + groupId + '_' + newNumber;
     }
-    
+
     const button = item.querySelector('button');
     if (button) {
       button.setAttribute('onclick', `removeSectionFromGroup(${groupId}, ${newNumber})`);
@@ -197,11 +197,11 @@ function updateGroupSectionNumbers(groupId) {
 function getSelectedSections() {
   const selectedSections = new Set();
   const groupBlocks = document.querySelectorAll('.group-block');
-  
+
   groupBlocks.forEach(groupBlock => {
     const groupId = groupBlock.id.replace('groupBlock', '');
     const groupSectionsDiv = document.getElementById('groupSections' + groupId);
-    
+
     if (groupSectionsDiv) {
       const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
       sectionItems.forEach(sectionItem => {
@@ -212,7 +212,7 @@ function getSelectedSections() {
       });
     }
   });
-  
+
   return selectedSections;
 }
 
@@ -222,10 +222,10 @@ function getSelectedSections() {
 function handleGroupSectionChange() {
   // Update groups object with current selections
   updateGroupsObject();
-  
+
   // Refresh all group dropdowns to update available options
   updateGroupDropdowns();
-  
+
   const requestAutosave = getRequestAutosave();
   if (requestAutosave) {
     requestAutosave();
@@ -239,19 +239,19 @@ function updateGroupsObject() {
   const groups = getGroups();
   // Clear existing groups by setting properties to empty
   Object.keys(groups).forEach(key => delete groups[key]);
-  
+
   const groupBlocks = document.querySelectorAll('.group-block');
-  
+
   groupBlocks.forEach(groupBlock => {
     const groupId = groupBlock.id.replace('groupBlock', '');
     const groupNameEl = document.getElementById('groupName' + groupId);
     const groupName = groupNameEl ? groupNameEl.value.trim() : 'Group ' + groupId;
-    
+
     groups[groupId] = {
       name: groupName,
       sections: []
     };
-    
+
     // Get sections in this group
     const groupSectionsDiv = document.getElementById('groupSections' + groupId);
     if (groupSectionsDiv) {
@@ -270,20 +270,19 @@ function updateGroupsObject() {
  * Loads groups from JSON data
  */
 function loadGroupsFromData(groupsData) {
-  console.log('loadGroupsFromData called with:', groupsData);
+
   if (!groupsData || !Array.isArray(groupsData)) {
-    console.log('loadGroupsFromData: invalid data, returning');
+
     return;
   }
-  console.log('loadGroupsFromData: groupsData is valid array with length:', groupsData.length);
-  
+
   // Clear existing groups
   const groupsContainer = document.getElementById('groupsContainer');
   if (groupsContainer) {
     const existingGroups = groupsContainer.querySelectorAll('.group-block');
     existingGroups.forEach(group => group.remove());
   }
-  
+
   // Reset counter and groups
   if (window.flowchartConfig) {
     window.flowchartConfig.groupCounter = 1;
@@ -292,33 +291,32 @@ function loadGroupsFromData(groupsData) {
     window.groupCounter = 1;
     window.groups = {};
   }
-  
+
   // Load groups
   groupsData.forEach(group => {
-    console.log('Loading group:', group);
+
     addGroup(group.groupId);
-    console.log(`Created group block for groupId ${group.groupId}`);
-    
+
     // Set group name
     const groupNameInput = document.getElementById('groupName' + group.groupId);
     if (groupNameInput && group.name) {
       groupNameInput.value = group.name;
       updateGroupName(group.groupId);
-      console.log(`Set group name to "${group.name}" for groupId ${group.groupId}`);
+
     } else {
-      console.log(`Could not find groupName input for groupId ${group.groupId} or name is empty`);
+
     }
-    
+
     // Add sections to group
     if (group.sections && group.sections.length > 0) {
       group.sections.forEach(sectionName => {
-        console.log(`Adding section "${sectionName}" to group ${group.groupId}`);
+
         addSectionToGroup(group.groupId, sectionName);
       });
     } else {
-      console.log(`No sections to add for group ${group.groupId}`);
+
     }
-    
+
     // Update counter
     const groupCounter = getGroupCounter();
     if (group.groupId >= groupCounter) {
@@ -329,7 +327,7 @@ function loadGroupsFromData(groupsData) {
       }
     }
   });
-  
+
   // Update groups object
   updateGroupsObject();
 }
@@ -341,7 +339,7 @@ function getGroupsData() {
   updateGroupsObject();
   const groups = getGroups();
   const groupsArray = [];
-  
+
   Object.keys(groups).forEach(groupId => {
     // Export all groups, even if they have no sections
     groupsArray.push({
@@ -350,7 +348,7 @@ function getGroupsData() {
       sections: groups[groupId].sections || []
     });
   });
-  
+
   return groupsArray;
 }
 
@@ -359,18 +357,18 @@ function getGroupsData() {
  */
 function updateGroupDropdowns() {
   const groupBlocks = document.querySelectorAll('.group-block');
-  
+
   groupBlocks.forEach(groupBlock => {
     const groupId = groupBlock.id.replace('groupBlock', '');
     const groupSectionsDiv = document.getElementById('groupSections' + groupId);
-    
+
     if (groupSectionsDiv) {
       const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
       sectionItems.forEach(sectionItem => {
         const select = sectionItem.querySelector('select');
         if (select) {
           const currentValue = select.value;
-          
+
           // Get updated section names
           const sectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs);
           const allSections = [];
@@ -381,10 +379,10 @@ function updateGroupDropdowns() {
               allSections.push(sectionName.trim());
             }
           });
-          
+
           // Get currently selected sections to filter them out
           const selectedSections = getSelectedSections();
-          
+
           // Update dropdown options
           let dropdownOptions = '<option value="">-- Select a section --</option>';
           allSections.forEach(section => {
@@ -395,7 +393,7 @@ function updateGroupDropdowns() {
               dropdownOptions += `<option value="${section}" ${selected}>${section}</option>`;
             }
           });
-          
+
           select.innerHTML = dropdownOptions;
         }
       });
@@ -456,7 +454,7 @@ function initializeDefaultPdfProperties() {
     pdfFile: "",
     pdfPrice: ""
   };
-  
+
   // Update UI with blank values
   updateDefaultPdfPropertiesUI();
 }
@@ -468,7 +466,7 @@ function updateDefaultPdfPropertiesUI() {
   const nameInput = document.getElementById('defaultPdfNameInput');
   const fileInput = document.getElementById('defaultPdfFileInput');
   const priceInput = document.getElementById('defaultPdfPriceInput');
-  
+
   if (nameInput) nameInput.value = defaultPdfProperties.pdfName || "";
   if (fileInput) fileInput.value = defaultPdfProperties.pdfFile || "";
   if (priceInput) priceInput.value = defaultPdfProperties.pdfPrice || "";
@@ -481,14 +479,14 @@ function updateDefaultPdfProperties() {
   const nameInput = document.getElementById('defaultPdfNameInput');
   const fileInput = document.getElementById('defaultPdfFileInput');
   const priceInput = document.getElementById('defaultPdfPriceInput');
-  
+
   if (nameInput) defaultPdfProperties.pdfName = nameInput.value.trim();
   if (fileInput) defaultPdfProperties.pdfFile = fileInput.value.trim();
   if (priceInput) defaultPdfProperties.pdfPrice = priceInput.value.trim();
-  
+
   // Save to localStorage
   localStorage.setItem('defaultPdfProperties', JSON.stringify(defaultPdfProperties));
-  
+
   // Trigger autosave
   const requestAutosave = getRequestAutosave();
   if (requestAutosave) {
@@ -509,10 +507,10 @@ function getDefaultPdfProperties() {
 function setDefaultPdfProperties(properties) {
   defaultPdfProperties = { ...properties };
   updateDefaultPdfPropertiesUI();
-  
+
   // Save to localStorage
   localStorage.setItem('defaultPdfProperties', JSON.stringify(defaultPdfProperties));
-  
+
   // Trigger autosave
   const requestAutosave = getRequestAutosave();
   if (requestAutosave) {

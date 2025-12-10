@@ -20,7 +20,6 @@ let newSectionButton, untangleEdge, changeEdgeStyle, disableDragEdge, deleteEdge
 let disableDragNode;
 let placeQuestionNode, placeOptionNode, placeSampleQuestionNode, placeMiscellaneousNode;
 
-
 // Initialize DOM element references
 function initializeContextMenuElements() {
   contextMenu = document.getElementById('contextMenu');
@@ -32,7 +31,7 @@ function initializeContextMenuElements() {
   optionTypeSubmenu = document.getElementById('optionTypeSubmenu');
   emptySpaceMenu = document.getElementById('emptySpaceMenu');
   propertiesMenu = document.getElementById('propertiesMenu');
-  
+
   deleteNode = document.getElementById('deleteNode');
   copyNodeButton = document.getElementById('copyNodeButton');
   jumpNode = document.getElementById('jumpNode');
@@ -43,7 +42,7 @@ function initializeContextMenuElements() {
   infoTypeBtn = document.getElementById('infoTypeBtn');
   renameNode = document.getElementById('renameNode');
   propertiesButton = document.getElementById('propertiesButton');
-  
+
   regularOptionType = document.getElementById('regularOptionType');
   imageOptionType = document.getElementById('imageOptionType');
   amountOptionType = document.getElementById('amountOptionType');
@@ -51,12 +50,12 @@ function initializeContextMenuElements() {
   alertNodeType = document.getElementById('alertNodeType');
   checklistNodeType = document.getElementById('checklistNodeType');
   endNodeType = document.getElementById('endNodeType');
-  
+
   notesBoldButton = document.getElementById('notesBoldButton');
   notesFontButton = document.getElementById('notesFontButton');
   notesCopyButton = document.getElementById('notesCopyButton');
   notesDeleteButton = document.getElementById('notesDeleteButton');
-  
+
   newSectionButton = document.getElementById('newSectionNode');
   untangleEdge = document.getElementById('untangleEdge');
   changeEdgeStyle = document.getElementById('changeEdgeStyle');
@@ -65,7 +64,7 @@ function initializeContextMenuElements() {
   edgeStyleCurved = document.getElementById('edgeStyleCurved');
   edgeStyleDirect = document.getElementById('edgeStyleDirect');
   disableDragNode = document.getElementById('disableDragNode');
-  
+
   placeQuestionNode = document.getElementById('placeQuestionNode');
   placeOptionNode = document.getElementById('placeOptionNode');
   placeSampleQuestionNode = document.getElementById('placeSampleQuestionNode');
@@ -75,7 +74,7 @@ function initializeContextMenuElements() {
 // Determine the type of a node (question, options, etc.)
 function getNodeType(cell) {
   if (!cell || !cell.style) return "unknown";
-  
+
   if (cell.style.includes("nodeType=question")) {
     return "question";
   } else if (cell.style.includes("nodeType=options")) {
@@ -102,10 +101,10 @@ function isEndNode(cell) {
 function autoSelectConnectingEdges() {
   const graph = window.graph;
   if (!graph) return;
-  
+
   const sel = graph.getSelectionCells();
   const verts = sel.filter(c => c && c.vertex);
-  
+
   // If there are 2 or more vertices, find edges between them
   const toAdd = [];
   if (verts.length >= 2) {
@@ -115,7 +114,7 @@ function autoSelectConnectingEdges() {
         const between1 = graph.getEdgesBetween(verts[i], verts[j], false) || [];
         const between2 = graph.getEdgesBetween(verts[j], verts[i], false) || [];
         const allBetween = [...between1, ...between2];
-        
+
         for (const e of allBetween) {
           if (!sel.includes(e) && !toAdd.includes(e)) {
             toAdd.push(e);
@@ -124,18 +123,18 @@ function autoSelectConnectingEdges() {
       }
     }
   }
-  
+
   // Also find edges that connect any selected vertex to any other selected vertex
   // This handles cases where edges might connect through intermediate nodes
   for (const vert of verts) {
     const outgoingEdges = graph.getOutgoingEdges(vert) || [];
     const incomingEdges = graph.getIncomingEdges(vert) || [];
     const allEdges = [...outgoingEdges, ...incomingEdges];
-    
+
     for (const edge of allEdges) {
       const source = edge.source;
       const target = edge.target;
-      
+
       // If both source and target are in the selected vertices, add the edge
       if (source && target && 
           verts.includes(source) && verts.includes(target) &&
@@ -144,7 +143,7 @@ function autoSelectConnectingEdges() {
       }
     }
   }
-  
+
   if (toAdd.length) {
     graph.getSelectionModel().addCells(toAdd);
   }
@@ -164,13 +163,13 @@ function hideContextMenuMain() {
   if (edgeContextMenu) edgeContextMenu.style.display = 'none';
   if (emptySpaceMenu) emptySpaceMenu.style.display = 'none';
   if (propertiesMenu) propertiesMenu.style.display = 'none';
-  
+
   // Hide all submenus
   if (typeSubmenu) typeSubmenu.style.display = 'none';
   if (calcSubmenu) calcSubmenu.style.display = 'none';
   if (optionTypeSubmenu) optionTypeSubmenu.style.display = 'none';
   if (edgeStyleSubmenu) edgeStyleSubmenu.style.display = 'none';
-  
+
   // Update UI state
   if (typeof window.contextMenuVisible !== 'undefined') {
     window.contextMenuVisible = false;
@@ -188,7 +187,7 @@ function hideContextMenu() {
 // Context Menu Setup
 function setupContextMenus(graph) {
   if (!graph) return;
-  
+
   // Context menu handling
   graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
     // NEW – let native menu appear inside inputs / textareas / contenteditable
@@ -199,12 +198,12 @@ function setupContextMenus(graph) {
     typeSubmenu.style.display = "none";
     window.selectedCell = cell;
     window.currentMouseEvent = evt;
-    
+
     // Right-click context menu
     if (mxEvent.isRightMouseButton(evt)) {
       // Store current selection before showing menu
       const currentSelection = graph.getSelectionCells();
-      
+
       // If right-clicking on a cell that's not in the current selection,
       // select it first (but preserve multi-selection if Ctrl/Shift is held)
       if (cell && !currentSelection.includes(cell)) {
@@ -215,20 +214,20 @@ function setupContextMenus(graph) {
           // Replace selection
           graph.getSelectionModel().setCell(cell);
         }
-        
+
         // Immediately trigger the selection change to ensure connecting edges are selected
         autoSelectConnectingEdges();
       }
-      
+
       const selectedCells = graph.getSelectionCells();
-      
+
       if (selectedCells && selectedCells.length > 0) {
         // Check if we have a single edge selected
         if (selectedCells.length === 1 && selectedCells[0].edge) {
           // Show edge context menu
           const x = evt.clientX;
           const y = evt.clientY;
-          
+
           if (edgeContextMenu) {
             // Update "Disable Drag" button text based on current state
             const edge = selectedCells[0];
@@ -236,7 +235,7 @@ function setupContextMenus(graph) {
             if (disableDragEdge) {
               disableDragEdge.textContent = isDragDisabled ? 'Enable Drag' : 'Disable Drag';
             }
-            
+
             edgeContextMenu.style.display = 'block';
             edgeContextMenu.style.left = x + 'px';
             edgeContextMenu.style.top = y + 'px';
@@ -247,13 +246,13 @@ function setupContextMenus(graph) {
           // Show special Notes context menu
           const x = evt.clientX;
           const y = evt.clientY;
-          
+
           if (notesContextMenu) {
             notesContextMenu.style.display = 'block';
             notesContextMenu.style.left = x + 'px';
             notesContextMenu.style.top = y + 'px';
           }
-          
+
           // Update bold button text based on current state
           const notesCell = selectedCells[0];
           const isBold = notesCell._notesBold || false;
@@ -264,18 +263,18 @@ function setupContextMenus(graph) {
           // Show regular context menu for other cells
           const x = evt.clientX;
           const y = evt.clientY;
-          
+
           if (contextMenu) {
             contextMenu.style.display = 'block';
             contextMenu.style.left = x + 'px';
             contextMenu.style.top = y + 'px';
           }
-          
+
           // Update menu title to show number of selected items
           if (selectedCells.length > 1) {
             if (deleteNode) deleteNode.textContent = `Delete ${selectedCells.length} Nodes`;
             if (copyNodeButton) copyNodeButton.textContent = `Copy ${selectedCells.length} Nodes`;
-            
+
             // Hide options that don't apply to multiple nodes
             if (yesNoNode) yesNoNode.style.display = 'none';
             if (changeType) changeType.style.display = 'none';
@@ -287,7 +286,7 @@ function setupContextMenus(graph) {
             if (copyNodeButton) copyNodeButton.textContent = "Copy";
             if (jumpNode) jumpNode.style.display = 'block';
             if (propertiesButton) propertiesButton.style.display = 'block';
-            
+
             const cell = selectedCells[0];
             if (getNodeType(cell) === 'question') {
               if (yesNoNode) yesNoNode.style.display = 'block';
@@ -322,14 +321,14 @@ function setupContextMenus(graph) {
         // No cells selected - show empty space context menu
         const x = evt.clientX;
         const y = evt.clientY;
-        
+
         // Convert client coordinates to graph coordinates
         const pt = graph.getPointForEvent(evt, false);
-        
+
         // Store click position in global variables for later use
         window.emptySpaceClickX = pt.x;
         window.emptySpaceClickY = pt.y;
-        
+
         // Show empty space context menu
         if (emptySpaceMenu) {
           emptySpaceMenu.style.display = 'block';
@@ -339,7 +338,7 @@ function setupContextMenus(graph) {
       }
       evt.preventDefault();
     }
-    
+
     return null; // Always return null to prevent the default menu
   };
 }
@@ -347,12 +346,12 @@ function setupContextMenus(graph) {
 // Setup Context Menu Event Listeners
 function setupContextMenuEventListeners(graph) {
   if (!graph) return;
-  
+
   // Ensure DOM elements are initialized
   if (!deleteNode) {
     initializeContextMenuElements();
   }
-  
+
   // Regular context menu event handlers
   if (deleteNode) deleteNode.addEventListener("click", () => {
     const selectedCells = graph.getSelectionCells();
@@ -368,7 +367,7 @@ function setupContextMenuEventListeners(graph) {
           }
         });
       }
-      
+
       graph.removeCells(selectedCells);
       if (typeof window.refreshAllCells === 'function') {
         window.refreshAllCells();
@@ -378,7 +377,7 @@ function setupContextMenuEventListeners(graph) {
   });
 
   if (copyNodeButton) copyNodeButton.addEventListener("click", () => {
-    console.log('🔍 [CONTEXT DEBUG] Context menu copy button clicked');
+
     const selectedCells = graph.getSelectionCells();
     if (selectedCells && selectedCells.length > 0) {
       if (typeof window.copySelectedNodeAsJson === 'function') {
@@ -423,10 +422,10 @@ function setupContextMenuEventListeners(graph) {
         // Only allow for question nodes
         if (getNodeType(cell) === 'question') {
           let style = cell.style || "";
-          
+
           // Check if drag is currently disabled
           const isDragDisabled = style.includes('dragDisabled=1');
-          
+
           if (isDragDisabled) {
             // Enable drag - remove dragDisabled
             style = style.replace(/dragDisabled=1;?/g, '');
@@ -441,10 +440,10 @@ function setupContextMenuEventListeners(graph) {
               style += (style ? ';' : '') + 'dragDisabled=1';
             }
           }
-          
+
           graph.getModel().setStyle(cell, style);
           graph.refresh();
-          
+
           if (typeof window.requestAutosave === 'function') {
             window.requestAutosave();
           }
@@ -489,9 +488,9 @@ function setupContextMenuEventListeners(graph) {
   // Type submenu buttons (for question nodes)
   if (document.getElementById('checkboxType')) {
     document.getElementById('checkboxType').addEventListener("click", () => {
-      console.log("Checkbox type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to checkbox type");
+
         // Clear existing complex structure and convert to checkbox
         window.selectedCell._questionType = "checkbox";
         window.selectedCell._questionText = "Checkbox question node";
@@ -501,13 +500,13 @@ function setupContextMenuEventListeners(graph) {
         delete window.selectedCell._textboxes;
         delete window.selectedCell._twoNumbers;
         delete window.selectedCell._options;
-        
+
         // Update the cell style to reflect the new question type
         let style = window.selectedCell.style || '';
         style = style.replace(/questionType=[^;]+/g, '');
         style += ';questionType=checkbox;';
         window.selectedCell.style = style;
-        
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.updateSimpleQuestionCell(window.selectedCell);
         }
@@ -521,9 +520,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('textType')) {
     document.getElementById('textType').addEventListener("click", () => {
-      console.log("Text type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to text type");
+
         // Clear existing complex structure and convert to simple text
         window.selectedCell._questionType = "text";
         window.selectedCell._questionText = "Text question node";
@@ -531,13 +530,13 @@ function setupContextMenuEventListeners(graph) {
         delete window.selectedCell._textboxes;
         delete window.selectedCell._twoNumbers;
         delete window.selectedCell._options;
-        
+
         // Update the cell style to reflect the new question type
         let style = window.selectedCell.style || '';
         style = style.replace(/questionType=[^;]+/g, '');
         style += ';questionType=text;';
         window.selectedCell.style = style;
-        
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.updateSimpleQuestionCell(window.selectedCell);
         }
@@ -551,9 +550,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('text2Type')) {
     document.getElementById('text2Type').addEventListener("click", () => {
-      console.log("Dropdown type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to dropdown type");
+
         // Clear existing complex structure and convert to dropdown
         window.selectedCell._questionType = "dropdown";
         window.selectedCell._questionText = "Dropdown question node";
@@ -561,13 +560,13 @@ function setupContextMenuEventListeners(graph) {
         delete window.selectedCell._textboxes;
         delete window.selectedCell._twoNumbers;
         delete window.selectedCell._options;
-        
+
         // Update the cell style to reflect the new question type
         let style = window.selectedCell.style || '';
         style = style.replace(/questionType=[^;]+/g, '');
         style += ';questionType=dropdown;';
         window.selectedCell.style = style;
-        
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.updateSimpleQuestionCell(window.selectedCell);
         }
@@ -581,9 +580,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('moneyType')) {
     document.getElementById('moneyType').addEventListener("click", () => {
-      console.log("Number type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to number type");
+
         // Clear existing complex structure and convert to number
         window.selectedCell._questionType = "number";
         window.selectedCell._questionText = "Number question node";
@@ -591,13 +590,13 @@ function setupContextMenuEventListeners(graph) {
         delete window.selectedCell._textboxes;
         delete window.selectedCell._twoNumbers;
         delete window.selectedCell._options;
-        
+
         // Update the cell style to reflect the new question type
         let style = window.selectedCell.style || '';
         style = style.replace(/questionType=[^;]+/g, '');
         style += ';questionType=number;';
         window.selectedCell.style = style;
-        
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.updateSimpleQuestionCell(window.selectedCell);
         }
@@ -611,9 +610,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('dateType')) {
     document.getElementById('dateType').addEventListener("click", () => {
-      console.log("Date type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to date type");
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.selectedCell._questionType = "date";
           window.updateSimpleQuestionCell(window.selectedCell);
@@ -628,9 +627,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('dateRangeType')) {
     document.getElementById('dateRangeType').addEventListener("click", () => {
-      console.log("Date range type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to date range type");
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.selectedCell._questionType = "dateRange";
           window.updateSimpleQuestionCell(window.selectedCell);
@@ -645,9 +644,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('emailType')) {
     document.getElementById('emailType').addEventListener("click", () => {
-      console.log("Email type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to email type");
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.selectedCell._questionType = "email";
           window.updateSimpleQuestionCell(window.selectedCell);
@@ -662,9 +661,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('phoneType')) {
     document.getElementById('phoneType').addEventListener("click", () => {
-      console.log("Phone type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to phone type");
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.selectedCell._questionType = "phone";
           window.updateSimpleQuestionCell(window.selectedCell);
@@ -679,9 +678,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('bigParagraphType')) {
     document.getElementById('bigParagraphType').addEventListener("click", () => {
-      console.log("Big paragraph type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to big paragraph type");
+
         if (typeof window.updateSimpleQuestionCell === 'function') {
           window.selectedCell._questionType = "bigParagraph";
           window.updateSimpleQuestionCell(window.selectedCell);
@@ -696,9 +695,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('multipleTextboxesTypeBtn')) {
     document.getElementById('multipleTextboxesTypeBtn').addEventListener("click", () => {
-      console.log("Multiple textboxes type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to multiple textboxes type");
+
         if (typeof window.updateMultipleTextboxHandler === 'function') {
           window.selectedCell._questionType = "multipleTextboxes";
           window.updateMultipleTextboxHandler(window.selectedCell);
@@ -713,9 +712,9 @@ function setupContextMenuEventListeners(graph) {
 
   if (document.getElementById('multipleDropdownTypeBtn')) {
     document.getElementById('multipleDropdownTypeBtn').addEventListener("click", () => {
-      console.log("Multiple dropdown type button clicked!");
+
       if (window.selectedCell) {
-        console.log("Converting to multiple dropdown type");
+
         if (typeof window.updateMultipleTextboxHandler === 'function') {
           window.selectedCell._questionType = "multipleDropdownType";
           window.updateMultipleTextboxHandler(window.selectedCell);
@@ -734,7 +733,7 @@ function setupContextMenuEventListeners(graph) {
       // Extract and preserve the current text content
       if (typeof window.extractTextFromCell === 'function') {
         const preservedText = window.extractTextFromCell(window.selectedCell);
-        
+
         // Convert to calculation node
         graph.getModel().beginUpdate();
         try {
@@ -757,7 +756,7 @@ function setupContextMenuEventListeners(graph) {
       // Extract and preserve the current text content
       if (typeof window.extractTextFromCell === 'function') {
         const preservedText = window.extractTextFromCell(window.selectedCell);
-        
+
         // Convert to subtitle node
         graph.getModel().beginUpdate();
         try {
@@ -782,7 +781,7 @@ function setupContextMenuEventListeners(graph) {
       // Extract and preserve the current text content
       if (typeof window.extractTextFromCell === 'function') {
         const preservedText = window.extractTextFromCell(window.selectedCell);
-        
+
         // Convert to info node
         graph.getModel().beginUpdate();
         try {
@@ -910,7 +909,7 @@ function setupContextMenuEventListeners(graph) {
           try {
             window.showPropertiesPopup(window.selectedCell);
           } catch (error) {
-            console.error("Error calling showPropertiesPopup:", error);
+
           }
         } else {
           // Fallback to old properties menu
@@ -926,7 +925,7 @@ function setupContextMenuEventListeners(graph) {
           }
         }
       }
-      
+
       // Delay hiding the context menu to give the popup time to be created
       setTimeout(() => {
         hideContextMenu();
@@ -1007,18 +1006,15 @@ function setupContextMenuEventListeners(graph) {
   // Rename node button event handler
   if (document.getElementById('renameNode')) {
     document.getElementById('renameNode').addEventListener("click", () => {
-      console.log("=== RENAME NODE BUTTON DEBUG ===");
-      console.log("Rename button clicked!");
+
       if (window.selectedCell) {
-        console.log("Selected cell for rename:", window.selectedCell);
-        console.log("Cell type:", typeof window.isQuestion === 'function' ? (window.isQuestion(window.selectedCell) ? 'question' : 'other') : 'unknown');
-        
+
         // Show rename popup for any node type
         if (typeof window.showQuestionTextPopup === 'function') {
-          console.log("Calling showQuestionTextPopup for rename");
+
           window.showQuestionTextPopup(window.selectedCell);
         } else {
-          console.log("showQuestionTextPopup function not found!");
+
           // Fallback: show a simple prompt
           const newText = prompt("Enter new text for the node:", window.selectedCell._questionText || "Node text");
           if (newText && newText.trim()) {
@@ -1029,7 +1025,7 @@ function setupContextMenuEventListeners(graph) {
           }
         }
       } else {
-        console.log("No selected cell for rename!");
+
       }
       hideContextMenu();
     });
@@ -1038,105 +1034,85 @@ function setupContextMenuEventListeners(graph) {
   // Increase the "section number" for a question
   if (document.getElementById('newSectionNode')) {
     document.getElementById('newSectionNode').addEventListener("click", () => {
-      console.log("=== NEW SECTION BUTTON DEBUG ===");
-      console.log("New Section button clicked!");
-      
+
       if (window.selectedCell) {
-        console.log("Selected cell:", window.selectedCell);
-        console.log("Selected cell ID:", window.selectedCell.id);
-        console.log("Selected cell style (before):", window.selectedCell.style);
-        console.log("Selected cell _questionText:", window.selectedCell._questionText);
-        
+
         // Check if getSection function exists and works
         if (typeof window.getSection === 'function') {
-          console.log("getSection function exists");
-          
+
           // Try to get current section
           const currentSection = window.getSection(window.selectedCell);
-          console.log("Raw current section from getSection:", currentSection);
-          
+
           const currentSectionNum = parseInt(currentSection || "1", 10);
-          console.log("Parsed current section number:", currentSectionNum);
-          
+
           const newSection = currentSectionNum + 1;
-          console.log("Calculated new section number:", newSection);
-          
+
           // Check if setSection function exists
           if (typeof window.setSection === 'function') {
-            console.log("setSection function exists");
-            console.log("About to call setSection with cell:", window.selectedCell, "and new section:", newSection);
-            
+
             // Call setSection
             try {
               window.setSection(window.selectedCell, newSection);
-              console.log("setSection call completed without error");
+
             } catch (error) {
-              console.error("Error calling setSection:", error);
+
             }
-            
+
             // Wait a moment then verify the change
             setTimeout(() => {
-              console.log("=== VERIFICATION AFTER SETSECTION ===");
+
               const updatedSection = window.getSection(window.selectedCell);
-              console.log("Updated section from getSection:", updatedSection);
-              console.log("Updated cell style (after):", window.selectedCell.style);
-              
+
               // Check if the style actually changed
               if (window.selectedCell.style.includes(`section=${newSection}`)) {
-                console.log("✅ SUCCESS: Cell style now contains the new section number!");
+
               } else {
-                console.log("❌ FAILURE: Cell style does not contain the new section number");
-                console.log("Expected to find: section=" + newSection);
-                console.log("Actual style:", window.selectedCell.style);
+
               }
-              
+
               // Try to manually update the style if setSection didn't work
               if (!window.selectedCell.style.includes(`section=${newSection}`)) {
-                console.log("Attempting manual style update...");
+
                 let style = window.selectedCell.style || "";
                 style = style.replace(/section=[^;]+/g, "");
                 style += `;section=${newSection};`;
                 window.selectedCell.style = style;
-                console.log("Manual style update completed. New style:", window.selectedCell.style);
+
               }
             }, 100);
-            
+
           } else {
-            console.log("❌ setSection function not found!");
-            console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Section')));
+
           }
         } else {
-          console.log("❌ getSection function not found!");
-          console.log("Available window functions:", Object.keys(window).filter(key => key.includes('Section')));
+
         }
-        
+
         // Try to refresh the display
         if (typeof window.refreshAllCells === 'function') {
-          console.log("Calling refreshAllCells");
+
           window.refreshAllCells();
         } else {
-          console.log("refreshAllCells function not found!");
+
         }
-        
+
         // Also try graph refresh
         if (window.graph) {
-          console.log("Graph object exists, attempting refresh");
+
           if (typeof window.graph.refresh === 'function') {
             window.graph.refresh();
-            console.log("Graph refresh called");
+
           } else {
-            console.log("Graph refresh method not found");
+
           }
         } else {
-          console.log("Graph object not found in window");
+
         }
-        
+
       } else {
-        console.log("❌ No selected cell!");
-        console.log("window.selectedCell:", window.selectedCell);
+
       }
-      
-      console.log("=== END NEW SECTION BUTTON DEBUG ===");
+
       hideContextMenu();
     });
   }
@@ -1175,10 +1151,10 @@ function setupContextMenuEventListeners(graph) {
       if (selectedCells.length === 1 && selectedCells[0].edge) {
         const edge = selectedCells[0];
         let style = edge.style || "";
-        
+
         // Check if drag is currently disabled
         const isDragDisabled = style.includes('dragDisabled=1');
-        
+
         if (isDragDisabled) {
           // Enable drag - remove dragDisabled and strokeDasharray
           style = style.replace(/dragDisabled=1;?/g, '');
@@ -1199,10 +1175,10 @@ function setupContextMenuEventListeners(graph) {
           style += ';strokeDasharray=5,5';
           disableDragEdge.textContent = 'Enable Drag';
         }
-        
+
         graph.getModel().setStyle(edge, style);
         graph.refresh();
-        
+
         if (typeof window.requestAutosave === 'function') {
           window.requestAutosave();
         }
@@ -1280,28 +1256,27 @@ function setupContextMenuEventListeners(graph) {
       hideContextMenu();
     });
   }
-  
+
   if (placeOptionNode) {
     placeOptionNode.addEventListener('click', function() {
       placeNodeAtClickLocation(graph, 'options');
       hideContextMenu();
     });
   }
-  
+
   if (placeSampleQuestionNode) {
     placeSampleQuestionNode.addEventListener('click', function() {
       placeSampleQuestion(graph);
       hideContextMenu();
     });
   }
-  
+
   if (placeMiscellaneousNode) {
     placeMiscellaneousNode.addEventListener('click', function() {
       placeMiscellaneousNodeAtClickLocation(graph);
       hideContextMenu();
     });
   }
-  
 
   // Global click listener for hiding menus
   document.addEventListener("click", e => {
@@ -1309,7 +1284,7 @@ function setupContextMenuEventListeners(graph) {
     if (e.target.closest('.properties-modal')) {
       return;
     }
-    
+
     // Hide menus if clicking outside of them
     if (
       !(contextMenu && contextMenu.contains(e.target)) &&
@@ -1334,22 +1309,18 @@ function setupContextMenuEventListeners(graph) {
 
 // Properties Menu Functions
 function showPropertiesMenu(cell, evt) {
-  console.log("📋 CONTEXT MENU PROPERTIES DIALOG CALLED");
-  console.log("Cell:", cell);
-  console.log("Cell ID:", cell.id);
-  console.log("Cell style:", cell.style);
-  console.log("Cell value:", cell.value);
+
   if (!cell) {
-    console.log("No cell provided");
+
     return;
   }
   if (propertiesMenu) {
-    console.log("Properties menu found, showing it");
+
     propertiesMenu.style.display = "block";
     propertiesMenu.style.left = evt.clientX + 10 + "px";
     propertiesMenu.style.top = evt.clientY + 10 + "px";
   } else {
-    console.log("Properties menu not found!");
+
   }
 
   // Get properties panel elements from the properties module
@@ -1382,7 +1353,7 @@ function showPropertiesMenu(cell, evt) {
     const propAmountName = document.getElementById("propAmountName");
     const propAmountPlaceholder = document.getElementById("propAmountPlaceholder");
     const amountProps = document.getElementById("amountProps");
-    
+
     if (propAmountName) propAmountName.textContent = cell._amountName || "";
     if (propAmountPlaceholder) propAmountPlaceholder.textContent = cell._amountPlaceholder || "";
     if (amountProps) amountProps.style.display = "block";
@@ -1403,17 +1374,17 @@ function showPropertiesMenu(cell, evt) {
           const target = edge.target;
           return typeof window.isPdfNode === 'function' && window.isPdfNode(target);
         });
-        
+
         if (pdfNode) {
           // Show PDF properties
           pdfProps.style.display = "block";
-          
+
           // Display PDF node information
           if (propPdfNode) {
             const targetCell = pdfNode.target;
             propPdfNode.textContent = `Node ${targetCell.id}`;
           }
-          
+
           if (propPdfFilename) {
             const targetCell = pdfNode.target;
             // Extract filename from the PDF node value or use a default
@@ -1435,23 +1406,20 @@ function showPropertiesMenu(cell, evt) {
   }
 
   if (propNodeId) {
-    console.log("📋 PROPERTIES DIALOG DEBUG START");
-    console.log("Cell:", cell);
-    console.log("window.getNodeId function exists:", typeof window.getNodeId === 'function');
+
     const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : "") || "";
-    console.log("Retrieved nodeId:", nodeId);
+
     propNodeId.textContent = nodeId;
-    console.log("Set propNodeId.textContent to:", propNodeId.textContent);
-    console.log("📋 PROPERTIES DIALOG DEBUG END");
+
   }
   if (propNodeSection) propNodeSection.textContent = (typeof window.getSection === 'function' ? window.getSection(cell) : "") || "1";
-  
+
   const sec = typeof window.getSection === 'function' ? window.getSection(cell) : "1";
   if (propSectionName) {
     const sectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
     propSectionName.textContent = (sectionPrefs[sec] && sectionPrefs[sec].name) || "Enter section name";
   }
-  
+
   const propQuestionNumber = document.getElementById("propQuestionNumber");
   if (propQuestionNumber) propQuestionNumber.textContent = cell._questionId || "";
 
@@ -1484,14 +1452,14 @@ function showPropertiesMenu(cell, evt) {
 // Node Placement Functions
 function placeNodeAtClickLocation(graph, nodeType) {
   if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
-  
+
   // Use the global graph variable if the parameter is not available
   const graphToUse = graph || window.graph;
   if (!graphToUse) {
-    console.error('Graph not available for node placement');
+
     return;
   }
-  
+
   const parent = graphToUse.getDefaultParent();
   graphToUse.getModel().beginUpdate();
   let cell;
@@ -1500,7 +1468,7 @@ function placeNodeAtClickLocation(graph, nodeType) {
     let label = "";
     let width = 160;
     let height = 80;
-    
+
     if (nodeType === 'question') {
       // Use the same style as the drag-and-drop elements
       const toolbarShape = document.querySelector('.shape[data-type="question"]');
@@ -1592,10 +1560,10 @@ function placeNodeAtClickLocation(graph, nodeType) {
       width = 150;
       height = 80;
     }
-    
+
     // Create the cell
     cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, width, height, style);
-    
+
     // Initialize specific node types - use same logic as drag-and-drop
     if (nodeType === 'question') {
       // Use the same initialization logic as drag-and-drop
@@ -1694,24 +1662,24 @@ function placeNodeAtClickLocation(graph, nodeType) {
         window.updateLinkedCheckboxNodeCell(cell);
       }
     }
-    
+
     // Clear the click position
     window.emptySpaceClickX = undefined;
     window.emptySpaceClickY = undefined;
-    
+
   } finally {
     graphToUse.getModel().endUpdate();
   }
-  
+
   // Select the new cell and finalize - use same logic as drag-and-drop
   if (cell) {
     graphToUse.setSelectionCell(cell);
-    
+
     // Call refreshAllCells for all node types to ensure proper display
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
-    
+
     // Request autosave
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
@@ -1722,14 +1690,14 @@ function placeNodeAtClickLocation(graph, nodeType) {
 // Place Miscellaneous Node at click location
 function placeMiscellaneousNodeAtClickLocation(graph) {
   if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
-  
+
   // Use the global graph variable if the parameter is not available
   const graphToUse = graph || window.graph;
   if (!graphToUse) {
-    console.error('Graph not available for miscellaneous node placement');
+
     return;
   }
-  
+
   const parent = graphToUse.getDefaultParent();
   graphToUse.getModel().beginUpdate();
   let cell;
@@ -1753,29 +1721,29 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
         <option value="linkedLogic">Linked Logic Node</option>
       </select>
     </div>`;
-    
+
     cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, style);
-    
+
     // Mark this as a miscellaneous node
     cell._isMiscellaneousNode = true;
-    
+
     // Clear the click position
     window.emptySpaceClickX = undefined;
     window.emptySpaceClickY = undefined;
-    
+
   } finally {
     graphToUse.getModel().endUpdate();
   }
-  
+
   // Select the new cell and finalize
   if (cell) {
     graphToUse.setSelectionCell(cell);
-    
+
     // Call refreshAllCells to ensure proper display
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
-    
+
     // Request autosave
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
@@ -1787,14 +1755,14 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
 window.convertMiscellaneousNode = function(selectElement) {
   const selectedType = selectElement.value;
   if (!selectedType) return;
-  
+
   // Find the cell that contains this select element
   const graph = window.graph;
   if (!graph) return;
-  
+
   const cells = graph.getChildCells(graph.getDefaultParent(), true, true);
   let targetCell = null;
-  
+
   // Find the cell that contains this select element
   for (const cell of cells) {
     if (cell._isMiscellaneousNode && cell.value && cell.value.includes(selectElement.id)) {
@@ -1802,25 +1770,25 @@ window.convertMiscellaneousNode = function(selectElement) {
       break;
     }
   }
-  
+
   if (!targetCell) return;
-  
+
   // Get current position and size
   const geometry = targetCell.geometry;
   const x = geometry.x;
   const y = geometry.y;
-  
+
   // Use the exact same logic as placeNodeAtClickLocation
   graph.getModel().beginUpdate();
   try {
     // Remove the miscellaneous node marker
     delete targetCell._isMiscellaneousNode;
-    
+
     let style = "";
     let label = "";
     let width = 160;
     let height = 80;
-    
+
     // Use exact same logic as placeNodeAtClickLocation
     if (selectedType === 'calculation') {
       // Calculation node style and label now handled by calc.js
@@ -1896,17 +1864,17 @@ window.convertMiscellaneousNode = function(selectElement) {
       width = 150;
       height = 80;
     }
-    
+
     // Update the cell with new style, label, and dimensions
     targetCell.style = style;
     targetCell.value = label;
-    
+
     // Update geometry with new dimensions
     const newGeometry = geometry.clone();
     newGeometry.width = width;
     newGeometry.height = height;
     graph.getModel().setGeometry(targetCell, newGeometry);
-    
+
     // Initialize specific node types - use exact same logic as placeNodeAtClickLocation
     if (selectedType === 'calculation') {
       // Use same logic as drag-and-drop for calculation nodes
@@ -1980,16 +1948,16 @@ window.convertMiscellaneousNode = function(selectElement) {
         window.updateLinkedLogicNodeCell(targetCell);
       }
     }
-    
+
   } finally {
     graph.getModel().endUpdate();
   }
-  
+
   // Refresh the cell display
   if (typeof window.refreshAllCells === 'function') {
     window.refreshAllCells();
   }
-  
+
   // Request autosave
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
@@ -2001,58 +1969,58 @@ window.convertMiscellaneousNode = function(selectElement) {
  */
 function placeSampleQuestion(graph) {
   if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
-  
+
   const graphToUse = graph || window.graph;
   if (!graphToUse) {
-    console.error('Graph not available for sample question placement');
+
     return;
   }
-  
+
   const parent = graphToUse.getDefaultParent();
   graphToUse.getModel().beginUpdate();
-  
+
   try {
     // Create the main question node (dropdown type)
     const questionStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;spacing=12;fontSize=16;align=center;verticalAlign=middle;pointerEvents=1;overflow=fill;";
     const questionCell = graphToUse.insertVertex(parent, null, "Hungry?", 
       window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, questionStyle);
-    
+
     // Set question text
     questionCell._questionText = "Hungry?";
-    
+
     // Create Yes option - positioned slightly to the right of the dropdown
     const yesOptionStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;spacing=12;fontSize=16;align=center;verticalAlign=middle;pointerEvents=1;overflow=fill;";
     const yesOption = graphToUse.insertVertex(parent, null, "Yes", 
       window.emptySpaceClickX + 20, window.emptySpaceClickY + 120, 80, 40, yesOptionStyle);
     yesOption._optionText = "Yes";
-    
+
     // Create No option - positioned slightly to the right of the dropdown
     const noOptionStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;spacing=12;fontSize=16;align=center;verticalAlign=middle;pointerEvents=1;overflow=fill;";
     const noOption = graphToUse.insertVertex(parent, null, "No", 
       window.emptySpaceClickX + 120, window.emptySpaceClickY + 120, 80, 40, noOptionStyle);
     noOption._optionText = "No";
-    
+
     // Connect question to options
     graphToUse.insertEdge(parent, null, "", questionCell, yesOption, "edgeStyle=none;rounded=0;orthogonalLoop=0;");
     graphToUse.insertEdge(parent, null, "", questionCell, noOption, "edgeStyle=none;rounded=0;orthogonalLoop=0;");
-    
+
     // Select the question cell
     graphToUse.setSelectionCell(questionCell);
-    
+
     // Call refreshAllCells to ensure proper display
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
     }
-    
+
     // Request autosave
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
-    
+
   } catch (error) {
-    console.error('Error creating sample question:', error);
+
   }
-  
+
   graphToUse.getModel().endUpdate();
 }
 
@@ -2061,13 +2029,13 @@ function initializeContextMenusModule(graph) {
   if (!graph) {
     return;
   }
-  
+
   // Initialize DOM element references first
   initializeContextMenuElements();
-  
+
   // Setup context menus
   setupContextMenus(graph);
-  
+
   // Setup event listeners
   setupContextMenuEventListeners(graph);
 }
@@ -2078,15 +2046,15 @@ window.contextMenus = {
   hideContextMenu,
   getNodeType,
   isEndNode,
-  
+
   // Setup functions
   setupContextMenus,
   setupContextMenuEventListeners,
-  
+
   // Menu functions
   showPropertiesMenu,
   placeNodeAtClickLocation,
-  
+
   // Initialization
   initializeContextMenusModule
 };
@@ -2103,37 +2071,37 @@ Object.assign(window, {
 
 // Test function for debugging context menu properties button
 window.testContextMenuProperties = function() {
-  console.log("🔧 [TEST] Testing context menu properties button...");
+
   const graph = window.graph;
   if (!graph) {
-    console.log("🔧 [TEST] No graph available");
+
     return;
   }
-  
+
   const selectedCells = graph.getSelectionCells();
   if (selectedCells.length === 0) {
-    console.log("🔧 [TEST] No cells selected, selecting first available cell");
+
     const vertices = graph.getChildVertices(graph.getModel().getRoot());
     if (vertices.length > 0) {
       graph.setSelectionCell(vertices[0]);
       window.selectedCell = vertices[0];
-      console.log("🔧 [TEST] Selected cell:", vertices[0]);
+
     } else {
-      console.log("🔧 [TEST] No vertices available");
+
       return;
     }
   } else {
     window.selectedCell = selectedCells[0];
-    console.log("🔧 [TEST] Using selected cell:", selectedCells[0]);
+
   }
-  
+
   // Simulate clicking the properties button
   const propertiesButton = document.getElementById('propertiesButton');
   if (propertiesButton) {
-    console.log("🔧 [TEST] Properties button found, simulating click");
+
     propertiesButton.click();
   } else {
-    console.log("🔧 [TEST] Properties button not found");
+
   }
 };
 

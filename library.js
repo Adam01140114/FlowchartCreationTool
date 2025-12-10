@@ -21,8 +21,6 @@ function isAlertNode(cell) {
 
 // Export functions moved to export.js module
 
-
-
 // Import a flowchart JSON file
 function importFlowchartJson(event) {
   const file = event.target.files[0];
@@ -89,15 +87,15 @@ window.exportGuiJson = function(download = true) {
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
   }
-  
+
   // Reset all Node IDs SECOND (after PDF inheritance is fixed)
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
   }
-  
+
   // Renumber questions by Y position before export
   renumberQuestionIds();
-  
+
   // Get all cells
   const cells = graph.getModel().cells;
   const sections = [];
@@ -121,9 +119,7 @@ window.exportGuiJson = function(download = true) {
   const sectionMap = {};
   // Get current section preferences using the proper function
   const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.sectionPrefs || {});
-  
-  console.log('🔍 [GUI EXPORT DEBUG] Current section preferences:', JSON.stringify(currentSectionPrefs, null, 2));
-  
+
   for (const num in currentSectionPrefs) {
     if (parseInt(num) >= sectionCounter) {
       sectionCounter = parseInt(num) + 1;
@@ -133,15 +129,15 @@ window.exportGuiJson = function(download = true) {
     if (sectionName === "Enter section name" || sectionName === "Enter Name") {
       sectionName = `Section ${num}`;
     }
-    
+
     sectionMap[num] = {
       sectionId: parseInt(num),
       sectionName: sectionName,
       questions: []
     };
-    console.log(`🔍 [GUI EXPORT DEBUG] Section ${num} name: "${currentSectionPrefs[num].name || `Section ${num}`}"`);
+
   }
-  
+
   // Find the maximum section number used by questions
   let maxSectionNumber = 1;
   for (const cell of questions) {
@@ -151,7 +147,7 @@ window.exportGuiJson = function(download = true) {
       maxSectionNumber = sectionNum;
     }
   }
-  
+
   // Update sectionCounter to be the next available section number
   sectionCounter = Math.max(sectionCounter, maxSectionNumber + 1);
 
@@ -166,7 +162,7 @@ window.exportGuiJson = function(download = true) {
         sectionName = "Section 1";
       }
     }
-    
+
     sectionMap["1"] = {
       sectionId: 1,
       sectionName: sectionName,
@@ -177,16 +173,16 @@ window.exportGuiJson = function(download = true) {
   // Add questions to sections by their section number
   for (const cell of questions) {
     let section = getSection(cell) || "1";
-    
+
     // Special case: If this is the first question (lowest Y position), put it in Section 1
     const isFirstQuestion = questions.every(otherCell => 
       otherCell === cell || cell.geometry.y <= otherCell.geometry.y
     );
-    
+
     if (isFirstQuestion && section !== "1") {
       section = "1";
     }
-    
+
     if (!sectionMap[section]) {
       // Get the section name from sectionPrefs, with fallback to default
       let sectionName = `Section ${section}`;
@@ -197,19 +193,19 @@ window.exportGuiJson = function(download = true) {
           sectionName = `Section ${section}`;
         }
       }
-      
+
       sectionMap[section] = {
         sectionId: parseInt(section),
         sectionName: sectionName,
         questions: []
       };
     }
-    
+
     let questionType = getQuestionType(cell);
     let exportType = questionType;
     // --- PATCH: treat text2 as dropdown ---
     if (questionType === "text2") exportType = "dropdown";
-    
+
     const question = {
       questionId: cell._questionId || questionCounter,
       text: cell._questionText || cell.value || "",
@@ -273,13 +269,13 @@ window.exportGuiJson = function(download = true) {
         height: 0
       }
     };
-    
+
     // Add nameId and placeholder for non-multiple textboxes questions
     if (questionType !== "multipleTextboxes") {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
     }
-      
+
       // Add line limit and character limit for big paragraph questions
       if (questionType === "bigParagraph") {
         if (cell._lineLimit !== undefined && cell._lineLimit !== '') {
@@ -291,7 +287,7 @@ window.exportGuiJson = function(download = true) {
         if (cell._paragraphLimit !== undefined && cell._paragraphLimit !== '') {
           question.paragraphLimit = parseInt(cell._paragraphLimit) || 0;
         }
-        
+
         // Add Big Paragraph PDF Logic if enabled
         if (cell._pdfLogicEnabled) {
           question.pdfLogic.enabled = true;
@@ -306,60 +302,61 @@ window.exportGuiJson = function(download = true) {
           }];
         }
     }
-    
+
     // For text2, clean the text from HTML
     if (questionType === "text2" && question.text) {
       const temp = document.createElement("div");
       temp.innerHTML = question.text;
       question.text = temp.textContent || temp.innerText || question.text;
     }
-    
+
     // Clean HTML entities and tags from all question text
     if (question.text) {
       // First decode HTML entities
       const textarea = document.createElement('textarea');
       textarea.innerHTML = question.text;
       let cleanedText = textarea.value;
-      
+
       // Then remove HTML tags
       const temp = document.createElement("div");
       temp.innerHTML = cleanedText;
       cleanedText = temp.textContent || temp.innerText || cleanedText;
-      
+
       // Clean up extra whitespace
       cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
-      
+
       question.text = cleanedText;
     }
-    
+
     // For multiple textboxes, add the textboxes array and nodeId with location data support
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
       // Process PDF name to remove .pdf extension and clean up formatting
       const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
-      
+
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
-      
+
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
-      
+
       // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
       const allFieldsInOrder = [];
-      
+
       // If _itemOrder exists, use it to determine the correct order
       if (cell._itemOrder && cell._itemOrder.length > 0) {
-        console.log('🔧 [GUI EXPORT DEBUG] Using _itemOrder for field ordering:', cell._itemOrder);
-        
+
         cell._itemOrder.forEach((item, orderIndex) => {
           // Handle both 'option' (for numbered dropdowns) and 'textbox' (for multiple textboxes) types
           if ((item.type === 'option' || item.type === 'textbox') && cell._textboxes && cell._textboxes[item.index]) {
             const tb = cell._textboxes[item.index];
             const labelName = tb.nameId || "";
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            const fieldType = tb.isAmountOption ? "amount" : "label";
-            
+            const fieldType = tb.type === 'phone'
+              ? 'phone'
+              : (tb.isAmountOption ? "amount" : "label");
+
             allFieldsInOrder.push({
               type: fieldType,
               label: labelName,
@@ -391,7 +388,7 @@ window.exportGuiJson = function(download = true) {
               text: option.checkboxText || option.text || "",
               nodeId: option.nodeId || ""
               };
-              
+
               // Add linked fields if they exist
               if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
                 optionObj.linkedFields = option.linkedFields.map(linkedField => {
@@ -408,7 +405,7 @@ window.exportGuiJson = function(download = true) {
                   };
                 });
               }
-              
+
               // Add PDF entries if they exist
               if (option.pdfEntries && Array.isArray(option.pdfEntries) && option.pdfEntries.length > 0) {
                 optionObj.pdfEntries = option.pdfEntries.map(pdfEntry => ({
@@ -418,10 +415,10 @@ window.exportGuiJson = function(download = true) {
                   priceId: pdfEntry.priceId || ""
                 }));
               }
-              
+
               return optionObj;
             }) : [];
-            
+
             allFieldsInOrder.push({
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
@@ -442,13 +439,13 @@ window.exportGuiJson = function(download = true) {
                 nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
               };
             }) : [];
-            
+
             // Process trigger sequences
             const triggerSequences = [];
             if (dropdown.triggerSequences && dropdown.triggerSequences.length > 0) {
               dropdown.triggerSequences.forEach(trigger => {
                 const fields = [];
-                
+
                 // Create maps for quick lookup by identifier
                 const labelMap = new Map();
                 if (trigger.labels && trigger.labels.length > 0) {
@@ -456,21 +453,21 @@ window.exportGuiJson = function(download = true) {
                     labelMap.set(label.fieldName || '', label);
                   });
                 }
-                
+
                 const checkboxMap = new Map();
                 if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                   trigger.checkboxes.forEach(checkbox => {
                     checkboxMap.set(checkbox.fieldName || '', checkbox);
                   });
                 }
-                
+
                 const timeMap = new Map();
                 if (trigger.times && trigger.times.length > 0) {
                   trigger.times.forEach(time => {
                     timeMap.set(time.fieldName || '', time);
                   });
                 }
-                
+
                 const locationMap = new Map();
                 if (trigger.locations && trigger.locations.length > 0) {
                   trigger.locations.forEach(location => {
@@ -478,7 +475,7 @@ window.exportGuiJson = function(download = true) {
                     locationMap.set(identifier, location);
                   });
                 }
-                
+
                 const pdfMap = new Map();
                 if (trigger.pdfs && trigger.pdfs.length > 0) {
                   trigger.pdfs.forEach(pdf => {
@@ -486,14 +483,14 @@ window.exportGuiJson = function(download = true) {
                     pdfMap.set(identifier, pdf);
                   });
                 }
-                
+
                 const dropdownMap = new Map();
                 if (trigger.dropdowns && trigger.dropdowns.length > 0) {
                   trigger.dropdowns.forEach(nestedDropdown => {
                     dropdownMap.set(nestedDropdown.fieldName || '', nestedDropdown);
                   });
                 }
-                
+
                 // Use unified order if available, otherwise use type-based order
                 if (trigger._actionOrder && trigger._actionOrder.length > 0) {
                   // Add fields in the unified order
@@ -523,7 +520,7 @@ window.exportGuiJson = function(download = true) {
                             text: option.checkboxText || "",
                             nodeId: option.nodeId || ""
                           };
-                          
+
                           // Add linked fields if they exist
                           if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
                             optionObj.linkedFields = option.linkedFields.map(linkedField => ({
@@ -531,10 +528,10 @@ window.exportGuiJson = function(download = true) {
                               title: linkedField.title || ""
                             }));
                           }
-                          
+
                           return optionObj;
                         }) : [];
-                        
+
                         fields.push({
                           type: "checkbox",
                           fieldName: checkbox.fieldName || "",
@@ -559,7 +556,7 @@ window.exportGuiJson = function(download = true) {
                           label: time.fieldName || "",
                           nodeId: nodeId
                         };
-                        
+
                         // Include conditional logic if it exists
                         if (time.conditionalLogic && time.conditionalLogic.enabled) {
                           // Regenerate conditions if they're missing forward slashes
@@ -586,13 +583,13 @@ window.exportGuiJson = function(download = true) {
                               return condition;
                             });
                           }
-                          
+
                           dateField.conditionalLogic = {
                             enabled: time.conditionalLogic.enabled,
                             conditions: conditions.filter(c => c && c.trim() !== '')
                           };
                         }
-                        
+
                         fields.push(dateField);
                       }
                     } else if (orderItem.type === 'dropdown') {
@@ -601,13 +598,13 @@ window.exportGuiJson = function(download = true) {
                         const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                           text: option.text || ""
                         })) : [];
-                        
+
                         const dropdownField = {
                           type: "dropdown",
                           fieldName: nestedDropdown.fieldName || "",
                           options: nestedDropdownOptions
                         };
-                        
+
                         // Include conditional logic if it exists
                         if (nestedDropdown.conditionalLogic && nestedDropdown.conditionalLogic.enabled) {
                           // Regenerate conditions if they're missing forward slashes
@@ -634,13 +631,13 @@ window.exportGuiJson = function(download = true) {
                               return condition;
                             });
                           }
-                          
+
                           dropdownField.conditionalLogic = {
                             enabled: nestedDropdown.conditionalLogic.enabled,
                             conditions: conditions.filter(c => c && c.trim() !== '')
                           };
                         }
-                        
+
                         fields.push(dropdownField);
                       }
                     } else if (orderItem.type === 'location') {
@@ -665,7 +662,7 @@ window.exportGuiJson = function(download = true) {
                       }
                     }
                   });
-                  
+
                   // Add any fields not in the unified order (safety check)
                   if (trigger.labels && trigger.labels.length > 0) {
                     trigger.labels.forEach(label => {
@@ -688,7 +685,7 @@ window.exportGuiJson = function(download = true) {
                       }
                     });
                   }
-                  
+
                   if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                     trigger.checkboxes.forEach(checkbox => {
                       if (!checkboxMap.has(checkbox.fieldName || '')) {
@@ -698,7 +695,7 @@ window.exportGuiJson = function(download = true) {
                             text: option.checkboxText || "",
                             nodeId: option.nodeId || ""
                           })) : [];
-                          
+
                           fields.push({
                             type: "checkbox",
                             fieldName: checkbox.fieldName || "",
@@ -710,7 +707,7 @@ window.exportGuiJson = function(download = true) {
                       }
                     });
                   }
-                  
+
                   if (trigger.times && trigger.times.length > 0) {
                     trigger.times.forEach(time => {
                       if (!timeMap.has(time.fieldName || '')) {
@@ -728,7 +725,7 @@ window.exportGuiJson = function(download = true) {
                             label: time.fieldName || "",
                             nodeId: nodeId
                           };
-                          
+
                           // Include conditional logic if it exists
                           if (time.conditionalLogic && time.conditionalLogic.enabled) {
                             dateField.conditionalLogic = {
@@ -736,13 +733,13 @@ window.exportGuiJson = function(download = true) {
                               conditions: time.conditionalLogic.conditions || []
                             };
                           }
-                          
+
                           fields.push(dateField);
                         }
                       }
                     });
                   }
-                  
+
                   if (trigger.locations && trigger.locations.length > 0) {
                     trigger.locations.forEach(location => {
                       const identifier = location.locationTitle || location.fieldName || 'location';
@@ -758,7 +755,7 @@ window.exportGuiJson = function(download = true) {
                       }
                     });
                   }
-                  
+
                   if (trigger.dropdowns && trigger.dropdowns.length > 0) {
                     trigger.dropdowns.forEach(nestedDropdown => {
                       // Check if this dropdown was already added to fields
@@ -767,7 +764,7 @@ window.exportGuiJson = function(download = true) {
                         const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                           text: option.text || ""
                         })) : [];
-                        
+
                         fields.push({
                           type: "dropdown",
                           fieldName: nestedDropdown.fieldName || "",
@@ -776,7 +773,7 @@ window.exportGuiJson = function(download = true) {
                       }
                     });
                   }
-                  
+
                   if (trigger.pdfs && trigger.pdfs.length > 0) {
                     trigger.pdfs.forEach(pdf => {
                       const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
@@ -806,7 +803,7 @@ window.exportGuiJson = function(download = true) {
                       });
                     });
                   }
-                  
+
                   // Add checkboxes
                   if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                     trigger.checkboxes.forEach(checkbox => {
@@ -815,7 +812,7 @@ window.exportGuiJson = function(download = true) {
                           text: option.checkboxText || "",
                           nodeId: option.nodeId || ""
                         };
-                        
+
                         // Add linked fields if they exist
                         if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
                           optionObj.linkedFields = option.linkedFields.map(linkedField => ({
@@ -823,10 +820,10 @@ window.exportGuiJson = function(download = true) {
                             title: linkedField.title || ""
                           }));
                         }
-                        
+
                         return optionObj;
                       }) : [];
-                      
+
                       fields.push({
                         type: "checkbox",
                         fieldName: checkbox.fieldName || "",
@@ -836,7 +833,7 @@ window.exportGuiJson = function(download = true) {
                       });
                     });
                   }
-                  
+
                   // Add times
                   if (trigger.times && trigger.times.length > 0) {
                     trigger.times.forEach(time => {
@@ -845,7 +842,7 @@ window.exportGuiJson = function(download = true) {
                         label: time.fieldName || "",
                         nodeId: time.nodeId || ""
                       };
-                      
+
                       // Include conditional logic if it exists
                       if (time.conditionalLogic && time.conditionalLogic.enabled) {
                         dateField.conditionalLogic = {
@@ -853,11 +850,11 @@ window.exportGuiJson = function(download = true) {
                           conditions: time.conditionalLogic.conditions || []
                         };
                       }
-                      
+
                       fields.push(dateField);
                     });
                   }
-                  
+
                   // Add locations
                   if (trigger.locations && trigger.locations.length > 0) {
                     trigger.locations.forEach(location => {
@@ -868,14 +865,14 @@ window.exportGuiJson = function(download = true) {
                       });
                     });
                   }
-                  
+
                   // Add dropdowns
                   if (trigger.dropdowns && trigger.dropdowns.length > 0) {
                     trigger.dropdowns.forEach(nestedDropdown => {
                       const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                         text: option.text || ""
                       })) : [];
-                      
+
                       fields.push({
                         type: "dropdown",
                         fieldName: nestedDropdown.fieldName || "",
@@ -883,7 +880,7 @@ window.exportGuiJson = function(download = true) {
                       });
                     });
                   }
-                  
+
                   // Add PDFs
                   if (trigger.pdfs && trigger.pdfs.length > 0) {
                     trigger.pdfs.forEach(pdf => {
@@ -897,22 +894,22 @@ window.exportGuiJson = function(download = true) {
                     });
                   }
                 }
-                
+
                 // Find the matching option text for the condition
                 const matchingOption = dropdown.options.find(option => option.value === trigger.triggerOption);
                 const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
-                
+
                 triggerSequences.push({
                   condition: conditionText,
                   fields: fields
                 });
               });
             }
-            
+
             // Calculate the correct order for dropdown
             // All items (including location) are now single entries, so use orderIndex + 1
             let dropdownOrder = orderIndex + 1;
-            
+
             allFieldsInOrder.push({
               type: "dropdown",
               fieldName: dropdown.name || "",
@@ -924,18 +921,20 @@ window.exportGuiJson = function(download = true) {
         });
       } else {
         // Fallback to old logic if _itemOrder doesn't exist
-        console.log('🔧 [GUI EXPORT DEBUG] No _itemOrder found, using fallback logic');
+
         const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
-        
+
         // Process each textbox in order
         if (cell._textboxes && cell._textboxes.length > 0) {
           cell._textboxes.forEach((tb, index) => {
             const labelName = tb.nameId || "";
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            
-            // Check if this textbox is marked as an amount option
-            const fieldType = tb.isAmountOption ? "amount" : "label";
-            
+
+            // Check if this textbox is marked as an amount option or phone
+            const fieldType = tb.type === 'phone'
+              ? 'phone'
+              : (tb.isAmountOption ? "amount" : "label");
+
             allFieldsInOrder.push({
               type: fieldType,
               label: labelName,
@@ -946,10 +945,10 @@ window.exportGuiJson = function(download = true) {
             });
           });
         }
-        
+
         // Insert location entry at the correct position if locationIndex is set
         const shouldIncludeLocationFields = locationIndex >= 0;
-        
+
         if (shouldIncludeLocationFields) {
           // Export as a single location entry with fieldName (location title) and nodeId: "location_data"
           // Similar to how numbered dropdown questions export location data
@@ -959,19 +958,19 @@ window.exportGuiJson = function(download = true) {
             nodeId: "location_data",
             order: locationIndex + 1
           };
-          
+
           if (allFieldsInOrder.length === 0) {
             allFieldsInOrder.push(locationEntry);
           } else {
             allFieldsInOrder.splice(locationIndex, 0, locationEntry);
-            
+
             // Re-number all fields after insertion
             allFieldsInOrder.forEach((field, index) => {
               field.order = index + 1;
             });
           }
         }
-        
+
         // Add checkbox fields if they exist
         if (cell._checkboxes && cell._checkboxes.length > 0) {
           cell._checkboxes.forEach((checkbox, checkboxIndex) => {
@@ -980,7 +979,7 @@ window.exportGuiJson = function(download = true) {
               text: option.checkboxText || option.text || "",
               nodeId: option.nodeId || ""
               };
-              
+
               // Add linked fields if they exist
               if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
                 optionObj.linkedFields = option.linkedFields.map(linkedField => {
@@ -997,7 +996,7 @@ window.exportGuiJson = function(download = true) {
                   };
                 });
               }
-              
+
               // Add PDF entries if they exist
               if (option.pdfEntries && Array.isArray(option.pdfEntries) && option.pdfEntries.length > 0) {
                 optionObj.pdfEntries = option.pdfEntries.map(pdfEntry => ({
@@ -1007,10 +1006,10 @@ window.exportGuiJson = function(download = true) {
                   priceId: pdfEntry.priceId || ""
                 }));
               }
-              
+
               return optionObj;
             }) : [];
-            
+
             allFieldsInOrder.push({
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
@@ -1020,7 +1019,7 @@ window.exportGuiJson = function(download = true) {
             });
           });
         }
-        
+
         // Add time fields if they exist
         if (cell._times && cell._times.length > 0) {
           cell._times.forEach((time, timeIndex) => {
@@ -1033,10 +1032,10 @@ window.exportGuiJson = function(download = true) {
           });
         }
       }
-      
+
       // Set the allFieldsInOrder array
       question.allFieldsInOrder = allFieldsInOrder;
-      
+
       // Keep backward compatibility with old format
       question.textboxes = cell._textboxes.map(tb => ({
         label: "", // Empty label field as required
@@ -1045,10 +1044,10 @@ window.exportGuiJson = function(download = true) {
       }));
       // Add empty amounts array for multipleTextboxes
       question.amounts = [];
-      
+
       // Add nodeId for multiple textboxes (with PDF prefix if available)
       question.nodeId = nodeId;
-      
+
       // Add missing fields to match expected structure
       question.pdfLogic = {
         enabled: false,
@@ -1058,12 +1057,12 @@ window.exportGuiJson = function(download = true) {
         conditions: []
       };
     }
-    
+
     // Handle outgoing edges to option nodes
     const outgoingEdges = graph.getOutgoingEdges(cell);
     const jumpConditions = [];
     let endOption = null;
-    
+
     // Check for direct connections to END nodes or other questions (for text-based questions)
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
@@ -1087,23 +1086,23 @@ window.exportGuiJson = function(download = true) {
             if (targetQuestionId) {
               // Get the target question's section using the same logic as section assignment
               let targetSection = parseInt(getSection(targetCell) || "1", 10);
-              
+
               // Apply the same section assignment logic for the target question
               const targetIsFirstQuestion = questions.every(otherCell => 
                 otherCell === targetCell || targetCell.geometry.y <= otherCell.geometry.y
               );
-              
+
               if (targetIsFirstQuestion && targetSection !== 1) {
                 targetSection = 1;
               }
-              
+
               const currentSection = parseInt(section || "1", 10);
-              
+
               // Only add jump logic if:
               // 1. Target is in a section before current section, OR
               // 2. Target is more than 1 section above current section
               const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
-              
+
               if (shouldAddJump) {
                 jumpConditions.push({
                   option: "Any Text",
@@ -1115,7 +1114,7 @@ window.exportGuiJson = function(download = true) {
         }
       }
     }
-    
+
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
@@ -1127,21 +1126,21 @@ window.exportGuiJson = function(download = true) {
             const textarea = document.createElement('textarea');
             textarea.innerHTML = optionText;
             let cleanedText = textarea.value;
-            
+
             // Then remove HTML tags
             const temp = document.createElement("div");
             temp.innerHTML = cleanedText;
             cleanedText = temp.textContent || temp.innerText || cleanedText;
-            
+
             // Clean up extra whitespace
             cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
-            
+
             optionText = cleanedText;
           }
           const option = {
             text: optionText
           };
-          
+
           // Check if this option leads to an end node (directly or through multipleDropdownType/multipleTextboxes)
           const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
@@ -1176,30 +1175,30 @@ window.exportGuiJson = function(download = true) {
                     }
                   }
                 }
-                
+
                 // Check for jumps to other questions - only add jump logic if target is in a different section
                 // that is either before the current section or more than 1 section above
                 const targetQuestionId = optionTarget._questionId || "";
                 if (targetQuestionId) {
                   // Get the target question's section using the same logic as section assignment
                   let targetSection = parseInt(getSection(optionTarget) || "1", 10);
-                  
+
                   // Apply the same section assignment logic for the target question
                   const targetIsFirstQuestion = questions.every(otherCell => 
                     otherCell === optionTarget || optionTarget.geometry.y <= otherCell.geometry.y
                   );
-                  
+
                   if (targetIsFirstQuestion && targetSection !== 1) {
                     targetSection = 1;
                   }
-                  
+
                   const currentSection = parseInt(section || "1", 10);
-                  
+
                   // Only add jump logic if:
                   // 1. Target is in a section before current section, OR
                   // 2. Target is more than 1 section above current section
                   const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
-                  
+
                   if (shouldAddJump) {
                     // Check if this jump already exists
                     const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
@@ -1214,7 +1213,7 @@ window.exportGuiJson = function(download = true) {
               }
             }
           }
-          
+
           // Handle amount options
           if (getQuestionType(targetCell) === "amountOption") {
             option.amount = {
@@ -1230,7 +1229,7 @@ window.exportGuiJson = function(download = true) {
         }
       }
     }
-    
+
     // Check for hidden logic - look for hidden checkbox/textbox nodes connected to options
     const hiddenLogicConfigs = [];
     if (outgoingEdges) {
@@ -1249,7 +1248,7 @@ window.exportGuiJson = function(download = true) {
             cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
             optionText = cleanedText;
           }
-          
+
           // Check if this option connects to hidden nodes
           const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
           if (optionOutgoingEdges) {
@@ -1277,7 +1276,7 @@ window.exportGuiJson = function(download = true) {
         }
       }
     }
-    
+
     // Sort options by their position (X coordinate, then Y coordinate) for both checkbox and dropdown
     if (exportType === "checkbox" || exportType === "dropdown") {
       question.options.sort((a, b) => {
@@ -1299,17 +1298,17 @@ window.exportGuiJson = function(download = true) {
                 cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
                 optionText = cleanedText;
               }
-              
+
               if (optionText === a.text || optionText === b.text) {
                 optionCells.push({ text: optionText, cell: targetCell });
               }
             }
           }
         }
-        
+
         const aCell = optionCells.find(oc => oc.text === a.text)?.cell;
         const bCell = optionCells.find(oc => oc.text === b.text)?.cell;
-        
+
         if (aCell && bCell) {
           const aX = aCell.geometry?.x || 0;
           const bX = bCell.geometry?.x || 0;
@@ -1321,7 +1320,7 @@ window.exportGuiJson = function(download = true) {
         return 0;
       });
     }
-    
+
     // Set hidden logic if any hidden nodes are connected to options
     if (hiddenLogicConfigs.length > 0) {
       question.hiddenLogic = {
@@ -1334,22 +1333,22 @@ window.exportGuiJson = function(download = true) {
         configs: []
       };
     }
-    
+
     // Set jump logic if any options lead to end nodes or section jumps
     if (jumpConditions.length > 0) {
       question.jump.enabled = true;
       question.jump.conditions = jumpConditions;
     }
-    
+
     // Set conditionalPDF answer to the option that leads to end (if any)
     if (endOption) {
       question.conditionalPDF.answer = endOption;
     }
-    
+
     // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
     if (exportType === "dropdown") {
       let imageData = null;
-      
+
       // Convert options to array of strings, and extract image node if present
       question.options = question.options.map(opt => {
         if (typeof opt.text === 'string') {
@@ -1362,13 +1361,13 @@ window.exportGuiJson = function(download = true) {
         }
         return "";
       }).filter(opt => opt !== null); // Remove null entries (image options)
-      
+
       // Update image field if imageData is found
       if (imageData) {
         question.image = imageData;
       }
     }
-    
+
     // --- PATCH: For checkboxes, convert options to proper checkbox format ---
     if (exportType === "checkbox") {
       // Clean the question text from HTML
@@ -1377,24 +1376,24 @@ window.exportGuiJson = function(download = true) {
         temp.innerHTML = question.text;
         question.text = temp.textContent || temp.innerText || question.text;
       }
-      
+
       // Get the proper base nameId from the question's nodeId
       const baseNameId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || question.nameId || "unnamed";
-      
+
       // Check if this is a "mark only one" checkbox
       const checkboxAvailability = cell._checkboxAvailability || 'markAll';
-      
+
       // Convert options to checkbox format with proper amount handling
       question.options = question.options.map(opt => {
         if (typeof opt.text === 'string') {
           const optionText = opt.text.trim();
-          
+
           // Check if this option has amount properties
           const hasAmount = opt.amount && typeof opt.amount === 'object';
-          
+
           // Always use the base nameId prefix for checkbox options
           const nameId = `${baseNameId}_${optionText.toLowerCase().replace(/\s+/g, '_')}`;
-          
+
           return {
             label: optionText,
             nameId: nameId,
@@ -1413,10 +1412,10 @@ window.exportGuiJson = function(download = true) {
           amountPlaceholder: ""
         };
       });
-      
+
       // Set conditionalPDF answer to "Yes" for checkboxes
       question.conditionalPDF.answer = "Yes";
-      
+
       // For "mark only one" checkboxes, add markOnlyOne field and remove nameId/placeholder
       if (checkboxAvailability === 'markOne') {
         question.markOnlyOne = true;
@@ -1424,39 +1423,40 @@ window.exportGuiJson = function(download = true) {
         delete question.placeholder;
       }
     }
-    
+
     // --- PATCH: For multipleDropdownType, convert to numberedDropdown format ---
     if (exportType === "multipleDropdownType") {
       // Change type to numberedDropdown
       question.type = "numberedDropdown";
-      
+
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
       // Process PDF name to remove .pdf extension and clean up formatting
       const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
-      
+
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
-      
+
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
-      
+
       // Extract labels and amounts from textboxes with location data support
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
         // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
         const allFieldsInOrder = [];
-        
+
         // If _itemOrder exists, use it to determine the correct order
         if (cell._itemOrder && cell._itemOrder.length > 0) {
-          console.log('🔧 [GUI EXPORT DEBUG] NumberedDropdown using _itemOrder for field ordering:', cell._itemOrder);
-          
+
           cell._itemOrder.forEach((item, orderIndex) => {
             if (item.type === 'option' && cell._textboxes && cell._textboxes[item.index]) {
               const tb = cell._textboxes[item.index];
               const labelName = tb.nameId || tb.placeholder || "";
-              const fieldType = tb.isAmountOption === true ? "amount" : "label";
+              const fieldType = tb.type === 'phone'
+                ? 'phone'
+                : (tb.isAmountOption === true ? "amount" : "label");
               const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-              
+
               allFieldsInOrder.push({
                 type: fieldType,
                 label: labelName,
@@ -1488,7 +1488,7 @@ window.exportGuiJson = function(download = true) {
                 text: option.checkboxText || option.text || "",
                 nodeId: option.nodeId || ""
               };
-              
+
               // Add linked fields if they exist
               if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
                 optionObj.linkedFields = option.linkedFields.map(linkedField => {
@@ -1505,7 +1505,7 @@ window.exportGuiJson = function(download = true) {
                   };
                 });
               }
-              
+
               // Add PDF entries if they exist
               if (option.pdfEntries && Array.isArray(option.pdfEntries) && option.pdfEntries.length > 0) {
                 optionObj.pdfEntries = option.pdfEntries.map(pdfEntry => ({
@@ -1515,10 +1515,10 @@ window.exportGuiJson = function(download = true) {
                   priceId: pdfEntry.priceId || ""
                 }));
               }
-              
+
               return optionObj;
             }) : [];
-              
+
               allFieldsInOrder.push({
                 type: "checkbox",
                 fieldName: checkbox.fieldName || "",
@@ -1538,13 +1538,13 @@ window.exportGuiJson = function(download = true) {
                   nodeId: `${sanitizedDropdownName}_${sanitizedOptionValue}`
                 };
               }) : [];
-              
+
               // Process trigger sequences
               const triggerSequences = [];
               if (dropdown.triggerSequences && dropdown.triggerSequences.length > 0) {
                 dropdown.triggerSequences.forEach(trigger => {
                   const fields = [];
-                  
+
                   // Create maps for quick lookup by identifier
                   const labelMap = new Map();
                   if (trigger.labels && trigger.labels.length > 0) {
@@ -1552,21 +1552,21 @@ window.exportGuiJson = function(download = true) {
                       labelMap.set(label.fieldName || '', label);
                     });
                   }
-                  
+
                   const checkboxMap = new Map();
                   if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                     trigger.checkboxes.forEach(checkbox => {
                       checkboxMap.set(checkbox.fieldName || '', checkbox);
                     });
                   }
-                  
+
                   const timeMap = new Map();
                   if (trigger.times && trigger.times.length > 0) {
                     trigger.times.forEach(time => {
                       timeMap.set(time.fieldName || '', time);
                     });
                   }
-                  
+
                   const locationMap = new Map();
                   if (trigger.locations && trigger.locations.length > 0) {
                     trigger.locations.forEach(location => {
@@ -1574,7 +1574,7 @@ window.exportGuiJson = function(download = true) {
                       locationMap.set(identifier, location);
                     });
                   }
-                  
+
                   const pdfMap = new Map();
                   if (trigger.pdfs && trigger.pdfs.length > 0) {
                     trigger.pdfs.forEach(pdf => {
@@ -1582,14 +1582,14 @@ window.exportGuiJson = function(download = true) {
                       pdfMap.set(identifier, pdf);
                     });
                   }
-                  
+
                   const dropdownMap = new Map();
                   if (trigger.dropdowns && trigger.dropdowns.length > 0) {
                     trigger.dropdowns.forEach(dropdown => {
                       dropdownMap.set(dropdown.fieldName || '', dropdown);
                     });
                   }
-                  
+
                   // Use unified order if available, otherwise use type-based order
                   if (trigger._actionOrder && trigger._actionOrder.length > 0) {
                     // Add fields in the unified order
@@ -1618,7 +1618,7 @@ window.exportGuiJson = function(download = true) {
                             text: option.checkboxText || "",
                             nodeId: option.nodeId || ""
                           })) : [];
-                          
+
                           fields.push({
                             type: "checkbox",
                             fieldName: checkbox.fieldName || "",
@@ -1643,7 +1643,7 @@ window.exportGuiJson = function(download = true) {
                             label: time.fieldName || "",
                             nodeId: nodeId
                           };
-                          
+
                           // Include conditional logic if it exists
                           if (time.conditionalLogic && time.conditionalLogic.enabled) {
                             // Regenerate conditions if they're missing forward slashes
@@ -1670,13 +1670,13 @@ window.exportGuiJson = function(download = true) {
                                 return condition;
                               });
                             }
-                            
+
                             dateField.conditionalLogic = {
                               enabled: time.conditionalLogic.enabled,
                               conditions: conditions.filter(c => c && c.trim() !== '')
                             };
                           }
-                          
+
                           fields.push(dateField);
                         }
                       } else if (orderItem.type === 'dropdown') {
@@ -1685,13 +1685,13 @@ window.exportGuiJson = function(download = true) {
                           const dropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                             text: option.text || ""
                           })) : [];
-                          
+
                           const dropdownField = {
                             type: "dropdown",
                             fieldName: nestedDropdown.fieldName || "",
                             options: dropdownOptions
                           };
-                          
+
                           // Include conditional logic if it exists
                           if (nestedDropdown.conditionalLogic && nestedDropdown.conditionalLogic.enabled) {
                             // Regenerate conditions if they're missing forward slashes
@@ -1718,13 +1718,13 @@ window.exportGuiJson = function(download = true) {
                                 return condition;
                               });
                             }
-                            
+
                             dropdownField.conditionalLogic = {
                               enabled: nestedDropdown.conditionalLogic.enabled,
                               conditions: conditions.filter(c => c && c.trim() !== '')
                             };
                           }
-                          
+
                           fields.push(dropdownField);
                         }
                       } else if (orderItem.type === 'location') {
@@ -1749,7 +1749,7 @@ window.exportGuiJson = function(download = true) {
                         }
                       }
                     });
-                    
+
                     // Add any fields not in the unified order (safety check)
                     if (trigger.labels && trigger.labels.length > 0) {
                       trigger.labels.forEach(label => {
@@ -1772,7 +1772,7 @@ window.exportGuiJson = function(download = true) {
                         }
                       });
                     }
-                    
+
                     if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                       trigger.checkboxes.forEach(checkbox => {
                         if (!checkboxMap.has(checkbox.fieldName || '')) {
@@ -1782,7 +1782,7 @@ window.exportGuiJson = function(download = true) {
                               text: option.checkboxText || "",
                               nodeId: option.nodeId || ""
                             })) : [];
-                            
+
                             fields.push({
                               type: "checkbox",
                               fieldName: checkbox.fieldName || "",
@@ -1793,7 +1793,7 @@ window.exportGuiJson = function(download = true) {
                         }
                       });
                     }
-                    
+
                     if (trigger.times && trigger.times.length > 0) {
                       trigger.times.forEach(time => {
                         if (!timeMap.has(time.fieldName || '')) {
@@ -1811,7 +1811,7 @@ window.exportGuiJson = function(download = true) {
                               label: time.fieldName || "",
                               nodeId: nodeId
                             };
-                            
+
                             // Include conditional logic if it exists
                             if (time.conditionalLogic && time.conditionalLogic.enabled) {
                               dateField.conditionalLogic = {
@@ -1819,13 +1819,13 @@ window.exportGuiJson = function(download = true) {
                                 conditions: time.conditionalLogic.conditions || []
                               };
                             }
-                            
+
                             fields.push(dateField);
                           }
                         }
                       });
                     }
-                    
+
                     if (trigger.locations && trigger.locations.length > 0) {
                       trigger.locations.forEach(location => {
                         const identifier = location.locationTitle || location.fieldName || 'location';
@@ -1841,7 +1841,7 @@ window.exportGuiJson = function(download = true) {
                         }
                       });
                     }
-                    
+
                     if (trigger.dropdowns && trigger.dropdowns.length > 0) {
                       trigger.dropdowns.forEach(dropdown => {
                         // Check if this dropdown was already added to fields
@@ -1850,7 +1850,7 @@ window.exportGuiJson = function(download = true) {
                           const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
                             text: option.text || ""
                           })) : [];
-                          
+
                           fields.push({
                             type: "dropdown",
                             fieldName: dropdown.fieldName || "",
@@ -1859,7 +1859,7 @@ window.exportGuiJson = function(download = true) {
                         }
                       });
                     }
-                    
+
                     if (trigger.pdfs && trigger.pdfs.length > 0) {
                       trigger.pdfs.forEach(pdf => {
                         const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
@@ -1889,7 +1889,7 @@ window.exportGuiJson = function(download = true) {
                         });
                       });
                     }
-                    
+
                     // Add checkboxes
                     if (trigger.checkboxes && trigger.checkboxes.length > 0) {
                       trigger.checkboxes.forEach(checkbox => {
@@ -1898,7 +1898,7 @@ window.exportGuiJson = function(download = true) {
                             text: option.checkboxText || "",
                             nodeId: option.nodeId || ""
                           };
-                          
+
                           // Add linked fields if they exist
                           if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
                             optionObj.linkedFields = option.linkedFields.map(linkedField => ({
@@ -1906,10 +1906,10 @@ window.exportGuiJson = function(download = true) {
                               title: linkedField.title || ""
                             }));
                           }
-                          
+
                           return optionObj;
                         }) : [];
-                        
+
                         fields.push({
                           type: "checkbox",
                           fieldName: checkbox.fieldName || "",
@@ -1919,7 +1919,7 @@ window.exportGuiJson = function(download = true) {
                         });
                       });
                     }
-                    
+
               // Add times
               if (trigger.times && trigger.times.length > 0) {
                 trigger.times.forEach(time => {
@@ -1928,7 +1928,7 @@ window.exportGuiJson = function(download = true) {
                     label: time.fieldName || "",
                     nodeId: time.nodeId || ""
                   };
-                  
+
                   // Include conditional logic if it exists
                   if (time.conditionalLogic && time.conditionalLogic.enabled) {
                     dateField.conditionalLogic = {
@@ -1936,11 +1936,11 @@ window.exportGuiJson = function(download = true) {
                       conditions: time.conditionalLogic.conditions || []
                     };
                   }
-                  
+
                   fields.push(dateField);
                 });
               }
-                    
+
                     // Add locations
                     if (trigger.locations && trigger.locations.length > 0) {
                       trigger.locations.forEach(location => {
@@ -1951,14 +1951,14 @@ window.exportGuiJson = function(download = true) {
                         });
                       });
                     }
-                    
+
                     // Add dropdowns
                     if (trigger.dropdowns && trigger.dropdowns.length > 0) {
                       trigger.dropdowns.forEach(dropdown => {
                         const dropdownOptions = dropdown.options ? dropdown.options.map(option => ({
                           text: option.text || ""
                         })) : [];
-                        
+
                         fields.push({
                           type: "dropdown",
                           fieldName: dropdown.fieldName || "",
@@ -1966,7 +1966,7 @@ window.exportGuiJson = function(download = true) {
                         });
                       });
                     }
-                    
+
                     // Add PDFs
                     if (trigger.pdfs && trigger.pdfs.length > 0) {
                       trigger.pdfs.forEach(pdf => {
@@ -1980,22 +1980,22 @@ window.exportGuiJson = function(download = true) {
                       });
                     }
                   }
-                  
+
                   // Find the matching option text for the condition
                   const matchingOption = dropdown.options.find(option => option.value === trigger.triggerOption);
                   const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
-                  
+
                   triggerSequences.push({
                     condition: conditionText,
                     fields: fields
                   });
                 });
               }
-              
+
               // Calculate the correct order for dropdown
               // All items (including location) are now single entries, so use orderIndex + 1
               let dropdownOrder = orderIndex + 1;
-              
+
               allFieldsInOrder.push({
                 type: "dropdown",
                 fieldName: dropdown.name || "",
@@ -2007,15 +2007,17 @@ window.exportGuiJson = function(download = true) {
           });
         } else {
           // Fallback to old logic if _itemOrder doesn't exist
-          console.log('🔧 [GUI EXPORT DEBUG] NumberedDropdown no _itemOrder found, using fallback logic');
+
           const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
-          
+
           // Process each textbox in order
           cell._textboxes.forEach((tb, index) => {
             const labelName = tb.nameId || tb.placeholder || "";
-            const fieldType = tb.isAmountOption === true ? "amount" : "label";
+            const fieldType = tb.type === 'phone'
+              ? 'phone'
+              : (tb.isAmountOption === true ? "amount" : "label");
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            
+
             allFieldsInOrder.push({
               type: fieldType,
               label: labelName,
@@ -2025,15 +2027,15 @@ window.exportGuiJson = function(download = true) {
               conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
             });
           });
-          
+
           // Insert location fields at the correct position if locationIndex is set
           const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
             ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
           );
-          
+
           const shouldIncludeLocationFields = (exportType === "multipleDropdownType" && locationIndex >= 0) || 
                                             (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
-          
+
           if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
             const locationFields = [
               { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
@@ -2041,7 +2043,7 @@ window.exportGuiJson = function(download = true) {
               { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
               { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
             ];
-            
+
             locationFields.forEach((field, fieldIndex) => {
               allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
                 type: field.label === "Zip" ? "amount" : "label",
@@ -2050,12 +2052,12 @@ window.exportGuiJson = function(download = true) {
                 order: locationIndex + fieldIndex + 1
               });
             });
-            
+
             allFieldsInOrder.forEach((field, index) => {
               field.order = index + 1;
             });
           }
-          
+
           // Add checkbox fields if they exist
           if (cell._checkboxes && cell._checkboxes.length > 0) {
             cell._checkboxes.forEach((checkbox, checkboxIndex) => {
@@ -2063,7 +2065,7 @@ window.exportGuiJson = function(download = true) {
                 text: option.checkboxText || option.text || "",
                 nodeId: option.nodeId || ""
               })) : [];
-              
+
               allFieldsInOrder.push({
                 type: "checkbox",
                 fieldName: checkbox.fieldName || "",
@@ -2073,7 +2075,7 @@ window.exportGuiJson = function(download = true) {
               });
             });
           }
-          
+
           // Add time fields if they exist
           if (cell._times && cell._times.length > 0) {
             cell._times.forEach((time, timeIndex) => {
@@ -2086,7 +2088,7 @@ window.exportGuiJson = function(download = true) {
             });
           }
         }
-        
+
         // Extract min and max from _twoNumbers
         if (cell._twoNumbers) {
           question.min = cell._twoNumbers.first || "1";
@@ -2095,13 +2097,13 @@ window.exportGuiJson = function(download = true) {
           question.min = "1";
           question.max = "1";
         }
-        
+
         // Add nodeId for numberedDropdown (with PDF prefix if available)
         question.nodeId = nodeId;
-        
+
         // Set the allFieldsInOrder array
         question.allFieldsInOrder = allFieldsInOrder;
-        
+
         // Keep empty arrays for backward compatibility
         question.labels = [];
         question.amounts = [];
@@ -2110,7 +2112,7 @@ window.exportGuiJson = function(download = true) {
         question.labels = [];
         question.amounts = [];
         question.labelNodeIds = [];
-      
+
       // Extract min and max from _twoNumbers
       if (cell._twoNumbers) {
         question.min = cell._twoNumbers.first || "1";
@@ -2119,32 +2121,32 @@ window.exportGuiJson = function(download = true) {
         question.min = "1";
         question.max = "1";
       }
-      
+
       // Add nodeId for numberedDropdown (with PDF prefix if available)
       question.nodeId = nodeId;
-        
+
         question.allFieldsInOrder = [];
       }
-      
+
       // Clear options array for numberedDropdown
       question.options = [];
-      
+
       // Remove nameId and placeholder fields that shouldn't be in numberedDropdown
       delete question.nameId;
       delete question.placeholder;
     }
-    
+
     // --- PATCH: For number type questions, convert to money type ---
     if (exportType === "number") {
       // Number questions should be exported as money type
       question.type = "money";
       question.placeholder = cell._placeholder || "";
-      
+
       // Clear options array for money questions
       question.options = [];
       question.labels = [];
     }
-    
+
     // --- PATCH: Add comprehensive parent conditional logic ---
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
@@ -2152,7 +2154,7 @@ window.exportGuiJson = function(download = true) {
       // For conditional logic, we need to check if the source and target are in the same logical flow
       // Since we're processing questions in order, we can determine this by position
       const currentSection = parseInt(getSection(cell) || "1", 10);
-      
+
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
         if (sourceCell && isOptions(sourceCell)) {
@@ -2162,7 +2164,7 @@ window.exportGuiJson = function(download = true) {
             const parentQ = optEdge.source;
             if (parentQ && isQuestion(parentQ)) {
               const sourceSection = parseInt(getSection(parentQ) || "1", 10);
-              
+
               // Only add conditional logic if the source section is the same as current section
               // Cross-section connections should be handled by jump logic
               if (sourceSection === currentSection) {
@@ -2174,15 +2176,15 @@ window.exportGuiJson = function(download = true) {
                   const textarea = document.createElement('textarea');
                   textarea.innerHTML = optionLabel;
                   let cleanedLabel = textarea.value;
-                  
+
                   // Then remove HTML tags
                   const temp = document.createElement("div");
                   temp.innerHTML = cleanedLabel;
                   cleanedLabel = temp.textContent || temp.innerText || cleanedLabel;
-                  
+
                   // Clean up extra whitespace
                   cleanedLabel = cleanedLabel.replace(/\s+/g, ' ').trim();
-                  
+
                   optionLabel = cleanedLabel;
                 }
                 conditions.push({
@@ -2195,7 +2197,7 @@ window.exportGuiJson = function(download = true) {
         } else if (sourceCell && isQuestion(sourceCell)) {
           // This is a direct question-to-question connection
           const sourceSection = parseInt(getSection(sourceCell) || "1", 10);
-          
+
           // Only add conditional logic if the source section is the same as current section
           if (sourceSection === currentSection) {
             // Check if the source is a multiple textbox/dropdown question or number question
@@ -2214,7 +2216,7 @@ window.exportGuiJson = function(download = true) {
           }
         }
       }
-      
+
       // Remove duplicates based on prevQuestion and prevAnswer combination
       const uniqueConditions = [];
       const seen = new Set();
@@ -2225,16 +2227,16 @@ window.exportGuiJson = function(download = true) {
           uniqueConditions.push(condition);
         }
       }
-      
+
       // If there are multiple conditions, return all of them
       if (uniqueConditions.length > 1) {
         return uniqueConditions;
       }
-      
+
       // Return the first condition if only one, or null if none
       return uniqueConditions.length > 0 ? uniqueConditions[0] : null;
     }
-    
+
     const directParentCondition = findDirectParentCondition(cell);
     if (directParentCondition) {
       question.logic.enabled = true;
@@ -2246,16 +2248,16 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END PATCH ---
-    
+
     // --- PATCH: Add PDF Logic detection ---
     // Check if this question is connected to PDF nodes (directly or through options)
     const pdfs = [];
     const pdfConditions = [];
-    
+
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
-        
+
         // Check for direct connection to PDF node
         if (targetCell && isPdfNode(targetCell)) {
           // This question is directly connected to a PDF node
@@ -2266,7 +2268,7 @@ window.exportGuiJson = function(download = true) {
             triggerOption: "" // For direct connections
           };
           pdfs.push(pdfEntry);
-          
+
           // If this is a Big Paragraph question and the PDF node has a character limit
           if (questionType === "bigParagraph" && targetCell._characterLimit) {
             pdfConditions.push({
@@ -2283,7 +2285,7 @@ window.exportGuiJson = function(download = true) {
             }
           }
         }
-        
+
         // Check for connection through options
         if (targetCell && isOptions(targetCell)) {
           // Check if this option leads to a PDF node
@@ -2299,7 +2301,7 @@ window.exportGuiJson = function(download = true) {
                   stripePriceId: pdfCell._pdfPrice || pdfCell._priceId || "",
                   triggerOption: "" // Will be set below
                 };
-                
+
                 // Extract the option text
                 let optionText = targetCell.value || "";
                 // Clean HTML from option text
@@ -2309,10 +2311,10 @@ window.exportGuiJson = function(download = true) {
                   optionText = temp.textContent || temp.innerText || optionText;
                   optionText = optionText.trim();
                 }
-                
+
                 pdfEntry.triggerOption = optionText;
                 pdfs.push(pdfEntry);
-                
+
                 // Add condition for this option
                 pdfConditions.push({
                   prevQuestion: String(cell._questionId || ""),
@@ -2324,7 +2326,7 @@ window.exportGuiJson = function(download = true) {
         }
       }
     }
-    
+
     // Set up the PDF logic structure
     if (pdfs.length > 0) {
       question.pdfLogic.enabled = true;
@@ -2332,7 +2334,7 @@ window.exportGuiJson = function(download = true) {
       question.pdfLogic.pdfs = pdfs;
     }
     // --- END PDF Logic PATCH ---
-    
+
     // --- PATCH: Add PDF Preview detection ---
     // Check if any option is connected to a PDF preview node
     if (exportType === "dropdown" && outgoingEdges) {
@@ -2346,8 +2348,7 @@ window.exportGuiJson = function(download = true) {
               const pdfPreviewCell = optionEdge.target;
               if (pdfPreviewCell && typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(pdfPreviewCell)) {
                 // This question's option leads to a PDF preview node
-                console.log('🔍 [GUI EXPORT DEBUG] PDF Preview Node found connected to option:', optionCell.id);
-                
+
                 // Extract the option text
                 let optionText = optionCell.value || "";
                 // Clean HTML from option text
@@ -2357,23 +2358,17 @@ window.exportGuiJson = function(download = true) {
                   optionText = temp.textContent || temp.innerText || optionText;
                   optionText = optionText.trim();
                 }
-                
+
                 // Get PDF preview properties
                 const previewTitle = pdfPreviewCell._pdfPreviewTitle || "";
                 const previewFile = pdfPreviewCell._pdfPreviewFile || "";
-                
-                console.log('🔍 [GUI EXPORT DEBUG] PDF Preview properties:', {
-                  trigger: optionText,
-                  title: previewTitle,
-                  file: previewFile
-                });
-                
+
                 // Set PDF preview properties
                 question.pdfPreview.enabled = true;
                 question.pdfPreview.trigger = optionText;
                 question.pdfPreview.title = previewTitle;
                 question.pdfPreview.file = previewFile;
-                
+
                 // Only one PDF preview per question, so break after finding one
                 break;
               }
@@ -2387,7 +2382,7 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END PDF Preview PATCH ---
-    
+
     // --- PATCH: Add Alert Logic detection ---
     // Check if this question is connected to an alert node through its options
     if (outgoingEdges) {
@@ -2402,10 +2397,10 @@ window.exportGuiJson = function(download = true) {
               if (targetCell && isAlertNode(targetCell)) {
                 // This question's option leads to an alert node
                 question.alertLogic.enabled = true;
-                
+
                 // Extract alert text from the alert node's HTML content
                 let alertText = "";
-                
+
                 // First, try the _questionText property (most current user-entered text)
                 if (targetCell._questionText) {
                   alertText = targetCell._questionText;
@@ -2423,7 +2418,7 @@ window.exportGuiJson = function(download = true) {
                     alertText = input.value || input.getAttribute('value') || "";
                   }
                 }
-                
+
                 // Clean up the alert text (remove any HTML entities or extra whitespace)
                 if (alertText) {
                   alertText = alertText.replace(/&amp;/g, '&')
@@ -2433,9 +2428,9 @@ window.exportGuiJson = function(download = true) {
                                     .replace(/&#39;/g, "'")
                                     .trim();
                 }
-                
+
                 question.alertLogic.message = alertText;
-                
+
                 // Extract the option text
                 let optionText = optionCell.value || "";
                 // Clean HTML from option text
@@ -2445,7 +2440,7 @@ window.exportGuiJson = function(download = true) {
                   optionText = temp.textContent || temp.innerText || optionText;
                   optionText = optionText.trim();
                 }
-                
+
                 question.alertLogic.conditions = [{
                   prevQuestion: String(cell._questionId || ""),
                   prevAnswer: optionText
@@ -2458,21 +2453,21 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Alert Logic PATCH ---
-    
+
     // --- PATCH: Add Subtitle detection ---
     // Check if this question is connected to a subtitle node
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
-        
+
         // Check for direct connection to subtitle node
         if (targetCell && typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(targetCell)) {
           // This question is directly connected to a subtitle node
           question.subtitle.enabled = true;
-          
+
           // Extract subtitle text from the subtitle node
           let subtitleText = "";
-          
+
           // First, try the _subtitleText property (most current user-entered text)
           if (targetCell._subtitleText) {
             subtitleText = targetCell._subtitleText;
@@ -2484,16 +2479,16 @@ window.exportGuiJson = function(download = true) {
             subtitleText = temp.textContent || temp.innerText || targetCell.value;
             subtitleText = subtitleText.trim();
           }
-          
+
           // Clean up the subtitle text (remove any HTML entities or extra whitespace)
           if (subtitleText) {
             subtitleText = subtitleText.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
           }
-          
+
           question.subtitle.text = subtitleText || "Subtitle text";
           break; // Only process the first subtitle connection
         }
-        
+
         // Check for connection through options
         if (targetCell && isOptions(targetCell)) {
           // Check if this option leads to a subtitle node
@@ -2504,10 +2499,10 @@ window.exportGuiJson = function(download = true) {
               if (subtitleCell && typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(subtitleCell)) {
                 // This question's option leads to a subtitle node
                 question.subtitle.enabled = true;
-                
+
                 // Extract subtitle text from the subtitle node
                 let subtitleText = "";
-                
+
                 // First, try the _subtitleText property (most current user-entered text)
                 if (subtitleCell._subtitleText) {
                   subtitleText = subtitleCell._subtitleText;
@@ -2519,12 +2514,12 @@ window.exportGuiJson = function(download = true) {
                   subtitleText = temp.textContent || temp.innerText || subtitleCell.value;
                   subtitleText = subtitleText.trim();
                 }
-                
+
                 // Clean up the subtitle text (remove any HTML entities or extra whitespace)
                 if (subtitleText) {
                   subtitleText = subtitleText.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
                 }
-                
+
                 question.subtitle.text = subtitleText || "Subtitle text";
                 break; // Only process the first subtitle connection
               }
@@ -2534,10 +2529,10 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Subtitle PATCH ---
-    
+
     sectionMap[section].questions.push(question);
   }
-  
+
   // Create a map of questions by their clean names for calculation lookups
   const questionNameMap = new Map();
   questions.forEach(questionCell => {
@@ -2555,7 +2550,7 @@ window.exportGuiJson = function(download = true) {
     if (!cell._calcTitle || !cell._calcTerms || cell._calcTerms.length === 0) {
       continue;
     }
-    
+
     // Create hidden field for calculation node
     const hiddenField = {
       hiddenFieldId: hiddenFieldCounter.toString(),
@@ -2565,7 +2560,7 @@ window.exportGuiJson = function(download = true) {
       conditions: [],
       calculations: []
     };
-    
+
     // Convert calculation terms to the expected format for both checkbox and text types
     const calculation = {
       terms: [],
@@ -2575,13 +2570,13 @@ window.exportGuiJson = function(download = true) {
         "checked" : 
         cell._calcFinalText || ""
     };
-    
+
     // Process each calculation term
     for (const term of cell._calcTerms) {
       if (term.amountLabel) {
         // Extract the question name from the amount label
         let cleanQuestionName = term.amountLabel;
-        
+
         // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
         if (term.amountLabel.startsWith('question_value:')) {
           const parts = term.amountLabel.split(':');
@@ -2597,17 +2592,17 @@ window.exportGuiJson = function(download = true) {
           // For regular labels, use as-is
           cleanQuestionName = term.amountLabel;
         }
-        
+
         // Look up the actual nodeId from the question name map
         const questionNameId = questionNameMap.get(cleanQuestionName.toLowerCase().trim()) || cleanQuestionName;
-        
+
         calculation.terms.push({
           operator: term.mathOperator || "",
           questionNameId: questionNameId
         });
       }
     }
-    
+
     // Only add the calculation if it has terms
     if (calculation.terms.length > 0) {
       hiddenField.calculations.push(calculation);
@@ -2615,7 +2610,7 @@ window.exportGuiJson = function(download = true) {
       hiddenFieldCounter++;
     }
   }
-  
+
   // Sort questions within each section by questionId
   for (const secNum in sectionMap) {
     sectionMap[secNum].questions.sort((a, b) => {
@@ -2624,13 +2619,13 @@ window.exportGuiJson = function(download = true) {
       return aId - bId;
     });
   }
-  
+
   // Convert sectionMap to array and sort by sectionId
   for (const secNum in sectionMap) {
     sections.push(sectionMap[secNum]);
   }
   sections.sort((a, b) => a.sectionId - b.sectionId);
-  
+
   // Calculate the maximum question ID found
   let maxQuestionId = 0;
   for (const section of sections) {
@@ -2641,95 +2636,65 @@ window.exportGuiJson = function(download = true) {
       }
     }
   }
-  
+
   // Update questionCounter to be the next available question ID
   questionCounter = maxQuestionId + 1;
-  
+
   // Get default PDF properties
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
-  
+
   // Get form name
   const formName = document.getElementById('formNameInput')?.value || 'Example Form';
-  
+
   // Process Linked Logic nodes for linkedFields
   const linkedFields = [];
   const linkedLogicNodes = vertices.filter(cell => 
     typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)
   );
-  
-  console.log('🔍 [GUI JSON DEBUG] Found linked logic nodes:', linkedLogicNodes.length);
-  
+
   linkedLogicNodes.forEach((cell, index) => {
-    console.log(`🔍 [GUI JSON DEBUG] Linked Logic node ${index}:`, {
-      cellId: cell.id,
-      _linkedLogicNodeId: cell._linkedLogicNodeId,
-      _linkedFields: cell._linkedFields,
-      hasNodeId: !!cell._linkedLogicNodeId,
-      hasFields: !!(cell._linkedFields && cell._linkedFields.length > 0)
-    });
-    
+
     if (cell._linkedLogicNodeId && cell._linkedFields && cell._linkedFields.length > 0) {
       // Process linked fields to convert spaces to underscores while preserving PDF prefix
       const processedFields = cell._linkedFields.map(field => {
         // Convert all spaces to underscores in the field name
         return field.replace(/\s+/g, '_');
       });
-      
+
       const linkedFieldEntry = {
         id: `linkedField${index}`,
         linkedFieldId: cell._linkedLogicNodeId,
         fields: processedFields
       };
-      
-      console.log('✅ [GUI JSON DEBUG] Adding linked field entry:', linkedFieldEntry);
+
       linkedFields.push(linkedFieldEntry);
     } else {
-      console.log('⚠️ [GUI JSON DEBUG] Skipping linked logic node due to missing data:', {
-        hasNodeId: !!cell._linkedLogicNodeId,
-        hasFields: !!(cell._linkedFields && cell._linkedFields.length > 0)
-      });
+
     }
   });
-  
-  console.log('🔍 [GUI JSON DEBUG] Final linkedFields array:', linkedFields);
-  
+
   // Process linked checkbox nodes from flowchart editor
   const linkedCheckboxes = [];
   const linkedCheckboxNodes = vertices.filter(cell => 
     typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)
   );
-  
-  console.log('🔍 [GUI JSON DEBUG] Found linked checkbox nodes:', linkedCheckboxNodes.length);
-  
+
   linkedCheckboxNodes.forEach((cell, index) => {
-    console.log(`🔍 [GUI JSON DEBUG] Linked Checkbox node ${index}:`, {
-      cellId: cell.id,
-      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId,
-      _linkedCheckboxOptions: cell._linkedCheckboxOptions,
-      hasNodeId: !!cell._linkedCheckboxNodeId,
-      hasOptions: !!(cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0)
-    });
-    
+
     if (cell._linkedCheckboxNodeId && cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0) {
       const linkedCheckboxEntry = {
         id: `linkedCheckbox${index}`,
         linkedCheckboxId: cell._linkedCheckboxNodeId,
         checkboxes: cell._linkedCheckboxOptions
       };
-      
-      console.log('✅ [GUI JSON DEBUG] Adding linked checkbox entry:', linkedCheckboxEntry);
+
       linkedCheckboxes.push(linkedCheckboxEntry);
     } else {
-      console.log('⚠️ [GUI JSON DEBUG] Skipping linked checkbox node due to missing data:', {
-        hasNodeId: !!cell._linkedCheckboxNodeId,
-        hasOptions: !!(cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0)
-      });
+
     }
   });
-  
-  console.log('🔍 [GUI JSON DEBUG] Final linkedCheckboxes array:', linkedCheckboxes);
-  
+
   // Create final output object
   const output = {
     sections: sections,
@@ -2757,13 +2722,13 @@ window.exportGuiJson = function(download = true) {
       ...linkedCheckboxes
     ]
   };
-  
+
   // Convert to string and download
   const jsonStr = JSON.stringify(output, null, 2);
-  
+
   // Copy to clipboard
   navigator.clipboard.writeText(jsonStr).then(() => {
-    console.log('GUI JSON copied to clipboard');
+
     // Show user feedback
     const notification = document.createElement('div');
     notification.textContent = 'GUI JSON copied to clipboard!';
@@ -2773,9 +2738,9 @@ window.exportGuiJson = function(download = true) {
       document.body.removeChild(notification);
     }, 3000);
   }).catch(err => {
-    console.error('Failed to copy to clipboard:', err);
+
   });
-  
+
   if (download) {
     downloadJson(jsonStr, "gui.json");
   }
@@ -2791,22 +2756,21 @@ window.exportBothJson = function() {
     if (typeof window.resetAllPdfInheritance === 'function') {
       window.resetAllPdfInheritance();
     }
-    
+
     // Reset all Node IDs SECOND (after PDF inheritance is fixed)
     if (typeof resetAllNodeIds === 'function') {
       resetAllNodeIds();
     }
-    
+
     // Get flowchart JSON
     const parent = graph.getDefaultParent();
     const encoder = new mxCodec();
     const cells = graph.getChildCells(parent, true, true);
 
     // Map cells, keeping only needed properties
-    console.log('🔍 [EXPORT DEBUG] Starting export, total cells:', cells.length);
+
     const simplifiedCells = cells.map(cell => {
-      console.log('🔍 [EXPORT DEBUG] Processing cell:', cell.id, 'vertex:', cell.vertex, 'edge:', cell.edge);
-      
+
       // Basic info about the cell
       const cellData = {
         id: cell.id,
@@ -2841,59 +2805,45 @@ window.exportBothJson = function() {
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
-      
+
       // textbox properties
       if (cell._amountName) cellData._amountName = cell._amountName;
       if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
-      
+
       // image option
       if (cell._image) cellData._image = cell._image;
-      
+
       // PDF node properties
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
       // PDF preview node properties - always include if the node is a PDF preview node
       if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
-        console.log('🔍 [EXPORT DEBUG] PDF Preview Node found:', cell.id);
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewTitle value:', cell._pdfPreviewTitle);
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewTitle type:', typeof cell._pdfPreviewTitle);
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewTitle !== undefined:', cell._pdfPreviewTitle !== undefined);
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile value:', cell._pdfPreviewFile);
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile type:', typeof cell._pdfPreviewFile);
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile !== undefined:', cell._pdfPreviewFile !== undefined);
-        console.log('🔍 [EXPORT DEBUG] All cell properties:', Object.keys(cell).filter(k => k.startsWith('_')));
-        
+
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
         cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
-        
-        console.log('🔍 [EXPORT DEBUG] Exported _pdfPreviewTitle:', cellData._pdfPreviewTitle);
-        console.log('🔍 [EXPORT DEBUG] Exported _pdfPreviewFile:', cellData._pdfPreviewFile);
+
       } else if (cell._pdfPreviewTitle !== undefined) {
         // Include even if not a PDF preview node (for backward compatibility)
-        console.log('🔍 [EXPORT DEBUG] PDF Preview properties found on non-preview node:', cell.id);
+
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle;
       }
       if (cell._pdfPreviewFile !== undefined) {
-        console.log('🔍 [EXPORT DEBUG] _pdfPreviewFile found on non-preview node:', cell.id, cell._pdfPreviewFile);
+
         cellData._pdfPreviewFile = cell._pdfPreviewFile;
       }
-      
+
       // Final verification for PDF preview nodes
       if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
-        console.log('🔍 [EXPORT DEBUG] Final check for PDF Preview Node:', cell.id);
-        console.log('🔍 [EXPORT DEBUG] Final cellData._pdfPreviewTitle:', cellData._pdfPreviewTitle);
-        console.log('🔍 [EXPORT DEBUG] Final cellData._pdfPreviewFile:', cellData._pdfPreviewFile);
-        console.log('🔍 [EXPORT DEBUG] Final cell._pdfPreviewTitle:', cell._pdfPreviewTitle);
-        console.log('🔍 [EXPORT DEBUG] Final cell._pdfPreviewFile:', cell._pdfPreviewFile);
+
       }
-      
+
       if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
       if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
       if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
       if (cell._bigParagraphPdfFile !== undefined) cellData._bigParagraphPdfFile = cell._bigParagraphPdfFile;
       if (cell._bigParagraphPdfPrice !== undefined) cellData._bigParagraphPdfPrice = cell._bigParagraphPdfPrice;
-      
+
       // calculation node properties
       if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
       if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
@@ -2903,53 +2853,53 @@ window.exportBothJson = function() {
       if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
       if (cell._calcFinalOutputType !== undefined) cellData._calcFinalOutputType = cell._calcFinalOutputType;
       if (cell._calcFinalCheckboxChecked !== undefined) cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
-      
+
       // subtitle & info nodes
       if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
       if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
-      
+
       // checkbox availability
       if (cell._checkboxAvailability !== undefined) cellData._checkboxAvailability = cell._checkboxAvailability;
-      
+
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
       if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
-      
+
       // Hidden node properties
       if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
-      
+
       // Linked logic node properties
       if (cell._linkedLogicNodeId !== undefined) {
         cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
-        console.log('💾 [LIBRARY SAVE] Saving _linkedLogicNodeId:', cell._linkedLogicNodeId, 'for cell:', cell.id);
+
       } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-        console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedLogicNodeId is undefined for cell:', cell.id);
+
       }
       if (cell._linkedFields !== undefined) {
         cellData._linkedFields = cell._linkedFields;
-        console.log('💾 [LIBRARY SAVE] Saving _linkedFields:', cell._linkedFields, 'for cell:', cell.id);
+
       } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-        console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedFields is undefined for cell:', cell.id);
+
       }
       if (cell._linkedCheckboxNodeId !== undefined) {
         cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
-        console.log('💾 [LIBRARY SAVE] Saving _linkedCheckboxNodeId:', cell._linkedCheckboxNodeId, 'for cell:', cell.id);
+
       } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
-        console.log('⚠️ [LIBRARY SAVE] Linked Checkbox node found but _linkedCheckboxNodeId is undefined for cell:', cell.id);
+
       }
       if (cell._linkedCheckboxOptions !== undefined) {
         cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
-        console.log('💾 [LIBRARY SAVE] Saving _linkedCheckboxOptions:', cell._linkedCheckboxOptions, 'for cell:', cell.id);
+
       } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
-        console.log('⚠️ [LIBRARY SAVE] Linked Checkbox node found but _linkedCheckboxOptions is undefined for cell:', cell.id);
+
       }
-      
+
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
-      
+
       // checkbox properties (including linked fields in options)
       if (cell._checkboxes) {
         cellData._checkboxes = JSON.parse(JSON.stringify(cell._checkboxes));
@@ -2970,10 +2920,10 @@ window.exportBothJson = function() {
     // Get default PDF properties
     const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
       window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
-    
+
     // Get form name
     const formName = document.getElementById('formNameInput')?.value || '';
-    
+
     const flowchartExportObj = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefs,
@@ -2983,29 +2933,23 @@ window.exportBothJson = function() {
       edgeStyle: currentEdgeStyle
     };
 
-    console.log('🔍 [EXPORT DEBUG] Final flowchartExportObj structure:');
-    console.log('🔍 [EXPORT DEBUG] Total cells in export:', flowchartExportObj.cells.length);
     flowchartExportObj.cells.forEach((cell, index) => {
       if (cell.style && cell.style.includes('nodeType=pdfPreview')) {
-        console.log(`🔍 [EXPORT DEBUG] Cell ${index} (${cell.id}) is PDF Preview Node:`);
-        console.log('🔍 [EXPORT DEBUG]   _pdfPreviewTitle:', cell._pdfPreviewTitle);
-        console.log('🔍 [EXPORT DEBUG]   _pdfPreviewFile:', cell._pdfPreviewFile);
-        console.log('🔍 [EXPORT DEBUG]   Full cell data:', JSON.stringify(cell, null, 2));
+
       }
     });
 
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
-    console.log('🔍 [EXPORT DEBUG] Final JSON length:', flowchartJson.length);
-    
+
     // Get GUI JSON (without downloading)
     const guiJson = exportGuiJson(false);
-    
+
     // Combine both JSONs in the specified format
     const combinedText = `Okay great, here is my flowchart json: "${flowchartJson}" and here is the gui json produced: "${guiJson}"`;
-    
+
     // Copy to clipboard
     navigator.clipboard.writeText(combinedText).then(() => {
-      console.log('Both JSONs copied to clipboard');
+
       // Show user feedback
       const notification = document.createElement('div');
       notification.textContent = 'Both JSONs copied to clipboard!';
@@ -3015,11 +2959,11 @@ window.exportBothJson = function() {
         document.body.removeChild(notification);
       }, 3000);
     }).catch(err => {
-      console.error('Failed to copy to clipboard:', err);
+
     });
-    
+
   } catch (error) {
-    console.error('Error in exportBothJson:', error);
+
     alert('Error exporting both JSONs: ' + error.message);
   }
 };
@@ -3033,46 +2977,46 @@ window.fixCapitalizationInJumps();
 
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
-  console.log('💾 [LIBRARY SAVE] saveFlowchart function called');
+
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
-  
+
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  
+
   // Check Linked Logic properties BEFORE reset
   const graph = window.graph;
   const parent = graph.getDefaultParent();
   const allCells = graph.getChildVertices(parent);
   allCells.forEach(cell => {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-      console.log('🔍 [BEFORE RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+
     }
   });
-  
+
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
   }
-  
+
   // Reset all Node IDs SECOND (after PDF inheritance is fixed)
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
   }
-  
+
   // Check Linked Logic properties AFTER reset
   allCells.forEach(cell => {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-      console.log('🔍 [AFTER RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+
     }
   });
-  
+
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
   if (!flowchartName) {
     // Get form name from input field
     const formNameInput = document.getElementById('formNameInput');
     const formName = formNameInput ? formNameInput.value.trim() : '';
-    
+
     if (formName) {
       flowchartName = formName;
     } else {
@@ -3129,10 +3073,10 @@ window.saveFlowchart = function() {
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
       _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null
     };
-    
+
     // Debug logging for Linked Logic properties
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-      console.log('💾 [LIBRARY SAVE] Saving Linked Logic properties for cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+
     }
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle || null;
@@ -3150,22 +3094,22 @@ window.saveFlowchart = function() {
   const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
   data.sectionPrefs = currentSectionPrefs;
   data.groups = getGroupsData();
-  
+
   // Get default PDF properties
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   data.defaultPdfProperties = defaultPdfProps;
-  
+
   // Get form name
   const formName = document.getElementById('formNameInput')?.value || '';
   data.formName = formName;
-  
+
   // Get current edge style
   data.edgeStyle = currentEdgeStyle;
-  
+
   // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
   const cleanedData = removeUndefinedValues(data);
-  
+
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: cleanedData,
     lastUsed: Date.now()
@@ -3184,52 +3128,52 @@ window.saveFlowchart = function() {
 
 // Save flowchart as a new flowchart (Save As functionality)
 window.saveAsFlowchart = function() {
-  console.log('💾 [LIBRARY SAVE AS] saveAsFlowchart function called');
+
   if (!window.currentUser || window.currentUser.isGuest) { 
     alert("Please log in with a real account to save flowcharts. Guest users cannot save."); 
     return;
   }  
-  
+
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  
+
   // Check Linked Logic properties BEFORE reset
   const graph = window.graph;
   const parent = graph.getDefaultParent();
   const allCells = graph.getChildVertices(parent);
   allCells.forEach(cell => {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-      console.log('🔍 [BEFORE RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+
     }
   });
-  
+
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
   }
-  
+
   // Reset all Node IDs SECOND (after PDF inheritance is fixed)
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
   }
-  
+
   // Check Linked Logic properties AFTER reset
   allCells.forEach(cell => {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-      console.log('🔍 [AFTER RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+
     }
   });
-  
+
   renumberQuestionIds();
-  
+
   // Always prompt for a new name for "Save As"
   let flowchartName = prompt("Enter a name for this new flowchart:");
   if (!flowchartName || !flowchartName.trim()) return;
-  
+
   // Update the current flowchart name to the new name
   currentFlowchartName = flowchartName;
   window.currentFlowchartName = flowchartName;
-  
+
   // Gather data and save (same logic as saveFlowchart)
   const data = { cells: [] };
   const cells = graph.getModel().cells;
@@ -3277,10 +3221,10 @@ window.saveAsFlowchart = function() {
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
       _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null
     };
-    
+
     // Debug logging for Linked Logic properties
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
-      console.log('💾 [LIBRARY SAVE AS] Saving Linked Logic properties for cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+
     }
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle || null;
@@ -3298,22 +3242,22 @@ window.saveAsFlowchart = function() {
   const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
   data.sectionPrefs = currentSectionPrefs;
   data.groups = getGroupsData();
-  
+
   // Get default PDF properties
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   data.defaultPdfProperties = defaultPdfProps;
-  
+
   // Get form name
   const formName = document.getElementById('formNameInput')?.value || '';
   data.formName = formName;
-  
+
   // Get current edge style
   data.edgeStyle = currentEdgeStyle;
-  
+
   // Remove undefined values before saving to Firebase (Firebase doesn't accept undefined)
   const cleanedData = removeUndefinedValues(data);
-  
+
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: cleanedData,
     lastUsed: Date.now()
@@ -3346,16 +3290,16 @@ window.viewSavedFlowcharts = function() {
           data: data
         });
       });
-      
+
       // Sort by recently used (most recent first)
       flowcharts.sort((a, b) => b.lastUsed - a.lastUsed);
-      
+
       // Store flowcharts for search functionality
       window.currentFlowcharts = flowcharts;
-      
+
       // Display flowcharts
       displayFlowcharts(flowcharts);
-      
+
       // Set up search functionality
       const searchInput = document.getElementById("flowchartSearchInput");
       if (searchInput) {
@@ -3368,7 +3312,7 @@ window.viewSavedFlowcharts = function() {
           displayFlowcharts(filteredFlowcharts);
         };
       }
-      
+
       document.getElementById("flowchartListOverlay").style.display = "flex";
     })
     .catch(err=>alert("Error fetching: " + err));
@@ -3395,23 +3339,24 @@ function displayFlowcharts(flowcharts) {
 
 window.openSavedFlowchart = function(name, onCompleteCallback) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
-  
-  
+
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
     .get().then(docSnap=>{
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
-      
+
       currentFlowchartName = name;
       window.currentFlowchartName = name;
       loadFlowchartData(docSnap.data().flowchart, name, onCompleteCallback);
-      
+
       // Update last used timestamp
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
         .update({ lastUsed: Date.now() })
-        .catch(err => console.log("Error updating last used timestamp:", err));
-      
+        .catch(err => {
+          console.error("Error updating lastUsed timestamp:", err);
+        });
+
       document.getElementById("flowchartListOverlay").style.display = "none";
-      
+
     }).catch(err=>alert("Error loading: " + err));
 };
 
@@ -3463,11 +3408,11 @@ function removeUndefinedValues(obj) {
   if (obj === null || typeof obj !== 'object') {
     return obj;
   }
-  
+
   if (Array.isArray(obj)) {
     return obj.map(item => removeUndefinedValues(item));
   }
-  
+
   const cleaned = {};
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
@@ -3500,13 +3445,13 @@ function downloadJson(str, filename) {
 function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new Set()) {
     if (!startCell || visited.has(startCell.id)) return;
     visited.add(startCell.id);
-    
+
     const graph = window.graph;
     if (!graph) return;
-    
+
     // Get all outgoing edges from the start cell
     const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
-    
+
     // Fallback: If getOutgoingEdges doesn't work, manually find edges
     if (outgoingEdges.length === 0) {
       const modelEdges = graph.getModel().getEdges();
@@ -3515,7 +3460,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       const manualOutgoingEdges = allEdges.filter(edge => 
         edge.source && edge.source.id === startCell.id
       );
-      
+
       // Use manual edges if found
       if (manualOutgoingEdges.length > 0) {
         for (const edge of manualOutgoingEdges) {
@@ -3524,7 +3469,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
             // Check if target doesn't already have PDF properties
             if (!targetCell._pdfName && !targetCell._pdfFilename && !targetCell._pdfUrl && !targetCell._pdfFile && 
                 !(typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell))) {
-              
+
               // Copy PDF properties from source to target
               if (sourceCell._pdfName) targetCell._pdfName = sourceCell._pdfName;
               if (sourceCell._pdfFilename) targetCell._pdfFilename = sourceCell._pdfFilename;
@@ -3533,9 +3478,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
               if (sourceCell._pdfUrl) targetCell._pdfUrl = sourceCell._pdfUrl;
               if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
               if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
-              
-              console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
-              
+
               // Recursively propagate to further downstream nodes
               propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
             }
@@ -3544,14 +3487,14 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         return; // Exit early since we handled the manual edges
       }
     }
-    
+
     for (const edge of outgoingEdges) {
         const targetCell = edge.target;
         if (targetCell && !visited.has(targetCell.id)) {
             // Check if target doesn't already have PDF properties
             if (!targetCell._pdfName && !targetCell._pdfFilename && !targetCell._pdfUrl && !targetCell._pdfFile && 
                 !(typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell))) {
-                
+
                 // Copy PDF properties from source to target
                 if (sourceCell._pdfName) targetCell._pdfName = sourceCell._pdfName;
                 if (sourceCell._pdfFilename) targetCell._pdfFilename = sourceCell._pdfFilename;
@@ -3560,9 +3503,7 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
                 if (sourceCell._pdfUrl) targetCell._pdfUrl = sourceCell._pdfUrl;
                 if (sourceCell._priceId) targetCell._priceId = sourceCell._priceId;
                 if (sourceCell._characterLimit) targetCell._characterLimit = sourceCell._characterLimit;
-                
-                console.log(`🔍 [PDF INHERITANCE] Propagated PDF properties from ${sourceCell.id} to downstream ${targetCell.id}`);
-                
+
                 // Recursively propagate to further downstream nodes
                 propagatePdfPropertiesDownstream(targetCell, sourceCell, visited);
             }
@@ -3576,50 +3517,48 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
 function propagatePdfPropertiesAfterImport() {
   const graph = window.graph;
   if (!graph) return;
-  
-  
+
   // Force graph model to update and refresh
   graph.getModel().beginUpdate();
   graph.getModel().endUpdate();
   graph.refresh();
-  
+
   // Get all cells in the graph
   const allCells = graph.getModel().cells;
   const cells = Object.values(allCells).filter(cell => cell && cell.vertex);
-  
+
   // Find all PDF nodes
   const pdfNodes = cells.filter(cell => {
     return cell._pdfName || cell._pdfFilename || cell._pdfUrl || cell._pdfFile || 
            (typeof window.isPdfNode === 'function' && window.isPdfNode(cell));
   });
-  
-  
+
   // For each PDF node, propagate its properties to all downstream nodes
   pdfNodes.forEach(pdfNode => {
-    
+
     // Check all edges in the graph using multiple methods
     const modelEdges = graph.getModel().getEdges();
     const childEdges = graph.getChildEdges(graph.getDefaultParent());
-    
+
     // Use childEdges as the primary source since it's more reliable
     const allEdges = childEdges.length > 0 ? childEdges : modelEdges;
-    
+
     // Check edges specifically connected to this PDF node
     const connectedEdges = allEdges.filter(edge => 
       (edge.source && edge.source.id === pdfNode.id) || 
       (edge.target && edge.target.id === pdfNode.id)
     );
-    
+
     // Check if PDF node has incoming edges (should propagate to source)
     const incomingEdges = allEdges.filter(edge => 
       edge.target && edge.target.id === pdfNode.id
     );
-    
+
     // Check if PDF node has outgoing edges (should propagate to targets)
     const outgoingEdges = allEdges.filter(edge => 
       edge.source && edge.source.id === pdfNode.id
     );
-    
+
     // Try both directions: outgoing edges (PDF node as source) and incoming edges (PDF node as target)
     if (outgoingEdges.length > 0) {
       propagatePdfPropertiesDownstream(pdfNode, pdfNode, new Set());
@@ -3646,7 +3585,7 @@ function propagatePdfPropertiesAfterImport() {
       }
     }
   });
-  
+
 }
 
 /**
@@ -3654,26 +3593,25 @@ function propagatePdfPropertiesAfterImport() {
  * Naming convention: [pdf name if associated]-[parent node text]-[current node text]
  */
 window.correctNodeIdsAfterImport = function() {
-  
+
   const graph = window.graph;
   if (!graph) {
     return;
   }
-  
-  
+
   // Get all cells in the graph
   const allCells = graph.getModel().cells;
   const cells = Object.values(allCells).filter(cell => cell && cell.vertex);
-  
+
   let validatedCount = 0;
   let correctedCount = 0;
   let invalidIds = [];
-  
+
   // First pass: Validate all existing Node IDs
   cells.forEach(cell => {
     if (cell && cell.vertex) {
       validatedCount++;
-      
+
       // Get current Node ID
       let currentId = '';
       if (cell.style) {
@@ -3682,7 +3620,7 @@ window.correctNodeIdsAfterImport = function() {
           currentId = decodeURIComponent(styleMatch[1]);
         }
       }
-      
+
       // If no Node ID exists, mark as invalid
       if (!currentId) {
         invalidIds.push({
@@ -3692,10 +3630,10 @@ window.correctNodeIdsAfterImport = function() {
         });
         return;
       }
-      
+
       // Generate what the correct Node ID should be
       const correctId = generateCorrectNodeId(cell);
-      
+
       // Check if current ID matches the correct format
       if (currentId !== correctId) {
         invalidIds.push({
@@ -3707,11 +3645,10 @@ window.correctNodeIdsAfterImport = function() {
       }
     }
   });
-  
-  
+
   // Second pass: Correct all invalid Node IDs
   if (invalidIds.length > 0) {
-    
+
     invalidIds.forEach(({ cell, currentId, correctId, reason }) => {
       if (typeof window.setNodeId === 'function') {
         try {
@@ -3719,18 +3656,17 @@ window.correctNodeIdsAfterImport = function() {
           let style = cell.style || '';
           style = style.replace(/nodeId=[^;]+/, '');
           graph.getModel().setStyle(cell, style);
-          
+
           // Set the correct Node ID
           window.setNodeId(cell, correctId);
           correctedCount++;
-          
+
         } catch (error) {
         }
       } else {
       }
     });
-    
-    
+
     // Refresh the graph to show the corrected Node IDs
     if (typeof window.refreshAllCells === 'function') {
       window.refreshAllCells();
@@ -3746,16 +3682,16 @@ window.correctNodeIdsAfterImport = function() {
 function generateCorrectNodeId(cell) {
   // Get PDF name if associated with this node
   const pdfName = getPdfNameForNode(cell);
-  
+
   // Get parent node text (for option nodes)
   const parentText = getParentNodeText(cell);
-  
+
   // Get current node text
   const currentText = getCurrentNodeText(cell);
-  
+
   // Build the Node ID according to the convention
   let nodeId = '';
-  
+
   // Add PDF name prefix if present
   if (pdfName && pdfName.trim()) {
     const cleanPdfName = pdfName.trim()
@@ -3765,7 +3701,7 @@ function generateCorrectNodeId(cell) {
       .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanPdfName + '_';
   }
-  
+
   // Add parent text if present (only for option nodes, not question nodes)
   if (parentText && parentText.trim() && isOptions(cell)) {
     const cleanParentText = parentText.trim()
@@ -3775,7 +3711,7 @@ function generateCorrectNodeId(cell) {
       .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanParentText + '_';
   }
-  
+
   // Add current node text
   if (currentText && currentText.trim()) {
     const cleanCurrentText = currentText.trim()
@@ -3785,16 +3721,16 @@ function generateCorrectNodeId(cell) {
       .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanCurrentText;
   }
-  
+
   // Clean up the final result
   nodeId = nodeId.replace(/_+/g, '_') // Replace multiple underscores with single
                  .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
-  
+
   // Fallback if no valid text found
   if (!nodeId) {
     nodeId = 'unnamed_node';
   }
-  
+
   return nodeId;
 }
 
@@ -3803,12 +3739,12 @@ function generateCorrectNodeId(cell) {
  */
 window.getCurrentPdfNameFromHtml = function(pdfNode) {
   if (!pdfNode || !pdfNode.value) return null;
-  
+
   try {
     // Parse the HTML to find the PDF Name input field
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = pdfNode.value;
-    
+
     // Look for the PDF Name input field
     const pdfNameInput = tempDiv.querySelector('input[type="text"]');
     if (pdfNameInput) {
@@ -3818,9 +3754,9 @@ window.getCurrentPdfNameFromHtml = function(pdfNode) {
       }
     }
   } catch (error) {
-    console.error('Error reading PDF name from HTML:', error);
+
     }
-    
+
     return null;
 };
 
@@ -3830,33 +3766,33 @@ window.getCurrentPdfNameFromHtml = function(pdfNode) {
 window.resetPdfInheritance = function(cell) {
   const graph = window.graph;
   if (!graph) {
-    console.error('Graph not available for PDF reset');
+
     return;
   }
-  
+
   // Check if cell is valid
   if (!cell) {
-    console.error('Cell is undefined for PDF reset');
+
     return;
   }
-  
+
   // Recursive function to find the source PDF node by following the inheritance chain
   function findSourcePdfNode(currentCell, visited = new Set()) {
     // Check if currentCell is valid
     if (!currentCell || !currentCell.id) {
       return null;
     }
-    
+
     if (visited.has(currentCell.id)) {
       return null; // Avoid infinite loops
     }
     visited.add(currentCell.id);
-    
+
     // Check if this cell is a PDF node
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(currentCell)) {
       return currentCell;
     }
-    
+
     // Check outgoing edges for direct PDF node connections
     const outgoingEdges = graph.getOutgoingEdges(currentCell) || [];
     for (const edge of outgoingEdges) {
@@ -3865,7 +3801,7 @@ window.resetPdfInheritance = function(cell) {
         return target;
       }
     }
-    
+
     // Check incoming edges for PDF nodes or nodes with PDF inheritance
     const incomingEdges = graph.getIncomingEdges(currentCell) || [];
     for (const edge of incomingEdges) {
@@ -3875,7 +3811,7 @@ window.resetPdfInheritance = function(cell) {
         if (typeof window.isPdfNode === 'function' && window.isPdfNode(source)) {
           return source;
         }
-        
+
         // Check if the source has PDF inheritance (recursive search)
         const sourcePdfName = window.getPdfNameForNode(source);
         if (sourcePdfName) {
@@ -3887,20 +3823,20 @@ window.resetPdfInheritance = function(cell) {
         }
       }
     }
-    
+
     return null;
   }
-  
+
   // Find the connected PDF node using the recursive search
   const connectedPdfNode = findSourcePdfNode(cell);
-  
+
   if (connectedPdfNode) {
     // Get the current PDF name from the PDF node's HTML input
     const currentPdfName = window.getCurrentPdfNameFromHtml(connectedPdfNode);
     if (currentPdfName) {
       // Update the cell's PDF properties to reflect the current value
       cell._pdfName = currentPdfName;
-      
+
       // Refresh the properties popup to show the updated value
       if (window.__propertiesPopupOpen) {
         // Close and reopen the properties popup to refresh the display
@@ -3913,11 +3849,11 @@ window.resetPdfInheritance = function(cell) {
           window.showPropertiesPopup(cell);
         }, 100);
       }
-      
+
       return currentPdfName;
     }
   }
-  
+
   // Clear all PDF properties from the node since no PDF connection exists
   cell._pdfName = '';
   cell._pdfFilename = '';
@@ -3926,7 +3862,7 @@ window.resetPdfInheritance = function(cell) {
   cell._pdfPrice = '';
   cell._priceId = '';
   cell._characterLimit = '';
-  
+
   // Refresh the properties popup to remove PDF fields
   if (window.__propertiesPopupOpen) {
     // Close and reopen the properties popup to refresh the display
@@ -3939,7 +3875,7 @@ window.resetPdfInheritance = function(cell) {
       window.showPropertiesPopup(cell);
     }, 100);
   }
-  
+
   return null;
 };
 
@@ -3949,24 +3885,24 @@ window.resetPdfInheritance = function(cell) {
 window.resetAllPdfInheritance = function() {
   const graph = window.graph;
   if (!graph) {
-    console.error('Graph not available for PDF reset');
+
     return;
   }
-  
+
   // Get all cells in the graph
   const allCells = graph.getModel().cells;
   const cells = Object.values(allCells).filter(cell => cell && cell.vertex);
-  
+
   let resetCount = 0;
   let totalCount = 0;
-  
+
   // Process each cell
   cells.forEach(cell => {
     // Skip PDF nodes themselves (they don't need inheritance reset)
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
       return;
     }
-    
+
     // Skip hidden nodes - they should not be affected by PDF reset
     if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
       return; // Skip hidden checkbox nodes
@@ -3977,7 +3913,7 @@ window.resetAllPdfInheritance = function() {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
       return; // Skip linked logic nodes
     }
-    
+
     // Check if this cell has PDF inheritance
     const currentPdfName = window.getPdfNameForNode(cell);
     if (currentPdfName) {
@@ -3985,9 +3921,9 @@ window.resetAllPdfInheritance = function() {
       window.resetPdfInheritance(cell);
     }
   });
-  
+
   // User feedback removed - operation completes silently
-  
+
   return { resetCount, totalCount };
 };
 
@@ -4012,7 +3948,7 @@ function getPdfNameForNode(cell) {
     const result = filename.replace(/\.pdf$/i, '').trim();
     return result;
   }
-  
+
   // Check if connected to a PDF node or inheriting PDF from connected nodes
   const graph = window.graph;
   if (graph) {
@@ -4023,7 +3959,7 @@ function getPdfNameForNode(cell) {
         const currentPdfName = window.getCurrentPdfNameFromHtml(targetCell);
         if (currentPdfName) return currentPdfName;
       }
-      
+
       // Fallback to stored properties for non-PDF nodes
       if (targetCell._pdfName && targetCell._pdfName.trim() && targetCell._pdfName.trim() !== "PDF Document") return targetCell._pdfName.trim();
       if (targetCell._pdfFilename && targetCell._pdfFilename.trim()) return targetCell._pdfFilename.trim();
@@ -4033,10 +3969,10 @@ function getPdfNameForNode(cell) {
         const filename = urlParts[urlParts.length - 1];
         return filename.replace(/\.pdf$/i, '').trim();
       }
-      
+
       return null;
     };
-    
+
     // Check incoming edges for PDF nodes and PDF inheritance (downstream flow)
     const incomingEdges = graph.getIncomingEdges(cell) || [];
     for (const edge of incomingEdges) {
@@ -4047,7 +3983,7 @@ function getPdfNameForNode(cell) {
           const pdfName = extractPdfName(source);
           if (pdfName) return pdfName;
         }
-        
+
         // Check for PDF inheritance from connected question nodes (downstream only)
         if ((source._pdfName && source._pdfName.trim() && source._pdfName.trim() !== "PDF Document") || 
             (source._pdfFilename && source._pdfFilename.trim()) || 
@@ -4058,7 +3994,7 @@ function getPdfNameForNode(cell) {
         }
       }
     }
-    
+
     // Check outgoing edges for PDF nodes (upstream flow - when this node points to a PDF node)
     const outgoingEdges = graph.getOutgoingEdges(cell) || [];
     for (const edge of outgoingEdges) {
@@ -4072,7 +4008,7 @@ function getPdfNameForNode(cell) {
       }
     }
   }
-  
+
   return null;
 }
 
@@ -4082,7 +4018,7 @@ function getPdfNameForNode(cell) {
 function getParentNodeText(cell) {
   const graph = window.graph;
   if (!graph) return null;
-  
+
   // Check if this is an option node by looking for incoming edges from question nodes
   const incomingEdges = graph.getIncomingEdges(cell) || [];
   for (const edge of incomingEdges) {
@@ -4091,7 +4027,7 @@ function getParentNodeText(cell) {
       return getCurrentNodeText(source);
     }
   }
-  
+
   return null;
 }
 
@@ -4105,7 +4041,7 @@ function getCurrentNodeText(cell) {
       return cell._questionText.trim();
     }
   }
-  
+
   // Extract text from cell value
   if (cell.value) {
     const tempDiv = document.createElement('div');
@@ -4113,7 +4049,7 @@ function getCurrentNodeText(cell) {
     const text = tempDiv.textContent || tempDiv.innerText || '';
     return text.trim();
   }
-  
+
   return null;
 }
 
@@ -4121,11 +4057,11 @@ function getCurrentNodeText(cell) {
  * Manual Node ID validation function - can be called from console for debugging
  */
 window.validateAllNodeIds = function() {
-  console.log('🔧 [MANUAL VALIDATION] Manual Node ID validation requested');
+
   if (typeof window.correctNodeIdsAfterImport === 'function') {
     window.correctNodeIdsAfterImport();
   } else {
-    console.error('🔧 [MANUAL VALIDATION] ERROR: correctNodeIdsAfterImport function not available');
+
   }
 }
 
@@ -4134,76 +4070,70 @@ window.validateAllNodeIds = function() {
  * Can be called from console: testEdgeStylePersistence()
  */
 window.testEdgeStylePersistence = function() {
-  console.log('🧪 [EDGE STYLE TEST] Testing edge style persistence...');
-  
+
   // Test 1: Check current edge style
-  console.log('🧪 [EDGE STYLE TEST] Current edge style:', currentEdgeStyle);
-  
+
   // Test 2: Create a simple test flowchart with edges
   if (!window.graph) {
-    console.error('🧪 [EDGE STYLE TEST] ERROR: Graph not available');
+
     return;
   }
-  
+
   const parent = window.graph.getDefaultParent();
-  
+
   // Clear existing content
   const existingCells = window.graph.getChildCells(parent, true, true);
   window.graph.removeCells(existingCells);
-  
+
   // Create test nodes
   const node1 = window.graph.insertVertex(parent, null, 'Test Node 1', 100, 100, 100, 50);
   const node2 = window.graph.insertVertex(parent, null, 'Test Node 2', 300, 100, 100, 50);
-  
+
   // Create test edge
   const edge = window.graph.insertEdge(parent, null, '', node1, node2);
-  
-  console.log('🧪 [EDGE STYLE TEST] Created test flowchart with edge');
-  console.log('🧪 [EDGE STYLE TEST] Edge style:', edge.style);
-  
+
   // Test 3: Export the flowchart and check if edgeStyle is included
   const exportData = window.exportFlowchartJson(false);
   const parsedData = JSON.parse(exportData);
-  
+
   if (parsedData.edgeStyle) {
-    console.log('✅ [EDGE STYLE TEST] PASS: Edge style is included in export:', parsedData.edgeStyle);
+
   } else {
-    console.error('❌ [EDGE STYLE TEST] FAIL: Edge style is missing from export');
+
   }
-  
+
   // Test 4: Change edge style and test again
   const originalStyle = currentEdgeStyle;
   currentEdgeStyle = 'straight';
   if (typeof updateEdgeStyle === 'function') {
     updateEdgeStyle();
   }
-  
+
   const exportData2 = window.exportFlowchartJson(false);
   const parsedData2 = JSON.parse(exportData2);
-  
+
   if (parsedData2.edgeStyle === 'straight') {
-    console.log('✅ [EDGE STYLE TEST] PASS: Edge style change is saved:', parsedData2.edgeStyle);
+
   } else {
-    console.error('❌ [EDGE STYLE TEST] FAIL: Edge style change not saved');
+
   }
-  
+
   // Test 5: Load the data back and check if edge style is restored
   window.loadFlowchartData(parsedData2);
-  
+
   setTimeout(() => {
     if (currentEdgeStyle === 'straight') {
-      console.log('✅ [EDGE STYLE TEST] PASS: Edge style restored correctly:', currentEdgeStyle);
+
     } else {
-      console.error('❌ [EDGE STYLE TEST] FAIL: Edge style not restored correctly. Expected: straight, Got:', currentEdgeStyle);
+
     }
-    
+
     // Restore original style
     currentEdgeStyle = originalStyle;
     if (typeof updateEdgeStyle === 'function') {
       updateEdgeStyle();
     }
-    
-    console.log('🧪 [EDGE STYLE TEST] Test completed. Original style restored:', currentEdgeStyle);
+
   }, 1000);
 }
 
@@ -4211,15 +4141,15 @@ window.testEdgeStylePersistence = function() {
  * Load a flowchart from JSON data.
  */
 window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallback) {
-  
+
   // Store library flowchart name in a global variable for autosave to access
   window._loadingLibraryFlowchartName = libraryFlowchartName || null;
-  
+
   if (!data.cells) {
     alert("Invalid flowchart data");
     return;
   }
-  
+
   // Check if we have edges without an existing edge style - add default style
   data.cells.forEach(item => {
     if (item.edge && (!item.style || item.style === "")) {
@@ -4232,33 +4162,33 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
     const parent = graph.getDefaultParent();
     graph.removeCells(graph.getChildVertices(parent));
     const createdCells = {};
-    
+
     // Store section renumbering map for use in setTimeout callbacks
     let sectionRenumberMap = null;
 
     if (data.sectionPrefs) {
-      
+
       // Renumber sections sequentially (1, 2, 3, etc. without gaps)
       const originalSectionPrefs = data.sectionPrefs;
       const sectionNumbers = Object.keys(originalSectionPrefs)
         .map(num => parseInt(num))
         .filter(num => !isNaN(num))
         .sort((a, b) => a - b);
-      
+
       // Create mapping from old section numbers to new sequential numbers
       sectionRenumberMap = {};
       sectionNumbers.forEach((oldNum, index) => {
         const newNum = (index + 1).toString();
         sectionRenumberMap[oldNum.toString()] = newNum;
       });
-      
+
       // Create renumbered sectionPrefs
       const renumberedSectionPrefs = {};
       sectionNumbers.forEach((oldNum, index) => {
         const newNum = (index + 1).toString();
         renumberedSectionPrefs[newNum] = originalSectionPrefs[oldNum.toString()];
       });
-      
+
       // Update section references in all cells before they're created
       if (data.cells && Array.isArray(data.cells)) {
         data.cells.forEach(cell => {
@@ -4271,42 +4201,42 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           }
         });
       }
-      
+
       // Update section preferences through the proper accessor
       if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
         window.flowchartConfig.sectionPrefs = renumberedSectionPrefs;
       } else {
         window.sectionPrefs = renumberedSectionPrefs;
       }
-      
+
       // Test the getSectionPrefs function immediately after setting
       if (typeof getSectionPrefs === 'function') {
         const testResult = getSectionPrefs();
       }
-      
+
       // updateSectionLegend is defined in legend.js
       // Add a small delay to ensure DOM is ready
       setTimeout(() => {
-        
+
         // Check if section preferences have changed since we set them
         const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
-        
+
         if (typeof updateSectionLegend === 'function') {
           updateSectionLegend();
         } else {
-          console.error('updateSectionLegend function not available!');
+
         }
       }, 50);
     } else {
       // No section preferences in import data, but we need to check if cells have sections
     }
-    
+
     // After creating cells, check for missing section preferences and create them
     // Also ensure all cells have correct section numbers after renumbering
     setTimeout(() => {
       const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
       const usedSections = new Set();
-      
+
       // Collect all sections used by cells
       const graph = window.graph;
       if (graph) {
@@ -4321,7 +4251,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
       });
       }
-      
+
       // Create missing section preferences
       let needsUpdate = false;
       usedSections.forEach(sectionNum => {
@@ -4333,16 +4263,16 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           needsUpdate = true;
         }
       });
-      
+
       if (needsUpdate) {
-        
+
         // Update the section preferences
         if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
           window.flowchartConfig.sectionPrefs = currentSectionPrefs;
         } else {
           window.sectionPrefs = currentSectionPrefs;
         }
-        
+
         // Update the legend
         if (typeof updateSectionLegend === 'function') {
           updateSectionLegend();
@@ -4359,7 +4289,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         text2ConversionCount++;
       }
     });
-    
+
     // Show conversion alert if any text2 nodes were converted
     if (text2ConversionCount > 0) {
       alert(`${text2ConversionCount} text2 nodes converted into dropdowns`);
@@ -4385,28 +4315,28 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         const newCell = new mxCell(cellValue, geo, item.style);
         newCell.vertex = true;
         newCell.id = item.id;
-        
+
         // Transfer all custom properties
         if (item._textboxes) newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
         if (item._checkboxes) {
-          console.log('🔧 [IMPORT DEBUG] Loading _checkboxes for cell', item.id, ':', item._checkboxes);
+
           newCell._checkboxes = JSON.parse(JSON.stringify(item._checkboxes));
-          console.log('🔧 [IMPORT DEBUG] Loaded _checkboxes data:', newCell._checkboxes);
+
         }
         if (item._itemOrder) {
-          console.log('🔧 [IMPORT DEBUG] Loading _itemOrder for cell', item.id, ':', item._itemOrder);
+
           newCell._itemOrder = JSON.parse(JSON.stringify(item._itemOrder));
-          console.log('🔧 [IMPORT DEBUG] Loaded _itemOrder data:', newCell._itemOrder);
+
         }
         if (item._times) {
-          console.log('🔧 [IMPORT DEBUG] Loading _times for cell', item.id, ':', item._times);
+
           newCell._times = JSON.parse(JSON.stringify(item._times));
-          console.log('🔧 [IMPORT DEBUG] Loaded _times data:', newCell._times);
+
         }
         if (item._dropdowns) {
-          console.log('🔧 [IMPORT DEBUG] Loading _dropdowns for cell', item.id, ':', item._dropdowns);
+
           newCell._dropdowns = JSON.parse(JSON.stringify(item._dropdowns));
-          console.log('🔧 [IMPORT DEBUG] Loaded _dropdowns data:', newCell._dropdowns);
+
         }
         if (item._questionText) {
           // Decode HTML entities in _questionText as well
@@ -4424,14 +4354,14 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         if (item._questionId) newCell._questionId = item._questionId;
         if (item._locationIndex !== undefined && item._locationIndex !== null) newCell._locationIndex = item._locationIndex;
         if (item._locationTitle !== undefined && item._locationTitle !== null) newCell._locationTitle = item._locationTitle;
-        
+
         // Amount option properties
         if (item._amountName) newCell._amountName = item._amountName;
         if (item._amountPlaceholder) newCell._amountPlaceholder = item._amountPlaceholder;
-        
+
         // Image option
         if (item._image) newCell._image = item._image;
-        
+
         // PDF node properties
         if (item._pdfName !== undefined) newCell._pdfName = item._pdfName;
         if (item._pdfFile !== undefined) newCell._pdfFile = item._pdfFile;
@@ -4441,7 +4371,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         // Legacy PDF properties for backward compatibility
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
-        
+
         // Big Paragraph PDF Logic properties
         if (item._pdfLogicEnabled !== undefined) newCell._pdfLogicEnabled = item._pdfLogicEnabled;
         if (item._pdfTriggerLimit !== undefined) newCell._pdfTriggerLimit = item._pdfTriggerLimit;
@@ -4449,7 +4379,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         if (item._bigParagraphPdfFile !== undefined) newCell._bigParagraphPdfFile = item._bigParagraphPdfFile;
         if (item._bigParagraphPdfPrice !== undefined) newCell._bigParagraphPdfPrice = item._bigParagraphPdfPrice;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
-        
+
         // Notes node properties
         if (item._notesText !== undefined) {
           let notesText = item._notesText;
@@ -4462,7 +4392,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._notesBold !== undefined) newCell._notesBold = item._notesBold;
         if (item._notesFontSize !== undefined) newCell._notesFontSize = item._notesFontSize;
-        
+
         // Checklist node properties
         if (item._checklistText !== undefined) {
           let checklistText = item._checklistText;
@@ -4473,7 +4403,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           }
           newCell._checklistText = checklistText;
         }
-        
+
         // Alert node properties
         if (item._alertText !== undefined) {
           let alertText = item._alertText;
@@ -4484,7 +4414,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           }
           newCell._alertText = alertText;
         }
-        
+
         // Hidden node properties
         if (item._hiddenNodeId !== undefined) newCell._hiddenNodeId = item._hiddenNodeId;
         if (item._defaultText !== undefined) {
@@ -4497,7 +4427,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           newCell._defaultText = defaultText;
         } else {
         }
-        
+
         // Linked logic node properties
         if (item._linkedLogicNodeId !== undefined) {
           newCell._linkedLogicNodeId = item._linkedLogicNodeId;
@@ -4511,7 +4441,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         if (item._linkedCheckboxOptions !== undefined) {
           newCell._linkedCheckboxOptions = item._linkedCheckboxOptions;
         }
-        
+
         // Calculation properties
         if (item._calcTitle !== undefined) {
           let calcTitle = item._calcTitle;
@@ -4545,7 +4475,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         if (item._calcTerms !== undefined) newCell._calcTerms = JSON.parse(JSON.stringify(item._calcTerms));
         if (item._calcFinalOutputType !== undefined) newCell._calcFinalOutputType = item._calcFinalOutputType;
         if (item._calcFinalCheckboxChecked !== undefined) newCell._calcFinalCheckboxChecked = item._calcFinalCheckboxChecked;
-        
+
         // Subtitle and info node properties - decode HTML entities
         if (item._subtitleText !== undefined) {
           let subtitleText = item._subtitleText;
@@ -4565,10 +4495,10 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           }
           newCell._infoText = infoText;
         }
-        
+
         // Checkbox availability
         if (item._checkboxAvailability !== undefined) newCell._checkboxAvailability = item._checkboxAvailability;
-        
+
         // Big paragraph properties
         if (item._lineLimit !== undefined) newCell._lineLimit = item._lineLimit;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
@@ -4588,15 +4518,15 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
       if (item.edge === true && item.source && item.target) {
         const source = createdCells[item.source];
         const target = createdCells[item.target];
-        
+
         if (source && target) {
           const geo = new mxGeometry();
-          
+
           // Restore edge geometry (articulation points) if it exists
           if (item.edgeGeometry && item.edgeGeometry.points && item.edgeGeometry.points.length > 0) {
             geo.points = item.edgeGeometry.points.map(point => new mxPoint(point.x, point.y));
           }
-          
+
           const edge = new mxCell("", geo, item.style);
           edge.edge = true;
           edge.id = item.id;
@@ -4662,7 +4592,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
     } finally {
       graph.getModel().endUpdate();
     }
-    
+
     // Fourth pass: Ensure question nodes are editable
     Object.values(createdCells).forEach(cell => {
       if (isQuestion(cell)) {
@@ -4679,7 +4609,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
   }
 
   refreshAllCells();
-  
+
   // Call completion callback if provided (after main loading is done)
   if (typeof onCompleteCallback === 'function') {
     // Use requestAnimationFrame to ensure DOM is updated
@@ -4687,33 +4617,31 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
       onCompleteCallback();
     });
   }
-  
+
   // Load groups data if present (after sections are fully processed)
-  console.log('loadFlowchartData: checking for groups data');
-  console.log('loadFlowchartData: data.groups =', data.groups);
+
   if (data.groups) {
-    console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
+
     loadGroupsFromData(data.groups);
   } else {
-    console.log('loadFlowchartData: no groups data found');
+
   }
-  
+
   // Load default PDF properties if present, otherwise clear them
-  console.log('loadFlowchartData: checking for default PDF properties');
-  console.log('loadFlowchartData: data.defaultPdfProperties =', data.defaultPdfProperties);
+
   if (data.defaultPdfProperties) {
-    console.log('loadFlowchartData: loading default PDF properties:', data.defaultPdfProperties);
+
     if (typeof window.setDefaultPdfProperties === 'function') {
       window.setDefaultPdfProperties(data.defaultPdfProperties);
     }
   } else {
-    console.log('loadFlowchartData: no default PDF properties found, clearing them');
+
     // Clear default PDF properties if the loaded flowchart doesn't have them
     if (typeof window.setDefaultPdfProperties === 'function') {
       window.setDefaultPdfProperties({ pdfName: "", pdfFile: "", pdfPrice: "" });
     }
   }
-  
+
   // Load form name if present
   if (data.formName) {
     const formNameInput = document.getElementById('formNameInput');
@@ -4721,10 +4649,10 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
       formNameInput.value = data.formName;
     }
   }
-  
+
   // Load edge style if present
   if (data.edgeStyle) {
-    console.log('loadFlowchartData: loading edge style:', data.edgeStyle);
+
     currentEdgeStyle = data.edgeStyle;
     // Update the settings UI if it exists
     const edgeStyleToggle = document.getElementById('edgeStyleToggle');
@@ -4736,19 +4664,19 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
       updateEdgeStyle();
     }
   } else {
-    console.log('loadFlowchartData: no edge style found, using default');
+
   }
-  
+
   // Propagate PDF properties through the flowchart after all cells and edges are loaded
   setTimeout(() => {
     propagatePdfPropertiesAfterImport();
   }, 500); // Increased delay to ensure all edges are fully processed in graph model
-  
+
   // Validate and correct Node IDs after a 1-second delay to ensure everything is loaded
   setTimeout(() => {
     correctNodeIdsAfterImport();
   }, 1000);
-  
+
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {
     const vertices = graph.getChildVertices(graph.getDefaultParent());
@@ -4784,7 +4712,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
 function resolveDuplicateNodeIds(cells) {
   const nodeIdCounts = new Map();
   const nodeIdToCells = new Map();
-  
+
   // First pass: collect all node IDs and their occurrences
   cells.forEach(cell => {
     const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
@@ -4797,12 +4725,12 @@ function resolveDuplicateNodeIds(cells) {
       nodeIdToCells.get(nodeId).push(cell);
     }
   });
-  
+
   // Second pass: resolve duplicates by adding numbering
   nodeIdCounts.forEach((count, nodeId) => {
     if (count > 1) {
       const cellsWithThisId = nodeIdToCells.get(nodeId);
-      
+
       // Keep the first occurrence as is, number the rest
       for (let i = 1; i < cellsWithThisId.length; i++) {
         const cell = cellsWithThisId[i];
@@ -4815,8 +4743,3 @@ function resolveDuplicateNodeIds(cells) {
 
 // Export the generateCorrectNodeId function to window for use by other modules
 window.generateCorrectNodeId = generateCorrectNodeId;
-
-
-
-
-
