@@ -403,7 +403,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        .hidden { display: none !important; }',
     '    </style>',
     '    <script>',
-    '      // Phone formatter: (123)-456-7890',
+    '      // Phone formatter: Phone Number',
     '      window.formatPhoneInput = window.formatPhoneInput || function(inputEl) {',
     '        if (!inputEl) return;',
     '        const digits = (inputEl.value || "").replace(/\\D/g, "").slice(0, 10);',
@@ -1151,7 +1151,7 @@ questionSlugMap[questionId] = slug;
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
         const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
         const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
-        const placeholder = phEl && phEl.value ? phEl.value : "(123) 456-7890";
+        const placeholder = phEl && phEl.value ? phEl.value : "Phone Number";
         questionNameIds[questionId] = nameId;
         formHTML += `<div class="text-input-container"><input type="tel" id="${nameId}" name="${nameId}" placeholder="${placeholder}" maxlength="14"></div>`;
       } else if (questionType === "radio") {
@@ -2069,7 +2069,7 @@ formHTML += `</div><br></div>`;
               const inputDiv = document.createElement('div');
               const inputHTML = `
                 <label for="${fieldId}" style="display:block;margin-bottom:4px;font-weight:600;color:#333;">${field.label || 'Phone'}</label>
-                <input type="tel" id="${fieldId}" name="${fieldId}" placeholder="(123)-456-7890" style="width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease; text-align: center;" oninput="formatPhoneInput(this)">
+                <input type="tel" id="${fieldId}" name="${fieldId}" placeholder="Phone Number" class="address-input" style="margin: 4px auto; max-width: 400px;" oninput="formatPhoneInput(this)">
               `;
               inputDiv.innerHTML = inputHTML;
               // Append all children (label + input) to ensure input renders
