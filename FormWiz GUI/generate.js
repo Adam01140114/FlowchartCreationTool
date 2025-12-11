@@ -379,7 +379,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
       '</div>'
     ]),
     "<header>",
-    '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'../index.html\';">',
+    '    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href=\'../index.html\';">',
     "    <nav>",
     '        <a href="../index.html">Home',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
@@ -426,7 +426,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     "",
     "    <!-- Sliding Cart Menu -->",
     '    <div class="cart-overlay" id="cart-overlay">',
-    '        <div class="cart-side-menu" id="cart-side-menu">',
+    '        <div class="cart-side-menu" id="cart-side-menu" style="max-height: 100vh; overflow-y: auto;">',
             "            <div class=\"cart-header\" style=\"background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;\">",
             "                <h2 style=\"margin:0;font-size:1.5em;font-weight:700;\">🛒 Cart</h2>",
             '                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>',
@@ -435,7 +435,7 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
             '                <div class="cart-icon-large">🛒</div>',
             '                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>',
             '                <div class="cart-description" id="cart-description">',
-                                "                    To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. ",
+                                "                    To add forms to your cart and make purchases, you\\'ll need to create a FormStar account. ",
             "                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.",
             "                </div>",
             '                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>',
@@ -454,6 +454,8 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
+    // Cart manager (Firebase-backed). Assumes this page lives beside cart.js; adjust path if relocated.
+    '<script src="cart.js"></script>',
     "",
     '<script>',
     '// Firebase Configuration',
@@ -3884,9 +3886,9 @@ if (s > 1){
     '<div class="pro-footer">',
     '        <div class="pro-footer-col address-col">',
     '            <div class="pro-footer-logo">',
-    '                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">',
+    '                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">',
     '            </div>',
-    '            <div class="pro-footer-title">FormWiz</div>',
+    '            <div class="pro-footer-title">FormStar</div>',
     '            <div class="pro-footer-contact">',
     '                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; ',
     '                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>',
@@ -3901,12 +3903,12 @@ if (s > 1){
     '            <a href="../Pages/contact.html">Contact Us</a>',
     '        </div>',
     '        <div class="pro-footer-col company-col">',
-    '            <div class="pro-footer-title company-title">About FormWiz</div>',
-    '            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>',
+    '            <div class="pro-footer-title company-title">About FormStar</div>',
+    '            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>',
     '        </div>',
     '    </div>',
     '    <footer>',
-    '        &copy; 2024 FormWiz. All rights reserved.',
+    '        &copy; 2024 FormStar. All rights reserved.',
     '    </footer>',
   ].join("\n");
   // Add alert popup HTML and CSS
@@ -10823,7 +10825,7 @@ if (typeof handleNext === 'function') {
                 } else {
                     // User is not signed in - show signup message
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
-                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
+                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormStar account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
                     if (cartItemsList) cartItemsList.style.display = 'none';
                     if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
