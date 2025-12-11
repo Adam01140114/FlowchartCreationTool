@@ -22,6 +22,7 @@ const hiddenLogicConfigs = []; // For storing hidden logic configurations
 const linkedFields = []; // For storing linked field configurations
 const linkedCheckboxes = []; // For storing linked checkbox configurations
 const checkboxRequiredMap = {}; // questionId -> boolean required
+console.log('[GEN DBG] checkboxRequiredMap initialized', checkboxRequiredMap);
 // Cart functions are now included in the generated HTML
 /*------------------------------------------------------------------
  * HISTORY STACK for accurate "Back" navigation
@@ -1274,6 +1275,7 @@ questionNameIds[questionId] = qSlug;      // so helpers know the base
 /* Required/optional flag (defaults to required) */
 const requiredSelect = qBlock.querySelector(`[id^="checkboxRequired${questionId}_"]`);
 const isCheckboxRequired = !(requiredSelect && requiredSelect.value === 'optional');
+console.log('[GEN DBG][CHECKBOX Q] render', { questionId, requiredRaw: requiredSelect ? requiredSelect.value : undefined, isCheckboxRequired });
 checkboxRequiredMap[questionId] = isCheckboxRequired;
 logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; \n`;
 /* ── check for "Mark only one" option ─────────────────────────── */
@@ -2039,6 +2041,7 @@ formHTML += `</div><br></div>`;
                 const checkboxOptions = field.options || [];
                 const selectionType = field.selectionType || 'multiple';
                 const isCheckboxRequired = field.required !== 'optional';
+                console.log('[GEN DBG][MDD] checkbox field render', { questionId, fieldName: field.fieldName, requiredRaw: field.required, isCheckboxRequired });
                 checkboxRequiredMap[questionId] = isCheckboxRequired;
                 logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; \n`;
                 // Create checkbox/radio options
@@ -3424,8 +3427,21 @@ if (s > 1){
             }
           });
           const radiosSatisfied = Object.values(radioGroups).every(group => group.some(Boolean));
-          const checkboxRequired = checkboxRequiredMap[questionId] !== false; // default required unless explicitly optional
+          // Use explicit hasOwnProperty so missing entries default to optional
+          const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMap, questionId)
+            ? checkboxRequiredMap[questionId]
+            : false;
           const checkboxesSatisfied = !hasCheckbox || !checkboxRequired || checkboxAnyChecked;
+          console.debug('[VALIDATION DBG] checkbox gate', {
+            questionId,
+            questionText,
+            hasCheckbox,
+            checkboxRequiredMapVal: checkboxRequiredMap[questionId],
+            checkboxRequired,
+            checkboxAnyChecked,
+            radiosSatisfied,
+            allStandardSatisfied
+          });
           // Additional check: if any trigger sequence container is visible, its fields become required
           const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
           if (visibleTriggerContainers.length > 0) {
@@ -3810,6 +3826,21 @@ if (s > 1){
         const visibleIndices = getVisibleIndices();
         const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
         activateIndex(initialIndex);
+      });
+      // Global shortcut: Shift+Enter → click the visible "next" arrow
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.shiftKey) {
+          e.preventDefault();
+          const activeSection = document.querySelector('.section.active');
+          const nextBtn = activeSection ? activeSection.querySelector('.question-next') : null;
+          console.debug('[NAV DBG] Shift+Enter pressed', {
+            activeSectionId: activeSection ? activeSection.id : null,
+            hasNextBtn: !!nextBtn
+          });
+          if (nextBtn) {
+            nextBtn.click();
+          }
+        }
       });
     });
   </script>

@@ -173,7 +173,11 @@
                         {
                           "text": "No"
                         }
-                      ]
+                      ],
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": []
+                      }
                     }
                   ]
                 }
@@ -181,6 +185,78 @@
               "order": 5
             }
           ]
+        },
+        {
+          "questionId": 2,
+          "text": "Hungry?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "hungry",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
         }
       ]
     }
@@ -188,10 +264,10 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 2,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
-  "formName": "Example Form",
+  "formName": "New SC-100",
   "defaultPDFName": "",
   "pdfOutputName": "",
   "stripePriceId": "",
