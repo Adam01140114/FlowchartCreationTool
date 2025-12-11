@@ -7216,6 +7216,33 @@ function showTextboxLabels(questionId, count){
                         }
                     }, 100);
                 }
+            } else if (field.type === 'phone') {
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                // No conditional prefills expected for phone, but keep for parity
+                let prefillValue = '';
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                } else if (field.prefill) {
+                    prefillValue = field.prefill;
+                }
+                const safePrefill = prefillValue ? prefillValue.replace(/"/g, '&quot;') : '';
+                inputDiv.innerHTML =
+                  '<div class="address-field">' +
+                    '<input type="tel"' +
+                    ' id="' + fieldId + '"' +
+                    ' name="' + fieldId + '"' +
+                    ' placeholder="' + (field.label || 'Phone') + '"' +
+                    ' class="address-input"' +
+                    ' style="margin: 4px auto; max-width: 400px;"' +
+                    ' oninput="formatPhoneInput(this)"' +
+                    ' value="' + safePrefill + '">' +
+                  '</div>';
+                // Append all children (wrapper + input)
+                Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
             } else if (field.type === 'amount') {
                 const fieldId = field.nodeId + "_" + j;
                 const inputDiv = document.createElement('div');

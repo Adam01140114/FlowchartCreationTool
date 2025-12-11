@@ -8468,37 +8468,39 @@ function createOptionField(option, index, cell, parentContainer) {
   phoneRadio.value = 'phone';
   phoneRadio.name = `mdd_type_${cell.id}_${index}`;
   phoneRadio.checked = isPhone;
-  const setType = (newType) => {
-    option.type = newType;
-    option.isAmountOption = newType === 'amount';
-    if (typeof window.requestAutosave === 'function') {
-      window.requestAutosave();
-    }
+  // Sync helper keeps DOM in step with data
+  const syncRadios = (nextType) => {
+    const typeToSync = nextType || option.type || (option.isAmountOption ? 'amount' : 'label');
+    amountRadio.checked = typeToSync === 'amount';
+    phoneRadio.checked = typeToSync === 'phone';
   };
-  amountRadio.onclick = (e) => {
-    if (option.type === 'amount' && amountRadio.checked) {
-      e.preventDefault();
-      amountRadio.checked = false;
-      phoneRadio.checked = false;
-      setType('label');
-      return;
+  const applyToggle = (newType) => {
+    const current = option.type || (option.isAmountOption ? 'amount' : 'label');
+    const finalType = current === newType ? 'label' : newType;
+    if (typeof window.setMultipleDropdownType === 'function') {
+      window.setMultipleDropdownType(cell.id, index, finalType);
+    } else {
+      option.type = finalType;
+      option.isAmountOption = finalType === 'amount';
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
     }
-    amountRadio.checked = true;
-    phoneRadio.checked = false;
-    setType('amount');
+    option.type = finalType;
+    option.isAmountOption = finalType === 'amount';
+    syncRadios(finalType);
   };
-  phoneRadio.onclick = (e) => {
-    if (option.type === 'phone' && phoneRadio.checked) {
-      e.preventDefault();
-      phoneRadio.checked = false;
-      amountRadio.checked = false;
-      setType('label');
-      return;
-    }
-    phoneRadio.checked = true;
-    amountRadio.checked = false;
-    setType('phone');
+  const handlePointer = (newType) => (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    applyToggle(newType);
   };
+  amountRadio.addEventListener('pointerdown', handlePointer('amount'), true);
+  phoneRadio.addEventListener('pointerdown', handlePointer('phone'), true);
+  // Change events help keep visual state aligned if native events fire after toggle
+  amountRadio.addEventListener('change', () => syncRadios());
+  phoneRadio.addEventListener('change', () => syncRadios());
   phoneLabel.appendChild(phoneRadio);
   phoneLabel.appendChild(document.createTextNode('Phone?'));
   // Copy ID button
@@ -11855,6 +11857,43 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
+  }
+};
+// Set type for multiple dropdown option: 'label' | 'amount' | 'phone' with toggle-off
+window.setMultipleDropdownType = function(cellId, index, type) {
+  const cell = getGraph()?.getModel().getCell(cellId);
+  if (!(cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes && cell._textboxes[index])) {
+    return;
+  }
+  const allowed = ['label', 'amount', 'phone'];
+  const requested = allowed.includes(type) ? type : 'label';
+  const current = cell._textboxes[index].type || (cell._textboxes[index].isAmountOption ? 'amount' : 'label');
+  const finalType = current === requested ? 'label' : requested;
+  getGraph().getModel().beginUpdate();
+  try {
+    cell._textboxes[index].type = finalType;
+    cell._textboxes[index].isAmountOption = finalType === 'amount'; // backward compat
+  } finally {
+    getGraph().getModel().endUpdate();
+  }
+  // Sync radio visuals (inline + any modal mirrors)
+  const names = [
+    `mdd_type_${cellId}_${index}`,
+    `mdd_modal_type_${cellId}_${index}`
+  ];
+  names.forEach(name => {
+    const radios = document.getElementsByName(name);
+    Array.from(radios || []).forEach(radio => {
+      if (finalType === 'label') {
+        radio.checked = false;
+      } else {
+        radio.checked = (radio.value === finalType);
+      }
+    });
+  });
+  updatemultipleDropdownTypeCell(cell);
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
   }
 };
 window.addMultipleDropdownLocationHandler = function(cellId) {

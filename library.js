@@ -376,7 +376,7 @@ window.exportGuiJson = function(download = true) {
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
               selectionType: checkbox.selectionType || "multiple",
-              required: checkbox.required || "required",
+              required: (checkbox.required === false || checkbox.required === 'optional') ? "optional" : (checkbox.required || "required"),
               options: checkboxOptions,
               order: orderIndex + 1
             });
@@ -478,7 +478,7 @@ window.exportGuiJson = function(download = true) {
                           type: "checkbox",
                           fieldName: checkbox.fieldName || "",
                           selectionType: checkbox.selectionType || "multiple",
-                          required: checkbox.required || "required",
+                          required: (checkbox.required === false || checkbox.required === 'optional') ? "optional" : (checkbox.required || "required"),
                           options: checkboxOptions
                         });
                       }
@@ -632,7 +632,7 @@ window.exportGuiJson = function(download = true) {
                             type: "checkbox",
                             fieldName: checkbox.fieldName || "",
                             selectionType: checkbox.selectionType || "multiple",
-                            required: checkbox.required || "required",
+                            required: (checkbox.required === false || checkbox.required === 'optional') ? "optional" : (checkbox.required || "required"),
                             options: checkboxOptions
                           });
                         }
@@ -748,8 +748,8 @@ window.exportGuiJson = function(download = true) {
                       fields.push({
                         type: "checkbox",
                         fieldName: checkbox.fieldName || "",
-                        selectionType: checkbox.selectionType || "multiple",
-                        required: checkbox.required || "required",
+                      selectionType: checkbox.selectionType || "multiple",
+                      required: (checkbox.required === false || checkbox.required === 'optional') ? "optional" : (checkbox.required || "required"),
                         options: checkboxOptions
                       });
                     });
@@ -911,6 +911,7 @@ window.exportGuiJson = function(download = true) {
               type: "checkbox",
               fieldName: checkbox.fieldName || "",
               selectionType: checkbox.selectionType || "multiple",
+              required: (checkbox.required === false || checkbox.required === 'optional') ? "optional" : (checkbox.required || "required"),
               options: checkboxOptions,
               order: allFieldsInOrder.length + 1
             });
@@ -1292,7 +1293,7 @@ window.exportGuiJson = function(download = true) {
         // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
         const allFieldsInOrder = [];
         // If _itemOrder exists, use it to determine the correct order
-        if (cell._itemOrder && cell._itemOrder.length > 0) {
+          if (cell._itemOrder && cell._itemOrder.length > 0) {
           cell._itemOrder.forEach((item, orderIndex) => {
             if (item.type === 'option' && cell._textboxes && cell._textboxes[item.index]) {
               const tb = cell._textboxes[item.index];
@@ -1310,13 +1311,15 @@ window.exportGuiJson = function(download = true) {
                 conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
               });
             } else if (item.type === 'location') {
-              // Create a single location entry instead of expanding into individual fields
+              // Only include location if it still exists (locationIndex present)
+              if (cell._locationIndex !== undefined && cell._locationIndex >= 0) {
                 allFieldsInOrder.push({
-                type: "location",
-                fieldName: cell._locationTitle || "",
-                nodeId: "location_data",
-                order: orderIndex + 1
-              });
+                  type: "location",
+                  fieldName: cell._locationTitle || "",
+                  nodeId: "location_data",
+                  order: orderIndex + 1
+                });
+              }
             } else if (item.type === 'time' && cell._times && cell._times[item.index]) {
               const time = cell._times[item.index];
               allFieldsInOrder.push({
@@ -1363,6 +1366,7 @@ window.exportGuiJson = function(download = true) {
                 type: "checkbox",
                 fieldName: checkbox.fieldName || "",
                 selectionType: checkbox.selectionType || "multiple",
+                required: (checkbox.required === false || checkbox.required === 'optional') ? "optional" : (checkbox.required || "required"),
                 options: checkboxOptions,
                 order: orderIndex + 1
               });
@@ -1827,8 +1831,7 @@ window.exportGuiJson = function(download = true) {
           const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
             ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
           );
-          const shouldIncludeLocationFields = (exportType === "multipleDropdownType" && locationIndex >= 0) || 
-                                            (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
+          const shouldIncludeLocationFields = (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
           if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
             const locationFields = [
               { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },

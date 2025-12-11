@@ -337,7 +337,8 @@ function loadFormData(formData) {
                         // Restore required/optional select (defaults to required)
                         const requiredSelect = questionBlock.querySelector(`[id^="checkboxRequired${question.questionId}_"]`);
                         if (requiredSelect) {
-                            requiredSelect.value = (question.required === false) ? 'optional' : 'required';
+                            const isOptional = (question.required === false) || (question.required === 'optional');
+                            requiredSelect.value = isOptional ? 'optional' : 'required';
                         }
                         // Add the "None of the above" checkbox if it exists in the data
                         if (hasNoneOption) {
@@ -564,8 +565,9 @@ function loadFormData(formData) {
                                         if (selectionTypeEl && field.selectionType) {
                                             selectionTypeEl.value = field.selectionType;
                                         }
-                                        if (requiredEl && field.required) {
-                                            requiredEl.value = field.required;
+                                        if (requiredEl) {
+                                            const requiredValue = (field.required === false || field.required === 'optional') ? 'optional' : 'required';
+                                            requiredEl.value = requiredValue;
                                         }
                                         // Add checkbox options
                                         if (field.options && field.options.length > 0) {
@@ -1246,6 +1248,29 @@ function loadFormData(formData) {
                                         console.log('🔧 [IMPORT DEBUG - NUMBERED] Set conditional prefills for amount field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
                                     }
                                 }
+                            } else if (field.type === 'phone') {
+                                // Add a label field and then mark it as phone
+                                addTextboxLabel(question.questionId);
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    // Mark this unified field as phone for display and data
+                                    lastField.setAttribute('data-type', 'phone');
+                                    const typeTextEl = lastField.querySelector('#typeText' + question.questionId + '_' + fieldOrder);
+                                    if (typeTextEl) typeTextEl.textContent = 'Phone';
+                                    // Prefill
+                                    if (field.prefill !== undefined) {
+                                        lastField.setAttribute('data-prefill', field.prefill || '');
+                                    }
+                                    // Conditional prefills
+                                    if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                        lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+                                    }
+                                }
                             } else if (field.type === 'checkbox') {
                                 // Add a checkbox field
                                 addCheckboxField(question.questionId);
@@ -1255,11 +1280,16 @@ function loadFormData(formData) {
                                     const fieldOrder = lastField.getAttribute('data-order');
                                     const fieldNameEl = lastField.querySelector('#checkboxFieldName' + question.questionId + '_' + fieldOrder);
                                     const selectionTypeEl = lastField.querySelector('#checkboxSelectionType' + question.questionId + '_' + fieldOrder);
+                                    const requiredEl = lastField.querySelector('#checkboxRequired' + question.questionId + '_' + fieldOrder);
                                     if (fieldNameEl && field.fieldName) {
                                         fieldNameEl.value = field.fieldName;
                                     }
                                     if (selectionTypeEl && field.selectionType) {
                                         selectionTypeEl.value = field.selectionType;
+                                    }
+                                    if (requiredEl) {
+                                        const requiredValue = (field.required === false || field.required === 'optional') ? 'optional' : 'required';
+                                        requiredEl.value = requiredValue;
                                     }
                                     // Add checkbox options
                                     if (field.options && field.options.length > 0) {
