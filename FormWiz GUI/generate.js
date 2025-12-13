@@ -11774,10 +11774,27 @@ function updateUserAddressFields() {
   const cityHidden = document.getElementById('user_city_hidden');
   const stateHidden = document.getElementById('user_state_hidden');
   const zipHidden = document.getElementById('user_zip_hidden');
+  const fullAddressField = document.getElementById('user_full_address');
+  const fullAddressHidden = document.getElementById('user_full_address_hidden');
+  // Build full address string
+  const parts = [];
+  if (street) parts.push(street);
+  const cityState = [city, state].filter(Boolean).join(', ').trim();
+  if (cityState) parts.push(cityState);
+  if (zip) {
+    if (parts.length > 0) {
+      parts[parts.length - 1] = parts[parts.length - 1] + (zip ? ' ' + zip : '');
+    } else {
+      parts.push(zip);
+    }
+  }
+  const fullAddress = parts.join(', ').replace(/, ,/g, ',').trim();
   if (streetHidden) streetHidden.value = street;
   if (cityHidden) cityHidden.value = city;
   if (stateHidden) stateHidden.value = state;
   if (zipHidden) zipHidden.value = zip;
+  if (fullAddressField) fullAddressField.value = fullAddress;
+  if (fullAddressHidden) fullAddressHidden.value = fullAddress;
 }
 // Add event listeners for first and last name fields
 document.addEventListener('DOMContentLoaded', function() {
@@ -11919,7 +11936,9 @@ function generateHiddenPDFFields(formName) {
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
-<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">`;
+<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
+<input type="hidden" id="user_full_address"     name="user_full_address">
+<input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">`;
     /* linked checkboxes - generate hidden checkboxes for each linked checkbox group */
     if (linkedCheckboxes && linkedCheckboxes.length > 0) {
         linkedCheckboxes.forEach(linkedCheckboxGroup => {
