@@ -4789,6 +4789,9 @@ let currentLinkedFieldConfig = [];
 // Linked Checkbox globals
 let linkedCheckboxCounter = 0;
 window.linkedCheckboxCounter = linkedCheckboxCounter;
+let inverseCheckboxCounter = 0;
+window.inverseCheckboxCounter = inverseCheckboxCounter;
+let currentInverseCheckboxConfig = null;
 let currentLinkedCheckboxConfig = [];
 // Open the linked field modal
 function openLinkedFieldModal() {
@@ -4817,14 +4820,35 @@ function openLinkedFieldModal() {
             const dropdownIndex = currentLinkedFieldConfig.length - 1;
             const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
             const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+            const customInput = document.getElementById(`linkedFieldCustom${dropdownIndex}`);
             if (select) {
-                select.value = fieldId;
-                currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
-                // Also update the search input field with the selected option text
-                if (searchInput) {
-                    const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
-                    if (selectedOption) {
+                const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
+                // Check if the fieldId exists in the dropdown options
+                if (selectedOption) {
+                    // Field exists in dropdown, use dropdown selection
+                    select.value = fieldId;
+                    currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+                    // Update the search input field with the selected option text
+                    if (searchInput) {
                         searchInput.value = selectedOption.textContent;
+                    }
+                    // Clear custom input
+                    if (customInput) {
+                        customInput.value = '';
+                    }
+                } else {
+                    // Field doesn't exist in dropdown, use custom input
+                    if (customInput) {
+                        customInput.value = fieldId;
+                        currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+                    }
+                    // Clear dropdown selection
+                    if (select) {
+                        select.value = '';
+                    }
+                    // Clear search input
+                    if (searchInput) {
+                        searchInput.value = '';
                     }
                 }
             }
@@ -4890,13 +4914,8 @@ function createLinkedFieldModal() {
             closeLinkedFieldModal();
         }
     });
-    // Add Enter key functionality
-    document.addEventListener('keydown', function(event) {
-        if (modal.style.display === 'block' && event.key === 'Enter') {
-            event.preventDefault();
-            finalizeLinkedField();
-        }
-    });
+    // Note: Enter key functionality removed - users should click "Done" button to finalize
+    // Enter key still works for selecting dropdown options via the search input handler
 }
 // ============================================
 // ======= LINKED CHECKBOX FUNCTIONALITY ======
@@ -5510,6 +5529,673 @@ function createLinkedCheckboxDisplayFromImport(linkedCheckboxData) {
         checkboxes: linkedCheckboxData.checkboxes
     });
 }
+// ============================================
+// ======= INVERSE CHECKBOX FUNCTIONALITY =====
+// ============================================
+function openInverseCheckboxModal() {
+    console.log('🔵 [INVERSE CHECKBOX] openInverseCheckboxModal called');
+    console.log('🔵 [INVERSE CHECKBOX] window.linkedCheckboxesConfig at modal open:', window.linkedCheckboxesConfig);
+    if (!document.getElementById('inverseCheckboxModal')) {
+        createInverseCheckboxModal();
+    }
+    // Clear editing flag when opening for new entry
+    window.editingInverseCheckboxId = null;
+    currentInverseCheckboxConfig = null;
+    document.getElementById('inverseCheckboxModal').style.display = 'block';
+    const container = document.getElementById('inverseCheckboxDropdown');
+    container.innerHTML = '';
+    // Clear linked checkbox ID input
+    const inverseCheckboxIdInput = document.getElementById('inverseCheckboxIdInput');
+    if (inverseCheckboxIdInput) {
+        inverseCheckboxIdInput.value = '';
+    }
+    addInverseCheckboxDropdown();
+}
+function createInverseCheckboxModal() {
+    const modal = document.createElement('div');
+    modal.id = 'inverseCheckboxModal';
+    modal.style.cssText = 'display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5)';
+    modal.addEventListener('click', () => modal.style.display = 'none');
+    modal.innerHTML = `
+      <div style="background:#fff;margin:5% auto;padding:20px;border-radius:10px;width:90%;max-width:1200px;max-height:80vh;overflow:auto;" onclick="event.stopPropagation()">
+        <h3 style="text-align:center;margin-bottom:20px;color:#2c3e50;">Inverse Checkbox Configuration Menu</h3>
+        <div id="inverseCheckboxDropdown" style="margin-bottom:20px;"></div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block;margin-bottom:5px;font-weight:bold;">Linked Checkbox ID:</label>
+          <input type="text" id="inverseCheckboxIdInput" placeholder="Enter linked Checkbox ID (e.g., linked_checkbox)" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;">
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <button type="button" onclick="finalizeInverseCheckbox()" style="background:#27ae60;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Done</button>
+          <button type="button" onclick="closeInverseCheckboxModal()" style="background:#e74c3c;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;">Cancel</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+}
+function addInverseCheckboxDropdown() {
+    const container = document.getElementById('inverseCheckboxDropdown');
+    const div = document.createElement('div');
+    div.id = 'inverseCheckboxDropdown0';
+    div.style.cssText = 'display:flex;align-items:center;margin-bottom:15px;padding:10px;border:1px solid #ddd;border-radius:5px;background:#f9f9f9;';
+    div.innerHTML = `
+      <div style="flex:1;margin-right:10px;">
+        <label style="display:block;margin-bottom:5px;font-weight:bold;">Checkbox Option 1:</label>
+        <div style="position:relative;">
+          <input type="text" id="inverseCheckboxSearch0" placeholder="Search for a Checkbox Option..." style="width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;"
+            onkeyup="filterInverseCheckboxOptions(0)" onfocus="showInverseCheckboxOptions(0)" onblur="hideInverseCheckboxOptions(0)">
+          <div id="inverseCheckboxOptions0" style="display:none;position:absolute;top:100%;left:0;min-width:400px;background:#fff;border:1px solid #ccc;border-top:none;border-radius:0 0 4px 4px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 8px rgba(0,0,0,0.1);"></div>
+        </div>
+        <select id="inverseCheckboxSelect0" style="display:none;"></select>
+      </div>`;
+    container.appendChild(div);
+    console.log('🔵 [INVERSE CHECKBOX] About to populate dropdown, window.linkedCheckboxesConfig:', window.linkedCheckboxesConfig);
+    populateInverseCheckboxDropdown(0);
+    currentInverseCheckboxConfig = { index: 0, selectedValue: '' };
+}
+function populateInverseCheckboxDropdown(idx) {
+    console.log('🔵 [INVERSE CHECKBOX] populateInverseCheckboxDropdown called with idx:', idx);
+    const select = document.getElementById(`inverseCheckboxSelect${idx}`);
+    if (!select) {
+        console.error('❌ [INVERSE CHECKBOX] Select element not found for idx:', idx);
+        return;
+    }
+    select.innerHTML = '<option value="">Select a checkbox option...</option>';
+    const options = [];
+    const blocks = document.querySelectorAll('[id^="questionBlock"]');
+    console.log('🔵 [INVERSE CHECKBOX] Found question blocks:', blocks.length);
+    blocks.forEach(block => {
+        const qId = block.id.replace('questionBlock','');
+        const typeSel = block.querySelector(`#questionType${qId}`);
+        if (!typeSel) return;
+        if (typeSel.value === 'checkbox') {
+            // Basic checkbox question options
+            const nameInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionName${qId}_"]`);
+            const textInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionText${qId}_"]`);
+            console.log(`🔵 [INVERSE CHECKBOX] Question ${qId} (checkbox): Found ${nameInputs.length} checkbox options`);
+            nameInputs.forEach((nameInput, i) => {
+                const nodeId = nameInput.value.trim();
+                const labelText = (textInputs[i]?.value || '').trim();
+                if (nodeId) {
+                    options.push({ nodeId, label: labelText || nodeId });
+                    console.log(`✅ [INVERSE CHECKBOX] Added checkbox option from question ${qId}: ${labelText || nodeId} (${nodeId})`);
+                }
+            });
+        }
+        // Unified checkbox options (checkboxNodeId*)
+        const unifiedNodes = block.querySelectorAll(`input[id^="checkboxNodeId${qId}_"]`);
+        const unifiedTexts = block.querySelectorAll(`input[id^="checkboxText${qId}_"]`);
+        unifiedNodes.forEach((nodeInput, i) => {
+            const nodeId = nodeInput.value.trim();
+            const labelText = (unifiedTexts[i]?.value || '').trim();
+            if (nodeId) options.push({ nodeId, label: labelText || nodeId });
+        });
+        // Hidden dropdown checkboxes - generate IDs for dropdown options
+        if (typeSel.value === 'dropdown') {
+            // Get the dropdown's nameId (similar to how textbox gets its nameId)
+            const nameIdInput = block.querySelector(`#textboxName${qId}`);
+            const nameId = nameIdInput ? nameIdInput.value.trim() : '';
+            // Get dropdown question text for better labeling
+            const questionTextEl = block.querySelector(`#question${qId}`);
+            const questionText = questionTextEl ? questionTextEl.value.trim() : `Question ${qId}`;
+            // Get all dropdown options
+            const dropdownOptionInputs = block.querySelectorAll(`#dropdownOptions${qId} input`);
+            dropdownOptionInputs.forEach((optionInput) => {
+                const optionValue = optionInput.value.trim();
+                if (optionValue) {
+                    // Generate checkbox ID using same pattern as dropdownMirror
+                    // Sanitize: replace non-word chars with underscore, convert to lowercase
+                    // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues
+                    const sanitizedValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+                    const dropdownNameId = nameId || `answer${qId}`;
+                    const checkboxId = `${dropdownNameId}_${sanitizedValue}`;
+                    // Create label: "Question Text - Option Value (checkboxId)"
+                    const label = `${questionText} - ${optionValue} (${checkboxId})`;
+                    options.push({ nodeId: checkboxId, label: label });
+                }
+            });
+        }
+        // Hidden dropdown checkboxes from numbered dropdown questions
+        if (typeSel.value === 'numberedDropdown') {
+            // Get the numbered dropdown's min and max range
+            const minInput = block.querySelector(`#numberRangeStart${qId}`);
+            const maxInput = block.querySelector(`#numberRangeEnd${qId}`);
+            const minValue = minInput ? parseInt(minInput.value) || 1 : 1;
+            const maxValue = maxInput ? parseInt(maxInput.value) || 1 : 1;
+            // Get numbered dropdown question text for better labeling
+            const questionTextEl = block.querySelector(`#question${qId}`);
+            const questionText = questionTextEl ? questionTextEl.value.trim() : `Question ${qId}`;
+            // Find all dropdown fields within this numbered dropdown
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${qId}`);
+            if (unifiedFieldsContainer) {
+                const dropdownFields = unifiedFieldsContainer.querySelectorAll('[data-type="dropdown"]');
+                dropdownFields.forEach((dropdownField) => {
+                    // Get the dropdown field name
+                    const fieldCount = dropdownField.getAttribute('data-order');
+                    const fieldNameInput = block.querySelector(`#dropdownFieldName${qId}_${fieldCount}`);
+                    const fieldName = fieldNameInput ? fieldNameInput.value.trim() : '';
+                    if (fieldName) {
+                        // Sanitize field name: lowercase, remove question marks, replace spaces with underscores
+                        const sanitizedFieldName = fieldName
+                            .toLowerCase()
+                            .replace(/[?]/g, '')
+                            .replace(/[^a-z0-9_]+/g, '_')
+                            .replace(/^_+|_+$/g, '');
+                        // Get all dropdown options for this field
+                        const dropdownOptionsContainer = block.querySelector(`#dropdownOptions${qId}_${fieldCount}`);
+                        if (dropdownOptionsContainer) {
+                            const optionInputs = dropdownOptionsContainer.querySelectorAll('input[type="text"]');
+                            optionInputs.forEach((optionInput) => {
+                                const optionValue = optionInput.value.trim();
+                                if (optionValue) {
+                                    // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+                                    // Use character class [^A-Za-z0-9_] instead of \W to avoid backslash escaping issues
+                                    const sanitizedOptionValue = optionValue.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+                                    // Generate checkbox IDs for each entry number (1 to max)
+                                    for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
+                                        const checkboxId = `${sanitizedFieldName}_${entryNum}_${sanitizedOptionValue}`;
+                                        const label = `${questionText} - ${fieldName} (${entryNum}) - ${optionValue} (${checkboxId})`;
+                                        options.push({ nodeId: checkboxId, label: label });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            // Hidden dropdown checkboxes from dropdowns inside trigger sequences
+            // Get the numbered dropdown's nodeId (question nodeId)
+            // For numbered dropdowns, nodeId is stored in #nodeId${qId}, not #textboxName${qId}
+            const nodeIdInput = block.querySelector(`#nodeId${qId}`);
+            const questionNodeId = nodeIdInput ? nodeIdInput.value.trim() : `answer${qId}`;
+            // Find all dropdown fields within this numbered dropdown
+            const unifiedFieldsContainerForTriggers = block.querySelector(`#unifiedFields${qId}`);
+            if (unifiedFieldsContainerForTriggers) {
+                const dropdownFields = unifiedFieldsContainerForTriggers.querySelectorAll('[data-type="dropdown"]');
+                dropdownFields.forEach((dropdownField) => {
+                    // Get the dropdown field name
+                    const fieldCount = dropdownField.getAttribute('data-order');
+                    const fieldNameInput = block.querySelector(`#dropdownFieldName${qId}_${fieldCount}`);
+                    const fieldName = fieldNameInput ? fieldNameInput.value.trim() : '';
+                    if (fieldName) {
+                        // Find all trigger sequences for this dropdown
+                        const triggerSequencesContainer = block.querySelector(`#triggerSequences${qId}_${fieldCount}`);
+                        if (triggerSequencesContainer) {
+                            const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
+                            sequenceElements.forEach((sequenceEl, sequenceIndex) => {
+                                // Find all dropdown fields within this trigger sequence
+                                const triggerFieldsContainer = sequenceEl.querySelector(`#triggerFields${qId}_${fieldCount}_${sequenceIndex + 1}`);
+                                if (triggerFieldsContainer) {
+                                    const triggerFieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
+                                    triggerFieldElements.forEach((triggerFieldEl, triggerFieldIndex) => {
+                                        // Check if this is a dropdown field
+                                        const triggerDropdownFieldNameEl = triggerFieldEl.querySelector(`#triggerDropdownFieldName${qId}_${fieldCount}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                        if (triggerDropdownFieldNameEl) {
+                                            const triggerDropdownFieldName = triggerDropdownFieldNameEl.value.trim();
+                                            if (triggerDropdownFieldName) {
+                                                // Get the parent dropdown's nodeId (trigger title) from the dropdown field's options
+                                                // The parent dropdown is the one that contains this trigger sequence
+                                                let parentDropdownNodeId = questionNodeId; // Fallback to question nodeId
+                                                // Get the dropdown field's options to extract the parent nodeId
+                                                const dropdownOptionsContainer = block.querySelector(`#dropdownOptions${qId}_${fieldCount}`);
+                                                if (dropdownOptionsContainer) {
+                                                    const dropdownOptionNodeIdInputs = dropdownOptionsContainer.querySelectorAll('input[id^="dropdownOptionNodeId"]');
+                                                    if (dropdownOptionNodeIdInputs.length > 0) {
+                                                        // Get the first option's nodeId and extract the base (e.g., "is_this_plaintiff_a_business_yes" -> "is_this_plaintiff_a_business")
+                                                        const firstOptionNodeId = dropdownOptionNodeIdInputs[0].value.trim();
+                                                        if (firstOptionNodeId) {
+                                                            const lastUnderscoreIndex = firstOptionNodeId.lastIndexOf('_');
+                                                            if (lastUnderscoreIndex > 0) {
+                                                                parentDropdownNodeId = firstOptionNodeId.substring(0, lastUnderscoreIndex);
+                                                            } else {
+                                                                parentDropdownNodeId = firstOptionNodeId;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                // Sanitize trigger dropdown field name
+                                                const sanitizedTriggerFieldName = triggerDropdownFieldName
+                                                    .toLowerCase()
+                                                    .replace(/[?]/g, '')
+                                                    .replace(/[^a-z0-9_]+/g, '_')
+                                                    .replace(/^_+|_+$/g, '');
+                                                // Get all dropdown options for this trigger dropdown
+                                                const triggerDropdownOptionsContainer = triggerFieldEl.querySelector(`#triggerDropdownOptions${qId}_${fieldCount}_${sequenceIndex + 1}_${triggerFieldIndex + 1}`);
+                                                if (triggerDropdownOptionsContainer) {
+                                                    const triggerOptionInputs = triggerDropdownOptionsContainer.querySelectorAll('input[type="text"]');
+                                                    triggerOptionInputs.forEach((triggerOptionInput) => {
+                                                        const triggerOptionValue = triggerOptionInput.value.trim();
+                                                        if (triggerOptionValue) {
+                                                            // Sanitize option value: replace non-word chars with underscore, convert to lowercase
+                                                            const sanitizedTriggerOptionValue = triggerOptionValue
+                                                                .replace(/[^A-Za-z0-9_]+/g, "_")
+                                                                .toLowerCase()
+                                                                .replace(/^_+|_+$/g, '');
+                                                            // Generate checkbox IDs for each entry number (minValue to maxValue)
+                                                            // Format: {parentDropdownNodeId}_{dropdownFieldName}_{optionValue}_{entryNumber}
+                                                            for (let entryNum = minValue; entryNum <= maxValue; entryNum++) {
+                                                                const checkboxId = `${parentDropdownNodeId}_${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}_${entryNum}`;
+                                                                const label = `${questionText} - ${fieldName} [Trigger] - ${triggerDropdownFieldName} (${entryNum}) - ${triggerOptionValue} (${checkboxId})`;
+                                                                options.push({ nodeId: checkboxId, label: label });
+                                                            }
+                }
+            });
+                                                }
+                                            }
+        }
+    });
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+        // Hidden checkboxes from hidden logic configurations
+        const enableHiddenLogicCheckbox = block.querySelector(`#enableHiddenLogic${qId}`);
+        if (enableHiddenLogicCheckbox && enableHiddenLogicCheckbox.checked) {
+            const configsContainer = block.querySelector(`#hiddenLogicConfigs${qId}`);
+            if (configsContainer) {
+                const configElements = configsContainer.querySelectorAll('.hidden-logic-config');
+                configElements.forEach((configElement, configIndex) => {
+                    const typeSelect = configElement.querySelector(`#hiddenLogicType${qId}_${configIndex}`);
+                    const nodeIdInput = configElement.querySelector(`#hiddenLogicNodeId${qId}_${configIndex}`);
+                    // Only include checkbox type hidden logic
+                    if (typeSelect && typeSelect.value === 'checkbox' && nodeIdInput) {
+                        const nodeId = nodeIdInput.value.trim();
+                        if (nodeId) {
+                            // Get question text for better labeling
+                            const questionTextEl = block.querySelector(`#question${qId}`);
+                            const questionText = questionTextEl ? questionTextEl.value.trim() : `Question ${qId}`;
+                            // Get trigger value for context
+                            const triggerSelect = configElement.querySelector(`#hiddenLogicTrigger${qId}_${configIndex}`);
+                            const triggerValue = triggerSelect ? triggerSelect.value.trim() : '';
+                            // Create label: "Question Text - Hidden Logic (nodeId) [Trigger: value]"
+                            const label = triggerValue 
+                                ? `${questionText} - Hidden Logic (${nodeId}) [Trigger: ${triggerValue}]`
+                                : `${questionText} - Hidden Logic (${nodeId})`;
+                            options.push({ nodeId: nodeId, label: label });
+                        }
+                    }
+                });
+            }
+        }
+    });
+    // Add linked checkbox nodes from the graph
+    console.log('🔵 [INVERSE CHECKBOX] Checking for graph-linked checkbox nodes...');
+    if (window.graph) {
+        const allCells = window.graph.getChildVertices(window.graph.getDefaultParent());
+        console.log('🔵 [INVERSE CHECKBOX] Found graph cells:', allCells.length);
+        allCells.forEach(cell => {
+            // Check if this is a linked checkbox node
+            if (cell._linkedCheckboxNodeId) {
+                const nodeId = cell._linkedCheckboxNodeId.trim();
+                if (nodeId) {
+                    // Get node text for better labeling
+                    const nodeText = (cell.value || '').replace(/<[^>]*>/g, '').trim() || nodeId;
+                    const label = `Linked Checkbox: ${nodeText} (${nodeId})`;
+                    options.push({ nodeId: nodeId, label: label });
+                    console.log('✅ [INVERSE CHECKBOX] Added graph linked checkbox node:', nodeId);
+                }
+            }
+        });
+    } else {
+        console.log('⚠️ [INVERSE CHECKBOX] window.graph not available');
+    }
+    // Add linked checkbox IDs themselves as options (so inverse checkbox can target the entire linked checkbox group)
+    console.log('🔵 [INVERSE CHECKBOX] Checking window.linkedCheckboxesConfig...');
+    console.log('🔵 [INVERSE CHECKBOX] window.linkedCheckboxesConfig:', window.linkedCheckboxesConfig);
+    if (window.linkedCheckboxesConfig && Array.isArray(window.linkedCheckboxesConfig)) {
+        console.log('✅ [INVERSE CHECKBOX] Found linkedCheckboxesConfig with', window.linkedCheckboxesConfig.length, 'configs');
+        window.linkedCheckboxesConfig.forEach((config, configIndex) => {
+            console.log(`🔵 [INVERSE CHECKBOX] Processing config ${configIndex}:`, config);
+            // Add the linked checkbox ID itself as an option
+            if (config.linkedCheckboxId && typeof config.linkedCheckboxId === 'string') {
+                const linkedCheckboxId = config.linkedCheckboxId.trim();
+                if (linkedCheckboxId) {
+                    // Check if this linked checkbox ID is already in the list
+                    const alreadyExists = options.some(opt => opt.nodeId === linkedCheckboxId);
+                    console.log(`🔵 [INVERSE CHECKBOX] Linked checkbox ID ${linkedCheckboxId} already exists:`, alreadyExists);
+                    if (!alreadyExists) {
+                        // Get the checkbox names for better labeling
+                        const checkboxNames = config.checkboxes && Array.isArray(config.checkboxes) 
+                            ? config.checkboxes.join(', ') 
+                            : 'Linked Checkbox';
+                        const label = `Linked Checkbox: ${checkboxNames} (${linkedCheckboxId})`;
+                        options.push({ nodeId: linkedCheckboxId, label: label });
+                        console.log(`✅ [INVERSE CHECKBOX] Added linked checkbox ID: ${label}`);
+                    }
+                }
+            }
+            // Also add individual checkbox options from linked checkbox configs (even if they exist, mark them as from linked checkbox)
+            if (config.checkboxes && Array.isArray(config.checkboxes)) {
+                console.log(`🔵 [INVERSE CHECKBOX] Config ${configIndex} has ${config.checkboxes.length} checkboxes:`, config.checkboxes);
+                config.checkboxes.forEach((checkboxNodeId, checkboxIndex) => {
+                    console.log(`🔵 [INVERSE CHECKBOX] Processing checkbox ${checkboxIndex}:`, checkboxNodeId);
+                    if (checkboxNodeId && typeof checkboxNodeId === 'string') {
+                        const nodeId = checkboxNodeId.trim();
+                        // Check if this option is already in the list
+                        const existingOption = options.find(opt => opt.nodeId === nodeId);
+                        console.log(`🔵 [INVERSE CHECKBOX] Checkbox ${nodeId} already exists:`, !!existingOption);
+                        if (existingOption) {
+                            // Update the label to indicate it's part of a linked checkbox
+                            const linkedCheckboxId = config.linkedCheckboxId || 'linked';
+                            if (!existingOption.label.includes('Linked Checkbox')) {
+                                existingOption.label = `${existingOption.label} [Linked: ${linkedCheckboxId}]`;
+                                console.log(`✅ [INVERSE CHECKBOX] Updated label for existing checkbox: ${existingOption.label}`);
+                            }
+                        } else if (nodeId) {
+                            // Try to find a label for this checkbox from the question blocks
+                            let label = nodeId;
+                            blocks.forEach(block => {
+                                const qId = block.id.replace('questionBlock','');
+                                // Check basic checkbox options
+                                const nameInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionName${qId}_"]`);
+                                const textInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionText${qId}_"]`);
+                                nameInputs.forEach((nameInput, i) => {
+                                    if (nameInput.value.trim() === nodeId) {
+                                        const labelText = (textInputs[i]?.value || '').trim();
+                                        if (labelText) {
+                                            label = labelText;
+                                            console.log(`✅ [INVERSE CHECKBOX] Found label for ${nodeId}: ${labelText}`);
+                                        }
+                                    }
+                                });
+                                // Check unified checkbox options
+                                const unifiedNodes = block.querySelectorAll(`input[id^="checkboxNodeId${qId}_"]`);
+                                const unifiedTexts = block.querySelectorAll(`input[id^="checkboxText${qId}_"]`);
+                                unifiedNodes.forEach((nodeInput, i) => {
+                                    if (nodeInput.value.trim() === nodeId) {
+                                        const labelText = (unifiedTexts[i]?.value || '').trim();
+                                        if (labelText) {
+                                            label = labelText;
+                                            console.log(`✅ [INVERSE CHECKBOX] Found unified label for ${nodeId}: ${labelText}`);
+                                        }
+                                    }
+                                });
+                            });
+                            // Add with label indicating it's from a linked checkbox
+                            const linkedCheckboxId = config.linkedCheckboxId || 'linked';
+                            const finalLabel = `${label} [Linked: ${linkedCheckboxId}] (${nodeId})`;
+                            options.push({ nodeId: nodeId, label: finalLabel });
+                            console.log(`✅ [INVERSE CHECKBOX] Added linked checkbox option: ${finalLabel}`);
+                        }
+                    } else {
+                        console.log(`⚠️ [INVERSE CHECKBOX] Invalid checkbox node ID:`, checkboxNodeId);
+                    }
+                });
+            } else {
+                console.log(`⚠️ [INVERSE CHECKBOX] Config ${configIndex} has no checkboxes array or it's not an array`);
+            }
+        });
+    } else {
+        console.log('⚠️ [INVERSE CHECKBOX] window.linkedCheckboxesConfig is not available or not an array');
+        console.log('🔵 [INVERSE CHECKBOX] Type of window.linkedCheckboxesConfig:', typeof window.linkedCheckboxesConfig);
+    }
+    // Build options list and searchable overlay - show full node ID like linked checkbox menu
+    console.log('🔵 [INVERSE CHECKBOX] Total options collected:', options.length);
+    console.log('🔵 [INVERSE CHECKBOX] Options:', options);
+    const overlay = document.getElementById(`inverseCheckboxOptions${idx}`);
+    if (overlay) {
+        overlay.innerHTML = '';
+    }
+    options.forEach((opt, optIndex) => {
+        const o = document.createElement('option');
+        o.value = opt.nodeId;
+        // Show just the node ID for cleaner display
+        o.textContent = opt.nodeId;
+        select.appendChild(o);
+        if (optIndex < 5) { // Log first 5 options
+            console.log(`✅ [INVERSE CHECKBOX] Added option ${optIndex}:`, o.textContent);
+        }
+    });
+    console.log('✅ [INVERSE CHECKBOX] Finished populating dropdown with', select.options.length - 1, 'options');
+    initializeInverseCheckboxSearch(idx);
+}
+function initializeInverseCheckboxSearch(idx) {
+    const searchInput = document.getElementById(`inverseCheckboxSearch${idx}`);
+    if (!searchInput) return;
+    const select = document.getElementById(`inverseCheckboxSelect${idx}`);
+    const optionsContainer = document.getElementById(`inverseCheckboxOptions${idx}`);
+    if (!select || !optionsContainer) return;
+    searchInput.addEventListener('keydown', function(e) {
+        const options = optionsContainer.querySelectorAll('.inverse-checkbox-option');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const currentActive = optionsContainer.querySelector('.inverse-checkbox-option.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const next = currentActive.nextElementSibling;
+                if (next) {
+                    next.classList.add('active');
+                    next.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (options.length > 0) {
+                options[0].classList.add('active');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const currentActive = optionsContainer.querySelector('.inverse-checkbox-option.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const prev = currentActive.previousElementSibling;
+                if (prev) {
+                    prev.classList.add('active');
+                    prev.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (options.length > 0) {
+                options[options.length - 1].classList.add('active');
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const activeOption = optionsContainer.querySelector('.inverse-checkbox-option.active');
+            if (activeOption) {
+                activeOption.click();
+            }
+        } else if (e.key === 'Escape') {
+            optionsContainer.style.display = 'none';
+            searchInput.blur();
+        }
+    });
+}
+function filterInverseCheckboxOptions(idx) {
+    const searchInput = document.getElementById(`inverseCheckboxSearch${idx}`);
+    const select = document.getElementById(`inverseCheckboxSelect${idx}`);
+    const optionsContainer = document.getElementById(`inverseCheckboxOptions${idx}`);
+    if (!searchInput || !select || !optionsContainer) return;
+    const searchTerm = searchInput.value.toLowerCase();
+    const allOptions = Array.from(select.options).slice(1);
+    optionsContainer.innerHTML = '';
+    const filteredOptions = allOptions.filter(option => {
+        const optionText = option.textContent.toLowerCase();
+        return optionText.includes(searchTerm);
+    });
+    if (filteredOptions.length > 0) {
+        optionsContainer.style.display = 'block';
+        filteredOptions.forEach(option => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'inverse-checkbox-option';
+            optionDiv.style.cssText = 'padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:background-color 0.2s;';
+            optionDiv.textContent = option.textContent;
+            optionDiv.onmouseover = function() { this.style.backgroundColor = '#f8f9fa'; };
+            optionDiv.onmouseout = function() { this.style.backgroundColor = 'white'; };
+            optionDiv.onclick = function() {
+                selectInverseCheckboxOption(idx, option.value, option.textContent);
+            };
+            optionsContainer.appendChild(optionDiv);
+        });
+    } else {
+        optionsContainer.style.display = 'none';
+    }
+}
+function showInverseCheckboxOptions(idx) {
+    const optionsContainer = document.getElementById(`inverseCheckboxOptions${idx}`);
+    const searchInput = document.getElementById(`inverseCheckboxSearch${idx}`);
+    if (searchInput.value === '') {
+        filterInverseCheckboxOptions(idx);
+    }
+}
+function hideInverseCheckboxOptions(idx) {
+    setTimeout(() => {
+        const optionsContainer = document.getElementById(`inverseCheckboxOptions${idx}`);
+        if (optionsContainer) {
+        optionsContainer.style.display = 'none';
+        } else {
+            console.warn('⚠️ [INVERSE CHECKBOX] Options container not found for idx:', idx);
+        }
+    }, 200);
+}
+function selectInverseCheckboxOption(idx, value, text) {
+    const searchInput = document.getElementById(`inverseCheckboxSearch${idx}`);
+    const selectElement = document.getElementById(`inverseCheckboxSelect${idx}`);
+    const optionsContainer = document.getElementById(`inverseCheckboxOptions${idx}`);
+    searchInput.value = text;
+    selectElement.value = value;
+    optionsContainer.style.display = 'none';
+    if (currentInverseCheckboxConfig) {
+        currentInverseCheckboxConfig.selectedValue = value;
+    }
+}
+function finalizeInverseCheckbox() {
+    if (!currentInverseCheckboxConfig || !currentInverseCheckboxConfig.selectedValue) {
+        alert('Please select a checkbox option.');
+        return;
+    }
+    const inverseCheckboxIdInput = document.getElementById('inverseCheckboxIdInput');
+    const inverseCheckboxId = inverseCheckboxIdInput ? inverseCheckboxIdInput.value.trim() : '';
+    if (!inverseCheckboxId) {
+        alert('Please enter an Inverse Checkbox ID.');
+        return;
+    }
+    if (window.editingInverseCheckboxId) {
+        removeInverseCheckboxDisplay(window.editingInverseCheckboxId);
+        createInverseCheckboxDisplay(currentInverseCheckboxConfig.selectedValue, inverseCheckboxId);
+        window.editingInverseCheckboxId = null;
+    } else {
+        createInverseCheckboxDisplay(currentInverseCheckboxConfig.selectedValue, inverseCheckboxId);
+    }
+    closeInverseCheckboxModal();
+}
+function closeInverseCheckboxModal() {
+    document.getElementById('inverseCheckboxModal').style.display = 'none';
+    currentInverseCheckboxConfig = null;
+    const dropdownsContainer = document.getElementById('inverseCheckboxDropdown');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
+    }
+    const inverseCheckboxIdInput = document.getElementById('inverseCheckboxIdInput');
+    if (inverseCheckboxIdInput) {
+        inverseCheckboxIdInput.value = '';
+    }
+    window.editingInverseCheckboxId = null;
+}
+function createInverseCheckboxDisplay(targetCheckboxId, inverseCheckboxId) {
+    const displayId = `inverseCheckbox${inverseCheckboxCounter++}`;
+    window.inverseCheckboxCounter = inverseCheckboxCounter;
+    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+    if (!linkedFieldsContainer) {
+        linkedFieldsContainer = document.createElement('div');
+        linkedFieldsContainer.id = 'linkedFieldsContainer';
+        linkedFieldsContainer.style.cssText = `
+            background: #fff;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        `;
+        const formBuilder = document.getElementById('formBuilder');
+        if (formBuilder) {
+            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
+        }
+    }
+    const inverseCheckboxDiv = document.createElement('div');
+    inverseCheckboxDiv.id = displayId;
+    inverseCheckboxDiv.style.cssText = `
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+        transition: all 0.2s ease;
+    `;
+    inverseCheckboxDiv.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderColor = '#27ae60';
+        this.style.transform = 'translateY(-1px)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+    inverseCheckboxDiv.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#f9f9f9';
+        this.style.borderColor = '#ddd';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+    });
+    inverseCheckboxDiv.addEventListener('dblclick', function() {
+        editInverseCheckboxDisplay(displayId);
+    });
+    inverseCheckboxDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="editInverseCheckboxDisplay('${displayId}')" style="flex: 1; cursor: pointer;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Inverse Checkbox (${inverseCheckboxId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em;">Target: ${targetCheckboxId}</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <button type="button" onclick="editInverseCheckboxDisplay('${displayId}')" style="background:#3498db;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Edit</button>
+              <button type="button" onclick="document.getElementById('${displayId}').remove(); removeInverseCheckboxConfig('${displayId}')" style="background:#e74c3c;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">Remove</button>
+            </div>
+        </div>
+    `;
+    linkedFieldsContainer.appendChild(inverseCheckboxDiv);
+    window.inverseCheckboxesConfig = window.inverseCheckboxesConfig || [];
+    window.inverseCheckboxesConfig.push({
+        id: displayId,
+        inverseCheckboxId: inverseCheckboxId,
+        targetCheckboxId: targetCheckboxId
+    });
+}
+function editInverseCheckboxDisplay(displayId) {
+    const config = window.inverseCheckboxesConfig.find(c => c.id === displayId);
+    if (!config) return;
+    window.editingInverseCheckboxId = displayId;
+    if (!document.getElementById('inverseCheckboxModal')) {
+        createInverseCheckboxModal();
+    }
+    currentInverseCheckboxConfig = null;
+    const inverseCheckboxIdInput = document.getElementById('inverseCheckboxIdInput');
+    if (inverseCheckboxIdInput) {
+        inverseCheckboxIdInput.value = config.inverseCheckboxId || '';
+    }
+    const dropdownsContainer = document.getElementById('inverseCheckboxDropdown');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
+    }
+    addInverseCheckboxDropdown();
+    setTimeout(() => {
+        const select = document.getElementById('inverseCheckboxSelect0');
+        const searchInput = document.getElementById('inverseCheckboxSearch0');
+        if (select) {
+            select.value = config.targetCheckboxId;
+            if (currentInverseCheckboxConfig) {
+                currentInverseCheckboxConfig.selectedValue = config.targetCheckboxId;
+            }
+            if (searchInput) {
+                const selectedOption = select.querySelector(`option[value="${config.targetCheckboxId}"]`);
+                if (selectedOption) {
+                    searchInput.value = selectedOption.textContent;
+                }
+            }
+        }
+    }, 50);
+    document.getElementById('inverseCheckboxModal').style.display = 'block';
+}
+function removeInverseCheckboxDisplay(displayId) {
+    const div = document.getElementById(displayId);
+    if (div) div.remove();
+}
+function removeInverseCheckboxConfig(displayId) {
+    window.inverseCheckboxesConfig = window.inverseCheckboxesConfig || [];
+    window.inverseCheckboxesConfig = window.inverseCheckboxesConfig.filter(c => c.id !== displayId);
+}
 // Add a dropdown to the linked field configuration
 function addLinkedFieldDropdown() {
     console.log('🔍 [DEBUG] addLinkedFieldDropdown called');
@@ -5539,6 +6225,9 @@ function addLinkedFieldDropdown() {
                        onblur="hideLinkedFieldOptions(${dropdownIndex})">
                 <div id="linkedFieldOptions${dropdownIndex}" style="display: none; position: absolute; top: 100%; left: 0; min-width: 400px; background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"></div>
             </div>
+            <input type="text" id="linkedFieldCustom${dropdownIndex}" placeholder="Enter custom textbox node ID" 
+                   style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 8px;"
+                   oninput="updateLinkedFieldCustomValue(${dropdownIndex})">
             <!-- Hidden select for form submission -->
             <select id="linkedFieldSelect${dropdownIndex}" style="display: none;">
                 <option value="">Select a text question...</option>
@@ -5880,8 +6569,29 @@ function renumberLinkedFieldDropdowns() {
 }
 // Finalize the linked field configuration
 function finalizeLinkedField() {
+    // Collect selected values, checking custom inputs first, then dropdown values
+    const selectedFields = [];
+    currentLinkedFieldConfig.forEach((config, index) => {
+        const customInput = document.getElementById(`linkedFieldCustom${index}`);
+        let selectedValue = '';
+        
+        // Check custom input first
+        if (customInput && customInput.value.trim()) {
+            selectedValue = customInput.value.trim();
+        } else {
+            // Fall back to dropdown selection
+            selectedValue = config.selectedValue || '';
+        }
+        
+        if (selectedValue) {
+            selectedFields.push({
+                index: index,
+                selectedValue: selectedValue
+            });
+        }
+    });
+    
     // Validate that at least 2 fields are selected
-    const selectedFields = currentLinkedFieldConfig.filter(config => config.selectedValue);
     if (selectedFields.length < 2) {
         alert('Please select at least 2 text questions to link.');
         return;
@@ -6031,14 +6741,35 @@ function editLinkedFieldDisplay(displayId) {
         const dropdownIndex = currentLinkedFieldConfig.length - 1;
         const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
         const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+        const customInput = document.getElementById(`linkedFieldCustom${dropdownIndex}`);
         if (select) {
-            select.value = fieldId;
-            currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
-            // Also update the search input field with the selected option text
-            if (searchInput) {
-                const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
-                if (selectedOption) {
+            const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
+            // Check if the fieldId exists in the dropdown options
+            if (selectedOption) {
+                // Field exists in dropdown, use dropdown selection
+                select.value = fieldId;
+                currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+                // Update the search input field with the selected option text
+                if (searchInput) {
                     searchInput.value = selectedOption.textContent;
+                }
+                // Clear custom input
+                if (customInput) {
+                    customInput.value = '';
+                }
+            } else {
+                // Field doesn't exist in dropdown, use custom input
+                if (customInput) {
+                    customInput.value = fieldId;
+                    currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+                }
+                // Clear dropdown selection
+                if (select) {
+                    select.value = '';
+                }
+                // Clear search input
+                if (searchInput) {
+                    searchInput.value = '';
                 }
             }
         }
@@ -6211,10 +6942,15 @@ function selectLinkedFieldOption(dropdownIndex, value, text) {
     const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
     const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
     const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    const customInput = document.getElementById(`linkedFieldCustom${dropdownIndex}`);
     // Update search input with selected text
     searchInput.value = text;
     // Update hidden select element
     selectElement.value = value;
+    // Clear custom input when selecting from dropdown
+    if (customInput) {
+        customInput.value = '';
+    }
     // Hide options
     optionsContainer.style.display = 'none';
     // Update the current configuration
@@ -6222,6 +6958,46 @@ function selectLinkedFieldOption(dropdownIndex, value, text) {
         currentLinkedFieldConfig[dropdownIndex].selectedValue = value;
     }
     console.log(`🔍 [DEBUG] Selected linked field option: ${text} (${value}) for dropdown ${dropdownIndex}`);
+}
+// Update linked field custom value when user types in custom input
+function updateLinkedFieldCustomValue(dropdownIndex) {
+    const customInput = document.getElementById(`linkedFieldCustom${dropdownIndex}`);
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    
+    if (!customInput) return;
+    
+    const customValue = customInput.value.trim();
+    
+    // If custom input has a value, use it and clear the dropdown selection
+    if (customValue) {
+        if (currentLinkedFieldConfig[dropdownIndex]) {
+            currentLinkedFieldConfig[dropdownIndex].selectedValue = customValue;
+        }
+        // Clear the dropdown selection
+        if (selectElement) {
+            selectElement.value = '';
+        }
+        // Clear the search input if it doesn't match the custom value
+        if (searchInput && searchInput.value !== customValue) {
+            searchInput.value = '';
+        }
+        console.log(`🔍 [DEBUG] Custom linked field value set: ${customValue} for dropdown ${dropdownIndex}`);
+    } else {
+        // If custom input is cleared, check if there's a dropdown selection to use
+        const dropdownValue = selectElement ? selectElement.value : '';
+        if (dropdownValue) {
+            // Use dropdown value if available
+            if (currentLinkedFieldConfig[dropdownIndex]) {
+                currentLinkedFieldConfig[dropdownIndex].selectedValue = dropdownValue;
+            }
+        } else {
+            // No dropdown selection either, reset to empty
+            if (currentLinkedFieldConfig[dropdownIndex]) {
+                currentLinkedFieldConfig[dropdownIndex].selectedValue = '';
+            }
+        }
+    }
 }
 // Initialize search functionality for a linked field dropdown
 function initializeLinkedFieldSearch(dropdownIndex) {

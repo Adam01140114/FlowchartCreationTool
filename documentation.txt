@@ -1,0 +1,49 @@
+================================================================================
+DOCUMENTATION
+================================================================================
+
+This is our documentation file which documents how all our different features 
+work in the FormWiz GUI tool. This document serves as a reference guide for 
+understanding the functionality, behavior, and purpose of various features 
+within the form builder system.
+
+================================================================================
+BIG PARAGRAPH QUESTIONS - LIMITS
+================================================================================
+
+When creating a big paragraph question in the FormWiz GUI tool, there are two 
+different types of limits you can set:
+
+1. MAX CHARACTER LIMIT (maxCharacterLimit)
+   - This is a HARD LIMIT that physically prevents users from typing beyond 
+     the specified number of characters.
+   - Sets the maxlength attribute on the textarea element, which enforces a 
+     hard cap on input.
+   - Controls the character counter display (e.g., "150 / 200 characters").
+   - Users cannot type more characters once they reach this limit.
+
+2. PARAGRAPH LIMIT (paragraphLimit)
+   - This is a SOFT LIMIT that does NOT prevent users from typing beyond the 
+     specified number of characters.
+   - When the text length exceeds this limit, it automatically creates and 
+     checks a hidden checkbox with the id: textareaId + "_overlimit".
+   - This hidden checkbox can be used for conditional logic (like PDF logic) 
+     to trigger additional PDFs, warnings, or other conditional behavior.
+   - Users can continue typing beyond this limit - it's used to trigger 
+     behavior rather than block input.
+
+EXAMPLE SCENARIO:
+- Max Character Limit = 500: User cannot type more than 500 characters.
+- Paragraph Limit = 300: User can type beyond 300 characters, but when they 
+  do, a hidden checkbox is checked that can trigger additional PDFs, warnings, 
+  or other conditional behavior.
+
+In summary: Max Character Limit blocks input, while Paragraph Limit triggers 
+conditional behavior without blocking.
+
+================================================================================
+
+
+
+
+

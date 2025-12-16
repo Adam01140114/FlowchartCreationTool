@@ -1,0 +1,118 @@
+{
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Section 1",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "Checkbox question node",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "options": [
+            {
+              "label": "Yes",
+              "nameId": "checkbox_question_node_yes",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            },
+            {
+              "label": "No",
+              "nameId": "checkbox_question_node_no",
+              "value": "",
+              "hasAmount": false,
+              "amountName": "",
+              "amountPlaceholder": ""
+            }
+          ],
+          "labels": [],
+          "required": true,
+          "markOnlyOne": false
+        }
+      ]
+    }
+  ],
+  "groups": [],
+  "hiddenFields": [],
+  "sectionCounter": 2,
+  "questionCounter": 2,
+  "hiddenFieldCounter": 1,
+  "groupCounter": 1,
+  "formName": "Example Form",
+  "defaultPDFName": "",
+  "pdfOutputName": "",
+  "stripePriceId": "",
+  "additionalPDFs": [],
+  "checklistItems": [],
+  "linkedFields": [],
+  "linkedCheckboxes": [],
+  "inverseCheckboxes": [
+    {
+      "id": "inverseCheckbox0",
+      "inverseCheckboxId": "test",
+      "targetCheckboxId": "bruh"
+    },
+    {
+      "id": "inverseCheckbox1",
+      "inverseCheckboxId": "test",
+      "targetCheckboxId": "checkbox_question_node_yes"
+    },
+    {
+      "id": "inverseCheckbox2",
+      "inverseCheckboxId": "tester",
+      "targetCheckboxId": "checkbox_question_node_yes"
+    }
+  ]
+}

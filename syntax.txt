@@ -225,3 +225,245 @@ When building regex patterns in template literals for generated JavaScript:
 5. **If you must use escape sequences**, you may need `\\\\` (four backslashes) to get `\` (one backslash) in the final JavaScript, but character classes are simpler
 
 This approach completely avoids backslash escaping issues and makes the code more readable and maintainable.
+
+## Quote Escaping in Inline JavaScript Handlers: "Unexpected identifier" Errors
+
+### The Problem
+When generating HTML with inline JavaScript event handlers (like `onclick`, `onmouseover`, `onmouseout`), you may encounter syntax errors like:
+- `SyntaxError: Unexpected identifier '#e9ecef'`
+- `SyntaxError: Unexpected string`
+- `SyntaxError: Unexpected token`
+
+These errors occur because of nested quote conflicts when JavaScript code is embedded inside HTML attributes.
+
+### The Issue
+Inline JavaScript handlers require JavaScript code to be written as a string value inside an HTML attribute. This creates a "quotes within quotes" problem:
+
+```javascript
+// ❌ PROBLEMATIC - Quote escaping nightmare
+const html = '<div onmouseover="this.style.background=\'#e9ecef\';" onclick="previewPdf(\'' + pdfName + '\')">';
+```
+
+**Why this breaks:**
+1. The HTML attribute uses double quotes: `onmouseover="..."`
+2. Inside the attribute, JavaScript strings use single quotes: `'#e9ecef'`
+3. When `pdfName` contains quotes or special characters, escaping becomes complex
+4. The browser parser gets confused about where strings start/end
+5. Result: `SyntaxError: Unexpected identifier '#e9ecef'` (the parser thinks `#e9ecef` is an identifier, not a string)
+
+**Common failure scenarios:**
+- PDF names with apostrophes: `"John's Document.pdf"` → breaks `onclick="previewPdf('John's Document.pdf')"`
+- PDF names with quotes: `'Document "Important".pdf'` → breaks `onclick="previewPdf('Document "Important".pdf')"`
+- Color values in style strings: `'#e9ecef'` → breaks when quotes aren't properly escaped
+- Multiple nested quotes: `onmouseover="this.style.background='#e9ecef';"` → parser confusion
+
+### The Solution: Avoid Inline Handlers Entirely
+
+**Use CSS classes + data attributes + addEventListener instead of inline JavaScript handlers.**
+
+#### Step 1: Replace Inline Event Handlers with CSS Classes
+
+**Before (Broken):**
+```javascript
+// ❌ WRONG - Inline JavaScript handlers with quote issues
+listHTML += '<div style="padding: 15px;" ' +
+    'onmouseover="this.style.background=\'#e9ecef\'; this.style.borderColor=\'#2980b9\';" ' +
+    'onmouseout="this.style.background=\'#f8f9fa\'; this.style.borderColor=\'#dee2e6\';" ' +
+    'onclick="previewPdf(\'' + escapedBaseName + '\')">' +
+    '<strong>' + escapedDisplayName + '</strong>' +
+    '</div>';
+```
+
+**After (Fixed):**
+```javascript
+// ✅ CORRECT - CSS classes for styling, data attributes for data
+listHTML += '<style>' +
+    '.pdf-preview-item { ' +
+        'padding: 15px; ' +
+        'background: #f8f9fa; ' +
+        'border: 1px solid #dee2e6; ' +
+        'border-radius: 8px; ' +
+        'cursor: pointer; ' +
+        'transition: all 0.3s; ' +
+    '} ' +
+    '.pdf-preview-item:hover { ' +
+        'background: #e9ecef; ' +
+        'border-color: #2980b9; ' +
+    '}' +
+    '</style>';
+
+listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName + '">' +
+    '<strong>' + escapedDisplayName + '</strong>' +
+    '</div>';
+```
+
+#### Step 2: Attach Event Listeners After HTML Insertion
+
+**After inserting HTML into the DOM, use addEventListener:**
+
+```javascript
+// ✅ CORRECT - Attach event listeners after HTML is inserted
+listContainer.innerHTML = listHTML;
+
+// Attach click handlers using data attributes
+const pdfItems = listContainer.querySelectorAll('.pdf-preview-item');
+pdfItems.forEach(item => {
+    item.addEventListener('click', function() {
+        const pdfName = this.getAttribute('data-pdf-name');
+        if (pdfName) {
+            previewPdf(pdfName);
+        }
+    });
+});
+```
+
+### Complete Example: Before vs After
+
+#### Before (Broken - Quote Escaping Issues):
+```javascript
+// ❌ PROBLEMATIC CODE
+function showPreviewPdfsListModal() {
+    const listContainer = document.getElementById('previewPdfsList');
+    let listHTML = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+    
+    pdfsList.forEach((pdf, index) => {
+        const escapedBaseName = pdf.baseName.replace(/'/g, "\\'");
+        const escapedDisplayName = pdf.displayName.replace(/"/g, '&quot;');
+        
+        // This will break with quote escaping issues:
+        listHTML += '<div style="padding: 15px; background: #f8f9fa;" ' +
+            'onmouseover="this.style.background=\'#e9ecef\';" ' +
+            'onmouseout="this.style.background=\'#f8f9fa\';" ' +
+            'onclick="previewPdf(\'' + escapedBaseName + '\')">' +
+            '<strong>' + escapedDisplayName + '</strong>' +
+            '</div>';
+    });
+    
+    listHTML += '</div>';
+    listContainer.innerHTML = listHTML;
+    // Errors: SyntaxError: Unexpected identifier '#e9ecef'
+}
+```
+
+#### After (Fixed - No Quote Escaping Issues):
+```javascript
+// ✅ CORRECT CODE
+function showPreviewPdfsListModal() {
+    const listContainer = document.getElementById('previewPdfsList');
+    
+    // CSS classes for styling (no inline JavaScript)
+    let listHTML = '<style>' +
+        '.pdf-preview-item { ' +
+            'padding: 15px; ' +
+            'background: #f8f9fa; ' +
+            'border: 1px solid #dee2e6; ' +
+            'border-radius: 8px; ' +
+            'cursor: pointer; ' +
+            'transition: all 0.3s; ' +
+        '} ' +
+        '.pdf-preview-item:hover { ' +
+            'background: #e9ecef; ' +
+            'border-color: #2980b9; ' +
+        '}' +
+        '</style>';
+    
+    listHTML += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+    
+    pdfsList.forEach((pdf, index) => {
+        // Escape only for HTML attributes (data-pdf-name), not JavaScript strings
+        const escapedBaseName = pdf.baseName.replace(/"/g, '&quot;');
+        const escapedDisplayName = pdf.displayName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        
+        // Data attribute stores the value, no JavaScript code in HTML
+        listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName + '">' +
+            '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
+            '<span style="color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px;">Click to preview</span>' +
+            '</div>';
+    });
+    
+    listHTML += '</div>';
+    
+    // Insert HTML first
+    listContainer.innerHTML = listHTML;
+    
+    // Attach event listeners after HTML is inserted (no quote escaping needed)
+    const pdfItems = listContainer.querySelectorAll('.pdf-preview-item');
+    pdfItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const pdfName = this.getAttribute('data-pdf-name');
+            if (pdfName) {
+                previewPdf(pdfName);
+            }
+        });
+    });
+}
+```
+
+### Why This Solution Works
+
+1. **No JavaScript in HTML attributes** → No quote escaping needed
+2. **CSS handles styling** → `:hover` pseudo-class replaces `onmouseover`/`onmouseout`
+3. **Data attributes store values** → `data-pdf-name` safely stores the PDF name
+4. **addEventListener attaches handlers** → JavaScript code runs in proper context, not as strings
+5. **Proper escaping** → Only need to escape for HTML attributes (`&quot;`, `&#39;`), not JavaScript strings
+
+### Real-World Case Study
+
+**Problem:** Generated HTML with PDF preview list caused:
+- `SyntaxError: Unexpected identifier '#e9ecef'` at line 8595
+- `SyntaxError: Unexpected string` at line 5984
+
+**Root Cause:** Inline JavaScript handlers with nested quotes:
+```html
+<div onmouseover="this.style.background='#e9ecef';" onclick="previewPdf('John's Document.pdf')">
+```
+- The parser saw `'#e9ecef'` and thought it was an identifier, not a string
+- Apostrophes in PDF names broke the `onclick` handler
+
+**Solution Applied:**
+1. Replaced `onmouseover`/`onmouseout` with CSS `.pdf-preview-item:hover` class
+2. Replaced `onclick="previewPdf(...)"` with `data-pdf-name` attribute + `addEventListener`
+3. Moved all JavaScript code out of HTML attributes
+
+**Result:** 
+- Zero syntax errors
+- Works with any PDF name (quotes, apostrophes, special characters)
+- More maintainable and secure code
+
+### Key Takeaways
+
+**NEVER use inline JavaScript handlers when generating HTML dynamically:**
+
+1. **Avoid these patterns:**
+   - ❌ `onclick="function('value')"`
+   - ❌ `onmouseover="this.style.background='#color';"`
+   - ❌ `onchange="updateField('name')"`
+   - ❌ Any JavaScript code inside HTML attributes
+
+2. **Use these patterns instead:**
+   - ✅ CSS classes with `:hover` for hover effects
+   - ✅ `data-*` attributes to store values
+   - ✅ `addEventListener()` to attach event handlers
+   - ✅ JavaScript code in `<script>` tags or separate files
+
+3. **When you must escape:**
+   - HTML attributes: Use `&quot;` for `"` and `&#39;` for `'`
+   - HTML content: Use `&quot;` for `"` and `&#39;` for `'`
+   - Never escape JavaScript strings in HTML attributes (avoid this pattern entirely)
+
+4. **Best practice:**
+   - Generate HTML with CSS classes and data attributes
+   - Attach all event handlers using `addEventListener` after DOM insertion
+   - Keep JavaScript code separate from HTML generation
+
+### Testing Checklist
+
+When generating HTML with interactive elements, verify:
+- [ ] No `onclick`, `onmouseover`, `onmouseout`, `onchange` attributes in generated HTML
+- [ ] CSS classes handle all styling and hover effects
+- [ ] Data attributes (`data-*`) store values instead of JavaScript code
+- [ ] Event listeners are attached using `addEventListener` after HTML insertion
+- [ ] Generated HTML validates without syntax errors
+- [ ] Works with special characters (quotes, apostrophes, etc.) in data values
+
+**Remember: If you're writing JavaScript code as a string inside an HTML attribute, you're doing it wrong. Use CSS + data attributes + addEventListener instead.**

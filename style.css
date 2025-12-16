@@ -6,6 +6,8 @@ html, body {
   user-select: none;
   /* Prevent default browser wheel scroll so we can do zoom */
   overflow: hidden;
+  background-color: #ffffff;
+  color-scheme: light;
 }
 
 /* MAIN TOOLBAR */
@@ -32,6 +34,15 @@ html, body {
   cursor: default;
   overflow: hidden;
   z-index: 0;
+  background-color: #ffffff !important;
+}
+
+/* Force white background for mxGraph canvas elements */
+#graphContainer canvas,
+#graphContainer svg,
+.mxGraph canvas,
+.mxGraph svg {
+  background-color: #ffffff !important;
 }
 
 /* SHAPES IN THE TOOLBAR */

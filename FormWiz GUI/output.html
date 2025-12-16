@@ -59,7 +59,7 @@
 </head>
 <body>
 <header>
-    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
+    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../index.html';">
     <nav>
         <a href="../index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -106,7 +106,7 @@
 
     <!-- Sliding Cart Menu -->
     <div class="cart-overlay" id="cart-overlay">
-        <div class="cart-side-menu" id="cart-side-menu">
+        <div class="cart-side-menu" id="cart-side-menu" style="max-height: 100vh; overflow-y: auto;">
             <div class="cart-header" style="background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;">
                 <h2 style="margin:0;font-size:1.5em;font-weight:700;">🛒 Cart</h2>
                 <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>
@@ -115,7 +115,7 @@
                 <div class="cart-icon-large">🛒</div>
                 <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
                 <div class="cart-description" id="cart-description">
-                    To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. 
+                    To add forms to your cart and make purchases, you\'ll need to create a FormStar account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
                 <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
@@ -134,6 +134,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -269,18 +270,26 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 3</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing in total?</h3></label><select id="how_many_people_are_you_suing_in_total" name="how_many_people_are_you_suing_in_total" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_you_suing_in_total', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div>
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Checkbox question node</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+      <span class="checkbox-inline" id="checkbox-container-checkbox_question_node_yes">
+        <label class="checkbox-label">
+          <input type="checkbox" id="checkbox_question_node_yes" name="checkbox_question_node_yes" value="Yes" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          Yes
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-checkbox_question_node_no">
+        <label class="checkbox-label">
+          <input type="checkbox" id="checkbox_question_node_no" name="checkbox_question_node_no" value="No" 
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
+          No
+        </label>
+      </span></div><br></div></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 3</h1>
-      <div class="question-nav" data-section-index="2">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
-      </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
@@ -414,8 +423,21 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           });
           const radiosSatisfied = Object.values(radioGroups).every(group => group.some(Boolean));
-          const checkboxRequired = checkboxRequiredMap[questionId] !== false; // default required unless explicitly optional
+          // Use explicit hasOwnProperty so missing entries default to optional
+          const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMap, questionId)
+            ? checkboxRequiredMap[questionId]
+            : false;
           const checkboxesSatisfied = !hasCheckbox || !checkboxRequired || checkboxAnyChecked;
+          console.debug('[VALIDATION DBG] checkbox gate', {
+            questionId,
+            questionText,
+            hasCheckbox,
+            checkboxRequiredMapVal: checkboxRequiredMap[questionId],
+            checkboxRequired,
+            checkboxAnyChecked,
+            radiosSatisfied,
+            allStandardSatisfied
+          });
           // Additional check: if any trigger sequence container is visible, its fields become required
           const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
           if (visibleTriggerContainers.length > 0) {
@@ -462,6 +484,25 @@ document.addEventListener("DOMContentLoaded", function() {
           }
           const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
           if (!relevantJumps.length) return false;
+          
+          // Check for "Any Text" jump option first - this applies to textareas and text inputs
+          const hasAnyTextJump = relevantJumps.some(jl => {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            return jumpOption === 'any text' || jumpOption === 'any amount' || jumpOption === 'any date';
+          });
+          
+          if (hasAnyTextJump) {
+            // For "Any Text", check if any textarea or text input has content
+            const textElements = container.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"]');
+            for (const el of textElements) {
+              if (el.value && el.value.trim()) {
+                return true;
+              }
+            }
+            return false;
+          }
+          
+          // For dropdown/radio/checkbox questions, check their values
           const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
           const currentAnswers = [];
           interactiveElements.forEach(el => {
@@ -801,6 +842,36 @@ document.addEventListener("DOMContentLoaded", function() {
         const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
         activateIndex(initialIndex);
       });
+      // Global shortcut: Shift+Enter → click the visible "next" arrow
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.shiftKey) {
+          e.preventDefault();
+          const activeSection = document.querySelector('.section.active');
+          const nextBtn = activeSection ? activeSection.querySelector('.question-next') : null;
+          console.debug('[NAV DBG] Shift+Enter pressed', {
+            activeSectionId: activeSection ? activeSection.id : null,
+            hasNextBtn: !!nextBtn
+          });
+          if (nextBtn) {
+            nextBtn.click();
+          }
+        }
+      });
+      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'CapsLock' && e.ctrlKey) {
+          e.preventDefault();
+          const activeSection = document.querySelector('.section.active');
+          const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
+          console.debug('[NAV DBG] Ctrl+CapsLock pressed', {
+            activeSectionId: activeSection ? activeSection.id : null,
+            hasPrevBtn: !!prevBtn
+          });
+          if (prevBtn) {
+            prevBtn.click();
+          }
+        }
+      });
     });
   </script>
   <div id="hidden_pdf_fields">
@@ -813,6 +884,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
+<input type="hidden" id="user_full_address"     name="user_full_address">
+<input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div>
   <script>
@@ -830,16 +903,36 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   </script>
   </form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
+</div>
+<!-- PDF Preview Modals -->
+<style>
+.modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.modal-content { background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: relative; }
+#previewPdfsListModal .modal-content { max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 30px; }
+#previewPdfFullscreenModal .modal-content { width: 98vw; max-width: 1600px; max-height: 98vh; padding: 0; }
+</style>
+<div id="previewPdfsListModal" class="modal" style="display: none; z-index: 10000;" onclick="if(event.target === this) closePreviewPdfsListModal();">
+  <div class="modal-content" onclick="event.stopPropagation();">
+    <span class="close" onclick="closePreviewPdfsListModal()" style="position: absolute; top: 10px; right: 18px; font-size: 2rem; font-weight: bold; color: #333; cursor: pointer; z-index: 10;">&times;</span>
+    <h2 style="margin-top: 0; color: #2c3e50;">Available PDFs</h2>
+    <div id="previewPdfsList" style="margin-top: 20px;"></div>
+  </div>
+</div>
+<div id="previewPdfFullscreenModal" class="modal" style="display: none; z-index: 10001;" onclick="if(event.target === this) closePreviewPdfFullscreen();">
+  <div class="modal-content" onclick="event.stopPropagation();">
+    <span class="close" onclick="closePreviewPdfFullscreen()" style="position: absolute; top: 10px; right: 18px; font-size: 2rem; font-weight: bold; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">&times;</span>
+    <iframe id="previewPdfIframe" style="width: 100%; height: 98vh; border: none;"></iframe>
+  </div>
 </div>
 <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
             </div>
-            <div class="pro-footer-title">FormWiz</div>
+            <div class="pro-footer-title">FormStar</div>
             <div class="pro-footer-contact">
                 <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
@@ -854,12 +947,12 @@ document.addEventListener("DOMContentLoaded", function() {
             <a href="../Pages/contact.html">Contact Us</a>
         </div>
         <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About FormWiz</div>
-            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+            <div class="pro-footer-title company-title">About FormStar</div>
+            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
         </div>
     </div>
     <footer>
-        &copy; 2024 FormWiz. All rights reserved.
+        &copy; 2024 FormStar. All rights reserved.
     </footer>
   <style>
   .alert-overlay {
@@ -936,11 +1029,12 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"how_many_people_are_you_suing_in_total"};
-var questionNameIds = {"1":"how_many_people_are_you_suing_in_total"};
+var questionSlugMap = {"1":"checkbox_question_node"};
+var questionNameIds = {"1":"checkbox_question_node"};
 var linkedCheckboxes = [];
-var checkboxRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_in_total_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_in_total_phone","order":2}]};
+var inverseCheckboxes = [{"inverseCheckboxId":"test","targetCheckboxId":"bruh"},{"inverseCheckboxId":"test","targetCheckboxId":"checkbox_question_node_yes"},{"inverseCheckboxId":"tester","targetCheckboxId":"checkbox_question_node_yes"}];
+var checkboxRequiredMap = {"1":true};
+var unifiedFieldsMap = {};
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -1151,6 +1245,139 @@ var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_p
           }
         });
         linkedCheckbox.checked = anyChecked;
+      });
+    };
+  });
+  // Set up inverse checkbox listeners after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
+    if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
+      return;
+    }
+    const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+    
+    function updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds) {
+      const inverseCheckbox = document.getElementById(inverseCheckboxId);
+      if (!inverseCheckbox) {
+        return;
+      }
+      
+      if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
+        // For linked checkboxes: check if ANY source checkbox is checked
+        let anyChecked = false;
+        sourceCheckboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox && sourceCheckbox.checked) {
+            anyChecked = true;
+          }
+        });
+        // Inverse checkbox is checked when NONE of the source checkboxes are checked
+        inverseCheckbox.checked = !anyChecked;
+      } else {
+        // For regular checkboxes: inverse is opposite of target
+        const targetCheckbox = document.getElementById(targetCheckboxId);
+        if (!targetCheckbox) {
+          return;
+        }
+        inverseCheckbox.checked = !targetCheckbox.checked;
+      }
+    }
+    
+    function setupInverseCheckboxListener(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds) {
+      if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
+        // For linked checkboxes: listen to all source checkboxes
+        sourceCheckboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox) {
+            const updateHandler = function() {
+              updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+            };
+            sourceCheckbox.addEventListener('change', updateHandler);
+            sourceCheckbox.addEventListener('click', function() {
+              setTimeout(updateHandler, 0);
+            });
+          }
+        });
+        // Also listen to the linked checkbox itself in case it gets updated programmatically
+        const linkedCheckbox = document.getElementById(targetCheckboxId);
+        if (linkedCheckbox) {
+          const updateHandler = function() {
+            updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+          };
+          linkedCheckbox.addEventListener('change', updateHandler);
+        }
+      } else {
+        // For regular checkboxes: listen to the target checkbox
+        const targetCheckbox = document.getElementById(targetCheckboxId);
+        if (targetCheckbox) {
+          const updateHandler = function() {
+            updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+          };
+          targetCheckbox.addEventListener('change', updateHandler);
+          targetCheckbox.addEventListener('click', function() {
+            setTimeout(updateHandler, 0);
+          });
+        }
+      }
+    }
+    
+    inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
+      const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
+      const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
+      if (!inverseCheckboxId || !targetCheckboxId) {
+        return;
+      }
+      
+      // Check if target is a linked checkbox
+      let isLinkedCheckbox = false;
+      let sourceCheckboxIds = [];
+      const linkedCheckboxConfig = linkedCheckboxesArray.find(lc => lc.linkedCheckboxId === targetCheckboxId);
+      if (linkedCheckboxConfig) {
+        isLinkedCheckbox = true;
+        sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
+      }
+      
+      // Create the hidden inverse checkbox
+      const form = document.getElementById('customForm');
+      if (form) {
+        const inverseCheckbox = document.createElement('input');
+        inverseCheckbox.type = 'checkbox';
+        inverseCheckbox.id = inverseCheckboxId;
+        inverseCheckbox.name = inverseCheckboxId;
+        inverseCheckbox.style.display = 'none';
+        form.appendChild(inverseCheckbox);
+      }
+      
+      // Set up listeners
+      setupInverseCheckboxListener(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+      
+      // Initial update
+      setTimeout(() => {
+        updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+      }, 500);
+    });
+    
+    window.updateAllInverseCheckboxes = function() {
+      const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
+        return;
+      }
+      inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
+        const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
+        const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
+        if (!inverseCheckboxId || !targetCheckboxId) {
+          return;
+        }
+        // Check if target is a linked checkbox
+        let isLinkedCheckbox = false;
+        let sourceCheckboxIds = [];
+        const linkedCheckboxConfig = linkedCheckboxesArray.find(lc => lc.linkedCheckboxId === targetCheckboxId);
+        if (linkedCheckboxConfig) {
+          isLinkedCheckbox = true;
+          sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
+        }
+        updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
       });
     };
   });
@@ -2329,9 +2556,9 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name"],"length":0};
-var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["how_many_people_are_you_suing_in_total_name"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -2554,6 +2781,7 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+checkboxRequiredMap[1] = true; 
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -3954,6 +4182,33 @@ function showTextboxLabels(questionId, count){
                         }
                     }, 100);
                 }
+            } else if (field.type === 'phone') {
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                // No conditional prefills expected for phone, but keep for parity
+                let prefillValue = '';
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                } else if (field.prefill) {
+                    prefillValue = field.prefill;
+                }
+                const safePrefill = prefillValue ? prefillValue.replace(/"/g, '&quot;') : '';
+                inputDiv.innerHTML =
+                  '<div class="address-field">' +
+                    '<input type="tel"' +
+                    ' id="' + fieldId + '"' +
+                    ' name="' + fieldId + '"' +
+                    ' placeholder="' + (field.label || 'Phone') + '"' +
+                    ' class="address-input"' +
+                    ' style="margin: 4px auto; max-width: 400px;"' +
+                    ' oninput="formatPhoneInput(this)"' +
+                    ' value="' + safePrefill + '">' +
+                  '</div>';
+                // Append all children (wrapper + input)
+                Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
             } else if (field.type === 'amount') {
                 const fieldId = field.nodeId + "_" + j;
                 const inputDiv = document.createElement('div');
@@ -4066,8 +4321,13 @@ function showTextboxLabels(questionId, count){
                                     hiddenTextbox.name = hiddenTextboxId;
                                     hiddenTextbox.style.display = 'none';
                                     hiddenTextbox.value = sourceField.value || '';
-                                    // Add to form (append to body or a container)
-                                    document.body.appendChild(hiddenTextbox);
+                                    // Add to form (append to form element, not body)
+                                    const form = document.getElementById('customForm');
+                                    if (form) {
+                                        form.appendChild(hiddenTextbox);
+                                    } else {
+                                        document.body.appendChild(hiddenTextbox);
+                                    }
                                     // Sync with source field
                                     function syncLinkedField() {
                                         hiddenTextbox.value = sourceField.value || '';
@@ -5692,6 +5952,332 @@ async function processAllPdfs() {
     } else {
     }
 }
+// Function to collect all PDFs that would be downloaded (for preview)
+async function getAllPdfsList() {
+    const pdfsList = [];
+    const processedPdfs = new Set();
+    
+    // Process main PDF
+    if (pdfOutputFileName) {
+        const baseName = pdfOutputFileName.replace(/.pdf$/i, '');
+        if (!processedPdfs.has(baseName)) {
+            processedPdfs.add(baseName);
+            pdfsList.push({
+                baseName: baseName,
+                displayName: pdfOutputFileName.replace(/.pdf$/i, ''),
+                type: 'main'
+            });
+        }
+    }
+    
+    // Process Conditional PDFs
+    if (conditionalPDFs && conditionalPDFs.length > 0) {
+        for (const conditionalPDF of conditionalPDFs) {
+            if (conditionalPDF.pdfName) {
+                let shouldInclude = false;
+                const questionElement = document.getElementById(questionNameIds[conditionalPDF.questionId]) || 
+                                      document.getElementById('answer' + conditionalPDF.questionId);
+                if (questionElement) {
+                    let questionValue = '';
+                    if (questionElement.type === 'checkbox') {
+                        questionValue = questionElement.checked ? questionElement.value : '';
+                    } else {
+                        questionValue = questionElement.value;
+                    }
+                    if (questionValue.toString().toLowerCase() === conditionalPDF.conditionalAnswer.toLowerCase()) {
+                        shouldInclude = true;
+                    }
+                }
+                if (shouldInclude) {
+                    const baseName = conditionalPDF.pdfName.replace(/.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        pdfsList.push({
+                            baseName: baseName,
+                            displayName: conditionalPDF.pdfName.replace(/.pdf$/i, ''),
+                            type: 'conditional'
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    // Process PDF Logic PDFs
+    if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
+        for (const pdfLogic of pdfLogicPDFs) {
+            if (pdfLogic.pdfName) {
+                let shouldInclude = false;
+                if (pdfLogic.isBigParagraph) {
+                    pdfLogic.conditions.forEach(condition => {
+                        if (condition.characterLimit) {
+                            const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                  document.getElementById('answer' + pdfLogic.questionId);
+                            if (questionElement) {
+                                const questionValue = questionElement.value || '';
+                                if (questionValue.length > condition.characterLimit) {
+                                    shouldInclude = true;
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    if (pdfLogic.triggerOption) {
+                        const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                              document.getElementById('answer' + pdfLogic.questionId);
+                        if (questionElement) {
+                            const selectedValue = questionElement.value;
+                            if (selectedValue === pdfLogic.triggerOption) {
+                                shouldInclude = true;
+                            }
+                        }
+                    } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+                        const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                              document.getElementById('answer' + pdfLogic.questionId);
+                        if (questionElement) {
+                            const selectedValue = parseFloat(questionElement.value) || 0;
+                            const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+                            let conditionMet = false;
+                            if (pdfLogic.numberTrigger === '=') {
+                                conditionMet = selectedValue === triggerValue;
+                            } else if (pdfLogic.numberTrigger === '>') {
+                                conditionMet = selectedValue > triggerValue;
+                            } else if (pdfLogic.numberTrigger === '<') {
+                                conditionMet = selectedValue < triggerValue;
+                            }
+                            if (conditionMet) {
+                                shouldInclude = true;
+                            }
+                        }
+                    } else if (pdfLogic.isTriggerSequencePdf) {
+                        const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                    document.getElementById('answer' + pdfLogic.questionId);
+                        if (numberedDropdownEl && numberedDropdownEl.value) {
+                            const entryCount = parseInt(numberedDropdownEl.value) || 0;
+                            const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                            if (targetEntryNumber <= entryCount) {
+                                const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+                                    .replace(/W+/g, '_')
+                                    .toLowerCase();
+                                const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                                const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                                if (triggerDropdownEl) {
+                                    const selectedValue = triggerDropdownEl.value || '';
+                                    if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                        shouldInclude = true;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        pdfLogic.conditions.forEach(condition => {
+                            const prevQuestionId = condition.prevQuestion;
+                            const prevAnswer = condition.prevAnswer;
+                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                                      document.getElementById('answer' + prevQuestionId);
+                            if (prevQuestionElement) {
+                                let prevValue = '';
+                                if (prevQuestionElement.type === 'checkbox') {
+                                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                                } else {
+                                    prevValue = prevQuestionElement.value;
+                                }
+                                if (prevAnswer === '*' && prevValue !== '') {
+                                    shouldInclude = true;
+                                } else if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                                    shouldInclude = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                if (shouldInclude) {
+                    const baseName = pdfLogic.pdfName.replace(/.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        pdfsList.push({
+                            baseName: baseName,
+                            displayName: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+                            type: 'pdfLogic'
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    // Process Checkbox PDF Entries
+    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+        for (const pdfEntry of window.checkboxPdfEntries) {
+            if (pdfEntry.pdfFile) {
+                const baseName = pdfEntry.pdfFile.replace(/.pdf$/i, '');
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    pdfsList.push({
+                        baseName: baseName,
+                        displayName: pdfEntry.pdfName || pdfEntry.pdfFile.replace(/.pdf$/i, ''),
+                        type: 'checkbox'
+                    });
+                }
+            }
+        }
+    }
+    
+    return pdfsList;
+}
+
+// Function to show the PDF list modal
+async function showPreviewPdfsModal() {
+    const modal = document.getElementById('previewPdfsListModal');
+    const listContainer = document.getElementById('previewPdfsList');
+    
+    if (!modal || !listContainer) {
+        alert('Preview modals not found. Please refresh the page.');
+        return;
+    }
+    
+    // Show loading state
+    listContainer.innerHTML = '<p style="text-align: center; padding: 20px;">Loading PDFs...</p>';
+    modal.style.display = 'flex';
+    
+    try {
+        // Get all PDFs
+        const pdfsList = await getAllPdfsList();
+        
+        if (pdfsList.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">No PDFs available for preview.</p>';
+            return;
+        }
+        
+        // Create list of PDFs
+        let listHTML = '<style>.pdf-preview-item { padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; cursor: pointer; transition: all 0.3s; } .pdf-preview-item:hover { background: #e9ecef; border-color: #2980b9; }</style>';
+        listHTML += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+        pdfsList.forEach((pdf, index) => {
+            const escapedBaseName = pdf.baseName.replace(/'/g, "\'").replace(/"/g, '&quot;');
+            const escapedDisplayName = pdf.displayName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            // Use data attribute and addEventListener to avoid quote escaping issues
+            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '">' +
+                    '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
+                    '<span style="color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px;">Click to preview</span>' +
+                '</div>';
+        });
+        listHTML += '</div>';
+        // Insert HTML first
+        listContainer.innerHTML = listHTML;
+        // Attach click handlers using data attributes (after HTML is inserted)
+        const pdfItems = listContainer.querySelectorAll('.pdf-preview-item');
+        pdfItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const pdfName = this.getAttribute('data-pdf-name');
+                if (pdfName) {
+                    previewPdf(pdfName);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error loading PDFs:', error);
+        listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #dc3545;">Error loading PDFs. Please try again.</p>';
+    }
+}
+
+// Function to close the PDF list modal
+function closePreviewPdfsListModal() {
+    const modal = document.getElementById('previewPdfsListModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Function to preview a PDF in full screen
+async function previewPdf(baseName) {
+    const modal = document.getElementById('previewPdfFullscreenModal');
+    const iframe = document.getElementById('previewPdfIframe');
+    
+    if (!modal || !iframe) {
+        alert('Preview modal not found. Please refresh the page.');
+        return;
+    }
+    
+    // Close the list modal
+    closePreviewPdfsListModal();
+    
+    // Show loading in fullscreen modal
+    modal.style.display = 'flex';
+    iframe.style.display = 'none';
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('customForm');
+        const fd = new FormData();
+        const formElements = form.querySelectorAll('input, textarea, select');
+        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+        const allFormElements = [...formElements, ...externalFormElements];
+        
+        allFormElements.forEach(element => {
+            if (element.name && !element.disabled) {
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                    if (element.checked) {
+                        fd.append(element.name, 'on');
+                    }
+                } else {
+                    let value = element.value;
+                    if (element.type === 'date' && value) {
+                        value = formatDateForServer(value);
+                    }
+                    if (value && value.trim() !== '') {
+                        fd.append(element.name, value);
+                    }
+                }
+            }
+        });
+        
+        // Fetch the filled PDF
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        const res = await fetch(endpoint, { 
+            method: 'POST', 
+            body: fd 
+        });
+        
+        if (!res.ok) {
+            throw new Error("HTTP error! status: " + res.status);
+        }
+        
+        const blob = await res.blob();
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
+        
+        const url = URL.createObjectURL(blob);
+        iframe.src = url;
+        iframe.style.display = 'block';
+        
+        // Store the URL for cleanup
+        iframe.dataset.pdfUrl = url;
+        
+    } catch (error) {
+        console.error('Error previewing PDF:', error);
+        alert('Error loading PDF preview: ' + error.message);
+        modal.style.display = 'none';
+    }
+}
+
+// Function to close the fullscreen PDF preview
+function closePreviewPdfFullscreen() {
+    const modal = document.getElementById('previewPdfFullscreenModal');
+    const iframe = document.getElementById('previewPdfIframe');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    if (iframe) {
+        // Clean up the object URL if it exists
+        if (iframe.dataset.pdfUrl) {
+            URL.revokeObjectURL(iframe.dataset.pdfUrl);
+            delete iframe.dataset.pdfUrl;
+        }
+        iframe.src = '';
+    }
+}
+
 // Function to go back to the form from the thank you screen
 function goBackToForm() {
     // Hide the thank you message
@@ -7503,7 +8089,7 @@ if (typeof handleNext === 'function') {
                 } else {
                     // User is not signed in - show signup message
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
-                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
+                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\'ll need to create a FormStar account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
                     if (cartItemsList) cartItemsList.style.display = 'none';
                     if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
@@ -8452,10 +9038,27 @@ function updateUserAddressFields() {
   const cityHidden = document.getElementById('user_city_hidden');
   const stateHidden = document.getElementById('user_state_hidden');
   const zipHidden = document.getElementById('user_zip_hidden');
+  const fullAddressField = document.getElementById('user_full_address');
+  const fullAddressHidden = document.getElementById('user_full_address_hidden');
+  // Build full address string
+  const parts = [];
+  if (street) parts.push(street);
+  const cityState = [city, state].filter(Boolean).join(', ').trim();
+  if (cityState) parts.push(cityState);
+  if (zip) {
+    if (parts.length > 0) {
+      parts[parts.length - 1] = parts[parts.length - 1] + (zip ? ' ' + zip : '');
+    } else {
+      parts.push(zip);
+    }
+  }
+  const fullAddress = parts.join(', ').replace(/, ,/g, ',').trim();
   if (streetHidden) streetHidden.value = street;
   if (cityHidden) cityHidden.value = city;
   if (stateHidden) stateHidden.value = state;
   if (zipHidden) zipHidden.value = zip;
+  if (fullAddressField) fullAddressField.value = fullAddress;
+  if (fullAddressHidden) fullAddressHidden.value = fullAddress;
 }
 // Add event listeners for first and last name fields
 document.addEventListener('DOMContentLoaded', function() {

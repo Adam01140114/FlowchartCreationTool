@@ -2325,6 +2325,16 @@ function loadFormData(formData) {
             createLinkedCheckboxDisplayFromImport(linkedCheckbox);
         });
     }
+    // Load inverse checkboxes
+    if (formData.inverseCheckboxes && formData.inverseCheckboxes.length > 0) {
+        // Initialize inverse checkboxes configuration
+        window.inverseCheckboxesConfig = [];
+        window.inverseCheckboxCounter = 0;
+        formData.inverseCheckboxes.forEach(inverseCheckbox => {
+            // Create the inverse checkbox display
+            createInverseCheckboxDisplay(inverseCheckbox.targetCheckboxId, inverseCheckbox.inverseCheckboxId);
+        });
+    }
     // 7) Build groups from JSON
     if (formData.groups && formData.groups.length > 0) {
         console.log('Importing groups:', formData.groups); // Debug log
@@ -2429,6 +2439,16 @@ function exportForm() {
         }));
     } else {
         formData.linkedCheckboxes = [];
+    }
+    // Collect all inverse checkboxes
+    if (window.inverseCheckboxesConfig && window.inverseCheckboxesConfig.length > 0) {
+        formData.inverseCheckboxes = window.inverseCheckboxesConfig.map(config => ({
+            id: config.id,
+            inverseCheckboxId: config.inverseCheckboxId,
+            targetCheckboxId: config.targetCheckboxId
+        }));
+    } else {
+        formData.inverseCheckboxes = [];
     }
     // Create a map of questionId to question text for easy lookup
     const questionTextMap = {};

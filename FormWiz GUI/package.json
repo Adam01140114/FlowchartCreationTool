@@ -1,0 +1,15 @@
+{
+  "name": "formwiz-gui",
+  "version": "1.0.0",
+  "description": "Local server for FormWiz GUI",
+  "scripts": {
+    "start": "npx --yes http-server -p 8000 -o",
+    "server": "npx --yes http-server -p 8000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+
+

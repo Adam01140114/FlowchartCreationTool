@@ -1,0 +1,20 @@
+QUICK START - Copy and paste this into PowerShell:
+
+================================================================================
+Option 1: Run the script file
+================================================================================
+cd "C:\Users\defau\Desktop\FlowchartCreationTool\FormWiz GUI"
+.\start-server.ps1
+
+================================================================================
+Option 2: One-liner (paste directly into PowerShell)
+================================================================================
+cd "C:\Users\defau\Desktop\FlowchartCreationTool\FormWiz GUI"; if (python --version 2>$null) { python -m http.server 8000 } elseif (python3 --version 2>$null) { python3 -m http.server 8000 } elseif (node --version 2>$null) { npx --yes http-server -p 8000 } else { Write-Host "ERROR: Install Python or Node.js first!" }
+
+================================================================================
+After running, open in browser:
+http://localhost:8000/gui.html
+================================================================================
+
+
+

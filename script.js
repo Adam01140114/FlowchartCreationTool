@@ -1968,12 +1968,22 @@ window.showLocationIdsPopup = function(cellId) {
   // Check if this question has a PDF property
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  // Get location title and sanitize it
+  const locationTitle = cell._locationTitle || '';
+  const sanitizedLocationTitle = locationTitle.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .trim();
   // Build the prefix with PDF name if available
   let prefix;
   if (sanitizedPdfName) {
     prefix = `${sanitizedPdfName}_${sanitizedQuestion}`;
   } else {
     prefix = sanitizedQuestion;
+  }
+  // Add location title to prefix if available
+  if (sanitizedLocationTitle) {
+    prefix = `${prefix}_${sanitizedLocationTitle}`;
   }
   // Generate dynamic entries based on the prefix
   const locationIds = [
@@ -3304,8 +3314,14 @@ const keyLastPressed = {
 // Animation frame request ID for smooth movement
 let animationFrameId = null;
 // Speed and smoothness settings
-const MOVEMENT_SPEED = 2; // pixels per frame (much slower for single tap)
+// MOVEMENT_SPEED is now loaded from userSettings, default to 2 if not set
+let MOVEMENT_SPEED = (window.userSettings && window.userSettings.wasdSpeed) || 2; // pixels per frame (much slower for single tap)
 const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
+
+// Function to update movement speed from settings
+window.updateMovementSpeed = function(newSpeed) {
+  MOVEMENT_SPEED = parseFloat(newSpeed) || 2;
+};
   const BASE_ZOOM_FACTOR = 1.005; // base zoom factor per frame
 // Handle key down events - start movement
 document.addEventListener('keydown', function(evt) {
@@ -6515,8 +6531,9 @@ function sanitizePdfName(pdfName) {
   if (!pdfName) return '';
   // Remove file extension if present
   const nameWithoutExt = pdfName.replace(/\.[^/.]+$/, '');
-  // Sanitize the name: convert to lowercase, replace non-alphanumeric with underscores
-  return nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  // Sanitize the name: convert to lowercase, remove ALL non-alphanumeric characters (spaces, dashes, underscores, etc.)
+  // This ensures PDF names are all one word with no separators
+  return nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 // Make helper functions globally accessible
 window.findPdfNameForQuestion = findPdfNameForQuestion;

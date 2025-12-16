@@ -11,7 +11,8 @@ var userSettings = userSettings || {
   showGrid: true,
   theme: 'light',
   language: 'en',
-  zoomSensitivity: 0.67 // Default zoom sensitivity (0.001 = very sensitive, 0.1 = less sensitive)
+  zoomSensitivity: 0.67, // Default zoom sensitivity (0.001 = very sensitive, 0.1 = less sensitive)
+  wasdSpeed: 2 // Default WASD movement speed (pixels per frame)
 };
 // Color preferences
 var colorPreferences = colorPreferences || {
@@ -41,13 +42,20 @@ window.loadSettingsFromLocalStorage = async function() {
       if (typeof loadZoomSensitivityFromFirebase === 'function') {
         await loadZoomSensitivityFromFirebase();
       }
+      // Load WASD speed from Firebase if available
+      if (typeof loadWasdSpeedFromFirebase === 'function') {
+        await loadWasdSpeedFromFirebase();
+      }
     }
     // Update window reference
     if (window.userSettings) {
       window.userSettings.zoomSensitivity = userSettings.zoomSensitivity;
+      window.userSettings.wasdSpeed = userSettings.wasdSpeed;
     }
     // Update UI
     updateSettingsUI();
+    // Apply WASD speed to movement system
+    applyWasdSpeed();
   } catch (error) {
   }
 };
@@ -60,6 +68,10 @@ window.saveSettings = function() {
     // Save to Firebase if available
     if (typeof saveZoomSensitivityToFirebase === 'function') {
       saveZoomSensitivityToFirebase(userSettings.zoomSensitivity);
+    }
+    // Save WASD speed to Firebase if available
+    if (typeof saveWasdSpeedToFirebase === 'function') {
+      saveWasdSpeedToFirebase(userSettings.wasdSpeed);
     }
   } catch (error) {
   }
@@ -75,6 +87,14 @@ function updateSettingsUI() {
   }
   if (zoomSensitivityValue) {
     zoomSensitivityValue.textContent = userSettings.zoomSensitivity;
+  }
+  const wasdSpeedInput = document.getElementById('wasdSpeedInput');
+  const wasdSpeedValue = document.getElementById('wasdSpeedValue');
+  if (wasdSpeedInput) {
+    wasdSpeedInput.value = userSettings.wasdSpeed;
+  }
+  if (wasdSpeedValue) {
+    wasdSpeedValue.textContent = userSettings.wasdSpeed;
   }
 }
 /**
@@ -164,6 +184,83 @@ window.setupZoomSensitivityForGraph = function(graph) {
     graph.mouseWheelHandler.zoomSensitivity = userSettings.zoomSensitivity;
   }
 };
+/**
+ * Update WASD movement speed
+ */
+window.updateWasdSpeed = function(value) {
+  userSettings.wasdSpeed = parseFloat(value);
+  if (window.userSettings) {
+    window.userSettings.wasdSpeed = userSettings.wasdSpeed;
+  }
+  // Update display
+  const displaySpan = document.getElementById('wasdSpeedValue');
+  if (displaySpan) {
+    displaySpan.textContent = value;
+  }
+  // Save settings
+  saveSettings();
+  // Apply to movement
+  applyWasdSpeed();
+};
+/**
+ * Save WASD speed to Firebase
+ */
+window.saveWasdSpeedToFirebase = async function(value) {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+      const user = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      await db.collection('userSettings').doc(user.uid).set({
+        wasdSpeed: parseFloat(value),
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+  } catch (error) {
+  }
+};
+/**
+ * Load WASD speed from Firebase
+ */
+window.loadWasdSpeedFromFirebase = async function() {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+      const user = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      const doc = await db.collection('userSettings').doc(user.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.wasdSpeed !== undefined) {
+          userSettings.wasdSpeed = data.wasdSpeed;
+          // Update UI elements
+          const input = document.getElementById('wasdSpeedInput');
+          const displaySpan = document.getElementById('wasdSpeedValue');
+          if (input) {
+            input.value = data.wasdSpeed;
+          }
+          if (displaySpan) {
+            displaySpan.textContent = data.wasdSpeed;
+          }
+          // Apply to movement
+          applyWasdSpeed();
+          // Update window reference
+          if (window.userSettings) {
+            window.userSettings.wasdSpeed = userSettings.wasdSpeed;
+          }
+        }
+      }
+    }
+  } catch (error) {
+  }
+};
+/**
+ * Apply WASD speed to the movement system
+ */
+function applyWasdSpeed() {
+  // Update the global MOVEMENT_SPEED variable if it exists
+  if (typeof window.updateMovementSpeed === 'function') {
+    window.updateMovementSpeed(userSettings.wasdSpeed);
+  }
+}
 // The slider uses oninput attribute in HTML for simplicity
 // Export settings for use in other modules
 window.userSettings = userSettings;

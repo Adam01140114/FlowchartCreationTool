@@ -16,7 +16,7 @@ function isQuestion(cell) {
 window.generateNodeIdForDropdownField = function generateNodeIdForDropdownField(fieldName, dropdownName, cell, triggerOption = '') {
   // Get PDF name if available
   const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-  const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
+  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
   // Build base name components - use window.sanitizeNameId to preserve forward slashes
   const sanitizeFn = typeof window.sanitizeNameId === 'function' ? window.sanitizeNameId : 
     (name) => (name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
@@ -111,6 +111,10 @@ window.getCheckboxOptionNodeIdsFromTriggerSequence = function getCheckboxOptionN
 }
 // Helper function to create unified dropdown entry that looks like other entries
 function createUnifiedDropdownEntry(dropdown, index, cell) {
+  // Don't render dropdown entries for calculation nodes
+  if (cell && cell.style && cell.style.includes("nodeType=calculation")) {
+    return document.createElement('div'); // Return empty container
+  }
   const entryContainer = document.createElement('div');
   entryContainer.style.cssText = `
     display: flex;
@@ -252,7 +256,9 @@ function createUnifiedDropdownEntry(dropdown, index, cell) {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     `;
     // Create the full dropdown field configuration
+    console.log('[QUESTIONS showNumberedDropdownProperties] About to call createDropdownField for dropdown:', dropdown, 'index:', index, 'cell:', cell);
     const dropdownContainer = createDropdownField(dropdown, index, cell, modalContent);
+    console.log('[QUESTIONS showNumberedDropdownProperties] createDropdownField returned:', dropdownContainer);
     modalContent.appendChild(dropdownContainer);
     // Add close button
     const closeBtn = document.createElement('button');
@@ -1104,8 +1110,9 @@ function sanitizePdfName(pdfName) {
   if (!pdfName) return '';
   // Remove file extension if present
   const nameWithoutExt = pdfName.replace(/\.[^/.]+$/, '');
-  // Sanitize the name: convert to lowercase, replace non-alphanumeric with underscores
-  return nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  // Sanitize the name: convert to lowercase, remove ALL non-alphanumeric characters (spaces, dashes, underscores, etc.)
+  // This ensures PDF names are all one word with no separators
+  return nameWithoutExt.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 // Make functions globally accessible
 window.toggleReorderAmount = toggleReorderAmount;
@@ -1679,6 +1686,14 @@ function validateReorderIndices(cell, draggedType, draggedIndex, dropType, dropI
 }
 // Helper function to create options container
 function createOptionsContainer(cell) {
+  console.log('[QUESTIONS createOptionsContainer] Called with cell:', cell);
+  console.trace('[QUESTIONS createOptionsContainer] Stack trace');
+  // Don't render options UI for calculation nodes
+  if (cell && cell.style && cell.style.includes("nodeType=calculation")) {
+    console.warn('[QUESTIONS createOptionsContainer] Calculation node detected, returning empty container');
+    return document.createElement('div'); // Return empty container
+  }
+  console.log('[QUESTIONS createOptionsContainer] Not a calculation node, proceeding');
   const container = document.createElement('div');
   container.className = 'unified-fields-container';
   container.style.cssText = `
@@ -2545,6 +2560,24 @@ function createOptionsContainer(cell) {
 }
 // Helper function to create dropdown field
 function createDropdownField(dropdown, index, cell, parentContainer) {
+  console.log('[QUESTIONS createDropdownField] Called with:', { dropdown, index, cell, parentContainer });
+  console.trace('[QUESTIONS createDropdownField] Stack trace');
+  // Don't render dropdown fields for calculation nodes
+  if (cell && cell.style && cell.style.includes("nodeType=calculation")) {
+    console.warn('[QUESTIONS createDropdownField] Calculation node detected, returning empty container');
+    return document.createElement('div'); // Return empty container
+  }
+  console.log('[QUESTIONS createDropdownField] Not a calculation node, proceeding');
+  // Safety check: ensure dropdown and dropdown.options exist
+  if (!dropdown) {
+    console.warn('createDropdownField called with undefined dropdown');
+    return document.createElement('div'); // Return empty div to prevent errors
+  }
+  if (!dropdown.options || !Array.isArray(dropdown.options)) {
+    // Initialize options array if it doesn't exist
+    dropdown.options = [];
+  }
+  
   const dropdownContainer = document.createElement('div');
   dropdownContainer.style.cssText = `
     margin: 8px 0;
@@ -2700,7 +2733,20 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
   optionsList.style.cssText = `
     margin-top: 10px;
   `;
-  dropdown.options.forEach((option, optionIndex) => {
+  // Safety check before iterating - ensure dropdown exists and is an object
+  if (!dropdown || typeof dropdown !== 'object') {
+    console.error('createDropdownField: CRITICAL - dropdown is not a valid object!', dropdown);
+    return dropdownContainer;
+  }
+  // Ensure dropdown.options exists and is an array
+  if (typeof dropdown.options === 'undefined' || !Array.isArray(dropdown.options)) {
+    dropdown.options = [];
+  }
+  // Final safety check - ensure we have an array to iterate
+  const optionsArray = Array.isArray(dropdown.options) ? dropdown.options : [];
+  // Now safely iterate
+  try {
+    optionsArray.forEach((option, optionIndex) => {
     const optionDiv = document.createElement('div');
     optionDiv.style.cssText = `
       display: flex;
@@ -2812,7 +2858,12 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
     optionDiv.appendChild(copyIdBtn);
     optionDiv.appendChild(deleteOptionBtn);
     optionsList.appendChild(optionDiv);
-  });
+    });
+  } catch (error) {
+    console.error('createDropdownField: Error iterating dropdown.options:', error);
+    console.error('dropdown:', dropdown);
+    console.error('dropdown.options:', dropdown ? dropdown.options : 'N/A');
+  }
   optionsSection.appendChild(optionsList);
   dropdownContainer.appendChild(optionsSection);
   // Conditional Logic Section
@@ -2891,12 +2942,15 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           defaultOption.value = '';
           defaultOption.textContent = 'Select an option...';
           triggerSelect.appendChild(defaultOption);
-          dropdown.options.forEach(option => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option.value;
-            optionElement.textContent = option.text;
-            triggerSelect.appendChild(optionElement);
-          });
+          // Safety check before iterating
+          if (dropdown && dropdown.options && Array.isArray(dropdown.options)) {
+            dropdown.options.forEach(option => {
+              const optionElement = document.createElement('option');
+              optionElement.value = option.value;
+              optionElement.textContent = option.text;
+              triggerSelect.appendChild(optionElement);
+            });
+          }
         };
         // Initial population
         updateTriggerOptions();
@@ -4773,15 +4827,18 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
       defaultOption.value = '';
       defaultOption.textContent = 'Select an option...';
       triggerSelect.appendChild(defaultOption);
-      dropdown.options.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.value = option.value;
-        optionElement.textContent = option.text;
-        if (option.value === trigger.triggerOption) {
-          optionElement.selected = true;
-        }
-        triggerSelect.appendChild(optionElement);
-      });
+      // Safety check before iterating
+      if (dropdown && dropdown.options && Array.isArray(dropdown.options)) {
+        dropdown.options.forEach(option => {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.text;
+          if (option.value === trigger.triggerOption) {
+            optionElement.selected = true;
+          }
+          triggerSelect.appendChild(optionElement);
+        });
+      }
     };
     // Initial population
     updateTriggerOptions();

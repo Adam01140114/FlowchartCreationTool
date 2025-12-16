@@ -2298,9 +2298,7 @@ window.exportGuiJson = function(download = true) {
       terms: [],
       compareOperator: cell._calcOperator || "=",
       threshold: cell._calcThreshold || "0",
-      result: cell._calcFinalOutputType === "checkbox" ? 
-        "checked" : 
-        cell._calcFinalText || ""
+      fillValue: cell._calcFinalText || ""
     };
     // Process each calculation term
     for (const term of cell._calcTerms) {

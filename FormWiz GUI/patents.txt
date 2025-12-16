@@ -22,3 +22,79 @@ How to adapt this elsewhere
 - Define the neutral state (e.g., `label` or `none`) and set both radios unchecked when toggling off.
 - Optionally add change-log hooks during debugging to confirm event flow in complex UIs.
 
+---
+
+Feature: Searchable Dropdown (Filter-as-you-type Select)
+- Context: When dropdowns have many options (like the Calculation Node's "pick an amount label" or Linked Checkbox menu), a standard <select> becomes unwieldy. A searchable dropdown allows users to type to filter options.
+- Implementation details:
+  - Structure: Replace `<select>` with a container holding:
+    1. A text `<input>` for searching (shows selected value or placeholder)
+    2. A `<div>` options container (absolutely positioned, hidden by default)
+  - Options data: Create a `getAllOptions()` function that gathers all available options with `{ value, displayName }` objects.
+  - Render function: `renderOptions(searchTerm)` clears the options container, filters options by `displayName.toLowerCase().includes(searchTerm.toLowerCase())`, and creates clickable `<div>` rows for each match.
+  - Event handling:
+    - `focus`: Show options container, highlight input border, call `renderOptions(input.value)`
+    - `blur`: Hide options after a delay (150ms) to allow click events to fire first
+    - `input`: Re-filter options as user types, show container
+    - Option row `mousedown`: Call `e.preventDefault()` to prevent input blur
+    - Option row `click`: Set the selected value, update input display, hide options, trigger onChange callback
+  - Styling: Options container uses `position: absolute; z-index: 1000; max-height: 200px; overflow-y: auto;` for proper layering and scrolling.
+  - Hover effects: Add `mouseenter`/`mouseleave` handlers on option rows for visual feedback.
+
+- Code example (from calc.js):
+```javascript
+// Create searchable dropdown container
+const searchableContainer = document.createElement('div');
+searchableContainer.style.cssText = 'position: relative; width: 100%;';
+
+// Search input
+const searchInput = document.createElement('input');
+searchInput.type = 'text';
+searchInput.placeholder = 'Search or select an option...';
+searchInput.style.cssText = `padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box;`;
+
+// Options container (dropdown)
+const optionsContainer = document.createElement('div');
+optionsContainer.style.cssText = `position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ddd; z-index: 1000; display: none;`;
+
+// Render options function
+const renderOptions = (searchTerm = '') => {
+  optionsContainer.innerHTML = '';
+  const filteredOptions = allOptions.filter(opt => 
+    opt.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  filteredOptions.forEach(opt => {
+    const optionRow = document.createElement('div');
+    optionRow.textContent = opt.displayName;
+    optionRow.style.cssText = 'padding: 8px 12px; cursor: pointer;';
+    optionRow.addEventListener('mousedown', e => e.preventDefault()); // Prevent blur
+    optionRow.addEventListener('click', () => {
+      selectedValue = opt.value;
+      searchInput.value = opt.displayName;
+      optionsContainer.style.display = 'none';
+      onChange(opt.value);
+    });
+    optionsContainer.appendChild(optionRow);
+  });
+};
+
+// Event listeners
+searchInput.addEventListener('focus', () => { renderOptions(searchInput.value); optionsContainer.style.display = 'block'; });
+searchInput.addEventListener('blur', () => { setTimeout(() => optionsContainer.style.display = 'none', 150); });
+searchInput.addEventListener('input', () => { renderOptions(searchInput.value); optionsContainer.style.display = 'block'; });
+```
+
+- Why this works:
+  - The 150ms blur delay gives click events time to fire before the dropdown hides
+  - `mousedown` with `preventDefault()` stops the blur from firing when clicking an option
+  - Absolute positioning keeps the dropdown on top without affecting layout
+  - Filter on `displayName` allows user-friendly labels while storing actual values
+
+How to adapt this elsewhere:
+- Replace any `<select>` with many options that would benefit from filtering
+- Gather options into `{ value, displayName }` format from your data source
+- Copy the container structure: input + absolutely-positioned options div
+- Implement the three key events: focus (show), blur (hide with delay), input (filter)
+- Use mousedown preventDefault on option rows to prevent blur conflicts
+- Style options container with appropriate z-index for your modal/popup context
+

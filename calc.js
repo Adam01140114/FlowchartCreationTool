@@ -232,8 +232,8 @@ function gatherAllAmountLabels() {
             labels.push(optionLabel);
           }
         }
-      } else if (qType === "money" || qType === "number") {
-        // Add number/money type questions directly
+      } else if (qType === "money" || qType === "number" || qType === "currency") {
+        // Add number/money/currency type questions directly
         const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
         const nodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
         // Use answer{questionId} format for consistent JSON export
@@ -528,15 +528,34 @@ window.updateCalcNodeFinalCheckboxChecked = (cellId, checked) => {
  * Show calculation node properties popup
  */
 window.showCalculationNodeProperties = function(cell) {
-  if (!cell || !isCalculationNode(cell)) return;
+  console.log('[CALC PROPERTIES] showCalculationNodeProperties called', cell);
+  if (!cell || !isCalculationNode(cell)) {
+    console.warn('[CALC PROPERTIES] Invalid cell or not a calculation node', cell);
+    return;
+  }
   // Prevent multiple popups
   if (window.__calcPropertiesPopupOpen) {
+    console.warn('[CALC PROPERTIES] Popup already open, returning');
     return;
   }
   window.__calcPropertiesPopupOpen = true;
+  console.log('[CALC PROPERTIES] Setting popup flag to true');
   // Clean up any existing popups
   const existingPopups = document.querySelectorAll('.calc-properties-modal');
+  console.log('[CALC PROPERTIES] Found', existingPopups.length, 'existing popups, removing them');
   existingPopups.forEach(n => n.remove());
+  // Ensure calculation nodes don't have _dropdowns property (which would trigger options UI)
+  if (cell._dropdowns) {
+    console.warn('[CALC PROPERTIES] Cell has _dropdowns property, deleting it', cell._dropdowns);
+    delete cell._dropdowns;
+  }
+  console.log('[CALC PROPERTIES] Cell properties:', {
+    _dropdowns: cell._dropdowns,
+    _calcTitle: cell._calcTitle,
+    _calcOperator: cell._calcOperator,
+    _calcThreshold: cell._calcThreshold,
+    _calcTerms: cell._calcTerms
+  });
   // Create popup container
   const popup = document.createElement('div');
   popup.className = 'calc-properties-modal';
@@ -610,19 +629,131 @@ window.showCalculationNodeProperties = function(cell) {
     cell._calcTitle = value;
     updateCalculationNodeCell(cell);
   });
-  // Calculation Terms
-  const termsContainer = createCalculationTermsContainer(cell);
-  // Comparison Operator
-  const operatorField = createDropdownField('Comparison Operator', cell._calcOperator || '=', ['=', '>', '<'], (value) => {
-    cell._calcOperator = value;
-    updateCalculationNodeCell(cell);
+
+  // Calc Type dropdown (textbox or checkbox)
+  const calcTypeContainer = document.createElement('div');
+  calcTypeContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+  const calcTypeLabel = document.createElement('label');
+  calcTypeLabel.textContent = 'Calc Type:';
+  calcTypeLabel.style.cssText = 'font-weight: 500; color: #333;';
+  calcTypeContainer.appendChild(calcTypeLabel);
+  const calcTypeSelect = document.createElement('select');
+  calcTypeSelect.style.cssText = `
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+  `;
+  const calcTypes = ['textbox', 'checkbox'];
+  calcTypes.forEach(type => {
+    const option = document.createElement('option');
+    option.value = type;
+    option.textContent = type;
+    if (type === (cell._calcFinalOutputType || 'textbox')) {
+      option.selected = true;
+    }
+    calcTypeSelect.appendChild(option);
   });
+  calcTypeSelect.onchange = () => {
+    cell._calcFinalOutputType = calcTypeSelect.value;
+    updateCalculationNodeCell(cell);
+    // Refresh the popup to show the appropriate output field
+    setTimeout(() => {
+      popup.remove();
+      window.__calcPropertiesPopupOpen = false;
+      showCalculationNodeProperties(cell);
+    }, 100);
+  };
+  calcTypeContainer.appendChild(calcTypeSelect);
+
+  // Calculation Terms
+  console.log('[CALC PROPERTIES] Creating calculation terms container');
+  const termsContainer = createCalculationTermsContainer(cell);
+  console.log('[CALC PROPERTIES] Terms container created', termsContainer);
+  // Comparison Operator - create as a proper dropdown (not a text input)
+  console.log('[CALC PROPERTIES] Creating comparison operator dropdown');
+  const operatorContainer = document.createElement('div');
+  operatorContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+  const operatorLabel = document.createElement('label');
+  operatorLabel.textContent = 'Comparison Operator:';
+  operatorLabel.style.cssText = 'font-weight: 500; color: #333;';
+  operatorContainer.appendChild(operatorLabel);
+  const operatorSelect = document.createElement('select');
+  operatorSelect.style.cssText = `
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+  `;
+  const operators = ['=', '>', '<'];
+  operators.forEach(op => {
+    const option = document.createElement('option');
+    option.value = op;
+    option.textContent = op;
+    if (op === (cell._calcOperator || '=')) {
+      option.selected = true;
+    }
+    operatorSelect.appendChild(option);
+  });
+  operatorSelect.onchange = () => {
+    cell._calcOperator = operatorSelect.value;
+    updateCalculationNodeCell(cell);
+  };
+  operatorContainer.appendChild(operatorSelect);
   // Threshold Number
+  console.log('[CALC PROPERTIES] Creating threshold field');
   const thresholdField = createField('Number', cell._calcThreshold || '0', (value) => {
     cell._calcThreshold = value;
     updateCalculationNodeCell(cell);
   });
+  console.log('[CALC PROPERTIES] Threshold field created', thresholdField);
+  
+  // Output field - conditional based on calc type
+  let outputField;
+  if ((cell._calcFinalOutputType || 'textbox') === 'checkbox') {
+    // Checkbox type: show dropdown with checked/unchecked
+    const outputContainer = document.createElement('div');
+    outputContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
+    const outputLabel = document.createElement('label');
+    outputLabel.textContent = 'Default State:';
+    outputLabel.style.cssText = 'font-weight: 500; color: #333;';
+    outputContainer.appendChild(outputLabel);
+    const outputSelect = document.createElement('select');
+    outputSelect.style.cssText = `
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    `;
+    const states = ['checked', 'unchecked'];
+    states.forEach(state => {
+      const option = document.createElement('option');
+      option.value = state;
+      option.textContent = state;
+      // Determine current state from _calcFinalCheckboxChecked
+      const currentState = cell._calcFinalCheckboxChecked ? 'checked' : 'unchecked';
+      if (state === currentState) {
+        option.selected = true;
+      }
+      outputSelect.appendChild(option);
+    });
+    outputSelect.onchange = () => {
+      cell._calcFinalCheckboxChecked = outputSelect.value === 'checked';
+      updateCalculationNodeCell(cell);
+    };
+    outputContainer.appendChild(outputSelect);
+    outputField = outputContainer;
+  } else {
+    // Textbox type: show text input
+    outputField = createField('Output Text', cell._calcFinalText || '', (value) => {
+      cell._calcFinalText = value;
+      updateCalculationNodeCell(cell);
+    });
+  }
+
   // Final Output Type
+  console.log('[CALC PROPERTIES] Creating final output type field - calling createDropdownField');
+  console.log('[CALC PROPERTIES] createDropdownField function:', typeof createDropdownField, createDropdownField);
   const outputTypeField = createDropdownField('Final Output Type', cell._calcFinalOutputType || 'textbox', ['textbox', 'checkbox'], (value) => {
     cell._calcFinalOutputType = value;
     updateCalculationNodeCell(cell);
@@ -650,12 +781,25 @@ window.showCalculationNodeProperties = function(cell) {
     finalOutputContainer.appendChild(checkboxField);
   }
   // Assemble content
+  console.log('[CALC PROPERTIES] Assembling content - appending fields');
+  console.log('[CALC PROPERTIES] Title field:', titleField);
+  console.log('[CALC PROPERTIES] Terms container:', termsContainer);
+  console.log('[CALC PROPERTIES] Operator container:', operatorContainer);
+  console.log('[CALC PROPERTIES] Threshold field:', thresholdField);
+  console.log('[CALC PROPERTIES] Output type field:', outputTypeField);
+  console.log('[CALC PROPERTIES] Final output container:', finalOutputContainer);
   content.appendChild(titleField);
+  content.appendChild(calcTypeContainer);
   content.appendChild(termsContainer);
-  content.appendChild(operatorField);
+  content.appendChild(operatorContainer); // Use operatorContainer instead of operatorField
   content.appendChild(thresholdField);
-  content.appendChild(outputTypeField);
-  content.appendChild(finalOutputContainer);
+  content.appendChild(outputField);
+  // Removed outputTypeField and finalOutputContainer per user request
+  // content.appendChild(outputTypeField);
+  // content.appendChild(finalOutputContainer);
+  console.log('[CALC PROPERTIES] Content assembled, checking for any "New Dropdown" elements');
+  const newDropdownInputs = content.querySelectorAll('input[placeholder*="Dropdown"], input[value*="New Dropdown"], .dropdown-field, [data-type="dropdown"]');
+  console.log('[CALC PROPERTIES] Found', newDropdownInputs.length, 'potential "New Dropdown" inputs:', newDropdownInputs);
   // Create footer with buttons
   const footer = document.createElement('div');
   footer.style.cssText = `
@@ -691,7 +835,30 @@ window.showCalculationNodeProperties = function(cell) {
   popup.appendChild(content);
   popup.appendChild(footer);
   // Add to document
+  console.log('[CALC PROPERTIES] About to append popup to document.body');
+  console.log('[CALC PROPERTIES] Popup HTML structure (first 1000 chars):', popup.innerHTML.substring(0, 1000));
   document.body.appendChild(popup);
+  console.log('[CALC PROPERTIES] Popup appended to document.body');
+  // Check for any "New Dropdown" inputs after appending
+  setTimeout(() => {
+    const allNewDropdowns = popup.querySelectorAll('input[placeholder*="Dropdown"], input[value*="New Dropdown"], .dropdown-field, [data-type="dropdown"], [data-dropdown-index], input[name*="dropdown"]');
+    console.log('[CALC PROPERTIES] After append - Found', allNewDropdowns.length, 'potential "New Dropdown" inputs:', allNewDropdowns);
+    allNewDropdowns.forEach((el, idx) => {
+      console.log(`[CALC PROPERTIES] "New Dropdown" ${idx}:`, {
+        element: el,
+        tagName: el.tagName,
+        placeholder: el.placeholder,
+        value: el.value,
+        className: el.className,
+        parentElement: el.parentElement,
+        parentClasses: el.parentElement ? el.parentElement.className : 'N/A',
+        parentHTML: el.parentElement ? el.parentElement.innerHTML.substring(0, 200) : 'N/A'
+      });
+    });
+    // Also check for any elements with purple borders (the styling used for dropdown fields)
+    const purpleBordered = popup.querySelectorAll('[style*="border: 2px solid #9c27b0"], [style*="border:2px solid #9c27b0"]');
+    console.log('[CALC PROPERTIES] Found', purpleBordered.length, 'elements with purple borders:', purpleBordered);
+  }, 100);
   // Close on escape key
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
@@ -724,12 +891,15 @@ function createField(label, value, onChange) {
   return container;
 }
 function createDropdownField(label, value, options, onChange) {
+  console.log('[CALC createDropdownField] Called with:', { label, value, options, onChange: typeof onChange });
+  console.trace('[CALC createDropdownField] Stack trace');
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; flex-direction: column; gap: 8px;';
   const labelEl = document.createElement('label');
   labelEl.textContent = label + ':';
   labelEl.style.cssText = 'font-weight: 500; color: #333;';
   const select = document.createElement('select');
+  console.log('[CALC createDropdownField] Created select element');
   select.style.cssText = `
     padding: 8px 12px;
     border: 1px solid #ddd;
@@ -820,55 +990,140 @@ function createCalculationTermField(cell, term, index) {
   termLabel.textContent = `Calc ${index + 1}:`;
   termLabel.style.cssText = 'font-weight: 500; color: #333;';
   container.appendChild(termLabel);
-  // Amount Label dropdown
-  const amountSelect = document.createElement('select');
-  amountSelect.style.cssText = `
+
+  // Create searchable dropdown container
+  const searchableContainer = document.createElement('div');
+  searchableContainer.style.cssText = 'position: relative; width: 100%;';
+
+  // Search input
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search or select an amount label...';
+  searchInput.style.cssText = `
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 14px;
     width: 100%;
+    box-sizing: border-box;
+    background: white;
   `;
-  // Function to populate dropdown options
-  const populateDropdown = () => {
-    // Clear existing options
-    amountSelect.innerHTML = '';
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = '-- pick an amount label --';
-    amountSelect.appendChild(defaultOption);
+
+  // Get current display value
+  let currentDisplayValue = '';
+  if (term.amountLabel) {
+    if (term.amountLabel.startsWith('question_value:')) {
+      const parts = term.amountLabel.split(':');
+      if (parts.length >= 3) {
+        currentDisplayValue = parts[2];
+      }
+    } else {
+      currentDisplayValue = term.amountLabel;
+    }
+  }
+  searchInput.value = currentDisplayValue;
+
+  // Options container (dropdown)
+  const optionsContainer = document.createElement('div');
+  optionsContainer.style.cssText = `
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  `;
+
+  // Function to get all options with display names
+  const getAllOptions = () => {
     const allAmountLabels = gatherAllAmountLabels();
-    allAmountLabels.forEach(lbl => {
-      const option = document.createElement('option');
-      option.value = lbl;
-      // Extract clean display name
+    return allAmountLabels.map(lbl => {
       let displayName = lbl;
+      let value = lbl;
       if (lbl.startsWith('question_value:')) {
-        // Format: question_value:label:displayName
         const parts = lbl.split(':');
         if (parts.length >= 3) {
-          displayName = parts[2]; // Use the display name part
+          displayName = parts[2];
+          value = lbl;
         }
-      } else {
-        // For regular labels, just use as-is
-        displayName = lbl;
       }
-      option.textContent = displayName;
-      if (lbl === term.amountLabel) option.selected = true;
-      amountSelect.appendChild(option);
+      return { value, displayName };
     });
   };
-  // Populate dropdown initially
-  populateDropdown();
-  // Refresh dropdown when clicked
-  amountSelect.onmousedown = () => {
-    populateDropdown();
+
+  // Function to render options
+  const renderOptions = (searchTerm = '') => {
+    optionsContainer.innerHTML = '';
+    const options = getAllOptions();
+    const filteredOptions = options.filter(opt => 
+      opt.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (filteredOptions.length === 0) {
+      const noResults = document.createElement('div');
+      noResults.textContent = 'No matching options';
+      noResults.style.cssText = 'padding: 8px 12px; color: #666; font-style: italic;';
+      optionsContainer.appendChild(noResults);
+      return;
+    }
+
+    filteredOptions.forEach(opt => {
+      const optionRow = document.createElement('div');
+      optionRow.textContent = opt.displayName;
+      optionRow.style.cssText = `
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background 0.15s;
+      `;
+      optionRow.addEventListener('mouseenter', () => {
+        optionRow.style.backgroundColor = '#e3f2fd';
+      });
+      optionRow.addEventListener('mouseleave', () => {
+        optionRow.style.backgroundColor = '';
+      });
+      optionRow.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Prevent blur
+      });
+      optionRow.addEventListener('click', () => {
+        term.amountLabel = opt.value;
+        searchInput.value = opt.displayName;
+        optionsContainer.style.display = 'none';
+        updateCalculationNodeCell(cell);
+      });
+      optionsContainer.appendChild(optionRow);
+    });
   };
-  amountSelect.onchange = () => {
-    term.amountLabel = amountSelect.value;
-    updateCalculationNodeCell(cell);
-  };
-  container.appendChild(amountSelect);
+
+  // Event listeners
+  searchInput.addEventListener('focus', () => {
+    searchInput.style.borderColor = '#1976d2';
+    renderOptions(searchInput.value);
+    optionsContainer.style.display = 'block';
+  });
+
+  searchInput.addEventListener('blur', () => {
+    searchInput.style.borderColor = '#ddd';
+    // Delay hiding to allow click events
+    setTimeout(() => {
+      optionsContainer.style.display = 'none';
+    }, 150);
+  });
+
+  searchInput.addEventListener('input', () => {
+    renderOptions(searchInput.value);
+    optionsContainer.style.display = 'block';
+  });
+
+  searchableContainer.appendChild(searchInput);
+  searchableContainer.appendChild(optionsContainer);
+  container.appendChild(searchableContainer);
   // Math Operator dropdown (only for terms after the first)
   if (index > 0) {
     const operatorSelect = document.createElement('select');

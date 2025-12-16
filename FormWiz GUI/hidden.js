@@ -28,6 +28,7 @@ function initializeHiddenPDFFieldsModule() {
         <button type="button" onclick="addHiddenField()">Add Hidden Field</button>
         <button type="button" onclick="openLinkedFieldModal()">Add Linked Field</button>
         <button type="button" onclick="openLinkedCheckboxModal()">Add Linked Checkbox</button>
+        <button type="button" onclick="openInverseCheckboxModal()">Add Inverse Checkbox</button>
         <hr>
     `;
     formBuilder.appendChild(hiddenFieldsModule);

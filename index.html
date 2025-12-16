@@ -428,6 +428,13 @@
           <span id="zoomSensitivityValue" style="margin-left: 10px; font-weight: bold;">0.67</span>
         </div>
       </div>
+      <div class="setting-item">
+        <label for="wasdSpeedInput">WASD Speed:</label>
+        <div class="slider-container">
+          <input type="number" id="wasdSpeedInput" min="0.5" max="10" step="0.5" value="2" onchange="updateWasdSpeed(this.value)" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+          <span id="wasdSpeedValue" style="margin-left: 10px; font-weight: bold;">2</span>
+        </div>
+      </div>
       <div class="settings-actions">
         <button id="saveSettingsBtn">Save Settings</button>
         <button id="cancelSettingsBtn">Cancel</button>

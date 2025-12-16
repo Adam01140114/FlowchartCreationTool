@@ -143,6 +143,7 @@
             <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
             <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
             <button onclick="exportForm()">Export JSON</button>
+            <button type="button" id="loadJsonBtn">Load JSON</button>
             <button type="button" id="previewButton" onclick="setTimeout(() => showPreview(), 100);">Preview</button>
             <div style="margin-top: 10px;">
                 <label style="display: inline-flex; align-items: center; cursor: pointer;">
@@ -165,6 +166,66 @@
                     <button id="confirmPasteJsonBtn">Import</button>
                 </div>
             </div>
+            <!-- Modal for JSON Library -->
+            <div id="jsonLibraryModal" class="modal" style="display:none;">
+                <div class="modal-content" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+                    <span class="close" onclick="closeJsonLibrary()">&times;</span>
+                    <h3>JSON Library</h3>
+                    <div id="jsonLibraryList" style="margin: 20px 0;">
+                        <p style="color: #666; text-align: center;">No saved JSONs yet. Add your first JSON below!</p>
+                    </div>
+                    <!-- Sign In Modal (shown when not authenticated) -->
+                    <div id="jsonLibrarySignInModal" style="display:none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 10000; display: flex; justify-content: center; align-items: center;">
+                        <div style="background: white; padding: 50px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+                            <h2 style="text-align: center; margin-bottom: 20px; color: #333; font-size: 2rem;">Sign In Required</h2>
+                            <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1rem;">Please sign in to save and load JSONs from your library.</p>
+                            <div id="jsonLibrarySignInError" style="color: #dc3545; text-align: center; margin-bottom: 20px; min-height: 25px; font-size: 1rem;"></div>
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 1.1rem;">Email:</label>
+                                <input type="email" id="jsonLibrarySignInEmail" style="width: 100%; padding: 15px; border: 2px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1.1rem;">
+                            </div>
+                            <div style="margin-bottom: 30px;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 1.1rem;">Password:</label>
+                                <input type="password" id="jsonLibrarySignInPassword" style="width: 100%; padding: 15px; border: 2px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1.1rem;">
+                            </div>
+                            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                                <button type="button" id="jsonLibrarySignInBtn" style="flex: 1; padding: 15px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                    Sign In
+                                </button>
+                                <button type="button" id="jsonLibrarySignUpBtn" style="flex: 1; padding: 15px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                    Sign Up
+                                </button>
+                            </div>
+                            <button type="button" id="jsonLibraryCancelSignInBtn" style="width: 100%; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    <div style="border-top: 2px solid #eee; padding-top: 20px; margin-top: 20px;">
+                        <button type="button" id="addJsonToLibraryBtn" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-bottom: 15px;">
+                            Add JSON to Library
+                        </button>
+                        <div id="addJsonForm" style="display:none;">
+                            <label style="display:block; margin-bottom: 8px; font-weight: bold;">JSON Name:</label>
+                            <input type="text" id="jsonNameInput" placeholder="Enter a name for this JSON" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                            <label style="display:block; margin-bottom: 8px; font-weight: bold;">JSON Content:</label>
+                            <textarea id="jsonContentTextarea" placeholder="Paste JSON here..." style="width: 100%; min-height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: monospace; box-sizing: border-box; resize: vertical;"></textarea>
+                            <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+                            <button type="button" id="uploadJsonFileBtn" style="width: 100%; padding: 10px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 10px;">
+                                Upload JSON File
+                            </button>
+                            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                <button type="button" id="saveJsonBtn" style="flex: 1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+                                    Save JSON
+                                </button>
+                                <button type="button" id="cancelAddJsonBtn" style="flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem;">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
     <section>
@@ -179,6 +240,10 @@
     <footer>
         &copy; 2024 Custom Form Builder. All rights reserved.
     </footer>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="gui.js"></script>
     <script src="generate.js"></script>
     <script src="download.js"></script>
@@ -468,6 +533,394 @@
                 }
             });
         }
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.firebasestorage.app",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
+        };
+
+        // Initialize Firebase
+        if (typeof firebase !== "undefined" && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let currentUserId = null;
+
+        // Auth state listener
+        auth.onAuthStateChanged(function(user) {
+            currentUserId = user ? user.uid : null;
+            const signInModal = document.getElementById('jsonLibrarySignInModal');
+            if (user) {
+                if (signInModal) signInModal.style.display = 'none';
+                loadJsonLibrary();
+            } else {
+                // If not logged in, show sign-in modal
+                if (signInModal) signInModal.style.display = 'flex';
+                document.getElementById('jsonLibraryList').innerHTML = '';
+            }
+        });
+
+        // JSON Library Functions
+        function openJsonLibrary() {
+            document.getElementById('jsonLibraryModal').style.display = 'flex';
+            if (currentUserId) {
+                loadJsonLibrary();
+            }
+        }
+
+        function closeJsonLibrary() {
+            document.getElementById('jsonLibraryModal').style.display = 'none';
+            document.getElementById('addJsonForm').style.display = 'none';
+            document.getElementById('jsonNameInput').value = '';
+            document.getElementById('jsonContentTextarea').value = '';
+        }
+
+        function showSignInModal() {
+            const signInModal = document.getElementById('jsonLibrarySignInModal');
+            if (signInModal) {
+                signInModal.style.display = 'flex';
+            }
+        }
+
+        function hideSignInModal() {
+            const signInModal = document.getElementById('jsonLibrarySignInModal');
+            if (signInModal) {
+                signInModal.style.display = 'none';
+            }
+        }
+
+        function loadJsonLibrary() {
+            if (!currentUserId) {
+                showSignInModal();
+                return;
+            }
+
+            const libraryList = document.getElementById('jsonLibraryList');
+            libraryList.innerHTML = '<p style="color: #666; text-align: center;">Loading...</p>';
+
+            db.collection('users').doc(currentUserId).collection('jsonLibrary').orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        libraryList.innerHTML = '<p style="color: #666; text-align: center;">No saved JSONs yet. Add your first JSON below!</p>';
+                        return;
+                    }
+
+                    let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        html += `
+                            <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; background: #f9f9f9;">
+                                <h4 style="margin: 0 0 10px 0; color: #333;">${data.name || 'Unnamed JSON'}</h4>
+                                <button onclick="deleteJsonFromLibrary('${doc.id}')" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; margin-bottom: 10px;">
+                                    Delete
+                                </button>
+                                <p style="margin: 5px 0; color: #666; font-size: 0.9rem;">
+                                    Created: ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : 'Unknown'}
+                                </p>
+                                <button onclick="loadJsonFromLibrary('${doc.id}')" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 10px;">
+                                    Load This JSON
+                                </button>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    libraryList.innerHTML = html;
+                })
+                .catch((error) => {
+                    console.error('Error loading JSON library:', error);
+                    libraryList.innerHTML = '<p style="color: #dc3545; text-align: center;">Error loading JSON library. Please try again.</p>';
+                });
+        }
+
+        function loadJsonFromLibrary(jsonId) {
+            if (!currentUserId) {
+                showSignInModal();
+                return;
+            }
+
+            db.collection('users').doc(currentUserId).collection('jsonLibrary').doc(jsonId)
+                .get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        try {
+                            const jsonData = typeof data.json === 'string' ? JSON.parse(data.json) : data.json;
+                            loadFormData(jsonData);
+                            setTimeout(updateFormAfterImport, 300);
+                            closeJsonLibrary();
+                            // Auto-preview after import
+                            setTimeout(function() {
+                                if (typeof showPreview === 'function') showPreview();
+                            }, 350);
+                        } catch (e) {
+                            alert('Error loading JSON: ' + e.message);
+                        }
+                    } else {
+                        alert('JSON not found.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error loading JSON:', error);
+                    alert('Error loading JSON. Please try again.');
+                });
+        }
+
+        function deleteJsonFromLibrary(jsonId) {
+            if (!currentUserId) {
+                showSignInModal();
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this JSON?')) {
+                return;
+            }
+
+            db.collection('users').doc(currentUserId).collection('jsonLibrary').doc(jsonId)
+                .delete()
+                .then(() => {
+                    loadJsonLibrary();
+                })
+                .catch((error) => {
+                    console.error('Error deleting JSON:', error);
+                    alert('Error deleting JSON. Please try again.');
+                });
+        }
+
+        // Event listeners for JSON Library
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadJsonBtn = document.getElementById('loadJsonBtn');
+            const addJsonBtn = document.getElementById('addJsonToLibraryBtn');
+            const saveJsonBtn = document.getElementById('saveJsonBtn');
+            const cancelAddJsonBtn = document.getElementById('cancelAddJsonBtn');
+
+            if (loadJsonBtn) {
+                loadJsonBtn.addEventListener('click', openJsonLibrary);
+            }
+
+            if (addJsonBtn) {
+                addJsonBtn.addEventListener('click', function() {
+                    document.getElementById('addJsonForm').style.display = 'block';
+                    document.getElementById('jsonNameInput').value = '';
+                    // Try to auto-populate with current form JSON
+                    try {
+                        // Get the current form data by using the exportForm logic
+                        // We'll extract it from the clipboard or generate it directly
+                        if (typeof getFormData === 'function') {
+                            const currentJson = getFormData();
+                            if (currentJson) {
+                                document.getElementById('jsonContentTextarea').value = JSON.stringify(currentJson, null, 2);
+                            } else {
+                                document.getElementById('jsonContentTextarea').value = '';
+                            }
+                        } else {
+                            // Fallback: prompt user to paste
+                            document.getElementById('jsonContentTextarea').value = '';
+                            document.getElementById('jsonContentTextarea').placeholder = 'Paste JSON here... (Tip: Use Export JSON button first and paste it here)';
+                        }
+                    } catch (e) {
+                        console.error('Error getting current form JSON:', e);
+                        document.getElementById('jsonContentTextarea').value = '';
+                    }
+                });
+            }
+
+            if (cancelAddJsonBtn) {
+                cancelAddJsonBtn.addEventListener('click', function() {
+                    document.getElementById('addJsonForm').style.display = 'none';
+                    document.getElementById('jsonNameInput').value = '';
+                    document.getElementById('jsonContentTextarea').value = '';
+                    document.getElementById('jsonFileInput').value = '';
+                });
+            }
+
+            // Upload JSON file button
+            const uploadJsonFileBtn = document.getElementById('uploadJsonFileBtn');
+            const jsonFileInput = document.getElementById('jsonFileInput');
+            if (uploadJsonFileBtn && jsonFileInput) {
+                uploadJsonFileBtn.addEventListener('click', function() {
+                    jsonFileInput.click();
+                });
+
+                jsonFileInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    // Check if it's a JSON file
+                    if (!file.name.toLowerCase().endsWith('.json')) {
+                        alert('Please select a JSON file (.json)');
+                        jsonFileInput.value = '';
+                        return;
+                    }
+
+                    // Read the file
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const fileContent = e.target.result;
+                            // Try to parse and pretty-print the JSON
+                            const jsonData = JSON.parse(fileContent);
+                            document.getElementById('jsonContentTextarea').value = JSON.stringify(jsonData, null, 2);
+                            
+                            // Auto-fill the name if it's empty, using the filename (without extension)
+                            const nameInput = document.getElementById('jsonNameInput');
+                            if (!nameInput.value.trim()) {
+                                const fileName = file.name.replace(/\.json$/i, '');
+                                nameInput.value = fileName;
+                            }
+                        } catch (error) {
+                            alert('Error reading JSON file: ' + error.message + '\n\nPlease make sure the file contains valid JSON.');
+                            document.getElementById('jsonContentTextarea').value = '';
+                        }
+                    };
+                    reader.onerror = function() {
+                        alert('Error reading file. Please try again.');
+                    };
+                    reader.readAsText(file);
+                });
+            }
+
+            if (saveJsonBtn) {
+                saveJsonBtn.addEventListener('click', function() {
+                    if (!currentUserId) {
+                        showSignInModal();
+                        return;
+                    }
+
+                    const name = document.getElementById('jsonNameInput').value.trim();
+                    const jsonContent = document.getElementById('jsonContentTextarea').value.trim();
+
+                    if (!name) {
+                        alert('Please enter a name for this JSON.');
+                        return;
+                    }
+
+                    if (!jsonContent) {
+                        alert('Please paste JSON content.');
+                        return;
+                    }
+
+                    // Validate JSON
+                    let jsonData;
+                    try {
+                        jsonData = JSON.parse(jsonContent);
+                    } catch (e) {
+                        alert('Invalid JSON: ' + e.message);
+                        return;
+                    }
+
+                    // Save to Firebase
+                    db.collection('users').doc(currentUserId).collection('jsonLibrary').add({
+                        name: name,
+                        json: JSON.stringify(jsonData),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    })
+                    .then(() => {
+                        alert('JSON saved successfully!');
+                        document.getElementById('addJsonForm').style.display = 'none';
+                        document.getElementById('jsonNameInput').value = '';
+                        document.getElementById('jsonContentTextarea').value = '';
+                        loadJsonLibrary();
+                    })
+                    .catch((error) => {
+                        console.error('Error saving JSON:', error);
+                        alert('Error saving JSON. Please try again.');
+                    });
+                });
+            }
+
+            // Close modal when clicking outside
+            const jsonLibraryModal = document.getElementById('jsonLibraryModal');
+            if (jsonLibraryModal) {
+                jsonLibraryModal.addEventListener('click', function(event) {
+                    if (event.target === jsonLibraryModal) {
+                        closeJsonLibrary();
+                    }
+                });
+            }
+
+            // Sign In functionality
+            const signInBtn = document.getElementById('jsonLibrarySignInBtn');
+            const signUpBtn = document.getElementById('jsonLibrarySignUpBtn');
+            const cancelSignInBtn = document.getElementById('jsonLibraryCancelSignInBtn');
+            const signInEmail = document.getElementById('jsonLibrarySignInEmail');
+            const signInPassword = document.getElementById('jsonLibrarySignInPassword');
+            const signInError = document.getElementById('jsonLibrarySignInError');
+
+            if (signInBtn) {
+                signInBtn.addEventListener('click', function() {
+                    const email = signInEmail ? signInEmail.value.trim() : '';
+                    const password = signInPassword ? signInPassword.value : '';
+
+                    if (!email || !password) {
+                        if (signInError) signInError.textContent = 'Please enter both email and password.';
+                        return;
+                    }
+
+                    if (signInError) signInError.textContent = '';
+                    
+                    auth.signInWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            currentUserId = userCredential.user.uid;
+                            hideSignInModal();
+                            loadJsonLibrary();
+                            if (signInError) signInError.textContent = '';
+                        })
+                        .catch((error) => {
+                            if (signInError) {
+                                signInError.textContent = error.message || 'Error signing in. Please try again.';
+                            }
+                        });
+                });
+            }
+
+            if (signUpBtn) {
+                signUpBtn.addEventListener('click', function() {
+                    const email = signInEmail ? signInEmail.value.trim() : '';
+                    const password = signInPassword ? signInPassword.value : '';
+
+                    if (!email || !password) {
+                        if (signInError) signInError.textContent = 'Please enter both email and password.';
+                        return;
+                    }
+
+                    if (password.length < 6) {
+                        if (signInError) signInError.textContent = 'Password must be at least 6 characters.';
+                        return;
+                    }
+
+                    if (signInError) signInError.textContent = '';
+                    
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            currentUserId = userCredential.user.uid;
+                            hideSignInModal();
+                            loadJsonLibrary();
+                            if (signInError) signInError.textContent = '';
+                        })
+                        .catch((error) => {
+                            if (signInError) {
+                                signInError.textContent = error.message || 'Error creating account. Please try again.';
+                            }
+                        });
+                });
+            }
+
+            if (cancelSignInBtn) {
+                cancelSignInBtn.addEventListener('click', function() {
+                    hideSignInModal();
+                });
+            }
+        });
     </script>
 </body>
 </html>

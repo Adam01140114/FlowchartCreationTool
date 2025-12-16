@@ -726,17 +726,31 @@ questionSlugMap[questionId] = slug;
       const jumpEnabled = jumpEnabledEl && jumpEnabledEl.checked;
       if (jumpEnabled) {
         const jumpConditions = qBlock.querySelectorAll(".jump-condition");
+        // Check if this is a textbox question type (no select dropdown in jump condition)
+        const isTextboxQuestion = questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange';
         jumpConditions.forEach((condition) => {
           const jumpOptionEl = condition.querySelector("select");
           const jumpToEl = condition.querySelector('input[type="text"]');
-          if (jumpOptionEl && jumpToEl && jumpToEl.value.trim()) {
-            jumpLogics.push({
-              questionId: questionId,
-              questionType: questionType,
-              jumpOption: jumpOptionEl.value.trim(),
-              jumpTo: jumpToEl.value.trim(),
-              section: s,
-            });
+          if (jumpToEl && jumpToEl.value.trim()) {
+            // For textbox questions, use "Any Text" as the jumpOption since there's no select dropdown
+            if (isTextboxQuestion) {
+              jumpLogics.push({
+                questionId: questionId,
+                questionType: questionType,
+                jumpOption: "Any Text",
+                jumpTo: jumpToEl.value.trim(),
+                section: s,
+              });
+            } else if (jumpOptionEl && jumpOptionEl.value.trim()) {
+              // For other question types, require both option and jumpTo
+              jumpLogics.push({
+                questionId: questionId,
+                questionType: questionType,
+                jumpOption: jumpOptionEl.value.trim(),
+                jumpTo: jumpToEl.value.trim(),
+                section: s,
+              });
+            }
           }
         });
       }
@@ -2116,8 +2130,13 @@ formHTML += `</div><br></div>`;
                                     hiddenTextbox.name = linkedField.title;
                                     hiddenTextbox.style.display = 'none';
                                     hiddenTextbox.value = sourceField.value || '';
-                                    // Add to form (append to body or a container)
-                                    document.body.appendChild(hiddenTextbox);
+                                    // Add to form (append to form element, not body)
+                                    const form = document.getElementById('customForm');
+                                    if (form) {
+                                        form.appendChild(hiddenTextbox);
+                                    } else {
+                                        document.body.appendChild(hiddenTextbox);
+                                    }
                                     // Sync with source field
                                     function syncLinkedField() {
                                         hiddenTextbox.value = sourceField.value || '';
@@ -2205,8 +2224,13 @@ formHTML += `</div><br></div>`;
                                             hiddenTextbox.name = linkedField.title;
                                             hiddenTextbox.style.display = 'none';
                                             hiddenTextbox.value = sourceField.value || '';
-                                            // Add to form (append to body or a container)
-                                            document.body.appendChild(hiddenTextbox);
+                                            // Add to form (append to form element, not body)
+                                            const form = document.getElementById('customForm');
+                                            if (form) {
+                                                form.appendChild(hiddenTextbox);
+                                            } else {
+                                                document.body.appendChild(hiddenTextbox);
+                                            }
                                             // Sync with source field
                                             function syncLinkedField() {
                                                 hiddenTextbox.value = sourceField.value || '';
@@ -2359,7 +2383,13 @@ formHTML += `</div><br></div>`;
                                                 hiddenTextbox.name = linkedField.title;
                                                 hiddenTextbox.style.display = 'none';
                                                 hiddenTextbox.value = sourceField.value || '';
-                                                document.body.appendChild(hiddenTextbox);
+                                                // Add to form (append to form element, not body)
+                                                const form = document.getElementById('customForm');
+                                                if (form) {
+                                                    form.appendChild(hiddenTextbox);
+                                                } else {
+                                                    document.body.appendChild(hiddenTextbox);
+                                                }
                                                 function syncLinkedField() {
                                                     hiddenTextbox.value = sourceField.value || '';
                                                     // Trigger linked field synchronization if updateLinkedFields function exists
@@ -3490,6 +3520,25 @@ if (s > 1){
           }
           const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
           if (!relevantJumps.length) return false;
+          
+          // Check for "Any Text" jump option first - this applies to textareas and text inputs
+          const hasAnyTextJump = relevantJumps.some(jl => {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            return jumpOption === 'any text' || jumpOption === 'any amount' || jumpOption === 'any date';
+          });
+          
+          if (hasAnyTextJump) {
+            // For "Any Text", check if any textarea or text input has content
+            const textElements = container.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"]');
+            for (const el of textElements) {
+              if (el.value && el.value.trim()) {
+                return true;
+              }
+            }
+            return false;
+          }
+          
+          // For dropdown/radio/checkbox questions, check their values
           const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
           const currentAnswers = [];
           interactiveElements.forEach(el => {
@@ -3844,6 +3893,21 @@ if (s > 1){
           }
         }
       });
+      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'CapsLock' && e.ctrlKey) {
+          e.preventDefault();
+          const activeSection = document.querySelector('.section.active');
+          const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
+          console.debug('[NAV DBG] Ctrl+CapsLock pressed', {
+            activeSectionId: activeSection ? activeSection.id : null,
+            hasPrevBtn: !!prevBtn
+          });
+          if (prevBtn) {
+            prevBtn.click();
+          }
+        }
+      });
     });
   </script>
   `;
@@ -3853,6 +3917,16 @@ if (s > 1){
       linkedCheckboxes.push({
         linkedCheckboxId: config.linkedCheckboxId,
         checkboxes: config.checkboxes
+      });
+    });
+  }
+  // Collect inverse checkboxes data from GUI (must be before generateHiddenPDFFields)
+  const inverseCheckboxes = [];
+  if (window.inverseCheckboxesConfig && window.inverseCheckboxesConfig.length > 0) {
+    window.inverseCheckboxesConfig.forEach(config => {
+      inverseCheckboxes.push({
+        inverseCheckboxId: config.inverseCheckboxId,
+        targetCheckboxId: config.targetCheckboxId
       });
     });
   }
@@ -3879,10 +3953,30 @@ if (s > 1){
   // Close the form & add the thank-you message
   formHTML += [
     "</form>",
-    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
+    '<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href=\'../Pages/forms.html\'" style="font-size: 1.2em;">Exit Survey</button></div>',
     "</div>",
     "</section>",
     "</div>",
+    '<!-- PDF Preview Modals -->',
+    '<style>',
+    '.modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; }',
+    '.modal-content { background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: relative; }',
+    '#previewPdfsListModal .modal-content { max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 30px; }',
+    '#previewPdfFullscreenModal .modal-content { width: 98vw; max-width: 1600px; max-height: 98vh; padding: 0; }',
+    '</style>',
+    '<div id="previewPdfsListModal" class="modal" style="display: none; z-index: 10000;" onclick="if(event.target === this) closePreviewPdfsListModal();">',
+    '  <div class="modal-content" onclick="event.stopPropagation();">',
+    '    <span class="close" onclick="closePreviewPdfsListModal()" style="position: absolute; top: 10px; right: 18px; font-size: 2rem; font-weight: bold; color: #333; cursor: pointer; z-index: 10;">&times;</span>',
+    '    <h2 style="margin-top: 0; color: #2c3e50;">Available PDFs</h2>',
+    '    <div id="previewPdfsList" style="margin-top: 20px;"></div>',
+    '  </div>',
+    '</div>',
+    '<div id="previewPdfFullscreenModal" class="modal" style="display: none; z-index: 10001;" onclick="if(event.target === this) closePreviewPdfFullscreen();">',
+    '  <div class="modal-content" onclick="event.stopPropagation();">',
+    '    <span class="close" onclick="closePreviewPdfFullscreen()" style="position: absolute; top: 10px; right: 18px; font-size: 2rem; font-weight: bold; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">&times;</span>',
+    '    <iframe id="previewPdfIframe" style="width: 100%; height: 98vh; border: none;"></iframe>',
+    '  </div>',
+    '</div>',
     '<div class="pro-footer">',
     '        <div class="pro-footer-col address-col">',
     '            <div class="pro-footer-logo">',
@@ -3994,6 +4088,7 @@ if (s > 1){
   formHTML += `var questionSlugMap = ${JSON.stringify(questionSlugMap || {})};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds || {})};\n`;
   formHTML += `var linkedCheckboxes = ${JSON.stringify(linkedCheckboxes || [])};\n`;
+  formHTML += `var inverseCheckboxes = ${JSON.stringify(inverseCheckboxes || [])};\n`;
   formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
   formHTML += `
@@ -4206,6 +4301,139 @@ if (s > 1){
           }
         });
         linkedCheckbox.checked = anyChecked;
+      });
+    };
+  });
+  // Set up inverse checkbox listeners after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
+    if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
+      return;
+    }
+    const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+    
+    function updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds) {
+      const inverseCheckbox = document.getElementById(inverseCheckboxId);
+      if (!inverseCheckbox) {
+        return;
+      }
+      
+      if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
+        // For linked checkboxes: check if ANY source checkbox is checked
+        let anyChecked = false;
+        sourceCheckboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox && sourceCheckbox.checked) {
+            anyChecked = true;
+          }
+        });
+        // Inverse checkbox is checked when NONE of the source checkboxes are checked
+        inverseCheckbox.checked = !anyChecked;
+      } else {
+        // For regular checkboxes: inverse is opposite of target
+        const targetCheckbox = document.getElementById(targetCheckboxId);
+        if (!targetCheckbox) {
+          return;
+        }
+        inverseCheckbox.checked = !targetCheckbox.checked;
+      }
+    }
+    
+    function setupInverseCheckboxListener(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds) {
+      if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
+        // For linked checkboxes: listen to all source checkboxes
+        sourceCheckboxIds.forEach(checkboxId => {
+          const sourceCheckbox = document.getElementById(checkboxId);
+          if (sourceCheckbox) {
+            const updateHandler = function() {
+              updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+            };
+            sourceCheckbox.addEventListener('change', updateHandler);
+            sourceCheckbox.addEventListener('click', function() {
+              setTimeout(updateHandler, 0);
+            });
+          }
+        });
+        // Also listen to the linked checkbox itself in case it gets updated programmatically
+        const linkedCheckbox = document.getElementById(targetCheckboxId);
+        if (linkedCheckbox) {
+          const updateHandler = function() {
+            updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+          };
+          linkedCheckbox.addEventListener('change', updateHandler);
+        }
+      } else {
+        // For regular checkboxes: listen to the target checkbox
+        const targetCheckbox = document.getElementById(targetCheckboxId);
+        if (targetCheckbox) {
+          const updateHandler = function() {
+            updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+          };
+          targetCheckbox.addEventListener('change', updateHandler);
+          targetCheckbox.addEventListener('click', function() {
+            setTimeout(updateHandler, 0);
+          });
+        }
+      }
+    }
+    
+    inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
+      const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
+      const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
+      if (!inverseCheckboxId || !targetCheckboxId) {
+        return;
+      }
+      
+      // Check if target is a linked checkbox
+      let isLinkedCheckbox = false;
+      let sourceCheckboxIds = [];
+      const linkedCheckboxConfig = linkedCheckboxesArray.find(lc => lc.linkedCheckboxId === targetCheckboxId);
+      if (linkedCheckboxConfig) {
+        isLinkedCheckbox = true;
+        sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
+      }
+      
+      // Create the hidden inverse checkbox
+      const form = document.getElementById('customForm');
+      if (form) {
+        const inverseCheckbox = document.createElement('input');
+        inverseCheckbox.type = 'checkbox';
+        inverseCheckbox.id = inverseCheckboxId;
+        inverseCheckbox.name = inverseCheckboxId;
+        inverseCheckbox.style.display = 'none';
+        form.appendChild(inverseCheckbox);
+      }
+      
+      // Set up listeners
+      setupInverseCheckboxListener(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+      
+      // Initial update
+      setTimeout(() => {
+        updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
+      }, 500);
+    });
+    
+    window.updateAllInverseCheckboxes = function() {
+      const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
+        return;
+      }
+      inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
+        const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
+        const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
+        if (!inverseCheckboxId || !targetCheckboxId) {
+          return;
+        }
+        // Check if target is a linked checkbox
+        let isLinkedCheckbox = false;
+        let sourceCheckboxIds = [];
+        const linkedCheckboxConfig = linkedCheckboxesArray.find(lc => lc.linkedCheckboxId === targetCheckboxId);
+        if (linkedCheckboxConfig) {
+          isLinkedCheckbox = true;
+          sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
+        }
+        updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
       });
     };
   });
@@ -7388,8 +7616,13 @@ function showTextboxLabels(questionId, count){
                                     hiddenTextbox.name = hiddenTextboxId;
                                     hiddenTextbox.style.display = 'none';
                                     hiddenTextbox.value = sourceField.value || '';
-                                    // Add to form (append to body or a container)
-                                    document.body.appendChild(hiddenTextbox);
+                                    // Add to form (append to form element, not body)
+                                    const form = document.getElementById('customForm');
+                                    if (form) {
+                                        form.appendChild(hiddenTextbox);
+                                    } else {
+                                        document.body.appendChild(hiddenTextbox);
+                                    }
                                     // Sync with source field
                                     function syncLinkedField() {
                                         hiddenTextbox.value = sourceField.value || '';
@@ -9014,6 +9247,332 @@ async function processAllPdfs() {
     } else {
     }
 }
+// Function to collect all PDFs that would be downloaded (for preview)
+async function getAllPdfsList() {
+    const pdfsList = [];
+    const processedPdfs = new Set();
+    
+    // Process main PDF
+    if (pdfOutputFileName) {
+        const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
+        if (!processedPdfs.has(baseName)) {
+            processedPdfs.add(baseName);
+            pdfsList.push({
+                baseName: baseName,
+                displayName: pdfOutputFileName.replace(/\.pdf$/i, ''),
+                type: 'main'
+            });
+        }
+    }
+    
+    // Process Conditional PDFs
+    if (conditionalPDFs && conditionalPDFs.length > 0) {
+        for (const conditionalPDF of conditionalPDFs) {
+            if (conditionalPDF.pdfName) {
+                let shouldInclude = false;
+                const questionElement = document.getElementById(questionNameIds[conditionalPDF.questionId]) || 
+                                      document.getElementById('answer' + conditionalPDF.questionId);
+                if (questionElement) {
+                    let questionValue = '';
+                    if (questionElement.type === 'checkbox') {
+                        questionValue = questionElement.checked ? questionElement.value : '';
+                    } else {
+                        questionValue = questionElement.value;
+                    }
+                    if (questionValue.toString().toLowerCase() === conditionalPDF.conditionalAnswer.toLowerCase()) {
+                        shouldInclude = true;
+                    }
+                }
+                if (shouldInclude) {
+                    const baseName = conditionalPDF.pdfName.replace(/\.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        pdfsList.push({
+                            baseName: baseName,
+                            displayName: conditionalPDF.pdfName.replace(/\.pdf$/i, ''),
+                            type: 'conditional'
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    // Process PDF Logic PDFs
+    if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
+        for (const pdfLogic of pdfLogicPDFs) {
+            if (pdfLogic.pdfName) {
+                let shouldInclude = false;
+                if (pdfLogic.isBigParagraph) {
+                    pdfLogic.conditions.forEach(condition => {
+                        if (condition.characterLimit) {
+                            const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                  document.getElementById('answer' + pdfLogic.questionId);
+                            if (questionElement) {
+                                const questionValue = questionElement.value || '';
+                                if (questionValue.length > condition.characterLimit) {
+                                    shouldInclude = true;
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    if (pdfLogic.triggerOption) {
+                        const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                              document.getElementById('answer' + pdfLogic.questionId);
+                        if (questionElement) {
+                            const selectedValue = questionElement.value;
+                            if (selectedValue === pdfLogic.triggerOption) {
+                                shouldInclude = true;
+                            }
+                        }
+                    } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+                        const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                              document.getElementById('answer' + pdfLogic.questionId);
+                        if (questionElement) {
+                            const selectedValue = parseFloat(questionElement.value) || 0;
+                            const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+                            let conditionMet = false;
+                            if (pdfLogic.numberTrigger === '=') {
+                                conditionMet = selectedValue === triggerValue;
+                            } else if (pdfLogic.numberTrigger === '>') {
+                                conditionMet = selectedValue > triggerValue;
+                            } else if (pdfLogic.numberTrigger === '<') {
+                                conditionMet = selectedValue < triggerValue;
+                            }
+                            if (conditionMet) {
+                                shouldInclude = true;
+                            }
+                        }
+                    } else if (pdfLogic.isTriggerSequencePdf) {
+                        const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                    document.getElementById('answer' + pdfLogic.questionId);
+                        if (numberedDropdownEl && numberedDropdownEl.value) {
+                            const entryCount = parseInt(numberedDropdownEl.value) || 0;
+                            const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                            if (targetEntryNumber <= entryCount) {
+                                const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
+                                    .replace(/\W+/g, '_')
+                                    .toLowerCase();
+                                const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                                const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                                if (triggerDropdownEl) {
+                                    const selectedValue = triggerDropdownEl.value || '';
+                                    if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                        shouldInclude = true;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        pdfLogic.conditions.forEach(condition => {
+                            const prevQuestionId = condition.prevQuestion;
+                            const prevAnswer = condition.prevAnswer;
+                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                                      document.getElementById('answer' + prevQuestionId);
+                            if (prevQuestionElement) {
+                                let prevValue = '';
+                                if (prevQuestionElement.type === 'checkbox') {
+                                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                                } else {
+                                    prevValue = prevQuestionElement.value;
+                                }
+                                if (prevAnswer === '*' && prevValue !== '') {
+                                    shouldInclude = true;
+                                } else if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                                    shouldInclude = true;
+                                }
+                            }
+                        });
+                    }
+                }
+                if (shouldInclude) {
+                    const baseName = pdfLogic.pdfName.replace(/\.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        pdfsList.push({
+                            baseName: baseName,
+                            displayName: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+                            type: 'pdfLogic'
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    // Process Checkbox PDF Entries
+    if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
+        for (const pdfEntry of window.checkboxPdfEntries) {
+            if (pdfEntry.pdfFile) {
+                const baseName = pdfEntry.pdfFile.replace(/\.pdf$/i, '');
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    pdfsList.push({
+                        baseName: baseName,
+                        displayName: pdfEntry.pdfName || pdfEntry.pdfFile.replace(/\.pdf$/i, ''),
+                        type: 'checkbox'
+                    });
+                }
+            }
+        }
+    }
+    
+    return pdfsList;
+}
+
+// Function to show the PDF list modal
+async function showPreviewPdfsModal() {
+    const modal = document.getElementById('previewPdfsListModal');
+    const listContainer = document.getElementById('previewPdfsList');
+    
+    if (!modal || !listContainer) {
+        alert('Preview modals not found. Please refresh the page.');
+        return;
+    }
+    
+    // Show loading state
+    listContainer.innerHTML = '<p style="text-align: center; padding: 20px;">Loading PDFs...</p>';
+    modal.style.display = 'flex';
+    
+    try {
+        // Get all PDFs
+        const pdfsList = await getAllPdfsList();
+        
+        if (pdfsList.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">No PDFs available for preview.</p>';
+            return;
+        }
+        
+        // Create list of PDFs
+        let listHTML = '<style>.pdf-preview-item { padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; cursor: pointer; transition: all 0.3s; } .pdf-preview-item:hover { background: #e9ecef; border-color: #2980b9; }</style>';
+        listHTML += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+        pdfsList.forEach((pdf, index) => {
+            const escapedBaseName = pdf.baseName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const escapedDisplayName = pdf.displayName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            // Use data attribute and addEventListener to avoid quote escaping issues
+            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '">' +
+                    '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
+                    '<span style="color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px;">Click to preview</span>' +
+                '</div>';
+        });
+        listHTML += '</div>';
+        // Insert HTML first
+        listContainer.innerHTML = listHTML;
+        // Attach click handlers using data attributes (after HTML is inserted)
+        const pdfItems = listContainer.querySelectorAll('.pdf-preview-item');
+        pdfItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const pdfName = this.getAttribute('data-pdf-name');
+                if (pdfName) {
+                    previewPdf(pdfName);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error loading PDFs:', error);
+        listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #dc3545;">Error loading PDFs. Please try again.</p>';
+    }
+}
+
+// Function to close the PDF list modal
+function closePreviewPdfsListModal() {
+    const modal = document.getElementById('previewPdfsListModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Function to preview a PDF in full screen
+async function previewPdf(baseName) {
+    const modal = document.getElementById('previewPdfFullscreenModal');
+    const iframe = document.getElementById('previewPdfIframe');
+    
+    if (!modal || !iframe) {
+        alert('Preview modal not found. Please refresh the page.');
+        return;
+    }
+    
+    // Close the list modal
+    closePreviewPdfsListModal();
+    
+    // Show loading in fullscreen modal
+    modal.style.display = 'flex';
+    iframe.style.display = 'none';
+    
+    try {
+        // Collect form data
+        const form = document.getElementById('customForm');
+        const fd = new FormData();
+        const formElements = form.querySelectorAll('input, textarea, select');
+        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+        const allFormElements = [...formElements, ...externalFormElements];
+        
+        allFormElements.forEach(element => {
+            if (element.name && !element.disabled) {
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                    if (element.checked) {
+                        fd.append(element.name, 'on');
+                    }
+                } else {
+                    let value = element.value;
+                    if (element.type === 'date' && value) {
+                        value = formatDateForServer(value);
+                    }
+                    if (value && value.trim() !== '') {
+                        fd.append(element.name, value);
+                    }
+                }
+            }
+        });
+        
+        // Fetch the filled PDF
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        const res = await fetch(endpoint, { 
+            method: 'POST', 
+            body: fd 
+        });
+        
+        if (!res.ok) {
+            throw new Error("HTTP error! status: " + res.status);
+        }
+        
+        const blob = await res.blob();
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
+        
+        const url = URL.createObjectURL(blob);
+        iframe.src = url;
+        iframe.style.display = 'block';
+        
+        // Store the URL for cleanup
+        iframe.dataset.pdfUrl = url;
+        
+    } catch (error) {
+        console.error('Error previewing PDF:', error);
+        alert('Error loading PDF preview: ' + error.message);
+        modal.style.display = 'none';
+    }
+}
+
+// Function to close the fullscreen PDF preview
+function closePreviewPdfFullscreen() {
+    const modal = document.getElementById('previewPdfFullscreenModal');
+    const iframe = document.getElementById('previewPdfIframe');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    if (iframe) {
+        // Clean up the object URL if it exists
+        if (iframe.dataset.pdfUrl) {
+            URL.revokeObjectURL(iframe.dataset.pdfUrl);
+            delete iframe.dataset.pdfUrl;
+        }
+        iframe.src = '';
+    }
+}
+
 // Function to go back to the form from the thank you screen
 function goBackToForm() {
     // Hide the thank you message

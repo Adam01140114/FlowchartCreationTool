@@ -13,6 +13,9 @@ function initializeGraph() {
     return null;
   }
   const graph = new mxGraph(container);
+  // Force white background (override dark mode)
+  // Set container background explicitly - CSS will handle the rest
+  container.style.backgroundColor = '#ffffff';
   // Performance optimizations
   graph.setAllowLoops(false);
   graph.setAllowDanglingEdges(false);
@@ -303,6 +306,13 @@ function setupCustomDoubleClickBehavior(graph) {
         if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
           if (typeof window.showPropertiesPopup === 'function') {
             window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        // Show calculation node properties popup for calculation nodes
+        if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
+          if (typeof window.showCalculationNodeProperties === 'function') {
+            window.showCalculationNodeProperties(cell);
           }
           return;
         }
@@ -825,6 +835,11 @@ function showPropertiesPopup(cell) {
   // Add Max Line Limit and Max Character Limit for big paragraph questions
   if (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
       typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+    console.log('[PROPERTIES] Opening properties for Big Paragraph, cell._lineLimit:', cell._lineLimit, 'cell._characterLimit:', cell._characterLimit, 'cell._paragraphLimit:', cell._paragraphLimit);
+    console.log('[PROPERTIES] cell._lineLimit type:', typeof cell._lineLimit, 'value:', cell._lineLimit);
+    console.log('[PROPERTIES] cell._characterLimit type:', typeof cell._characterLimit, 'value:', cell._characterLimit);
+    console.log('[PROPERTIES] cell._paragraphLimit type:', typeof cell._paragraphLimit, 'value:', cell._paragraphLimit);
+    
     properties.push({
       label: 'Max Line Limit',
       value: cell._lineLimit || '',
@@ -839,6 +854,7 @@ function showPropertiesPopup(cell) {
       editable: true,
       inputType: 'number'
     });
+    console.log('[PROPERTIES] Created propCharacterLimit property with value:', cell._characterLimit || '', 'from cell._characterLimit:', cell._characterLimit);
     properties.push({
       label: 'Paragraph Limit',
       value: cell._paragraphLimit || '',
@@ -1805,6 +1821,7 @@ function showPropertiesPopup(cell) {
         { value: 'text2', label: 'Dropdown' },
         { value: 'checkbox', label: 'Checkbox' },
         { value: 'number', label: 'Number' },
+        { value: 'currency', label: 'Currency' },
         { value: 'date', label: 'Date' },
         { value: 'bigParagraph', label: 'Big Paragraph' },
         { value: 'multipleTextboxes', label: 'Multiple Textboxes' },
@@ -2304,8 +2321,29 @@ function showPropertiesPopup(cell) {
           valueSpan.parentNode.insertBefore(input, valueSpan);
           input.focus();
           input.select();
+          
+          // Add extensive logging for Character Limit field
+          if (prop.id === 'propCharacterLimit' || prop.id === 'propLineLimit' || prop.id === 'propParagraphLimit') {
+            console.log('[PROPERTIES] Input created for:', prop.id, 'Initial value:', prop.value, 'Cell ID:', cell.id);
+            
+            // Log when user types in the input
+            input.addEventListener('input', (e) => {
+              console.log('[PROPERTIES] User typing in', prop.id, 'Current value:', e.target.value, 'Input element:', e.target, 'Input ID:', e.target.id);
+            });
+            
+            // Log when input gains/loses focus
+            input.addEventListener('focus', () => {
+              console.log('[PROPERTIES] Input focused:', prop.id, 'Current value:', input.value);
+            });
+            
+            input.addEventListener('blur', () => {
+              console.log('[PROPERTIES] Input blurred:', prop.id, 'Value before save:', input.value);
+            });
+          }
+          
           const saveValue = () => {
             const newValue = input.value.trim();
+            console.log('[PROPERTIES] saveValue called for:', prop.id, 'New value:', newValue, 'Input element exists:', !!input, 'Input parent exists:', !!(input && input.parentNode));
             valueSpan.textContent = newValue;
             valueSpan.style.display = 'block';
             // Special debugging for PDF properties
@@ -2314,8 +2352,16 @@ function showPropertiesPopup(cell) {
             // For PDF Logic fields and PDF Preview fields, keep the input element so it can be found by the save function
             const isPdfLogicField = prop.id && prop.id.startsWith('propPdf');
             const isPdfPreviewField = prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile';
-            if (!isPdfLogicField && !isPdfPreviewField && input && input.parentNode) {
+            const isBigParagraphField = prop.id === 'propCharacterLimit' || prop.id === 'propLineLimit' || prop.id === 'propParagraphLimit';
+            
+            if (!isPdfLogicField && !isPdfPreviewField && !isBigParagraphField && input && input.parentNode) {
+              console.log('[PROPERTIES] Removing input for:', prop.id);
               input.remove();
+            } else if (isBigParagraphField) {
+              console.log('[PROPERTIES] Keeping input element for Big Paragraph field:', prop.id, 'Input element:', input, 'Input ID:', input.id);
+              // Make sure the input is hidden and valueSpan is visible with the correct value
+              input.style.display = 'none';
+              console.log('[PROPERTIES] Hid input element, valueSpan textContent:', valueSpan.textContent);
             } else if (isPdfPreviewField) {
             }
             // Update cell property
@@ -2361,13 +2407,42 @@ function showPropertiesPopup(cell) {
                 cell._questionId = newValue;
                 break;
               case 'propLineLimit':
+                console.log('[PROPERTIES] Saving propLineLimit, old value:', cell._lineLimit, 'new value:', newValue);
                 cell._lineLimit = newValue;
+                console.log('[PROPERTIES] propLineLimit saved, cell._lineLimit now:', cell._lineLimit);
                 break;
               case 'propCharacterLimit':
-                cell._characterLimit = newValue;
+                console.log('[PROPERTIES] Saving propCharacterLimit, old value:', cell._characterLimit, 'new value:', newValue, 'newValue type:', typeof newValue);
+                // Use graph model to properly update the cell
+                const graph = window.graph;
+                if (graph && graph.getModel) {
+                  graph.getModel().beginUpdate();
+                  try {
+                    cell._characterLimit = newValue === '' ? '' : newValue;
+                    console.log('[PROPERTIES] propCharacterLimit saved via model, cell._characterLimit now:', cell._characterLimit, 'type:', typeof cell._characterLimit);
+                  } finally {
+                    graph.getModel().endUpdate();
+                  }
+                } else {
+                  cell._characterLimit = newValue === '' ? '' : newValue;
+                  console.log('[PROPERTIES] propCharacterLimit saved directly, cell._characterLimit now:', cell._characterLimit, 'type:', typeof cell._characterLimit);
+                }
+                console.log('[PROPERTIES] Full cell object after saving:', JSON.stringify({
+                  id: cell.id,
+                  _characterLimit: cell._characterLimit,
+                  _lineLimit: cell._lineLimit,
+                  _paragraphLimit: cell._paragraphLimit
+                }));
+                // Trigger autosave to persist the change
+                if (typeof window.requestAutosave === 'function') {
+                  console.log('[PROPERTIES] Triggering autosave after saving propCharacterLimit');
+                  window.requestAutosave();
+                }
                 break;
               case 'propParagraphLimit':
+                console.log('[PROPERTIES] Saving propParagraphLimit, old value:', cell._paragraphLimit, 'new value:', newValue);
                 cell._paragraphLimit = newValue;
+                console.log('[PROPERTIES] propParagraphLimit saved, cell._paragraphLimit now:', cell._paragraphLimit);
                 break;
               case 'propNodeId':
                 // Update the _nameId property
@@ -2825,6 +2900,91 @@ function showPropertiesPopup(cell) {
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
+    }
+    // Save any Big Paragraph properties that might be in input fields but not yet saved
+    console.log('[PROPERTIES] ClosePopup called, checking for Big Paragraph properties');
+    console.log('[PROPERTIES] Cell isQuestion:', typeof window.isQuestion === 'function' ? window.isQuestion(cell) : 'function not available');
+    console.log('[PROPERTIES] Cell questionType:', typeof window.getQuestionType === 'function' ? window.getQuestionType(cell) : 'function not available');
+    console.log('[PROPERTIES] Cell current _characterLimit:', cell._characterLimit);
+    console.log('[PROPERTIES] Cell current _lineLimit:', cell._lineLimit);
+    console.log('[PROPERTIES] Cell current _paragraphLimit:', cell._paragraphLimit);
+    
+    if (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
+        typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
+      console.log('[PROPERTIES] Cell is a Big Paragraph question, checking for input fields');
+      
+      // Check for Line Limit input
+      const lineLimitInput = document.getElementById('propLineLimit_input');
+      console.log('[PROPERTIES] Looking for propLineLimit_input, found:', !!lineLimitInput);
+      if (lineLimitInput) {
+        const lineLimitValue = lineLimitInput.value.trim();
+        console.log('[PROPERTIES] propLineLimit_input value:', lineLimitValue, 'Input element:', lineLimitInput);
+        console.log('[PROPERTIES] Setting cell._lineLimit from', cell._lineLimit, 'to', (lineLimitValue || null));
+        cell._lineLimit = lineLimitValue || null;
+        console.log('[PROPERTIES] cell._lineLimit after setting:', cell._lineLimit);
+      } else {
+        console.log('[PROPERTIES] propLineLimit_input NOT FOUND in DOM');
+      }
+      
+      // Check for Character Limit input
+      const characterLimitInput = document.getElementById('propCharacterLimit_input');
+      console.log('[PROPERTIES] Looking for propCharacterLimit_input, found:', !!characterLimitInput);
+      if (characterLimitInput) {
+        const characterLimitValue = characterLimitInput.value.trim();
+        console.log('[PROPERTIES] propCharacterLimit_input value:', characterLimitValue, 'Input element:', characterLimitInput);
+        console.log('[PROPERTIES] Setting cell._characterLimit from', cell._characterLimit, 'to', (characterLimitValue || ''));
+        // Use graph model to properly update the cell
+        const graph = window.graph;
+        if (graph && graph.getModel) {
+          graph.getModel().beginUpdate();
+          try {
+            if (characterLimitValue === '') {
+              cell._characterLimit = '';
+            } else {
+              cell._characterLimit = characterLimitValue;
+            }
+            console.log('[PROPERTIES] cell._characterLimit after setting via model:', cell._characterLimit, 'type:', typeof cell._characterLimit);
+          } finally {
+            graph.getModel().endUpdate();
+          }
+        } else {
+          if (characterLimitValue === '') {
+            cell._characterLimit = '';
+          } else {
+            cell._characterLimit = characterLimitValue;
+          }
+          console.log('[PROPERTIES] cell._characterLimit after setting directly:', cell._characterLimit, 'type:', typeof cell._characterLimit);
+        }
+        console.log('[PROPERTIES] Cell object after setting:', cell);
+      } else {
+        console.log('[PROPERTIES] propCharacterLimit_input NOT FOUND in DOM');
+        // Try to find it another way
+        const allInputs = document.querySelectorAll('#propertiesMenu input');
+        console.log('[PROPERTIES] All inputs in propertiesMenu:', Array.from(allInputs).map(inp => ({ id: inp.id, value: inp.value, type: inp.type })));
+      }
+      
+      // Check for Paragraph Limit input
+      const paragraphLimitInput = document.getElementById('propParagraphLimit_input');
+      console.log('[PROPERTIES] Looking for propParagraphLimit_input, found:', !!paragraphLimitInput);
+      if (paragraphLimitInput) {
+        const paragraphLimitValue = paragraphLimitInput.value.trim();
+        console.log('[PROPERTIES] propParagraphLimit_input value:', paragraphLimitValue, 'Input element:', paragraphLimitInput);
+        console.log('[PROPERTIES] Setting cell._paragraphLimit from', cell._paragraphLimit, 'to', (paragraphLimitValue || null));
+        cell._paragraphLimit = paragraphLimitValue || null;
+        console.log('[PROPERTIES] cell._paragraphLimit after setting:', cell._paragraphLimit);
+      } else {
+        console.log('[PROPERTIES] propParagraphLimit_input NOT FOUND in DOM');
+      }
+      
+      // Trigger autosave after saving Big Paragraph properties
+      if (typeof window.requestAutosave === 'function') {
+        console.log('[PROPERTIES] Triggering autosave');
+        window.requestAutosave();
+      } else {
+        console.log('[PROPERTIES] requestAutosave function not available');
+      }
+    } else {
+      console.log('[PROPERTIES] Cell is NOT a Big Paragraph question, skipping Big Paragraph property save');
     }
     // Auto-save Big Paragraph PDF Logic if enabled
     if (cell._pdfLogicEnabled && typeof window.saveBigParagraphPdfLogic === 'function') {
@@ -3813,9 +3973,20 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
       // Add location data options if location index is set
       if (node._locationIndex !== undefined) {
         const locationFields = ['street', 'city', 'state', 'zip'];
+        // Get location title and sanitize it
+        const locationTitle = node._locationTitle || '';
+        const sanitizedLocationTitle = locationTitle.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .trim();
+        // Build the location prefix with location title if available
+        let locationPrefix = baseNodeId;
+        if (sanitizedLocationTitle) {
+          locationPrefix = `${baseNodeId}_${sanitizedLocationTitle}`;
+        }
         locationFields.forEach(locationField => {
           const option = document.createElement('div');
-          const labelId = `${baseNodeId}_${locationField}`;
+          const labelId = `${locationPrefix}_${locationField}`;
           option.textContent = labelId;
           option.style.cssText = `
             padding: 8px;
@@ -3831,7 +4002,7 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
           // Add short state field for state location field
           if (locationField === 'state') {
             const shortOption = document.createElement('div');
-            const shortLabelId = `${baseNodeId}_${locationField}_short`;
+            const shortLabelId = `${locationPrefix}_${locationField}_short`;
             shortOption.textContent = shortLabelId;
             shortOption.style.cssText = `
               padding: 8px;
@@ -3897,11 +4068,22 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
       // Add location data options if location index is set
       if (node._locationIndex !== undefined) {
         const locationFields = ['street', 'city', 'state', 'zip'];
+        // Get location title and sanitize it
+        const locationTitle = node._locationTitle || '';
+        const sanitizedLocationTitle = locationTitle.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .trim();
+        // Build the location prefix with location title if available
+        let locationPrefix = baseNodeId;
+        if (sanitizedLocationTitle) {
+          locationPrefix = `${baseNodeId}_${sanitizedLocationTitle}`;
+        }
         locationFields.forEach(locationField => {
           // Generate options for each number in the range for each location field
           for (let num = firstNumber; num <= secondNumber; num++) {
             const option = document.createElement('div');
-            const labelId = `${baseNodeId}_${locationField}_${num}`;
+            const labelId = `${locationPrefix}_${locationField}_${num}`;
             option.textContent = labelId;
             option.style.cssText = `
               padding: 8px;
@@ -3917,7 +4099,7 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
             // Add short state field for state location field
             if (locationField === 'state') {
               const shortOption = document.createElement('div');
-              const shortLabelId = `${baseNodeId}_${locationField}_short_${num}`;
+              const shortLabelId = `${locationPrefix}_${locationField}_short_${num}`;
               shortOption.textContent = shortLabelId;
               shortOption.style.cssText = `
                 padding: 8px;
@@ -4379,22 +4561,41 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
   });
   // 4. Add options from numbered dropdown questions (main checkboxes and trigger sequence checkboxes)
   numberedDropdownNodes.forEach(node => {
-    // Main checkboxes
+    // Get numbered dropdown question text, nodeId, and range
+    const questionText = node._questionText || node.value || `Question ${node._questionId || ''}`;
+    
+    // More robust parsing of _twoNumbers to handle various formats
+    let minValue = 1;
+    let maxValue = 1;
+    if (node._twoNumbers) {
+      // Try to get values from different possible property names/formats
+      const firstVal = node._twoNumbers.first || node._twoNumbers.min || node._twoNumbers[0] || '1';
+      const secondVal = node._twoNumbers.second || node._twoNumbers.max || node._twoNumbers[1] || '1';
+      minValue = parseInt(String(firstVal).trim()) || 1;
+      maxValue = parseInt(String(secondVal).trim()) || 1;
+      // Ensure maxValue is at least minValue
+      if (maxValue < minValue) {
+        maxValue = minValue;
+      }
+    }
+    console.log('[LINKED CHECKBOX DEBUG] Processing numbered dropdown:', questionText, 'Range:', minValue, '-', maxValue);
+    // Main checkboxes - generate numbered versions for multiple dropdown questions
     if (node._checkboxes && Array.isArray(node._checkboxes)) {
       node._checkboxes.forEach(checkbox => {
         if (checkbox.options && Array.isArray(checkbox.options)) {
           checkbox.options.forEach(option => {
             if (option.nodeId) {
-              addOptionIfNotExists(option.nodeId, option.nodeId);
+              // For multiple dropdown questions, generate numbered versions (1, 2, 3, etc.)
+              for (let num = minValue; num <= maxValue; num++) {
+                const numberedNodeId = `${option.nodeId}_${num}`;
+                const label = `${questionText} - ${checkbox.fieldName || ''} [Trigger] - ${option.checkboxText || option.nodeId} (${num}) (${numberedNodeId})`;
+                addOptionIfNotExists(numberedNodeId, label);
+              }
             }
           });
         }
       });
     }
-    // Get numbered dropdown question text, nodeId, and range
-    const questionText = node._questionText || node.value || `Question ${node._questionId || ''}`;
-    const minValue = node._twoNumbers ? (parseInt(node._twoNumbers.first) || 1) : 1;
-    const maxValue = node._twoNumbers ? (parseInt(node._twoNumbers.second) || 1) : 1;
     // Get the question nodeId for this numbered dropdown
     let questionNodeId = '';
     if (typeof window.getNodeId === 'function') {
@@ -4746,16 +4947,27 @@ function populateLinkedLogicDropdown(dropdown, cell) {
       // Add location data options if location index is set
       if (node._locationIndex !== undefined) {
         const locationFields = ['street', 'city', 'state', 'zip'];
+        // Get location title and sanitize it
+        const locationTitle = node._locationTitle || '';
+        const sanitizedLocationTitle = locationTitle.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .trim();
+        // Build the location prefix with location title if available
+        let locationPrefix = baseNodeId;
+        if (sanitizedLocationTitle) {
+          locationPrefix = `${baseNodeId}_${sanitizedLocationTitle}`;
+        }
         locationFields.forEach(locationField => {
           const option = document.createElement('option');
-          const labelId = `${baseNodeId}_${locationField}`;
+          const labelId = `${locationPrefix}_${locationField}`;
           option.value = labelId;
           option.textContent = labelId;
           dropdown.appendChild(option);
           // Add short state field for state location field
           if (locationField === 'state') {
             const shortOption = document.createElement('option');
-            const shortLabelId = `${baseNodeId}_${locationField}_short`;
+            const shortLabelId = `${locationPrefix}_${locationField}_short`;
             shortOption.value = shortLabelId;
             shortOption.textContent = shortLabelId;
             dropdown.appendChild(shortOption);
@@ -4794,18 +5006,29 @@ function populateLinkedLogicDropdown(dropdown, cell) {
       // Add location data options if location index is set
       if (node._locationIndex !== undefined) {
         const locationFields = ['street', 'city', 'state', 'zip'];
+        // Get location title and sanitize it
+        const locationTitle = node._locationTitle || '';
+        const sanitizedLocationTitle = locationTitle.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .trim();
+        // Build the location prefix with location title if available
+        let locationPrefix = baseNodeId;
+        if (sanitizedLocationTitle) {
+          locationPrefix = `${baseNodeId}_${sanitizedLocationTitle}`;
+        }
         locationFields.forEach(locationField => {
           // Generate options for each number in the range for each location field
           for (let num = firstNumber; num <= secondNumber; num++) {
             const option = document.createElement('option');
-            const labelId = `${baseNodeId}_${locationField}_${num}`;
+            const labelId = `${locationPrefix}_${locationField}_${num}`;
             option.value = labelId;
             option.textContent = labelId;
             dropdown.appendChild(option);
             // Add short state field for state location field
             if (locationField === 'state') {
               const shortOption = document.createElement('option');
-              const shortLabelId = `${baseNodeId}_${locationField}_short_${num}`;
+              const shortLabelId = `${locationPrefix}_${locationField}_short_${num}`;
               shortOption.value = shortLabelId;
               shortOption.textContent = shortLabelId;
               dropdown.appendChild(shortOption);
@@ -4906,22 +5129,29 @@ function populateLinkedCheckboxOptionsDropdown(dropdown, cell) {
   });
   // Add options from numbered dropdown questions (main checkboxes and trigger sequence checkboxes)
   numberedDropdownNodes.forEach(node => {
-    // Main checkboxes
+    // Get the number range from _twoNumbers
+    const minValue = node._twoNumbers ? (parseInt(node._twoNumbers.first) || 1) : 1;
+    const maxValue = node._twoNumbers ? (parseInt(node._twoNumbers.second) || 1) : 1;
+    // Main checkboxes - generate numbered versions for multiple dropdown questions
     if (node._checkboxes && Array.isArray(node._checkboxes)) {
       node._checkboxes.forEach(checkbox => {
         if (checkbox.options && Array.isArray(checkbox.options)) {
           checkbox.options.forEach(option => {
             if (option.nodeId) {
-              const optionElement = document.createElement('option');
-              optionElement.value = option.nodeId;
-              optionElement.textContent = option.nodeId;
-              dropdown.appendChild(optionElement);
+              // For multiple dropdown questions, generate numbered versions (1, 2, 3, etc.)
+              for (let num = minValue; num <= maxValue; num++) {
+                const numberedNodeId = `${option.nodeId}_${num}`;
+                const optionElement = document.createElement('option');
+                optionElement.value = numberedNodeId;
+                optionElement.textContent = numberedNodeId;
+                dropdown.appendChild(optionElement);
+              }
             }
           });
         }
       });
     }
-    // Trigger sequence checkboxes
+    // Trigger sequence checkboxes - also generate numbered versions if part of multiple dropdown
     if (node._dropdowns && Array.isArray(node._dropdowns)) {
       node._dropdowns.forEach(dropdownItem => {
         if (dropdownItem.triggerSequences && Array.isArray(dropdownItem.triggerSequences)) {
@@ -4931,10 +5161,14 @@ function populateLinkedCheckboxOptionsDropdown(dropdown, cell) {
                 if (checkbox.options && Array.isArray(checkbox.options)) {
                   checkbox.options.forEach(option => {
                     if (option.nodeId) {
-                      const optionElement = document.createElement('option');
-                      optionElement.value = option.nodeId;
-                      optionElement.textContent = option.nodeId;
-                      dropdown.appendChild(optionElement);
+                      // For multiple dropdown questions, generate numbered versions
+                      for (let num = minValue; num <= maxValue; num++) {
+                        const numberedNodeId = `${option.nodeId}_${num}`;
+                        const optionElement = document.createElement('option');
+                        optionElement.value = numberedNodeId;
+                        optionElement.textContent = numberedNodeId;
+                        dropdown.appendChild(optionElement);
+                      }
                     }
                   });
                 }
