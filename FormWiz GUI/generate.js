@@ -4436,6 +4436,111 @@ if (s > 1){
         updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
       });
     };
+    
+    // Periodic validation to ensure inverse relationship is always maintained
+    // This catches any cases where autofill or other code tries to set both checkboxes
+    function validateAndFixInverseCheckboxes() {
+      const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
+        return;
+      }
+      
+      inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
+        const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
+        const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
+        if (!inverseCheckboxId || !targetCheckboxId) {
+          return;
+        }
+        
+        const inverseCheckbox = document.getElementById(inverseCheckboxId);
+        if (!inverseCheckbox) {
+          return;
+        }
+        
+        // Check if target is a linked checkbox
+        let isLinkedCheckbox = false;
+        let sourceCheckboxIds = [];
+        const linkedCheckboxConfig = linkedCheckboxesArray.find(lc => lc.linkedCheckboxId === targetCheckboxId);
+        if (linkedCheckboxConfig) {
+          isLinkedCheckbox = true;
+          sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
+        }
+        
+        // Calculate what the inverse checkbox state SHOULD be
+        let shouldBeChecked = false;
+        if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
+          // For linked checkboxes: inverse is checked when NONE of source checkboxes are checked
+          let anyChecked = false;
+          sourceCheckboxIds.forEach(checkboxId => {
+            const sourceCheckbox = document.getElementById(checkboxId);
+            if (sourceCheckbox && sourceCheckbox.checked) {
+              anyChecked = true;
+            }
+          });
+          shouldBeChecked = !anyChecked;
+        } else {
+          // For regular checkboxes: inverse is opposite of target
+          const targetCheckbox = document.getElementById(targetCheckboxId);
+          if (targetCheckbox) {
+            shouldBeChecked = !targetCheckbox.checked;
+          }
+        }
+        
+        // If the inverse checkbox state is wrong, fix it
+        if (inverseCheckbox.checked !== shouldBeChecked) {
+          inverseCheckbox.checked = shouldBeChecked;
+        }
+      });
+    }
+    
+    // Run periodic validation every 500ms to catch any violations
+    setInterval(validateAndFixInverseCheckboxes, 500);
+    
+    // Also validate after autofill operations
+    // Hook into autofill completion by watching for the isInitialAutofill flag
+    let autofillCheckInterval = setInterval(function() {
+      if (typeof window.isInitialAutofill !== 'undefined' && !window.isInitialAutofill) {
+        // Autofill is complete, validate inverse checkboxes
+        validateAndFixInverseCheckboxes();
+        // Also call updateAllInverseCheckboxes to ensure everything is synced
+        if (typeof window.updateAllInverseCheckboxes === 'function') {
+          window.updateAllInverseCheckboxes();
+        }
+        clearInterval(autofillCheckInterval);
+      }
+    }, 100);
+    
+    // Clear the autofill check interval after 10 seconds to avoid infinite checking
+    setTimeout(function() {
+      clearInterval(autofillCheckInterval);
+    }, 10000);
+    
+    // Also validate when form fields change (MutationObserver for programmatic changes)
+    const form = document.getElementById('customForm');
+    if (form) {
+      const observer = new MutationObserver(function(mutations) {
+        // Check if any checkbox attributes changed
+        let shouldValidate = false;
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'checked') {
+            shouldValidate = true;
+          }
+        });
+        if (shouldValidate) {
+          // Small delay to let all changes settle
+          setTimeout(validateAndFixInverseCheckboxes, 50);
+        }
+      });
+      
+      // Observe the entire form for checkbox changes
+      observer.observe(form, {
+        attributes: true,
+        attributeFilter: ['checked'],
+        subtree: true,
+        childList: true
+      });
+    }
   });
   `;
   formHTML += `var isCreatingFields = false;\n`;
@@ -8611,6 +8716,10 @@ function dropdownMirror(selectEl, baseName){
                 } else {
                 }
                 window.updateAllLinkedCheckboxes();
+                // Also update inverse checkboxes after linked checkbox update
+                if (typeof window.updateAllInverseCheckboxes === 'function') {
+                    window.updateAllInverseCheckboxes();
+                }
             }, 200);
         } else {
         }
@@ -10785,6 +10894,10 @@ if (typeof handleNext === 'function') {
             // 🔧 NEW: Update all linked checkboxes after autofill completes
             if (typeof window.updateAllLinkedCheckboxes === 'function') {
                 window.updateAllLinkedCheckboxes();
+            }
+            // Also update inverse checkboxes after autofill
+            if (typeof window.updateAllInverseCheckboxes === 'function') {
+                window.updateAllInverseCheckboxes();
             }
             // 🔧 NEW: Create hidden checkboxes for any autofilled radio buttons in numbered dropdowns
             const autofilledRadioButtons = document.querySelectorAll('input[type="radio"][id*="_radio"]:checked');

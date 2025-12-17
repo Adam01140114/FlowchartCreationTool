@@ -2407,26 +2407,17 @@ window.exportGuiJson = function(download = true) {
   const inverseCheckboxNodes = vertices.filter(cell => 
     typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)
   );
-  let inverseCheckboxCounter = 0;
+  let inverseCheckboxCounter = 1; // Start at 1
   inverseCheckboxNodes.forEach((cell) => {
     if (cell._inverseCheckboxNodeId && cell._inverseCheckboxOption) {
-      // First entry: just the inverseCheckboxId
-      const inverseCheckboxEntry1 = {
-        id: `inverseCheckbox${inverseCheckboxCounter}`,
-        inverseCheckboxId: cell._inverseCheckboxNodeId
-      };
-      inverseCheckboxes.push(inverseCheckboxEntry1);
-      inverseCheckboxCounter++;
-      
-      // Second entry: inverseCheckboxId with targetCheckboxId
-      const inverseCheckboxEntry2 = {
+      // Single entry with inverseCheckboxId and targetCheckboxId
+      const inverseCheckboxEntry = {
         id: `inverseCheckbox${inverseCheckboxCounter}`,
         inverseCheckboxId: cell._inverseCheckboxNodeId,
         targetCheckboxId: cell._inverseCheckboxOption
       };
-      inverseCheckboxes.push(inverseCheckboxEntry2);
+      inverseCheckboxes.push(inverseCheckboxEntry);
       inverseCheckboxCounter++;
-    } else {
     }
   });
   // Create final output object
