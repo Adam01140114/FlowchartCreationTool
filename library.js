@@ -2402,6 +2402,33 @@ window.exportGuiJson = function(download = true) {
     } else {
     }
   });
+  // Process inverse checkbox nodes from flowchart editor
+  const inverseCheckboxes = [];
+  const inverseCheckboxNodes = vertices.filter(cell => 
+    typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)
+  );
+  let inverseCheckboxCounter = 0;
+  inverseCheckboxNodes.forEach((cell) => {
+    if (cell._inverseCheckboxNodeId && cell._inverseCheckboxOption) {
+      // First entry: just the inverseCheckboxId
+      const inverseCheckboxEntry1 = {
+        id: `inverseCheckbox${inverseCheckboxCounter}`,
+        inverseCheckboxId: cell._inverseCheckboxNodeId
+      };
+      inverseCheckboxes.push(inverseCheckboxEntry1);
+      inverseCheckboxCounter++;
+      
+      // Second entry: inverseCheckboxId with targetCheckboxId
+      const inverseCheckboxEntry2 = {
+        id: `inverseCheckbox${inverseCheckboxCounter}`,
+        inverseCheckboxId: cell._inverseCheckboxNodeId,
+        targetCheckboxId: cell._inverseCheckboxOption
+      };
+      inverseCheckboxes.push(inverseCheckboxEntry2);
+      inverseCheckboxCounter++;
+    } else {
+    }
+  });
   // Create final output object
   const output = {
     sections: sections,
@@ -2427,7 +2454,8 @@ window.exportGuiJson = function(download = true) {
       })),
       // Linked checkboxes from flowchart editor (linkedCheckboxNodes)
       ...linkedCheckboxes
-    ]
+    ],
+    inverseCheckboxes: inverseCheckboxes
   };
   // Convert to string and download
   const jsonStr = JSON.stringify(output, null, 2);
@@ -2564,6 +2592,15 @@ window.exportBothJson = function() {
         cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
       } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
       }
+      // Inverse checkbox node properties - always include for inverse checkbox nodes
+      if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+        cellData._inverseCheckboxNodeId = cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null;
+        cellData._inverseCheckboxOption = cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null;
+      } else if (cell._inverseCheckboxNodeId !== undefined) {
+        cellData._inverseCheckboxNodeId = cell._inverseCheckboxNodeId;
+      } else if (cell._inverseCheckboxOption !== undefined) {
+        cellData._inverseCheckboxOption = cell._inverseCheckboxOption;
+      }
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
@@ -2667,9 +2704,31 @@ window.saveFlowchart = function() {
     currentFlowchartName = flowchartName;
     window.currentFlowchartName = flowchartName;
   }
+  console.log('[EXPORT SAVEFLOWCHART] ========== SAVE FLOWCHART STARTED ==========');
   // Gather data and save
   const data = { cells: [] };
   const cells = graph.getModel().cells;
+  console.log('[EXPORT SAVEFLOWCHART] Total cells in model:', Object.keys(cells).length);
+  
+  // Log all inverse checkbox nodes before export
+  const allInverseCheckboxNodes = [];
+  for (let id in cells) {
+    if (id === "0" || id === "1") continue;
+    const cell = cells[id];
+    if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+      allInverseCheckboxNodes.push({ id, cell });
+    }
+  }
+  console.log('[EXPORT SAVEFLOWCHART] Found', allInverseCheckboxNodes.length, 'inverse checkbox nodes');
+  allInverseCheckboxNodes.forEach(({ id, cell }, index) => {
+    console.log(`[EXPORT SAVEFLOWCHART] Inverse Checkbox Node ${index + 1} (id: ${id}):`, {
+      _inverseCheckboxNodeId: cell._inverseCheckboxNodeId,
+      _inverseCheckboxOption: cell._inverseCheckboxOption,
+      hasInverseCheckboxNodeId: cell._inverseCheckboxNodeId !== undefined,
+      hasInverseCheckboxOption: cell._inverseCheckboxOption !== undefined
+    });
+  });
+  
   for (let id in cells) {
     if (id === "0" || id === "1") continue;
     const cell = cells[id];
@@ -2712,8 +2771,20 @@ window.saveFlowchart = function() {
       _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
-      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null
+      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null,
+      _inverseCheckboxNodeId: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null) : (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null),
+      _inverseCheckboxOption: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null) : (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null)
     };
+    // Log inverse checkbox properties for this cell
+    if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+      console.log(`[EXPORT] Cell ${cell.id} is inverse checkbox:`, {
+        cellId: cell.id,
+        cellInverseCheckboxNodeId: cell._inverseCheckboxNodeId,
+        cellInverseCheckboxOption: cell._inverseCheckboxOption,
+        exportedInverseCheckboxNodeId: cellData._inverseCheckboxNodeId,
+        exportedInverseCheckboxOption: cellData._inverseCheckboxOption
+      });
+    }
     // Debug logging for Linked Logic properties
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
     }
@@ -2840,8 +2911,20 @@ window.saveAsFlowchart = function() {
       _dropdowns: cell._dropdowns||null,
       _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
       _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null,
-      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null
+      _linkedCheckboxNodeId: cell._linkedCheckboxNodeId||null, _linkedCheckboxOptions: cell._linkedCheckboxOptions||null,
+      _inverseCheckboxNodeId: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null) : (cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null),
+      _inverseCheckboxOption: (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) ? (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null) : (cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null)
     };
+    // Log inverse checkbox properties for this cell
+    if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+      console.log(`[EXPORT] Cell ${cell.id} is inverse checkbox:`, {
+        cellId: cell.id,
+        cellInverseCheckboxNodeId: cell._inverseCheckboxNodeId,
+        cellInverseCheckboxOption: cell._inverseCheckboxOption,
+        exportedInverseCheckboxNodeId: cellData._inverseCheckboxNodeId,
+        exportedInverseCheckboxOption: cellData._inverseCheckboxOption
+      });
+    }
     // Debug logging for Linked Logic properties
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
     }
@@ -3872,6 +3955,12 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._linkedCheckboxOptions !== undefined) {
           newCell._linkedCheckboxOptions = item._linkedCheckboxOptions;
+        }
+        if (item._inverseCheckboxNodeId !== undefined) {
+          newCell._inverseCheckboxNodeId = item._inverseCheckboxNodeId;
+        }
+        if (item._inverseCheckboxOption !== undefined) {
+          newCell._inverseCheckboxOption = item._inverseCheckboxOption;
         }
         // Calculation properties
         if (item._calcTitle !== undefined) {

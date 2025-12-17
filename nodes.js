@@ -60,6 +60,9 @@ window.createNode = function(nodeType, x, y) {
       case 'linkedCheckbox':
         vertex = createLinkedCheckboxNode(x, y);
         break;
+      case 'inverseCheckbox':
+        vertex = createInverseCheckboxNode(x, y);
+        break;
       default:
         return null;
     }
@@ -277,6 +280,19 @@ function createLinkedCheckboxNode(x, y) {
   return vertex;
 }
 /**
+ * Create an inverse checkbox node
+ */
+function createInverseCheckboxNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=inverseCheckbox;section=1;fillColor=#FFB6C1;strokeColor=#FF69B4;');
+  // Set default properties
+  vertex.value = "Inverse Checkbox";
+  vertex._inverseCheckboxNodeId = "inverse_checkbox";
+  vertex._inverseCheckboxOption = ""; // Single checkbox option ID (not an array)
+  return vertex;
+}
+/**
  * Generate a unique question ID
  */
 function generateQuestionId() {
@@ -334,6 +350,12 @@ window.isLinkedCheckboxNode = function(cell) {
   return cell && cell.style && cell.style.includes("nodeType=linkedCheckbox");
 };
 /**
+ * Check if a cell is an inverse checkbox node
+ */
+window.isInverseCheckboxNode = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=inverseCheckbox");
+};
+/**
  * Update linked logic node cell display
  */
 window.updateLinkedLogicNodeCell = function(cell) {
@@ -353,6 +375,19 @@ window.updateLinkedCheckboxNodeCell = function(cell) {
   if (!cell) return;
   // Update the display value with the Node ID
   const nodeId = cell._linkedCheckboxNodeId || 'linked_checkbox';
+  cell.value = nodeId;
+  // Update the graph display
+  if (window.graph) {
+    window.graph.refresh(cell);
+  }
+};
+/**
+ * Update inverse checkbox node cell display
+ */
+window.updateInverseCheckboxNodeCell = function(cell) {
+  if (!cell) return;
+  // Update the display value with the Node ID
+  const nodeId = cell._inverseCheckboxNodeId || 'inverse_checkbox';
   cell.value = nodeId;
   // Update the graph display
   if (window.graph) {

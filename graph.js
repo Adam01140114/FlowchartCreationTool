@@ -309,6 +309,13 @@ function setupCustomDoubleClickBehavior(graph) {
           }
           return;
         }
+        // Show properties popup for inverse checkbox nodes
+        if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
         // Show calculation node properties popup for calculation nodes
         if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
           if (typeof window.showCalculationNodeProperties === 'function') {
@@ -405,11 +412,13 @@ function showPropertiesPopup(cell) {
   const popup = document.createElement('div');
   popup.className = 'properties-modal';
   popup._cell = cell; // Store cell reference for use in event handlers
-  // Determine if this is a linked checkbox node (needs wider width)
+  // Determine if this is a linked checkbox or inverse checkbox node (needs wider width)
   const isLinkedCheckbox = typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell);
-  const initialWidth = isLinkedCheckbox ? '800px' : '600px';
-  const minWidth = isLinkedCheckbox ? '600px' : '500px';
-  const maxWidth = isLinkedCheckbox ? '1200px' : '800px';
+  const isInverseCheckbox = typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell);
+  const needsWideWidth = isLinkedCheckbox || isInverseCheckbox;
+  const initialWidth = needsWideWidth ? '800px' : '600px';
+  const minWidth = needsWideWidth ? '600px' : '500px';
+  const maxWidth = needsWideWidth ? '1200px' : '800px';
   popup.style.cssText = `
     position: fixed;
     top: 50%;
@@ -467,6 +476,8 @@ function showPropertiesPopup(cell) {
     title.textContent = 'Linked Logic Properties';
   } else if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
     title.textContent = 'Linked Checkbox Properties';
+  } else if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+    title.textContent = 'Inverse Checkbox Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -783,6 +794,12 @@ function showPropertiesPopup(cell) {
     properties = [
       { label: 'Node ID', value: cell._linkedCheckboxNodeId || 'linked_checkbox', id: 'propLinkedCheckboxNodeId', editable: true },
       { label: 'Linked Checkbox Options', value: 'linkedCheckboxOptions', id: 'propLinkedCheckboxOptions', editable: false, special: 'linkedCheckboxOptions' }
+    ];
+  } else if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+    // For inverse checkbox nodes, show special properties with single dropdown
+    properties = [
+      { label: 'Node ID', value: cell._inverseCheckboxNodeId || 'inverse_checkbox', id: 'propInverseCheckboxNodeId', editable: true },
+      { label: 'Checkbox Option', value: 'inverseCheckboxOption', id: 'propInverseCheckboxOption', editable: false, special: 'inverseCheckboxOption' }
     ];
   } else {
     // For all other nodes, show the standard properties
@@ -1784,6 +1801,176 @@ function showPropertiesPopup(cell) {
         }
       });
       return; // Skip the normal property creation
+    } else if (prop.special === 'inverseCheckboxOption') {
+      // Special handling for inverse checkbox option (single dropdown, no "link another" button)
+      const fieldDiv = document.createElement('div');
+      fieldDiv.style.cssText = `
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+      `;
+      const label = document.createElement('label');
+      label.textContent = prop.label ? prop.label + ':' : '';
+      label.style.cssText = `
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      `;
+      // Create container for inverse checkbox option dropdown
+      const inverseCheckboxOptionContainer = document.createElement('div');
+      inverseCheckboxOptionContainer.setAttribute('data-inverse-checkbox-container', 'true');
+      inverseCheckboxOptionContainer.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      `;
+      // Get current inverse checkbox option value
+      const currentInverseCheckboxOption = cell._inverseCheckboxOption || '';
+      // Create search bar
+      const searchBar = document.createElement('input');
+      searchBar.type = 'text';
+      searchBar.placeholder = 'Search for a checkbox option...';
+      searchBar.style.cssText = `
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        background-color: #f9f9f9;
+      `;
+      // Create custom dropdown container
+      const dropdownContainer = document.createElement('div');
+      dropdownContainer.style.cssText = `
+        flex: 1;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      `;
+      // Create the visible dropdown display
+      const dropdownDisplay = document.createElement('div');
+      dropdownDisplay.style.cssText = `
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        background-color: white;
+        cursor: pointer;
+        min-height: 20px;
+        display: flex;
+        align-items: center;
+      `;
+      dropdownDisplay.textContent = 'Select a checkbox option...';
+      // Create the options container (initially hidden)
+      const optionsContainer = document.createElement('div');
+      optionsContainer.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      `;
+      // Create hidden select for form compatibility
+      const hiddenSelect = document.createElement('select');
+      hiddenSelect.style.display = 'none';
+      // Populate options
+      populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSelect, cell);
+      // Set selected value if it exists
+      if (currentInverseCheckboxOption) {
+        const selectedOption = optionsContainer.querySelector(`[data-value="${currentInverseCheckboxOption}"]`);
+        if (selectedOption) {
+          dropdownDisplay.textContent = selectedOption.textContent;
+          hiddenSelect.value = currentInverseCheckboxOption;
+        }
+      }
+      dropdownContainer.appendChild(dropdownDisplay);
+      dropdownContainer.appendChild(hiddenSelect);
+      // Setup search functionality
+      setupLinkedCheckboxOptionsCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
+      // Create the main container for this dropdown
+      const mainContainer = document.createElement('div');
+      mainContainer.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 8px;
+        position: relative;
+      `;
+      // Add search bar to main container
+      mainContainer.appendChild(searchBar);
+      // Add options container to main container (positioned relative to search bar)
+      mainContainer.appendChild(optionsContainer);
+      // Add dropdown to main container
+      mainContainer.appendChild(dropdownContainer);
+      // Add main container to inverse checkbox option container
+      inverseCheckboxOptionContainer.appendChild(mainContainer);
+      // Add Save button
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cssText = `
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 8px;
+        width: 100%;
+      `;
+      saveBtn.onclick = () => {
+        // Get the selected checkbox option value
+        const selectedValue = hiddenSelect.value || '';
+        cell._inverseCheckboxOption = selectedValue;
+        // Update the cell's inverse checkbox node ID
+        const nodeIdElement = document.getElementById('propInverseCheckboxNodeId');
+        if (nodeIdElement) {
+          let nodeIdValue;
+          if (nodeIdElement.tagName === 'INPUT') {
+            nodeIdValue = nodeIdElement.value;
+          } else {
+            nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
+          }
+          cell._inverseCheckboxNodeId = nodeIdValue;
+        }
+        // Show success message
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saved!';
+        saveBtn.style.backgroundColor = '#45a049';
+        setTimeout(() => {
+          saveBtn.textContent = originalText;
+          saveBtn.style.backgroundColor = '#4CAF50';
+        }, 1000);
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      inverseCheckboxOptionContainer.appendChild(saveBtn);
+      fieldDiv.appendChild(label);
+      fieldDiv.appendChild(inverseCheckboxOptionContainer);
+      content.appendChild(fieldDiv);
+      // Helper function to update inverse checkbox option
+      function updateInverseCheckboxOption(cell) {
+        const selectedValue = hiddenSelect.value || '';
+        cell._inverseCheckboxOption = selectedValue;
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      }
+      // Add change listener to dropdown
+      hiddenSelect.addEventListener('change', () => {
+        updateInverseCheckboxOption(cell);
+      });
+      return; // Skip the normal property creation
     }
     const fieldDiv = document.createElement('div');
     fieldDiv.style.cssText = `
@@ -2540,6 +2727,18 @@ function showPropertiesPopup(cell) {
                   window.requestAutosave();
                 }
                 break;
+              case 'propInverseCheckboxNodeId':
+                // Update the inverse checkbox node ID property
+                cell._inverseCheckboxNodeId = newValue;
+                // Update the node text to match the Node ID for inverse checkbox nodes
+                if (typeof window.updateInverseCheckboxNodeCell === 'function') {
+                  window.updateInverseCheckboxNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
               case 'propDefaultText':
                 // Update the default text property for hidden textbox
                 cell._defaultText = newValue;
@@ -3017,6 +3216,50 @@ function showPropertiesPopup(cell) {
           window.requestAutosave();
         }
       } else {
+      }
+    }
+    // Auto-save Inverse Checkbox Option if this is an inverse checkbox node
+    if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+      const inverseCheckboxOptionContainer = popup.querySelector('[data-inverse-checkbox-container]');
+      if (inverseCheckboxOptionContainer) {
+        const hiddenSelect = inverseCheckboxOptionContainer.querySelector('select[style*="display: none"], select[style*="display:none"]');
+        if (hiddenSelect) {
+          // Always save the value, even if empty
+          cell._inverseCheckboxOption = hiddenSelect.value || '';
+        }
+        // Also update the inverse checkbox node ID if it exists
+        const nodeIdElement = document.getElementById('propInverseCheckboxNodeId');
+        if (nodeIdElement) {
+          let nodeIdValue;
+          if (nodeIdElement.tagName === 'INPUT') {
+            nodeIdValue = nodeIdElement.value;
+          } else {
+            nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
+          }
+          // Always save the node ID, even if empty
+          cell._inverseCheckboxNodeId = nodeIdValue || (cell._inverseCheckboxNodeId || 'inverse_checkbox');
+        } else {
+          // Ensure node ID is set even if input doesn't exist
+          if (!cell._inverseCheckboxNodeId) {
+            cell._inverseCheckboxNodeId = 'inverse_checkbox';
+          }
+        }
+        // Ensure option is initialized even if empty
+        if (cell._inverseCheckboxOption === undefined) {
+          cell._inverseCheckboxOption = '';
+        }
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      } else {
+        // Even if container not found, ensure properties are initialized
+        if (!cell._inverseCheckboxNodeId) {
+          cell._inverseCheckboxNodeId = 'inverse_checkbox';
+        }
+        if (cell._inverseCheckboxOption === undefined) {
+          cell._inverseCheckboxOption = '';
+        }
       }
     }
     if (outsideClickHandler) {
@@ -4731,6 +4974,21 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
       });
     }
   });
+  // 6. Add linked checkbox node IDs (for inverse checkbox nodes)
+  const linkedCheckboxNodes = allCells.filter(cell => 
+    typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)
+  );
+  linkedCheckboxNodes.forEach(node => {
+    if (node._linkedCheckboxNodeId) {
+      const nodeId = node._linkedCheckboxNodeId.trim();
+      if (nodeId) {
+        // Get node text for better labeling
+        const nodeText = (node.value || '').replace(/<[^>]*>/g, '').trim() || nodeId;
+        const label = `Linked Checkbox: ${nodeText} (${nodeId})`;
+        addOptionIfNotExists(nodeId, label);
+      }
+    }
+  });
   // If no checkbox options found, add a placeholder
   if (optionsContainer.children.length === 1) { // Only the default option
     const noOptions = document.createElement('div');
@@ -4829,6 +5087,32 @@ function setupLinkedCheckboxOptionsCustomSearch(optionsContainer, hiddenSelect, 
               window.requestAutosave();
             }
           } else {
+            // Check if this is an inverse checkbox node
+            const inverseCheckboxOptionsContainer = optionsContainer.closest('[data-inverse-checkbox-container]') || 
+                                                   document.querySelector('[data-inverse-checkbox-container]');
+            if (inverseCheckboxOptionsContainer && typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+              // Update the inverse checkbox option immediately
+              cell._inverseCheckboxOption = value || '';
+              // Ensure node ID is set
+              if (!cell._inverseCheckboxNodeId) {
+                const nodeIdElement = document.getElementById('propInverseCheckboxNodeId');
+                if (nodeIdElement) {
+                  let nodeIdValue;
+                  if (nodeIdElement.tagName === 'INPUT') {
+                    nodeIdValue = nodeIdElement.value;
+                  } else {
+                    nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
+                  }
+                  cell._inverseCheckboxNodeId = nodeIdValue || 'inverse_checkbox';
+                } else {
+                  cell._inverseCheckboxNodeId = 'inverse_checkbox';
+                }
+              }
+              // Trigger autosave
+              if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+              }
+            }
           }
         } else {
         }

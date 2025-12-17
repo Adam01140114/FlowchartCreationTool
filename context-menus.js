@@ -1460,6 +1460,12 @@ function placeNodeAtClickLocation(graph, nodeType) {
       if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
         window.updateLinkedCheckboxNodeCell(cell);
       }
+    } else if (nodeType === 'inverseCheckbox') {
+      cell._inverseCheckboxNodeId = "inverse_checkbox";
+      cell._inverseCheckboxOption = "";
+      if (typeof window.updateInverseCheckboxNodeCell === 'function') {
+        window.updateInverseCheckboxNodeCell(cell);
+      }
     }
     // Clear the click position
     window.emptySpaceClickX = undefined;
@@ -1509,6 +1515,8 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
         <option value="hiddenCheckbox">Hidden Checkbox Node</option>
         <option value="hiddenTextbox">Hidden Textbox Node</option>
         <option value="linkedLogic">Linked Logic Node</option>
+        <option value="linkedCheckbox">Linked Checkbox Node</option>
+        <option value="inverseCheckbox">Inverse Checkbox Node</option>
       </select>
     </div>`;
     cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, style);

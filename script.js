@@ -4790,6 +4790,13 @@ function autosaveFlowchartToLocalStorage() {
       if (cell.hasOwnProperty('_linkedCheckboxOptions')) {
         cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
       }
+      // Inverse checkbox node properties - always save these if they exist on the cell
+      if (cell.hasOwnProperty('_inverseCheckboxNodeId')) {
+        cellData._inverseCheckboxNodeId = cell._inverseCheckboxNodeId;
+      }
+      if (cell.hasOwnProperty('_inverseCheckboxOption')) {
+        cellData._inverseCheckboxOption = cell._inverseCheckboxOption;
+      }
       // Special handling for hidden textbox nodes - always save _defaultText even if empty
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
         // Always save _defaultText for hidden textbox nodes, even if undefined or empty
@@ -5493,6 +5500,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
             window.updateLinkedCheckboxNodeCell(newCell);
           }
+        } else if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(newCell)) {
+          // Update inverse checkbox node display
+          if (typeof window.updateInverseCheckboxNodeCell === 'function') {
+            window.updateInverseCheckboxNodeCell(newCell);
+          }
         }
       });
       // Then, create all edges
@@ -5619,6 +5631,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update linked checkbox node display
           if (typeof window.updateLinkedCheckboxNodeCell === 'function') {
             window.updateLinkedCheckboxNodeCell(newCell);
+          }
+        } else if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(newCell)) {
+          // Update inverse checkbox node display
+          if (typeof window.updateInverseCheckboxNodeCell === 'function') {
+            window.updateInverseCheckboxNodeCell(newCell);
           }
         }
       });

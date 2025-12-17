@@ -160,7 +160,11 @@ function showFlowchartLoadedNotification() {
  * Exports flowchart JSON without downloading (returns the string)
  */
 window.exportFlowchartJson = function(download = true) {
-  if (!graph) return null;
+  console.log('[EXPORT] ========== EXPORT FLOWCHART JSON STARTED ==========');
+  if (!graph) {
+    console.error('[EXPORT] Graph is null!');
+    return null;
+  }
   // Automatically reset PDF inheritance and Node IDs before export
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
   // Reset PDF inheritance for all nodes FIRST
@@ -173,6 +177,23 @@ window.exportFlowchartJson = function(download = true) {
   }
   const parent = graph.getDefaultParent();
   const cells = graph.getChildCells(parent, true, true);
+  console.log('[EXPORT] Total cells to export:', cells.length);
+  
+  // Log all inverse checkbox nodes before export
+  const inverseCheckboxNodes = cells.filter(cell => 
+    typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)
+  );
+  console.log('[EXPORT] Found', inverseCheckboxNodes.length, 'inverse checkbox nodes');
+  inverseCheckboxNodes.forEach((cell, index) => {
+    console.log(`[EXPORT] Inverse Checkbox Node ${index + 1}:`, {
+      id: cell.id,
+      _inverseCheckboxNodeId: cell._inverseCheckboxNodeId,
+      _inverseCheckboxOption: cell._inverseCheckboxOption,
+      hasInverseCheckboxNodeId: cell._inverseCheckboxNodeId !== undefined,
+      hasInverseCheckboxOption: cell._inverseCheckboxOption !== undefined,
+      isInverseCheckboxNode: typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)
+    });
+  });
   // Use the same serialization logic as the existing export function
   const simplifiedCells = cells.map(cell => {
     const cellData = {
@@ -282,6 +303,26 @@ window.exportFlowchartJson = function(download = true) {
     // Linked checkbox node properties
     if (cell._linkedCheckboxNodeId !== undefined) cellData._linkedCheckboxNodeId = cell._linkedCheckboxNodeId;
     if (cell._linkedCheckboxOptions !== undefined) cellData._linkedCheckboxOptions = cell._linkedCheckboxOptions;
+    // Inverse checkbox node properties - always include for inverse checkbox nodes
+    const isInverseCheckbox = typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell);
+    if (isInverseCheckbox) {
+      console.log(`[EXPORT] Processing inverse checkbox node ${cell.id}:`, {
+        _inverseCheckboxNodeId: cell._inverseCheckboxNodeId,
+        _inverseCheckboxOption: cell._inverseCheckboxOption,
+        nodeIdUndefined: cell._inverseCheckboxNodeId === undefined,
+        optionUndefined: cell._inverseCheckboxOption === undefined
+      });
+      cellData._inverseCheckboxNodeId = cell._inverseCheckboxNodeId !== undefined ? cell._inverseCheckboxNodeId : null;
+      cellData._inverseCheckboxOption = cell._inverseCheckboxOption !== undefined ? cell._inverseCheckboxOption : null;
+      console.log(`[EXPORT] Added to cellData for ${cell.id}:`, {
+        _inverseCheckboxNodeId: cellData._inverseCheckboxNodeId,
+        _inverseCheckboxOption: cellData._inverseCheckboxOption
+      });
+    } else if (cell._inverseCheckboxNodeId !== undefined) {
+      cellData._inverseCheckboxNodeId = cell._inverseCheckboxNodeId;
+    } else if (cell._inverseCheckboxOption !== undefined) {
+      cellData._inverseCheckboxOption = cell._inverseCheckboxOption;
+    }
     // mult dropdown location indicator
     if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
     if (cell._locationTitle !== undefined) cellData._locationTitle = cell._locationTitle;
