@@ -4734,6 +4734,7 @@ function autosaveFlowchartToLocalStorage() {
       }
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+      if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
@@ -5070,6 +5071,10 @@ function setupAutosaveHooks() {
     // - 3000ms: Our automatic reset (after all internal processes complete)
     // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
     setTimeout(() => {
+      // Apply PDF name setting to all node IDs after loading
+      if (typeof window.updateAllNodeIdsForPdfNameSetting === 'function') {
+        window.updateAllNodeIdsForPdfNameSetting();
+      }
       // Reset PDF inheritance for all nodes FIRST
       if (typeof window.resetAllPdfInheritance === 'function') {
         window.resetAllPdfInheritance();
@@ -5454,7 +5459,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.vertex = true;
         newCell.id = nodeData.newId;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         // Section
@@ -5584,7 +5589,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section

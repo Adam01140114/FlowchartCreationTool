@@ -295,8 +295,10 @@ window.exportGuiJson = function(download = true) {
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+      // Check if PDF name should be added to node ID based on user setting
+      const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
       // Process PDF name to remove .pdf extension and clean up formatting
-      const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
+      const sanitizedPdfName = (pdfName && shouldAddPdfName) ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
       // Create nodeId with PDF prefix if available
@@ -354,6 +356,29 @@ window.exportGuiJson = function(download = true) {
                   if (baseNodeId) {
                     // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
                     baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                  }
+                  // Check if PDF name should be added to node ID based on user setting
+                  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+                  // If setting is OFF, remove PDF prefix from baseNodeId if present
+                  if (!shouldAddPdfName && baseNodeId) {
+                    // Get PDF name for the cell to check if it matches the prefix
+                    const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+                    if (pdfName && typeof window.sanitizePdfName === 'function') {
+                      const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                      // Remove PDF prefix if present
+                      if (sanitizedPdfName && baseNodeId.startsWith(sanitizedPdfName + '_')) {
+                        baseNodeId = baseNodeId.substring(sanitizedPdfName.length + 1);
+                      }
+                    }
+                    // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
+                    const pdfPrefixMatch = baseNodeId.match(/^[a-z0-9]+_(.+)$/);
+                    if (pdfPrefixMatch) {
+                      const prefix = baseNodeId.substring(0, baseNodeId.indexOf('_'));
+                      // Only remove if the prefix looks like a PDF name (short alphanumeric)
+                      if (prefix.match(/^[a-z0-9]{1,20}$/)) {
+                        baseNodeId = pdfPrefixMatch[1];
+                      }
+                    }
                   }
                   return {
                     nodeId: baseNodeId,
@@ -451,11 +476,15 @@ window.exportGuiJson = function(download = true) {
                             nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
                           }
                         }
-                        fields.push({
+                        const labelField = {
                           type: "label",
                           label: label.fieldName || "",
                           nodeId: nodeId
-                        });
+                        };
+                        if (label.isAmountOption) {
+                          labelField.isAmountOption = true;
+                        }
+                        fields.push(labelField);
                       }
                     } else if (orderItem.type === 'checkbox') {
                       const checkbox = checkboxMap.get(orderItem.identifier);
@@ -610,11 +639,15 @@ window.exportGuiJson = function(download = true) {
                               nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
                             }
                           }
-                          fields.push({
+                          const labelField = {
                             type: "label",
                             label: label.fieldName || "",
                             nodeId: nodeId
-                          });
+                          };
+                          if (label.isAmountOption) {
+                            labelField.isAmountOption = true;
+                          }
+                          fields.push(labelField);
                         }
                       }
                     });
@@ -701,18 +734,16 @@ window.exportGuiJson = function(download = true) {
                   }
                   if (trigger.pdfs && trigger.pdfs.length > 0) {
                     trigger.pdfs.forEach(pdf => {
-                      const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
-                      if (!pdfMap.has(identifier)) {
-                        const existingField = fields.find(f => f.type === 'pdf' && f.number === pdf.triggerNumber);
-                        if (!existingField) {
-                          fields.push({
-                            type: "pdf",
-                            number: pdf.triggerNumber || "",
-                            pdfTitle: pdf.pdfTitle || "",
-                            pdfName: pdf.pdfFilename || "",
-                            priceId: pdf.pdfPriceId || ""
-                          });
-                        }
+                      // Check if this PDF was already added (by _actionOrder processing)
+                      const existingField = fields.find(f => f.type === 'pdf' && f.number === pdf.triggerNumber);
+                      if (!existingField) {
+                        fields.push({
+                          type: "pdf",
+                          number: pdf.triggerNumber || "",
+                          pdfTitle: pdf.pdfTitle || "",
+                          pdfName: pdf.pdfFilename || "",
+                          priceId: pdf.pdfPriceId || ""
+                        });
                       }
                     });
                   }
@@ -721,11 +752,15 @@ window.exportGuiJson = function(download = true) {
                   // Add labels
                   if (trigger.labels && trigger.labels.length > 0) {
                     trigger.labels.forEach(label => {
-                      fields.push({
+                      const labelField = {
                         type: "label",
                         label: label.fieldName || "",
                         nodeId: label.nodeId || ""
-                      });
+                      };
+                      if (label.isAmountOption) {
+                        labelField.isAmountOption = true;
+                      }
+                      fields.push(labelField);
                     });
                   }
                   // Add checkboxes
@@ -813,6 +848,7 @@ window.exportGuiJson = function(download = true) {
                 const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
                 triggerSequences.push({
                   condition: conditionText,
+                  title: "Additional Information",
                   fields: fields
                 });
               });
@@ -836,7 +872,11 @@ window.exportGuiJson = function(download = true) {
         if (cell._textboxes && cell._textboxes.length > 0) {
           cell._textboxes.forEach((tb, index) => {
             const labelName = tb.nameId || "";
-            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+            // Check if PDF name should be added to node ID based on user setting
+            const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+            const effectiveSanitizedPdfName = shouldAddPdfName ? sanitizedPdfName : '';
+            const effectiveNodeId = effectiveSanitizedPdfName ? `${effectiveSanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
+            const fieldNodeId = effectiveSanitizedPdfName ? `${effectiveNodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
             // Check if this textbox is marked as an amount option or phone
             const fieldType = tb.type === 'phone'
               ? 'phone'
@@ -889,6 +929,29 @@ window.exportGuiJson = function(download = true) {
                   if (baseNodeId) {
                     // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
                     baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                  }
+                  // Check if PDF name should be added to node ID based on user setting
+                  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+                  // If setting is OFF, remove PDF prefix from baseNodeId if present
+                  if (!shouldAddPdfName && baseNodeId) {
+                    // Get PDF name for the cell to check if it matches the prefix
+                    const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+                    if (pdfName && typeof window.sanitizePdfName === 'function') {
+                      const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                      // Remove PDF prefix if present
+                      if (sanitizedPdfName && baseNodeId.startsWith(sanitizedPdfName + '_')) {
+                        baseNodeId = baseNodeId.substring(sanitizedPdfName.length + 1);
+                      }
+                    }
+                    // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
+                    const pdfPrefixMatch = baseNodeId.match(/^[a-z0-9]+_(.+)$/);
+                    if (pdfPrefixMatch) {
+                      const prefix = baseNodeId.substring(0, baseNodeId.indexOf('_'));
+                      // Only remove if the prefix looks like a PDF name (short alphanumeric)
+                      if (prefix.match(/^[a-z0-9]{1,20}$/)) {
+                        baseNodeId = pdfPrefixMatch[1];
+                      }
+                    }
                   }
                   return {
                     nodeId: baseNodeId,
@@ -1282,8 +1345,10 @@ window.exportGuiJson = function(download = true) {
       question.type = "numberedDropdown";
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+      // Check if PDF name should be added to node ID based on user setting
+      const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
       // Process PDF name to remove .pdf extension and clean up formatting
-      const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
+      const sanitizedPdfName = (pdfName && shouldAddPdfName) ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
       // Create nodeId with PDF prefix if available
@@ -1344,6 +1409,29 @@ window.exportGuiJson = function(download = true) {
                   if (baseNodeId) {
                     // Remove trailing _${number} pattern (e.g., "_1", "_2", "_3")
                     baseNodeId = baseNodeId.replace(/_\d+$/, '');
+                  }
+                  // Check if PDF name should be added to node ID based on user setting
+                  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+                  // If setting is OFF, remove PDF prefix from baseNodeId if present
+                  if (!shouldAddPdfName && baseNodeId) {
+                    // Get PDF name for the cell to check if it matches the prefix
+                    const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+                    if (pdfName && typeof window.sanitizePdfName === 'function') {
+                      const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                      // Remove PDF prefix if present
+                      if (sanitizedPdfName && baseNodeId.startsWith(sanitizedPdfName + '_')) {
+                        baseNodeId = baseNodeId.substring(sanitizedPdfName.length + 1);
+                      }
+                    }
+                    // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
+                    const pdfPrefixMatch = baseNodeId.match(/^[a-z0-9]+_(.+)$/);
+                    if (pdfPrefixMatch) {
+                      const prefix = baseNodeId.substring(0, baseNodeId.indexOf('_'));
+                      // Only remove if the prefix looks like a PDF name (short alphanumeric)
+                      if (prefix.match(/^[a-z0-9]{1,20}$/)) {
+                        baseNodeId = pdfPrefixMatch[1];
+                      }
+                    }
                   }
                   return {
                     nodeId: baseNodeId,
@@ -1441,11 +1529,15 @@ window.exportGuiJson = function(download = true) {
                               nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
                             }
                           }
-                          fields.push({
+                          const labelField = {
                             type: "label",
                             label: label.fieldName || "",
                             nodeId: nodeId
-                          });
+                          };
+                          if (label.isAmountOption) {
+                            labelField.isAmountOption = true;
+                          }
+                          fields.push(labelField);
                         }
                       } else if (orderItem.type === 'checkbox') {
                         const checkbox = checkboxMap.get(orderItem.identifier);
@@ -1590,11 +1682,15 @@ window.exportGuiJson = function(download = true) {
                                 nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
                               }
                             }
-                            fields.push({
+                            const labelField = {
                               type: "label",
                               label: label.fieldName || "",
                               nodeId: nodeId
-                            });
+                            };
+                            if (label.isAmountOption) {
+                              labelField.isAmountOption = true;
+                            }
+                            fields.push(labelField);
                           }
                         }
                       });
@@ -1680,18 +1776,16 @@ window.exportGuiJson = function(download = true) {
                     }
                     if (trigger.pdfs && trigger.pdfs.length > 0) {
                       trigger.pdfs.forEach(pdf => {
-                        const identifier = pdf.triggerNumber || pdf.pdfTitle || pdf.pdfFilename || 'pdf';
-                        if (!pdfMap.has(identifier)) {
-                          const existingField = fields.find(f => f.type === 'pdf' && f.number === pdf.triggerNumber);
-                          if (!existingField) {
-                            fields.push({
-                              type: "pdf",
-                              number: pdf.triggerNumber || "",
-                              pdfTitle: pdf.pdfTitle || "",
-                              pdfName: pdf.pdfFilename || "",
-                              priceId: pdf.pdfPriceId || ""
-                            });
-                          }
+                        // Check if this PDF was already added (by _actionOrder processing)
+                        const existingField = fields.find(f => f.type === 'pdf' && f.number === pdf.triggerNumber);
+                        if (!existingField) {
+                          fields.push({
+                            type: "pdf",
+                            number: pdf.triggerNumber || "",
+                            pdfTitle: pdf.pdfTitle || "",
+                            pdfName: pdf.pdfFilename || "",
+                            priceId: pdf.pdfPriceId || ""
+                          });
                         }
                       });
                     }
@@ -1700,11 +1794,15 @@ window.exportGuiJson = function(download = true) {
                     // Add labels
                     if (trigger.labels && trigger.labels.length > 0) {
                       trigger.labels.forEach(label => {
-                        fields.push({
+                        const labelField = {
                           type: "label",
                           label: label.fieldName || "",
                           nodeId: label.nodeId || ""
-                        });
+                        };
+                        if (label.isAmountOption) {
+                          labelField.isAmountOption = true;
+                        }
+                        fields.push(labelField);
                       });
                     }
                     // Add checkboxes
@@ -1792,6 +1890,7 @@ window.exportGuiJson = function(download = true) {
                   const conditionText = matchingOption ? matchingOption.text : trigger.triggerOption || "";
                   triggerSequences.push({
                     condition: conditionText,
+                    title: "Additional Information",
                     fields: fields
                   });
                 });
@@ -1833,11 +1932,15 @@ window.exportGuiJson = function(download = true) {
           );
           const shouldIncludeLocationFields = (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
           if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
+            // Check if PDF name should be added to node ID based on user setting (for location fields)
+            const shouldAddPdfNameForLocation = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+            const effectiveSanitizedPdfName = shouldAddPdfNameForLocation ? sanitizedPdfName : '';
+            const effectiveNodeId = effectiveSanitizedPdfName ? `${effectiveSanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
             const locationFields = [
-              { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
-              { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
-              { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
-              { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+              { label: "Street", nodeId: effectiveSanitizedPdfName ? `${effectiveNodeId}_street` : `${baseQuestionName}_street` },
+              { label: "City", nodeId: effectiveSanitizedPdfName ? `${effectiveNodeId}_city` : `${baseQuestionName}_city` },
+              { label: "State", nodeId: effectiveSanitizedPdfName ? `${effectiveNodeId}_state` : `${baseQuestionName}_state` },
+              { label: "Zip", nodeId: effectiveSanitizedPdfName ? `${effectiveNodeId}_zip` : `${baseQuestionName}_zip` }
             ];
             locationFields.forEach((field, fieldIndex) => {
               allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
@@ -1889,16 +1992,13 @@ window.exportGuiJson = function(download = true) {
         }
         // Add nodeId for numberedDropdown (with PDF prefix if available)
         question.nodeId = nodeId;
+        // Add entryTitle if _dropdownTitle is set
+        if (cell._dropdownTitle) {
+          question.entryTitle = cell._dropdownTitle;
+        }
         // Set the allFieldsInOrder array
         question.allFieldsInOrder = allFieldsInOrder;
-        // Keep empty arrays for backward compatibility
-        question.labels = [];
-        question.amounts = [];
-        question.labelNodeIds = [];
       } else {
-        question.labels = [];
-        question.amounts = [];
-        question.labelNodeIds = [];
       // Extract min and max from _twoNumbers
       if (cell._twoNumbers) {
         question.min = cell._twoNumbers.first || "1";
@@ -1909,6 +2009,10 @@ window.exportGuiJson = function(download = true) {
       }
       // Add nodeId for numberedDropdown (with PDF prefix if available)
       question.nodeId = nodeId;
+      // Add entryTitle if _dropdownTitle is set
+      if (cell._dropdownTitle) {
+        question.entryTitle = cell._dropdownTitle;
+      }
         question.allFieldsInOrder = [];
       }
       // Clear options array for numberedDropdown
@@ -2514,6 +2618,7 @@ window.exportBothJson = function() {
       }
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+      if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
@@ -2745,7 +2850,7 @@ window.saveFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _nameId: cell._nameId||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -2885,7 +2990,7 @@ window.saveAsFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _nameId: cell._nameId||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -3864,6 +3969,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           newCell._questionText = questionText;
         }
         if (item._twoNumbers) newCell._twoNumbers = item._twoNumbers;
+        if (item._dropdownTitle) newCell._dropdownTitle = item._dropdownTitle;
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;
         if (item._questionId) newCell._questionId = item._questionId;

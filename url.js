@@ -229,6 +229,7 @@ window.exportFlowchartJson = function(download = true) {
     }
     if (cell._questionText) cellData._questionText = cell._questionText;
     if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+    if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
     if (cell._nameId) cellData._nameId = cell._nameId;
     if (cell._placeholder) cellData._placeholder = cell._placeholder;
     if (cell._questionId) cellData._questionId = cell._questionId;

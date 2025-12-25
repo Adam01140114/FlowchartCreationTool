@@ -545,6 +545,8 @@ function addQuestion(sectionId, questionId = null) {
             <label>Number Range: </label>
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
             <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
+            <label>Entry Title: </label>
+            <input type="text" id="entryTitle${currentQuestionId}" placeholder="e.g., Please enter car info" style="width: 250px;"><br><br>
             <div style="text-align: center; margin: 15px 0;">
                 <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
                 <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
@@ -3023,6 +3025,12 @@ function addTriggerLabel(questionId, fieldCount, sequenceCount) {
             </div>
             <div id="${conditionalLogicContainerId}" style="margin-top: 8px; display: none;">
                 <!-- Conditional logic UI will be populated here -->
+            </div>
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label for="triggerLabelAmount${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Amount (numbers only)</label>
+            <div style="display: flex; justify-content: center;">
+                <input type="checkbox" id="triggerLabelAmount${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="cursor: pointer;">
             </div>
         </div>
         <div style="text-align: center; margin-top: 8px;">

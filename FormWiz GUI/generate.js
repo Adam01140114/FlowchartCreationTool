@@ -64,9 +64,20 @@ window.formatPhoneInput = function(inputEl) {
 };
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] dropdown:', dropdown);
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] hiddenFullId:', hiddenFullId);
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] hiddenShortId:', hiddenShortId);
+    
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] selectedState:', selectedState);
+    
     const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
     const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
+    
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] fullField:', fullField);
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] shortField:', shortField);
+    
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -80,8 +91,23 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
-    if (shortField) shortField.value = abbreviation;
-    if (fullField && fullField.tagName !== 'SELECT') fullField.value = selectedState;
+    console.log('[STATE_SHORT_DEBUG - BUILD TIME] abbreviation:', abbreviation);
+    
+    if (shortField) {
+        shortField.value = abbreviation;
+        console.log('[STATE_SHORT_DEBUG - BUILD TIME] Set shortField.value to:', shortField.value);
+    } else {
+        console.error('[STATE_SHORT_DEBUG - BUILD TIME] shortField NOT FOUND!');
+    }
+    
+    if (fullField && fullField.tagName !== 'SELECT') {
+        fullField.value = selectedState;
+        console.log('[STATE_SHORT_DEBUG - BUILD TIME] Set fullField.value to:', fullField.value);
+    } else if (!fullField) {
+        console.error('[STATE_SHORT_DEBUG - BUILD TIME] fullField NOT FOUND!');
+    } else {
+        console.log('[STATE_SHORT_DEBUG - BUILD TIME] fullField is a SELECT, skipping value set');
+    }
 }
 /* slug‑aware prefix for any checkbox belonging to a question */
 function getCbPrefix (qId){
@@ -269,6 +295,28 @@ function updateAllHiddenAddressFields() {
 }
 function getFormHTML() {
 	try {
+	// Get county lookup data from global variables (loaded via script tags in gui.html)
+	let zipCodeToCountyData = '{}';
+	let countyToCourtData = '{}';
+	
+	// Check if the data is available as global variables (loaded from script tags)
+	// In browser, const variables from script tags are in global scope
+	try {
+		if (typeof zipCodeToCounty !== 'undefined') {
+			zipCodeToCountyData = JSON.stringify(zipCodeToCounty);
+		}
+	} catch (e) {
+		console.warn('zipCodeToCounty not available:', e.message);
+	}
+	
+	try {
+		if (typeof countyToCourt !== 'undefined') {
+			countyToCourtData = JSON.stringify(countyToCourt);
+		}
+	} catch (e) {
+		console.warn('countyToCourt not available:', e.message);
+	}
+	
 	// Define replaceUrlParametersInText for use during HTML generation
 	// During generation, we don't have URL parameters, so just return the text as-is
 	// The actual URL parameter processing will happen in the browser when the HTML loads
@@ -316,10 +364,10 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '    <link rel="stylesheet" href="generate2.css">',
     '    <style>',
     '        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }',
-    '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 567px; width: 100%; }',
+    '        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }',
     '        .question-container .question-text { margin-top: 0; }',
     '        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }',
-    '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 567px; }',
+    '        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }',
     '        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }',
     '        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }',
     '        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }',
@@ -592,6 +640,8 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '        <input type="hidden" id="form_defendant" name="form_defendant" value="">',
     '        <input type="hidden" id="form_ID" name="form_ID" value="">',
     '        <input type="hidden" id="current_date" name="current_date" value="">',
+    '        <input type="hidden" id="court_name" name="court_name" value="">',
+    '        <input type="hidden" id="court_address" name="court_address" value="">',
   ].join("\n");
   // Get all PDF names
   const pdfFormNameInputEl = document.getElementById("formPDFName");
@@ -1491,11 +1541,18 @@ formHTML += `</div><br></div>`;
                           });
                         } else if (labelTextEl && labelNodeIdEl) {
                           // Trigger label field
-                          triggerFields.push({
+                          const triggerFieldCountForLabel = fieldIndex + 1;
+                          const labelField = {
                             type: 'label',
                             label: labelTextEl.value.trim(),
                             nodeId: labelNodeIdEl.value.trim()
-                          });
+                          };
+                          // Check for amount checkbox
+                          const amountCheckboxEl = document.getElementById(`triggerLabelAmount${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCountForLabel}`);
+                          if (amountCheckboxEl && amountCheckboxEl.checked) {
+                            labelField.isAmountOption = true;
+                          }
+                          triggerFields.push(labelField);
                         } else if (checkboxFieldNameEl) {
                           // Trigger checkbox field
                           const checkboxOptions = [];
@@ -1705,7 +1762,7 @@ formHTML += `</div><br></div>`;
             // Create entry container div
             const entryContainer = document.createElement('div');
             entryContainer.className = 'entry-container';
-            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+            entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box;';
             // Process all fields in creation order
             for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
               const field = allFieldsInOrder[fieldIndex];
@@ -1736,6 +1793,58 @@ formHTML += `</div><br></div>`;
                 const locationFieldName = sanitizeQuestionText(field.fieldName || 'location');
                 const sanitizedLocationName = locationFieldName.replace(/ +/g, '_').toLowerCase();
                 let locPrefix = questionNodeId + '_' + sanitizedLocationName;
+                
+                // Create hidden full_address field (stores complete address like "921 Sloat Road, Salinas, CA 93907")
+                const fullAddressHidden = document.createElement('input');
+                fullAddressHidden.type = 'text';
+                fullAddressHidden.id = locPrefix + '_full_address';
+                fullAddressHidden.name = fullAddressHidden.id;
+                fullAddressHidden.style.display = 'none';
+                const fullAddressId = fullAddressHidden.id;
+                
+                // Define field IDs for the update function
+                const streetFieldId = locPrefix + '_street';
+                const cityFieldId = locPrefix + '_city';
+                const stateShortFieldId = locPrefix + '_state_short';
+                const zipFieldId = locPrefix + '_zip';
+                
+                // Helper function code to update full address (will be inlined in oninput/onchange)
+                const updateFullAddressCode = `
+                    (function() {
+                        var streetEl = document.getElementById('${streetFieldId}');
+                        var cityEl = document.getElementById('${cityFieldId}');
+                        var stateShortEl = document.getElementById('${stateShortFieldId}');
+                        var zipEl = document.getElementById('${zipFieldId}');
+                        var fullAddressEl = document.getElementById('${fullAddressId}');
+                        if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG] fullAddressEl not found:', '${fullAddressId}'); return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+                        console.log('[FULL_ADDRESS_DEBUG] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip);
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city && stateShort && zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city && stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city && zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort && zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+                        console.log('[FULL_ADDRESS_DEBUG] Full address set to:', fullAddress);
+                    })();
+                `;
+                
                 locs.forEach(f=>{
                     let input;
                     if (f.label === 'State'){
@@ -1745,29 +1854,62 @@ formHTML += `</div><br></div>`;
                         input.name = input.id;
                         input.className = 'address-select-trigger';
                         input.style.cssText = 'width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: 0.2s;';
-                        // Create hidden short code field for state abbreviation
+                        
+                        // Create hidden full state field (stores full state name like "California")
+                        const fullHidden = document.createElement('input');
+                        fullHidden.type = 'text';
+                        fullHidden.id = locPrefix + '_state_hidden';
+                        fullHidden.name = fullHidden.id;
+                        fullHidden.style.display = 'none';
+                        
+                        // Create hidden short code field for state abbreviation (stores "CA")
                         const shortHidden = document.createElement('input');
                         shortHidden.type = 'text';
                         // For multipleTextboxes, don't add entry number suffix (j is always 1)
                         shortHidden.id = locPrefix + '_state_short';
                         shortHidden.name = shortHidden.id;
                         shortHidden.style.display = 'none';
+                        
                         const defaultOption = document.createElement('option');
                         defaultOption.value = '';
                         defaultOption.textContent = 'Select State';
                         input.appendChild(defaultOption);
                         const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
                         states.forEach(state=>{ const o=document.createElement('option'); o.value=state; o.textContent=state; input.appendChild(o); });
-                        // Keep short field and hidden checkbox in sync with selection
-                        input.addEventListener('change', function(){
+                        
+                        // CRITICAL FIX: Use inline onchange attribute instead of addEventListener
+                        // addEventListener does NOT persist when DOM is serialized to HTML via outerHTML
+                        // The inline onchange will be included in the HTML output
+                        const fullHiddenId = fullHidden.id;
+                        const shortHiddenId = shortHidden.id;
+                        const selectId = input.id;
+                        input.setAttribute('onchange', `
+                            console.log('[STATE_SHORT_DEBUG] State dropdown changed!');
+                            console.log('[STATE_SHORT_DEBUG] Dropdown ID:', '${selectId}');
+                            console.log('[STATE_SHORT_DEBUG] Selected value:', this.value);
+                            console.log('[STATE_SHORT_DEBUG] Full hidden field ID:', '${fullHiddenId}');
+                            console.log('[STATE_SHORT_DEBUG] Short hidden field ID:', '${shortHiddenId}');
+                            var fullField = document.getElementById('${fullHiddenId}');
+                            var shortField = document.getElementById('${shortHiddenId}');
+                            console.log('[STATE_SHORT_DEBUG] Full field found:', !!fullField, fullField);
+                            console.log('[STATE_SHORT_DEBUG] Short field found:', !!shortField, shortField);
                             if (typeof updateStateHiddenFields === 'function') {
-                                updateStateHiddenFields(this, input.id, shortHidden.id);
+                                console.log('[STATE_SHORT_DEBUG] Calling updateStateHiddenFields...');
+                                updateStateHiddenFields(this, '${fullHiddenId}', '${shortHiddenId}');
+                                console.log('[STATE_SHORT_DEBUG] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');
+                                console.log('[STATE_SHORT_DEBUG] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');
+                            } else {
+                                console.error('[STATE_SHORT_DEBUG] updateStateHiddenFields function NOT FOUND!');
                             }
                             if (typeof dropdownMirror === 'function') {
-                                dropdownMirror(this, input.id);
+                                dropdownMirror(this, '${selectId}');
                             }
-                        });
+                            // Update full address after state change (with small delay to ensure state_short is updated)
+                            setTimeout(function() { ${updateFullAddressCode} }, 50);
+                        `);
+                        
                         locationFieldDiv.appendChild(input);
+                        locationFieldDiv.appendChild(fullHidden);
                         locationFieldDiv.appendChild(shortHidden);
                     } else {
                         input = document.createElement('input');
@@ -1777,9 +1919,13 @@ formHTML += `</div><br></div>`;
                         input.name = input.id;
                         input.placeholder = f.label;
                         input.style.cssText = 'width: 170px; padding: 10px; margin: 2px 0; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: all 0.2s ease; text-align: center;';
+                        // Add oninput handler to update full address when street, city, or zip changes
+                        input.setAttribute('oninput', updateFullAddressCode);
                         locationFieldDiv.appendChild(input);
                     }
                 });
+                // Add the full_address hidden field to the location div
+                locationFieldDiv.appendChild(fullAddressHidden);
                 entryContainer.appendChild(locationFieldDiv);
                 lastWasLocation = true;
               } else if (field.type === 'label') {
@@ -2488,9 +2634,16 @@ formHTML += `</div><br></div>`;
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
         const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
         const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
+        const entryTitleEl = qBlock.querySelector("#entryTitle" + questionId);
         const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
         const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
         const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
+        const entryTitle = entryTitleEl ? entryTitleEl.value.trim() : "";
+        // Store entry title in the map for use in showTextboxLabels
+        window.entryTitleMap = window.entryTitleMap || {};
+        if (entryTitle) {
+          window.entryTitleMap[questionId] = entryTitle;
+        }
         // gather unified field data from the new unified container
         const unifiedFields = qBlock.querySelectorAll("#unifiedFields" + questionId + " .unified-field");
         const labelVals = [];
@@ -2644,8 +2797,13 @@ formHTML += `</div><br></div>`;
                           label: labelTextEl.value.trim(),
                           nodeId: labelNodeIdEl.value.trim()
                         };
-                        // Check for conditional logic from window.triggerLabelConditionalLogic
+                        // Check for amount checkbox
                         const triggerFieldCount = fieldIndex + 1;
+                        const amountCheckboxEl = document.getElementById(`triggerLabelAmount${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                        if (amountCheckboxEl && amountCheckboxEl.checked) {
+                          labelField.isAmountOption = true;
+                        }
+                        // Check for conditional logic from window.triggerLabelConditionalLogic
                         const conditionalLogicKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
                         if (window.triggerLabelConditionalLogic && window.triggerLabelConditionalLogic[conditionalLogicKey]) {
                           const storedLogic = window.triggerLabelConditionalLogic[conditionalLogicKey];
@@ -4091,6 +4249,7 @@ if (s > 1){
   formHTML += `var inverseCheckboxes = ${JSON.stringify(inverseCheckboxes || [])};\n`;
   formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
+  formHTML += `var entryTitleMap = ${JSON.stringify(window.entryTitleMap || {})};\n`;
   formHTML += `
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -4584,7 +4743,8 @@ if (s > 1){
         label.textContent = triggerField.label + ":";
         label.style.cssText = 'display: block; margin-bottom: 8px; font-weight: bold; color: #2980b9; font-size: 15px; text-align: center;';
         const input = document.createElement('input');
-        input.type = 'text';
+        // Use number type if isAmountOption is true, otherwise text
+        input.type = triggerField.isAmountOption ? 'number' : 'text';
         // For multipleTextboxes: use nodeId directly from JSON (e.g., "hello_yes_name")
         // For numberedDropdown: {fieldName}_{entryNumber}
         if (isMultipleTextboxes) {
@@ -5472,6 +5632,52 @@ if (s > 1){
         // For multipleTextboxes: {dropdownName}_{locationFieldName} (no entry number, no trigger condition)
         // For numberedDropdown: {dropdownName}_{locationFieldName} (entry number added per field)
         const locPrefix = sanitizedDropdownNameForLocation + '_' + sanitizedLocationName;
+        
+        // Create hidden full_address field (stores complete address like "921 Sloat Road, Salinas, CA 93907")
+        const fullAddressHidden = document.createElement('input');
+        fullAddressHidden.type = 'text';
+        if (isMultipleTextboxes) {
+          fullAddressHidden.id = locPrefix + '_full_address';
+        } else {
+          fullAddressHidden.id = locPrefix + '_full_address_' + entryNumber;
+        }
+        fullAddressHidden.name = fullAddressHidden.id;
+        fullAddressHidden.style.display = 'none';
+        const fullAddressId = fullAddressHidden.id;
+        
+        // Define field IDs for the update function (varies based on multipleTextboxes or numberedDropdown)
+        const triggerStreetFieldId = isMultipleTextboxes ? locPrefix + '_street' : locPrefix + '_street_' + entryNumber;
+        const triggerCityFieldId = isMultipleTextboxes ? locPrefix + '_city' : locPrefix + '_city_' + entryNumber;
+        const triggerStateShortFieldId = isMultipleTextboxes ? locPrefix + '_state_short' : locPrefix + '_state_short_' + entryNumber;
+        const triggerZipFieldId = isMultipleTextboxes ? locPrefix + '_zip' : locPrefix + '_zip_' + entryNumber;
+        
+        // Helper function code to update full address (using escaped backticks since we're inside formHTML template literal)
+        const triggerUpdateFullAddressCode = "(function() { " +
+            "var streetEl = document.getElementById('" + triggerStreetFieldId + "'); " +
+            "var cityEl = document.getElementById('" + triggerCityFieldId + "'); " +
+            "var stateShortEl = document.getElementById('" + triggerStateShortFieldId + "'); " +
+            "var zipEl = document.getElementById('" + triggerZipFieldId + "'); " +
+            "var fullAddressEl = document.getElementById('" + fullAddressId + "'); " +
+            "if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG - TRIGGER] fullAddressEl not found:', '" + fullAddressId + "'); return; } " +
+            "var street = streetEl ? streetEl.value.trim() : ''; " +
+            "var city = cityEl ? cityEl.value.trim() : ''; " +
+            "var stateShort = stateShortEl ? stateShortEl.value.trim() : ''; " +
+            "var zip = zipEl ? zipEl.value.trim() : ''; " +
+            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip); " +
+            "var parts = []; " +
+            "if (street) parts.push(street); " +
+            "if (city && stateShort && zip) { parts.push(city + ', ' + stateShort + ' ' + zip); } " +
+            "else if (city && stateShort) { parts.push(city + ', ' + stateShort); } " +
+            "else if (city && zip) { parts.push(city + ' ' + zip); } " +
+            "else if (city) { parts.push(city); } " +
+            "else if (stateShort && zip) { parts.push(stateShort + ' ' + zip); } " +
+            "else if (stateShort) { parts.push(stateShort); } " +
+            "else if (zip) { parts.push(zip); } " +
+            "var fullAddress = parts.join(', '); " +
+            "fullAddressEl.value = fullAddress; " +
+            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Full address set to:', fullAddress); " +
+            "})();";
+        
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
@@ -5486,7 +5692,19 @@ if (s > 1){
             }
             input.name = input.id;
             input.className = 'address-select-main';
-            // Hidden short code field
+            
+            // Create hidden full state field (stores full state name like "California")
+            const fullHidden = document.createElement('input');
+            fullHidden.type = 'text';
+            if (isMultipleTextboxes) {
+              fullHidden.id = locPrefix + '_state_hidden';
+            } else {
+              fullHidden.id = locPrefix + '_state_hidden_' + entryNumber;
+            }
+            fullHidden.name = fullHidden.id;
+            fullHidden.style.display = 'none';
+            
+            // Hidden short code field (stores "CA")
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';
             if (isMultipleTextboxes) {
@@ -5496,6 +5714,7 @@ if (s > 1){
             }
             shortHidden.name = shortHidden.id;
             shortHidden.style.display = 'none';
+            
             // Add state options
             const states = [
               'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
@@ -5516,21 +5735,44 @@ if (s > 1){
               option.textContent = state;
               input.appendChild(option);
             });
-            // Sync abbreviation and hidden checkbox on change
-            input.addEventListener('change', function(){
-              if (typeof updateStateHiddenFields === 'function') {
-                updateStateHiddenFields(this, input.id, shortHidden.id);
-              }
-              if (typeof dropdownMirror === 'function') {
-                dropdownMirror(this, input.id);
-              }
-              if (typeof updateHiddenLogic === 'function') {
-                updateHiddenLogic(input.id, this.value);
-              }
-            });
-            // Append hidden short field
+            
+            // CRITICAL FIX: Use inline onchange attribute instead of addEventListener
+            // addEventListener does NOT persist when DOM is serialized to HTML via outerHTML
+            const fullHiddenId = fullHidden.id;
+            const shortHiddenId = shortHidden.id;
+            const selectId = input.id;
+            // Build onchange handler using string concatenation to avoid nested template literal issues
+            input.setAttribute('onchange', 
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] State dropdown changed!');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Dropdown ID:', '" + selectId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Selected value:', this.value);" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full hidden field ID:', '" + fullHiddenId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short hidden field ID:', '" + shortHiddenId + "');" +
+              "var fullField = document.getElementById('" + fullHiddenId + "');" +
+              "var shortField = document.getElementById('" + shortHiddenId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full field found:', !!fullField, fullField);" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short field found:', !!shortField, shortField);" +
+              "if (typeof updateStateHiddenFields === 'function') {" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] Calling updateStateHiddenFields...');" +
+              "  updateStateHiddenFields(this, '" + fullHiddenId + "', '" + shortHiddenId + "');" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');" +
+              "} else {" +
+              "  console.error('[STATE_SHORT_DEBUG - TRIGGER] updateStateHiddenFields function NOT FOUND!');" +
+              "}" +
+              "if (typeof dropdownMirror === 'function') {" +
+              "  dropdownMirror(this, '" + selectId + "');" +
+              "}" +
+              "if (typeof updateHiddenLogic === 'function') {" +
+              "  updateHiddenLogic('" + selectId + "', this.value);" +
+              "}" +
+              "setTimeout(function() { " + triggerUpdateFullAddressCode + " }, 50);"
+            );
+            
+            // Append hidden fields
             const hiddenWrap = document.createElement('div');
             hiddenWrap.style.display = 'none';
+            hiddenWrap.appendChild(fullHidden);
             hiddenWrap.appendChild(shortHidden);
             locationFieldDiv.appendChild(hiddenWrap);
           } else {
@@ -5548,6 +5790,8 @@ if (s > 1){
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
             input.style.textAlign = 'center'; // Ensure text is centered
+            // Add oninput handler to update full address when street, city, or zip changes
+            input.setAttribute('oninput', triggerUpdateFullAddressCode);
           }
           // Wrap each input in an .address-field div so margins apply
           const addrWrap = document.createElement('div');
@@ -5555,6 +5799,11 @@ if (s > 1){
           addrWrap.appendChild(input);
           locationFieldDiv.appendChild(addrWrap);
         });
+        // Add the full_address hidden field to the location div
+        const fullAddressWrap = document.createElement('div');
+        fullAddressWrap.style.display = 'none';
+        fullAddressWrap.appendChild(fullAddressHidden);
+        locationFieldDiv.appendChild(fullAddressWrap);
         triggerContainer.appendChild(locationFieldDiv);
       } else if (triggerField.type === 'pdf') {
         // PDF fields are handled separately by PDF logic evaluation
@@ -5669,10 +5918,34 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   };
   // Keep these helpers global too (they may be called by onchange/autofill)
   window.updateStateHiddenFields = function(selectEl, fullId, shortId) {
+    console.log('[STATE_SHORT_DEBUG] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG] selectEl:', selectEl);
+    console.log('[STATE_SHORT_DEBUG] selectEl.value:', selectEl ? selectEl.value : 'N/A');
+    console.log('[STATE_SHORT_DEBUG] fullId:', fullId);
+    console.log('[STATE_SHORT_DEBUG] shortId:', shortId);
+    
     const fullField  = document.getElementById(fullId);
     const shortField = document.getElementById(shortId);
-    if (!fullField || !shortField) return;
+    
+    console.log('[STATE_SHORT_DEBUG] fullField element:', fullField);
+    console.log('[STATE_SHORT_DEBUG] shortField element:', shortField);
+    
+    if (!fullField || !shortField) {
+      console.error('[STATE_SHORT_DEBUG] MISSING FIELD! fullField:', !!fullField, 'shortField:', !!shortField);
+      console.error('[STATE_SHORT_DEBUG] Looking for fullId:', fullId);
+      console.error('[STATE_SHORT_DEBUG] Looking for shortId:', shortId);
+      // List all hidden inputs to help debug
+      var allHiddenInputs = document.querySelectorAll('input[style*="display: none"], input[style*="display:none"]');
+      console.log('[STATE_SHORT_DEBUG] All hidden inputs on page:', allHiddenInputs.length);
+      allHiddenInputs.forEach(function(inp) {
+        console.log('[STATE_SHORT_DEBUG]   - Hidden input id:', inp.id, 'name:', inp.name);
+      });
+      return;
+    }
+    
     const full = (selectEl.value || '').trim();
+    console.log('[STATE_SHORT_DEBUG] Full state name:', full);
+    
     // Map full -> short (two-letter)
     const map = {
       'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO',
@@ -5686,8 +5959,13 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
       'West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'
     };
     const short = map[full] || '';
+    console.log('[STATE_SHORT_DEBUG] Short state code:', short);
+    
     fullField.value  = full;
     shortField.value = short;
+    
+    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set fullField.value to:', fullField.value);
+    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set shortField.value to:', shortField.value);
   };
 })();
 `;
@@ -5857,13 +6135,69 @@ if (document.readyState === 'loading') {
 '        if (defendantField) defendantField.value = defendant;\n' +
 '    }\n' +
 '    \n' +
-'    if (formId) {\n' +
-'        const formIdField = document.getElementById("form_ID");\n' +
-'        if (formIdField) formIdField.value = formId;\n' +
-'    }\n' +
-'    \n' +
-'}\n\n' +
-'// Function to replace URL parameter placeholders in text\n' +
+'        if (formId) {\n' +
+        '        const formIdField = document.getElementById("form_ID");\n' +
+        '        if (formIdField) formIdField.value = formId;\n' +
+        '    }\n' +
+        '    \n' +
+        '}\n\n' +
+        '// County Lookup Functionality\n' +
+        'const zipCodeToCounty = ' + zipCodeToCountyData + ';\n\n' +
+        'const countyToCourt = ' + countyToCourtData + ';\n\n' +
+        'function getCourtByCounty(countyName) {\n' +
+        '    return countyToCourt[countyName] || null;\n' +
+        '}\n\n' +
+        'function formatCourtAddress(courtInfo) {\n' +
+        '    if (!courtInfo) return null;\n' +
+        '    return courtInfo.address + ", " + courtInfo.city + ", " + courtInfo.state + " " + courtInfo.zip;\n' +
+        '}\n\n' +
+        'function getCourtFromZipCode(zipCode) {\n' +
+        '    const county = zipCodeToCounty[zipCode];\n' +
+        '    if (!county) return null;\n' +
+        '    const courtInfo = getCourtByCounty(county);\n' +
+        '    if (!courtInfo) return { county: county, error: "Court information not found for this county" };\n' +
+        '    return {\n' +
+        '        county: county,\n' +
+        '        courtName: courtInfo.name,\n' +
+        '        address: courtInfo.address,\n' +
+        '        city: courtInfo.city,\n' +
+        '        state: courtInfo.state,\n' +
+        '        zip: courtInfo.zip,\n' +
+        '        phone: courtInfo.phone,\n' +
+        '        fullAddress: formatCourtAddress(courtInfo)\n' +
+        '    };\n' +
+        '}\n\n' +
+        'function lookupCourtFromZip() {\n' +
+        '    const zipField = document.getElementById("form_zip");\n' +
+        '    const courtNameField = document.getElementById("court_name");\n' +
+        '    const courtAddressField = document.getElementById("court_address");\n' +
+        '    if (!zipField || !courtNameField || !courtAddressField) return;\n' +
+        '    const zipCode = zipField.value.trim();\n' +
+        '    if (zipCode.length === 5) {\n' +
+        '        const courtInfo = getCourtFromZipCode(zipCode);\n' +
+        '        if (courtInfo && courtInfo.courtName) {\n' +
+        '            courtNameField.value = courtInfo.courtName;\n' +
+        '            courtAddressField.value = courtInfo.fullAddress || "";\n' +
+        '        } else {\n' +
+        '            courtNameField.value = "";\n' +
+        '            courtAddressField.value = "";\n' +
+        '        }\n' +
+        '    } else {\n' +
+        '        courtNameField.value = "";\n' +
+        '        courtAddressField.value = "";\n' +
+        '    }\n' +
+        '}\n\n' +
+        'document.addEventListener("DOMContentLoaded", function() {\n' +
+        '    const zipField = document.getElementById("form_zip");\n' +
+        '    if (zipField) {\n' +
+        '        zipField.addEventListener("input", lookupCourtFromZip);\n' +
+        '        zipField.addEventListener("change", lookupCourtFromZip);\n' +
+        '        if (zipField.value) {\n' +
+        '            setTimeout(lookupCourtFromZip, 100);\n' +
+        '        }\n' +
+        '    }\n' +
+        '});\n\n' +
+        '// Function to replace URL parameter placeholders in text\n' +
 'function replaceUrlParametersInText(text) {\n' +
 '    if (!text || typeof text !== \'string\') {\n' +
 '        \n' +
@@ -6294,33 +6628,55 @@ window.showCartModal = function () {
         }
       } else if (pdfLogic.isTriggerSequencePdf) {
         // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] === Processing Trigger Sequence PDF ===');
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] PDF:', pdfLogic.pdfName);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] questionId:', pdfLogic.questionId);
         // First, check that the numbered dropdown has a value (entries exist)
         const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                     document.getElementById('answer' + pdfLogic.questionId);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for numbered dropdown with IDs:', (window.questionNameIds || {})[pdfLogic.questionId], 'or', 'answer' + pdfLogic.questionId);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] numberedDropdownEl found:', !!numberedDropdownEl, numberedDropdownEl);
         if (!numberedDropdownEl || !numberedDropdownEl.value) {
-          // No match
+          console.log('[TRIGGER_SEQ_PDF_DEBUG] No numbered dropdown or no value selected - NO MATCH');
         } else {
           const entryCount = parseInt(numberedDropdownEl.value) || 0;
           const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+          console.log('[TRIGGER_SEQ_PDF_DEBUG] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
           // Check if target entry exists
           if (targetEntryNumber > entryCount) {
-            // No match
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Target entry', targetEntryNumber, 'exceeds entry count', entryCount, '- NO MATCH');
           } else {
             // Find the trigger sequence dropdown for this entry
             // The dropdown ID format: sanitizedFieldName_entryNumber
-            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j
+            // Must match the exact pattern used when creating the dropdown (uses character classes to avoid backslash escaping issues)
             const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-              .replace(/\W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-              .toLowerCase();
+              .toLowerCase()
+              .replace(/[?]/g, '')  // Remove question marks
+              .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore (character class avoids escaping issues)
+              .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores (CRITICAL: must match ID generation)
             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Original field name:', pdfLogic.triggerSequenceFieldName);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Sanitized field name:', sanitizedFieldName);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for trigger dropdown with ID:', triggerDropdownId);
             const triggerDropdownEl = document.getElementById(triggerDropdownId);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerDropdownEl found:', !!triggerDropdownEl, triggerDropdownEl);
             if (triggerDropdownEl) {
               const selectedValue = triggerDropdownEl.value || '';
+              console.log('[TRIGGER_SEQ_PDF_DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
               if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG] MATCH! Adding PDF:', pdfLogic.pdfName);
                 matched = true;
               } else {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG] Value mismatch - NO MATCH');
               }
             } else {
+              console.log('[TRIGGER_SEQ_PDF_DEBUG] Trigger dropdown not found - listing all select elements:');
+              document.querySelectorAll('select').forEach(function(sel) {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG]   Select ID:', sel.id, 'Value:', sel.value);
+              });
             }
           }
         }
@@ -6590,33 +6946,48 @@ window.addFormToCart = function (priceId) {
           }
         } else if (pdfLogic.isTriggerSequencePdf) {
           // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] === Processing Trigger Sequence PDF (Cart) ===');
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] PDF:', pdfLogic.pdfName);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
           // First, check that the numbered dropdown has a value (entries exist)
           const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                       document.getElementById('answer' + pdfLogic.questionId);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] numberedDropdownEl found:', !!numberedDropdownEl);
           if (!numberedDropdownEl || !numberedDropdownEl.value) {
-            // No match
+            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] No numbered dropdown or no value - NO MATCH');
           } else {
             const entryCount = parseInt(numberedDropdownEl.value) || 0;
             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
             // Check if target entry exists
             if (targetEntryNumber > entryCount) {
-              // No match
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Target entry exceeds count - NO MATCH');
             } else {
               // Find the trigger sequence dropdown for this entry
-              // The dropdown ID format: sanitizedFieldName_entryNumber
-              // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j
+              // The dropdown ID format: sanitizedFieldName_entryNumber (uses character classes to avoid backslash escaping issues)
               const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                .replace(/\W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-                .toLowerCase();
+                .toLowerCase()
+                .replace(/[?]/g, '')  // Remove question marks
+                .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
               const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Looking for trigger dropdown:', triggerDropdownId);
               const triggerDropdownEl = document.getElementById(triggerDropdownId);
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerDropdownEl found:', !!triggerDropdownEl);
               if (triggerDropdownEl) {
                 const selectedValue = triggerDropdownEl.value || '';
+                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] MATCH! Adding PDF:', pdfLogic.pdfName);
                   matched = true;
                 } else {
+                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Value mismatch - NO MATCH');
                 }
               } else {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Dropdown not found - listing all selects:');
+                document.querySelectorAll('select').forEach(function(sel) { console.log('[TRIGGER_SEQ_PDF_DEBUG_CART]   ', sel.id, '=', sel.value); });
               }
             }
           }
@@ -7438,7 +7809,15 @@ function showTextboxLabels(questionId, count){
         // Create entry container div
         const entryContainer = document.createElement('div');
         entryContainer.className = 'entry-container';
-        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box;';
+        // Add entry title if configured
+        const entryTitle = (window.entryTitleMap && window.entryTitleMap[questionId]) ? window.entryTitleMap[questionId] : '';
+        if (entryTitle) {
+            const titleLabel = document.createElement('h4');
+            titleLabel.textContent = entryTitle;
+            titleLabel.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center; padding-bottom: 10px; border-bottom: 1px solid #e1e5e9;';
+            entryContainer.appendChild(titleLabel);
+        }
         // Process all fields in creation order
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
@@ -9099,8 +9478,8 @@ function setCurrentDate () {
     const year = t.getFullYear();
     const currentDateElement = document.getElementById('current_date');
     if (currentDateElement) {
-        // Format as dd/mm/yyyy for server
-        currentDateElement.value = day + '/' + month + '/' + year;
+        // Format as mm/dd/yyyy for server
+        currentDateElement.value = month + '/' + day + '/' + year;
         // Mark this field as protected from autofill
         currentDateElement.setAttribute('data-protected', 'true');
     }
@@ -9279,28 +9658,48 @@ async function processAllPdfs() {
                     }
                 } else if (pdfLogic.isTriggerSequencePdf) {
                     // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] === Processing Trigger Sequence PDF (Download) ===');
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] PDF:', pdfLogic.pdfName);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
                     // First, check that the numbered dropdown has a value (entries exist)
                     const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                 document.getElementById('answer' + pdfLogic.questionId);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] numberedDropdownEl found:', !!numberedDropdownEl);
                     if (numberedDropdownEl && numberedDropdownEl.value) {
                         const entryCount = parseInt(numberedDropdownEl.value) || 0;
                         const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
                         // Check if target entry exists
                         if (targetEntryNumber <= entryCount) {
-                            // Find the trigger sequence dropdown for this entry
-                            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/\W+/g, '_').toLowerCase() + "_" + j
+                            // Find the trigger sequence dropdown for this entry (uses character classes to avoid backslash escaping issues)
                             const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                                .replace(/\W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-                                .toLowerCase();
+                                .toLowerCase()
+                                .replace(/[?]/g, '')  // Remove question marks
+                                .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                                .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Looking for trigger dropdown:', triggerDropdownId);
                             const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerDropdownEl found:', !!triggerDropdownEl);
                             if (triggerDropdownEl) {
                                 const selectedValue = triggerDropdownEl.value || '';
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] MATCH! PDF will be downloaded:', pdfLogic.pdfName);
                                     shouldDownload = true;
+                                } else {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Value mismatch - NO MATCH');
                                 }
+                            } else {
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Dropdown not found');
                             }
+                        } else {
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Target entry', targetEntryNumber, 'exceeds count', entryCount);
                         }
+                    } else {
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] No numbered dropdown value - NO MATCH');
                     }
                 } else {
                         // For regular conditions, check previous question logic
@@ -9454,24 +9853,43 @@ async function getAllPdfsList() {
                             }
                         }
                     } else if (pdfLogic.isTriggerSequencePdf) {
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] === Processing Trigger Sequence PDF (Include Check) ===');
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] PDF:', pdfLogic.pdfName, 'Entry:', pdfLogic.pdfEntryNumber);
                         const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                     document.getElementById('answer' + pdfLogic.questionId);
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] numberedDropdownEl found:', !!numberedDropdownEl);
                         if (numberedDropdownEl && numberedDropdownEl.value) {
                             const entryCount = parseInt(numberedDropdownEl.value) || 0;
                             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
                             if (targetEntryNumber <= entryCount) {
+                                // Uses character classes to avoid backslash escaping issues
                                 const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                                    .replace(/\W+/g, '_')
-                                    .toLowerCase();
+                                    .toLowerCase()
+                                    .replace(/[?]/g, '')  // Remove question marks
+                                    .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                                    .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                                 const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Looking for trigger dropdown:', triggerDropdownId);
                                 const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] triggerDropdownEl found:', !!triggerDropdownEl);
                                 if (triggerDropdownEl) {
                                     const selectedValue = triggerDropdownEl.value || '';
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                                     if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] MATCH! Including PDF:', pdfLogic.pdfName);
                                         shouldInclude = true;
+                                    } else {
+                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Value mismatch - NOT including');
                                     }
+                                } else {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Dropdown not found');
                                 }
+                            } else {
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Target entry exceeds count');
                             }
+                        } else {
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] No numbered dropdown value');
                         }
                     } else {
                         pdfLogic.conditions.forEach(condition => {
@@ -12402,9 +12820,20 @@ document.addEventListener('change', function() {
 });
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] dropdown:', dropdown);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenFullId:', hiddenFullId);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenShortId:', hiddenShortId);
+    
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] selectedState:', selectedState);
+    
     const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
     const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
+    
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField:', fullField);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] shortField:', shortField);
+    
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -12418,8 +12847,23 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
-    if (shortField) shortField.value = abbreviation;
-    if (fullField && fullField.tagName !== 'SELECT') fullField.value = selectedState;
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] abbreviation:', abbreviation);
+    
+    if (shortField) {
+        shortField.value = abbreviation;
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set shortField.value to:', shortField.value);
+    } else {
+        console.error('[STATE_SHORT_DEBUG - RUNTIME] shortField NOT FOUND!');
+    }
+    
+    if (fullField && fullField.tagName !== 'SELECT') {
+        fullField.value = selectedState;
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set fullField.value to:', fullField.value);
+    } else if (!fullField) {
+        console.error('[STATE_SHORT_DEBUG - RUNTIME] fullField NOT FOUND!');
+    } else {
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField is a SELECT, skipping value set');
+    }
 }
 // Function to update user full name
 function updateUserFullName() {

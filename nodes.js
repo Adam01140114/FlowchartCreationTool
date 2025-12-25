@@ -667,6 +667,264 @@ window.sanitizeNameId = function(name) {
     .replace(/\s+/g, '_')
     .trim();
 };
+/**
+ * Update all node IDs in the flowchart based on the addPdfNameToNodeId setting
+ * This function removes PDF prefixes from node IDs if the setting is OFF,
+ * or adds them if the setting is ON and the node has a PDF property
+ */
+window.updateAllNodeIdsForPdfNameSetting = function() {
+  if (!window.graph) {
+    return;
+  }
+  const graph = window.graph;
+  const parent = graph.getDefaultParent();
+  const cells = graph.getChildVertices(parent);
+  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+  
+  let updatedCount = 0;
+  
+  graph.getModel().beginUpdate();
+  try {
+    cells.forEach(cell => {
+      if (!cell || !cell.vertex) return;
+      
+      // Skip hidden nodes - they should keep their custom Node IDs
+      if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+        return;
+      }
+      if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+        return;
+      }
+      if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+        return;
+      }
+      
+      // Get current node ID from style
+      let currentNodeId = '';
+      if (cell.style) {
+        const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+        if (styleMatch) {
+          currentNodeId = decodeURIComponent(styleMatch[1]);
+        }
+      }
+      
+      if (!currentNodeId) return; // Skip if no node ID
+      
+      // Get PDF name for this cell
+      const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+      const sanitizedPdfName = (pdfName && typeof window.sanitizePdfName === 'function') ? window.sanitizePdfName(pdfName) : '';
+      
+      // Determine what the node ID should be
+      let newNodeId = currentNodeId;
+      
+      // Check if current node ID has a PDF prefix (matching current PDF or any PDF)
+      const hasCurrentPdfPrefix = sanitizedPdfName && currentNodeId.startsWith(sanitizedPdfName + '_');
+      // Also check for any PDF prefix pattern (word followed by underscore at the start)
+      const hasAnyPdfPrefix = /^[a-z0-9]+_/.test(currentNodeId);
+      
+      if (shouldAddPdfName) {
+        // Setting is ON: add PDF prefix if it's missing and PDF name exists
+        if (sanitizedPdfName && !hasCurrentPdfPrefix) {
+          // Remove any existing PDF prefix first (in case it's a different PDF)
+          let baseId = currentNodeId;
+          if (hasAnyPdfPrefix) {
+            // Remove the first part (PDF prefix) and the following underscore
+            baseId = currentNodeId.replace(/^[^_]+_/, '');
+          }
+          newNodeId = `${sanitizedPdfName}_${baseId}`;
+        }
+      } else {
+        // Setting is OFF: remove PDF prefix if present
+        if (hasCurrentPdfPrefix) {
+          // Remove the current PDF prefix
+          newNodeId = currentNodeId.substring(sanitizedPdfName.length + 1);
+        } else if (hasAnyPdfPrefix && sanitizedPdfName) {
+          // If there's any PDF prefix but it doesn't match current PDF, 
+          // try to remove it if we can determine it's a PDF prefix
+          // This handles cases where PDF was changed but node ID wasn't updated
+          const potentialPdfPrefix = currentNodeId.match(/^([^_]+)_/);
+          if (potentialPdfPrefix) {
+            // Check if it looks like a PDF name (alphanumeric, lowercase)
+            const prefix = potentialPdfPrefix[1];
+            if (prefix.match(/^[a-z0-9]+$/)) {
+              newNodeId = currentNodeId.substring(prefix.length + 1);
+            }
+          }
+        }
+      }
+      
+      // Update node ID if it changed
+      if (newNodeId !== currentNodeId && typeof window.setNodeId === 'function') {
+        window.setNodeId(cell, newNodeId);
+        updatedCount++;
+      }
+      
+      // Also update linked field node IDs in checkboxes if present
+      if (cell._checkboxes && Array.isArray(cell._checkboxes)) {
+        cell._checkboxes.forEach(checkbox => {
+          if (checkbox.options && Array.isArray(checkbox.options)) {
+            checkbox.options.forEach(option => {
+              if (option.linkedFields && Array.isArray(option.linkedFields)) {
+                option.linkedFields.forEach(linkedField => {
+                  if (linkedField.selectedNodeId) {
+                    let linkedNodeId = linkedField.selectedNodeId;
+                    // Extract entry number suffix if present
+                    const entryNumberMatch = linkedNodeId.match(/^(.+)_(\d+)$/);
+                    const entryNumber = entryNumberMatch ? entryNumberMatch[2] : null;
+                    const baseLinkedId = entryNumberMatch ? entryNumberMatch[1] : linkedNodeId;
+                    
+                    // Check if it has a PDF prefix
+                    const hasCurrentPdfPrefix = sanitizedPdfName && baseLinkedId.startsWith(sanitizedPdfName + '_');
+                    const hasAnyPdfPrefix = /^[a-z0-9]+_/.test(baseLinkedId);
+                    
+                    let newLinkedNodeId = baseLinkedId;
+                    
+                    if (shouldAddPdfName) {
+                      // Setting is ON: add PDF prefix if missing
+                      if (sanitizedPdfName && !hasCurrentPdfPrefix) {
+                        let baseId = baseLinkedId;
+                        if (hasAnyPdfPrefix) {
+                          baseId = baseLinkedId.replace(/^[^_]+_/, '');
+                        }
+                        newLinkedNodeId = `${sanitizedPdfName}_${baseId}`;
+                      }
+                    } else {
+                      // Setting is OFF: remove PDF prefix if present
+                      if (hasCurrentPdfPrefix) {
+                        newLinkedNodeId = baseLinkedId.substring(sanitizedPdfName.length + 1);
+                      } else if (hasAnyPdfPrefix) {
+                        // Try to remove any PDF-like prefix
+                        const pdfPrefixMatch = baseLinkedId.match(/^([a-z0-9]{1,20})_(.+)$/);
+                        if (pdfPrefixMatch) {
+                          newLinkedNodeId = pdfPrefixMatch[2];
+                        }
+                      }
+                    }
+                    
+                    // Restore entry number if it was there
+                    if (entryNumber) {
+                      linkedField.selectedNodeId = `${newLinkedNodeId}_${entryNumber}`;
+                    } else {
+                      linkedField.selectedNodeId = newLinkedNodeId;
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+      
+      // Also update checkbox option node IDs in _checkboxes array (for numberedDropdown questions)
+      if (cell._checkboxes && Array.isArray(cell._checkboxes)) {
+        cell._checkboxes.forEach(checkbox => {
+          if (checkbox.options && Array.isArray(checkbox.options)) {
+            checkbox.options.forEach(option => {
+              if (option.nodeId) {
+                let optionNodeId = option.nodeId;
+                // Check if it has a PDF prefix
+                const hasCurrentPdfPrefix = sanitizedPdfName && optionNodeId.startsWith(sanitizedPdfName + '_');
+                const hasAnyPdfPrefix = /^[a-z0-9]+_/.test(optionNodeId);
+                
+                let newOptionNodeId = optionNodeId;
+                
+                if (shouldAddPdfName) {
+                  // Setting is ON: add PDF prefix if missing
+                  if (sanitizedPdfName && !hasCurrentPdfPrefix) {
+                    let baseId = optionNodeId;
+                    if (hasAnyPdfPrefix) {
+                      baseId = optionNodeId.replace(/^[^_]+_/, '');
+                    }
+                    newOptionNodeId = `${sanitizedPdfName}_${baseId}`;
+                  }
+                } else {
+                  // Setting is OFF: remove PDF prefix if present
+                  if (hasCurrentPdfPrefix) {
+                    newOptionNodeId = optionNodeId.substring(sanitizedPdfName.length + 1);
+                  } else if (hasAnyPdfPrefix) {
+                    // Try to remove any PDF-like prefix
+                    const pdfPrefixMatch = optionNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
+                    if (pdfPrefixMatch) {
+                      newOptionNodeId = pdfPrefixMatch[2];
+                    }
+                  }
+                }
+                
+                if (newOptionNodeId !== optionNodeId) {
+                  option.nodeId = newOptionNodeId;
+                  updatedCount++;
+                }
+              }
+            });
+          }
+        });
+      }
+      
+      // Also update checkbox option node IDs in numberedDropdown trigger sequences
+      if (cell._dropdowns && Array.isArray(cell._dropdowns)) {
+        cell._dropdowns.forEach(dropdown => {
+          if (dropdown.triggerSequences && Array.isArray(dropdown.triggerSequences)) {
+            dropdown.triggerSequences.forEach(triggerSequence => {
+              if (triggerSequence.fields && Array.isArray(triggerSequence.fields)) {
+                triggerSequence.fields.forEach(field => {
+                  if (field.type === 'checkbox' && field.options && Array.isArray(field.options)) {
+                    field.options.forEach(option => {
+                      if (option.nodeId) {
+                        let optionNodeId = option.nodeId;
+                        // Check if it has a PDF prefix
+                        const hasCurrentPdfPrefix = sanitizedPdfName && optionNodeId.startsWith(sanitizedPdfName + '_');
+                        const hasAnyPdfPrefix = /^[a-z0-9]+_/.test(optionNodeId);
+                        
+                        let newOptionNodeId = optionNodeId;
+                        
+                        if (shouldAddPdfName) {
+                          // Setting is ON: add PDF prefix if missing
+                          if (sanitizedPdfName && !hasCurrentPdfPrefix) {
+                            let baseId = optionNodeId;
+                            if (hasAnyPdfPrefix) {
+                              baseId = optionNodeId.replace(/^[^_]+_/, '');
+                            }
+                            newOptionNodeId = `${sanitizedPdfName}_${baseId}`;
+                          }
+                        } else {
+                          // Setting is OFF: remove PDF prefix if present
+                          if (hasCurrentPdfPrefix) {
+                            newOptionNodeId = optionNodeId.substring(sanitizedPdfName.length + 1);
+                          } else if (hasAnyPdfPrefix) {
+                            // Try to remove any PDF-like prefix
+                            const pdfPrefixMatch = optionNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
+                            if (pdfPrefixMatch) {
+                              newOptionNodeId = pdfPrefixMatch[2];
+                            }
+                          }
+                        }
+                        
+                        if (newOptionNodeId !== optionNodeId) {
+                          option.nodeId = newOptionNodeId;
+                          updatedCount++;
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  // Refresh the graph to show changes
+  if (typeof window.refreshAllCells === 'function') {
+    window.refreshAllCells();
+  }
+  
+  return updatedCount;
+};
+
 // Export utility functions for use in other modules
 window.setSection = function(cell, sectionNum) {
   if (window.setSection) {

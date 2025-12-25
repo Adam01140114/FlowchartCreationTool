@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="generate2.css">
     <style>
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
-        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 567px; width: 100%; }
+        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 1067px; width: 100%; }
         .question-container .question-text { margin-top: 0; }
         .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 567px; }
@@ -270,21 +270,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Checkbox question node</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
-      <span class="checkbox-inline" id="checkbox-container-checkbox_question_node_yes">
-        <label class="checkbox-label">
-          <input type="checkbox" id="checkbox_question_node_yes" name="checkbox_question_node_yes" value="Yes" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Yes
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-checkbox_question_node_no">
-        <label class="checkbox-label">
-          <input type="checkbox" id="checkbox_question_node_no" name="checkbox_question_node_no" value="No" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          No
-        </label>
-      </span></div><br></div></div>
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many cars</h3></label><select id="how_many_cars" name="how_many_cars" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_cars', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
@@ -1029,12 +1016,12 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"checkbox_question_node"};
-var questionNameIds = {"1":"checkbox_question_node"};
+var questionSlugMap = {"1":"how_many_cars"};
+var questionNameIds = {"1":"how_many_cars"};
 var linkedCheckboxes = [];
-var inverseCheckboxes = [{"inverseCheckboxId":"test","targetCheckboxId":"bruh"},{"inverseCheckboxId":"test","targetCheckboxId":"checkbox_question_node_yes"},{"inverseCheckboxId":"tester","targetCheckboxId":"checkbox_question_node_yes"}];
-var checkboxRequiredMap = {"1":true};
-var unifiedFieldsMap = {};
+var inverseCheckboxes = [];
+var checkboxRequiredMap = {};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_cars_name","order":1,"prefill":""}]};
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -1380,6 +1367,111 @@ var unifiedFieldsMap = {};
         updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
       });
     };
+    
+    // Periodic validation to ensure inverse relationship is always maintained
+    // This catches any cases where autofill or other code tries to set both checkboxes
+    function validateAndFixInverseCheckboxes() {
+      const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
+      const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+      if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
+        return;
+      }
+      
+      inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
+        const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
+        const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
+        if (!inverseCheckboxId || !targetCheckboxId) {
+          return;
+        }
+        
+        const inverseCheckbox = document.getElementById(inverseCheckboxId);
+        if (!inverseCheckbox) {
+          return;
+        }
+        
+        // Check if target is a linked checkbox
+        let isLinkedCheckbox = false;
+        let sourceCheckboxIds = [];
+        const linkedCheckboxConfig = linkedCheckboxesArray.find(lc => lc.linkedCheckboxId === targetCheckboxId);
+        if (linkedCheckboxConfig) {
+          isLinkedCheckbox = true;
+          sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
+        }
+        
+        // Calculate what the inverse checkbox state SHOULD be
+        let shouldBeChecked = false;
+        if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
+          // For linked checkboxes: inverse is checked when NONE of source checkboxes are checked
+          let anyChecked = false;
+          sourceCheckboxIds.forEach(checkboxId => {
+            const sourceCheckbox = document.getElementById(checkboxId);
+            if (sourceCheckbox && sourceCheckbox.checked) {
+              anyChecked = true;
+            }
+          });
+          shouldBeChecked = !anyChecked;
+        } else {
+          // For regular checkboxes: inverse is opposite of target
+          const targetCheckbox = document.getElementById(targetCheckboxId);
+          if (targetCheckbox) {
+            shouldBeChecked = !targetCheckbox.checked;
+          }
+        }
+        
+        // If the inverse checkbox state is wrong, fix it
+        if (inverseCheckbox.checked !== shouldBeChecked) {
+          inverseCheckbox.checked = shouldBeChecked;
+        }
+      });
+    }
+    
+    // Run periodic validation every 500ms to catch any violations
+    setInterval(validateAndFixInverseCheckboxes, 500);
+    
+    // Also validate after autofill operations
+    // Hook into autofill completion by watching for the isInitialAutofill flag
+    let autofillCheckInterval = setInterval(function() {
+      if (typeof window.isInitialAutofill !== 'undefined' && !window.isInitialAutofill) {
+        // Autofill is complete, validate inverse checkboxes
+        validateAndFixInverseCheckboxes();
+        // Also call updateAllInverseCheckboxes to ensure everything is synced
+        if (typeof window.updateAllInverseCheckboxes === 'function') {
+          window.updateAllInverseCheckboxes();
+        }
+        clearInterval(autofillCheckInterval);
+      }
+    }, 100);
+    
+    // Clear the autofill check interval after 10 seconds to avoid infinite checking
+    setTimeout(function() {
+      clearInterval(autofillCheckInterval);
+    }, 10000);
+    
+    // Also validate when form fields change (MutationObserver for programmatic changes)
+    const form = document.getElementById('customForm');
+    if (form) {
+      const observer = new MutationObserver(function(mutations) {
+        // Check if any checkbox attributes changed
+        let shouldValidate = false;
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'checked') {
+            shouldValidate = true;
+          }
+        });
+        if (shouldValidate) {
+          // Small delay to let all changes settle
+          setTimeout(validateAndFixInverseCheckboxes, 50);
+        }
+      });
+      
+      // Observe the entire form for checkbox changes
+      observer.observe(form, {
+        attributes: true,
+        attributeFilter: ['checked'],
+        subtree: true,
+        childList: true
+      });
+    }
   });
   var isCreatingFields = false;
 
@@ -2309,6 +2401,52 @@ var unifiedFieldsMap = {};
         // For multipleTextboxes: {dropdownName}_{locationFieldName} (no entry number, no trigger condition)
         // For numberedDropdown: {dropdownName}_{locationFieldName} (entry number added per field)
         const locPrefix = sanitizedDropdownNameForLocation + '_' + sanitizedLocationName;
+        
+        // Create hidden full_address field (stores complete address like "921 Sloat Road, Salinas, CA 93907")
+        const fullAddressHidden = document.createElement('input');
+        fullAddressHidden.type = 'text';
+        if (isMultipleTextboxes) {
+          fullAddressHidden.id = locPrefix + '_full_address';
+        } else {
+          fullAddressHidden.id = locPrefix + '_full_address_' + entryNumber;
+        }
+        fullAddressHidden.name = fullAddressHidden.id;
+        fullAddressHidden.style.display = 'none';
+        const fullAddressId = fullAddressHidden.id;
+        
+        // Define field IDs for the update function (varies based on multipleTextboxes or numberedDropdown)
+        const triggerStreetFieldId = isMultipleTextboxes ? locPrefix + '_street' : locPrefix + '_street_' + entryNumber;
+        const triggerCityFieldId = isMultipleTextboxes ? locPrefix + '_city' : locPrefix + '_city_' + entryNumber;
+        const triggerStateShortFieldId = isMultipleTextboxes ? locPrefix + '_state_short' : locPrefix + '_state_short_' + entryNumber;
+        const triggerZipFieldId = isMultipleTextboxes ? locPrefix + '_zip' : locPrefix + '_zip_' + entryNumber;
+        
+        // Helper function code to update full address (using escaped backticks since we're inside formHTML template literal)
+        const triggerUpdateFullAddressCode = "(function() { " +
+            "var streetEl = document.getElementById('" + triggerStreetFieldId + "'); " +
+            "var cityEl = document.getElementById('" + triggerCityFieldId + "'); " +
+            "var stateShortEl = document.getElementById('" + triggerStateShortFieldId + "'); " +
+            "var zipEl = document.getElementById('" + triggerZipFieldId + "'); " +
+            "var fullAddressEl = document.getElementById('" + fullAddressId + "'); " +
+            "if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG - TRIGGER] fullAddressEl not found:', '" + fullAddressId + "'); return; } " +
+            "var street = streetEl ? streetEl.value.trim() : ''; " +
+            "var city = cityEl ? cityEl.value.trim() : ''; " +
+            "var stateShort = stateShortEl ? stateShortEl.value.trim() : ''; " +
+            "var zip = zipEl ? zipEl.value.trim() : ''; " +
+            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip); " +
+            "var parts = []; " +
+            "if (street) parts.push(street); " +
+            "if (city && stateShort && zip) { parts.push(city + ', ' + stateShort + ' ' + zip); } " +
+            "else if (city && stateShort) { parts.push(city + ', ' + stateShort); } " +
+            "else if (city && zip) { parts.push(city + ' ' + zip); } " +
+            "else if (city) { parts.push(city); } " +
+            "else if (stateShort && zip) { parts.push(stateShort + ' ' + zip); } " +
+            "else if (stateShort) { parts.push(stateShort); } " +
+            "else if (zip) { parts.push(zip); } " +
+            "var fullAddress = parts.join(', '); " +
+            "fullAddressEl.value = fullAddress; " +
+            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Full address set to:', fullAddress); " +
+            "})();";
+        
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
@@ -2323,7 +2461,19 @@ var unifiedFieldsMap = {};
             }
             input.name = input.id;
             input.className = 'address-select-main';
-            // Hidden short code field
+            
+            // Create hidden full state field (stores full state name like "California")
+            const fullHidden = document.createElement('input');
+            fullHidden.type = 'text';
+            if (isMultipleTextboxes) {
+              fullHidden.id = locPrefix + '_state_hidden';
+            } else {
+              fullHidden.id = locPrefix + '_state_hidden_' + entryNumber;
+            }
+            fullHidden.name = fullHidden.id;
+            fullHidden.style.display = 'none';
+            
+            // Hidden short code field (stores "CA")
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';
             if (isMultipleTextboxes) {
@@ -2333,6 +2483,7 @@ var unifiedFieldsMap = {};
             }
             shortHidden.name = shortHidden.id;
             shortHidden.style.display = 'none';
+            
             // Add state options
             const states = [
               'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
@@ -2353,21 +2504,44 @@ var unifiedFieldsMap = {};
               option.textContent = state;
               input.appendChild(option);
             });
-            // Sync abbreviation and hidden checkbox on change
-            input.addEventListener('change', function(){
-              if (typeof updateStateHiddenFields === 'function') {
-                updateStateHiddenFields(this, input.id, shortHidden.id);
-              }
-              if (typeof dropdownMirror === 'function') {
-                dropdownMirror(this, input.id);
-              }
-              if (typeof updateHiddenLogic === 'function') {
-                updateHiddenLogic(input.id, this.value);
-              }
-            });
-            // Append hidden short field
+            
+            // CRITICAL FIX: Use inline onchange attribute instead of addEventListener
+            // addEventListener does NOT persist when DOM is serialized to HTML via outerHTML
+            const fullHiddenId = fullHidden.id;
+            const shortHiddenId = shortHidden.id;
+            const selectId = input.id;
+            // Build onchange handler using string concatenation to avoid nested template literal issues
+            input.setAttribute('onchange', 
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] State dropdown changed!');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Dropdown ID:', '" + selectId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Selected value:', this.value);" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full hidden field ID:', '" + fullHiddenId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short hidden field ID:', '" + shortHiddenId + "');" +
+              "var fullField = document.getElementById('" + fullHiddenId + "');" +
+              "var shortField = document.getElementById('" + shortHiddenId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full field found:', !!fullField, fullField);" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short field found:', !!shortField, shortField);" +
+              "if (typeof updateStateHiddenFields === 'function') {" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] Calling updateStateHiddenFields...');" +
+              "  updateStateHiddenFields(this, '" + fullHiddenId + "', '" + shortHiddenId + "');" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');" +
+              "} else {" +
+              "  console.error('[STATE_SHORT_DEBUG - TRIGGER] updateStateHiddenFields function NOT FOUND!');" +
+              "}" +
+              "if (typeof dropdownMirror === 'function') {" +
+              "  dropdownMirror(this, '" + selectId + "');" +
+              "}" +
+              "if (typeof updateHiddenLogic === 'function') {" +
+              "  updateHiddenLogic('" + selectId + "', this.value);" +
+              "}" +
+              "setTimeout(function() { " + triggerUpdateFullAddressCode + " }, 50);"
+            );
+            
+            // Append hidden fields
             const hiddenWrap = document.createElement('div');
             hiddenWrap.style.display = 'none';
+            hiddenWrap.appendChild(fullHidden);
             hiddenWrap.appendChild(shortHidden);
             locationFieldDiv.appendChild(hiddenWrap);
           } else {
@@ -2385,6 +2559,8 @@ var unifiedFieldsMap = {};
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
             input.style.textAlign = 'center'; // Ensure text is centered
+            // Add oninput handler to update full address when street, city, or zip changes
+            input.setAttribute('oninput', triggerUpdateFullAddressCode);
           }
           // Wrap each input in an .address-field div so margins apply
           const addrWrap = document.createElement('div');
@@ -2392,6 +2568,11 @@ var unifiedFieldsMap = {};
           addrWrap.appendChild(input);
           locationFieldDiv.appendChild(addrWrap);
         });
+        // Add the full_address hidden field to the location div
+        const fullAddressWrap = document.createElement('div');
+        fullAddressWrap.style.display = 'none';
+        fullAddressWrap.appendChild(fullAddressHidden);
+        locationFieldDiv.appendChild(fullAddressWrap);
         triggerContainer.appendChild(locationFieldDiv);
       } else if (triggerField.type === 'pdf') {
         // PDF fields are handled separately by PDF logic evaluation
@@ -2502,10 +2683,34 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   };
   // Keep these helpers global too (they may be called by onchange/autofill)
   window.updateStateHiddenFields = function(selectEl, fullId, shortId) {
+    console.log('[STATE_SHORT_DEBUG] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG] selectEl:', selectEl);
+    console.log('[STATE_SHORT_DEBUG] selectEl.value:', selectEl ? selectEl.value : 'N/A');
+    console.log('[STATE_SHORT_DEBUG] fullId:', fullId);
+    console.log('[STATE_SHORT_DEBUG] shortId:', shortId);
+    
     const fullField  = document.getElementById(fullId);
     const shortField = document.getElementById(shortId);
-    if (!fullField || !shortField) return;
+    
+    console.log('[STATE_SHORT_DEBUG] fullField element:', fullField);
+    console.log('[STATE_SHORT_DEBUG] shortField element:', shortField);
+    
+    if (!fullField || !shortField) {
+      console.error('[STATE_SHORT_DEBUG] MISSING FIELD! fullField:', !!fullField, 'shortField:', !!shortField);
+      console.error('[STATE_SHORT_DEBUG] Looking for fullId:', fullId);
+      console.error('[STATE_SHORT_DEBUG] Looking for shortId:', shortId);
+      // List all hidden inputs to help debug
+      var allHiddenInputs = document.querySelectorAll('input[style*="display: none"], input[style*="display:none"]');
+      console.log('[STATE_SHORT_DEBUG] All hidden inputs on page:', allHiddenInputs.length);
+      allHiddenInputs.forEach(function(inp) {
+        console.log('[STATE_SHORT_DEBUG]   - Hidden input id:', inp.id, 'name:', inp.name);
+      });
+      return;
+    }
+    
     const full = (selectEl.value || '').trim();
+    console.log('[STATE_SHORT_DEBUG] Full state name:', full);
+    
     // Map full -> short (two-letter)
     const map = {
       'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO',
@@ -2519,8 +2724,13 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
       'West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'
     };
     const short = map[full] || '';
+    console.log('[STATE_SHORT_DEBUG] Short state code:', short);
+    
     fullField.value  = full;
     shortField.value = short;
+    
+    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set fullField.value to:', fullField.value);
+    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set shortField.value to:', shortField.value);
   };
 })();
 
@@ -2556,9 +2766,9 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"1":["Name"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_cars_name"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -2781,7 +2991,6 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-checkboxRequiredMap[1] = true; 
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -2975,33 +3184,55 @@ window.showCartModal = function () {
         }
       } else if (pdfLogic.isTriggerSequencePdf) {
         // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] === Processing Trigger Sequence PDF ===');
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] PDF:', pdfLogic.pdfName);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] questionId:', pdfLogic.questionId);
         // First, check that the numbered dropdown has a value (entries exist)
         const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                     document.getElementById('answer' + pdfLogic.questionId);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for numbered dropdown with IDs:', (window.questionNameIds || {})[pdfLogic.questionId], 'or', 'answer' + pdfLogic.questionId);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] numberedDropdownEl found:', !!numberedDropdownEl, numberedDropdownEl);
         if (!numberedDropdownEl || !numberedDropdownEl.value) {
-          // No match
+          console.log('[TRIGGER_SEQ_PDF_DEBUG] No numbered dropdown or no value selected - NO MATCH');
         } else {
           const entryCount = parseInt(numberedDropdownEl.value) || 0;
           const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+          console.log('[TRIGGER_SEQ_PDF_DEBUG] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
           // Check if target entry exists
           if (targetEntryNumber > entryCount) {
-            // No match
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Target entry', targetEntryNumber, 'exceeds entry count', entryCount, '- NO MATCH');
           } else {
             // Find the trigger sequence dropdown for this entry
             // The dropdown ID format: sanitizedFieldName_entryNumber
-            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+            // Must match the exact pattern used when creating the dropdown (uses character classes to avoid backslash escaping issues)
             const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-              .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-              .toLowerCase();
+              .toLowerCase()
+              .replace(/[?]/g, '')  // Remove question marks
+              .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore (character class avoids escaping issues)
+              .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores (CRITICAL: must match ID generation)
             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Original field name:', pdfLogic.triggerSequenceFieldName);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Sanitized field name:', sanitizedFieldName);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for trigger dropdown with ID:', triggerDropdownId);
             const triggerDropdownEl = document.getElementById(triggerDropdownId);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerDropdownEl found:', !!triggerDropdownEl, triggerDropdownEl);
             if (triggerDropdownEl) {
               const selectedValue = triggerDropdownEl.value || '';
+              console.log('[TRIGGER_SEQ_PDF_DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
               if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG] MATCH! Adding PDF:', pdfLogic.pdfName);
                 matched = true;
               } else {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG] Value mismatch - NO MATCH');
               }
             } else {
+              console.log('[TRIGGER_SEQ_PDF_DEBUG] Trigger dropdown not found - listing all select elements:');
+              document.querySelectorAll('select').forEach(function(sel) {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG]   Select ID:', sel.id, 'Value:', sel.value);
+              });
             }
           }
         }
@@ -3271,33 +3502,48 @@ window.addFormToCart = function (priceId) {
           }
         } else if (pdfLogic.isTriggerSequencePdf) {
           // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] === Processing Trigger Sequence PDF (Cart) ===');
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] PDF:', pdfLogic.pdfName);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
           // First, check that the numbered dropdown has a value (entries exist)
           const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                       document.getElementById('answer' + pdfLogic.questionId);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] numberedDropdownEl found:', !!numberedDropdownEl);
           if (!numberedDropdownEl || !numberedDropdownEl.value) {
-            // No match
+            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] No numbered dropdown or no value - NO MATCH');
           } else {
             const entryCount = parseInt(numberedDropdownEl.value) || 0;
             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
             // Check if target entry exists
             if (targetEntryNumber > entryCount) {
-              // No match
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Target entry exceeds count - NO MATCH');
             } else {
               // Find the trigger sequence dropdown for this entry
-              // The dropdown ID format: sanitizedFieldName_entryNumber
-              // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+              // The dropdown ID format: sanitizedFieldName_entryNumber (uses character classes to avoid backslash escaping issues)
               const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-                .toLowerCase();
+                .toLowerCase()
+                .replace(/[?]/g, '')  // Remove question marks
+                .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
               const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Looking for trigger dropdown:', triggerDropdownId);
               const triggerDropdownEl = document.getElementById(triggerDropdownId);
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerDropdownEl found:', !!triggerDropdownEl);
               if (triggerDropdownEl) {
                 const selectedValue = triggerDropdownEl.value || '';
+                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] MATCH! Adding PDF:', pdfLogic.pdfName);
                   matched = true;
                 } else {
+                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Value mismatch - NO MATCH');
                 }
               } else {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Dropdown not found - listing all selects:');
+                document.querySelectorAll('select').forEach(function(sel) { console.log('[TRIGGER_SEQ_PDF_DEBUG_CART]   ', sel.id, '=', sel.value); });
               }
             }
           }
@@ -5316,6 +5562,10 @@ function dropdownMirror(selectEl, baseName){
                 } else {
                 }
                 window.updateAllLinkedCheckboxes();
+                // Also update inverse checkboxes after linked checkbox update
+                if (typeof window.updateAllInverseCheckboxes === 'function') {
+                    window.updateAllInverseCheckboxes();
+                }
             }, 200);
         } else {
         }
@@ -5875,28 +6125,48 @@ async function processAllPdfs() {
                     }
                 } else if (pdfLogic.isTriggerSequencePdf) {
                     // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] === Processing Trigger Sequence PDF (Download) ===');
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] PDF:', pdfLogic.pdfName);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
                     // First, check that the numbered dropdown has a value (entries exist)
                     const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                 document.getElementById('answer' + pdfLogic.questionId);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] numberedDropdownEl found:', !!numberedDropdownEl);
                     if (numberedDropdownEl && numberedDropdownEl.value) {
                         const entryCount = parseInt(numberedDropdownEl.value) || 0;
                         const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
                         // Check if target entry exists
                         if (targetEntryNumber <= entryCount) {
-                            // Find the trigger sequence dropdown for this entry
-                            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+                            // Find the trigger sequence dropdown for this entry (uses character classes to avoid backslash escaping issues)
                             const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                                .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-                                .toLowerCase();
+                                .toLowerCase()
+                                .replace(/[?]/g, '')  // Remove question marks
+                                .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                                .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Looking for trigger dropdown:', triggerDropdownId);
                             const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerDropdownEl found:', !!triggerDropdownEl);
                             if (triggerDropdownEl) {
                                 const selectedValue = triggerDropdownEl.value || '';
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] MATCH! PDF will be downloaded:', pdfLogic.pdfName);
                                     shouldDownload = true;
+                                } else {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Value mismatch - NO MATCH');
                                 }
+                            } else {
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Dropdown not found');
                             }
+                        } else {
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Target entry', targetEntryNumber, 'exceeds count', entryCount);
                         }
+                    } else {
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] No numbered dropdown value - NO MATCH');
                     }
                 } else {
                         // For regular conditions, check previous question logic
@@ -6050,24 +6320,43 @@ async function getAllPdfsList() {
                             }
                         }
                     } else if (pdfLogic.isTriggerSequencePdf) {
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] === Processing Trigger Sequence PDF (Include Check) ===');
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] PDF:', pdfLogic.pdfName, 'Entry:', pdfLogic.pdfEntryNumber);
                         const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                     document.getElementById('answer' + pdfLogic.questionId);
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] numberedDropdownEl found:', !!numberedDropdownEl);
                         if (numberedDropdownEl && numberedDropdownEl.value) {
                             const entryCount = parseInt(numberedDropdownEl.value) || 0;
                             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
                             if (targetEntryNumber <= entryCount) {
+                                // Uses character classes to avoid backslash escaping issues
                                 const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                                    .replace(/W+/g, '_')
-                                    .toLowerCase();
+                                    .toLowerCase()
+                                    .replace(/[?]/g, '')  // Remove question marks
+                                    .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                                    .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                                 const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Looking for trigger dropdown:', triggerDropdownId);
                                 const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] triggerDropdownEl found:', !!triggerDropdownEl);
                                 if (triggerDropdownEl) {
                                     const selectedValue = triggerDropdownEl.value || '';
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                                     if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] MATCH! Including PDF:', pdfLogic.pdfName);
                                         shouldInclude = true;
+                                    } else {
+                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Value mismatch - NOT including');
                                     }
+                                } else {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Dropdown not found');
                                 }
+                            } else {
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Target entry exceeds count');
                             }
+                        } else {
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] No numbered dropdown value');
                         }
                     } else {
                         pdfLogic.conditions.forEach(condition => {
@@ -7490,6 +7779,10 @@ if (typeof handleNext === 'function') {
             // 🔧 NEW: Update all linked checkboxes after autofill completes
             if (typeof window.updateAllLinkedCheckboxes === 'function') {
                 window.updateAllLinkedCheckboxes();
+            }
+            // Also update inverse checkboxes after autofill
+            if (typeof window.updateAllInverseCheckboxes === 'function') {
+                window.updateAllInverseCheckboxes();
             }
             // 🔧 NEW: Create hidden checkboxes for any autofilled radio buttons in numbered dropdowns
             const autofilledRadioButtons = document.querySelectorAll('input[type="radio"][id*="_radio"]:checked');
@@ -8994,9 +9287,20 @@ document.addEventListener('change', function() {
 });
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] dropdown:', dropdown);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenFullId:', hiddenFullId);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenShortId:', hiddenShortId);
+    
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] selectedState:', selectedState);
+    
     const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
     const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
+    
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField:', fullField);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] shortField:', shortField);
+    
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -9010,8 +9314,23 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
-    if (shortField) shortField.value = abbreviation;
-    if (fullField && fullField.tagName !== 'SELECT') fullField.value = selectedState;
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] abbreviation:', abbreviation);
+    
+    if (shortField) {
+        shortField.value = abbreviation;
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set shortField.value to:', shortField.value);
+    } else {
+        console.error('[STATE_SHORT_DEBUG - RUNTIME] shortField NOT FOUND!');
+    }
+    
+    if (fullField && fullField.tagName !== 'SELECT') {
+        fullField.value = selectedState;
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set fullField.value to:', fullField.value);
+    } else if (!fullField) {
+        console.error('[STATE_SHORT_DEBUG - RUNTIME] fullField NOT FOUND!');
+    } else {
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField is a SELECT, skipping value set');
+    }
 }
 // Function to update user full name
 function updateUserFullName() {

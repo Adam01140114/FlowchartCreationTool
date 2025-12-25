@@ -1,0 +1,298 @@
+================================================================================
+                    GUI JSON EXPORT/IMPORT GUIDE
+                    FormWiz Developer Reference
+================================================================================
+
+This document explains how to ensure any new input, checkbox, or field in the 
+GUI is properly saved and restored through the JSON export/import process.
+
+================================================================================
+                         OVERVIEW
+================================================================================
+
+The GUI has THREE separate concerns for any saveable field:
+
+    1. GUI DISPLAY (gui.js)        → Creates the UI element users interact with
+    2. EXPORT (download.js)        → Saves the value to JSON when exporting
+    3. IMPORT (download.js)        → Restores the value from JSON when importing
+
+Additionally, if the field affects HTML generation:
+
+    4. HTML GENERATION (generate.js) → Uses the saved value to build output HTML
+
+CRITICAL: All three (or four) locations must be updated for a field to work!
+
+================================================================================
+                      FILE RESPONSIBILITIES
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FILE           │  PURPOSE                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  gui.js         │  Creates UI elements (inputs, checkboxes, dropdowns)      │
+│                 │  Users interact with these elements in the browser        │
+│                 │                                                           │
+│  download.js    │  EXPORT: exportForm() - reads UI values, builds JSON      │
+│                 │  IMPORT: loadFormData() - reads JSON, sets UI values      │
+│                 │                                                           │
+│  generate.js    │  getFormHTML() - builds final HTML output                 │
+│                 │  Also has its own export logic for preview functionality  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                    STEP-BY-STEP: ADDING A NEW SAVEABLE FIELD
+================================================================================
+
+EXAMPLE: Adding an "Amount" checkbox to trigger labels that restricts input to 
+numbers only.
+
+-------------------------------------------------------------------------------
+STEP 1: ADD THE UI ELEMENT (gui.js)
+-------------------------------------------------------------------------------
+
+Location: Find the function that creates the UI component (e.g., addTriggerLabel)
+
+Add your new input/checkbox with a UNIQUE, PREDICTABLE ID pattern:
+
+    <input type="checkbox" 
+           id="triggerLabelAmount${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" 
+           style="cursor: pointer;">
+
+ID PATTERN RULES:
+    • Use a descriptive prefix (triggerLabelAmount, enableConditionalLogic, etc.)
+    • Include ALL relevant context IDs (questionId, fieldCount, etc.)
+    • Separate IDs with underscores
+    • Be consistent with existing patterns in the codebase
+
+-------------------------------------------------------------------------------
+STEP 2: ADD TO EXPORT (download.js - exportForm function)
+-------------------------------------------------------------------------------
+
+Location: Find where the parent object is being built in exportForm()
+
+For trigger labels, this is inside the loop that processes trigger fields.
+Search for: "type: 'label'" to find where label objects are created.
+
+Add code to READ the checkbox and ADD the property to the exported object:
+
+    // Check for amount checkbox
+    const amountCheckboxEl = fieldEl.querySelector(
+        `#triggerLabelAmount${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`
+    );
+    if (amountCheckboxEl && amountCheckboxEl.checked) {
+        labelField.isAmountOption = true;
+    }
+
+IMPORTANT: There may be MULTIPLE export paths! Search the entire file for 
+similar code patterns and update ALL of them. Common indicators:
+    • Search for the object type: "type: 'label'"
+    • Search for similar field names being exported
+    • Check both "PATH 1" and "PATH 2" comments if they exist
+
+-------------------------------------------------------------------------------
+STEP 3: ADD TO IMPORT (download.js - loadFormData function)
+-------------------------------------------------------------------------------
+
+Location: Find where the object is being processed during import.
+Search for where the field type is handled (e.g., "triggerField.type === 'label'")
+
+Add code to READ the JSON property and SET the checkbox:
+
+    // Restore amount checkbox if enabled
+    if (triggerField.isAmountOption) {
+        const amountCheckbox = document.getElementById(
+            `triggerLabelAmount${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`
+        );
+        if (amountCheckbox) {
+            amountCheckbox.checked = true;
+        }
+    }
+
+IMPORTANT: There may be MULTIPLE import paths too! Search for all places 
+where this field type is handled.
+
+-------------------------------------------------------------------------------
+STEP 4: USE IN HTML GENERATION (generate.js) - IF APPLICABLE
+-------------------------------------------------------------------------------
+
+If your field affects the generated HTML output:
+
+Location: Find where the field is rendered in getFormHTML()
+
+Use the saved property to modify the output:
+
+    // Use number type if isAmountOption is true, otherwise text
+    input.type = triggerField.isAmountOption ? 'number' : 'text';
+
+NOTE: generate.js also has its own export logic for preview functionality.
+You may need to update BOTH generate.js export AND download.js export.
+
+================================================================================
+                         COMMON PITFALLS
+================================================================================
+
+1. MULTIPLE EXPORT/IMPORT PATHS
+   ─────────────────────────────
+   The codebase has multiple code paths for different question types:
+   • multipleTextboxes questions
+   • numberedDropdown questions
+   • checkbox questions
+   • etc.
+   
+   ALWAYS search for ALL occurrences of the pattern you're modifying.
+   Use grep/search for the object type or property name.
+
+2. INCORRECT ELEMENT ID
+   ─────────────────────
+   The ID used in export/import MUST exactly match the ID in gui.js.
+   
+   Common mistakes:
+   • Wrong variable names (fieldCount vs fieldOrder)
+   • Missing +1 for 1-based indexing
+   • Wrong order of ID components
+   
+   TIP: Copy-paste the ID pattern from gui.js to ensure it matches.
+
+3. TIMING ISSUES ON IMPORT
+   ────────────────────────
+   Some elements don't exist immediately when loadFormData runs.
+   Use setTimeout() if the element is created asynchronously:
+   
+       setTimeout(() => {
+           const checkbox = document.getElementById('...');
+           if (checkbox) checkbox.checked = true;
+       }, 200);
+
+4. FORGETTING generate.js
+   ───────────────────────
+   generate.js has its OWN export logic that runs during preview.
+   If you only update download.js, the preview may work but export won't,
+   or vice versa.
+
+5. NOT HANDLING UNDEFINED/NULL
+   ────────────────────────────
+   Always check if the element exists before accessing properties:
+   
+       if (amountCheckbox && amountCheckbox.checked) { ... }
+   
+   And check if the JSON property exists:
+   
+       if (triggerField.isAmountOption) { ... }
+
+================================================================================
+                         VERIFICATION CHECKLIST
+================================================================================
+
+Before considering a new saveable field complete, verify:
+
+□ 1. GUI ELEMENT EXISTS
+      • Can you see and interact with the element in the browser?
+      • Does the element have a unique, predictable ID?
+
+□ 2. EXPORT WORKS
+      • Click "Export JSON" 
+      • Check the JSON output - does it contain your new property?
+      • If the property should only appear when enabled, test both states
+
+□ 3. IMPORT WORKS
+      • Export a JSON with your property set
+      • Clear the form or refresh the page
+      • Import the JSON
+      • Is your element restored to the correct state?
+
+□ 4. ROUND-TRIP WORKS
+      • Set your field to a specific value
+      • Export JSON
+      • Clear/refresh
+      • Import JSON
+      • Export JSON again
+      • Compare the two JSONs - they should be identical
+
+□ 5. HTML GENERATION WORKS (if applicable)
+      • Set your field value
+      • Click Preview
+      • Inspect the generated HTML - is your property applied correctly?
+
+□ 6. MULTIPLE PATHS UPDATED
+      • Search the codebase for similar patterns
+      • Are ALL export paths updated?
+      • Are ALL import paths updated?
+
+================================================================================
+                         QUICK REFERENCE: SEARCH PATTERNS
+================================================================================
+
+To find where to add export code:
+    Search for: "type: 'YOUR_FIELD_TYPE'"
+    Search for: "triggerFields.push"
+    Search for: the parent object being built
+
+To find where to add import code:
+    Search for: "triggerField.type === 'YOUR_FIELD_TYPE'"
+    Search for: "addTriggerLabel" or equivalent function call
+    Search for: where field values are being set after creation
+
+To find all occurrences:
+    Use grep: grep -r "type: 'label'" "FormWiz GUI/"
+    Use grep: grep -r "isAmountOption" "FormWiz GUI/"
+
+================================================================================
+                         EXAMPLE: COMPLETE FLOW
+================================================================================
+
+For the "Amount (numbers only)" checkbox on trigger labels:
+
+1. GUI (gui.js line ~3031-3033):
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ <label for="triggerLabelAmount${questionId}_${fieldCount}...">        │
+   │     Amount (numbers only)                                              │
+   │ </label>                                                               │
+   │ <input type="checkbox"                                                 │
+   │        id="triggerLabelAmount${questionId}_${fieldCount}_...">         │
+   └────────────────────────────────────────────────────────────────────────┘
+
+2. EXPORT (download.js, TWO locations ~3103-3107 and ~3767-3771):
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ const amountCheckboxEl = fieldEl.querySelector(                        │
+   │     `#triggerLabelAmount${questionId}_${fieldOrder}_...`               │
+   │ );                                                                     │
+   │ if (amountCheckboxEl && amountCheckboxEl.checked) {                    │
+   │     labelField.isAmountOption = true;                                  │
+   │ }                                                                      │
+   └────────────────────────────────────────────────────────────────────────┘
+
+3. IMPORT (download.js, TWO locations ~760-766 and ~1489-1496):
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ if (triggerField.isAmountOption) {                                     │
+   │     const amountCheckbox = document.getElementById(                    │
+   │         `triggerLabelAmount${question.questionId}_${fieldOrder}_...`   │
+   │     );                                                                 │
+   │     if (amountCheckbox) {                                              │
+   │         amountCheckbox.checked = true;                                 │
+   │     }                                                                  │
+   │ }                                                                      │
+   └────────────────────────────────────────────────────────────────────────┘
+
+4. HTML GENERATION (generate.js line ~4723):
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │ input.type = triggerField.isAmountOption ? 'number' : 'text';          │
+   └────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                         SUMMARY
+================================================================================
+
+When adding a new saveable field:
+
+    1. Add UI element in gui.js with unique ID
+    2. Add export logic in download.js (check for MULTIPLE paths!)
+    3. Add import logic in download.js (check for MULTIPLE paths!)
+    4. Add HTML generation logic in generate.js (if applicable)
+    5. Test the complete round-trip: set → export → clear → import → verify
+
+The most common cause of "save issues" is forgetting that there are MULTIPLE 
+code paths for export and import. ALWAYS search the entire codebase for 
+similar patterns before considering the work complete.
+
+================================================================================
+

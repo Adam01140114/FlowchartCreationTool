@@ -12,7 +12,8 @@ var userSettings = userSettings || {
   theme: 'light',
   language: 'en',
   zoomSensitivity: 0.67, // Default zoom sensitivity (0.001 = very sensitive, 0.1 = less sensitive)
-  wasdSpeed: 2 // Default WASD movement speed (pixels per frame)
+  wasdSpeed: 2, // Default WASD movement speed (pixels per frame)
+  addPdfNameToNodeId: false // Default to NOT adding PDF name to node IDs
 };
 // Color preferences
 var colorPreferences = colorPreferences || {
@@ -36,8 +37,12 @@ window.loadSettingsFromLocalStorage = async function() {
     if (savedSettings) {
       const parsedSettings = JSON.parse(savedSettings);
       const oldZoomSensitivity = userSettings.zoomSensitivity;
-      // Update settings
+      // Update settings, but ensure addPdfNameToNodeId defaults to false if not explicitly set
       Object.assign(userSettings, parsedSettings);
+      // If addPdfNameToNodeId is not explicitly set in saved settings, default to false
+      if (parsedSettings.addPdfNameToNodeId === undefined) {
+        userSettings.addPdfNameToNodeId = false;
+      }
       // Load from Firebase if available
       if (typeof loadZoomSensitivityFromFirebase === 'function') {
         await loadZoomSensitivityFromFirebase();
@@ -46,6 +51,13 @@ window.loadSettingsFromLocalStorage = async function() {
       if (typeof loadWasdSpeedFromFirebase === 'function') {
         await loadWasdSpeedFromFirebase();
       }
+      // Load addPdfNameToNodeId from Firebase if available
+      if (typeof loadAddPdfNameToNodeIdFromFirebase === 'function') {
+        await loadAddPdfNameToNodeIdFromFirebase();
+      }
+    } else {
+      // If no saved settings, ensure addPdfNameToNodeId is false
+      userSettings.addPdfNameToNodeId = false;
     }
     // Update window reference
     if (window.userSettings) {
@@ -73,6 +85,10 @@ window.saveSettings = function() {
     if (typeof saveWasdSpeedToFirebase === 'function') {
       saveWasdSpeedToFirebase(userSettings.wasdSpeed);
     }
+    // Save addPdfNameToNodeId to Firebase if available
+    if (typeof saveAddPdfNameToNodeIdToFirebase === 'function') {
+      saveAddPdfNameToNodeIdToFirebase(userSettings.addPdfNameToNodeId);
+    }
   } catch (error) {
   }
 };
@@ -95,6 +111,10 @@ function updateSettingsUI() {
   }
   if (wasdSpeedValue) {
     wasdSpeedValue.textContent = userSettings.wasdSpeed;
+  }
+  const addPdfNameToNodeIdToggle = document.getElementById('addPdfNameToNodeIdToggle');
+  if (addPdfNameToNodeIdToggle) {
+    addPdfNameToNodeIdToggle.checked = userSettings.addPdfNameToNodeId === true; // Default to false
   }
 }
 /**
@@ -261,6 +281,66 @@ function applyWasdSpeed() {
     window.updateMovementSpeed(userSettings.wasdSpeed);
   }
 }
+/**
+ * Update addPdfNameToNodeId setting
+ */
+window.updateAddPdfNameToNodeId = function(value) {
+  const oldValue = userSettings.addPdfNameToNodeId;
+  userSettings.addPdfNameToNodeId = value;
+  if (window.userSettings) {
+    window.userSettings.addPdfNameToNodeId = value;
+  }
+  // Save settings
+  saveSettings();
+  // If the setting changed, update all node IDs in the flowchart
+  if (oldValue !== value && typeof window.updateAllNodeIdsForPdfNameSetting === 'function') {
+    window.updateAllNodeIdsForPdfNameSetting();
+  }
+};
+/**
+ * Save addPdfNameToNodeId to Firebase
+ */
+window.saveAddPdfNameToNodeIdToFirebase = async function(value) {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+      const user = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      await db.collection('userSettings').doc(user.uid).set({
+        addPdfNameToNodeId: value,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+  } catch (error) {
+  }
+};
+/**
+ * Load addPdfNameToNodeId from Firebase
+ */
+window.loadAddPdfNameToNodeIdFromFirebase = async function() {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+      const user = firebase.auth().currentUser;
+      const db = firebase.firestore();
+      const doc = await db.collection('userSettings').doc(user.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.addPdfNameToNodeId !== undefined) {
+          userSettings.addPdfNameToNodeId = data.addPdfNameToNodeId;
+          // Update UI elements
+          const toggle = document.getElementById('addPdfNameToNodeIdToggle');
+          if (toggle) {
+            toggle.checked = data.addPdfNameToNodeId === true; // Default to false
+          }
+          // Update window reference
+          if (window.userSettings) {
+            window.userSettings.addPdfNameToNodeId = data.addPdfNameToNodeId;
+          }
+        }
+      }
+    }
+  } catch (error) {
+  }
+};
 // The slider uses oninput attribute in HTML for simplicity
 // Export settings for use in other modules
 window.userSettings = userSettings;

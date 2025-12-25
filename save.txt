@@ -1,200 +1,312 @@
-HOW PREFILL FEATURE IS PRESERVED IN SAVING PROCESSES
-====================================================
+HOW TO PRESERVE DATA THROUGH ALL THREE SAVING PROCESSES
+========================================================
 
-This document explains how the prefill input field for multiple textbox questions
-is preserved across all saving mechanisms in the Flowchart Creation Tool.
+This document explains how to ensure any new input/property is preserved through 
+all three saving mechanisms in the Flowchart Creation Tool.
 
-1. DATA STRUCTURE
------------------
-The prefill value is stored as a property within each textbox object in the 
-cell._textboxes array:
+================================================================================
+OVERVIEW: THE THREE SAVING PROCESSES
+================================================================================
 
-  cell._textboxes[index] = {
-    nameId: "textbox_name",
-    placeholder: "Enter value",
-    isAmountOption: false,
-    prefill: "default_value"  // <-- Prefill property
-  }
+1. FLOWCHART JSON EXPORT/IMPORT
+   - User exports flowchart as JSON file, imports it later
+   - Export: url.js (exportFlowchartJson function)
+   - Import: library.js (loadFlowchartData function)
 
-2. INITIALIZATION
------------------
-The prefill property is initialized in multiple places to ensure it always exists:
+2. AUTOSAVE
+   - Automatic saving to localStorage every few seconds
+   - Location: script.js (autosaveFlowchartToLocalStorage function)
 
-a) When creating a new multiple textbox question:
-   Location: questions.js, line 419
-   Code: cell._textboxes = [{ nameId:'', placeholder:'Enter value', prefill: '' }];
+3. FIREBASE LIBRARY SAVE
+   - User saves flowchart to their Firebase account
+   - Location: library.js (saveFlowchart and saveAsFlowchart functions)
 
-b) When rendering textboxes (if array doesn't exist):
-   Location: questions.js, line 572
-   Code: cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' }];
+================================================================================
+QUICK REFERENCE: FILES TO MODIFY
+================================================================================
 
-c) When adding a new textbox via "Add Option" button:
-   Location: questions.js, line 13004 and 13007
-   Code: cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' });
+For a NEW CELL PROPERTY (e.g., cell._myNewProperty):
 
-d) When adding a new textbox via "+ Add Textbox" button in properties menu:
-   Location: questions.js, line 11738
-   Code: const newTextbox = { nameId: '', placeholder: 'Enter value', isAmountOption: false, prefill: '' };
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FILE          │ FUNCTION/LOCATION              │ PURPOSE                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ url.js        │ exportFlowchartJson            │ JSON export                │
+│ script.js     │ autosaveFlowchartToLocalStorage│ Autosave                   │
+│ script.js     │ Copy/paste arrays (2 places)   │ Copy/paste nodes           │
+│ library.js    │ saveFlowchart cellData         │ Firebase save              │
+│ library.js    │ saveAsFlowchart cellData       │ Firebase save as           │
+│ library.js    │ loadFlowchartData              │ Restore on load            │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-e) In the createTextboxField function (if property doesn't exist):
-   Location: questions.js, line 12228-12230
-   Code:
-     if (textbox.prefill === undefined) {
-       textbox.prefill = '';
-     }
+================================================================================
+STEP-BY-STEP: ADDING A NEW PROPERTY
+================================================================================
 
-3. USER INPUT HANDLING
-----------------------
-When the user types in the prefill input field:
+Let's say you're adding a new input that stores data in: cell._myNewProperty
 
-Location: questions.js, line 12220-12225
-Code:
-  prefillInput.onblur = () => {
-    textbox.prefill = prefillInput.value.trim();
-    if (typeof window.requestAutosave === 'function') {
-      window.requestAutosave();
+STEP 1: ADD TO FLOWCHART JSON EXPORT (url.js)
+─────────────────────────────────────────────
+Find this pattern in url.js (around line 230):
+
+    if (cell._questionText) cellData._questionText = cell._questionText;
+    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+
+Add your property:
+
+    if (cell._myNewProperty) cellData._myNewProperty = cell._myNewProperty;
+
+
+STEP 2: ADD TO AUTOSAVE (script.js)
+───────────────────────────────────
+Find this pattern in script.js autosaveFlowchartToLocalStorage function (around line 4735):
+
+    if (cell._questionText) cellData._questionText = cell._questionText;
+    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+
+Add your property:
+
+    if (cell._myNewProperty) cellData._myNewProperty = cell._myNewProperty;
+
+
+STEP 3: ADD TO COPY/PASTE (script.js)
+─────────────────────────────────────
+Find the TWO copy/paste arrays in script.js (around lines 5458 and 5588):
+
+    ["_textboxes","_questionText","_twoNumbers",...].forEach(k => {
+
+Add your property to BOTH arrays:
+
+    ["_textboxes","_questionText","_twoNumbers","_myNewProperty",...].forEach(k => {
+
+
+STEP 4: ADD TO FIREBASE SAVE (library.js - saveFlowchart)
+─────────────────────────────────────────────────────────
+Find this pattern in saveFlowchart function (around line 2746):
+
+    _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
+    _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
+
+Add your property:
+
+    _twoNumbers: cell._twoNumbers||null, _myNewProperty: cell._myNewProperty||null, _nameId: cell._nameId||null,
+
+
+STEP 5: ADD TO FIREBASE SAVE AS (library.js - saveAsFlowchart)
+──────────────────────────────────────────────────────────────
+Find the SAME pattern in saveAsFlowchart function (around line 2887):
+
+    _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
+    _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
+
+Add your property (same as step 4):
+
+    _twoNumbers: cell._twoNumbers||null, _myNewProperty: cell._myNewProperty||null, _nameId: cell._nameId||null,
+
+NOTE: Steps 4 and 5 are identical patterns - you can use replace_all to fix both.
+
+
+STEP 6: ADD TO LOAD/RESTORE (library.js - loadFlowchartData)
+────────────────────────────────────────────────────────────
+Find this pattern in loadFlowchartData function (around line 3865):
+
+    if (item._twoNumbers) newCell._twoNumbers = item._twoNumbers;
+    if (item._nameId) newCell._nameId = item._nameId;
+
+Add your property:
+
+    if (item._myNewProperty) newCell._myNewProperty = item._myNewProperty;
+
+
+================================================================================
+DETAILED CODE LOCATIONS
+================================================================================
+
+1. url.js - exportFlowchartJson
+───────────────────────────────
+Purpose: Exports flowchart to downloadable JSON file
+Location: Around lines 220-340
+Pattern:
+    if (cell._propertyName) cellData._propertyName = cell._propertyName;
+
+For complex objects (arrays, nested objects):
+    if (cell._complexProperty) {
+      cellData._complexProperty = JSON.parse(JSON.stringify(cell._complexProperty));
     }
-  };
 
-This ensures:
-- The value is saved to the textbox object immediately when the field loses focus
-- Autosave is triggered to persist the change
 
-4. AUTOSAVE PROCESS
-------------------
-The autosave mechanism automatically saves all cell properties, including _textboxes:
+2. script.js - autosaveFlowchartToLocalStorage
+──────────────────────────────────────────────
+Purpose: Saves flowchart to localStorage automatically
+Location: Around lines 4679-4860
+Pattern (simple values):
+    if (cell._propertyName) cellData._propertyName = cell._propertyName;
 
-Location: script.js, autosaveFlowchartToLocalStorage function
+Pattern (complex objects):
+    if (cell._complexProperty) {
+      cellData._complexProperty = JSON.parse(JSON.stringify(cell._complexProperty));
+    }
 
-How it works:
-1. The autosave function exports the entire flowchart using exportFlowchartJson()
-2. exportFlowchartJson() includes all _textboxes with their properties
-3. The prefill property is included because it's part of the textbox object
-4. The data is saved to localStorage with a timestamp
+Pattern (values that can be 0 or empty string):
+    if (cell._propertyName !== undefined) cellData._propertyName = cell._propertyName;
 
-The prefill value is preserved because:
-- It's a property of the textbox object
-- The entire _textboxes array is serialized to JSON
-- JSON.stringify() includes all enumerable properties, including prefill
 
-5. FLOWCHART JSON EXPORT/IMPORT
---------------------------------
-The exportFlowchartJson function in library.js and url.js exports all cell properties:
+3. script.js - Copy/Paste Arrays
+────────────────────────────────
+Purpose: Preserves properties when copying/pasting nodes
+Location: Around lines 5458 and 5588 (TWO places!)
+Pattern: Add property name to the array:
+    ["_textboxes","_questionText","_myNewProperty",...].forEach(k => {
 
-Location: library.js and url.js, exportFlowchartJson function
 
-How it works:
-1. The function iterates through all cells in the graph
-2. For each cell, it creates a cellData object with all properties
-3. The _textboxes array is included with all its properties:
-   - nameId
-   - placeholder
-   - isAmountOption
-   - prefill  // <-- Automatically included
+4. library.js - saveFlowchart
+─────────────────────────────
+Purpose: Saves flowchart to Firebase
+Location: Around lines 2722-2791
+Pattern (inline with other properties):
+    _propertyName: cell._propertyName||null,
 
-4. The entire flowchart is serialized to JSON
-5. When importing, loadFlowchartData() restores all properties including prefill
+NOTE: Uses ||null pattern, not if-statement pattern
 
-The prefill is preserved because:
-- The _textboxes array is part of the cell's properties
-- All properties starting with "_" are included in the export
-- The import process restores the entire _textboxes array structure
 
-6. FIRESTORE LIBRARY SAVE
---------------------------
-When saving to Firestore library:
+5. library.js - saveAsFlowchart
+───────────────────────────────
+Purpose: Saves flowchart to Firebase as new document
+Location: Around lines 2862-2931
+Pattern: IDENTICAL to saveFlowchart
+    _propertyName: cell._propertyName||null,
 
-Location: library.js, exportFlowchartJson function (used by Firestore save)
 
-How it works:
-1. The same exportFlowchartJson function is used for Firestore saves
-2. The flowchart JSON is uploaded to Firestore
-3. When loading from Firestore, the same import process restores prefill values
+6. library.js - loadFlowchartData
+─────────────────────────────────
+Purpose: Restores flowchart from saved data (JSON import, autosave, Firebase)
+Location: Around lines 3832-4030
+Pattern:
+    if (item._propertyName) newCell._propertyName = item._propertyName;
 
-The prefill is preserved because:
-- It uses the same export/import mechanism as regular flowchart saves
-- The _textboxes array structure is maintained in Firestore
-- All textbox properties are preserved during the round-trip
+For properties that might be empty string or 0:
+    if (item._propertyName !== undefined) newCell._propertyName = item._propertyName;
 
-7. CODE LOCATIONS SUMMARY
--------------------------
-Key files and functions:
 
-questions.js:
-  - Line 419: Initialization in setQuestionType
-  - Line 572: Initialization in renderTextboxes
-  - Line 11738: Initialization when adding textbox via properties menu
-  - Line 12054-12249: createTextboxField function (UI creation and value saving)
-  - Line 12220-12225: onblur handler that saves prefill value
-  - Line 12228-12230: Safety check to initialize prefill if undefined
-  - Line 13004, 13007: Initialization in addMultipleTextboxHandler
+================================================================================
+PROPERTY VALUE PATTERNS
+================================================================================
 
-library.js:
-  - exportFlowchartJson: Exports all cell properties including _textboxes
-  - loadFlowchartData: Imports and restores all cell properties
+Different types of values need different handling:
 
-script.js:
-  - autosaveFlowchartToLocalStorage: Saves flowchart to localStorage
-  - Uses exportFlowchartJson which includes prefill
+STRING/NUMBER (can be empty or zero):
+─────────────────────────────────────
+Save:   if (cell._prop !== undefined) cellData._prop = cell._prop;
+Load:   if (item._prop !== undefined) newCell._prop = item._prop;
 
-url.js:
-  - exportFlowchartJson: Alternative export function (same mechanism)
+STRING/NUMBER (never empty):
+────────────────────────────
+Save:   if (cell._prop) cellData._prop = cell._prop;
+Load:   if (item._prop) newCell._prop = item._prop;
 
-8. TESTING THE PERSISTENCE
---------------------------
-To verify prefill is preserved:
+BOOLEAN:
+────────
+Save:   cellData._prop = cell._prop || false;
+Load:   if (item._prop !== undefined) newCell._prop = item._prop;
 
-1. Create a multiple textbox question
-2. Add a textbox entry
-3. Enter a prefill value (e.g., "test123")
-4. Close the properties menu
-5. Export the flowchart JSON
-6. Check the JSON - the prefill value should be in _textboxes[0].prefill
-7. Import the flowchart JSON
-8. Open the properties menu - the prefill value should still be "test123"
-9. Test autosave by closing the browser and reopening
-10. Test Firestore save by saving to library and loading back
+ARRAY OR OBJECT:
+────────────────
+Save:   if (cell._prop) cellData._prop = JSON.parse(JSON.stringify(cell._prop));
+Load:   if (item._prop) newCell._prop = JSON.parse(JSON.stringify(item._prop));
 
-9. WHY IT WORKS AUTOMATICALLY
------------------------------
-The prefill feature is preserved automatically because:
+NULLABLE (Firebase inline pattern):
+───────────────────────────────────
+Save:   _prop: cell._prop||null,
 
-1. It's stored as a property of the textbox object
-2. The _textboxes array is part of the cell's data structure
-3. All cell properties (including those starting with "_") are:
-   - Included in JSON export
-   - Saved to localStorage (autosave)
-   - Uploaded to Firestore
-   - Restored on import/load
 
-4. No special handling is needed because:
-   - JSON.stringify() automatically includes all object properties
-   - The import process restores the entire object structure
-   - The UI reads from the same data structure
+================================================================================
+CHECKLIST FOR NEW PROPERTIES
+================================================================================
 
-10. BEST PRACTICES
------------------
-To ensure prefill (or any new property) is preserved:
+□ 1. url.js - Added to exportFlowchartJson cellData building
+□ 2. script.js - Added to autosaveFlowchartToLocalStorage cellData building  
+□ 3. script.js - Added to FIRST copy/paste array (~line 5458)
+□ 4. script.js - Added to SECOND copy/paste array (~line 5588)
+□ 5. library.js - Added to saveFlowchart cellData (inline pattern)
+□ 6. library.js - Added to saveAsFlowchart cellData (inline pattern)
+□ 7. library.js - Added to loadFlowchartData restoration
 
-1. Always initialize the property when creating new objects:
-   { nameId: '', placeholder: '', prefill: '' }
 
-2. Initialize in all creation paths:
-   - setQuestionType
-   - renderTextboxes (fallback)
-   - addMultipleTextboxHandler
-   - Properties menu "Add" buttons
+================================================================================
+TESTING PERSISTENCE
+================================================================================
 
-3. Add a safety check in the UI creation function:
-   if (textbox.prefill === undefined) {
-     textbox.prefill = '';
-   }
+After adding a new property, test all three save methods:
 
-4. Save the value immediately on user input:
-   input.onblur = () => {
-     textbox.prefill = input.value.trim();
-     requestAutosave();
-   };
+TEST 1: Flowchart JSON Export/Import
+1. Create a node and set the property value
+2. Export flowchart JSON (File > Export Flowchart JSON)
+3. Clear the canvas or refresh the page
+4. Import the JSON file
+5. Verify the property value is restored
 
-5. No special export/import code needed - it's automatic!
+TEST 2: Autosave
+1. Create a node and set the property value
+2. Wait a few seconds (autosave happens automatically)
+3. Close the browser tab
+4. Reopen the tool - should prompt to restore
+5. Click "Yes" to restore
+6. Verify the property value is restored
 
+TEST 3: Firebase Library Save
+1. Create a node and set the property value
+2. Save to library (File > Save to Library)
+3. Clear the canvas or refresh the page
+4. Open from library (File > Open from Library)
+5. Verify the property value is restored
+
+
+================================================================================
+COMMON MISTAKES TO AVOID
+================================================================================
+
+1. FORGETTING saveAsFlowchart
+   - There are TWO Firebase save functions, not one
+   - saveFlowchart AND saveAsFlowchart need the property
+
+2. FORGETTING THE SECOND COPY/PASTE ARRAY
+   - There are TWO arrays in script.js for copy/paste
+   - Both need the property name added
+
+3. USING WRONG PATTERN FOR FIREBASE SAVE
+   - saveFlowchart/saveAsFlowchart use inline pattern: _prop: cell._prop||null,
+   - NOT the if-statement pattern used elsewhere
+
+4. FORGETTING loadFlowchartData
+   - Without this, data saves but doesn't restore!
+
+5. NOT DEEP CLONING OBJECTS/ARRAYS
+   - Use JSON.parse(JSON.stringify(obj)) for complex data
+   - Prevents reference issues
+
+
+================================================================================
+EXAMPLE: COMPLETE IMPLEMENTATION
+================================================================================
+
+Adding cell._dropdownTitle (Question Title for numbered dropdowns):
+
+1. url.js (~line 232):
+   if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
+
+2. script.js autosave (~line 4737):
+   if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
+
+3. script.js copy/paste (~lines 5458 & 5588):
+   Added "_dropdownTitle" to both arrays
+
+4. library.js saveFlowchart (~line 2747):
+   _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null,
+
+5. library.js saveAsFlowchart (~line 2887):
+   _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null,
+
+6. library.js loadFlowchartData (~line 3866):
+   if (item._dropdownTitle) newCell._dropdownTitle = item._dropdownTitle;
+
+
+================================================================================

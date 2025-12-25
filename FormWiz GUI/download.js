@@ -756,6 +756,14 @@ function loadFormData(formData) {
                                                             const triggerLabelNodeIdEl = document.getElementById('triggerLabelNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
                                                             if (triggerLabelTextEl) triggerLabelTextEl.value = triggerField.label;
                                                             if (triggerLabelNodeIdEl) triggerLabelNodeIdEl.value = triggerField.nodeId;
+                                                            // Restore amount checkbox if enabled
+                                                            if (triggerField.isAmountOption) {
+                                                                const triggerFieldCount = triggerFieldIndex + 1;
+                                                                const amountCheckbox = document.getElementById(`triggerLabelAmount${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+                                                                if (amountCheckbox) {
+                                                                    amountCheckbox.checked = true;
+                                                                }
+                                                            }
                                                             // Restore conditional logic if enabled
                                                             if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
                                                                 const triggerFieldCount = triggerFieldIndex + 1;
@@ -1172,6 +1180,11 @@ function loadFormData(formData) {
                     if (nodeIdEl && question.nodeId) {
                         nodeIdEl.value = question.nodeId;
                     }
+                    // Restore entry title if it exists
+                    const entryTitleEl = questionBlock.querySelector(`#entryTitle${question.questionId}`);
+                    if (entryTitleEl && question.entryTitle) {
+                        entryTitleEl.value = question.entryTitle;
+                    }
                     // Rebuild unified fields from exported data
                     const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
                     if (unifiedFieldsDiv) {
@@ -1473,6 +1486,14 @@ function loadFormData(formData) {
                                                         const triggerLabelNodeIdEl = document.getElementById('triggerLabelNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (triggerFieldIndex + 1));
                                                         if (triggerLabelTextEl) triggerLabelTextEl.value = triggerField.label;
                                                         if (triggerLabelNodeIdEl) triggerLabelNodeIdEl.value = triggerField.nodeId;
+                                                        // Restore amount checkbox if enabled
+                                                        if (triggerField.isAmountOption) {
+                                                            const triggerFieldCountForAmount = triggerFieldIndex + 1;
+                                                            const amountCheckbox = document.getElementById(`triggerLabelAmount${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCountForAmount}`);
+                                                            if (amountCheckbox) {
+                                                                amountCheckbox.checked = true;
+                                                            }
+                                                        }
                                                         // Restore conditional logic if enabled
                                                         if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
                                                             const triggerFieldCount = triggerFieldIndex + 1;
@@ -2904,6 +2925,11 @@ function exportForm() {
                 if (nodeIdInput && nodeIdInput.value.trim()) {
                     questionData.nodeId = nodeIdInput.value.trim();
                 }
+                // Export entry title if it exists
+                const entryTitleInput = questionBlock.querySelector(`#entryTitle${questionId}`);
+                if (entryTitleInput && entryTitleInput.value.trim()) {
+                    questionData.entryTitle = entryTitleInput.value.trim();
+                }
                 // Collect unified field data in true creation order
                 const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
                 console.log('🔧 [EXPORT DEBUG] Looking for unified container:', `#unifiedFields${questionId}`);
@@ -3074,6 +3100,11 @@ function exportForm() {
                                                     label: labelTextEl.value.trim(),
                                                     nodeId: labelNodeIdEl.value.trim()
                                                 };
+                                                // Check for amount checkbox
+                                                const amountCheckboxEl = fieldEl.querySelector(`#triggerLabelAmount${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                if (amountCheckboxEl && amountCheckboxEl.checked) {
+                                                    labelField.isAmountOption = true;
+                                                }
                                                 // Check for conditional logic
                                                 const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogicLabel${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
                                                 const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
@@ -3728,11 +3759,17 @@ function exportForm() {
                                                 if (labelTextEl && labelNodeIdEl) {
                                                     // Trigger label field
                                                     console.log('🔧 [EXPORT DEBUG] ✓ Detected as LABEL field');
-                                                    triggerFields.push({
+                                                    const labelField = {
                                                         type: 'label',
                                                         label: labelTextEl.value.trim(),
                                                         nodeId: labelNodeIdEl.value.trim()
-                                                    });
+                                                    };
+                                                    // Check for amount checkbox
+                                                    const amountCheckboxEl = fieldEl.querySelector(`#triggerLabelAmount${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    if (amountCheckboxEl && amountCheckboxEl.checked) {
+                                                        labelField.isAmountOption = true;
+                                                    }
+                                                    triggerFields.push(labelField);
                                                 } else if (checkboxFieldNameEl) {
                                                     // Trigger checkbox field
                                                     console.log('🔧 [EXPORT DEBUG] ✓ Detected as CHECKBOX field');

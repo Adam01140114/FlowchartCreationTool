@@ -16,7 +16,9 @@ function isQuestion(cell) {
 window.generateNodeIdForDropdownField = function generateNodeIdForDropdownField(fieldName, dropdownName, cell, triggerOption = '') {
   // Get PDF name if available
   const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+  // Check if PDF name should be added to node ID based on user setting
+  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+  const sanitizedPdfName = (pdfName && window.sanitizePdfName && shouldAddPdfName) ? window.sanitizePdfName(pdfName) : '';
   // Build base name components - use window.sanitizeNameId to preserve forward slashes
   const sanitizeFn = typeof window.sanitizeNameId === 'function' ? window.sanitizeNameId : 
     (name) => (name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
@@ -1427,6 +1429,16 @@ window.showNumberedDropdownProperties = function(cell) {
     })
   ]);
   modalContent.appendChild(rangeSection);
+  // Question Title Section (for the dropdown title displayed in GUI)
+  const questionTitleSection = createFieldSection('Question Title', [
+    createTextField('Title', cell._dropdownTitle || '', (value) => {
+      cell._dropdownTitle = value;
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    })
+  ]);
+  modalContent.appendChild(questionTitleSection);
   // Options Section (now includes location functionality)
   const optionsSection = createFieldSection('Dropdown Options', [
     createOptionsContainer(cell)
@@ -3139,6 +3151,28 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               };
               contentContainer.appendChild(fieldNameInput);
               contentContainer.appendChild(labelIdInput);
+              // Amount checkbox for label
+              const amountCheckboxContainer = document.createElement('label');
+              amountCheckboxContainer.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                margin-bottom: 8px;
+                font-size: 12px;
+                color: #666;
+              `;
+              const amountCheckbox = document.createElement('input');
+              amountCheckbox.type = 'checkbox';
+              amountCheckbox.checked = newLabel.isAmountOption || false;
+              amountCheckbox.onchange = () => {
+                newLabel.isAmountOption = amountCheckbox.checked;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              amountCheckboxContainer.appendChild(amountCheckbox);
+              amountCheckboxContainer.appendChild(document.createTextNode('Amount?'));
+              contentContainer.appendChild(amountCheckboxContainer);
               contentContainer.appendChild(deleteLabelBtn);
               // Copy ID button for label (positioned after delete button)
               const copyLabelIdBtn = document.createElement('button');
@@ -5015,6 +5049,28 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
           };
           contentContainer.appendChild(fieldNameInput);
           contentContainer.appendChild(labelIdInput);
+          // Amount checkbox for label
+          const amountCheckboxContainer = document.createElement('label');
+          amountCheckboxContainer.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #666;
+          `;
+          const amountCheckbox = document.createElement('input');
+          amountCheckbox.type = 'checkbox';
+          amountCheckbox.checked = newLabel.isAmountOption || false;
+          amountCheckbox.onchange = () => {
+            newLabel.isAmountOption = amountCheckbox.checked;
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          amountCheckboxContainer.appendChild(amountCheckbox);
+          amountCheckboxContainer.appendChild(document.createTextNode('Amount?'));
+          contentContainer.appendChild(amountCheckboxContainer);
           contentContainer.appendChild(deleteLabelBtn);
           labelContainer.appendChild(contentContainer);
           // Add drag handlers
@@ -6577,6 +6633,28 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         };
         contentContainer.appendChild(fieldNameInput);
         contentContainer.appendChild(labelIdInput);
+        // Amount checkbox for existing label
+        const amountCheckboxContainer = document.createElement('label');
+        amountCheckboxContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin-bottom: 8px;
+          font-size: 12px;
+          color: #666;
+        `;
+        const amountCheckbox = document.createElement('input');
+        amountCheckbox.type = 'checkbox';
+        amountCheckbox.checked = label.isAmountOption || false;
+        amountCheckbox.onchange = () => {
+          label.isAmountOption = amountCheckbox.checked;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        amountCheckboxContainer.appendChild(amountCheckbox);
+        amountCheckboxContainer.appendChild(document.createTextNode('Amount?'));
+        contentContainer.appendChild(amountCheckboxContainer);
         contentContainer.appendChild(deleteLabelBtn);
         // Copy ID button for existing label (positioned after delete button)
         const copyLabelIdBtn = document.createElement('button');
@@ -8824,7 +8902,9 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     const sanitizedCheckboxText = (checkboxText || '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
     // Check if this question has a PDF property
     const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
-    const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+    // Check if PDF name should be added to node ID based on user setting
+    const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+    const sanitizedPdfName = (pdfName && window.sanitizePdfName && shouldAddPdfName) ? window.sanitizePdfName(pdfName) : '';
     // Build the final ID with PDF name and question text prefix
     let idToCopy;
     if (sanitizedPdfName && sanitizedQuestion) {
@@ -9031,7 +9111,9 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
       const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
       // Check if this question has a PDF property
       const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
-      const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+      // Check if PDF name should be added to node ID based on user setting
+      const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+      const sanitizedPdfName = (pdfName && window.sanitizePdfName && shouldAddPdfName) ? window.sanitizePdfName(pdfName) : '';
       const minValue = cell._twoNumbers ? (parseInt(cell._twoNumbers.first) || 1) : 1;
       cell._textboxes.forEach((textbox, textboxIndex) => {
         const fieldName = textbox.nameId || '';
@@ -9076,9 +9158,31 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     const generateLinkedFieldTitle = () => {
       const checkboxOptionNodeId = option.nodeId || '';
       let linkedFieldNodeId = linkedField.selectedNodeId || '';
-      // Strip entry number suffix from linked field nodeId
-      if (linkedFieldNodeId) {
-        linkedFieldNodeId = linkedFieldNodeId.replace(/_\d+$/, '');
+      // Extract entry number suffix if present (but don't include it in the title)
+      const entryNumberMatch = linkedFieldNodeId.match(/^(.+)_(\d+)$/);
+      if (entryNumberMatch) {
+        linkedFieldNodeId = entryNumberMatch[1];
+      }
+      // Check if PDF name should be added to node ID based on user setting
+      const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+      // If setting is OFF, remove PDF prefix from linkedFieldNodeId if present
+      if (!shouldAddPdfName && linkedFieldNodeId) {
+        // Get PDF name for the cell to check if it matches the prefix
+        const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+        if (pdfName && typeof window.sanitizePdfName === 'function') {
+          const sanitizedPdfName = window.sanitizePdfName(pdfName);
+          // Remove PDF prefix if present
+          if (sanitizedPdfName && linkedFieldNodeId.startsWith(sanitizedPdfName + '_')) {
+            linkedFieldNodeId = linkedFieldNodeId.substring(sanitizedPdfName.length + 1);
+          }
+        }
+        // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
+        // This handles cases where the PDF name might have changed
+        const pdfPrefixMatch = linkedFieldNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
+        if (pdfPrefixMatch) {
+          // Only remove if the prefix looks like a PDF name (short alphanumeric)
+          linkedFieldNodeId = pdfPrefixMatch[2];
+        }
       }
       // Combine: checkboxOptionNodeId + linkedFieldNodeId
       if (checkboxOptionNodeId && linkedFieldNodeId) {
@@ -9696,7 +9800,9 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
       const sanitizedQuestion = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
       // Check if this question has a PDF property
       const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
-      const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
+      // Check if PDF name should be added to node ID based on user setting
+      const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+      const effectiveSanitizedPdfName = (pdfName && window.sanitizePdfName && shouldAddPdfName) ? window.sanitizePdfName(pdfName) : '';
       checkbox.options.forEach((option, optionIndex) => {
         const fieldName = checkbox.fieldName || '';
         const checkboxText = option.checkboxText || '';
@@ -9704,8 +9810,8 @@ function createCheckboxField(checkbox, index, cell, parentContainer) {
         const sanitizedCheckboxText = checkboxText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
         // Build the final ID with PDF name and question text prefix
         let nodeId;
-        if (sanitizedPdfName && sanitizedQuestion) {
-          nodeId = `${sanitizedPdfName}_${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
+        if (effectiveSanitizedPdfName && sanitizedQuestion) {
+          nodeId = `${effectiveSanitizedPdfName}_${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
         } else if (sanitizedQuestion) {
           nodeId = `${sanitizedQuestion}_${sanitizedFieldName}_${sanitizedCheckboxText}`;
         } else {
