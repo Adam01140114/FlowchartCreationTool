@@ -22,7 +22,7 @@ const hiddenLogicConfigs = []; // For storing hidden logic configurations
 const linkedFields = []; // For storing linked field configurations
 const linkedCheckboxes = []; // For storing linked checkbox configurations
 const checkboxRequiredMap = {}; // questionId -> boolean required
-console.log('[GEN DBG] checkboxRequiredMap initialized', checkboxRequiredMap);
+
 // Cart functions are now included in the generated HTML
 /*------------------------------------------------------------------
  * HISTORY STACK for accurate "Back" navigation
@@ -64,20 +64,12 @@ window.formatPhoneInput = function(inputEl) {
 };
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] updateStateHiddenFields called');
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] dropdown:', dropdown);
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] hiddenFullId:', hiddenFullId);
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] hiddenShortId:', hiddenShortId);
-    
+
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] selectedState:', selectedState);
-    
+
     const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
     const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
-    
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] fullField:', fullField);
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] shortField:', shortField);
-    
+
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -91,22 +83,21 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
-    console.log('[STATE_SHORT_DEBUG - BUILD TIME] abbreviation:', abbreviation);
-    
+
     if (shortField) {
         shortField.value = abbreviation;
-        console.log('[STATE_SHORT_DEBUG - BUILD TIME] Set shortField.value to:', shortField.value);
+
     } else {
-        console.error('[STATE_SHORT_DEBUG - BUILD TIME] shortField NOT FOUND!');
+
     }
-    
+
     if (fullField && fullField.tagName !== 'SELECT') {
         fullField.value = selectedState;
-        console.log('[STATE_SHORT_DEBUG - BUILD TIME] Set fullField.value to:', fullField.value);
+
     } else if (!fullField) {
-        console.error('[STATE_SHORT_DEBUG - BUILD TIME] fullField NOT FOUND!');
+
     } else {
-        console.log('[STATE_SHORT_DEBUG - BUILD TIME] fullField is a SELECT, skipping value set');
+
     }
 }
 /* slug‑aware prefix for any checkbox belonging to a question */
@@ -298,7 +289,7 @@ function getFormHTML() {
 	// Get county lookup data from global variables (loaded via script tags in gui.html)
 	let zipCodeToCountyData = '{}';
 	let countyToCourtData = '{}';
-	
+
 	// Check if the data is available as global variables (loaded from script tags)
 	// In browser, const variables from script tags are in global scope
 	try {
@@ -306,17 +297,17 @@ function getFormHTML() {
 			zipCodeToCountyData = JSON.stringify(zipCodeToCounty);
 		}
 	} catch (e) {
-		console.warn('zipCodeToCounty not available:', e.message);
+
 	}
-	
+
 	try {
 		if (typeof countyToCourt !== 'undefined') {
 			countyToCourtData = JSON.stringify(countyToCourt);
 		}
 	} catch (e) {
-		console.warn('countyToCourt not available:', e.message);
+
 	}
-	
+
 	// Define replaceUrlParametersInText for use during HTML generation
 	// During generation, we don't have URL parameters, so just return the text as-is
 	// The actual URL parameter processing will happen in the browser when the HTML loads
@@ -1341,7 +1332,7 @@ questionNameIds[questionId] = qSlug;      // so helpers know the base
 /* Required/optional flag (defaults to required) */
 const requiredSelect = qBlock.querySelector(`[id^="checkboxRequired${questionId}_"]`);
 const isCheckboxRequired = !(requiredSelect && requiredSelect.value === 'optional');
-console.log('[GEN DBG][CHECKBOX Q] render', { questionId, requiredRaw: requiredSelect ? requiredSelect.value : undefined, isCheckboxRequired });
+
 checkboxRequiredMap[questionId] = isCheckboxRequired;
 logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; \n`;
 /* ── check for "Mark only one" option ─────────────────────────── */
@@ -1793,7 +1784,7 @@ formHTML += `</div><br></div>`;
                 const locationFieldName = sanitizeQuestionText(field.fieldName || 'location');
                 const sanitizedLocationName = locationFieldName.replace(/ +/g, '_').toLowerCase();
                 let locPrefix = questionNodeId + '_' + sanitizedLocationName;
-                
+
                 // Create hidden full_address field (stores complete address like "921 Sloat Road, Salinas, CA 93907")
                 const fullAddressHidden = document.createElement('input');
                 fullAddressHidden.type = 'text';
@@ -1801,13 +1792,13 @@ formHTML += `</div><br></div>`;
                 fullAddressHidden.name = fullAddressHidden.id;
                 fullAddressHidden.style.display = 'none';
                 const fullAddressId = fullAddressHidden.id;
-                
+
                 // Define field IDs for the update function
                 const streetFieldId = locPrefix + '_street';
                 const cityFieldId = locPrefix + '_city';
                 const stateShortFieldId = locPrefix + '_state_short';
                 const zipFieldId = locPrefix + '_zip';
-                
+
                 // Helper function code to update full address (will be inlined in oninput/onchange)
                 const updateFullAddressCode = `
                     (function() {
@@ -1816,12 +1807,12 @@ formHTML += `</div><br></div>`;
                         var stateShortEl = document.getElementById('${stateShortFieldId}');
                         var zipEl = document.getElementById('${zipFieldId}');
                         var fullAddressEl = document.getElementById('${fullAddressId}');
-                        if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG] fullAddressEl not found:', '${fullAddressId}'); return; }
+                        if (!fullAddressEl) { return; }
                         var street = streetEl ? streetEl.value.trim() : '';
                         var city = cityEl ? cityEl.value.trim() : '';
                         var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
                         var zip = zipEl ? zipEl.value.trim() : '';
-                        console.log('[FULL_ADDRESS_DEBUG] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip);
+
                         var parts = [];
                         if (street) parts.push(street);
                         if (city && stateShort && zip) {
@@ -1841,10 +1832,10 @@ formHTML += `</div><br></div>`;
                         }
                         var fullAddress = parts.join(', ');
                         fullAddressEl.value = fullAddress;
-                        console.log('[FULL_ADDRESS_DEBUG] Full address set to:', fullAddress);
+
                     })();
                 `;
-                
+
                 locs.forEach(f=>{
                     let input;
                     if (f.label === 'State'){
@@ -1854,14 +1845,14 @@ formHTML += `</div><br></div>`;
                         input.name = input.id;
                         input.className = 'address-select-trigger';
                         input.style.cssText = 'width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid #87CEEB; border-radius: 8px; font-size: 14px; background-color: white; color: #2c3e50; transition: 0.2s;';
-                        
+
                         // Create hidden full state field (stores full state name like "California")
                         const fullHidden = document.createElement('input');
                         fullHidden.type = 'text';
                         fullHidden.id = locPrefix + '_state_hidden';
                         fullHidden.name = fullHidden.id;
                         fullHidden.style.display = 'none';
-                        
+
                         // Create hidden short code field for state abbreviation (stores "CA")
                         const shortHidden = document.createElement('input');
                         shortHidden.type = 'text';
@@ -1869,14 +1860,14 @@ formHTML += `</div><br></div>`;
                         shortHidden.id = locPrefix + '_state_short';
                         shortHidden.name = shortHidden.id;
                         shortHidden.style.display = 'none';
-                        
+
                         const defaultOption = document.createElement('option');
                         defaultOption.value = '';
                         defaultOption.textContent = 'Select State';
                         input.appendChild(defaultOption);
                         const states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
                         states.forEach(state=>{ const o=document.createElement('option'); o.value=state; o.textContent=state; input.appendChild(o); });
-                        
+
                         // CRITICAL FIX: Use inline onchange attribute instead of addEventListener
                         // addEventListener does NOT persist when DOM is serialized to HTML via outerHTML
                         // The inline onchange will be included in the HTML output
@@ -1884,22 +1875,16 @@ formHTML += `</div><br></div>`;
                         const shortHiddenId = shortHidden.id;
                         const selectId = input.id;
                         input.setAttribute('onchange', `
-                            console.log('[STATE_SHORT_DEBUG] State dropdown changed!');
-                            console.log('[STATE_SHORT_DEBUG] Dropdown ID:', '${selectId}');
-                            console.log('[STATE_SHORT_DEBUG] Selected value:', this.value);
-                            console.log('[STATE_SHORT_DEBUG] Full hidden field ID:', '${fullHiddenId}');
-                            console.log('[STATE_SHORT_DEBUG] Short hidden field ID:', '${shortHiddenId}');
+
                             var fullField = document.getElementById('${fullHiddenId}');
                             var shortField = document.getElementById('${shortHiddenId}');
-                            console.log('[STATE_SHORT_DEBUG] Full field found:', !!fullField, fullField);
-                            console.log('[STATE_SHORT_DEBUG] Short field found:', !!shortField, shortField);
+
                             if (typeof updateStateHiddenFields === 'function') {
-                                console.log('[STATE_SHORT_DEBUG] Calling updateStateHiddenFields...');
+
                                 updateStateHiddenFields(this, '${fullHiddenId}', '${shortHiddenId}');
-                                console.log('[STATE_SHORT_DEBUG] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');
-                                console.log('[STATE_SHORT_DEBUG] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');
+
                             } else {
-                                console.error('[STATE_SHORT_DEBUG] updateStateHiddenFields function NOT FOUND!');
+
                             }
                             if (typeof dropdownMirror === 'function') {
                                 dropdownMirror(this, '${selectId}');
@@ -1907,7 +1892,7 @@ formHTML += `</div><br></div>`;
                             // Update full address after state change (with small delay to ensure state_short is updated)
                             setTimeout(function() { ${updateFullAddressCode} }, 50);
                         `);
-                        
+
                         locationFieldDiv.appendChild(input);
                         locationFieldDiv.appendChild(fullHidden);
                         locationFieldDiv.appendChild(shortHidden);
@@ -1929,8 +1914,8 @@ formHTML += `</div><br></div>`;
                 entryContainer.appendChild(locationFieldDiv);
                 lastWasLocation = true;
               } else if (field.type === 'label') {
-                // For multipleTextboxes, use the base nodeId without numbering
-                const fieldId = field.nodeId;
+                // For numbered dropdowns, append entry number to field ID
+                const fieldId = field.nodeId + '_' + j;
                 let prefillValue = field.prefill || '';
                 // Check for conditional prefills - for multipleTextboxes, j is always 1, so check for trigger "1"
                 if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
@@ -2203,7 +2188,7 @@ formHTML += `</div><br></div>`;
                 const checkboxOptions = field.options || [];
                 const selectionType = field.selectionType || 'multiple';
                 const isCheckboxRequired = field.required !== 'optional';
-                console.log('[GEN DBG][MDD] checkbox field render', { questionId, fieldName: field.fieldName, requiredRaw: field.required, isCheckboxRequired });
+
                 checkboxRequiredMap[questionId] = isCheckboxRequired;
                 logicScriptBuffer += `checkboxRequiredMap[${questionId}] = ${isCheckboxRequired ? 'true' : 'false'}; \n`;
                 // Create checkbox/radio options
@@ -2212,13 +2197,23 @@ formHTML += `</div><br></div>`;
                     optionDiv.style.cssText = 'margin: 12px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); display: flex; align-items: center; transition: all 0.2s ease;';
                     const input = document.createElement('input');
                     input.type = selectionType === 'single' ? 'radio' : 'checkbox';
-                    // For multipleTextboxes, don't add entry number suffix
-                    input.id = selectionType === 'single' ? option.nodeId + '_radio' : option.nodeId;
-                    input.name = selectionType === 'single' ? 'radio_group_' + (questionId || 'unknown') : option.nodeId;
+                    // For numbered dropdowns, add entry number suffix to checkbox ID
+                    const checkboxIdBase = selectionType === 'single' ? option.nodeId + '_radio' : option.nodeId;
+                    input.id = checkboxIdBase + '_' + j;
+                    input.name = selectionType === 'single' ? 'radio_group_' + (questionId || 'unknown') + '_' + j : option.nodeId + '_' + j;
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     // Handle linked fields for this checkbox option
-                    const linkedFields = option.linkedFields || [];
+                    // For numbered dropdowns, we need to append entry number to linked field nodeIds and titles
+                    const linkedFields = (option.linkedFields || []).map(linkedField => {
+                        if (linkedField.nodeId && linkedField.title) {
+                            return {
+                                nodeId: linkedField.nodeId + '_' + j, // Append entry number to nodeId
+                                title: linkedField.title + '_' + j   // Append entry number to title (hidden field ID)
+                            };
+                        }
+                        return linkedField;
+                    });
                     // Handle PDF entries for this checkbox option
                     const pdfEntries = option.pdfEntries || [];
                     // Function to add PDF entries when checkbox is checked (for multipleTextboxes, entry number is always 1)
@@ -2260,32 +2255,49 @@ formHTML += `</div><br></div>`;
                     }
                     // Function to create linked textboxes when checkbox is checked
                     function createLinkedTextboxes() {
-                        linkedFields.forEach((linkedField) => {
+
+                        linkedFields.forEach((linkedField, index) => {
+
                             if (linkedField.nodeId && linkedField.title) {
-                                const sourceField = document.getElementById(linkedField.nodeId);
+                                // linkedField.nodeId already has entry number appended from mapping above
+                                const sourceFieldId = linkedField.nodeId;
+
+                                const sourceField = document.getElementById(sourceFieldId);
+
                                 if (sourceField) {
+                                    // linkedField.title already has entry number appended from mapping above
+                                    const hiddenTextboxId = linkedField.title;
+
                                     // Check if hidden textbox already exists
-                                    const existingHiddenTextbox = document.getElementById(linkedField.title);
+                                    const existingHiddenTextbox = document.getElementById(hiddenTextboxId);
                                     if (existingHiddenTextbox) {
+
                                         return; // Skip creating duplicate
                                     }
                                     // Create hidden textbox with title as ID
                                     const hiddenTextbox = document.createElement('input');
                                     hiddenTextbox.type = 'text';
-                                    hiddenTextbox.id = linkedField.title;
-                                    hiddenTextbox.name = linkedField.title;
+                                    hiddenTextbox.id = hiddenTextboxId;
+                                    hiddenTextbox.name = hiddenTextboxId;
                                     hiddenTextbox.style.display = 'none';
                                     hiddenTextbox.value = sourceField.value || '';
+
                                     // Add to form (append to form element, not body)
                                     const form = document.getElementById('customForm');
                                     if (form) {
                                         form.appendChild(hiddenTextbox);
+
                                     } else {
                                         document.body.appendChild(hiddenTextbox);
+
                                     }
                                     // Sync with source field
                                     function syncLinkedField() {
+                                        const oldValue = hiddenTextbox.value;
                                         hiddenTextbox.value = sourceField.value || '';
+                                        if (oldValue !== hiddenTextbox.value) {
+
+                                        }
                                         // Trigger linked field synchronization if updateLinkedFields function exists
                                         if (typeof updateLinkedFields === 'function') {
                                             updateLinkedFields();
@@ -2296,10 +2308,12 @@ formHTML += `</div><br></div>`;
                                     // Listen for changes on source field
                                     sourceField.addEventListener('input', syncLinkedField);
                                     sourceField.addEventListener('change', syncLinkedField);
+
                                     // Poll periodically to catch any missed updates (especially for autofill)
                                     // This ensures the linked textbox always stays in sync, even if events are missed
                                     const pollInterval = setInterval(function() {
                                         if (hiddenTextbox.value !== sourceField.value) {
+
                                             syncLinkedField();
                                         }
                                     }, 100); // Check every 100ms
@@ -2308,8 +2322,10 @@ formHTML += `</div><br></div>`;
                                     hiddenTextbox._sourceField = sourceField;
                                     hiddenTextbox._pollInterval = pollInterval;
                                 } else {
+
                                 }
                             } else {
+
                             }
                         });
                     }
@@ -2343,43 +2359,63 @@ formHTML += `</div><br></div>`;
                     const linkedFieldsJson = JSON.stringify(linkedFields);
                     const pdfEntriesJson = JSON.stringify(pdfEntries);
                     const checkboxId = input.id;
+                    const entryNumber = j; // Capture entry number for use in inline handler
                     // Create inline onchange handler that will work in the generated HTML
                     // Capture 'this' before the IIFE since inline handlers have 'this' referring to the element
                     input.setAttribute('onchange', `
                         var self = this; (function() {
+
                             const linkedFields = ${linkedFieldsJson};
                             const pdfEntries = ${pdfEntriesJson};
                             const checkboxId = '${checkboxId}';
+                            const entryNumber = ${entryNumber};
                             const checkbox = self; // Use captured 'this' from inline handler
                             const isChecked = checkbox ? checkbox.checked : false;
+
                             if (isChecked) {
                                 // Create linked textboxes
-                                linkedFields.forEach((linkedField) => {
+                                linkedFields.forEach((linkedField, index) => {
+
                                     if (linkedField.nodeId && linkedField.title) {
-                                        const sourceField = document.getElementById(linkedField.nodeId);
+                                        // linkedField.nodeId already has entry number appended from mapping above
+                                        const sourceFieldId = linkedField.nodeId;
+
+                                        const sourceField = document.getElementById(sourceFieldId);
+
                                         if (sourceField) {
+                                            // linkedField.title already has entry number appended from mapping above
+                                            const hiddenTextboxId = linkedField.title;
+
                                             // Check if hidden textbox already exists
-                                            const existingHiddenTextbox = document.getElementById(linkedField.title);
+                                            const existingHiddenTextbox = document.getElementById(hiddenTextboxId);
                                             if (existingHiddenTextbox) {
+
                                                 return; // Skip creating duplicate
                                             }
                                             // Create hidden textbox with title as ID
                                             const hiddenTextbox = document.createElement('input');
                                             hiddenTextbox.type = 'text';
-                                            hiddenTextbox.id = linkedField.title;
-                                            hiddenTextbox.name = linkedField.title;
+                                            hiddenTextbox.id = hiddenTextboxId;
+                                            hiddenTextbox.name = hiddenTextboxId;
                                             hiddenTextbox.style.display = 'none';
                                             hiddenTextbox.value = sourceField.value || '';
+
                                             // Add to form (append to form element, not body)
                                             const form = document.getElementById('customForm');
                                             if (form) {
                                                 form.appendChild(hiddenTextbox);
+
                                             } else {
                                                 document.body.appendChild(hiddenTextbox);
+
                                             }
                                             // Sync with source field
                                             function syncLinkedField() {
+                                                const oldValue = hiddenTextbox.value;
                                                 hiddenTextbox.value = sourceField.value || '';
+                                                if (oldValue !== hiddenTextbox.value) {
+
+                                                }
                                                 // Trigger linked field synchronization if updateLinkedFields function exists
                                                 if (typeof updateLinkedFields === 'function') {
                                                     updateLinkedFields();
@@ -2390,9 +2426,12 @@ formHTML += `</div><br></div>`;
                                             // Listen for changes on source field
                                             sourceField.addEventListener('input', syncLinkedField);
                                             sourceField.addEventListener('change', syncLinkedField);
+
                                             // Poll periodically to catch any missed updates (especially for autofill)
+                                            // This ensures the linked textbox always stays in sync, even if events are missed
                                             const pollInterval = setInterval(function() {
                                                 if (hiddenTextbox.value !== sourceField.value) {
+
                                                     syncLinkedField();
                                                 }
                                             }, 100); // Check every 100ms
@@ -2401,8 +2440,10 @@ formHTML += `</div><br></div>`;
                                             hiddenTextbox._sourceField = sourceField;
                                             hiddenTextbox._pollInterval = pollInterval;
                                         } else {
+
                                         }
                                     } else {
+
                                     }
                                 });
                                 // Add PDF entries
@@ -2428,22 +2469,32 @@ formHTML += `</div><br></div>`;
                                     }
                                 });
                             } else {
+
                                 // Remove linked textboxes
                                 linkedFields.forEach((linkedField) => {
                                     if (linkedField.title) {
-                                        const hiddenTextbox = document.getElementById(linkedField.title);
+                                        // linkedField.title already has entry number appended from mapping above
+                                        const hiddenTextboxId = linkedField.title;
+
+                                        const hiddenTextbox = document.getElementById(hiddenTextboxId);
                                         if (hiddenTextbox) {
+
                                             // Remove event listeners
                                             if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
                                                 hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
                                                 hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+
                                             }
                                             // Clear polling interval
                                             if (hiddenTextbox._pollInterval) {
                                                 clearInterval(hiddenTextbox._pollInterval);
+
                                             }
                                             // Remove the hidden textbox
                                             hiddenTextbox.remove();
+
+                                        } else {
+
                                         }
                                     }
                                 });
@@ -3159,8 +3210,19 @@ formHTML += `</div><br></div>`;
             );
             if (!pqEl || !paEl) continue;
             const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim().toLowerCase();
-            if (!pqVal || !paVal) continue;
+            // For text/currency/date questions the select is hidden; grab the hidden value
+            const hiddenAnswerEl = document.getElementById(`hiddenAnswer${questionId}_${rowIndex}`);
+            let paValRaw = paEl.value ? paEl.value.trim() : "";
+            if (paEl.style.display === "none" && hiddenAnswerEl && hiddenAnswerEl.value) {
+              paValRaw = hiddenAnswerEl.value.trim();
+            } else if (!paValRaw && hiddenAnswerEl && hiddenAnswerEl.value) {
+              paValRaw = hiddenAnswerEl.value.trim();
+            }
+            const paVal = paValRaw.toLowerCase();
+            if (!pqVal || !paVal) {
+              console.log("[LOGIC][SKIP] Q" + questionId + " condition " + rowIndex + " missing pq/pa", { pqVal, paValRaw });
+              continue;
+            }
             const pType = questionTypesMap[pqVal] || "text";
             logicScriptBuffer += `  (function(){\n`;
             logicScriptBuffer += `    var cPrevType="${pType}";\n`;
@@ -3180,9 +3242,9 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
             if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
-              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
+              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; console.log("[LOGIC][MATCH] Q${questionId} cond ${rowIndex} ANY for prevQ", cPrevQNum, "val:", val2); } else { console.log("[LOGIC][NO MATCH] Q${questionId} cond ${rowIndex} ANY for prevQ", cPrevQNum, "empty input"); } }\n`;
             } else {
-              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
+              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; console.log("[LOGIC][MATCH] Q${questionId} cond ${rowIndex} exact for prevQ", cPrevQNum, "val:", val2, "target:", cPrevAns); } else { console.log("[LOGIC][NO MATCH] Q${questionId} cond ${rowIndex} exact for prevQ", cPrevQNum, "val:", val2, "target:", cPrevAns); } }\n`;
             }
             logicScriptBuffer += `    }\n`;
             logicScriptBuffer += `  })();\n`;
@@ -3486,6 +3548,10 @@ if (s > 1){
   formHTML += `
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      console.groupCollapsed('[NAV DEBUG] form boot');
+      const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
+      console.log('[NAV DEBUG] initial questionTypesMap', JSON.parse(JSON.stringify(qtMap)));
+      console.groupEnd();
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
       const sectionElements = Array.from(sectionNodeList);
       const sectionNumbers = sectionElements.map(sectionEl => {
@@ -3578,7 +3644,9 @@ if (s > 1){
           return true;
         }
         function isQuestionAnswered(container) {
-          if (!container) return false;
+          if (!container) {
+            return false;
+          }
           const elements = Array.from(container.querySelectorAll('select, textarea, input'));
           const eligibleElements = elements.filter(isElementEligible);
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
@@ -3591,7 +3659,11 @@ if (s > 1){
             value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
             display: el.style && el.style.display ? el.style.display : null
           }));
-          if (!eligibleElements.length) return true;
+
+          if (!eligibleElements.length) {
+
+            return true;
+          }
           let allStandardSatisfied = true;
           const radioGroups = {};
           let hasCheckbox = false;
@@ -3601,9 +3673,11 @@ if (s > 1){
             const type = (el.type || '').toLowerCase();
             if (tag === 'SELECT') {
               const value = (el.value || '').trim();
+
               if (!value) allStandardSatisfied = false;
             } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
               const value = (el.value || '').trim();
+
               if (!value) allStandardSatisfied = false;
             } else if (type === 'radio') {
               const group = radioGroups[el.name || el.id] || [];
@@ -3622,19 +3696,11 @@ if (s > 1){
             ? checkboxRequiredMap[questionId]
             : false;
           const checkboxesSatisfied = !hasCheckbox || !checkboxRequired || checkboxAnyChecked;
-          console.debug('[VALIDATION DBG] checkbox gate', {
-            questionId,
-            questionText,
-            hasCheckbox,
-            checkboxRequiredMapVal: checkboxRequiredMap[questionId],
-            checkboxRequired,
-            checkboxAnyChecked,
-            radiosSatisfied,
-            allStandardSatisfied
-          });
+
           // Additional check: if any trigger sequence container is visible, its fields become required
           const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
           if (visibleTriggerContainers.length > 0) {
+
             visibleTriggerContainers.forEach(tc => {
               const triggerInputs = tc.querySelectorAll('select, textarea, input');
               triggerInputs.forEach(inp => {
@@ -3661,6 +3727,15 @@ if (s > 1){
             });
           }
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
+          console.log('[NAV DEBUG] isQuestionAnswered', {
+            questionId,
+            questionText,
+            answered,
+            allStandardSatisfied,
+            radiosSatisfied,
+            checkboxesSatisfied,
+            debugElements
+          });
           return answered;
         }
         function answerTriggersEnd(container) {
@@ -3678,13 +3753,13 @@ if (s > 1){
           }
           const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
           if (!relevantJumps.length) return false;
-          
+
           // Check for "Any Text" jump option first - this applies to textareas and text inputs
           const hasAnyTextJump = relevantJumps.some(jl => {
             const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
             return jumpOption === 'any text' || jumpOption === 'any amount' || jumpOption === 'any date';
           });
-          
+
           if (hasAnyTextJump) {
             // For "Any Text", check if any textarea or text input has content
             const textElements = container.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="url"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"]');
@@ -3695,7 +3770,7 @@ if (s > 1){
             }
             return false;
           }
-          
+
           // For dropdown/radio/checkbox questions, check their values
           const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
           const currentAnswers = [];
@@ -3721,42 +3796,63 @@ if (s > 1){
           return false;
         }
         function attachSubmitModeListeners(container, containerIdx) {
-          if (!container || container.dataset.submitModeListenersAttached === 'true') return;
+          if (!container || container.dataset.submitModeListenersAttached === 'true') {
+
+            return;
+          }
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
           const questionTextEl = container.querySelector('.question-text');
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+
           // Use event delegation - attach listeners to container to catch events from dynamically created fields
           container.addEventListener('change', function(event) {
             const target = event.target;
+
             // Only handle interactive elements
             if (target.tagName === 'SELECT' || target.type === 'radio' || target.type === 'checkbox') {
               // Make sure the element is within this container
               if (container.contains(target)) {
+
                 refreshNav(containerIdx);
+              } else {
+
               }
             }
           });
           container.addEventListener('input', function(event) {
             const target = event.target;
+            const isTextarea = target.tagName === 'TEXTAREA';
+            const isTextInput = target.tagName === 'INPUT' && ['text', 'email', 'tel', 'url', 'number', 'date', 'time', 'datetime-local'].includes(target.type);
+
             // Only handle text-like inputs
-            if (target.tagName === 'TEXTAREA' || 
-                (target.tagName === 'INPUT' && ['text', 'email', 'tel', 'url', 'number', 'date', 'time', 'datetime-local'].includes(target.type))) {
+            if (isTextarea || isTextInput) {
               // Make sure the element is within this container
               if (container.contains(target)) {
+
                 refreshNav(containerIdx);
+              } else {
+
               }
+            } else {
+
             }
           });
           container.dataset.submitModeListenersAttached = 'true';
+
         }
         function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
           const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
           const isAnswered = submitConfig && submitConfig.isAnswered;
           const currentQuestionId = submitConfig && submitConfig.questionId;
           const currentQuestionText = submitConfig && submitConfig.questionText;
+          const currentPos = submitConfig && typeof submitConfig.currentPos === 'number' ? submitConfig.currentPos : -1;
+          const visibleTotal = submitConfig && typeof submitConfig.visibleTotal === 'number' ? submitConfig.visibleTotal : 0;
+          const isLastQuestion = currentPos === visibleTotal - 1;
+
           if (prevBtn) {
             const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
             prevBtn.disabled = !canGoBack;
+
             if (!canGoBack) {
               prevBtn.dataset.advanceMode = '';
               delete prevBtn.dataset.prevSectionNumber;
@@ -3780,10 +3876,24 @@ if (s > 1){
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
               nextBtn.classList.add('submit-mode');
+
             } else {
               nextBtn.classList.remove('submit-mode');
-              const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+              // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
+              const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
+              console.log('[NAV DEBUG] updateButtons', {
+                questionId: currentQuestionId,
+                questionText: currentQuestionText,
+                isAnswered,
+                canAdvanceWithinSection,
+                canAdvanceAcrossSection,
+                isLastQuestion,
+                shouldSubmit,
+                visibleTotal,
+                currentPos
+              });
               nextBtn.disabled = !canAdvance;
+
               if (!canAdvance) {
                 nextBtn.dataset.advanceMode = '';
                 delete nextBtn.dataset.nextSectionNumber;
@@ -3854,17 +3964,23 @@ if (s > 1){
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
-          const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
+          // Allow advancing within section if there's a next question in the current section
+          const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
+          if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
+
+          }
+
           updateButtons(
             hasPrevQuestion,
             canAdvanceWithinSection,
             canAdvanceAcrossSection,
             cachedNextSectionInfo,
             cachedPrevSectionInfo,
-            { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText }
+            { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText, currentPos, visibleTotal }
           );
           activeIndex = targetIdx;
           isUpdating = false;
@@ -3966,20 +4082,27 @@ if (s > 1){
           activateIndex(visibleIndices[nextPos]);
         }
         function refreshNav(targetIdx) {
+
           const visibleIndices = getVisibleIndices();
+
           if (!visibleIndices.length) {
+
             activateIndex(0);
             return;
           }
           if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
             const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
+
             if (currentVisibleIdx === -1) {
+
               activateIndex(visibleIndices[0]);
             } else {
+
               activateIndex(activeIndex);
             }
             return;
           }
+
           activateIndex(targetIdx);
         }
         if (prevBtn) {
@@ -4036,16 +4159,43 @@ if (s > 1){
         const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
         activateIndex(initialIndex);
       });
+      // --- Fallback visibility enforcement for Q3 based on JSON logic (Q1 yes OR any text in Q2) ---
+      (function attachQ3FallbackLogic(){
+        const q1 = document.getElementById('have_you_sent_a_demand_letter_to_the_defendant') || document.getElementById('answer1');
+        const q2 = document.getElementById('explain_why_you_have_not_sent_a_demand_letter_yet') || document.getElementById('answer2');
+        const q3Container = document.getElementById('question-container-3');
+        const refreshNavForQ3 = () => {
+          const activeSection = document.querySelector('.section.active');
+          if (activeSection && window.questionNavControllers) {
+            const controller = window.questionNavControllers[activeSection.id];
+            if (typeof controller === 'function') controller();
+          }
+        };
+        const recompute = () => {
+          if (!q3Container) return;
+          const q1Val = (q1 && q1.value || '').trim().toLowerCase();
+          const q2Val = (q2 && q2.value || '').trim();
+          const shouldShow = q1Val === 'yes' || q2Val.length > 0;
+          console.log('[LOGIC DEBUG] Q3 visibility check', { q1Val, q2ValLength: q2Val.length, shouldShow });
+          if (shouldShow) {
+            q3Container.classList.remove('hidden');
+          } else {
+            q3Container.classList.add('hidden');
+          }
+          document.dispatchEvent(new CustomEvent('questionVisibilityChanged',{detail:{sectionId: q3Container.closest('[id^="section"]')?.id || null}}));
+          refreshNavForQ3();
+        };
+        if (q1) q1.addEventListener('change', recompute);
+        if (q2) q2.addEventListener('input', recompute);
+        recompute();
+      })();
       // Global shortcut: Shift+Enter → click the visible "next" arrow
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && e.shiftKey) {
           e.preventDefault();
           const activeSection = document.querySelector('.section.active');
           const nextBtn = activeSection ? activeSection.querySelector('.question-next') : null;
-          console.debug('[NAV DBG] Shift+Enter pressed', {
-            activeSectionId: activeSection ? activeSection.id : null,
-            hasNextBtn: !!nextBtn
-          });
+
           if (nextBtn) {
             nextBtn.click();
           }
@@ -4057,10 +4207,7 @@ if (s > 1){
           e.preventDefault();
           const activeSection = document.querySelector('.section.active');
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
-          console.debug('[NAV DBG] Ctrl+CapsLock pressed', {
-            activeSectionId: activeSection ? activeSection.id : null,
-            hasPrevBtn: !!prevBtn
-          });
+
           if (prevBtn) {
             prevBtn.click();
           }
@@ -4470,13 +4617,13 @@ if (s > 1){
       return;
     }
     const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
-    
+
     function updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds) {
       const inverseCheckbox = document.getElementById(inverseCheckboxId);
       if (!inverseCheckbox) {
         return;
       }
-      
+
       if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
         // For linked checkboxes: check if ANY source checkbox is checked
         let anyChecked = false;
@@ -4497,7 +4644,7 @@ if (s > 1){
         inverseCheckbox.checked = !targetCheckbox.checked;
       }
     }
-    
+
     function setupInverseCheckboxListener(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds) {
       if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
         // For linked checkboxes: listen to all source checkboxes
@@ -4535,14 +4682,14 @@ if (s > 1){
         }
       }
     }
-    
+
     inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
       const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
       const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
       if (!inverseCheckboxId || !targetCheckboxId) {
         return;
       }
-      
+
       // Check if target is a linked checkbox
       let isLinkedCheckbox = false;
       let sourceCheckboxIds = [];
@@ -4551,7 +4698,7 @@ if (s > 1){
         isLinkedCheckbox = true;
         sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
       }
-      
+
       // Create the hidden inverse checkbox
       const form = document.getElementById('customForm');
       if (form) {
@@ -4562,16 +4709,16 @@ if (s > 1){
         inverseCheckbox.style.display = 'none';
         form.appendChild(inverseCheckbox);
       }
-      
+
       // Set up listeners
       setupInverseCheckboxListener(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
-      
+
       // Initial update
       setTimeout(() => {
         updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
       }, 500);
     });
-    
+
     window.updateAllInverseCheckboxes = function() {
       const inverseCheckboxesArray = (typeof inverseCheckboxes !== 'undefined' && inverseCheckboxes) ? inverseCheckboxes : [];
       const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
@@ -4595,7 +4742,7 @@ if (s > 1){
         updateInverseCheckbox(inverseCheckboxId, targetCheckboxId, isLinkedCheckbox, sourceCheckboxIds);
       });
     };
-    
+
     // Periodic validation to ensure inverse relationship is always maintained
     // This catches any cases where autofill or other code tries to set both checkboxes
     function validateAndFixInverseCheckboxes() {
@@ -4604,19 +4751,19 @@ if (s > 1){
       if (!inverseCheckboxesArray || inverseCheckboxesArray.length === 0) {
         return;
       }
-      
+
       inverseCheckboxesArray.forEach(inverseCheckboxConfig => {
         const inverseCheckboxId = inverseCheckboxConfig.inverseCheckboxId;
         const targetCheckboxId = inverseCheckboxConfig.targetCheckboxId;
         if (!inverseCheckboxId || !targetCheckboxId) {
           return;
         }
-        
+
         const inverseCheckbox = document.getElementById(inverseCheckboxId);
         if (!inverseCheckbox) {
           return;
         }
-        
+
         // Check if target is a linked checkbox
         let isLinkedCheckbox = false;
         let sourceCheckboxIds = [];
@@ -4625,7 +4772,7 @@ if (s > 1){
           isLinkedCheckbox = true;
           sourceCheckboxIds = linkedCheckboxConfig.checkboxes || [];
         }
-        
+
         // Calculate what the inverse checkbox state SHOULD be
         let shouldBeChecked = false;
         if (isLinkedCheckbox && sourceCheckboxIds && sourceCheckboxIds.length > 0) {
@@ -4645,17 +4792,17 @@ if (s > 1){
             shouldBeChecked = !targetCheckbox.checked;
           }
         }
-        
+
         // If the inverse checkbox state is wrong, fix it
         if (inverseCheckbox.checked !== shouldBeChecked) {
           inverseCheckbox.checked = shouldBeChecked;
         }
       });
     }
-    
+
     // Run periodic validation every 500ms to catch any violations
     setInterval(validateAndFixInverseCheckboxes, 500);
-    
+
     // Also validate after autofill operations
     // Hook into autofill completion by watching for the isInitialAutofill flag
     let autofillCheckInterval = setInterval(function() {
@@ -4669,12 +4816,12 @@ if (s > 1){
         clearInterval(autofillCheckInterval);
       }
     }, 100);
-    
+
     // Clear the autofill check interval after 10 seconds to avoid infinite checking
     setTimeout(function() {
       clearInterval(autofillCheckInterval);
     }, 10000);
-    
+
     // Also validate when form fields change (MutationObserver for programmatic changes)
     const form = document.getElementById('customForm');
     if (form) {
@@ -4691,7 +4838,7 @@ if (s > 1){
           setTimeout(validateAndFixInverseCheckboxes, 50);
         }
       });
-      
+
       // Observe the entire form for checkbox changes
       observer.observe(form, {
         attributes: true,
@@ -5632,7 +5779,7 @@ if (s > 1){
         // For multipleTextboxes: {dropdownName}_{locationFieldName} (no entry number, no trigger condition)
         // For numberedDropdown: {dropdownName}_{locationFieldName} (entry number added per field)
         const locPrefix = sanitizedDropdownNameForLocation + '_' + sanitizedLocationName;
-        
+
         // Create hidden full_address field (stores complete address like "921 Sloat Road, Salinas, CA 93907")
         const fullAddressHidden = document.createElement('input');
         fullAddressHidden.type = 'text';
@@ -5644,13 +5791,13 @@ if (s > 1){
         fullAddressHidden.name = fullAddressHidden.id;
         fullAddressHidden.style.display = 'none';
         const fullAddressId = fullAddressHidden.id;
-        
+
         // Define field IDs for the update function (varies based on multipleTextboxes or numberedDropdown)
         const triggerStreetFieldId = isMultipleTextboxes ? locPrefix + '_street' : locPrefix + '_street_' + entryNumber;
         const triggerCityFieldId = isMultipleTextboxes ? locPrefix + '_city' : locPrefix + '_city_' + entryNumber;
         const triggerStateShortFieldId = isMultipleTextboxes ? locPrefix + '_state_short' : locPrefix + '_state_short_' + entryNumber;
         const triggerZipFieldId = isMultipleTextboxes ? locPrefix + '_zip' : locPrefix + '_zip_' + entryNumber;
-        
+
         // Helper function code to update full address (using escaped backticks since we're inside formHTML template literal)
         const triggerUpdateFullAddressCode = "(function() { " +
             "var streetEl = document.getElementById('" + triggerStreetFieldId + "'); " +
@@ -5658,12 +5805,12 @@ if (s > 1){
             "var stateShortEl = document.getElementById('" + triggerStateShortFieldId + "'); " +
             "var zipEl = document.getElementById('" + triggerZipFieldId + "'); " +
             "var fullAddressEl = document.getElementById('" + fullAddressId + "'); " +
-            "if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG - TRIGGER] fullAddressEl not found:', '" + fullAddressId + "'); return; } " +
+            "if (!fullAddressEl) { return; } " +
             "var street = streetEl ? streetEl.value.trim() : ''; " +
             "var city = cityEl ? cityEl.value.trim() : ''; " +
             "var stateShort = stateShortEl ? stateShortEl.value.trim() : ''; " +
             "var zip = zipEl ? zipEl.value.trim() : ''; " +
-            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip); " +
+            "" +
             "var parts = []; " +
             "if (street) parts.push(street); " +
             "if (city && stateShort && zip) { parts.push(city + ', ' + stateShort + ' ' + zip); } " +
@@ -5675,9 +5822,9 @@ if (s > 1){
             "else if (zip) { parts.push(zip); } " +
             "var fullAddress = parts.join(', '); " +
             "fullAddressEl.value = fullAddress; " +
-            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Full address set to:', fullAddress); " +
+            "" +
             "})();";
-        
+
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
@@ -5692,7 +5839,7 @@ if (s > 1){
             }
             input.name = input.id;
             input.className = 'address-select-main';
-            
+
             // Create hidden full state field (stores full state name like "California")
             const fullHidden = document.createElement('input');
             fullHidden.type = 'text';
@@ -5703,7 +5850,7 @@ if (s > 1){
             }
             fullHidden.name = fullHidden.id;
             fullHidden.style.display = 'none';
-            
+
             // Hidden short code field (stores "CA")
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';
@@ -5714,7 +5861,7 @@ if (s > 1){
             }
             shortHidden.name = shortHidden.id;
             shortHidden.style.display = 'none';
-            
+
             // Add state options
             const states = [
               'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
@@ -5735,7 +5882,7 @@ if (s > 1){
               option.textContent = state;
               input.appendChild(option);
             });
-            
+
             // CRITICAL FIX: Use inline onchange attribute instead of addEventListener
             // addEventListener does NOT persist when DOM is serialized to HTML via outerHTML
             const fullHiddenId = fullHidden.id;
@@ -5743,22 +5890,22 @@ if (s > 1){
             const selectId = input.id;
             // Build onchange handler using string concatenation to avoid nested template literal issues
             input.setAttribute('onchange', 
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] State dropdown changed!');" +
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Dropdown ID:', '" + selectId + "');" +
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Selected value:', this.value);" +
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full hidden field ID:', '" + fullHiddenId + "');" +
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short hidden field ID:', '" + shortHiddenId + "');" +
+              "" +
+              "" +
+              "" +
+              "" +
+              "" +
               "var fullField = document.getElementById('" + fullHiddenId + "');" +
               "var shortField = document.getElementById('" + shortHiddenId + "');" +
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full field found:', !!fullField, fullField);" +
-              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short field found:', !!shortField, shortField);" +
+              "" +
+              "" +
               "if (typeof updateStateHiddenFields === 'function') {" +
-              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] Calling updateStateHiddenFields...');" +
+              "  " +
               "  updateStateHiddenFields(this, '" + fullHiddenId + "', '" + shortHiddenId + "');" +
-              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');" +
-              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');" +
+              "  " +
+              "  " +
               "} else {" +
-              "  console.error('[STATE_SHORT_DEBUG - TRIGGER] updateStateHiddenFields function NOT FOUND!');" +
+              "  " +
               "}" +
               "if (typeof dropdownMirror === 'function') {" +
               "  dropdownMirror(this, '" + selectId + "');" +
@@ -5768,7 +5915,7 @@ if (s > 1){
               "}" +
               "setTimeout(function() { " + triggerUpdateFullAddressCode + " }, 50);"
             );
-            
+
             // Append hidden fields
             const hiddenWrap = document.createElement('div');
             hiddenWrap.style.display = 'none';
@@ -5918,34 +6065,23 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   };
   // Keep these helpers global too (they may be called by onchange/autofill)
   window.updateStateHiddenFields = function(selectEl, fullId, shortId) {
-    console.log('[STATE_SHORT_DEBUG] updateStateHiddenFields called');
-    console.log('[STATE_SHORT_DEBUG] selectEl:', selectEl);
-    console.log('[STATE_SHORT_DEBUG] selectEl.value:', selectEl ? selectEl.value : 'N/A');
-    console.log('[STATE_SHORT_DEBUG] fullId:', fullId);
-    console.log('[STATE_SHORT_DEBUG] shortId:', shortId);
-    
+
     const fullField  = document.getElementById(fullId);
     const shortField = document.getElementById(shortId);
-    
-    console.log('[STATE_SHORT_DEBUG] fullField element:', fullField);
-    console.log('[STATE_SHORT_DEBUG] shortField element:', shortField);
-    
+
     if (!fullField || !shortField) {
-      console.error('[STATE_SHORT_DEBUG] MISSING FIELD! fullField:', !!fullField, 'shortField:', !!shortField);
-      console.error('[STATE_SHORT_DEBUG] Looking for fullId:', fullId);
-      console.error('[STATE_SHORT_DEBUG] Looking for shortId:', shortId);
+
       // List all hidden inputs to help debug
       var allHiddenInputs = document.querySelectorAll('input[style*="display: none"], input[style*="display:none"]');
-      console.log('[STATE_SHORT_DEBUG] All hidden inputs on page:', allHiddenInputs.length);
+
       allHiddenInputs.forEach(function(inp) {
-        console.log('[STATE_SHORT_DEBUG]   - Hidden input id:', inp.id, 'name:', inp.name);
+
       });
       return;
     }
-    
+
     const full = (selectEl.value || '').trim();
-    console.log('[STATE_SHORT_DEBUG] Full state name:', full);
-    
+
     // Map full -> short (two-letter)
     const map = {
       'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO',
@@ -5959,13 +6095,10 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
       'West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'
     };
     const short = map[full] || '';
-    console.log('[STATE_SHORT_DEBUG] Short state code:', short);
-    
+
     fullField.value  = full;
     shortField.value = short;
-    
-    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set fullField.value to:', fullField.value);
-    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set shortField.value to:', shortField.value);
+
   };
 })();
 `;
@@ -6628,26 +6761,20 @@ window.showCartModal = function () {
         }
       } else if (pdfLogic.isTriggerSequencePdf) {
         // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] === Processing Trigger Sequence PDF ===');
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] PDF:', pdfLogic.pdfName);
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] questionId:', pdfLogic.questionId);
+
         // First, check that the numbered dropdown has a value (entries exist)
         const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                     document.getElementById('answer' + pdfLogic.questionId);
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for numbered dropdown with IDs:', (window.questionNameIds || {})[pdfLogic.questionId], 'or', 'answer' + pdfLogic.questionId);
-        console.log('[TRIGGER_SEQ_PDF_DEBUG] numberedDropdownEl found:', !!numberedDropdownEl, numberedDropdownEl);
+
         if (!numberedDropdownEl || !numberedDropdownEl.value) {
-          console.log('[TRIGGER_SEQ_PDF_DEBUG] No numbered dropdown or no value selected - NO MATCH');
+
         } else {
           const entryCount = parseInt(numberedDropdownEl.value) || 0;
           const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
-          console.log('[TRIGGER_SEQ_PDF_DEBUG] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
+
           // Check if target entry exists
           if (targetEntryNumber > entryCount) {
-            console.log('[TRIGGER_SEQ_PDF_DEBUG] Target entry', targetEntryNumber, 'exceeds entry count', entryCount, '- NO MATCH');
+
           } else {
             // Find the trigger sequence dropdown for this entry
             // The dropdown ID format: sanitizedFieldName_entryNumber
@@ -6658,24 +6785,22 @@ window.showCartModal = function () {
               .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore (character class avoids escaping issues)
               .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores (CRITICAL: must match ID generation)
             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
-            console.log('[TRIGGER_SEQ_PDF_DEBUG] Original field name:', pdfLogic.triggerSequenceFieldName);
-            console.log('[TRIGGER_SEQ_PDF_DEBUG] Sanitized field name:', sanitizedFieldName);
-            console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for trigger dropdown with ID:', triggerDropdownId);
+
             const triggerDropdownEl = document.getElementById(triggerDropdownId);
-            console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerDropdownEl found:', !!triggerDropdownEl, triggerDropdownEl);
+
             if (triggerDropdownEl) {
               const selectedValue = triggerDropdownEl.value || '';
-              console.log('[TRIGGER_SEQ_PDF_DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
+
               if (selectedValue === pdfLogic.triggerSequenceCondition) {
-                console.log('[TRIGGER_SEQ_PDF_DEBUG] MATCH! Adding PDF:', pdfLogic.pdfName);
+
                 matched = true;
               } else {
-                console.log('[TRIGGER_SEQ_PDF_DEBUG] Value mismatch - NO MATCH');
+
               }
             } else {
-              console.log('[TRIGGER_SEQ_PDF_DEBUG] Trigger dropdown not found - listing all select elements:');
+
               document.querySelectorAll('select').forEach(function(sel) {
-                console.log('[TRIGGER_SEQ_PDF_DEBUG]   Select ID:', sel.id, 'Value:', sel.value);
+
               });
             }
           }
@@ -6946,24 +7071,20 @@ window.addFormToCart = function (priceId) {
           }
         } else if (pdfLogic.isTriggerSequencePdf) {
           // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
-          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] === Processing Trigger Sequence PDF (Cart) ===');
-          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] PDF:', pdfLogic.pdfName);
-          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
-          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
-          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
+
           // First, check that the numbered dropdown has a value (entries exist)
           const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                       document.getElementById('answer' + pdfLogic.questionId);
-          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] numberedDropdownEl found:', !!numberedDropdownEl);
+
           if (!numberedDropdownEl || !numberedDropdownEl.value) {
-            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] No numbered dropdown or no value - NO MATCH');
+
           } else {
             const entryCount = parseInt(numberedDropdownEl.value) || 0;
             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
-            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
+
             // Check if target entry exists
             if (targetEntryNumber > entryCount) {
-              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Target entry exceeds count - NO MATCH');
+
             } else {
               // Find the trigger sequence dropdown for this entry
               // The dropdown ID format: sanitizedFieldName_entryNumber (uses character classes to avoid backslash escaping issues)
@@ -6973,21 +7094,21 @@ window.addFormToCart = function (priceId) {
                 .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
                 .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
               const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
-              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Looking for trigger dropdown:', triggerDropdownId);
+
               const triggerDropdownEl = document.getElementById(triggerDropdownId);
-              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerDropdownEl found:', !!triggerDropdownEl);
+
               if (triggerDropdownEl) {
                 const selectedValue = triggerDropdownEl.value || '';
-                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
+
                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
-                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] MATCH! Adding PDF:', pdfLogic.pdfName);
+
                   matched = true;
                 } else {
-                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Value mismatch - NO MATCH');
+
                 }
               } else {
-                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Dropdown not found - listing all selects:');
-                document.querySelectorAll('select').forEach(function(sel) { console.log('[TRIGGER_SEQ_PDF_DEBUG_CART]   ', sel.id, '=', sel.value); });
+
+                document.querySelectorAll('select').forEach(function(sel) { });
               }
             }
           }
@@ -8043,7 +8164,16 @@ function showTextboxLabels(questionId, count){
                     input.value = option.text;
                     input.style.cssText = 'margin-right: 12px; width: 18px; height: 18px; accent-color: #2980b9; cursor: pointer;';
                     // Handle linked fields for this checkbox option
-                    const linkedFields = option.linkedFields || [];
+                    // For numbered dropdowns, we need to append entry number to linked field nodeIds and titles
+                    const linkedFields = (option.linkedFields || []).map(linkedField => {
+                        if (linkedField.nodeId && linkedField.title) {
+                            return {
+                                nodeId: linkedField.nodeId + '_' + j, // Append entry number to nodeId
+                                title: linkedField.title + '_' + j   // Append entry number to title (hidden field ID)
+                            };
+                        }
+                        return linkedField;
+                    });
                     // Handle PDF entries for this checkbox option
                     const pdfEntries = option.pdfEntries || [];
                     // Function to add PDF entries when checkbox is checked
@@ -8086,30 +8216,50 @@ function showTextboxLabels(questionId, count){
                     }
                     // Function to create linked textboxes when checkbox is checked
                     function createLinkedTextboxes() {
-                        linkedFields.forEach((linkedField) => {
+
+                        linkedFields.forEach((linkedField, index) => {
+
                             if (linkedField.nodeId && linkedField.title) {
-                                // For numberedDropdown, source field ID includes entry number
-                                const sourceFieldId = linkedField.nodeId + "_" + j;
+                                // linkedField.nodeId already has entry number appended from mapping above
+                                const sourceFieldId = linkedField.nodeId;
+
                                 const sourceField = document.getElementById(sourceFieldId);
+
                                 if (sourceField) {
-                                    // Create hidden textbox with title as ID (append entry number for numberedDropdown)
-                                    const hiddenTextboxId = linkedField.title + "_" + j;
+                                    // linkedField.title already has entry number appended from mapping above
+                                    const hiddenTextboxId = linkedField.title;
+
+                                    // Check if hidden textbox already exists
+                                    const existingHiddenTextbox = document.getElementById(hiddenTextboxId);
+                                    if (existingHiddenTextbox) {
+
+                                        existingHiddenTextbox.value = sourceField.value || '';
+                                        return; // Skip creating duplicate, but update value
+                                    }
+                                    // Create hidden textbox with title as ID
                                     const hiddenTextbox = document.createElement('input');
                                     hiddenTextbox.type = 'text';
                                     hiddenTextbox.id = hiddenTextboxId;
                                     hiddenTextbox.name = hiddenTextboxId;
                                     hiddenTextbox.style.display = 'none';
                                     hiddenTextbox.value = sourceField.value || '';
+
                                     // Add to form (append to form element, not body)
                                     const form = document.getElementById('customForm');
                                     if (form) {
                                         form.appendChild(hiddenTextbox);
+
                                     } else {
                                         document.body.appendChild(hiddenTextbox);
+
                                     }
                                     // Sync with source field
                                     function syncLinkedField() {
+                                        const oldValue = hiddenTextbox.value;
                                         hiddenTextbox.value = sourceField.value || '';
+                                        if (oldValue !== hiddenTextbox.value) {
+
+                                        }
                                         // Trigger linked field synchronization if updateLinkedFields function exists
                                         if (typeof updateLinkedFields === 'function') {
                                             updateLinkedFields();
@@ -8120,10 +8270,12 @@ function showTextboxLabels(questionId, count){
                                     // Listen for changes on source field
                                     sourceField.addEventListener('input', syncLinkedField);
                                     sourceField.addEventListener('change', syncLinkedField);
+
                                     // Poll periodically to catch any missed updates (especially for autofill)
                                     // This ensures the linked textbox always stays in sync, even if events are missed
                                     const pollInterval = setInterval(function() {
                                         if (hiddenTextbox.value !== sourceField.value) {
+
                                             syncLinkedField();
                                         }
                                     }, 100); // Check every 100ms
@@ -8131,29 +8283,41 @@ function showTextboxLabels(questionId, count){
                                     hiddenTextbox._syncFunction = syncLinkedField;
                                     hiddenTextbox._sourceField = sourceField;
                                     hiddenTextbox._pollInterval = pollInterval;
+                                } else {
+
                                 }
+                            } else {
+
                             }
                         });
                     }
                     // Function to remove linked textboxes when checkbox is unchecked
                     function removeLinkedTextboxes() {
+
                         linkedFields.forEach((linkedField) => {
                             if (linkedField.title) {
-                                // For numberedDropdown, hidden textbox ID includes entry number
-                                const hiddenTextboxId = linkedField.title + "_" + j;
+                                // linkedField.title already has entry number appended from mapping above
+                                const hiddenTextboxId = linkedField.title;
+
                                 const hiddenTextbox = document.getElementById(hiddenTextboxId);
                                 if (hiddenTextbox) {
+
                                     // Remove event listeners
                                     if (hiddenTextbox._syncFunction && hiddenTextbox._sourceField) {
                                         hiddenTextbox._sourceField.removeEventListener('input', hiddenTextbox._syncFunction);
                                         hiddenTextbox._sourceField.removeEventListener('change', hiddenTextbox._syncFunction);
+
                                     }
                                     // Clear polling interval
                                     if (hiddenTextbox._pollInterval) {
                                         clearInterval(hiddenTextbox._pollInterval);
+
                                     }
                                     // Remove the hidden textbox
                                     hiddenTextbox.remove();
+
+                                } else {
+
                                 }
                             }
                         });
@@ -8164,10 +8328,13 @@ function showTextboxLabels(questionId, count){
                     }
                     // Add event listener for checkbox/radio changes
                     input.addEventListener('change', function() {
+
                         if (this.checked) {
+
                             createLinkedTextboxes();
                             addPdfEntries();
                         } else {
+
                             removeLinkedTextboxes();
                             removePdfEntries();
                         }
@@ -9658,19 +9825,15 @@ async function processAllPdfs() {
                     }
                 } else if (pdfLogic.isTriggerSequencePdf) {
                     // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
-                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] === Processing Trigger Sequence PDF (Download) ===');
-                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] PDF:', pdfLogic.pdfName);
-                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
-                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
-                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
+
                     // First, check that the numbered dropdown has a value (entries exist)
                     const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                 document.getElementById('answer' + pdfLogic.questionId);
-                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] numberedDropdownEl found:', !!numberedDropdownEl);
+
                     if (numberedDropdownEl && numberedDropdownEl.value) {
                         const entryCount = parseInt(numberedDropdownEl.value) || 0;
                         const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
-                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
+
                         // Check if target entry exists
                         if (targetEntryNumber <= entryCount) {
                             // Find the trigger sequence dropdown for this entry (uses character classes to avoid backslash escaping issues)
@@ -9680,26 +9843,26 @@ async function processAllPdfs() {
                                 .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
                                 .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
-                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Looking for trigger dropdown:', triggerDropdownId);
+
                             const triggerDropdownEl = document.getElementById(triggerDropdownId);
-                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerDropdownEl found:', !!triggerDropdownEl);
+
                             if (triggerDropdownEl) {
                                 const selectedValue = triggerDropdownEl.value || '';
-                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
+
                                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
-                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] MATCH! PDF will be downloaded:', pdfLogic.pdfName);
+
                                     shouldDownload = true;
                                 } else {
-                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Value mismatch - NO MATCH');
+
                                 }
                             } else {
-                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Dropdown not found');
+
                             }
                         } else {
-                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Target entry', targetEntryNumber, 'exceeds count', entryCount);
+
                         }
                     } else {
-                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] No numbered dropdown value - NO MATCH');
+
                     }
                 } else {
                         // For regular conditions, check previous question logic
@@ -9759,7 +9922,7 @@ async function processAllPdfs() {
 async function getAllPdfsList() {
     const pdfsList = [];
     const processedPdfs = new Set();
-    
+
     // Process main PDF
     if (pdfOutputFileName) {
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
@@ -9772,7 +9935,7 @@ async function getAllPdfsList() {
             });
         }
     }
-    
+
     // Process Conditional PDFs
     if (conditionalPDFs && conditionalPDFs.length > 0) {
         for (const conditionalPDF of conditionalPDFs) {
@@ -9805,7 +9968,7 @@ async function getAllPdfsList() {
             }
         }
     }
-    
+
     // Process PDF Logic PDFs
     if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
         for (const pdfLogic of pdfLogicPDFs) {
@@ -9853,15 +10016,14 @@ async function getAllPdfsList() {
                             }
                         }
                     } else if (pdfLogic.isTriggerSequencePdf) {
-                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] === Processing Trigger Sequence PDF (Include Check) ===');
-                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] PDF:', pdfLogic.pdfName, 'Entry:', pdfLogic.pdfEntryNumber);
+
                         const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                     document.getElementById('answer' + pdfLogic.questionId);
-                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] numberedDropdownEl found:', !!numberedDropdownEl);
+
                         if (numberedDropdownEl && numberedDropdownEl.value) {
                             const entryCount = parseInt(numberedDropdownEl.value) || 0;
                             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
-                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
+
                             if (targetEntryNumber <= entryCount) {
                                 // Uses character classes to avoid backslash escaping issues
                                 const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
@@ -9870,26 +10032,26 @@ async function getAllPdfsList() {
                                     .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
                                     .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                                 const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
-                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Looking for trigger dropdown:', triggerDropdownId);
+
                                 const triggerDropdownEl = document.getElementById(triggerDropdownId);
-                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] triggerDropdownEl found:', !!triggerDropdownEl);
+
                                 if (triggerDropdownEl) {
                                     const selectedValue = triggerDropdownEl.value || '';
-                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
+
                                     if (selectedValue === pdfLogic.triggerSequenceCondition) {
-                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] MATCH! Including PDF:', pdfLogic.pdfName);
+
                                         shouldInclude = true;
                                     } else {
-                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Value mismatch - NOT including');
+
                                     }
                                 } else {
-                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Dropdown not found');
+
                                 }
                             } else {
-                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Target entry exceeds count');
+
                             }
                         } else {
-                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] No numbered dropdown value');
+
                         }
                     } else {
                         pdfLogic.conditions.forEach(condition => {
@@ -9927,7 +10089,7 @@ async function getAllPdfsList() {
             }
         }
     }
-    
+
     // Process Checkbox PDF Entries
     if (window.checkboxPdfEntries && window.checkboxPdfEntries.length > 0) {
         for (const pdfEntry of window.checkboxPdfEntries) {
@@ -9944,7 +10106,7 @@ async function getAllPdfsList() {
             }
         }
     }
-    
+
     return pdfsList;
 }
 
@@ -9952,25 +10114,25 @@ async function getAllPdfsList() {
 async function showPreviewPdfsModal() {
     const modal = document.getElementById('previewPdfsListModal');
     const listContainer = document.getElementById('previewPdfsList');
-    
+
     if (!modal || !listContainer) {
         alert('Preview modals not found. Please refresh the page.');
         return;
     }
-    
+
     // Show loading state
     listContainer.innerHTML = '<p style="text-align: center; padding: 20px;">Loading PDFs...</p>';
     modal.style.display = 'flex';
-    
+
     try {
         // Get all PDFs
         const pdfsList = await getAllPdfsList();
-        
+
         if (pdfsList.length === 0) {
             listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">No PDFs available for preview.</p>';
             return;
         }
-        
+
         // Create list of PDFs
         let listHTML = '<style>.pdf-preview-item { padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; cursor: pointer; transition: all 0.3s; } .pdf-preview-item:hover { background: #e9ecef; border-color: #2980b9; }</style>';
         listHTML += '<div style="display: flex; flex-direction: column; gap: 10px;">';
@@ -9997,7 +10159,7 @@ async function showPreviewPdfsModal() {
             });
         });
     } catch (error) {
-        console.error('Error loading PDFs:', error);
+
         listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #dc3545;">Error loading PDFs. Please try again.</p>';
     }
 }
@@ -10014,19 +10176,19 @@ function closePreviewPdfsListModal() {
 async function previewPdf(baseName) {
     const modal = document.getElementById('previewPdfFullscreenModal');
     const iframe = document.getElementById('previewPdfIframe');
-    
+
     if (!modal || !iframe) {
         alert('Preview modal not found. Please refresh the page.');
         return;
     }
-    
+
     // Close the list modal
     closePreviewPdfsListModal();
-    
+
     // Show loading in fullscreen modal
     modal.style.display = 'flex';
     iframe.style.display = 'none';
-    
+
     try {
         // Collect form data
         const form = document.getElementById('customForm');
@@ -10034,7 +10196,7 @@ async function previewPdf(baseName) {
         const formElements = form.querySelectorAll('input, textarea, select');
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
-        
+
         allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 if (element.type === 'checkbox' || element.type === 'radio') {
@@ -10052,32 +10214,32 @@ async function previewPdf(baseName) {
                 }
             }
         });
-        
+
         // Fetch the filled PDF
         const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
         const res = await fetch(endpoint, { 
             method: 'POST', 
             body: fd 
         });
-        
+
         if (!res.ok) {
             throw new Error("HTTP error! status: " + res.status);
         }
-        
+
         const blob = await res.blob();
         if (blob.size === 0) {
             throw new Error("Received empty PDF blob from server");
         }
-        
+
         const url = URL.createObjectURL(blob);
         iframe.src = url;
         iframe.style.display = 'block';
-        
+
         // Store the URL for cleanup
         iframe.dataset.pdfUrl = url;
-        
+
     } catch (error) {
-        console.error('Error previewing PDF:', error);
+
         alert('Error loading PDF preview: ' + error.message);
         modal.style.display = 'none';
     }
@@ -12820,20 +12982,12 @@ document.addEventListener('change', function() {
 });
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] updateStateHiddenFields called');
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] dropdown:', dropdown);
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenFullId:', hiddenFullId);
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenShortId:', hiddenShortId);
-    
+
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] selectedState:', selectedState);
-    
+
     const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
     const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
-    
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField:', fullField);
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] shortField:', shortField);
-    
+
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -12847,22 +13001,21 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
-    console.log('[STATE_SHORT_DEBUG - RUNTIME] abbreviation:', abbreviation);
-    
+
     if (shortField) {
         shortField.value = abbreviation;
-        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set shortField.value to:', shortField.value);
+
     } else {
-        console.error('[STATE_SHORT_DEBUG - RUNTIME] shortField NOT FOUND!');
+
     }
-    
+
     if (fullField && fullField.tagName !== 'SELECT') {
         fullField.value = selectedState;
-        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set fullField.value to:', fullField.value);
+
     } else if (!fullField) {
-        console.error('[STATE_SHORT_DEBUG - RUNTIME] fullField NOT FOUND!');
+
     } else {
-        console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField is a SELECT, skipping value set');
+
     }
 }
 // Function to update user full name

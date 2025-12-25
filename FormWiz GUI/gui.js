@@ -1564,17 +1564,17 @@ function toggleConditionalPDFLogic(questionId) {
 }
 // Hidden logic toggling
 function toggleHiddenLogic(questionId) {
-    console.log('🔧 [HIDDEN LOGIC DEBUG] toggleHiddenLogic called for question:', questionId);
+
     const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`).checked;
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden logic enabled:', hiddenLogicEnabled);
+
     const hiddenLogicBlock = document.getElementById(`hiddenLogicBlock${questionId}`);
     hiddenLogicBlock.style.display = hiddenLogicEnabled ? 'block' : 'none';
     // Create first configuration when enabling
     if (hiddenLogicEnabled) {
         const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Configs container found:', !!configsContainer, 'Children count:', configsContainer ? configsContainer.children.length : 0);
+
         if (configsContainer && configsContainer.children.length === 0) {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Adding first hidden logic config for question:', questionId);
+
             addHiddenLogicConfig(questionId);
         }
     }
@@ -1629,12 +1629,12 @@ function updateHiddenLogicTriggerOptions(questionId) {
 }
 // Update hidden logic trigger options for numbered dropdown questions
 function updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId) {
-    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogicTriggerOptionsForNumberedDropdown called for question:', questionId);
+
     // Update all trigger selects for this question
     const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Found trigger selects:', triggerSelects.length);
+
     triggerSelects.forEach((triggerSelect, index) => {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing trigger select', index, ':', triggerSelect.id);
+
         // Save current value
         const currentValue = triggerSelect.value;
         // Clear existing options except the first one
@@ -1642,41 +1642,41 @@ function updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId) {
         // Get the number range from the numbered dropdown
         const startInput = document.getElementById(`numberRangeStart${questionId}`);
         const endInput = document.getElementById(`numberRangeEnd${questionId}`);
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Start input found:', !!startInput, 'End input found:', !!endInput);
+
         if (startInput && endInput) {
             const start = parseInt(startInput.value) || 1;
             const end = parseInt(endInput.value) || 1;
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Range:', start, 'to', end);
+
             // Add options for each number in the range
             for (let i = start; i <= end; i++) {
                 const opt = document.createElement('option');
                 opt.value = i.toString();
                 opt.textContent = i.toString();
                 triggerSelect.appendChild(opt);
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Added option:', i);
+
             }
             // Restore the current value if it's still valid
             if (currentValue && parseInt(currentValue) >= start && parseInt(currentValue) <= end) {
                 triggerSelect.value = currentValue;
-                console.log('🔧 [HIDDEN LOGIC DEBUG] Restored value:', currentValue);
+
             }
         } else {
-            console.log('🔧 [HIDDEN LOGIC DEBUG] Start or end input not found for question:', questionId);
+
         }
     });
 }
 // Add a new hidden logic configuration
 function addHiddenLogicConfig(questionId) {
-    console.log('🔧 [HIDDEN LOGIC DEBUG] addHiddenLogicConfig called for question:', questionId);
+
     const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
     if (!configsContainer) {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Configs container not found for question:', questionId);
+
         return;
     }
     // Get the next config index
     const existingConfigs = configsContainer.querySelectorAll('.hidden-logic-config');
     const configIndex = existingConfigs.length;
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Creating config with index:', configIndex);
+
     // Create the configuration HTML
     const configHtml = `
         <div class="hidden-logic-config" id="hiddenLogicConfig${questionId}_${configIndex}" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px;">
@@ -1708,12 +1708,12 @@ function addHiddenLogicConfig(questionId) {
     configsContainer.insertAdjacentHTML('beforeend', configHtml);
     // Populate trigger options for the new configuration
     const questionType = document.getElementById(`questionType${questionId}`).value;
-    console.log('🔧 [HIDDEN LOGIC DEBUG] Question type for trigger options:', questionType);
+
     if (questionType === 'numberedDropdown') {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptionsForNumberedDropdown');
+
         updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
     } else {
-        console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptions');
+
         updateHiddenLogicTriggerOptions(questionId);
     }
 }
@@ -2164,10 +2164,7 @@ function addTextboxAmount(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD AMOUNT DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
-    console.log('🔧 [ADD AMOUNT DEBUG] Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
-    console.log('🔧 [ADD AMOUNT DEBUG] Unified container display style:', window.getComputedStyle(unifiedDiv).display);
-    console.log('🔧 [ADD AMOUNT DEBUG] Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+
     // Force the container to be visible and have dimensions
     unifiedDiv.style.minHeight = '50px';
     unifiedDiv.style.border = '1px solid #e0e0e0';
@@ -2178,8 +2175,7 @@ function addTextboxAmount(questionId) {
     unifiedDiv.style.width = '100%';
     unifiedDiv.style.display = 'block';
     unifiedDiv.style.position = 'relative';
-    console.log('🔧 [ADD AMOUNT DEBUG] After styling - Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
-    console.log('🔧 [ADD AMOUNT DEBUG] After styling - Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
     if (displayDiv) {
@@ -2244,23 +2240,18 @@ function getUnifiedContainer(questionId) {
 }
 function addTextboxLabel(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
-    console.log('🔧 [ADD LABEL DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
-    console.log('🔧 [ADD LABEL DEBUG] Found unified container:', !!unifiedDiv);
-    console.log('🔧 [ADD LABEL DEBUG] Unified container display style:', unifiedDiv ? window.getComputedStyle(unifiedDiv).display : 'N/A');
-    console.log('🔧 [ADD LABEL DEBUG] Unified container visibility:', unifiedDiv ? window.getComputedStyle(unifiedDiv).visibility : 'N/A');
+
     // Check parent container
     if (unifiedDiv && unifiedDiv.parentElement) {
-        console.log('🔧 [ADD LABEL DEBUG] Parent container:', unifiedDiv.parentElement.tagName, unifiedDiv.parentElement.id);
-        console.log('🔧 [ADD LABEL DEBUG] Parent display style:', window.getComputedStyle(unifiedDiv.parentElement).display);
-        console.log('🔧 [ADD LABEL DEBUG] Parent dimensions:', unifiedDiv.parentElement.offsetWidth, 'x', unifiedDiv.parentElement.offsetHeight);
+
     }
     if (!unifiedDiv) {
-        console.error('🔧 [ADD LABEL DEBUG] Unified container not found!');
+
         return;
     }
     // Ensure the unified container is visible
     if (unifiedDiv.style.display === 'none') {
-        console.log('🔧 [ADD LABEL DEBUG] Unified container was hidden, making it visible');
+
         unifiedDiv.style.display = 'block';
     }
     // Remove placeholder if it exists
@@ -2269,7 +2260,7 @@ function addTextboxLabel(questionId) {
         placeholder.remove();
     }
     const fieldCount = unifiedDiv.children.length + 1;
-    console.log('🔧 [ADD LABEL DEBUG] Current field count:', fieldCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `unified-field field-${fieldCount}`;
     fieldDiv.setAttribute('data-type', 'label');
@@ -2284,17 +2275,13 @@ function addTextboxLabel(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD LABEL DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
-    console.log('🔧 [ADD LABEL DEBUG] Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
-    console.log('🔧 [ADD LABEL DEBUG] Unified container display style:', window.getComputedStyle(unifiedDiv).display);
-    console.log('🔧 [ADD LABEL DEBUG] Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+
     // Force a reflow and check if the container has any content
     unifiedDiv.offsetHeight; // Force reflow
-    console.log('🔧 [ADD LABEL DEBUG] Container has children:', unifiedDiv.children.length);
-    console.log('🔧 [ADD LABEL DEBUG] Container innerHTML length:', unifiedDiv.innerHTML.length);
+
     // Try adding a temporary visible element to force dimensions
     if (unifiedDiv.offsetWidth === 0 && unifiedDiv.offsetHeight === 0) {
-        console.log('🔧 [ADD LABEL DEBUG] Container has zero dimensions, adding temporary content');
+
         const tempDiv = document.createElement('div');
         tempDiv.style.width = '100px';
         tempDiv.style.height = '20px';
@@ -2304,7 +2291,7 @@ function addTextboxLabel(questionId) {
         tempDiv.style.left = '0';
         tempDiv.textContent = 'TEMP';
         unifiedDiv.appendChild(tempDiv);
-        console.log('🔧 [ADD LABEL DEBUG] After temp content - Container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+
     }
     // Force the container to be visible and have dimensions
     unifiedDiv.style.minHeight = '50px';
@@ -2316,8 +2303,7 @@ function addTextboxLabel(questionId) {
     unifiedDiv.style.width = '100%';
     unifiedDiv.style.display = 'block';
     unifiedDiv.style.position = 'relative';
-    console.log('🔧 [ADD LABEL DEBUG] After styling - Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
-    console.log('🔧 [ADD LABEL DEBUG] After styling - Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+
     // Add double-click event listener as backup
     const displayDiv = fieldDiv.querySelector('div');
     if (displayDiv) {
@@ -2366,15 +2352,14 @@ function removeTextboxLabel(questionId, labelNumber) {
 }
 function addCheckboxField(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
-    console.log('🔧 [ADD CHECKBOX DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
-    console.log('🔧 [ADD CHECKBOX DEBUG] Found unified container:', !!unifiedDiv);
+
     if (!unifiedDiv) {
-        console.error('🔧 [ADD CHECKBOX DEBUG] Unified container not found!');
+
         return;
     }
     // Ensure the unified container is visible
     if (unifiedDiv.style.display === 'none') {
-        console.log('🔧 [ADD CHECKBOX DEBUG] Unified container was hidden, making it visible');
+
         unifiedDiv.style.display = 'block';
     }
     // Remove placeholder if it exists
@@ -2383,7 +2368,7 @@ function addCheckboxField(questionId) {
         placeholder.remove();
     }
     const fieldCount = unifiedDiv.children.length + 1;
-    console.log('🔧 [ADD CHECKBOX DEBUG] Current field count:', fieldCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `unified-field field-${fieldCount}`;
     fieldDiv.setAttribute('data-type', 'checkbox');
@@ -2421,7 +2406,7 @@ function addCheckboxField(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD CHECKBOX DEBUG] Added checkbox field to unified container. New count:', unifiedDiv.children.length);
+
     // Force the container to be visible and have dimensions
     unifiedDiv.style.minHeight = '50px';
     unifiedDiv.style.border = '1px solid #e0e0e0';
@@ -2651,44 +2636,43 @@ function addPdfEntry(questionId, fieldCount, optionCount) {
 function updateCheckboxFieldName(questionId, fieldCount) {
     const fieldNameInput = document.getElementById(`checkboxFieldName${questionId}_${fieldCount}`);
     if (fieldNameInput) {
-        console.log('🔧 [CHECKBOX FIELD NAME] Updated field name:', fieldNameInput.value);
+
     }
 }
 function updateCheckboxSelectionType(questionId, fieldCount) {
     const selectionTypeSelect = document.getElementById(`checkboxSelectionType${questionId}_${fieldCount}`);
     if (selectionTypeSelect) {
-        console.log('🔧 [CHECKBOX SELECTION TYPE] Updated selection type:', selectionTypeSelect.value);
+
     }
 }
 function updateCheckboxRequired(questionId, fieldCount) {
     const requiredSelect = document.getElementById(`checkboxRequired${questionId}_${fieldCount}`);
     if (requiredSelect) {
-        console.log('🔧 [CHECKBOX REQUIRED] Updated required flag:', requiredSelect.value);
+
     }
 }
 function updateCheckboxOptionText(questionId, fieldCount, optionCount) {
     const textInput = document.getElementById(`checkboxText${questionId}_${fieldCount}_${optionCount}`);
     if (textInput) {
-        console.log('🔧 [CHECKBOX OPTION TEXT] Updated option text:', textInput.value);
+
     }
 }
 function updateCheckboxOptionNodeId(questionId, fieldCount, optionCount) {
     const nodeIdInput = document.getElementById(`checkboxNodeId${questionId}_${fieldCount}_${optionCount}`);
     if (nodeIdInput) {
-        console.log('🔧 [CHECKBOX OPTION NODE ID] Updated option node ID:', nodeIdInput.value);
+
     }
 }
 function addDateField(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
-    console.log('🔧 [ADD DATE DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
-    console.log('🔧 [ADD DATE DEBUG] Found unified container:', !!unifiedDiv);
+
     if (!unifiedDiv) {
-        console.error('🔧 [ADD DATE DEBUG] Unified container not found!');
+
         return;
     }
     // Ensure the unified container is visible
     if (unifiedDiv.style.display === 'none') {
-        console.log('🔧 [ADD DATE DEBUG] Unified container was hidden, making it visible');
+
         unifiedDiv.style.display = 'block';
     }
     // Remove placeholder if it exists
@@ -2697,7 +2681,7 @@ function addDateField(questionId) {
         placeholder.remove();
     }
     const fieldCount = unifiedDiv.children.length + 1;
-    console.log('🔧 [ADD DATE DEBUG] Current field count:', fieldCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `unified-field field-${fieldCount}`;
     fieldDiv.setAttribute('data-type', 'date');
@@ -2711,7 +2695,7 @@ function addDateField(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD DATE DEBUG] Added date field to unified container. New count:', unifiedDiv.children.length);
+
     // Force the container to be visible and have dimensions
     unifiedDiv.style.minHeight = '50px';
     unifiedDiv.style.border = '1px solid #e0e0e0';
@@ -2738,15 +2722,14 @@ function addDateField(questionId) {
 }
 function addDropdownField(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
-    console.log('🔧 [ADD DROPDOWN DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
-    console.log('🔧 [ADD DROPDOWN DEBUG] Found unified container:', !!unifiedDiv);
+
     if (!unifiedDiv) {
-        console.error('🔧 [ADD DROPDOWN DEBUG] Unified container not found!');
+
         return;
     }
     // Ensure the unified container is visible
     if (unifiedDiv.style.display === 'none') {
-        console.log('🔧 [ADD DROPDOWN DEBUG] Unified container was hidden, making it visible');
+
         unifiedDiv.style.display = 'block';
     }
     // Remove placeholder if it exists
@@ -2755,7 +2738,7 @@ function addDropdownField(questionId) {
         placeholder.remove();
     }
     const fieldCount = unifiedDiv.children.length + 1;
-    console.log('🔧 [ADD DROPDOWN DEBUG] Current field count:', fieldCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `unified-field field-${fieldCount}`;
     fieldDiv.setAttribute('data-type', 'dropdown');
@@ -2797,7 +2780,7 @@ function addDropdownField(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD DROPDOWN DEBUG] Added dropdown field to unified container. New count:', unifiedDiv.children.length);
+
     // Force the container to be visible and have dimensions
     unifiedDiv.style.minHeight = '50px';
     unifiedDiv.style.border = '1px solid #e0e0e0';
@@ -2825,11 +2808,11 @@ function addDropdownField(questionId) {
 function addDropdownOption(questionId, fieldCount) {
     const optionsContainer = document.getElementById(`dropdownOptions${questionId}_${fieldCount}`);
     if (!optionsContainer) {
-        console.error('🔧 [ADD DROPDOWN OPTION DEBUG] Options container not found!');
+
         return;
     }
     const optionCount = optionsContainer.children.length + 1;
-    console.log('🔧 [ADD DROPDOWN OPTION DEBUG] Adding option', optionCount, 'for field', fieldCount);
+
     const optionDiv = document.createElement('div');
     optionDiv.className = `dropdown-option-${optionCount}`;
     optionDiv.style.margin = '5px 0';
@@ -2851,7 +2834,7 @@ function addDropdownOption(questionId, fieldCount) {
         </div>
     `;
     optionsContainer.appendChild(optionDiv);
-    console.log('🔧 [ADD DROPDOWN OPTION DEBUG] Added option to container. New count:', optionsContainer.children.length);
+
     // Update trigger condition options for all trigger sequences
     const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
     if (triggerSequencesContainer) {
@@ -2864,13 +2847,13 @@ function addDropdownOption(questionId, fieldCount) {
 function updateDropdownFieldName(questionId, fieldCount) {
     const fieldNameInput = document.getElementById(`dropdownFieldName${questionId}_${fieldCount}`);
     if (fieldNameInput) {
-        console.log('🔧 [DROPDOWN FIELD NAME] Updated field name:', fieldNameInput.value);
+
     }
 }
 function updateDropdownOptionText(questionId, fieldCount, optionCount) {
     const textInput = document.getElementById(`dropdownOptionText${questionId}_${fieldCount}_${optionCount}`);
     if (textInput) {
-        console.log('🔧 [DROPDOWN OPTION TEXT] Updated option text:', textInput.value);
+
         // Update trigger condition options for all trigger sequences
         const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
         if (triggerSequencesContainer) {
@@ -2884,24 +2867,24 @@ function updateDropdownOptionText(questionId, fieldCount, optionCount) {
 function updateDropdownOptionNodeId(questionId, fieldCount, optionCount) {
     const nodeIdInput = document.getElementById(`dropdownOptionNodeId${questionId}_${fieldCount}_${optionCount}`);
     if (nodeIdInput) {
-        console.log('🔧 [DROPDOWN OPTION NODE ID] Updated option node ID:', nodeIdInput.value);
+
     }
 }
 function removeDropdownOption(questionId, fieldCount, optionCount) {
     const optionDiv = document.querySelector(`.dropdown-option-${optionCount}`);
     if (optionDiv) {
         optionDiv.remove();
-        console.log('🔧 [REMOVE DROPDOWN OPTION] Removed option', optionCount, 'from field', fieldCount);
+
     }
 }
 function addTriggerSequence(questionId, fieldCount) {
     const triggerSequencesContainer = document.getElementById(`triggerSequences${questionId}_${fieldCount}`);
     if (!triggerSequencesContainer) {
-        console.error('🔧 [ADD TRIGGER SEQUENCE DEBUG] Trigger sequences container not found!');
+
         return;
     }
     const sequenceCount = triggerSequencesContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER SEQUENCE DEBUG] Adding trigger sequence', sequenceCount, 'for field', fieldCount);
+
     const sequenceDiv = document.createElement('div');
     sequenceDiv.className = `trigger-sequence-${sequenceCount}`;
     sequenceDiv.style.margin = '10px 0';
@@ -2947,7 +2930,7 @@ function addTriggerSequence(questionId, fieldCount) {
         </div>
     `;
     triggerSequencesContainer.appendChild(sequenceDiv);
-    console.log('🔧 [ADD TRIGGER SEQUENCE DEBUG] Added trigger sequence to container. New count:', triggerSequencesContainer.children.length);
+
     // Populate the trigger condition dropdown with available options
     updateTriggerConditionOptions(questionId, fieldCount, sequenceCount);
 }
@@ -2974,30 +2957,30 @@ function updateTriggerConditionOptions(questionId, fieldCount, sequenceCount) {
 function updateTriggerCondition(questionId, fieldCount, sequenceCount) {
     const triggerSelect = document.getElementById(`triggerCondition${questionId}_${fieldCount}_${sequenceCount}`);
     if (triggerSelect) {
-        console.log('🔧 [TRIGGER CONDITION] Updated trigger condition:', triggerSelect.value);
+
     }
 }
 function updateTriggerTitle(questionId, fieldCount, sequenceCount) {
     const triggerTitleInput = document.getElementById(`triggerTitle${questionId}_${fieldCount}_${sequenceCount}`);
     if (triggerTitleInput) {
-        console.log('🔧 [TRIGGER TITLE] Updated trigger title:', triggerTitleInput.value);
+
     }
 }
 function removeTriggerSequence(questionId, fieldCount, sequenceCount) {
     const sequenceDiv = document.querySelector(`.trigger-sequence-${sequenceCount}`);
     if (sequenceDiv) {
         sequenceDiv.remove();
-        console.log('🔧 [REMOVE TRIGGER SEQUENCE] Removed trigger sequence', sequenceCount, 'from field', fieldCount);
+
     }
 }
 function addTriggerLabel(questionId, fieldCount, sequenceCount) {
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.error('🔧 [ADD TRIGGER LABEL DEBUG] Trigger fields container not found!');
+
         return;
     }
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER LABEL DEBUG] Adding trigger label', triggerFieldCount, 'for sequence', sequenceCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `trigger-field-${triggerFieldCount}`;
     fieldDiv.style.margin = '5px 0';
@@ -3042,11 +3025,11 @@ function addTriggerLabel(questionId, fieldCount, sequenceCount) {
 function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.error('🔧 [ADD TRIGGER CHECKBOX DEBUG] Trigger fields container not found!');
+
         return;
     }
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER CHECKBOX DEBUG] Adding trigger checkbox', triggerFieldCount, 'for sequence', sequenceCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `trigger-field-${triggerFieldCount}`;
     fieldDiv.style.margin = '5px 0';
@@ -3094,11 +3077,11 @@ function addTriggerCheckbox(questionId, fieldCount, sequenceCount) {
 function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.error('🔧 [ADD TRIGGER DROPDOWN DEBUG] Trigger fields container not found!');
+
         return;
     }
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER DROPDOWN DEBUG] Adding trigger dropdown', triggerFieldCount, 'for sequence', sequenceCount);
+
     // Create a unique ID for the conditional logic container
     const conditionalLogicContainerId = `conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
     const enableConditionalLogicCheckboxId = `enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
@@ -3135,17 +3118,17 @@ function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
         </div>
     `;
     triggerFieldsContainer.appendChild(fieldDiv);
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown field created, checkbox ID:', enableConditionalLogicCheckboxId, 'container ID:', conditionalLogicContainerId);
+
 }
 function addTriggerDate(questionId, fieldCount, sequenceCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] addTriggerDate called for questionId:', questionId, 'fieldCount:', fieldCount, 'sequenceCount:', sequenceCount);
+
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.error('🔧 [ADD TRIGGER DATE DEBUG] Trigger fields container not found!');
+
         return;
     }
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER DATE DEBUG] Adding trigger date', triggerFieldCount, 'for sequence', sequenceCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `trigger-field-${triggerFieldCount}`;
     fieldDiv.style.margin = '5px 0';
@@ -3180,16 +3163,16 @@ function addTriggerDate(questionId, fieldCount, sequenceCount) {
         </div>
     `;
     triggerFieldsContainer.appendChild(fieldDiv);
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Date field created, checkbox ID:', enableConditionalLogicCheckboxId, 'container ID:', conditionalLogicContainerId);
+
 }
 function addTriggerLocation(questionId, fieldCount, sequenceCount) {
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.error('🔧 [ADD TRIGGER LOCATION DEBUG] Trigger fields container not found!');
+
         return;
     }
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER LOCATION DEBUG] Adding trigger location field', triggerFieldCount, 'for sequence', sequenceCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `trigger-field-${triggerFieldCount}`;
     fieldDiv.style.margin = '5px 0';
@@ -3212,11 +3195,11 @@ function addTriggerLocation(questionId, fieldCount, sequenceCount) {
 function addTriggerPdf(questionId, fieldCount, sequenceCount) {
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.error('🔧 [ADD TRIGGER PDF DEBUG] Trigger fields container not found!');
+
         return;
     }
     const triggerFieldCount = triggerFieldsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER PDF DEBUG] Adding trigger PDF', triggerFieldCount, 'for sequence', sequenceCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `trigger-field-${triggerFieldCount}`;
     fieldDiv.style.margin = '5px 0';
@@ -3264,17 +3247,17 @@ function updateTriggerPdfPriceId(questionId, fieldCount, sequenceCount, triggerF
 function updateTriggerLocationTitle(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const titleInput = document.getElementById(`triggerLocationTitle${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (titleInput) {
-        console.log('🔧 [UPDATE TRIGGER LOCATION TITLE DEBUG] Location title updated:', titleInput.value);
+
     }
 }
 function addTriggerCheckboxOption(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const optionsContainer = document.getElementById(`triggerCheckboxOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!optionsContainer) {
-        console.error('🔧 [ADD TRIGGER CHECKBOX OPTION DEBUG] Options container not found!');
+
         return;
     }
     const optionCount = optionsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER CHECKBOX OPTION DEBUG] Adding option', optionCount, 'for trigger field', triggerFieldCount);
+
     const optionDiv = document.createElement('div');
     optionDiv.className = `trigger-checkbox-option-${optionCount}`;
     optionDiv.style.margin = '3px 0';
@@ -3301,24 +3284,24 @@ function removeTriggerField(questionId, fieldCount, sequenceCount, triggerFieldC
     const fieldDiv = document.querySelector(`.trigger-field-${triggerFieldCount}`);
     if (fieldDiv) {
         fieldDiv.remove();
-        console.log('🔧 [REMOVE TRIGGER FIELD] Removed trigger field', triggerFieldCount, 'from sequence', sequenceCount);
+
     }
 }
 function removeTriggerCheckboxOption(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
     const optionDiv = document.querySelector(`.trigger-checkbox-option-${optionCount}`);
     if (optionDiv) {
         optionDiv.remove();
-        console.log('🔧 [REMOVE TRIGGER CHECKBOX OPTION] Removed option', optionCount, 'from trigger field', triggerFieldCount);
+
     }
 }
 function addTriggerDropdownOption(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const optionsContainer = document.getElementById(`triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!optionsContainer) {
-        console.error('🔧 [ADD TRIGGER DROPDOWN OPTION DEBUG] Options container not found!');
+
         return;
     }
     const optionCount = optionsContainer.children.length + 1;
-    console.log('🔧 [ADD TRIGGER DROPDOWN OPTION DEBUG] Adding option', optionCount, 'for trigger field', triggerFieldCount);
+
     const optionDiv = document.createElement('div');
     optionDiv.className = `trigger-dropdown-option-${optionCount}`;
     optionDiv.style.margin = '3px 0';
@@ -3341,77 +3324,77 @@ function removeTriggerDropdownOption(questionId, fieldCount, sequenceCount, trig
     const optionDiv = document.querySelector(`.trigger-dropdown-option-${optionCount}`);
     if (optionDiv) {
         optionDiv.remove();
-        console.log('🔧 [REMOVE TRIGGER DROPDOWN OPTION] Removed option', optionCount, 'from trigger field', triggerFieldCount);
+
     }
 }
 function updateTriggerDropdownFieldName(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const fieldNameInput = document.getElementById(`triggerDropdownFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (fieldNameInput) {
-        console.log('🔧 [TRIGGER DROPDOWN FIELD NAME] Updated:', fieldNameInput.value);
+
     }
 }
 function updateTriggerDropdownOptionText(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
     const textInput = document.getElementById(`triggerDropdownOptionText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}`);
     if (textInput) {
-        console.log('🔧 [TRIGGER DROPDOWN OPTION TEXT] Updated:', textInput.value);
+
     }
 }
 // Update functions for trigger fields
 function updateTriggerLabelText(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const textInput = document.getElementById(`triggerLabelText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (textInput) {
-        console.log('🔧 [TRIGGER LABEL TEXT] Updated:', textInput.value);
+
     }
 }
 function updateTriggerLabelNodeId(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const nodeIdInput = document.getElementById(`triggerLabelNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (nodeIdInput) {
-        console.log('🔧 [TRIGGER LABEL NODE ID] Updated:', nodeIdInput.value);
+
     }
 }
 function updateTriggerCheckboxFieldName(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const fieldNameInput = document.getElementById(`triggerCheckboxFieldName${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (fieldNameInput) {
-        console.log('🔧 [TRIGGER CHECKBOX FIELD NAME] Updated:', fieldNameInput.value);
+
     }
 }
 function updateTriggerCheckboxSelectionType(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const selectionTypeSelect = document.getElementById(`triggerCheckboxSelectionType${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (selectionTypeSelect) {
-        console.log('🔧 [TRIGGER CHECKBOX SELECTION TYPE] Updated:', selectionTypeSelect.value);
+
     }
 }
 function updateTriggerCheckboxOptionText(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
     const textInput = document.getElementById(`triggerCheckboxOptionText${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}`);
     if (textInput) {
-        console.log('🔧 [TRIGGER CHECKBOX OPTION TEXT] Updated:', textInput.value);
+
     }
 }
 function updateTriggerCheckboxOptionNodeId(questionId, fieldCount, sequenceCount, triggerFieldCount, optionCount) {
     const nodeIdInput = document.getElementById(`triggerCheckboxOptionNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}_${optionCount}`);
     if (nodeIdInput) {
-        console.log('🔧 [TRIGGER CHECKBOX OPTION NODE ID] Updated:', nodeIdInput.value);
+
     }
 }
 function updateTriggerDateLabel(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const labelInput = document.getElementById(`triggerDateLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (labelInput) {
-        console.log('🔧 [TRIGGER DATE LABEL] Updated:', labelInput.value);
+
     }
 }
 function updateTriggerDateNodeId(questionId, fieldCount, sequenceCount, triggerFieldCount) {
     const nodeIdInput = document.getElementById(`triggerDateNodeId${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (nodeIdInput) {
-        console.log('🔧 [TRIGGER DATE NODE ID] Updated:', nodeIdInput.value);
+
     }
 }
 // Helper function to get checkbox option node IDs from a trigger sequence
 function getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Getting checkbox option node IDs for questionId:', questionId, 'fieldCount:', fieldCount, 'sequenceCount:', sequenceCount);
+
     const checkboxNodeIds = [];
     const triggerFieldsContainer = document.getElementById(`triggerFields${questionId}_${fieldCount}_${sequenceCount}`);
     if (!triggerFieldsContainer) {
-        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Trigger fields container not found');
+
         return checkboxNodeIds;
     }
     // Find all checkbox option node ID inputs in this trigger sequence
@@ -3421,7 +3404,7 @@ function getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, seq
         const nodeId = input.value.trim();
         if (nodeId && !checkboxNodeIds.includes(nodeId)) {
             checkboxNodeIds.push(nodeId);
-            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found checkbox option node ID:', nodeId);
+
         }
     });
     // Also find dropdown fields in this trigger sequence and generate their hidden checkbox IDs
@@ -3462,7 +3445,7 @@ function getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, seq
                                 const checkboxId = `${sanitizedTriggerFieldName}_${sanitizedTriggerOptionValue}`;
                                 if (!checkboxNodeIds.includes(checkboxId)) {
                                     checkboxNodeIds.push(checkboxId);
-                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found dropdown hidden checkbox ID:', checkboxId);
+
                                 }
                             }
                         });
@@ -3471,19 +3454,19 @@ function getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, seq
             }
         });
     }
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found checkbox option node IDs:', checkboxNodeIds);
+
     return checkboxNodeIds;
 }
 // Function to toggle conditional logic UI and update it
 function toggleTriggerDateConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerDateConditionalLogic called');
+
     const checkbox = document.getElementById(`enableConditionalLogic${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     const container = document.getElementById(`conditionalLogicUI${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!checkbox || !container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+
         return;
     }
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+
     container.style.display = checkbox.checked ? 'block' : 'none';
     // Initialize or update the data structure
     if (!window.triggerDateConditionalLogic) {
@@ -3504,10 +3487,10 @@ function toggleTriggerDateConditionalLogic(questionId, fieldCount, sequenceCount
 }
 // Function to update the conditional logic UI with checkbox option dropdowns
 function updateTriggerDateConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDateConditionalLogicUI called');
+
     const container = document.getElementById(`conditionalLogicUI${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+
         return;
     }
     // Get checkbox option node IDs from the trigger sequence
@@ -3549,7 +3532,7 @@ function updateTriggerDateConditionalLogicUI(questionId, fieldCount, sequenceCou
                 window.triggerDateConditionalLogic[key] = { enabled: true, conditions: [] };
             }
             window.triggerDateConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
-            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Condition updated:', window.triggerDateConditionalLogic[key].conditions);
+
         };
         const removeConditionBtn = document.createElement('button');
         removeConditionBtn.textContent = '×';
@@ -3582,18 +3565,18 @@ function updateTriggerDateConditionalLogicUI(questionId, fieldCount, sequenceCou
         updateTriggerDateConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
     };
     container.appendChild(addConditionBtn);
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic UI updated');
+
 }
 // Function to toggle conditional logic UI for dropdown fields and update it
 function toggleTriggerDropdownConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerDropdownConditionalLogic called');
+
     const checkbox = document.getElementById(`enableConditionalLogicDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     const container = document.getElementById(`conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!checkbox || !container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+
         return;
     }
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+
     container.style.display = checkbox.checked ? 'block' : 'none';
     // Initialize or update the data structure
     if (!window.triggerDropdownConditionalLogic) {
@@ -3618,10 +3601,10 @@ function toggleTriggerDropdownConditionalLogic(questionId, fieldCount, sequenceC
 }
 // Function to update the conditional logic UI for dropdown fields with checkbox option dropdowns
 function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDropdownConditionalLogicUI called for dropdown');
+
     const container = document.getElementById(`conditionalLogicUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+
         return;
     }
     // Get checkbox option node IDs from the trigger sequence
@@ -3663,7 +3646,7 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
                 window.triggerDropdownConditionalLogic[key] = { enabled: true, conditions: [] };
             }
             window.triggerDropdownConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
-            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition updated:', window.triggerDropdownConditionalLogic[key].conditions);
+
             // Trigger autosave to persist the changes
             if (typeof window.requestAutosave === 'function') {
                 window.requestAutosave();
@@ -3708,18 +3691,18 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
         }
     };
     container.appendChild(addConditionBtn);
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown conditional logic UI updated');
+
 }
 // Function to toggle conditional logic UI for label fields and update it
 function toggleTriggerLabelConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerLabelConditionalLogic called');
+
     const checkbox = document.getElementById(`enableConditionalLogicLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     const container = document.getElementById(`conditionalLogicUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!checkbox || !container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+
         return;
     }
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+
     container.style.display = checkbox.checked ? 'block' : 'none';
     if (!window.triggerLabelConditionalLogic) {
         window.triggerLabelConditionalLogic = {};
@@ -3741,10 +3724,10 @@ function toggleTriggerLabelConditionalLogic(questionId, fieldCount, sequenceCoun
 }
 // Function to update the conditional logic UI for label fields with checkbox option dropdowns
 function updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerLabelConditionalLogicUI called for label');
+
     const container = document.getElementById(`conditionalLogicUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+
         return;
     }
     const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount);
@@ -3780,7 +3763,7 @@ function updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCo
                 window.triggerLabelConditionalLogic[key] = { enabled: true, conditions: [] };
             }
             window.triggerLabelConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
-            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Label condition updated:', window.triggerLabelConditionalLogic[key].conditions);
+
             // Trigger autosave to persist the changes
             if (typeof window.requestAutosave === 'function') {
                 window.requestAutosave();
@@ -3824,18 +3807,18 @@ function updateTriggerLabelConditionalLogicUI(questionId, fieldCount, sequenceCo
         }
     };
     container.appendChild(addConditionBtn);
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Label conditional logic UI updated');
+
 }
 // Function to toggle conditional logic UI for checkbox fields and update it
 function toggleTriggerCheckboxConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] toggleTriggerCheckboxConditionalLogic called');
+
     const checkbox = document.getElementById(`enableConditionalLogicCheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     const container = document.getElementById(`conditionalLogicUICheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!checkbox || !container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox or container not found');
+
         return;
     }
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked:', checkbox.checked);
+
     container.style.display = checkbox.checked ? 'block' : 'none';
     if (!window.triggerCheckboxConditionalLogic) {
         window.triggerCheckboxConditionalLogic = {};
@@ -3857,10 +3840,10 @@ function toggleTriggerCheckboxConditionalLogic(questionId, fieldCount, sequenceC
 }
 // Function to update the conditional logic UI for checkbox fields with checkbox option dropdowns
 function updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerCheckboxConditionalLogicUI called for checkbox');
+
     const container = document.getElementById(`conditionalLogicUICheckbox${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
     if (!container) {
-        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Container not found');
+
         return;
     }
     const checkboxNodeIds = getCheckboxOptionNodeIdsFromTriggerSequence(questionId, fieldCount, sequenceCount);
@@ -3896,7 +3879,7 @@ function updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenc
                 window.triggerCheckboxConditionalLogic[key] = { enabled: true, conditions: [] };
             }
             window.triggerCheckboxConditionalLogic[key].conditions[conditionIndex] = conditionDropdown.value;
-            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox condition updated:', window.triggerCheckboxConditionalLogic[key].conditions);
+
             // Trigger autosave to persist the changes
             if (typeof window.requestAutosave === 'function') {
                 window.requestAutosave();
@@ -3940,19 +3923,18 @@ function updateTriggerCheckboxConditionalLogicUI(questionId, fieldCount, sequenc
         }
     };
     container.appendChild(addConditionBtn);
-    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox conditional logic UI updated');
+
 }
 function addTimeField(questionId) {
     const unifiedDiv = getUnifiedContainer(questionId);
-    console.log('🔧 [ADD TIME DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
-    console.log('🔧 [ADD TIME DEBUG] Found unified container:', !!unifiedDiv);
+
     if (!unifiedDiv) {
-        console.error('🔧 [ADD TIME DEBUG] Unified container not found!');
+
         return;
     }
     // Ensure the unified container is visible
     if (unifiedDiv.style.display === 'none') {
-        console.log('🔧 [ADD TIME DEBUG] Unified container was hidden, making it visible');
+
         unifiedDiv.style.display = 'block';
     }
     // Remove placeholder if it exists
@@ -3961,7 +3943,7 @@ function addTimeField(questionId) {
         placeholder.remove();
     }
     const fieldCount = unifiedDiv.children.length + 1;
-    console.log('🔧 [ADD TIME DEBUG] Current field count:', fieldCount);
+
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `unified-field field-${fieldCount}`;
     fieldDiv.setAttribute('data-type', 'time');
@@ -3975,7 +3957,7 @@ function addTimeField(questionId) {
         </div>
     `;
     unifiedDiv.appendChild(fieldDiv);
-    console.log('🔧 [ADD TIME DEBUG] Added time field to unified container. New count:', unifiedDiv.children.length);
+
     // Force the container to be visible and have dimensions
     unifiedDiv.style.minHeight = '50px';
     unifiedDiv.style.border = '1px solid #e0e0e0';
@@ -4530,7 +4512,7 @@ function loadExistingConditionalPrefills(questionId, fieldOrder, fieldDiv) {
                 addConditionalPrefill(questionId, fieldOrder, cp.trigger, cp.value);
             });
         } catch (e) {
-            console.error('Error loading conditional prefills:', e);
+
         }
     }
 }
@@ -4609,39 +4591,38 @@ function saveUnifiedField(questionId, fieldOrder) {
     fieldDiv.setAttribute('data-type', newType);
     if (newType === 'label') {
         fieldDiv.setAttribute('data-prefill', newPrefill);
-        console.log('🔧 [SAVE DEBUG] Set data-prefill for label field:', { questionId, fieldOrder, newPrefill, attributeValue: fieldDiv.getAttribute('data-prefill') });
+
         // Collect conditional prefills
         const conditionalPrefillContainer = document.getElementById(`conditionalPrefillContainer${questionId}_${fieldOrder}`);
-        console.log('🔧 [SAVE CONDITIONAL PREFILL] Container found:', !!conditionalPrefillContainer);
+
         if (conditionalPrefillContainer) {
             const conditionalPrefills = [];
             const entries = conditionalPrefillContainer.querySelectorAll('[id^="conditionalPrefill_"]');
-            console.log('🔧 [SAVE CONDITIONAL PREFILL] Found entries:', entries.length);
+
             entries.forEach(entry => {
                 const triggerSelect = entry.querySelector('.conditional-prefill-trigger');
                 const valueInput = entry.querySelector('.conditional-prefill-value');
                 if (triggerSelect && valueInput) {
                     const trigger = triggerSelect.value;
                     const value = valueInput.value;
-                    console.log('🔧 [SAVE CONDITIONAL PREFILL] Entry:', { trigger, value });
+
                     if (trigger && value) {
                         conditionalPrefills.push({ trigger: trigger, value: value });
                     }
                 }
             });
-            console.log('🔧 [SAVE CONDITIONAL PREFILL] Collected conditional prefills:', conditionalPrefills);
+
             // Save conditional prefills as JSON attribute
             if (conditionalPrefills.length > 0) {
                 const jsonString = JSON.stringify(conditionalPrefills);
                 fieldDiv.setAttribute('data-conditional-prefills', jsonString);
-                console.log('🔧 [SAVE CONDITIONAL PREFILL] Saved to attribute:', jsonString);
-                console.log('🔧 [SAVE CONDITIONAL PREFILL] Verified attribute value:', fieldDiv.getAttribute('data-conditional-prefills'));
+
             } else {
                 fieldDiv.removeAttribute('data-conditional-prefills');
-                console.log('🔧 [SAVE CONDITIONAL PREFILL] Removed attribute (no prefills)');
+
             }
         } else {
-            console.log('🔧 [SAVE CONDITIONAL PREFILL] Container not found!');
+
         }
     } else {
         fieldDiv.removeAttribute('data-prefill');
@@ -4705,7 +4686,7 @@ function updateHiddenContainers(questionId) {
         const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
         // Skip if elements don't exist (e.g., duplicate order numbers)
         if (!labelTextEl || !nodeIdTextEl) {
-            console.warn(`Skipping field with order ${fieldOrder} - elements not found`);
+
             return;
         }
         const labelText = labelTextEl.textContent;
@@ -4803,20 +4784,20 @@ let currentInverseCheckboxConfig = null;
 let currentLinkedCheckboxConfig = [];
 // Open the linked field modal
 function openLinkedFieldModal() {
-    console.log('🔍 [DEBUG] openLinkedFieldModal called');
+
     // Create modal if it doesn't exist
     if (!document.getElementById('linkedFieldModal')) {
-        console.log('🔍 [DEBUG] Creating linked field modal');
+
         createLinkedFieldModal();
     }
     // Reset current configuration
     currentLinkedFieldConfig = [];
     // Show modal
     document.getElementById('linkedFieldModal').style.display = 'block';
-    console.log('🔍 [DEBUG] Modal displayed');
+
     // Check if we have a stored configuration to restore
     if (window.lastLinkedFieldConfig && !window.editingLinkedFieldId) {
-        console.log('🔍 [DEBUG] Restoring last configuration:', window.lastLinkedFieldConfig);
+
         // Restore the linked field ID
         const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
         if (linkedFieldIdInput) {
@@ -5222,65 +5203,51 @@ function populateLinkedCheckboxDropdown(idx) {
         // Add mousedown handler to prevent blur event from firing
         row.addEventListener('mousedown', (e) => {
             e.preventDefault(); // Prevent input blur
-            console.log('🔵 [LINKED CHECKBOX DEBUG] mousedown on option row, preventing default');
+
         });
         row.onclick = (e) => {
             e.stopPropagation(); // Prevent event bubbling
-            console.log('🔵 [LINKED CHECKBOX DEBUG] Option clicked in dropdown:', {
-                idx: idx,
-                nodeId: opt.nodeId,
-                label: opt.label,
-                displayText: displayText
-            });
+
             const searchInput = document.getElementById(`linkedCheckboxSearch${idx}`);
             if (!searchInput) {
-                console.error('❌ [LINKED CHECKBOX DEBUG] Search input not found for idx:', idx);
+
                 return;
             }
             const selectElement = document.getElementById(`linkedCheckboxSelect${idx}`);
             if (!selectElement) {
-                console.error('❌ [LINKED CHECKBOX DEBUG] Select element not found for idx:', idx);
+
                 return;
             }
-            console.log('🔵 [LINKED CHECKBOX DEBUG] Before update:', {
-                searchInputValue: searchInput.value,
-                selectValue: selectElement.value,
-                configValue: currentLinkedCheckboxConfig[idx]?.selectedValue
-            });
+
             // Set search input to the full display text (not just nodeId)
             searchInput.value = displayText;
-            console.log('✅ [LINKED CHECKBOX DEBUG] Updated search input to:', displayText);
+
             // Verify the value was set
             const verifySearchValue = searchInput.value;
-            console.log('🔵 [LINKED CHECKBOX DEBUG] Verified search input value after setting:', verifySearchValue);
+
             // Set select value to nodeId
             selectElement.value = opt.nodeId;
-            console.log('✅ [LINKED CHECKBOX DEBUG] Updated select value to:', opt.nodeId);
+
             // Verify the select value was set
             const verifySelectValue = selectElement.value;
-            console.log('🔵 [LINKED CHECKBOX DEBUG] Verified select value after setting:', verifySelectValue);
+
             // Update config
             if (currentLinkedCheckboxConfig[idx]) {
             currentLinkedCheckboxConfig[idx].selectedValue = opt.nodeId;
-                console.log('✅ [LINKED CHECKBOX DEBUG] Updated config selectedValue to:', opt.nodeId);
+
             } else {
-                console.error('❌ [LINKED CHECKBOX DEBUG] Config entry not found for idx:', idx);
+
             }
             // Hide overlay immediately
             overlay.style.display = 'none';
-            console.log('✅ [LINKED CHECKBOX DEBUG] Hidden overlay');
+
             // Re-focus the search input to prevent blur issues
             setTimeout(() => {
                 searchInput.focus();
                 // Blur it again so it doesn't stay focused
                 setTimeout(() => searchInput.blur(), 10);
             }, 10);
-            console.log('🔵 [LINKED CHECKBOX DEBUG] After update:', {
-                searchInputValue: searchInput.value,
-                selectValue: selectElement.value,
-                configValue: currentLinkedCheckboxConfig[idx]?.selectedValue,
-                overlayDisplay: overlay.style.display
-            });
+
         };
         overlay.appendChild(row);
     });
@@ -5296,20 +5263,20 @@ function showLinkedCheckboxOptions(idx){
     document.getElementById(`linkedCheckboxOptions${idx}`).style.display = 'block';
 }
 function hideLinkedCheckboxOptions(idx){
-    console.log('🔵 [LINKED CHECKBOX DEBUG] hideLinkedCheckboxOptions called for idx:', idx);
+
     const overlay = document.getElementById(`linkedCheckboxOptions${idx}`);
     if (!overlay) {
-        console.error('❌ [LINKED CHECKBOX DEBUG] Overlay not found for idx:', idx);
+
         return;
     }
     // Use a longer delay to allow clicks to register
     setTimeout(() => {
         // Check if overlay is still visible (might have been clicked)
         if (overlay.style.display !== 'none') {
-            console.log('🔵 [LINKED CHECKBOX DEBUG] Hiding overlay after delay');
+
             overlay.style.display = 'none';
         } else {
-            console.log('🔵 [LINKED CHECKBOX DEBUG] Overlay already hidden, skipping');
+
         }
     }, 200);
 }
@@ -5368,10 +5335,10 @@ function editLinkedCheckboxDisplay(displayId) {
     // Find the configuration for this display
     const config = (window.linkedCheckboxesConfig || []).find(c => c.id === displayId);
     if (!config) {
-        console.log('❌ [DEBUG] Configuration not found for displayId:', displayId);
+
         return;
     }
-    console.log('✅ [DEBUG] Found configuration:', config);
+
     // Store the display ID we're editing
     window.editingLinkedCheckboxId = displayId;
     // Create modal if it doesn't exist
@@ -5415,7 +5382,7 @@ function editLinkedCheckboxDisplay(displayId) {
     });
     // Show modal
     document.getElementById('linkedCheckboxModal').style.display = 'block';
-    console.log('🔍 [DEBUG] Modal displayed for editing');
+
 }
 function createLinkedCheckboxDisplay(selectedOptions, linkedId){
     const displayId = `linkedCheckbox${linkedCheckboxCounter++}`;
@@ -5541,8 +5508,7 @@ function createLinkedCheckboxDisplayFromImport(linkedCheckboxData) {
 // ======= INVERSE CHECKBOX FUNCTIONALITY =====
 // ============================================
 function openInverseCheckboxModal() {
-    console.log('🔵 [INVERSE CHECKBOX] openInverseCheckboxModal called');
-    console.log('🔵 [INVERSE CHECKBOX] window.linkedCheckboxesConfig at modal open:', window.linkedCheckboxesConfig);
+
     if (!document.getElementById('inverseCheckboxModal')) {
         createInverseCheckboxModal();
     }
@@ -5595,21 +5561,21 @@ function addInverseCheckboxDropdown() {
         <select id="inverseCheckboxSelect0" style="display:none;"></select>
       </div>`;
     container.appendChild(div);
-    console.log('🔵 [INVERSE CHECKBOX] About to populate dropdown, window.linkedCheckboxesConfig:', window.linkedCheckboxesConfig);
+
     populateInverseCheckboxDropdown(0);
     currentInverseCheckboxConfig = { index: 0, selectedValue: '' };
 }
 function populateInverseCheckboxDropdown(idx) {
-    console.log('🔵 [INVERSE CHECKBOX] populateInverseCheckboxDropdown called with idx:', idx);
+
     const select = document.getElementById(`inverseCheckboxSelect${idx}`);
     if (!select) {
-        console.error('❌ [INVERSE CHECKBOX] Select element not found for idx:', idx);
+
         return;
     }
     select.innerHTML = '<option value="">Select a checkbox option...</option>';
     const options = [];
     const blocks = document.querySelectorAll('[id^="questionBlock"]');
-    console.log('🔵 [INVERSE CHECKBOX] Found question blocks:', blocks.length);
+
     blocks.forEach(block => {
         const qId = block.id.replace('questionBlock','');
         const typeSel = block.querySelector(`#questionType${qId}`);
@@ -5618,13 +5584,13 @@ function populateInverseCheckboxDropdown(idx) {
             // Basic checkbox question options
             const nameInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionName${qId}_"]`);
             const textInputs = block.querySelectorAll(`#checkboxOptions${qId} input[id^="checkboxOptionText${qId}_"]`);
-            console.log(`🔵 [INVERSE CHECKBOX] Question ${qId} (checkbox): Found ${nameInputs.length} checkbox options`);
+
             nameInputs.forEach((nameInput, i) => {
                 const nodeId = nameInput.value.trim();
                 const labelText = (textInputs[i]?.value || '').trim();
                 if (nodeId) {
                     options.push({ nodeId, label: labelText || nodeId });
-                    console.log(`✅ [INVERSE CHECKBOX] Added checkbox option from question ${qId}: ${labelText || nodeId} (${nodeId})`);
+
                 }
             });
         }
@@ -5828,10 +5794,10 @@ function populateInverseCheckboxDropdown(idx) {
         }
     });
     // Add linked checkbox nodes from the graph
-    console.log('🔵 [INVERSE CHECKBOX] Checking for graph-linked checkbox nodes...');
+
     if (window.graph) {
         const allCells = window.graph.getChildVertices(window.graph.getDefaultParent());
-        console.log('🔵 [INVERSE CHECKBOX] Found graph cells:', allCells.length);
+
         allCells.forEach(cell => {
             // Check if this is a linked checkbox node
             if (cell._linkedCheckboxNodeId) {
@@ -5841,27 +5807,26 @@ function populateInverseCheckboxDropdown(idx) {
                     const nodeText = (cell.value || '').replace(/<[^>]*>/g, '').trim() || nodeId;
                     const label = `Linked Checkbox: ${nodeText} (${nodeId})`;
                     options.push({ nodeId: nodeId, label: label });
-                    console.log('✅ [INVERSE CHECKBOX] Added graph linked checkbox node:', nodeId);
+
                 }
             }
         });
     } else {
-        console.log('⚠️ [INVERSE CHECKBOX] window.graph not available');
+
     }
     // Add linked checkbox IDs themselves as options (so inverse checkbox can target the entire linked checkbox group)
-    console.log('🔵 [INVERSE CHECKBOX] Checking window.linkedCheckboxesConfig...');
-    console.log('🔵 [INVERSE CHECKBOX] window.linkedCheckboxesConfig:', window.linkedCheckboxesConfig);
+
     if (window.linkedCheckboxesConfig && Array.isArray(window.linkedCheckboxesConfig)) {
-        console.log('✅ [INVERSE CHECKBOX] Found linkedCheckboxesConfig with', window.linkedCheckboxesConfig.length, 'configs');
+
         window.linkedCheckboxesConfig.forEach((config, configIndex) => {
-            console.log(`🔵 [INVERSE CHECKBOX] Processing config ${configIndex}:`, config);
+
             // Add the linked checkbox ID itself as an option
             if (config.linkedCheckboxId && typeof config.linkedCheckboxId === 'string') {
                 const linkedCheckboxId = config.linkedCheckboxId.trim();
                 if (linkedCheckboxId) {
                     // Check if this linked checkbox ID is already in the list
                     const alreadyExists = options.some(opt => opt.nodeId === linkedCheckboxId);
-                    console.log(`🔵 [INVERSE CHECKBOX] Linked checkbox ID ${linkedCheckboxId} already exists:`, alreadyExists);
+
                     if (!alreadyExists) {
                         // Get the checkbox names for better labeling
                         const checkboxNames = config.checkboxes && Array.isArray(config.checkboxes) 
@@ -5869,26 +5834,26 @@ function populateInverseCheckboxDropdown(idx) {
                             : 'Linked Checkbox';
                         const label = `Linked Checkbox: ${checkboxNames} (${linkedCheckboxId})`;
                         options.push({ nodeId: linkedCheckboxId, label: label });
-                        console.log(`✅ [INVERSE CHECKBOX] Added linked checkbox ID: ${label}`);
+
                     }
                 }
             }
             // Also add individual checkbox options from linked checkbox configs (even if they exist, mark them as from linked checkbox)
             if (config.checkboxes && Array.isArray(config.checkboxes)) {
-                console.log(`🔵 [INVERSE CHECKBOX] Config ${configIndex} has ${config.checkboxes.length} checkboxes:`, config.checkboxes);
+
                 config.checkboxes.forEach((checkboxNodeId, checkboxIndex) => {
-                    console.log(`🔵 [INVERSE CHECKBOX] Processing checkbox ${checkboxIndex}:`, checkboxNodeId);
+
                     if (checkboxNodeId && typeof checkboxNodeId === 'string') {
                         const nodeId = checkboxNodeId.trim();
                         // Check if this option is already in the list
                         const existingOption = options.find(opt => opt.nodeId === nodeId);
-                        console.log(`🔵 [INVERSE CHECKBOX] Checkbox ${nodeId} already exists:`, !!existingOption);
+
                         if (existingOption) {
                             // Update the label to indicate it's part of a linked checkbox
                             const linkedCheckboxId = config.linkedCheckboxId || 'linked';
                             if (!existingOption.label.includes('Linked Checkbox')) {
                                 existingOption.label = `${existingOption.label} [Linked: ${linkedCheckboxId}]`;
-                                console.log(`✅ [INVERSE CHECKBOX] Updated label for existing checkbox: ${existingOption.label}`);
+
                             }
                         } else if (nodeId) {
                             // Try to find a label for this checkbox from the question blocks
@@ -5903,7 +5868,7 @@ function populateInverseCheckboxDropdown(idx) {
                                         const labelText = (textInputs[i]?.value || '').trim();
                                         if (labelText) {
                                             label = labelText;
-                                            console.log(`✅ [INVERSE CHECKBOX] Found label for ${nodeId}: ${labelText}`);
+
                                         }
                                     }
                                 });
@@ -5915,7 +5880,7 @@ function populateInverseCheckboxDropdown(idx) {
                                         const labelText = (unifiedTexts[i]?.value || '').trim();
                                         if (labelText) {
                                             label = labelText;
-                                            console.log(`✅ [INVERSE CHECKBOX] Found unified label for ${nodeId}: ${labelText}`);
+
                                         }
                                     }
                                 });
@@ -5924,23 +5889,21 @@ function populateInverseCheckboxDropdown(idx) {
                             const linkedCheckboxId = config.linkedCheckboxId || 'linked';
                             const finalLabel = `${label} [Linked: ${linkedCheckboxId}] (${nodeId})`;
                             options.push({ nodeId: nodeId, label: finalLabel });
-                            console.log(`✅ [INVERSE CHECKBOX] Added linked checkbox option: ${finalLabel}`);
+
                         }
                     } else {
-                        console.log(`⚠️ [INVERSE CHECKBOX] Invalid checkbox node ID:`, checkboxNodeId);
+
                     }
                 });
             } else {
-                console.log(`⚠️ [INVERSE CHECKBOX] Config ${configIndex} has no checkboxes array or it's not an array`);
+
             }
         });
     } else {
-        console.log('⚠️ [INVERSE CHECKBOX] window.linkedCheckboxesConfig is not available or not an array');
-        console.log('🔵 [INVERSE CHECKBOX] Type of window.linkedCheckboxesConfig:', typeof window.linkedCheckboxesConfig);
+
     }
     // Build options list and searchable overlay - show full node ID like linked checkbox menu
-    console.log('🔵 [INVERSE CHECKBOX] Total options collected:', options.length);
-    console.log('🔵 [INVERSE CHECKBOX] Options:', options);
+
     const overlay = document.getElementById(`inverseCheckboxOptions${idx}`);
     if (overlay) {
         overlay.innerHTML = '';
@@ -5952,10 +5915,10 @@ function populateInverseCheckboxDropdown(idx) {
         o.textContent = opt.nodeId;
         select.appendChild(o);
         if (optIndex < 5) { // Log first 5 options
-            console.log(`✅ [INVERSE CHECKBOX] Added option ${optIndex}:`, o.textContent);
+
         }
     });
-    console.log('✅ [INVERSE CHECKBOX] Finished populating dropdown with', select.options.length - 1, 'options');
+
     initializeInverseCheckboxSearch(idx);
 }
 function initializeInverseCheckboxSearch(idx) {
@@ -6047,7 +6010,7 @@ function hideInverseCheckboxOptions(idx) {
         if (optionsContainer) {
         optionsContainer.style.display = 'none';
         } else {
-            console.warn('⚠️ [INVERSE CHECKBOX] Options container not found for idx:', idx);
+
         }
     }, 200);
 }
@@ -6206,11 +6169,10 @@ function removeInverseCheckboxConfig(displayId) {
 }
 // Add a dropdown to the linked field configuration
 function addLinkedFieldDropdown() {
-    console.log('🔍 [DEBUG] addLinkedFieldDropdown called');
+
     const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
     const dropdownIndex = currentLinkedFieldConfig.length;
-    console.log('🔍 [DEBUG] dropdownsContainer:', dropdownsContainer);
-    console.log('🔍 [DEBUG] dropdownIndex:', dropdownIndex);
+
     const dropdownDiv = document.createElement('div');
     dropdownDiv.id = `linkedFieldDropdown${dropdownIndex}`;
     dropdownDiv.style.cssText = `
@@ -6256,34 +6218,33 @@ function addLinkedFieldDropdown() {
 }
 // Populate a linked field dropdown with text questions
 function populateLinkedFieldDropdown(dropdownIndex) {
-    console.log('🔍 [DEBUG] populateLinkedFieldDropdown called with dropdownIndex:', dropdownIndex);
+
     const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
     if (!select) {
-        console.log('❌ [DEBUG] Select element not found for dropdownIndex:', dropdownIndex);
+
         return;
     }
-    console.log('✅ [DEBUG] Found select element:', select);
+
     // Clear existing options
     select.innerHTML = '<option value="">Select a text question...</option>';
     // Find all text questions and numbered dropdown fields
     const textQuestions = [];
     const questionBlocks = document.querySelectorAll('[id^="questionBlock"]');
-    console.log('🔍 [DEBUG] Found question blocks:', questionBlocks.length);
+
     questionBlocks.forEach((block, blockIndex) => {
         const questionId = block.id.replace('questionBlock', '');
-        console.log(`🔍 [DEBUG] Processing block ${blockIndex}: questionId=${questionId}, block.id=${block.id}`);
+
         const questionTypeSelect = block.querySelector(`#questionType${questionId}`);
         const questionNameInput = block.querySelector(`#textboxName${questionId}`);
-        console.log(`🔍 [DEBUG] Block ${blockIndex} - questionTypeSelect:`, questionTypeSelect);
-        console.log(`🔍 [DEBUG] Block ${blockIndex} - questionNameInput:`, questionNameInput);
+
         if (questionTypeSelect) {
-            console.log(`🔍 [DEBUG] Block ${blockIndex} - questionType:`, questionTypeSelect.value);
+
         }
         // Handle regular text questions
         if (questionTypeSelect && (questionTypeSelect.value === 'textbox' || questionTypeSelect.value === 'text') && questionNameInput) {
             const nodeId = questionNameInput.value.trim() || `answer${questionId}`;
             const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
-            console.log(`✅ [DEBUG] Found text question: ${questionText} (${nodeId})`);
+
             textQuestions.push({
                 questionId: questionId,
                 nodeId: nodeId,
@@ -6292,45 +6253,39 @@ function populateLinkedFieldDropdown(dropdownIndex) {
         }
         // Handle numbered dropdown questions
         if (questionTypeSelect && questionTypeSelect.value === 'numberedDropdown') {
-            console.log(`🔍 [DEBUG] Found numberedDropdown question ${questionId}`);
+
             const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
             const nodeId = block.querySelector(`#nodeId${questionId}`)?.value || `answer${questionId}`;
             const minValue = parseInt(block.querySelector(`#numberRangeStart${questionId}`)?.value || '1');
             const maxValue = parseInt(block.querySelector(`#numberRangeEnd${questionId}`)?.value || '1');
-            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - questionText:`, questionText);
-            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - nodeId:`, nodeId);
-            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - minValue:`, minValue);
-            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - maxValue:`, maxValue);
+
             // Get all fields from the numbered dropdown using the unified fields container
             const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
-            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - unifiedFieldsContainer:`, unifiedFieldsContainer);
+
             if (unifiedFieldsContainer) {
                 const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field');
-                console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - fieldContainers found:`, fieldContainers.length);
+
                 fieldContainers.forEach((fieldContainer, fieldIndex) => {
-                    console.log(`🔍 [DEBUG] Processing field container ${fieldIndex} for question ${questionId}`);
+
                     const fieldType = fieldContainer.getAttribute('data-type');
                     const fieldOrder = fieldContainer.getAttribute('data-order');
-                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
-                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
+
                     if (fieldType && (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone')) {
                         // Get the field data from the spans
                         const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
                         const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
-                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabelSpan:`, fieldLabelSpan);
-                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeIdSpan:`, fieldNodeIdSpan);
+
                         if (fieldLabelSpan && fieldNodeIdSpan) {
                             const fieldLabel = fieldLabelSpan.textContent.trim();
                             const fieldNodeId = fieldNodeIdSpan.textContent.trim();
-                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabel:`, fieldLabel);
-                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeId:`, fieldNodeId);
+
                             if (fieldLabel && fieldNodeId) {
-                                console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
+
                                 // Generate numbered options for each field
                                 for (let i = minValue; i <= maxValue; i++) {
                                     const numberedNodeId = `${fieldNodeId}_${i}`;
                                     const questionTextWithNumber = `${questionText} - ${fieldLabel} ${i}`;
-                                    console.log(`✅ [DEBUG] Adding numbered field: ${questionTextWithNumber} (${numberedNodeId})`);
+
                                     textQuestions.push({
                                         questionId: questionId,
                                         nodeId: numberedNodeId,
@@ -6340,7 +6295,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                     if (fieldLabel.toLowerCase() === 'state') {
                                         const shortNodeId = `${fieldNodeId}_short_${i}`;
                                         const questionTextWithShort = `${questionText} - ${fieldLabel} Short ${i}`;
-                                        console.log(`✅ [DEBUG] Adding short state field: ${questionTextWithShort} (${shortNodeId})`);
+
                                         textQuestions.push({
                                             questionId: questionId,
                                             nodeId: shortNodeId,
@@ -6350,52 +6305,48 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                 }
                             }
                         } else {
-                            console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
+
                         }
                     } else {
-                        console.log(`❌ [DEBUG] Field ${fieldIndex} doesn't meet criteria - fieldType: ${fieldType}`);
+
                     }
                 });
             } else {
-                console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+
             }
         }
         // Handle multiple textboxes questions
         if (questionTypeSelect && questionTypeSelect.value === 'multipleTextboxes') {
-            console.log(`🔍 [DEBUG] Found multipleTextboxes question ${questionId}`);
+
             const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
             const nodeId = block.querySelector(`#nodeId${questionId}`)?.value || `answer${questionId}`;
-            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - questionText:`, questionText);
-            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - nodeId:`, nodeId);
+
             // Get all fields from the multiple textboxes using the unified fields container
             const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
-            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - unifiedFieldsContainer:`, unifiedFieldsContainer);
+
             if (unifiedFieldsContainer) {
                 const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field');
-                console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - fieldContainers found:`, fieldContainers.length);
+
                 fieldContainers.forEach((fieldContainer, fieldIndex) => {
-                    console.log(`🔍 [DEBUG] Processing field container ${fieldIndex} for question ${questionId}`);
+
                     const fieldType = fieldContainer.getAttribute('data-type');
                     const fieldOrder = fieldContainer.getAttribute('data-order');
-                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
-                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
+
                     if (fieldType && (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone')) {
                         // Get the field data from the spans
                         const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
                         const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
-                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabelSpan:`, fieldLabelSpan);
-                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeIdSpan:`, fieldNodeIdSpan);
+
                         if (fieldLabelSpan && fieldNodeIdSpan) {
                             const fieldLabel = fieldLabelSpan.textContent.trim();
                             const fieldNodeId = fieldNodeIdSpan.textContent.trim();
-                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabel:`, fieldLabel);
-                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeId:`, fieldNodeId);
+
                             if (fieldLabel && fieldNodeId) {
-                                console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
+
                                 // For multipleTextboxes, use the base nodeId without numbering
                                 // because the actual generated fields use the base nodeId
                                 const questionTextWithField = `${questionText} - ${fieldLabel}`;
-                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithField} (${fieldNodeId})`);
+
                                 textQuestions.push({
                                     questionId: questionId,
                                     nodeId: fieldNodeId,
@@ -6405,7 +6356,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                 if (fieldLabel.toLowerCase() === 'state') {
                                     const shortNodeId = `${fieldNodeId}_short`;
                                     const questionTextWithShort = `${questionText} - ${fieldLabel} Short`;
-                                    console.log(`✅ [DEBUG] Adding short state field: ${questionTextWithShort} (${shortNodeId})`);
+
                                     textQuestions.push({
                                         questionId: questionId,
                                         nodeId: shortNodeId,
@@ -6414,19 +6365,19 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                 }
                             }
                         } else {
-                            console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
+
                         }
                     } else {
-                        console.log(`❌ [DEBUG] Field ${fieldIndex} doesn't meet criteria - fieldType: ${fieldType}`);
+
                     }
                 });
             } else {
-                console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+
             }
         }
         // Collect linked textbox IDs from checkbox options in numberedDropdown and multipleTextboxes
         if (questionTypeSelect && (questionTypeSelect.value === 'numberedDropdown' || questionTypeSelect.value === 'multipleTextboxes')) {
-            console.log(`🔍 [DEBUG] Collecting linked textboxes from checkbox options in ${questionTypeSelect.value} question ${questionId}`);
+
             const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
             const minValue = questionTypeSelect.value === 'numberedDropdown' 
                 ? parseInt(block.querySelector(`#numberRangeStart${questionId}`)?.value || '1')
@@ -6438,33 +6389,33 @@ function populateLinkedFieldDropdown(dropdownIndex) {
             const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
             if (unifiedFieldsContainer) {
                 const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field[data-type="checkbox"]');
-                console.log(`🔍 [DEBUG] Found ${fieldContainers.length} checkbox fields in ${questionTypeSelect.value} question ${questionId}`);
+
                 fieldContainers.forEach((fieldContainer) => {
                     const fieldOrder = fieldContainer.getAttribute('data-order');
                     const fieldNameEl = fieldContainer.querySelector(`#checkboxFieldName${questionId}_${fieldOrder}`);
                     const fieldName = fieldNameEl ? fieldNameEl.value.trim() : '';
-                    console.log(`🔍 [DEBUG] Processing checkbox field ${fieldOrder} (${fieldName})`);
+
                     // Get all checkbox options
                     const optionsContainer = fieldContainer.querySelector(`#checkboxOptions${questionId}_${fieldOrder}`);
                     if (optionsContainer) {
                         const optionDivs = optionsContainer.querySelectorAll('[class^="checkbox-option-"]');
-                        console.log(`🔍 [DEBUG] Found ${optionDivs.length} checkbox options`);
+
                         optionDivs.forEach((optionDiv, optionIndex) => {
                             const optionNodeIdEl = optionDiv.querySelector(`input[id^="checkboxNodeId${questionId}_${fieldOrder}_"]`);
                             const optionTextEl = optionDiv.querySelector(`input[id^="checkboxText${questionId}_${fieldOrder}_"]`);
                             const optionNodeId = optionNodeIdEl ? optionNodeIdEl.value.trim() : '';
                             const optionText = optionTextEl ? optionTextEl.value.trim() : '';
-                            console.log(`🔍 [DEBUG] Processing checkbox option ${optionIndex + 1} (${optionText}, nodeId: ${optionNodeId})`);
+
                             // Get linked fields for this option
                             const linkedFieldsContainer = optionDiv.querySelector(`#linkedFields${questionId}_${fieldOrder}_${optionIndex + 1}`);
                             if (linkedFieldsContainer) {
                                 const linkedFieldDivs = linkedFieldsContainer.querySelectorAll('[class^="linked-field-"]');
-                                console.log(`🔍 [DEBUG] Found ${linkedFieldDivs.length} linked fields for option ${optionIndex + 1}`);
+
                                 linkedFieldDivs.forEach((linkedFieldDiv) => {
                                     const titleInput = linkedFieldDiv.querySelector(`input[id^="linkedFieldTitle${questionId}_${fieldOrder}_${optionIndex + 1}_"]`);
                                     const linkedFieldTitle = titleInput ? titleInput.value.trim() : '';
                                     if (linkedFieldTitle) {
-                                        console.log(`✅ [DEBUG] Found linked field title: ${linkedFieldTitle}`);
+
                                         if (questionTypeSelect.value === 'numberedDropdown') {
                                             // For numberedDropdown, generate entries for each entry number
                                             for (let i = minValue; i <= maxValue; i++) {
@@ -6479,7 +6430,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                                 // We need to add _{i} to it
                                                 const linkedTextboxId = `${linkedFieldTitle}_${i}`;
                                                 const displayText = `${questionText} - ${fieldName} - ${optionText} - Linked (${i})`;
-                                                console.log(`✅ [DEBUG] Adding linked textbox for numberedDropdown: ${displayText} (${linkedTextboxId})`);
+
                                                 textQuestions.push({
                                                     questionId: questionId,
                                                     nodeId: linkedTextboxId,
@@ -6490,7 +6441,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                             // For multipleTextboxes, the title is already the full ID (no entry number)
                                             const linkedTextboxId = linkedFieldTitle;
                                             const displayText = `${questionText} - ${fieldName} - ${optionText} - Linked`;
-                                            console.log(`✅ [DEBUG] Adding linked textbox for multipleTextboxes: ${displayText} (${linkedTextboxId})`);
+
                                             textQuestions.push({
                                                 questionId: questionId,
                                                 nodeId: linkedTextboxId,
@@ -6506,7 +6457,7 @@ function populateLinkedFieldDropdown(dropdownIndex) {
             }
         }
     });
-    console.log('🔍 [DEBUG] Final textQuestions array:', textQuestions);
+
     // Add options to dropdown
     textQuestions.forEach(question => {
         const option = document.createElement('option');
@@ -6515,9 +6466,9 @@ function populateLinkedFieldDropdown(dropdownIndex) {
         const displayText = question.questionText.replace(/^Question \d+ - /, '');
         option.textContent = `${displayText} (${question.nodeId})`;
         select.appendChild(option);
-        console.log(`✅ [DEBUG] Added option: ${option.textContent}`);
+
     });
-    console.log(`✅ [DEBUG] Total options added: ${textQuestions.length}`);
+
     // Add change event listener
     select.addEventListener('change', function() {
         currentLinkedFieldConfig[dropdownIndex].selectedValue = this.value;
@@ -6582,7 +6533,7 @@ function finalizeLinkedField() {
     currentLinkedFieldConfig.forEach((config, index) => {
         const customInput = document.getElementById(`linkedFieldCustom${index}`);
         let selectedValue = '';
-        
+
         // Check custom input first
         if (customInput && customInput.value.trim()) {
             selectedValue = customInput.value.trim();
@@ -6590,7 +6541,7 @@ function finalizeLinkedField() {
             // Fall back to dropdown selection
             selectedValue = config.selectedValue || '';
         }
-        
+
         if (selectedValue) {
             selectedFields.push({
                 index: index,
@@ -6598,7 +6549,7 @@ function finalizeLinkedField() {
             });
         }
     });
-    
+
     // Validate that at least 2 fields are selected
     if (selectedFields.length < 2) {
         alert('Please select at least 2 text questions to link.');
@@ -6613,7 +6564,7 @@ function finalizeLinkedField() {
     }
     // Check if we're editing an existing linked field
     if (window.editingLinkedFieldId) {
-        console.log('🔍 [DEBUG] Editing existing linked field:', window.editingLinkedFieldId);
+
         // Remove the old display
         removeLinkedFieldDisplay(window.editingLinkedFieldId);
         // Create the new linked field display
@@ -6621,7 +6572,7 @@ function finalizeLinkedField() {
         // Clear the editing flag
         window.editingLinkedFieldId = null;
     } else {
-        console.log('🔍 [DEBUG] Creating new linked field');
+
         // Create the linked field display
         createLinkedFieldDisplay(selectedFields, linkedFieldId);
     }
@@ -6719,21 +6670,21 @@ function removeLinkedFieldDisplay(linkedFieldId) {
 }
 // Edit a linked field display
 function editLinkedFieldDisplay(displayId) {
-    console.log('🔍 [DEBUG] editLinkedFieldDisplay called with displayId:', displayId);
+
     // Find the configuration for this display
     const config = window.linkedFieldsConfig.find(c => c.id === displayId);
     if (!config) {
-        console.log('❌ [DEBUG] Configuration not found for displayId:', displayId);
+
         return;
     }
-    console.log('✅ [DEBUG] Found configuration:', config);
+
     // Store the display ID we're editing
     window.editingLinkedFieldId = displayId;
     // Clear any stored configuration since we're editing
     window.lastLinkedFieldConfig = null;
     // Create modal if it doesn't exist
     if (!document.getElementById('linkedFieldModal')) {
-        console.log('🔍 [DEBUG] Creating linked field modal');
+
         createLinkedFieldModal();
     }
     // Reset current configuration
@@ -6784,7 +6735,7 @@ function editLinkedFieldDisplay(displayId) {
     });
     // Show modal
     document.getElementById('linkedFieldModal').style.display = 'block';
-    console.log('🔍 [DEBUG] Modal displayed for editing');
+
 }
 // Close the linked field modal
 function closeLinkedFieldModal() {
@@ -6965,18 +6916,18 @@ function selectLinkedFieldOption(dropdownIndex, value, text) {
     if (currentLinkedFieldConfig[dropdownIndex]) {
         currentLinkedFieldConfig[dropdownIndex].selectedValue = value;
     }
-    console.log(`🔍 [DEBUG] Selected linked field option: ${text} (${value}) for dropdown ${dropdownIndex}`);
+
 }
 // Update linked field custom value when user types in custom input
 function updateLinkedFieldCustomValue(dropdownIndex) {
     const customInput = document.getElementById(`linkedFieldCustom${dropdownIndex}`);
     const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
     const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
-    
+
     if (!customInput) return;
-    
+
     const customValue = customInput.value.trim();
-    
+
     // If custom input has a value, use it and clear the dropdown selection
     if (customValue) {
         if (currentLinkedFieldConfig[dropdownIndex]) {
@@ -6990,7 +6941,7 @@ function updateLinkedFieldCustomValue(dropdownIndex) {
         if (searchInput && searchInput.value !== customValue) {
             searchInput.value = '';
         }
-        console.log(`🔍 [DEBUG] Custom linked field value set: ${customValue} for dropdown ${dropdownIndex}`);
+
     } else {
         // If custom input is cleared, check if there's a dropdown selection to use
         const dropdownValue = selectElement ? selectElement.value : '';

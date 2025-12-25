@@ -52,47 +52,47 @@ function findCheckboxOptionsByQuestionId(questionId) {
     return null;
 }
 function generateAndDownloadForm() {
-    console.log('🔧 [EXPORT DEBUG] generateAndDownloadForm() called');
+
     try {
-        console.log('🔧 [EXPORT DEBUG] Calling getFormHTML()...');
+
     const formHTML = getFormHTML();
-        console.log('🔧 [EXPORT DEBUG] getFormHTML() completed successfully, HTML length:', formHTML ? formHTML.length : 'null');
+
     navigator.clipboard.writeText(formHTML).then(() => {
         alert("HTML code has been copied to the clipboard.");
     });
     downloadHTML(formHTML, "custom_form.html");
     } catch (error) {
-        console.error('🔧 [EXPORT DEBUG] Error in generateAndDownloadForm():', error);
+
         alert('Error generating form: ' + error.message);
     }
 }
 function showPreview() {
-    console.log("🔧 [PREVIEW DEBUG] showPreview() called");
+
     // Check if the getFormHTML function exists
     if (typeof getFormHTML !== 'function') {
-        console.error("🔧 [PREVIEW DEBUG] getFormHTML function not found");
+
         alert("Preview function not available in this context. Please try again from the form editor.");
         return;
     }
-    console.log("🔧 [PREVIEW DEBUG] getFormHTML function exists, proceeding...");
+
     let formHTML;
     try {
-        console.log("🔧 [PREVIEW DEBUG] Calling getFormHTML()...");
+
         formHTML = getFormHTML();
-        console.log("🔧 [PREVIEW DEBUG] getFormHTML returned HTML length:", formHTML ? formHTML.length : 'null');
+
     } catch (error) {
-        console.error("🔧 [PREVIEW DEBUG] Error calling getFormHTML:", error);
+
         alert('Error generating form HTML: ' + error.message);
         return;
     }
     if (!formHTML || formHTML.trim() === '') {
-        console.error("🔧 [PREVIEW DEBUG] getFormHTML returned empty HTML");
+
         alert('No form content to preview. Please add some questions first.');
         return;
     }
     // Check if the HTML contains actual form content (not just the basic structure)
     if (!formHTML.includes('customForm') || !formHTML.includes('question')) {
-        console.error("🔧 [PREVIEW DEBUG] HTML does not contain form content");
+
         alert('Form appears to be empty. Please add some questions first.');
         return;
     }
@@ -111,26 +111,23 @@ function showPreview() {
                 }, 2000);
             }
         }).catch(err => {
-            console.error('Failed to copy to clipboard:', err);
+
         });
     }
-    console.log("🔧 [PREVIEW DEBUG] Getting modal elements...");
+
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
-    console.log("🔧 [PREVIEW DEBUG] previewModal found:", !!previewModal);
-    console.log("🔧 [PREVIEW DEBUG] previewFrame found:", !!previewFrame);
+
     if (!previewModal || !previewFrame) {
-        console.error("🔧 [PREVIEW DEBUG] Modal elements not found");
+
         alert('Preview modal elements not found. Please refresh the page and try again.');
         return;
     }
-    console.log("🔧 [PREVIEW DEBUG] Setting iframe content and showing modal...");
+
     previewFrame.srcdoc = formHTML;
     previewModal.style.display = 'flex';
     previewModal.style.zIndex = '9999';
-    console.log("🔧 [PREVIEW DEBUG] Modal should now be visible");
-    console.log("🔧 [PREVIEW DEBUG] Modal display style:", previewModal.style.display);
-    console.log("🔧 [PREVIEW DEBUG] Modal computed style:", window.getComputedStyle(previewModal).display);
+
     // Force a reflow to ensure the modal is visible
     previewModal.offsetHeight;
 }
@@ -489,7 +486,7 @@ function loadFormData(formData) {
                     }
                     // Check if we have unified fields data (new format)
                     if (question.allFieldsInOrder && question.allFieldsInOrder.length > 0) {
-                        console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Loading unified fields:', question.allFieldsInOrder);
+
                         // Rebuild unified fields from exported data
                         const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
                         if (unifiedFieldsDiv) {
@@ -509,14 +506,14 @@ function loadFormData(formData) {
                                         // Set prefill value (always set it, even if empty, to ensure it's preserved)
                                         if (field.prefill !== undefined) {
                                             lastField.setAttribute('data-prefill', field.prefill || '');
-                                            console.log('🔧 [IMPORT DEBUG] Set prefill for field:', field.label, 'prefill:', field.prefill, 'attribute value:', lastField.getAttribute('data-prefill'));
+
                                         } else {
-                                            console.log('🔧 [IMPORT DEBUG] No prefill defined for field:', field.label);
+
                                         }
                                         // Set conditional prefills if they exist
                                         if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
                                             lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
-                                            console.log('🔧 [IMPORT DEBUG] Set conditional prefills for field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+
                                         }
                                     }
                                 } else if (field.type === 'amount') {
@@ -533,7 +530,7 @@ function loadFormData(formData) {
                                         // Set conditional prefills if they exist
                                         if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
                                             lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
-                                            console.log('🔧 [IMPORT DEBUG] Set conditional prefills for amount field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+
                                         }
                                     }
                                 } else if (field.type === 'phone') {
@@ -662,10 +659,10 @@ function loadFormData(formData) {
                                         if (titleEl && field.fieldName) titleEl.value = field.fieldName;
                                     }
                                 } else if (field.type === 'dropdown') {
-                                    console.log('🔧 [IMPORT DEBUG] Processing dropdown field:', field);
+
                                     // Check if addDropdownField function is available
                                     if (typeof addDropdownField !== 'function') {
-                                        console.error('🔧 [IMPORT DEBUG] addDropdownField function not available!');
+
                                         return;
                                     }
                                     // Add a dropdown field
@@ -673,7 +670,7 @@ function loadFormData(formData) {
                                     // Set the field values
                                     const lastField = unifiedFieldsDiv.lastElementChild;
                                     if (lastField) {
-                                        console.log('🔧 [IMPORT DEBUG] Found last field:', lastField);
+
                                         const fieldOrder = lastField.getAttribute('data-order');
                                         const fieldNameEl = lastField.querySelector('#dropdownFieldName' + question.questionId + '_' + fieldOrder);
                                         if (fieldNameEl && field.fieldName) {
@@ -681,12 +678,12 @@ function loadFormData(formData) {
                                         }
                                         // Add dropdown options
                                         if (field.options && field.options.length > 0) {
-                                            console.log('🔧 [IMPORT DEBUG] Adding dropdown options:', field.options);
+
                                             if (typeof addDropdownOption !== 'function') {
-                                                console.error('🔧 [IMPORT DEBUG] addDropdownOption function not available!');
+
                                             } else {
                                                 field.options.forEach((option, optionIndex) => {
-                                                    console.log('🔧 [IMPORT DEBUG] Adding option', optionIndex + 1, ':', option);
+
                                                     // Add the dropdown option (this will create option with number = current count + 1)
                                                     addDropdownOption(question.questionId, fieldOrder);
                                                     // Get the actual option number that was just created
@@ -696,11 +693,7 @@ function loadFormData(formData) {
                                                     // Set the option values using the actual option number
                                                     const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + actualOptionNumber);
                                                     const optionNodeIdEl = document.getElementById('dropdownOptionNodeId' + question.questionId + '_' + fieldOrder + '_' + actualOptionNumber);
-                                                    console.log('🔧 [IMPORT DEBUG] Option elements found:', {
-                                                        actualOptionNumber: actualOptionNumber,
-                                                        optionTextEl: !!optionTextEl, 
-                                                        optionNodeIdEl: !!optionNodeIdEl
-                                                    });
+
                                                     if (optionTextEl) {
                                                         optionTextEl.value = option.text || '';
                                                         // Trigger change event to update any dependent fields
@@ -716,15 +709,15 @@ function loadFormData(formData) {
                                         }
                                         // Update trigger condition options after adding dropdown options
                                         if (field.triggerSequences && field.triggerSequences.length > 0) {
-                                            console.log('🔧 [IMPORT DEBUG] Adding trigger sequences:', field.triggerSequences);
+
                                             // Check if addTriggerSequence function is available
                                             if (typeof addTriggerSequence !== 'function') {
-                                                console.error('🔧 [IMPORT DEBUG] addTriggerSequence function not available!');
+
                                                 return;
                                             }
                                             // First add all trigger sequences
                                             field.triggerSequences.forEach((sequence, sequenceIndex) => {
-                                                console.log('🔧 [IMPORT DEBUG] Adding trigger sequence', sequenceIndex + 1, ':', sequence);
+
                                                 addTriggerSequence(question.questionId, fieldOrder);
                                             });
                                             // Then update trigger condition options for all sequences
@@ -742,12 +735,12 @@ function loadFormData(formData) {
                                                 }
                                                 // Add trigger fields
                                                 if (sequence.fields && sequence.fields.length > 0) {
-                                                    console.log('🔧 [IMPORT DEBUG] Adding trigger fields for sequence', sequenceIndex + 1, ':', sequence.fields);
+
                                                     sequence.fields.forEach((triggerField, triggerFieldIndex) => {
-                                                        console.log('🔧 [IMPORT DEBUG] Adding trigger field', triggerFieldIndex + 1, ':', triggerField);
+
                                                         if (triggerField.type === 'label') {
                                                             if (typeof addTriggerLabel !== 'function') {
-                                                                console.error('🔧 [IMPORT DEBUG] addTriggerLabel function not available!');
+
                                                                 return;
                                                             }
                                                             addTriggerLabel(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -810,7 +803,7 @@ function loadFormData(formData) {
                                                             }
                                                         } else if (triggerField.type === 'checkbox') {
                                                             if (typeof addTriggerCheckbox !== 'function') {
-                                                                console.error('🔧 [IMPORT DEBUG] addTriggerCheckbox function not available!');
+
                                                                 return;
                                                             }
                                                             addTriggerCheckbox(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -879,7 +872,7 @@ function loadFormData(formData) {
                                                             }
                                                         } else if (triggerField.type === 'dropdown') {
                                                             if (typeof addTriggerDropdown !== 'function') {
-                                                                console.error('🔧 [IMPORT DEBUG] addTriggerDropdown function not available!');
+
                                                                 return;
                                                             }
                                                             addTriggerDropdown(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -900,8 +893,7 @@ function loadFormData(formData) {
                                                             }
                                                             // Restore conditional logic if enabled (after options are added)
                                                             if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Dropdown conditional logic enabled, restoring...');
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Conditions:', triggerField.conditionalLogic.conditions);
+
                                                                 // Initialize the data structure first (use actualFieldCount)
                                                                 const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
                                                                 if (!window.triggerDropdownConditionalLogic) {
@@ -911,36 +903,34 @@ function loadFormData(formData) {
                                                                     enabled: true,
                                                                     conditions: [...(triggerField.conditionalLogic.conditions || [])]
                                                                 };
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Initialized dropdown conditional logic data structure:', window.triggerDropdownConditionalLogic[key]);
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Using actualFieldCount:', actualFieldCount, 'key:', key);
+
                                                                 // Wait for options to be added before restoring conditional logic
                                                                 setTimeout(() => {
                                                                     const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Looking for dropdown checkbox with ID: enableConditionalLogicDropdown' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + actualFieldCount);
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Checkbox found:', !!enableConditionalLogicCheckbox);
+
                                                                     if (enableConditionalLogicCheckbox) {
                                                                         enableConditionalLogicCheckbox.checked = true;
-                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Dropdown checkbox checked, triggering change event...');
+
                                                                         // Manually trigger the change event to update the UI
                                                                         const event = new Event('change');
                                                                         enableConditionalLogicCheckbox.dispatchEvent(event);
                                                                         // Set the conditions after a delay to ensure UI is ready
                                                                         setTimeout(() => {
                                                                             if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
-                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Updating dropdown UI with conditions...');
+
                                                                                 // Update the UI with the conditions
                                                                                 if (typeof updateTriggerDropdownConditionalLogicUI === 'function') {
                                                                                     updateTriggerDropdownConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
                                                                                     // Set the condition values after UI is updated
                                                                                     setTimeout(() => {
-                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Setting dropdown condition dropdown values...');
+
                                                                                         triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
-                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Setting dropdown condition', condIndex, ':', condition);
+
                                                                                             // Add condition if needed
                                                                                             if (condIndex > 0) {
                                                                                                 const addConditionBtn = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount} button`);
                                                                                                 if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
-                                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Clicking "Add Another Condition" button for dropdown...');
+
                                                                                                     addConditionBtn.click();
                                                                                                     // Wait a bit for the new dropdown to be created
                                                                                                     setTimeout(() => {
@@ -948,9 +938,9 @@ function loadFormData(formData) {
                                                                                                         if (conditionDropdown) {
                                                                                                             conditionDropdown.value = condition;
                                                                                                             conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Set dropdown condition', condIndex, 'to:', condition);
+
                                                                                                         } else {
-                                                                                                            console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Dropdown condition dropdown not found for index', condIndex);
+
                                                                                                         }
                                                                                                     }, 100);
                                                                                                     return;
@@ -962,26 +952,26 @@ function loadFormData(formData) {
                                                                                                 if (conditionDropdown) {
                                                                                                     conditionDropdown.value = condition;
                                                                                                     conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Set dropdown condition', condIndex, 'to:', condition);
+
                                                                                                 } else {
-                                                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Dropdown condition dropdown not found for index', condIndex);
+
                                                                                                 }
                                                                                             }, 150 * (condIndex + 1));
                                                                                         });
                                                                                     }, 300);
                                                                                 } else {
-                                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] updateTriggerDropdownConditionalLogicUI function not found!');
+
                                                                                 }
                                                                             }
                                                                         }, 400);
                                                                     } else {
-                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 1] Enable conditional logic checkbox not found for dropdown!');
+
                                                                     }
                                                                 }, 200);
                                                             }
                                                         } else if (triggerField.type === 'date') {
                                                             if (typeof addTriggerDate !== 'function') {
-                                                                console.error('🔧 [IMPORT DEBUG] addTriggerDate function not available!');
+
                                                                 return;
                                                             }
                                                             addTriggerDate(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -997,7 +987,7 @@ function loadFormData(formData) {
                                                                     const nodeIdInput = fieldEl.querySelector(`#triggerDateNodeId${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${i + 1}`);
                                                                     if (nodeIdInput && nodeIdInput.value === triggerField.nodeId) {
                                                                         triggerFieldCount = i + 1;
-                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Found date field at index:', triggerFieldCount);
+
                                                                         break;
                                                                     }
                                                                 }
@@ -1008,11 +998,9 @@ function loadFormData(formData) {
                                                             if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                             if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
                                                             // Restore conditional logic if enabled
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checking for conditional logic in triggerField:', triggerField);
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Using triggerFieldCount:', triggerFieldCount);
+
                                                             if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic enabled, restoring...');
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditions:', triggerField.conditionalLogic.conditions);
+
                                                                 // Initialize the data structure first
                                                                 const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
                                                                 if (!window.triggerDateConditionalLogic) {
@@ -1022,34 +1010,33 @@ function loadFormData(formData) {
                                                                     enabled: true,
                                                                     conditions: [...(triggerField.conditionalLogic.conditions || [])]
                                                                 };
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Initialized data structure:', window.triggerDateConditionalLogic[key]);
+
                                                                 setTimeout(() => {
                                                                     const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogic${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Looking for checkbox with ID: enableConditionalLogic' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox found:', !!enableConditionalLogicCheckbox);
+
                                                                     if (enableConditionalLogicCheckbox) {
                                                                         enableConditionalLogicCheckbox.checked = true;
-                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox checked, triggering change event...');
+
                                                                         // Manually trigger the change event to update the UI
                                                                         const event = new Event('change');
                                                                         enableConditionalLogicCheckbox.dispatchEvent(event);
                                                                         // Set the conditions after a delay to ensure UI is ready
                                                                         setTimeout(() => {
                                                                             if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
-                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Updating UI with conditions...');
+
                                                                                 // Update the UI with the conditions
                                                                                 if (typeof updateTriggerDateConditionalLogicUI === 'function') {
                                                                                     updateTriggerDateConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
                                                                                     // Set the condition values after UI is updated
                                                                                     setTimeout(() => {
-                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting condition dropdown values...');
+
                                                                                         triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
-                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting condition', condIndex, ':', condition);
+
                                                                                             // Add condition if needed
                                                                                             if (condIndex > 0) {
                                                                                                 const addConditionBtn = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
                                                                                                 if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
-                                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Clicking "Add Another Condition" button...');
+
                                                                                                     addConditionBtn.click();
                                                                                                     // Wait a bit for the new dropdown to be created
                                                                                                     setTimeout(() => {
@@ -1057,9 +1044,9 @@ function loadFormData(formData) {
                                                                                                         if (conditionDropdown) {
                                                                                                             conditionDropdown.value = condition;
                                                                                                             conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set condition', condIndex, 'to:', condition);
+
                                                                                                         } else {
-                                                                                                            console.error('🔍 [CONDITIONAL LOGIC DEBUG] Condition dropdown not found for index', condIndex);
+
                                                                                                         }
                                                                                                     }, 100);
                                                                                                     return;
@@ -1071,29 +1058,29 @@ function loadFormData(formData) {
                                                                                                 if (conditionDropdown) {
                                                                                                     conditionDropdown.value = condition;
                                                                                                     conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set condition', condIndex, 'to:', condition);
+
                                                                                                 } else {
-                                                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG] Condition dropdown not found for index', condIndex);
+
                                                                                                 }
                                                                                             }, 150 * (condIndex + 1));
                                                                                         });
                                                                                     }, 300);
                                                                                 } else {
-                                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDateConditionalLogicUI function not found!');
+
                                                                                 }
                                                                             }
                                                                         }, 400);
                                                                     } else {
-                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Enable conditional logic checkbox not found!');
+
                                                                     }
                                                                 }, 200);
                                                             } else {
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditional logic not enabled or not present');
+
                                                             }
                                                         } else if (triggerField.type === 'location') {
                                                             // Handle simplified location field format ("Location Data Added")
                                                             if (typeof addTriggerLocation !== 'function') {
-                                                                console.error('🔧 [IMPORT DEBUG] addTriggerLocation function not available!');
+
                                                                 return;
                                                             }
                                                             addTriggerLocation(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -1129,7 +1116,7 @@ function loadFormData(formData) {
                         }
                     } else {
                         // Fallback to old format
-                        console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Using fallback format');
+
                     const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
                     if (multipleTextboxesBlock) {
                         multipleTextboxesBlock.innerHTML = '';
@@ -1234,14 +1221,14 @@ function loadFormData(formData) {
                                     // Set prefill value (always set it, even if empty, to ensure it's preserved)
                                     if (field.prefill !== undefined) {
                                         lastField.setAttribute('data-prefill', field.prefill || '');
-                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] Set prefill for field:', field.label, 'prefill:', field.prefill, 'attribute value:', lastField.getAttribute('data-prefill'));
+
                                     } else {
-                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] No prefill defined for field:', field.label);
+
                                     }
                                     // Set conditional prefills if they exist
                                     if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
                                         lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
-                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] Set conditional prefills for field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+
                                     }
                                 }
                             } else if (field.type === 'amount') {
@@ -1258,7 +1245,7 @@ function loadFormData(formData) {
                                     // Set conditional prefills if they exist
                                     if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
                                         lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
-                                        console.log('🔧 [IMPORT DEBUG - NUMBERED] Set conditional prefills for amount field:', field.label, 'conditionalPrefills:', field.conditionalPrefills);
+
                                     }
                                 }
                             } else if (field.type === 'phone') {
@@ -1409,10 +1396,10 @@ function loadFormData(formData) {
                                         if (titleEl && field.fieldName) titleEl.value = field.fieldName;
                                     }
                                 } else if (field.type === 'dropdown') {
-                                console.log('🔧 [IMPORT DEBUG] Processing dropdown field:', field);
+
                                 // Check if addDropdownField function is available
                                 if (typeof addDropdownField !== 'function') {
-                                    console.error('🔧 [IMPORT DEBUG] addDropdownField function not available!');
+
                                     return;
                                 }
                                 // Add a dropdown field
@@ -1420,7 +1407,7 @@ function loadFormData(formData) {
                                 // Set the field values
                                 const lastField = unifiedFieldsDiv.lastElementChild;
                                 if (lastField) {
-                                    console.log('🔧 [IMPORT DEBUG] Found last field:', lastField);
+
                                     const fieldOrder = lastField.getAttribute('data-order');
                                     const fieldNameEl = lastField.querySelector('#dropdownFieldName' + question.questionId + '_' + fieldOrder);
                                     if (fieldNameEl && field.fieldName) {
@@ -1428,33 +1415,33 @@ function loadFormData(formData) {
                                     }
                                     // Add dropdown options
                                     if (field.options && field.options.length > 0) {
-                                        console.log('🔧 [IMPORT DEBUG] Adding dropdown options:', field.options);
+
                                         field.options.forEach((option, optionIndex) => {
-                                            console.log('🔧 [IMPORT DEBUG] Adding option', optionIndex + 1, ':', option);
+
                                         if (typeof addDropdownOption !== 'function') {
-                                            console.error('🔧 [IMPORT DEBUG] addDropdownOption function not available!');
+
                                                 return;
                                             }
                                         addDropdownOption(question.questionId, fieldOrder);
                                             // Set the option values
                                             const optionTextEl = document.getElementById('dropdownOptionText' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
                                             const optionNodeIdEl = document.getElementById('dropdownOptionNodeId' + question.questionId + '_' + fieldOrder + '_' + (optionIndex + 1));
-                                            console.log('🔧 [IMPORT DEBUG] Option elements found:', {optionTextEl: !!optionTextEl, optionNodeIdEl: !!optionNodeIdEl});
+
                                             if (optionTextEl) optionTextEl.value = option.text;
                                             if (optionNodeIdEl) optionNodeIdEl.value = option.nodeId;
                                         });
                                     }
                                     // Update trigger condition options after adding dropdown options
                                     if (field.triggerSequences && field.triggerSequences.length > 0) {
-                                        console.log('🔧 [IMPORT DEBUG] Adding trigger sequences:', field.triggerSequences);
+
                                         // Check if addTriggerSequence function is available
                                         if (typeof addTriggerSequence !== 'function') {
-                                            console.error('🔧 [IMPORT DEBUG] addTriggerSequence function not available!');
+
                                             return;
                                         }
                                         // First add all trigger sequences
                                         field.triggerSequences.forEach((sequence, sequenceIndex) => {
-                                            console.log('🔧 [IMPORT DEBUG] Adding trigger sequence', sequenceIndex + 1, ':', sequence);
+
                                             addTriggerSequence(question.questionId, fieldOrder);
                                         });
                                         // Then update trigger condition options for all sequences
@@ -1472,12 +1459,12 @@ function loadFormData(formData) {
                                             }
                                             // Add trigger fields
                                             if (sequence.fields && sequence.fields.length > 0) {
-                                                console.log('🔧 [IMPORT DEBUG] Adding trigger fields for sequence', sequenceIndex + 1, ':', sequence.fields);
+
                                                 sequence.fields.forEach((triggerField, triggerFieldIndex) => {
-                                                    console.log('🔧 [IMPORT DEBUG] Adding trigger field', triggerFieldIndex + 1, ':', triggerField);
+
                                                     if (triggerField.type === 'label') {
                                                         if (typeof addTriggerLabel !== 'function') {
-                                                            console.error('🔧 [IMPORT DEBUG] addTriggerLabel function not available!');
+
                                                             return;
                                                         }
                                                         addTriggerLabel(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -1540,7 +1527,7 @@ function loadFormData(formData) {
                                                         }
                                                     } else if (triggerField.type === 'checkbox') {
                                                         if (typeof addTriggerCheckbox !== 'function') {
-                                                            console.error('🔧 [IMPORT DEBUG] addTriggerCheckbox function not available!');
+
                                                             return;
                                                         }
                                                         addTriggerCheckbox(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -1609,7 +1596,7 @@ function loadFormData(formData) {
                                                         }
                                                         } else if (triggerField.type === 'dropdown') {
                                                             if (typeof addTriggerDropdown !== 'function') {
-                                                                console.error('🔧 [IMPORT DEBUG] addTriggerDropdown function not available!');
+
                                                                 return;
                                                             }
                                                             addTriggerDropdown(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -1630,8 +1617,7 @@ function loadFormData(formData) {
                                                             }
                                                             // Restore conditional logic if enabled (after options are added)
                                                             if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown conditional logic enabled, restoring...');
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Conditions:', triggerField.conditionalLogic.conditions);
+
                                                             // Initialize the data structure first (use actualFieldCount)
                                                             const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
                                                             if (!window.triggerDropdownConditionalLogic) {
@@ -1641,36 +1627,34 @@ function loadFormData(formData) {
                                                                 enabled: true,
                                                                 conditions: [...(triggerField.conditionalLogic.conditions || [])]
                                                             };
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Initialized dropdown conditional logic data structure:', window.triggerDropdownConditionalLogic[key]);
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Using actualFieldCount:', actualFieldCount, 'key:', key);
+
                                                             // Wait for options to be added before restoring conditional logic
                                                             setTimeout(() => {
                                                                 const enableConditionalLogicCheckbox = document.getElementById(`enableConditionalLogicDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Looking for dropdown checkbox with ID: enableConditionalLogicDropdown' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + actualFieldCount);
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Checkbox found:', !!enableConditionalLogicCheckbox);
+
                                                                 if (enableConditionalLogicCheckbox) {
                                                                     enableConditionalLogicCheckbox.checked = true;
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown checkbox checked, triggering change event...');
+
                                                                     // Manually trigger the change event to update the UI
                                                                     const event = new Event('change');
                                                                     enableConditionalLogicCheckbox.dispatchEvent(event);
                                                                     // Set the conditions after a delay to ensure UI is ready
                                                                     setTimeout(() => {
                                                                         if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
-                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG] Updating dropdown UI with conditions...');
+
                                                                             // Update the UI with the conditions
                                                                             if (typeof updateTriggerDropdownConditionalLogicUI === 'function') {
                                                                                 updateTriggerDropdownConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
                                                                                 // Set the condition values after UI is updated
                                                                                 setTimeout(() => {
-                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting dropdown condition dropdown values...');
+
                                                                                     triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
-                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Setting dropdown condition', condIndex, ':', condition);
+
                                                                                         // Add condition if needed
                                                                                         if (condIndex > 0) {
                                                                                             const addConditionBtn = document.querySelector(`#conditionalLogicUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount} button`);
                                                                                             if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
-                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Clicking "Add Another Condition" button for dropdown...');
+
                                                                                                 addConditionBtn.click();
                                                                                                 // Wait a bit for the new dropdown to be created
                                                                                                 setTimeout(() => {
@@ -1678,9 +1662,9 @@ function loadFormData(formData) {
                                                                                                     if (conditionDropdown) {
                                                                                                         conditionDropdown.value = condition;
                                                                                                         conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set dropdown condition', condIndex, 'to:', condition);
+
                                                                                                     } else {
-                                                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition dropdown not found for index', condIndex);
+
                                                                                                     }
                                                                                                 }, 100);
                                                                                                 return;
@@ -1692,29 +1676,27 @@ function loadFormData(formData) {
                                                                                             if (conditionDropdown) {
                                                                                                 conditionDropdown.value = condition;
                                                                                                 conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG] Set dropdown condition', condIndex, 'to:', condition);
+
                                                                                             } else {
-                                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG] Dropdown condition dropdown not found for index', condIndex);
+
                                                                                             }
                                                                                         }, 150 * (condIndex + 1));
                                                                                     });
                                                                                 }, 300);
                                                                             } else {
-                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG] updateTriggerDropdownConditionalLogicUI function not found!');
+
                                                                             }
                                                                         }
                                                                     }, 400);
                                                                 } else {
-                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG] Enable conditional logic checkbox not found for dropdown!');
+
                                                                 }
                                                             }, 200);
                                                         }
                                                     } else if (triggerField.type === 'date') {
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Date field import starting...');
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] triggerField:', triggerField);
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] questionId:', question.questionId, 'fieldOrder:', fieldOrder, 'sequenceIndex:', sequenceIndex, 'triggerFieldIndex:', triggerFieldIndex);
+
                                                         if (typeof addTriggerDate !== 'function') {
-                                                            console.error('🔧 [IMPORT DEBUG] addTriggerDate function not available!');
+
                                                             return;
                                                         }
                                                         addTriggerDate(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -1722,19 +1704,18 @@ function loadFormData(formData) {
                                                         // The field count is based on the number of fields in the container
                                                         const triggerFieldsContainer = document.getElementById(`triggerFields${question.questionId}_${fieldOrder}_${sequenceIndex + 1}`);
                                                         let triggerFieldCount = triggerFieldIndex + 1;
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Initial triggerFieldCount:', triggerFieldCount);
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Trigger fields container found:', !!triggerFieldsContainer);
+
                                                         // Try to find the actual field count by matching the nodeId
                                                         if (triggerFieldsContainer) {
                                                             const allFields = triggerFieldsContainer.querySelectorAll('[class*="trigger-field-"]');
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Found', allFields.length, 'trigger fields in container');
+
                                                             for (let i = 0; i < allFields.length; i++) {
                                                                 const fieldEl = allFields[i];
                                                                 const nodeIdInput = fieldEl.querySelector(`#triggerDateNodeId${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${i + 1}`);
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checking field', i + 1, 'nodeIdInput found:', !!nodeIdInput);
+
                                                                 if (nodeIdInput && nodeIdInput.value === triggerField.nodeId) {
                                                                     triggerFieldCount = i + 1;
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Found date field at index:', triggerFieldCount);
+
                                                                     break;
                                                                 }
                                                             }
@@ -1742,18 +1723,13 @@ function loadFormData(formData) {
                                                         // Set the trigger date field values
                                                         const triggerDateLabelEl = document.getElementById('triggerDateLabel' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
                                                         const triggerDateNodeIdEl = document.getElementById('triggerDateNodeId' + question.questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + triggerFieldCount);
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Final triggerFieldCount:', triggerFieldCount);
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Label element found:', !!triggerDateLabelEl);
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] NodeId element found:', !!triggerDateNodeIdEl);
+
                                                         if (triggerDateLabelEl) triggerDateLabelEl.value = triggerField.label;
                                                         if (triggerDateNodeIdEl) triggerDateNodeIdEl.value = triggerField.nodeId;
                                                         // Restore conditional logic if enabled
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checking for conditional logic in triggerField:', triggerField);
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] conditionalLogic exists:', !!(triggerField.conditionalLogic));
-                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] conditionalLogic.enabled:', !!(triggerField.conditionalLogic && triggerField.conditionalLogic.enabled));
+
                                                         if (triggerField.conditionalLogic && triggerField.conditionalLogic.enabled) {
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Conditional logic enabled, restoring...');
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Conditions:', triggerField.conditionalLogic.conditions);
+
                                                             // Initialize the data structure first
                                                             const key = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
                                                             if (!window.triggerDateConditionalLogic) {
@@ -1763,42 +1739,39 @@ function loadFormData(formData) {
                                                                 enabled: true,
                                                                 conditions: [...(triggerField.conditionalLogic.conditions || [])]
                                                             };
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Initialized data structure with key:', key);
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Data structure:', window.triggerDateConditionalLogic[key]);
+
                                                             setTimeout(() => {
                                                                 const checkboxId = `enableConditionalLogic${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Looking for checkbox with ID:', checkboxId);
+
                                                                 const enableConditionalLogicCheckbox = document.getElementById(checkboxId);
-                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checkbox found:', !!enableConditionalLogicCheckbox);
+
                                                                 if (enableConditionalLogicCheckbox) {
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Setting checkbox to checked...');
+
                                                                     enableConditionalLogicCheckbox.checked = true;
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checkbox checked state:', enableConditionalLogicCheckbox.checked);
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Triggering change event...');
+
                                                                     // Manually trigger the change event to update the UI
                                                                     const event = new Event('change');
                                                                     enableConditionalLogicCheckbox.dispatchEvent(event);
-                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Change event dispatched');
+
                                                                     // Set the conditions after a delay to ensure UI is ready
                                                                     setTimeout(() => {
                                                                         if (triggerField.conditionalLogic.conditions && triggerField.conditionalLogic.conditions.length > 0) {
-                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Updating UI with conditions...');
-                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Number of conditions:', triggerField.conditionalLogic.conditions.length);
+
                                                                             // Update the UI with the conditions
                                                                             if (typeof updateTriggerDateConditionalLogicUI === 'function') {
-                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Calling updateTriggerDateConditionalLogicUI...');
+
                                                                                 updateTriggerDateConditionalLogicUI(question.questionId, fieldOrder, sequenceIndex + 1, triggerFieldCount);
                                                                                 // Set the condition values after UI is updated
                                                                                 setTimeout(() => {
-                                                                                    console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Setting condition dropdown values...');
+
                                                                                     triggerField.conditionalLogic.conditions.forEach((condition, condIndex) => {
-                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Setting condition', condIndex, ':', condition);
+
                                                                                         // Add condition if needed
                                                                                         if (condIndex > 0) {
                                                                                             const addConditionBtn = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} button`);
-                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Add condition button found:', !!addConditionBtn);
+
                                                                                             if (addConditionBtn && addConditionBtn.textContent === 'Add Another Condition') {
-                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Clicking "Add Another Condition" button...');
+
                                                                                                 addConditionBtn.click();
                                                                                                 // Wait a bit for the new dropdown to be created
                                                                                                 setTimeout(() => {
@@ -1806,9 +1779,9 @@ function loadFormData(formData) {
                                                                                                     if (conditionDropdown) {
                                                                                                         conditionDropdown.value = condition;
                                                                                                         conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                        console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Set condition', condIndex, 'to:', condition);
+
                                                                                                     } else {
-                                                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Condition dropdown not found for index', condIndex);
+
                                                                                                     }
                                                                                                 }, 150);
                                                                                                 return;
@@ -1817,39 +1790,38 @@ function loadFormData(formData) {
                                                                                         // Set the condition value for the first condition or after adding
                                                                                         setTimeout(() => {
                                                                                             const conditionDropdown = document.querySelector(`#conditionalLogicUI${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount} select:nth-of-type(${condIndex + 1})`);
-                                                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Condition dropdown found for index', condIndex, ':', !!conditionDropdown);
+
                                                                                             if (conditionDropdown) {
                                                                                                 conditionDropdown.value = condition;
                                                                                                 conditionDropdown.dispatchEvent(new Event('change'));
-                                                                                                console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Set condition', condIndex, 'to:', condition);
+
                                                                                             } else {
-                                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Condition dropdown not found for index', condIndex);
+
                                                                                             }
                                                                                         }, 200 * (condIndex + 1));
                                                                                     });
                                                                                 }, 400);
                                                                             } else {
-                                                                                console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] updateTriggerDateConditionalLogicUI function not found!');
+
                                                                             }
                                                                         }
                                                                     }, 500);
                                                                 } else {
-                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Enable conditional logic checkbox not found!');
-                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Searched for ID:', checkboxId);
+
                                                                     // Try to find all checkboxes with similar IDs for debugging
                                                                     const allCheckboxes = document.querySelectorAll(`input[id^="enableConditionalLogic${question.questionId}_${fieldOrder}_${sequenceIndex + 1}"]`);
-                                                                    console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Found', allCheckboxes.length, 'checkboxes with similar IDs');
+
                                                                     allCheckboxes.forEach((cb, idx) => {
-                                                                        console.error('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Checkbox', idx, 'ID:', cb.id);
+
                                                                     });
                                                                 }
                                                             }, 300);
                                                         } else {
-                                                            console.log('🔍 [CONDITIONAL LOGIC DEBUG - PATH 2] Conditional logic not enabled or not present');
+
                                                         }
                                                     } else if (triggerField.type === 'pdf') {
                                                         if (typeof addTriggerPdf !== 'function') {
-                                                            console.error('🔧 [IMPORT DEBUG] addTriggerPdf function not available!');
+
                                                             return;
                                                         }
                                                         addTriggerPdf(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -1875,7 +1847,7 @@ function loadFormData(formData) {
                                                     } else if (triggerField.type === 'location') {
                                                         // Handle simplified location field format ("Location Data Added")
                                                         if (typeof addTriggerLocation !== 'function') {
-                                                            console.error('🔧 [IMPORT DEBUG] addTriggerLocation function not available!');
+
                                                             return;
                                                         }
                                                         addTriggerLocation(question.questionId, fieldOrder, sequenceIndex + 1);
@@ -2039,9 +2011,9 @@ function loadFormData(formData) {
                         toggleHiddenLogic(question.questionId);
                         // Update hidden logic trigger options for numbered dropdown
                         if (question.type === 'numberedDropdown') {
-                            console.log('🔧 [HIDDEN LOGIC DEBUG] Updating trigger options for numbered dropdown question:', question.questionId);
+
                             setTimeout(() => {
-                                console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptionsForNumberedDropdown for question:', question.questionId);
+
                                 updateHiddenLogicTriggerOptionsForNumberedDropdown(question.questionId);
                             }, 100);
                         }
@@ -2080,9 +2052,9 @@ function loadFormData(formData) {
                     }
                     // Update hidden logic trigger options for numbered dropdown
                     if (question.type === 'numberedDropdown') {
-                        console.log('🔧 [HIDDEN LOGIC DEBUG] Second update for numbered dropdown question:', question.questionId);
+
                         setTimeout(() => {
-                            console.log('🔧 [HIDDEN LOGIC DEBUG] Second call to updateHiddenLogicTriggerOptionsForNumberedDropdown for question:', question.questionId);
+
                             updateHiddenLogicTriggerOptionsForNumberedDropdown(question.questionId);
                         }, 50);
                     }
@@ -2358,12 +2330,12 @@ function loadFormData(formData) {
     }
     // 7) Build groups from JSON
     if (formData.groups && formData.groups.length > 0) {
-        console.log('Importing groups:', formData.groups); // Debug log
+        // Debug log
         formData.groups.forEach(group => {
             addGroupWithData(group);
         });
     } else {
-        console.log('No groups found in import data'); // Debug log
+        // Debug log
     }
     // 8) Build hidden fields from JSON (including multi-term calculations)
     if (formData.hiddenFields && formData.hiddenFields.length > 0) {
@@ -2568,7 +2540,7 @@ function exportForm() {
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
             // Debug logging for PDF logic
-            console.log(`🔧 [EXPORT DEBUG] Question ${questionId} (${questionType}): PDF Logic enabled: ${pdfLogicEnabled}`);
+
             // Collect PDF Logic conditions
             const pdfLogicConditionsArray = [];
             if (pdfLogicEnabled) {
@@ -2612,7 +2584,7 @@ function exportForm() {
                 const pdfDetailsContainer = questionBlock.querySelector(`#pdfDetailsContainer${questionId}`);
                 if (pdfDetailsContainer) {
                     const pdfGroups = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
-                    console.log(`🔧 [EXPORT DEBUG] Found ${pdfGroups.length} PDF groups for question ${questionId}`);
+
                     pdfGroups.forEach((pdfGroup, pdfIndex) => {
                         const pdfIndexNum = pdfIndex + 1;
                         const pdfLogicPdfName = pdfGroup.querySelector(`#pdfLogicPdfName${questionId}_${pdfIndexNum}`)?.value || "";
@@ -2631,15 +2603,13 @@ function exportForm() {
                             triggerOption = pdfTriggerSelect?.value || "";
                         }
                         // Debug logging
-                        console.log(`🔧 [EXPORT DEBUG] PDF ${pdfIndexNum} for question ${questionId}:`);
-                        console.log(`  - PDF Name: ${pdfLogicPdfName}`);
-                        console.log(`  - Question Type: ${questionType}`);
+
                         if (pdfIndexNum === 1) {
-                            console.log(`  - Main Trigger Option Element:`, questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`));
+
                         } else {
-                            console.log(`  - PDF Trigger Option Element:`, pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`));
+
                         }
-                        console.log(`  - Trigger Option Value: "${triggerOption}"`);
+
                         // Check if trigger option block is visible
                         let triggerOptionBlock = null;
                         if (pdfIndexNum === 1) {
@@ -2648,15 +2618,15 @@ function exportForm() {
                             triggerOptionBlock = pdfGroup.querySelector(`#triggerOptionBlock${questionId}_${pdfIndexNum}`);
                         }
                         if (triggerOptionBlock) {
-                            console.log(`  - Trigger Option Block Display: ${triggerOptionBlock.style.display}`);
+
                         } else {
-                            console.log(`  - Trigger Option Block: Not found`);
+
                         }
                         // Check if this is a numbered dropdown and trigger options should be available
                         if (questionType === 'numberedDropdown') {
-                            console.log(`  - This is a numbered dropdown, trigger options should be available`);
+
                         } else {
-                            console.log(`  - This is not a numbered dropdown (${questionType}), trigger options may not be available`);
+
                         }
                         // Check if the trigger option dropdown has options
                         let triggerSelect = null;
@@ -2666,12 +2636,11 @@ function exportForm() {
                             triggerSelect = pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`);
                         }
                         if (triggerSelect) {
-                            console.log(`  - Trigger Select Options:`, triggerSelect.options.length);
+
                             for (let i = 0; i < triggerSelect.options.length; i++) {
-                                console.log(`    Option ${i}: "${triggerSelect.options[i].value}" - "${triggerSelect.options[i].text}"`);
+
                             }
-                            console.log(`  - Trigger Select Display: ${triggerSelect.style.display}`);
-                            console.log(`  - Trigger Select Parent Display: ${triggerSelect.parentElement.style.display}`);
+
                         }
                         // Get number trigger fields for number questions
                         let numberTrigger = "";
@@ -2932,21 +2901,18 @@ function exportForm() {
                 }
                 // Collect unified field data in true creation order
                 const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
-                console.log('🔧 [EXPORT DEBUG] Looking for unified container:', `#unifiedFields${questionId}`);
-                console.log('🔧 [EXPORT DEBUG] Found unified container:', !!unifiedContainer);
+
                 if (unifiedContainer) {
-                    console.log('🔧 [EXPORT DEBUG] Unified container children count:', unifiedContainer.children.length);
-                    console.log('🔧 [EXPORT DEBUG] Unified container innerHTML length:', unifiedContainer.innerHTML.length);
-                    console.log('🔧 [EXPORT DEBUG] Unified container innerHTML preview:', unifiedContainer.innerHTML.substring(0, 200));
+
                 }
                 const unifiedFields = questionBlock.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
-                console.log('🔧 [EXPORT DEBUG] Found', unifiedFields.length, 'unified fields');
+
                 // Also try a more direct approach
                 const directUnifiedFields = document.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
-                console.log('🔧 [EXPORT DEBUG] Direct query found', directUnifiedFields.length, 'unified fields');
+
                 // Use the direct query if the questionBlock query didn't work
                 const fieldsToProcess = unifiedFields.length > 0 ? unifiedFields : directUnifiedFields;
-                console.log('🔧 [EXPORT DEBUG] Using', fieldsToProcess.length, 'fields for processing');
+
                 const allFieldsInOrder = [];
                 // Process fields in their creation order
                 fieldsToProcess.forEach((field, index) => {
@@ -2954,14 +2920,7 @@ function exportForm() {
                     const fieldOrder = field.getAttribute('data-order');
                     const labelTextEl = field.querySelector('#labelText' + questionId + '_' + fieldOrder);
                     const nodeIdTextEl = field.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                    console.log('🔧 [EXPORT DEBUG] Processing field', index, ':', {
-                        fieldType,
-                        fieldOrder,
-                        hasLabelText: !!labelTextEl,
-                        hasNodeIdText: !!nodeIdTextEl,
-                        labelText: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
-                        nodeIdText: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A'
-                    });
+
                     if (fieldType === 'checkbox') {
                         // Handle checkbox fields
                         const fieldNameEl = field.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
@@ -3031,20 +2990,15 @@ function exportForm() {
                         }
                     } else if (fieldType === 'dropdown') {
                         // Handle dropdown fields
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] ========== Processing DROPDOWN field ==========');
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Question ID:', questionId, 'Field Order:', fieldOrder);
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field element:', field);
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field element innerHTML length:', field.innerHTML ? field.innerHTML.length : 0);
+
                         const fieldNameEl = field.querySelector('#dropdownFieldName' + questionId + '_' + fieldOrder);
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field name element found:', !!fieldNameEl, fieldNameEl ? 'value: ' + fieldNameEl.value : '');
+
                         const optionsContainer = field.querySelector('#dropdownOptions' + questionId + '_' + fieldOrder);
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Options container found:', !!optionsContainer);
+
                         const triggerSequencesContainer = field.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Searching for trigger sequences container with selector: #triggerSequences' + questionId + '_' + fieldOrder);
-                        console.log('🔧 [EXPORT DEBUG - PATH 1] Trigger sequences container found:', !!triggerSequencesContainer);
+
                         if (triggerSequencesContainer) {
-                            console.log('🔧 [EXPORT DEBUG - PATH 1] Container innerHTML length:', triggerSequencesContainer.innerHTML.length);
-                            console.log('🔧 [EXPORT DEBUG - PATH 1] Container innerHTML preview:', triggerSequencesContainer.innerHTML.substring(0, 1000));
+
                         }
                         if (fieldNameEl) {
                             const dropdownOptions = [];
@@ -3064,25 +3018,21 @@ function exportForm() {
                             // Collect trigger sequences
                             const triggerSequences = [];
                             if (triggerSequencesContainer) {
-                                console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Found trigger sequences container');
+
                                 const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
-                                console.log('🔧 [EXPORT DEBUG - PATH 1] Found', sequenceElements.length, 'trigger sequence elements');
+
                                 sequenceElements.forEach((sequenceEl, sequenceIndex) => {
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ========== Processing trigger sequence', sequenceIndex + 1, '==========');
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Sequence element class:', sequenceEl.className);
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Sequence element innerHTML preview:', sequenceEl.innerHTML.substring(0, 500));
+
                                     const triggerConditionEl = sequenceEl.querySelector('#triggerCondition' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     const triggerTitleEl = sequenceEl.querySelector('#triggerTitle' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
                                     const triggerFields = [];
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Processing trigger sequence', sequenceIndex + 1);
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Trigger fields container found:', !!triggerFieldsContainer);
+
                                     if (triggerFieldsContainer) {
                                         const fieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
-                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Found', fieldElements.length, 'trigger field elements');
+
                                         fieldElements.forEach((fieldEl, fieldIndex) => {
-                                            console.log('🔧 [EXPORT DEBUG - PATH 1] Processing trigger field', fieldIndex + 1);
-                                            console.log('🔧 [EXPORT DEBUG - PATH 1] Field class:', fieldEl.className);
+
                                             const fieldType = fieldEl.className.includes('trigger-field-') ? 'trigger-field' : 'unknown';
                                             // Check for different field types within trigger
                                             const labelTextEl = fieldEl.querySelector('#triggerLabelText' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
@@ -3275,7 +3225,7 @@ function exportForm() {
                                                 triggerFields.push(dropdownField);
                                             } else if (dateLabelEl && dateNodeIdEl) {
                                                 // Trigger date field
-                                                console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as DATE field');
+
                                                 // Check for conditional logic
                                                 const enableConditionalLogicCheckbox = fieldEl.querySelector(`#enableConditionalLogic${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
                                                 const conditionalLogicEnabled = enableConditionalLogicCheckbox && enableConditionalLogicCheckbox.checked;
@@ -3326,15 +3276,15 @@ function exportForm() {
                                                 // Check for trigger PDF field by looking for "Trigger PDF" text
                                                 const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
                                                 const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
-                                                console.log('🔧 [EXPORT DEBUG - PATH 1] PDF title element found:', !!pdfTitleEl, isPdfField ? 'is PDF field!' : '');
+
                                                 const pdfNumberEl = fieldEl.querySelector('input[id*="triggerPdfNumber"]');
                                                 const pdfTitleInputEl = fieldEl.querySelector('input[id*="triggerPdfTitle"]');
                                                 const pdfNameEl = fieldEl.querySelector('input[id*="triggerPdfName"]');
                                                 const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
-                                                console.log('🔧 [EXPORT DEBUG - PATH 1] PDF inputs - number:', !!pdfNumberEl, pdfNumberEl ? 'value: ' + pdfNumberEl.value : '', 'title:', !!pdfTitleInputEl, pdfTitleInputEl ? 'value: ' + pdfTitleInputEl.value : '', 'name:', !!pdfNameEl, pdfNameEl ? 'value: ' + pdfNameEl.value : '', 'priceId:', !!pdfPriceIdEl, pdfPriceIdEl ? 'value: ' + pdfPriceIdEl.value : '');
+
                                                 if (isPdfField && pdfNumberEl && pdfNameEl) {
                                                     // This is a trigger PDF field
-                                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as PDF field');
+
                                                     triggerFields.push({
                                                         type: 'pdf',
                                                         number: pdfNumberEl.value.trim(),
@@ -3344,8 +3294,7 @@ function exportForm() {
                                                     });
                                                 } else if (pdfNumberEl && pdfNameEl) {
                                                     // Fallback: try to detect PDF even if title check failed
-                                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ⚠ Attempting fallback PDF detection');
-                                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as PDF field (via fallback)');
+
                                                     triggerFields.push({
                                                         type: 'pdf',
                                                         number: pdfNumberEl.value.trim(),
@@ -3359,12 +3308,11 @@ function exportForm() {
                                                     const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
                                                     if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
                                                         // This is a trigger location field
-                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as LOCATION field');
+
                                                         // Get the location title from the input field
                                                         const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
                                                         const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
-                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Location title element found:', locationTitleEl);
-                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Location title value:', locationTitle);
+
                                                         triggerFields.push({
                                                             type: 'location',
                                                             fieldName: locationTitle || 'Location Data',
@@ -3380,7 +3328,7 @@ function exportForm() {
                                                         const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
                                                         if (isPdfField && pdfNumberEl && pdfNameEl) {
                                                             // This is a trigger PDF field
-                                                            console.log('🔧 [EXPORT DEBUG - PATH 1] ✓ Detected as PDF field');
+
                                                             triggerFields.push({
                                                                 type: 'pdf',
                                                                 number: pdfNumberEl.value.trim(),
@@ -3390,7 +3338,7 @@ function exportForm() {
                                                             });
                                                         } else if (pdfNumberEl && pdfNameEl) {
                                                             // Fallback: try to detect PDF even if title check failed
-                                                            console.log('🔧 [EXPORT DEBUG - PATH 1] ⚠ Attempting fallback PDF detection');
+
                                                             triggerFields.push({
                                                                 type: 'pdf',
                                                                 number: pdfNumberEl.value.trim(),
@@ -3399,27 +3347,25 @@ function exportForm() {
                                                                 priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
                                                             });
                                                         } else {
-                                                            console.log('🔧 [EXPORT DEBUG - PATH 1] ✗ Unknown field type - fieldEl:', fieldEl);
+
                                                         }
-                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field class:', fieldEl.className);
-                                                        console.log('🔧 [EXPORT DEBUG - PATH 1] Field innerHTML snippet:', fieldEl.innerHTML.substring(0, 300));
+
                                                     }
                                                 }
                                             }
                                         });
                                     }
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] Final triggerFields for sequence', sequenceIndex + 1, ':', triggerFields.length, 'fields');
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] TriggerFields array:', JSON.stringify(triggerFields, null, 2));
+
                                     triggerSequences.push({
                                         condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
                                         title: triggerTitleEl ? (triggerTitleEl.value.trim() || 'Additional Information') : 'Additional Information',
                                         fields: triggerFields
                                     });
-                                    console.log('🔧 [EXPORT DEBUG - PATH 1] ========== End trigger sequence', sequenceIndex + 1, '==========');
+
                                 });
-                                console.log('🔧 [EXPORT DEBUG - PATH 1] Total triggerSequences collected:', triggerSequences.length);
+
                             } else {
-                                console.log('🔧 [EXPORT DEBUG - PATH 1] ✗ Trigger sequences container NOT FOUND');
+
                             }
                             allFieldsInOrder.push({
                                 type: fieldType,
@@ -3466,7 +3412,7 @@ function exportForm() {
                         const labelText = labelTextEl.textContent.trim();
                         const nodeIdText = nodeIdTextEl.textContent.trim();
                         const prefillValue = field.getAttribute('data-prefill') || '';
-                        console.log('🔧 [EXPORT DEBUG] Field:', { fieldType, labelText, nodeIdText, prefillValue, hasAttribute: field.hasAttribute('data-prefill') });
+
                         const fieldData = {
                             type: fieldType,
                             label: labelText,
@@ -3480,34 +3426,34 @@ function exportForm() {
                         // Export conditional prefills for both label and amount fields
                         if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone') {
                             const conditionalPrefillsData = field.getAttribute('data-conditional-prefills');
-                            console.log('🔧 [EXPORT CONDITIONAL PREFILL] Field:', fieldData.label, 'Has attribute:', !!conditionalPrefillsData);
+
                             if (conditionalPrefillsData) {
-                                console.log('🔧 [EXPORT CONDITIONAL PREFILL] Raw attribute value:', conditionalPrefillsData);
+
                                 try {
                                     fieldData.conditionalPrefills = JSON.parse(conditionalPrefillsData);
-                                    console.log('🔧 [EXPORT CONDITIONAL PREFILL] Parsed conditional prefills:', fieldData.conditionalPrefills);
+
                                 } catch (e) {
-                                    console.error('🔧 [EXPORT CONDITIONAL PREFILL] Error parsing conditional prefills:', e);
+
                                 }
                             } else {
-                                console.log('🔧 [EXPORT CONDITIONAL PREFILL] No conditional prefills attribute found');
+
                             }
                         }
                         if (fieldType === 'label') {
-                            console.log('🔧 [EXPORT DEBUG] Added prefill to fieldData:', fieldData);
+
                         }
                         allFieldsInOrder.push(fieldData);
                     }
                 });
                 // Sort by order to ensure correct sequence
                 allFieldsInOrder.sort((a, b) => a.order - b.order);
-                console.log('🔧 [EXPORT DEBUG] Final allFieldsInOrder:', allFieldsInOrder);
+
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
                 questionData.allFieldsInOrder = allFieldsInOrder;
                 // Fallback to old format if no unified fields found
                 if (allFieldsInOrder.length === 0) {
-                    console.log('🔧 [EXPORT DEBUG] No unified fields found, falling back to old format');
+
                     // Try to get data from the old hidden containers
                     const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${questionId}`);
                     const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${questionId}`);
@@ -3537,7 +3483,7 @@ function exportForm() {
                 questionData.labels = labels;
                     questionData.labelNodeIds = labelNodeIds;
                 questionData.amounts = amounts;
-                    console.log('🔧 [EXPORT DEBUG] Fallback data:', { labels, labelNodeIds, amounts });
+
                 }
             }
             else if (questionType === 'multipleTextboxes') {
@@ -3548,15 +3494,12 @@ function exportForm() {
                 }
                 // Use the same unified fields system as numberedDropdown
                 const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
-                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Looking for unified container:', `#unifiedFields${questionId}`);
-                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Found unified container:', !!unifiedContainer);
+
                 if (unifiedContainer) {
-                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container children count:', unifiedContainer.children.length);
-                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container innerHTML length:', unifiedContainer.innerHTML.length);
-                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container innerHTML preview:', unifiedContainer.innerHTML.substring(0, 200));
+
                 }
                 const unifiedFields = questionBlock.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
-                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Found', unifiedFields.length, 'unified fields');
+
                 if (unifiedFields.length > 0) {
                     // Use unified fields data
                     const allFieldsInOrder = [];
@@ -3565,7 +3508,7 @@ function exportForm() {
                         const fieldOrder = parseInt(el.getAttribute('data-order'));
                         const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
                         const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                        console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Processing field:', {fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl});
+
                         if (fieldType === 'checkbox') {
                             // Handle checkbox fields
                             const fieldNameEl = el.querySelector('#checkboxFieldName' + questionId + '_' + fieldOrder);
@@ -3632,29 +3575,24 @@ function exportForm() {
                                     options: checkboxOptions,
                                     order: fieldOrder
                                 };
-                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Checkbox field data:', fieldData);
+
                                 allFieldsInOrder.push(fieldData);
                             }
                         } else if (fieldType === 'dropdown') {
                             // Handle dropdown fields
-                            console.log('🔧 [EXPORT DEBUG] ========== Processing DROPDOWN field ==========');
-                            console.log('🔧 [EXPORT DEBUG] Question ID:', questionId, 'Field Order:', fieldOrder);
-                            console.log('🔧 [EXPORT DEBUG] Field element:', el);
-                            console.log('🔧 [EXPORT DEBUG] Field element innerHTML length:', el.innerHTML ? el.innerHTML.length : 0);
-                            console.log('🔧 [EXPORT DEBUG] Field element innerHTML preview:', el.innerHTML ? el.innerHTML.substring(0, 500) : 'N/A');
+
                             const fieldNameEl = el.querySelector('#dropdownFieldName' + questionId + '_' + fieldOrder);
-                            console.log('🔧 [EXPORT DEBUG] Field name element found:', !!fieldNameEl, fieldNameEl ? 'value: ' + fieldNameEl.value : '');
+
                             const optionsContainer = el.querySelector('#dropdownOptions' + questionId + '_' + fieldOrder);
-                            console.log('🔧 [EXPORT DEBUG] Options container found:', !!optionsContainer);
+
                             const triggerSequencesContainer = el.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
-                            console.log('🔧 [EXPORT DEBUG] Searching for trigger sequences container with selector: #triggerSequences' + questionId + '_' + fieldOrder);
-                            console.log('🔧 [EXPORT DEBUG] Trigger sequences container found:', !!triggerSequencesContainer);
+
                             if (!triggerSequencesContainer) {
-                                console.log('🔧 [EXPORT DEBUG] ⚠ Container not found! Searching in entire document...');
+
                                 const allContainers = document.querySelectorAll('[id*="triggerSequences"]');
-                                console.log('🔧 [EXPORT DEBUG] Found', allContainers.length, 'elements with triggerSequences in ID');
+
                                 allContainers.forEach((container, idx) => {
-                                    console.log('🔧 [EXPORT DEBUG] Container', idx, '- id:', container.id, 'innerHTML length:', container.innerHTML.length);
+
                                 });
                             }
                             if (fieldNameEl) {
@@ -3674,91 +3612,75 @@ function exportForm() {
                                 }
                                 // Collect trigger sequences
                                 const triggerSequences = [];
-                                console.log('🔧 [EXPORT DEBUG] Looking for trigger sequences container for question', questionId, 'field', fieldOrder);
+
                                 if (triggerSequencesContainer) {
-                                    console.log('🔧 [EXPORT DEBUG] ✓ Found trigger sequences container');
-                                    console.log('🔧 [EXPORT DEBUG] Container innerHTML length:', triggerSequencesContainer.innerHTML.length);
-                                    console.log('🔧 [EXPORT DEBUG] Container innerHTML preview:', triggerSequencesContainer.innerHTML.substring(0, 500));
+
                                     const sequenceElements = triggerSequencesContainer.querySelectorAll('[class^="trigger-sequence-"]');
-                                    console.log('🔧 [EXPORT DEBUG] Found', sequenceElements.length, 'trigger sequence elements');
+
                                     sequenceElements.forEach((sequenceEl, sequenceIndex) => {
-                                        console.log('🔧 [EXPORT DEBUG] ========== Processing trigger sequence', sequenceIndex + 1, '==========');
-                                        console.log('🔧 [EXPORT DEBUG] Sequence element:', sequenceEl);
-                                        console.log('🔧 [EXPORT DEBUG] Sequence element class:', sequenceEl.className);
-                                        console.log('🔧 [EXPORT DEBUG] Sequence element innerHTML length:', sequenceEl.innerHTML.length);
-                                        console.log('🔧 [EXPORT DEBUG] Sequence element innerHTML preview:', sequenceEl.innerHTML.substring(0, 500));
+
                                         const triggerConditionEl = sequenceEl.querySelector('#triggerCondition' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
-                                        console.log('🔧 [EXPORT DEBUG] Trigger condition element:', !!triggerConditionEl, triggerConditionEl ? 'value: ' + triggerConditionEl.value : '');
+
                                         const triggerFieldsContainer = sequenceEl.querySelector('#triggerFields' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1));
-                                        console.log('🔧 [EXPORT DEBUG] Trigger fields container found:', !!triggerFieldsContainer);
+
                                         // Initialize triggerFields array before the if block so it's always available
                                         const triggerFields = [];
                                         if (triggerFieldsContainer) {
-                                            console.log('🔧 [EXPORT DEBUG] Trigger fields container innerHTML length:', triggerFieldsContainer.innerHTML.length);
-                                            console.log('🔧 [EXPORT DEBUG] Trigger fields container innerHTML preview:', triggerFieldsContainer.innerHTML.substring(0, 1000));
+
                                             const fieldElements = triggerFieldsContainer.querySelectorAll('[class^="trigger-field-"]');
-                                            console.log('🔧 [EXPORT DEBUG] Found', fieldElements.length, 'trigger field elements for question', questionId, 'field', fieldOrder, 'sequence', sequenceIndex + 1);
+
                                             fieldElements.forEach((fieldEl, fieldIndex) => {
-                                                console.log('🔧 [EXPORT DEBUG] Processing trigger field', fieldIndex + 1, '- fieldEl:', fieldEl);
-                                                console.log('🔧 [EXPORT DEBUG] Field class:', fieldEl.className);
-                                                console.log('🔧 [EXPORT DEBUG] Field innerHTML snippet:', fieldEl.innerHTML.substring(0, 200));
+
                                                 // Check for different field types within trigger
                                                 const labelTextEl = fieldEl.querySelector('#triggerLabelText' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const labelNodeIdEl = fieldEl.querySelector('#triggerLabelNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
-                                                console.log('🔧 [EXPORT DEBUG] Label elements - text:', !!labelTextEl, 'nodeId:', !!labelNodeIdEl);
+
                                                 const checkboxFieldNameEl = fieldEl.querySelector('#triggerCheckboxFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const checkboxOptionsContainer = fieldEl.querySelector('#triggerCheckboxOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
-                                                console.log('🔧 [EXPORT DEBUG] Checkbox elements - fieldName:', !!checkboxFieldNameEl, 'optionsContainer:', !!checkboxOptionsContainer);
+
                                                 const dropdownFieldNameEl = fieldEl.querySelector('#triggerDropdownFieldName' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const dropdownOptionsContainer = fieldEl.querySelector('#triggerDropdownOptions' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
-                                                console.log('🔧 [EXPORT DEBUG] Dropdown elements - fieldName:', !!dropdownFieldNameEl, 'optionsContainer:', !!dropdownOptionsContainer);
+
                                                 const dateLabelEl = fieldEl.querySelector('#triggerDateLabel' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
                                                 const dateNodeIdEl = fieldEl.querySelector('#triggerDateNodeId' + questionId + '_' + fieldOrder + '_' + (sequenceIndex + 1) + '_' + (fieldIndex + 1));
-                                                console.log('🔧 [EXPORT DEBUG] Date elements - label:', !!dateLabelEl, 'nodeId:', !!dateNodeIdEl);
+
                                                 // Check for trigger PDF field by looking for "Trigger PDF" text (similar to location detection)
                                                 const pdfTitleEl = fieldEl.querySelector('div[style*="color: #DC3545"]');
-                                                console.log('🔧 [EXPORT DEBUG] PDF title element found:', !!pdfTitleEl);
+
                                                 if (pdfTitleEl) {
-                                                    console.log('🔧 [EXPORT DEBUG] PDF title text:', pdfTitleEl.textContent);
-                                                    console.log('🔧 [EXPORT DEBUG] PDF title style:', pdfTitleEl.getAttribute('style'));
+
                                                 }
                                                 const isPdfField = pdfTitleEl && pdfTitleEl.textContent && pdfTitleEl.textContent.trim().includes('Trigger PDF');
-                                                console.log('🔧 [EXPORT DEBUG] isPdfField:', isPdfField);
+
                                                 const pdfNumberEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfNumber"]') : null;
                                                 const pdfTitleInputEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfTitle"]') : null;
                                                 const pdfNameEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfName"]') : null;
                                                 const pdfPriceIdEl = isPdfField ? fieldEl.querySelector('input[id*="triggerPdfPriceId"]') : null;
-                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - number:', !!pdfNumberEl, pdfNumberEl ? 'id: ' + pdfNumberEl.id : '', pdfNumberEl ? 'value: ' + pdfNumberEl.value : '');
-                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - title:', !!pdfTitleInputEl, pdfTitleInputEl ? 'id: ' + pdfTitleInputEl.id : '', pdfTitleInputEl ? 'value: ' + pdfTitleInputEl.value : '');
-                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - name:', !!pdfNameEl, pdfNameEl ? 'id: ' + pdfNameEl.id : '', pdfNameEl ? 'value: ' + pdfNameEl.value : '');
-                                                console.log('🔧 [EXPORT DEBUG] PDF input elements - priceId:', !!pdfPriceIdEl, pdfPriceIdEl ? 'id: ' + pdfPriceIdEl.id : '', pdfPriceIdEl ? 'value: ' + pdfPriceIdEl.value : '');
+
                                                 // Also try to find PDF inputs without the isPdfField check
                                                 const allPdfNumberInputs = fieldEl.querySelectorAll('input[id*="triggerPdfNumber"]');
                                                 const allPdfTitleInputs = fieldEl.querySelectorAll('input[id*="triggerPdfTitle"]');
                                                 const allPdfNameInputs = fieldEl.querySelectorAll('input[id*="triggerPdfName"]');
                                                 const allPdfPriceIdInputs = fieldEl.querySelectorAll('input[id*="triggerPdfPriceId"]');
-                                                console.log('🔧 [EXPORT DEBUG] All PDF number inputs in field:', allPdfNumberInputs.length);
-                                                console.log('🔧 [EXPORT DEBUG] All PDF title inputs in field:', allPdfTitleInputs.length);
-                                                console.log('🔧 [EXPORT DEBUG] All PDF name inputs in field:', allPdfNameInputs.length);
-                                                console.log('🔧 [EXPORT DEBUG] All PDF priceId inputs in field:', allPdfPriceIdInputs.length);
+
                                                 if (allPdfNumberInputs.length > 0) {
                                                     allPdfNumberInputs.forEach((el, idx) => {
-                                                        console.log('🔧 [EXPORT DEBUG] PDF number input', idx, '- id:', el.id, 'value:', el.value);
+
                                                     });
                                                 }
                                                 if (allPdfTitleInputs.length > 0) {
                                                     allPdfTitleInputs.forEach((el, idx) => {
-                                                        console.log('🔧 [EXPORT DEBUG] PDF title input', idx, '- id:', el.id, 'value:', el.value);
+
                                                     });
                                                 }
                                                 if (allPdfNameInputs.length > 0) {
                                                     allPdfNameInputs.forEach((el, idx) => {
-                                                        console.log('🔧 [EXPORT DEBUG] PDF name input', idx, '- id:', el.id, 'value:', el.value);
+
                                                     });
                                                 }
                                                 if (labelTextEl && labelNodeIdEl) {
                                                     // Trigger label field
-                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as LABEL field');
+
                                                     const labelField = {
                                                         type: 'label',
                                                         label: labelTextEl.value.trim(),
@@ -3772,7 +3694,7 @@ function exportForm() {
                                                     triggerFields.push(labelField);
                                                 } else if (checkboxFieldNameEl) {
                                                     // Trigger checkbox field
-                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as CHECKBOX field');
+
                                                     const checkboxOptions = [];
                                                     if (checkboxOptionsContainer) {
                                                         const checkboxOptionElements = checkboxOptionsContainer.querySelectorAll('[class^="trigger-checkbox-option-"]');
@@ -3794,7 +3716,7 @@ function exportForm() {
                                                     });
                                                 } else if (dropdownFieldNameEl) {
                                                     // Trigger dropdown field
-                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as DROPDOWN field');
+
                                                     const dropdownOptions = [];
                                                     if (dropdownOptionsContainer) {
                                                         const dropdownOptionElements = dropdownOptionsContainer.querySelectorAll('[class^="trigger-dropdown-option-"]');
@@ -3856,7 +3778,7 @@ function exportForm() {
                                                     triggerFields.push(dropdownField);
                                                 } else if (dateLabelEl && dateNodeIdEl) {
                                                     // Trigger date field
-                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as DATE field');
+
                                                     triggerFields.push({
                                                         type: 'date',
                                                         label: dateLabelEl.value.trim(),
@@ -3864,11 +3786,7 @@ function exportForm() {
                                                     });
                                                 } else if (isPdfField && pdfNumberEl && pdfNameEl) {
                                                     // This is a trigger PDF field
-                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as PDF field (via title check)');
-                                                    console.log('🔧 [EXPORT DEBUG] PDF number value:', pdfNumberEl.value);
-                                                    console.log('🔧 [EXPORT DEBUG] PDF title value:', pdfTitleInputEl ? pdfTitleInputEl.value : '(not found)');
-                                                    console.log('🔧 [EXPORT DEBUG] PDF name value:', pdfNameEl.value);
-                                                    console.log('🔧 [EXPORT DEBUG] PDF priceId value:', pdfPriceIdEl ? pdfPriceIdEl.value : '(not found)');
+
                                                     triggerFields.push({
                                                         type: 'pdf',
                                                         number: pdfNumberEl.value.trim(),
@@ -3878,16 +3796,12 @@ function exportForm() {
                                                     });
                                                 } else if (allPdfNumberInputs.length > 0 && allPdfNameInputs.length > 0) {
                                                     // Fallback: try to detect PDF even if title check failed
-                                                    console.log('🔧 [EXPORT DEBUG] ⚠ Attempting fallback PDF detection');
+
                                                     const fallbackPdfNumber = allPdfNumberInputs[0];
                                                     const fallbackPdfTitle = allPdfTitleInputs.length > 0 ? allPdfTitleInputs[0] : null;
                                                     const fallbackPdfName = allPdfNameInputs[0];
                                                     const fallbackPdfPriceId = allPdfPriceIdInputs.length > 0 ? allPdfPriceIdInputs[0] : null;
-                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF number - id:', fallbackPdfNumber.id, 'value:', fallbackPdfNumber.value);
-                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF title - found:', !!fallbackPdfTitle, fallbackPdfTitle ? 'value: ' + fallbackPdfTitle.value : '');
-                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF name - id:', fallbackPdfName.id, 'value:', fallbackPdfName.value);
-                                                    console.log('🔧 [EXPORT DEBUG] Fallback PDF priceId - found:', !!fallbackPdfPriceId, fallbackPdfPriceId ? 'value: ' + fallbackPdfPriceId.value : '');
-                                                    console.log('🔧 [EXPORT DEBUG] ✓ Detected as PDF field (via fallback)');
+
                                                     triggerFields.push({
                                                         type: 'pdf',
                                                         number: fallbackPdfNumber.value.trim(),
@@ -3901,7 +3815,7 @@ function exportForm() {
                                                     const locationTextEl = fieldEl.querySelector('div[style*="color: #28a745"]');
                                                     if (locationTextEl && locationTextEl.textContent.trim() === 'Location Data Added') {
                                                         // This is a trigger location field
-                                                        console.log('🔧 [EXPORT DEBUG] ✓ Detected as LOCATION field');
+
                                                         // Get the location title from the input field
                                                         const locationTitleEl = fieldEl.querySelector('input[id*="triggerLocationTitle"]');
                                                         const locationTitle = locationTitleEl ? locationTitleEl.value.trim() : 'Location Data';
@@ -3920,7 +3834,7 @@ function exportForm() {
                                                         const pdfPriceIdEl = fieldEl.querySelector('input[id*="triggerPdfPriceId"]');
                                                         if (isPdfField && pdfNumberEl && pdfNameEl) {
                                                             // This is a trigger PDF field
-                                                            console.log('🔧 [EXPORT DEBUG] ✓ Detected as PDF field');
+
                                                             triggerFields.push({
                                                                 type: 'pdf',
                                                                 number: pdfNumberEl.value.trim(),
@@ -3930,7 +3844,7 @@ function exportForm() {
                                                             });
                                                         } else if (pdfNumberEl && pdfNameEl) {
                                                             // Fallback: try to detect PDF even if title check failed
-                                                            console.log('🔧 [EXPORT DEBUG] ⚠ Attempting fallback PDF detection');
+
                                                             triggerFields.push({
                                                                 type: 'pdf',
                                                                 number: pdfNumberEl.value.trim(),
@@ -3939,37 +3853,33 @@ function exportForm() {
                                                                 priceId: pdfPriceIdEl ? pdfPriceIdEl.value.trim() : ''
                                                             });
                                                         } else {
-                                                            console.log('🔧 [EXPORT DEBUG] ✗ Unknown field type - could not detect field type');
-                                                            console.log('🔧 [EXPORT DEBUG] Field element details:');
-                                                            console.log('  - Classes:', fieldEl.className);
+
                                                         }
-                                                        console.log('  - Inner HTML length:', fieldEl.innerHTML.length);
-                                                        console.log('  - Children count:', fieldEl.children.length);
+
                                                         for (let i = 0; i < fieldEl.children.length; i++) {
                                                             const child = fieldEl.children[i];
-                                                            console.log('  - Child', i, ':', child.tagName, child.textContent ? child.textContent.substring(0, 50) : '');
+
                                                         }
                                                     }
                                                 }
                                             });
-                                            console.log('🔧 [EXPORT DEBUG] Final triggerFields array:', JSON.stringify(triggerFields, null, 2));
+
                                         } else {
-                                            console.log('🔧 [EXPORT DEBUG] ⚠ Trigger fields container not found for question', questionId, 'field', fieldOrder, 'sequence', sequenceIndex + 1);
+
                                         }
-                                        console.log('🔧 [EXPORT DEBUG] Final triggerFields for sequence', sequenceIndex + 1, ':', triggerFields.length, 'fields');
+
                                         triggerSequences.push({
                                             condition: triggerConditionEl ? triggerConditionEl.value.trim() : '',
                                             fields: triggerFields
                                         });
-                                        console.log('🔧 [EXPORT DEBUG] ========== End trigger sequence', sequenceIndex + 1, '==========');
+
                                     });
                                 } else {
-                                    console.log('🔧 [EXPORT DEBUG] ✗ Trigger sequences container NOT FOUND for question', questionId, 'field', fieldOrder);
-                                    console.log('🔧 [EXPORT DEBUG] Attempting to find it with selector: #triggerSequences' + questionId + '_' + fieldOrder);
+
                                     const alternativeContainer = document.querySelector('#triggerSequences' + questionId + '_' + fieldOrder);
-                                    console.log('🔧 [EXPORT DEBUG] Alternative container found:', !!alternativeContainer);
+
                                     if (alternativeContainer) {
-                                        console.log('🔧 [EXPORT DEBUG] Alternative container innerHTML length:', alternativeContainer.innerHTML.length);
+
                                     }
                                 }
                                 const fieldData = {
@@ -3979,7 +3889,7 @@ function exportForm() {
                                     triggerSequences: triggerSequences,
                                     order: fieldOrder
                                 };
-                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Dropdown field data:', fieldData);
+
                                 allFieldsInOrder.push(fieldData);
                             }
                         } else if (fieldType === 'location') {
@@ -3992,7 +3902,7 @@ function exportForm() {
                                 nodeId: 'location_data',
                                 order: fieldOrder
                             };
-                            console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Location field data:', fieldData);
+
                             allFieldsInOrder.push(fieldData);
                         } else if (fieldType === 'time') {
                             // Handle time fields - use same structure as label fields
@@ -4003,7 +3913,7 @@ function exportForm() {
                                 nodeId: nodeIdTextEl.textContent.trim(),
                                 order: fieldOrder
                             };
-                                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Time field data:', fieldData);
+
                                 allFieldsInOrder.push(fieldData);
                             }
                         } else if (labelTextEl && nodeIdTextEl) {
@@ -4028,11 +3938,11 @@ function exportForm() {
                                     try {
                                         fieldData.conditionalPrefills = JSON.parse(conditionalPrefillsData);
                                     } catch (e) {
-                                        console.error('Error parsing conditional prefills:', e);
+
                                     }
                                 }
                             }
-                            console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Field data:', fieldData);
+
                             allFieldsInOrder.push(fieldData);
                         }
                     });
@@ -4040,10 +3950,10 @@ function exportForm() {
                     allFieldsInOrder.sort((a, b) => a.order - b.order);
                     // Store in the same format as numberedDropdown
                     questionData.allFieldsInOrder = allFieldsInOrder;
-                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Final allFieldsInOrder:', allFieldsInOrder);
+
                 } else {
                     // Fallback to old format if no unified fields found
-                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes No unified fields found, using fallback');
+
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 questionData.amounts = [];
@@ -4118,7 +4028,7 @@ function exportForm() {
     // ========== Export groups ==========
     formData.groups = [];
     const groupBlocks = document.querySelectorAll('.group-block');
-    console.log('Found group blocks:', groupBlocks.length); // Debug log
+    // Debug log
     groupBlocks.forEach((groupBlock) => {
         const groupId = parseInt(groupBlock.id.replace('groupBlock', ''), 10);
         const groupName = document.getElementById(`groupName${groupId}`).value || `Group ${groupId}`;
@@ -4131,17 +4041,17 @@ function exportForm() {
         const groupSectionsDiv = document.getElementById(`groupSections${groupId}`);
         if (groupSectionsDiv) {
             const sectionItems = groupSectionsDiv.querySelectorAll('.group-section-item');
-            console.log(`Group ${groupId} has ${sectionItems.length} sections`); // Debug log
+            // Debug log
             sectionItems.forEach((sectionItem) => {
                 const select = sectionItem.querySelector('select');
                 if (select && select.value.trim()) {
                     groupData.sections.push(select.value.trim());
-                    console.log(`Added section "${select.value.trim()}" to group ${groupId}`); // Debug log
+                    // Debug log
                 }
             });
         }
         formData.groups.push(groupData);
-        console.log('Exported group data:', groupData); // Debug log
+        // Debug log
     });
     // ========== Export hidden fields with multi-term calculations ==========
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
@@ -4346,7 +4256,7 @@ function exportForm() {
                 }, 2000);
             }
         }).catch(err => {
-            console.error('Failed to copy to clipboard:', err);
+
         });
     }
 }

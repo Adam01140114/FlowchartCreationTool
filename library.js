@@ -365,18 +365,9 @@ window.exportGuiJson = function(download = true) {
                     const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
                     if (pdfName && typeof window.sanitizePdfName === 'function') {
                       const sanitizedPdfName = window.sanitizePdfName(pdfName);
-                      // Remove PDF prefix if present
+                      // Remove PDF prefix if present (only if it matches the actual PDF name)
                       if (sanitizedPdfName && baseNodeId.startsWith(sanitizedPdfName + '_')) {
                         baseNodeId = baseNodeId.substring(sanitizedPdfName.length + 1);
-                      }
-                    }
-                    // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
-                    const pdfPrefixMatch = baseNodeId.match(/^[a-z0-9]+_(.+)$/);
-                    if (pdfPrefixMatch) {
-                      const prefix = baseNodeId.substring(0, baseNodeId.indexOf('_'));
-                      // Only remove if the prefix looks like a PDF name (short alphanumeric)
-                      if (prefix.match(/^[a-z0-9]{1,20}$/)) {
-                        baseNodeId = pdfPrefixMatch[1];
                       }
                     }
                   }
@@ -938,18 +929,9 @@ window.exportGuiJson = function(download = true) {
                     const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
                     if (pdfName && typeof window.sanitizePdfName === 'function') {
                       const sanitizedPdfName = window.sanitizePdfName(pdfName);
-                      // Remove PDF prefix if present
+                      // Remove PDF prefix if present (only if it matches the actual PDF name)
                       if (sanitizedPdfName && baseNodeId.startsWith(sanitizedPdfName + '_')) {
                         baseNodeId = baseNodeId.substring(sanitizedPdfName.length + 1);
-                      }
-                    }
-                    // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
-                    const pdfPrefixMatch = baseNodeId.match(/^[a-z0-9]+_(.+)$/);
-                    if (pdfPrefixMatch) {
-                      const prefix = baseNodeId.substring(0, baseNodeId.indexOf('_'));
-                      // Only remove if the prefix looks like a PDF name (short alphanumeric)
-                      if (prefix.match(/^[a-z0-9]{1,20}$/)) {
-                        baseNodeId = pdfPrefixMatch[1];
                       }
                     }
                   }
@@ -1330,11 +1312,15 @@ window.exportGuiJson = function(download = true) {
           amountPlaceholder: ""
         };
       });
-      // Set conditionalPDF answer to "Yes" for checkboxes
-      question.conditionalPDF.answer = "Yes";
-      // For "mark only one" checkboxes, add markOnlyOne field and remove nameId/placeholder
-      if (checkboxAvailability === 'markOne') {
-        question.markOnlyOne = true;
+      // Default required/markOnlyOne flags for checkboxes
+      question.required = checkboxAvailability !== 'optional';
+      question.markOnlyOne = checkboxAvailability === 'markOne';
+      // Set conditionalPDF answer to first option label if we only had the generic "Yes" default
+      if (question.conditionalPDF.answer === "Yes" && question.options.length > 0 && question.options[0].label) {
+        question.conditionalPDF.answer = question.options[0].label;
+      }
+      // For "mark only one" checkboxes, remove nameId/placeholder
+      if (question.markOnlyOne) {
         delete question.nameId;
         delete question.placeholder;
       }
@@ -1418,18 +1404,9 @@ window.exportGuiJson = function(download = true) {
                     const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
                     if (pdfName && typeof window.sanitizePdfName === 'function') {
                       const sanitizedPdfName = window.sanitizePdfName(pdfName);
-                      // Remove PDF prefix if present
+                      // Remove PDF prefix if present (only if it matches the actual PDF name)
                       if (sanitizedPdfName && baseNodeId.startsWith(sanitizedPdfName + '_')) {
                         baseNodeId = baseNodeId.substring(sanitizedPdfName.length + 1);
-                      }
-                    }
-                    // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
-                    const pdfPrefixMatch = baseNodeId.match(/^[a-z0-9]+_(.+)$/);
-                    if (pdfPrefixMatch) {
-                      const prefix = baseNodeId.substring(0, baseNodeId.indexOf('_'));
-                      // Only remove if the prefix looks like a PDF name (short alphanumeric)
-                      if (prefix.match(/^[a-z0-9]{1,20}$/)) {
-                        baseNodeId = pdfPrefixMatch[1];
                       }
                     }
                   }
@@ -2089,6 +2066,12 @@ window.exportGuiJson = function(download = true) {
                   conditions.push(sourceParentCondition);
                 }
               }
+            } else {
+              // Generic question-to-question connection means any answer from the source question
+              conditions.push({
+                prevQuestion: String(sourceCell._questionId || ""),
+                prevAnswer: "Any Text"
+              });
             }
           }
         }
@@ -2495,12 +2478,63 @@ window.exportGuiJson = function(download = true) {
   const linkedCheckboxNodes = vertices.filter(cell => 
     typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)
   );
+  
+  // Build a map of all possible checkbox option nodeIds (with entry numbers) from numbered dropdown questions
+  const checkboxOptionNodeIdMap = new Map();
+  const numberedDropdownNodes = vertices.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           cell.style.includes('questionType=multipleDropdownType');
+  });
+  numberedDropdownNodes.forEach(node => {
+    if (node._checkboxes && Array.isArray(node._checkboxes)) {
+      const isNumberedDropdown = node.style && node.style.includes('questionType=multipleDropdownType');
+      const firstNumber = isNumberedDropdown ? (parseInt(node._twoNumbers?.first) || 1) : null;
+      const secondNumber = isNumberedDropdown ? (parseInt(node._twoNumbers?.second) || 1) : null;
+      node._checkboxes.forEach(checkbox => {
+        if (checkbox.options && Array.isArray(checkbox.options)) {
+          checkbox.options.forEach(option => {
+            if (option.nodeId) {
+              if (isNumberedDropdown && firstNumber !== null && secondNumber !== null) {
+                // Generate numbered versions
+                for (let num = firstNumber; num <= secondNumber; num++) {
+                  const numberedNodeId = `${option.nodeId}_${num}`;
+                  // Store both the full nodeId and a version without "how_" prefix for lookup
+                  checkboxOptionNodeIdMap.set(numberedNodeId, numberedNodeId);
+                  // Also create a lookup key without "how_" if it starts with "how_"
+                  if (numberedNodeId.startsWith('how_')) {
+                    const withoutHow = numberedNodeId.substring(4); // Remove "how_"
+                    checkboxOptionNodeIdMap.set(withoutHow, numberedNodeId);
+                  }
+                }
+              }
+            }
+          });
+        }
+      });
+    }
+  });
+  
   linkedCheckboxNodes.forEach((cell, index) => {
     if (cell._linkedCheckboxNodeId && cell._linkedCheckboxOptions && cell._linkedCheckboxOptions.length > 0) {
+      // Fix stored checkbox option nodeIds that might be missing "how_" prefix
+      const correctedCheckboxes = cell._linkedCheckboxOptions.map(storedValue => {
+        // If the stored value exists in the map, use it
+        if (checkboxOptionNodeIdMap.has(storedValue)) {
+          return checkboxOptionNodeIdMap.get(storedValue);
+        }
+        // If the stored value doesn't exist but a version with "how_" prefix does, use that
+        const withHowPrefix = `how_${storedValue}`;
+        if (checkboxOptionNodeIdMap.has(withHowPrefix)) {
+          return checkboxOptionNodeIdMap.get(withHowPrefix);
+        }
+        // Otherwise, return the stored value as-is
+        return storedValue;
+      });
+      
       const linkedCheckboxEntry = {
         id: `linkedCheckbox${index}`,
         linkedCheckboxId: cell._linkedCheckboxNodeId,
-        checkboxes: cell._linkedCheckboxOptions
+        checkboxes: correctedCheckboxes
       };
       linkedCheckboxes.push(linkedCheckboxEntry);
     } else {
@@ -3418,14 +3452,16 @@ window.correctNodeIdsAfterImport = function() {
 function generateCorrectNodeId(cell) {
   // Get PDF name if associated with this node
   const pdfName = getPdfNameForNode(cell);
+  // Check if PDF name should be added to node ID based on user setting
+  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
   // Get parent node text (for option nodes)
   const parentText = getParentNodeText(cell);
   // Get current node text
   const currentText = getCurrentNodeText(cell);
   // Build the Node ID according to the convention
   let nodeId = '';
-  // Add PDF name prefix if present
-  if (pdfName && pdfName.trim()) {
+  // Add PDF name prefix if present and setting allows it
+  if (pdfName && pdfName.trim() && shouldAddPdfName) {
     const cleanPdfName = pdfName.trim()
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '') // Remove special characters

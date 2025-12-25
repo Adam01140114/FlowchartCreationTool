@@ -25,26 +25,26 @@ class CartManager {
         // Try cookies first
         let cartData = this.getCookie(this.cartCookieName);
         let source = 'cookies';
-        
+
         // Fallback to localStorage if no cookie data
         if (!cartData) {
             cartData = localStorage.getItem(this.cartCookieName);
             source = 'localStorage';
         }
-        
+
         if (!cartData) {
-            console.log('🛒 No cart data found in cookies or localStorage');
+
             return [];
         }
-        
+
         try {
             // Decode URL-encoded data if needed
             const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
             const cart = JSON.parse(decodedData);
-            console.log(`🛒 Cart loaded from ${source}:`, cart);
+
             return cart;
         } catch (e) {
-            console.error('Error parsing cart data', e);
+
             // Clear the corrupted data
             this.setCookie(this.cartCookieName, '', -1);
             localStorage.removeItem(this.cartCookieName);
@@ -57,7 +57,7 @@ class CartManager {
         this.setCookie(this.cartCookieName, cartData, 30);
         // Also save to localStorage for compatibility with cart.html
         localStorage.setItem(this.cartCookieName, cartData);
-        console.log('💾 Cart saved to both cookies and localStorage:', this.cart);
+
     }
 
     async addToCart(formId, formTitle, priceId, formData = null, countyName = '', defendantName = '', pdfName = null) {
@@ -76,39 +76,24 @@ class CartManager {
             portfolioId: formData?.portfolioId || null, // Store portfolio ID for grouping
             timestamp: Date.now()
         };
-        
-        console.log('🚨 PAGES CART MANAGER ADD TO CART CALLED!');
-        console.log('🛒 Pages CartManager.addToCart called with:', {
-            formId, formTitle, priceId, countyName, defendantName, pdfName, formData
-        });
-        console.log('🔍 FormData portfolioId:', formData?.portfolioId);
-        console.log('🔍 FormData originalFormId:', formData?.originalFormId);
-        console.log('📦 Adding cart item:', cartItem);
-        console.log('📦 Cart item portfolioId field:', cartItem.portfolioId);
-        console.log('🆔 Generated cartItemId:', cartItemId);
-        
+
         this.cart.push(cartItem);
         this.saveCart();
         await this.updateCartDisplay();
     }
 
     async removeFromCart(cartItemId) {
-        console.log('🗑️ [CART DEBUG] Attempting to remove cartItemId:', cartItemId);
-        console.log('🗑️ [CART DEBUG] Current cart items:', this.cart.map(item => ({ cartItemId: item.cartItemId, title: item.title })));
-        
+
         const beforeCount = this.cart.length;
         this.cart = this.cart.filter(i => i.cartItemId !== cartItemId);
         const afterCount = this.cart.length;
-        
-        console.log('🗑️ [CART DEBUG] Cart items before removal:', beforeCount);
-        console.log('🗑️ [CART DEBUG] Cart items after removal:', afterCount);
-        
+
         if (beforeCount === afterCount) {
-            console.error('❌ [CART DEBUG] No item was removed! cartItemId not found:', cartItemId);
+
         } else {
-            console.log('✅ [CART DEBUG] Item successfully removed');
+
         }
-        
+
         this.saveCart();
         await this.updateCartDisplay();
     }
@@ -212,7 +197,7 @@ class CartManager {
                 alert('Could not create payment session.');
             }
         } catch (e) {
-            console.error('Checkout error', e);
+
             alert('Checkout failed: ' + e.message);
         }
     }
@@ -229,7 +214,7 @@ class CartManager {
                     .collection('formAnswers').doc(item.formId)
                     .set(item.formData, { merge: true });
             } catch (e) {
-                console.error('Save form data error', e);
+
             }
         }
     }
@@ -266,38 +251,32 @@ class CartManager {
     }
 
     async handlePaymentSuccess() {
-        console.log('🎉 [PAYMENT DEBUG] Payment successful! Starting PDF processing...');
-        console.log('🎉 [PAYMENT DEBUG] Cart items to process:', this.cart.length, this.cart);
-        
+
         const processedItems = [];
         const failedItems = [];
-        
+
         for (const item of this.cart) {
             try {
-                console.log('🎉 [PAYMENT DEBUG] Processing item:', item.title, 'formId:', item.formId, 'portfolioId:', item.portfolioId);
+
                 await this.processFormPDF(item); // run unconditionally
                 processedItems.push(item);
-                console.log('✅ [PAYMENT DEBUG] Successfully processed:', item.title);
+
             } catch (err) {
-                console.error(`❌ [PAYMENT DEBUG] Failed to save ${item.formId}:`, err);
+
                 failedItems.push(item);
                 alert(`Could not save ${item.title || item.formId} to your account.`);
             }
         }
-        
-        console.log('🎉 [PAYMENT DEBUG] PDF processing complete!');
-        console.log('✅ [PAYMENT DEBUG] Successfully processed items:', processedItems.length, processedItems.map(item => item.title));
-        console.log('❌ [PAYMENT DEBUG] Failed items:', failedItems.length, failedItems.map(item => item.title));
-        
+
         // Remove portfolio entries after successful payment
         await this.removePortfolioEntries();
-        
+
         await this.clearCart();
-        
+
         // Show debug alert with processing results (commented out for production)
         /*
         const debugInfo = `🎉 Payment Debug Results:
-        
+
 ✅ Successfully processed ${processedItems.length} PDF(s):
 ${processedItems.map(item => `- ${item.title} (${item.formId}) - Portfolio: ${item.portfolioId || 'N/A'}`).join('\n')}
 
@@ -308,10 +287,10 @@ ${failedItems.map(item => `- ${item.title} (${item.formId})`).join('\n')}` : '�
 📥 Clicking download will open all PDFs associated with that form.
 
 Forms page requested.`;
-        
+
         alert(debugInfo);
         */
-        
+
         // Show success message and redirect to forms.html
         alert('Payment successful! Your documents have been saved to My Documents.');
         window.location.href = 'forms.html';
@@ -322,29 +301,27 @@ Forms page requested.`;
             // Get the current user
             const user = firebase.auth().currentUser;
             if (!user) {
-                console.log('No user logged in, skipping portfolio removal');
+
                 return;
             }
 
             const db = firebase.firestore();
-            
+
             // Get unique portfolio IDs from cart items
             const portfolioIds = [...new Set(this.cart.map(item => item.portfolioId).filter(id => id))];
-            
-            console.log('🗑️ Removing portfolio entries for portfolioIds:', portfolioIds);
-            
+
             // Remove each portfolio entry
             for (const portfolioId of portfolioIds) {
                 try {
                     await db.collection('users').doc(user.uid)
                         .collection('forms').doc(portfolioId).delete();
-                    console.log('✅ Removed portfolio entry:', portfolioId);
+
                 } catch (err) {
-                    console.error('❌ Failed to remove portfolio entry:', portfolioId, err);
+
                 }
             }
         } catch (err) {
-            console.error('❌ Error removing portfolio entries:', err);
+
         }
     }
 
@@ -381,24 +358,24 @@ Forms page requested.`;
             if (!userEmail) userEmail = prompt('Enter your email to receive a copy of your PDF');
             if (userEmail) {
                 try {
-                    console.log('📧 Attempting to email PDF to:', userEmail);
+
                     const emailData = new FormData();
                     emailData.append('to', userEmail);
                     emailData.append('filename', `Edited_${cartItem.formId}`);
                     emailData.append('subject', 'Your Completed Form from FormWiz');
                     emailData.append('text', 'Attached is your completed PDF form from FormWiz.');
                     emailData.append('pdf', blob, `Edited_${cartItem.formId}`);
-                    
+
                     const emailResponse = await fetch('/email-pdf', { method: 'POST', body: emailData, mode: 'cors' });
                     if (!emailResponse.ok) {
-                        console.error('❌ Email failed with status:', emailResponse.status, emailResponse.statusText);
+
                         const errorText = await emailResponse.text();
-                        console.error('❌ Email error details:', errorText);
+
                     } else {
-                        console.log('✅ Email sent successfully');
+
                     }
                 } catch (emailError) {
-                    console.error('❌ Email error:', emailError);
+
                 }
             }
 
@@ -436,9 +413,9 @@ Forms page requested.`;
                         }
                     } catch (e) {
                         // fallback: use cartItem data
-                        console.log('⚠️ Could not fetch form data from Firebase, using cart item data');
+
                     }
-                    
+
                     // Fallback to cart item data if Firebase data is not available
                     if (!docCounty && cartItem.countyName) docCounty = cartItem.countyName;
                     if (!docDefendant && cartItem.defendantName) docDefendant = cartItem.defendantName;
@@ -453,23 +430,14 @@ Forms page requested.`;
                         purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
                         downloadUrl
                     };
-                    
-                    console.log('💾 [PAYMENT DEBUG] Saving document to Firebase:', documentData);
-                    
+
                     await db.collection('users').doc(user.uid)
                         .collection('documents').doc(docId).set(documentData);
-                    
-                    console.log('✅ [PAYMENT DEBUG] Document saved successfully:', {
-                        formId: cartItem.formId,
-                        title: cartItem.title,
-                        portfolioId: cartItem.portfolioId,
-                        originalFormId: cartItem.originalFormId,
-                        docId: docId
-                    });
+
                 }
             }
         } catch (e) {
-            console.error(`PDF process error for ${cartItem.formId}`, e);
+
         }
     }
 }
@@ -482,15 +450,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function addToCart(formId, formTitle, priceId, formData, countyName, defendantName, pdfName) {
-    console.log('🌐 Pages addToCart called with:', {
-        formId, formTitle, priceId, countyName, defendantName, pdfName
-    });
-    
+
     if (cartManager) {
-        console.log('🛒 Calling CartManager.addToCart from Pages...');
+
         cartManager.addToCart(formId, formTitle, priceId, formData, countyName, defendantName, pdfName);
     } else {
-        console.error('❌ CartManager not available in Pages!');
+
     }
 }
 

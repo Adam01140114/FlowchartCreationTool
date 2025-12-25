@@ -72,7 +72,7 @@ logoutButton.addEventListener('click', () => {
     auth.signOut().then(() => {
         window.location.href = 'index.html';
     }).catch((error) => {
-        console.error('Sign Out Error', error);
+
     });
 });
 
@@ -206,13 +206,13 @@ function renderMyForms(forms) {
             li.addEventListener('click', async function(e) {
                 if (e.target === checkbox) return;
                 showSavingOverlay('Saving...', false);
-                console.log('[FormWiz] Attempting to update lastOpened for', form.id);
+
                 // Update lastOpened in Firestore, then navigate
                 const userId = auth.currentUser.uid;
                 const formRef = db.collection('users').doc(userId).collection('forms').doc(form.id);
                 try {
                     await formRef.set({ lastOpened: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-                    console.log('[FormWiz] lastOpened updated for', form.id);
+
                     hideSavingOverlay();
                     // Append county and portfolioId to the URL for autosave separation
                     const separator = form.url.includes('?') ? '&' : '?';
@@ -225,7 +225,7 @@ function renderMyForms(forms) {
                     if (form.defendantName) url += '&defendantName=' + encodeURIComponent(form.defendantName);
                     window.location.href = url;
                 } catch (err) {
-                    console.error('[FormWiz] Failed to update lastOpened:', err);
+
                     hideSavingOverlay();
                     alert('Failed to save last opened timestamp. Please try again.');
                 }
@@ -251,21 +251,21 @@ function updateRemoveSelectedButton() {
 // Remove selected forms
 removeSelectedButton.addEventListener('click', async () => {
     if (selectedForms.size === 0) return;
-    
+
     const userId = auth.currentUser.uid;
     const batch = db.batch();
-    
+
     selectedForms.forEach(formId => {
         const formRef = db.collection('users').doc(userId).collection('forms').doc(formId);
         batch.delete(formRef);
     });
-    
+
     try {
         await batch.commit();
         selectedForms.clear();
         // No need to call fetchMyForms - the real-time listener will automatically update
     } catch (error) {
-        console.error('Error removing selected forms:', error);
+
     }
 });
 
@@ -285,7 +285,7 @@ function listenToMyForms(userId) {
             selectedForms.clear();
             updateRemoveSelectedButton();
         }, (error) => {
-            console.error('Error listening to user forms:', error);
+
         });
 }
 
@@ -294,16 +294,16 @@ async function loadAvailableForms() {
     try {
         const snapshot = await db.collection('forms').get();
         const forms = [];
-        
+
         snapshot.forEach(doc => {
             const formData = doc.data();
             formData.id = doc.id;
-            
+
             // Transform URLs to use the correct format with Forms/ prefix and include portfolio ID
             if (formData.url) {
                 // Generate a unique portfolio ID for this form session
                 const portfolioId = generatePortfolioId();
-                
+
                 if (formData.id === 'sc100') {
                     formData.url = `../Forms/sc-100.html?formId=sc100&portfolioId=${portfolioId}`;
                 } else if (formData.id === 'sc120') {
@@ -314,14 +314,13 @@ async function loadAvailableForms() {
                     formData.url = `../Forms/fee-waiver.html?formId=fee-waiver&portfolioId=${portfolioId}`;
                 }
             }
-            
+
             forms.push(formData);
         });
-        
-        console.log('Loaded available forms from Firebase:', forms);
+
         return forms;
     } catch (error) {
-        console.error('Error loading available forms from Firebase:', error);
+
         return [];
     }
 }
@@ -335,7 +334,7 @@ async function loadCountyZipMap() {
         countyZipMap = await response.json();
         return countyZipMap;
     } catch (e) {
-        console.error('Error loading county-zips.json:', e);
+
         return {};
     }
 }
@@ -387,14 +386,14 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
             availableFormsList.innerHTML = '';
             formsToShow.forEach(form => {
                 const li = document.createElement('li');
-                
+
                 // Create form info container
                 const formInfo = document.createElement('div');
                 formInfo.style.display = 'flex';
                 formInfo.style.flexDirection = 'column';
                 formInfo.style.gap = '4px';
                 formInfo.style.flex = '1';
-                
+
                 // Create form name anchor
                 const anchor = document.createElement('a');
                 anchor.href = '#';
@@ -410,7 +409,7 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
                     e.preventDefault();
                     addFormToPortfolio(form.id, form.url, form.name);
                 });
-                
+
                 // Create form description
                 const description = document.createElement('div');
                 description.textContent = form.description || 'No description available';
@@ -419,11 +418,11 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
                 description.style.lineHeight = '1.4';
                 description.style.marginTop = '0px';
                 description.style.marginBottom = '10px';
-                
+
                 // Add description to form info
                 formInfo.appendChild(anchor);
                 formInfo.appendChild(description);
-                
+
                 // Create Click Here button
                 const addButton = document.createElement('button');
                 addButton.textContent = 'Click Here';
@@ -435,7 +434,7 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
                     e.preventDefault();
                     addFormToPortfolio(form.id, form.url, form.name);
                 });
-                
+
                 // Add elements to list item
                 li.appendChild(formInfo);
                 li.appendChild(addButton);
@@ -451,7 +450,7 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
         prevBtn.disabled = (page === 0);
         nextBtn.disabled = (page >= totalPages - 1);
     } catch (error) {
-        console.error('Error rendering available forms:', error);
+
     }
 }
 
@@ -511,13 +510,13 @@ async function addFormToPortfolio(formId, formUrl, formName) {
         return;
     }
     const userId = user.uid;
-    
+
     // Check if user already has this form for this county
     try {
         // Query all forms to check for duplicates of the same form type in the same county
         const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
         let duplicateFound = false;
-        
+
         formsSnapshot.forEach(doc => {
             const formData = doc.data();
             // Check if this is the same form type (by formId or originalFormId) and same county
@@ -525,22 +524,19 @@ async function addFormToPortfolio(formId, formUrl, formName) {
                 duplicateFound = true;
             }
         });
-        
+
         if (duplicateFound) {
             // Show duplicate confirmation modal
             showDuplicateFormModal(formName, foundCounty, formId, formUrl, foundCounty);
             return;
         }
-        
+
         // No duplicate found, proceed with adding the form
         await addFormToPortfolioInternal(formId, formUrl, formName, foundCounty);
     } catch (error) {
-        console.error('Error checking for duplicate form:', error);
+
     }
 }
-
-
-
 
 async function addFormToPortfolioInternal(formId, formUrl, formName, countyName, isDuplicate = false) {
     const user = auth.currentUser;
@@ -548,7 +544,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
         window.location.href = formUrl;
         return;
     }
-    
+
     const userId = user.uid;
     try {
         if (isDuplicate) {
@@ -571,7 +567,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
             // For new forms, check if it already exists for the same county
             const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
             let existingFormDoc = null;
-            
+
             formsSnapshot.forEach(doc => {
                 const formData = doc.data();
                 // Check if this is the same form type and same county
@@ -579,7 +575,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
                     existingFormDoc = doc;
                 }
             });
-            
+
             if (existingFormDoc) {
                 // Update lastOpened in Firestore for the existing form
                 await existingFormDoc.ref.update({
@@ -611,36 +607,9 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
             }
         }
     } catch (error) {
-        console.error('Error handling form:', error);
+
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
    // Patch addFormToPortfolio to show county modal first
    const originalAddFormToPortfolio = addFormToPortfolio;
@@ -650,7 +619,7 @@ addFormToPortfolio = async function(formId, formUrl, formName) {
         window.location.href = formUrl;
         return;
     }
-    
+
     // Show county selection modal
     showCountyModal(formId, formUrl, formName);
 };
@@ -736,7 +705,7 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
             }
         }
     } catch (error) {
-        console.error('Error handling form:', error);
+
     }
 };
 
@@ -873,10 +842,10 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
     const message = document.getElementById('duplicate-form-message');
     const yesBtn = document.getElementById('duplicate-form-yes-btn');
     const cancelBtn = document.getElementById('duplicate-form-cancel-btn');
-    
+
     // Set the message
     message.textContent = `You already have a ${formName} form for ${countyName} County in your portfolio, would you like to add another?`;
-    
+
     // Store the pending form data
     pendingFormData = {
         formId: formId,
@@ -884,10 +853,10 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
         formName: formName,
         countyName: newCountyName
     };
-    
+
     // Show the modal
     modal.style.display = 'block';
-    
+
     // Add event listeners for the buttons
     yesBtn.onclick = async function() {
         closeDuplicateFormModal();
@@ -898,7 +867,7 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
                 availableFormsData = await loadAvailableForms();
             }
             formObj = availableFormsData.find(f => f.id === pendingFormData.formId);
-            
+
             if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
                 // Show defendant modal for duplicate
                 showDefendantModal(formObj, pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true);
@@ -909,7 +878,7 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
             pendingFormData = null;
         }
     };
-    
+
     cancelBtn.onclick = function() {
         closeDuplicateFormModal();
         pendingFormData = null;
@@ -928,7 +897,7 @@ availableFormsList.addEventListener('click', async (e) => {
         const formId = e.target.getAttribute('data-form-id');
         const formUrl = e.target.getAttribute('data-form-url');
         const formName = e.target.textContent;
-        
+
         addFormToPortfolio(formId, formUrl, formName);
     }
 });
@@ -974,7 +943,7 @@ userSettingsForm.addEventListener('submit', async (e) => {
         closeSettings();
     } catch (error) {
         settingsError.textContent = error.message;
-        console.error('Error updating profile:', error);
+
     }
 });
 
@@ -1005,15 +974,15 @@ auth.onAuthStateChanged(async (user) => {
             let userDoc = await db.collection('users').doc(user.uid).get();
             let retryCount = 0;
             const maxRetries = 3;
-            
+
             // If user document doesn't exist, wait a bit and retry (for new users)
             while (!userDoc.exists && retryCount < maxRetries) {
-                console.log(`User document not found, retrying... (${retryCount + 1}/${maxRetries})`);
+
                 await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
                 userDoc = await db.collection('users').doc(user.uid).get();
                 retryCount++;
             }
-            
+
             if (userDoc.exists) {
                 const userData = userDoc.data();
                 // Update welcome message with actual name
@@ -1055,7 +1024,7 @@ auth.onAuthStateChanged(async (user) => {
                 listenToMyForms(user.uid);
             }
         } catch (error) {
-            console.error('Error loading user data:', error);
+
             if (welcomeMessage) welcomeMessage.textContent = 'Welcome User';
             listenToMyForms(user.uid);
         }
@@ -1190,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     // Load available forms for all users
     renderAvailableForms(0);
 });
@@ -1200,7 +1169,7 @@ function updateCartCountBadge() {
     const cartCountElement = document.getElementById('cart-count-badge');
     if (cartCountElement) {
         let count = 0;
-        
+
         // Try getCartCount function first
         if (typeof getCartCount === 'function') {
             count = getCartCount();
@@ -1217,23 +1186,23 @@ function updateCartCountBadge() {
                     }
                     return null;
                 }
-                
+
                 let cartData = getCookie('formwiz_cart');
                 if (!cartData) {
                     cartData = localStorage.getItem('formwiz_cart');
                 }
-                
+
                 if (cartData) {
                     const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
                     const cart = JSON.parse(decodedData);
                     count = Array.isArray(cart) ? cart.length : 0;
                 }
             } catch (e) {
-                console.error('Error getting cart count:', e);
+
                 count = 0;
             }
         }
-        
+
         cartCountElement.textContent = count;
         if (count > 0) {
             cartCountElement.style.display = 'flex';
@@ -1477,10 +1446,10 @@ function renderMyDocuments(docs) {
             const bDate = b.purchaseDate?.toDate ? b.purchaseDate.toDate() : new Date(b.purchaseDate);
             return bDate - aDate;
         });
-        
+
         // Group documents by their base form ID and purchase date (within 1 minute)
         const documentGroups = groupDocumentsByFormAndTime(docs);
-        
+
         // Render each group
         documentGroups.forEach((group, groupIndex) => {
             if (group.length === 1) {
@@ -1491,7 +1460,7 @@ function renderMyDocuments(docs) {
                 renderDocumentGroup(group, groupIndex);
             }
         });
-        
+
         updateDeleteDocumentsButton();
     }
 }
@@ -1499,40 +1468,40 @@ function renderMyDocuments(docs) {
 function groupDocumentsByFormAndTime(docs) {
     const groups = [];
     const processed = new Set();
-    
+
     docs.forEach((doc, index) => {
         if (processed.has(index)) return;
-        
+
         const group = [doc];
         processed.add(index);
-        
+
         // Find related documents (same portfolio ID, or same original form ID and similar purchase time)
         const portfolioId = doc.portfolioId;
         const originalFormId = doc.originalFormId || doc.formId;
         const docTime = doc.purchaseDate?.toDate ? doc.purchaseDate.toDate() : new Date(doc.purchaseDate || 0);
-        
+
         docs.forEach((otherDoc, otherIndex) => {
             if (processed.has(otherIndex) || otherIndex === index) return;
-            
+
             const otherPortfolioId = otherDoc.portfolioId;
             const otherOriginalFormId = otherDoc.originalFormId || otherDoc.formId;
             const otherTime = otherDoc.purchaseDate?.toDate ? otherDoc.purchaseDate.toDate() : new Date(otherDoc.purchaseDate || 0);
-            
+
             // Primary grouping: same portfolio ID
             // Secondary grouping: same original form and within 1 minute
             const samePortfolio = portfolioId && otherPortfolioId && portfolioId === otherPortfolioId;
             const sameFormAndTime = originalFormId && otherOriginalFormId && originalFormId === otherOriginalFormId && 
                                   Math.abs(docTime - otherTime) < 60000; // 1 minute in milliseconds
-            
+
             if (samePortfolio || sameFormAndTime) {
                 group.push(otherDoc);
                 processed.add(otherIndex);
             }
         });
-        
+
         groups.push(group);
     });
-    
+
     return groups;
 }
 
@@ -1675,7 +1644,7 @@ function renderDocumentGroup(docs, groupIndex) {
     li.style.flexDirection = 'column';
     li.style.alignItems = 'center';
     li.style.position = 'relative';
-    
+
     // Add checkbox for selection (top left) - same as portfolio
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -1706,7 +1675,7 @@ function renderDocumentGroup(docs, groupIndex) {
     checkbox.addEventListener('click', function(e) {
         e.stopPropagation();
     });
-    
+
     // Add purchase date timestamp (top right) - same as portfolio
     const purchaseDateDiv = document.createElement('div');
     purchaseDateDiv.className = 'last-opened';
@@ -1716,11 +1685,11 @@ function renderDocumentGroup(docs, groupIndex) {
         return docDate > latest ? docDate : latest;
     }, new Date(0));
     purchaseDateDiv.textContent = timeAgo(mostRecentDate);
-    
+
     // Get the original form name from the first document
     const originalFormId = docs[0].originalFormId || docs[0].formId;
     const originalFormName = getFormDisplayName(originalFormId);
-    
+
     // Add document name as a link (styled like portfolio)
     const a = document.createElement('a');
     a.href = '#';
@@ -1731,7 +1700,7 @@ function renderDocumentGroup(docs, groupIndex) {
     a.style.fontSize = '18px';
     a.style.color = '#2980b9';
     a.addEventListener('click', function(e) { e.preventDefault(); });
-    
+
     // Add county info if available (from first document)
     let countyDiv = null;
     if (docs[0].countyName) {
@@ -1746,7 +1715,7 @@ function renderDocumentGroup(docs, groupIndex) {
         }
         countyDiv.textContent = countyText;
     }
-    
+
     // Download All button (styled like portfolio Open button)
     const downloadAllBtn = document.createElement('button');
     downloadAllBtn.textContent = 'Download All';
@@ -1768,7 +1737,7 @@ function renderDocumentGroup(docs, groupIndex) {
             }, index * 500); // Stagger downloads by 500ms
         });
     });
-    
+
     // Make the whole li clickable except for the button
     li.addEventListener('click', function(e) {
         if (e.target === downloadAllBtn || e.target === checkbox) return;
@@ -1781,13 +1750,13 @@ function renderDocumentGroup(docs, groupIndex) {
             }, index * 500);
         });
     });
-    
+
     li.appendChild(checkbox);
     li.appendChild(purchaseDateDiv);
     li.appendChild(a);
     if (countyDiv) li.appendChild(countyDiv);
     li.appendChild(downloadAllBtn);
-    
+
     myDocumentsList.appendChild(li);
 }
 function updateDeleteDocumentsButton() {
@@ -1833,7 +1802,7 @@ function listenToMyDocuments(userId) {
             });
             renderMyDocuments(docs);
         }, (error) => {
-            console.error('Error listening to user documents:', error);
+
         });
 }
 
@@ -1944,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         cart = JSON.parse(decodedData);
                     }
                 } catch (e) { 
-                    console.error('Error parsing cart data:', e);
+
                     cart = []; 
                 }
                 if (!Array.isArray(cart) || cart.length === 0) {
@@ -2051,7 +2020,7 @@ function showCountyModal(formId, formUrl, formName) {
     const title = document.getElementById('county-modal-title');
     const message = document.getElementById('county-modal-message');
     const buttons = document.getElementById('county-modal-buttons');
-    
+
     // Reset modal to initial state
     title.textContent = 'Which county are you filing in?';
     message.textContent = 'Enter your zip code below to determine your county.';
@@ -2063,30 +2032,30 @@ function showCountyModal(formId, formUrl, formName) {
     submitBtn.style.display = 'block';
     cancelBtn.style.display = 'block';
     modal.style.display = 'block';
-    
+
     pendingCountyData = { formId, formUrl, formName };
     currentCounty = null;
-    
+
     function closeModal() {
         modal.style.display = 'none';
         pendingCountyData = null;
         currentCounty = null;
     }
-    
+
     closeBtn.onclick = closeModal;
     cancelBtn.onclick = closeModal;
-    
+
     window.onclick = function(event) {
         if (event.target == modal) closeModal();
     };
-    
+
     // Handle zip code input - only allow numbers
     zipInput.addEventListener('input', function() {
         let val = zipInput.value.replace(/\D/g, '');
         if (val.length > 5) val = val.slice(0, 5);
         zipInput.value = val;
     });
-    
+
     submitBtn.onclick = async function() {
         if (!currentCounty) {
             // First step: validate zip code and find county
@@ -2096,7 +2065,7 @@ function showCountyModal(formId, formUrl, formName) {
                 errorDiv.style.display = 'block';
                 return;
             }
-            
+
             // Find county for this zip
             const countyZipMap = await loadCountyZipMap();
             let foundCounty = null;
@@ -2106,13 +2075,13 @@ function showCountyModal(formId, formUrl, formName) {
                     break;
                 }
             }
-            
+
             if (!foundCounty) {
                 errorDiv.textContent = 'No county found for this zip code.';
                 errorDiv.style.display = 'block';
                 return;
             }
-            
+
             // Check if form supports this county
             let formObj = null;
             if (!availableFormsData.length) {
@@ -2124,7 +2093,7 @@ function showCountyModal(formId, formUrl, formName) {
                 errorDiv.style.display = 'block';
                 return;
             }
-            
+
             // Show confirmation step
             currentCounty = foundCounty;
             // Store the zip code for later use
@@ -2137,25 +2106,25 @@ function showCountyModal(formId, formUrl, formName) {
             errorDiv.style.display = 'none';
             submitBtn.textContent = 'Yes';
             cancelBtn.textContent = 'No';
-            
+
         } else {
             // Second step: user confirmed county, proceed with form addition
             modal.style.display = 'none';
-            
+
             if (pendingCountyData) {
                 // Check for duplicates
                 const userId = auth.currentUser.uid;
                 try {
                     const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
                     let duplicateFound = false;
-                    
+
                     formsSnapshot.forEach(doc => {
                         const formData = doc.data();
                         if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === currentCounty) {
                             duplicateFound = true;
                         }
                     });
-                    
+
                     if (duplicateFound) {
                         showDuplicateFormModal(pendingCountyData.formName, currentCounty, pendingCountyData.formId, pendingCountyData.formUrl, currentCounty);
                     } else {
@@ -2165,7 +2134,7 @@ function showCountyModal(formId, formUrl, formName) {
                             availableFormsData = await loadAvailableForms();
                         }
                         formObj = availableFormsData.find(f => f.id === pendingCountyData.formId);
-                        
+
                         if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
                             showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
                         } else {
@@ -2173,15 +2142,15 @@ function showCountyModal(formId, formUrl, formName) {
                         }
                     }
                 } catch (error) {
-                    console.error('Error checking for duplicate form:', error);
+
                 }
-                
+
                 pendingCountyData = null;
                 currentCounty = null;
             }
         }
     };
-    
+
     // Handle "No" button - go back to zip code input
     cancelBtn.onclick = function() {
         if (currentCounty) {

@@ -4402,7 +4402,21 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
             if (option.linkedFields && Array.isArray(option.linkedFields)) {
               option.linkedFields.forEach(linkedField => {
                 // Use the auto-generated title as the base ID
-                const baseLinkedFieldId = linkedField.title || '';
+                let baseLinkedFieldId = linkedField.title || '';
+                // Check if PDF name should be added to node ID based on user setting
+                const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+                // If setting is OFF, remove PDF prefix from the title if present
+                if (!shouldAddPdfName && baseLinkedFieldId) {
+                  // Get PDF name for the node to check if it matches the prefix
+                  const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(node) : null;
+                  if (pdfName && typeof window.sanitizePdfName === 'function') {
+                    const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                    // Remove PDF prefix if present (only if it matches the actual PDF name)
+                    if (sanitizedPdfName && baseLinkedFieldId.startsWith(sanitizedPdfName + '_')) {
+                      baseLinkedFieldId = baseLinkedFieldId.substring(sanitizedPdfName.length + 1);
+                    }
+                  }
+                }
                 if (baseLinkedFieldId) {
                   if (isNumberedDropdown && firstNumber !== null && secondNumber !== null) {
                     // Generate numbered versions based on the parent question's range
@@ -4745,7 +4759,22 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
         if (checkbox.options && Array.isArray(checkbox.options)) {
           checkbox.options.forEach(option => {
             if (option.nodeId) {
-              addOptionIfNotExists(option.nodeId, option.nodeId);
+              let displayNodeId = option.nodeId;
+              // Check if PDF name should be added to node ID based on user setting
+              const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+              // If setting is OFF, remove PDF prefix from nodeId if present (only if it matches the actual PDF name)
+              if (!shouldAddPdfName && displayNodeId) {
+                // Get PDF name for the node to check if it matches the prefix
+                const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(node) : null;
+                if (pdfName && typeof window.sanitizePdfName === 'function') {
+                  const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                  // Remove PDF prefix if present (only if it matches the actual PDF name)
+                  if (sanitizedPdfName && displayNodeId.startsWith(sanitizedPdfName + '_')) {
+                    displayNodeId = displayNodeId.substring(sanitizedPdfName.length + 1);
+                  }
+                }
+              }
+              addOptionIfNotExists(displayNodeId, displayNodeId);
             }
           });
         }
@@ -4828,10 +4857,25 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
         if (checkbox.options && Array.isArray(checkbox.options)) {
           checkbox.options.forEach(option => {
             if (option.nodeId) {
+              let displayNodeId = option.nodeId;
+              // Check if PDF name should be added to node ID based on user setting
+              const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+              // If setting is OFF, remove PDF prefix from nodeId if present (only if it matches the actual PDF name)
+              if (!shouldAddPdfName && displayNodeId) {
+                // Get PDF name for the node to check if it matches the prefix
+                const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(node) : null;
+                if (pdfName && typeof window.sanitizePdfName === 'function') {
+                  const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                  // Remove PDF prefix if present (only if it matches the actual PDF name)
+                  if (sanitizedPdfName && displayNodeId.startsWith(sanitizedPdfName + '_')) {
+                    displayNodeId = displayNodeId.substring(sanitizedPdfName.length + 1);
+                  }
+                }
+              }
               // For multiple dropdown questions, generate numbered versions (1, 2, 3, etc.)
               for (let num = minValue; num <= maxValue; num++) {
-                const numberedNodeId = `${option.nodeId}_${num}`;
-                const label = `${questionText} - ${checkbox.fieldName || ''} [Trigger] - ${option.checkboxText || option.nodeId} (${num}) (${numberedNodeId})`;
+                const numberedNodeId = `${displayNodeId}_${num}`;
+                const label = `${questionText} - ${checkbox.fieldName || ''} [Trigger] - ${option.checkboxText || displayNodeId} (${num}) (${numberedNodeId})`;
                 addOptionIfNotExists(numberedNodeId, label);
               }
             }
@@ -4921,7 +4965,28 @@ function populateLinkedCheckboxOptionsCustomDropdown(optionsContainer, hiddenSel
                 if (checkbox.options && Array.isArray(checkbox.options)) {
                   checkbox.options.forEach(option => {
                     if (option.nodeId) {
-                      addOptionIfNotExists(option.nodeId, option.nodeId);
+                      let displayNodeId = option.nodeId;
+                      // Check if PDF name should be added to node ID based on user setting
+                      const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+                      // If setting is OFF, remove PDF prefix from nodeId if present
+                      if (!shouldAddPdfName && displayNodeId) {
+                        // Get PDF name for the node to check if it matches the prefix
+                        const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(node) : null;
+                        if (pdfName && typeof window.sanitizePdfName === 'function') {
+                          const sanitizedPdfName = window.sanitizePdfName(pdfName);
+                          // Remove PDF prefix if present
+                          if (sanitizedPdfName && displayNodeId.startsWith(sanitizedPdfName + '_')) {
+                            displayNodeId = displayNodeId.substring(sanitizedPdfName.length + 1);
+                          }
+                        }
+                        // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
+                        const pdfPrefixMatch = displayNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
+                        if (pdfPrefixMatch) {
+                          // Only remove if the prefix looks like a PDF name (short alphanumeric)
+                          displayNodeId = pdfPrefixMatch[2];
+                        }
+                      }
+                      addOptionIfNotExists(displayNodeId, displayNodeId);
                     }
                   });
                 }

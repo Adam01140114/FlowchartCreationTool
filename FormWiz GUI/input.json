@@ -2,12 +2,12 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Section 1",
+      "sectionName": "Introduction",
       "questions": [
         {
           "questionId": 1,
-          "text": "How many cars",
-          "type": "numberedDropdown",
+          "text": "Are you a “licensee” or “deferred deposit originator” (payday lender)",
+          "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -59,20 +59,157 @@
             "title": "",
             "file": ""
           },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "are_you_a_licensee_or_deferred_deposit_originator_payday_lender",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "How much are you suing for?",
+          "type": "currency",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "No"
+              },
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
           "options": [],
           "labels": [],
-          "nodeId": "how_many_cars",
-          "min": "1",
-          "max": "3",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Name",
-              "nodeId": "how_many_cars_name",
-              "order": 1,
-              "prefill": ""
-            }
-          ]
+          "nameId": "how_much_are_you_suing_for",
+          "placeholder": ""
+        },
+        {
+          "questionId": 3,
+          "text": "List every rent payment you say the tenant owes for the time between March 1, 2020, and September 30, 2021. For each month, state how much rent was due and the exact date it was due.",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "2",
+                "prevAnswer": "Any Text"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": true,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "list_every_rent_payment_you_say_the_tenant_owes_for_the_time_between_march_1_2020_and_september_30_2021_for_each_month_state_how_much_rent_was_due_and_the_exact_date_it_was_due",
+          "placeholder": "",
+          "lineLimit": 80
         }
       ]
     }
@@ -80,7 +217,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 2,
+  "questionCounter": 4,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",

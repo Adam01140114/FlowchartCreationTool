@@ -9156,7 +9156,7 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
     linkedFieldEntry.dataset.linkedFieldIndex = linkedFieldIndex;
     // Helper function to generate linked field title
     const generateLinkedFieldTitle = () => {
-      const checkboxOptionNodeId = option.nodeId || '';
+      let checkboxOptionNodeId = option.nodeId || '';
       let linkedFieldNodeId = linkedField.selectedNodeId || '';
       // Extract entry number suffix if present (but don't include it in the title)
       const entryNumberMatch = linkedFieldNodeId.match(/^(.+)_(\d+)$/);
@@ -9165,23 +9165,22 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
       }
       // Check if PDF name should be added to node ID based on user setting
       const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
-      // If setting is OFF, remove PDF prefix from linkedFieldNodeId if present
-      if (!shouldAddPdfName && linkedFieldNodeId) {
+      // If setting is OFF, remove PDF prefix from both checkboxOptionNodeId and linkedFieldNodeId if present
+      if (!shouldAddPdfName) {
         // Get PDF name for the cell to check if it matches the prefix
         const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
         if (pdfName && typeof window.sanitizePdfName === 'function') {
           const sanitizedPdfName = window.sanitizePdfName(pdfName);
-          // Remove PDF prefix if present
-          if (sanitizedPdfName && linkedFieldNodeId.startsWith(sanitizedPdfName + '_')) {
+          
+          // Remove PDF prefix from checkboxOptionNodeId if present (only if it matches the actual PDF name)
+          if (checkboxOptionNodeId && sanitizedPdfName && checkboxOptionNodeId.startsWith(sanitizedPdfName + '_')) {
+            checkboxOptionNodeId = checkboxOptionNodeId.substring(sanitizedPdfName.length + 1);
+          }
+          
+          // Remove PDF prefix from linkedFieldNodeId if present (only if it matches the actual PDF name)
+          if (linkedFieldNodeId && sanitizedPdfName && linkedFieldNodeId.startsWith(sanitizedPdfName + '_')) {
             linkedFieldNodeId = linkedFieldNodeId.substring(sanitizedPdfName.length + 1);
           }
-        }
-        // Also try to remove any PDF-like prefix (alphanumeric followed by underscore at start)
-        // This handles cases where the PDF name might have changed
-        const pdfPrefixMatch = linkedFieldNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
-        if (pdfPrefixMatch) {
-          // Only remove if the prefix looks like a PDF name (short alphanumeric)
-          linkedFieldNodeId = pdfPrefixMatch[2];
         }
       }
       // Combine: checkboxOptionNodeId + linkedFieldNodeId
@@ -9326,8 +9325,13 @@ function createMiniCheckboxOption(option, optionIndex, checkbox, checkboxContain
   // Render existing linked fields
   if (option.linkedFields && option.linkedFields.length > 0) {
     option.linkedFields.forEach((linkedField, linkedFieldIndex) => {
+      // Regenerate title to ensure it respects current PDF name setting
       const linkedFieldEntry = createLinkedFieldEntry(linkedField, linkedFieldIndex);
       linkedFieldsContainer.appendChild(linkedFieldEntry);
+      // Update stored title after creating entry (in case it was regenerated)
+      if (linkedFieldEntry.updateTitle && typeof linkedFieldEntry.updateTitle === 'function') {
+        linkedFieldEntry.updateTitle();
+      }
     });
   }
   // Add Linked Field button

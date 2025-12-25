@@ -788,18 +788,12 @@ window.updateAllNodeIdsForPdfNameSetting = function() {
                         }
                         newLinkedNodeId = `${sanitizedPdfName}_${baseId}`;
                       }
-                    } else {
-                      // Setting is OFF: remove PDF prefix if present
-                      if (hasCurrentPdfPrefix) {
-                        newLinkedNodeId = baseLinkedId.substring(sanitizedPdfName.length + 1);
-                      } else if (hasAnyPdfPrefix) {
-                        // Try to remove any PDF-like prefix
-                        const pdfPrefixMatch = baseLinkedId.match(/^([a-z0-9]{1,20})_(.+)$/);
-                        if (pdfPrefixMatch) {
-                          newLinkedNodeId = pdfPrefixMatch[2];
+                      } else {
+                        // Setting is OFF: remove PDF prefix if present (only if it matches the actual PDF name)
+                        if (hasCurrentPdfPrefix) {
+                          newLinkedNodeId = baseLinkedId.substring(sanitizedPdfName.length + 1);
                         }
                       }
-                    }
                     
                     // Restore entry number if it was there
                     if (entryNumber) {
@@ -838,15 +832,9 @@ window.updateAllNodeIdsForPdfNameSetting = function() {
                     newOptionNodeId = `${sanitizedPdfName}_${baseId}`;
                   }
                 } else {
-                  // Setting is OFF: remove PDF prefix if present
+                  // Setting is OFF: remove PDF prefix if present (only if it matches the actual PDF name)
                   if (hasCurrentPdfPrefix) {
                     newOptionNodeId = optionNodeId.substring(sanitizedPdfName.length + 1);
-                  } else if (hasAnyPdfPrefix) {
-                    // Try to remove any PDF-like prefix
-                    const pdfPrefixMatch = optionNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
-                    if (pdfPrefixMatch) {
-                      newOptionNodeId = pdfPrefixMatch[2];
-                    }
                   }
                 }
                 
@@ -887,15 +875,9 @@ window.updateAllNodeIdsForPdfNameSetting = function() {
                             newOptionNodeId = `${sanitizedPdfName}_${baseId}`;
                           }
                         } else {
-                          // Setting is OFF: remove PDF prefix if present
+                          // Setting is OFF: remove PDF prefix if present (only if it matches the actual PDF name)
                           if (hasCurrentPdfPrefix) {
                             newOptionNodeId = optionNodeId.substring(sanitizedPdfName.length + 1);
-                          } else if (hasAnyPdfPrefix) {
-                            // Try to remove any PDF-like prefix
-                            const pdfPrefixMatch = optionNodeId.match(/^([a-z0-9]{1,20})_(.+)$/);
-                            if (pdfPrefixMatch) {
-                              newOptionNodeId = pdfPrefixMatch[2];
-                            }
                           }
                         }
                         

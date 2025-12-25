@@ -167,8 +167,8 @@ function addSectionToGroup(groupId, sectionName = '') {
         if (select) {
             // Always set the value, even if it wasn't in the original available sections
             select.value = sectionName;
-            console.log('Set dropdown value to:', sectionName); // Debug log
-            console.log('Available options:', Array.from(select.options).map(opt => opt.value)); // Debug log
+            // Debug log
+            // Debug log
         }
     }
 }
@@ -441,7 +441,7 @@ function updateGroupSectionDropdowns() {
  * When loading from JSON, we call addGroupWithData
  */
 function addGroupWithData(group) {
-    console.log('Loading group:', group); // Debug log
+    // Debug log
     var currentGroupId = group.groupId;
     addGroup(currentGroupId);
     // Update groupCounter to ensure it's higher than any loaded group
@@ -456,7 +456,7 @@ function addGroupWithData(group) {
     }
     // Add sections to group
     if(group.sections && group.sections.length > 0) {
-        console.log('Adding sections to group:', group.sections); // Debug log
+        // Debug log
         group.sections.forEach(sectionName => {
             addSectionToGroup(currentGroupId, sectionName);
         });
@@ -743,7 +743,7 @@ function updateConditionAnswers(hiddenFieldId, condId) {
         // For money questions, add an "Any Amount" option
         ansSel.innerHTML += '<option value="Any Amount">Any Amount</option>';
         // Debug to console
-        console.log('Money question detected, adding "Any Amount" option');
+
     }
     else if(qType==='date'){
         // For date questions, add an "Any Date" option
