@@ -3220,7 +3220,7 @@ formHTML += `</div><br></div>`;
             }
             const paVal = paValRaw.toLowerCase();
             if (!pqVal || !paVal) {
-              console.log("[LOGIC][SKIP] Q" + questionId + " condition " + rowIndex + " missing pq/pa", { pqVal, paValRaw });
+
               continue;
             }
             const pType = questionTypesMap[pqVal] || "text";
@@ -3242,9 +3242,9 @@ formHTML += `</div><br></div>`;
             logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
             if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
-              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; console.log("[LOGIC][MATCH] Q${questionId} cond ${rowIndex} ANY for prevQ", cPrevQNum, "val:", val2); } else { console.log("[LOGIC][NO MATCH] Q${questionId} cond ${rowIndex} ANY for prevQ", cPrevQNum, "empty input"); } }\n`;
+              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; } else { } }\n`;
             } else {
-              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; console.log("[LOGIC][MATCH] Q${questionId} cond ${rowIndex} exact for prevQ", cPrevQNum, "val:", val2, "target:", cPrevAns); } else { console.log("[LOGIC][NO MATCH] Q${questionId} cond ${rowIndex} exact for prevQ", cPrevQNum, "val:", val2, "target:", cPrevAns); } }\n`;
+              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }\n`;
             }
             logicScriptBuffer += `    }\n`;
             logicScriptBuffer += `  })();\n`;
@@ -3550,7 +3550,7 @@ if (s > 1){
     document.addEventListener('DOMContentLoaded', function() {
       console.groupCollapsed('[NAV DEBUG] form boot');
       const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
-      console.log('[NAV DEBUG] initial questionTypesMap', JSON.parse(JSON.stringify(qtMap)));
+
       console.groupEnd();
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
       const sectionElements = Array.from(sectionNodeList);
@@ -3727,15 +3727,7 @@ if (s > 1){
             });
           }
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
-          console.log('[NAV DEBUG] isQuestionAnswered', {
-            questionId,
-            questionText,
-            answered,
-            allStandardSatisfied,
-            radiosSatisfied,
-            checkboxesSatisfied,
-            debugElements
-          });
+
           return answered;
         }
         function answerTriggersEnd(container) {
@@ -3881,17 +3873,7 @@ if (s > 1){
               nextBtn.classList.remove('submit-mode');
               // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
-              console.log('[NAV DEBUG] updateButtons', {
-                questionId: currentQuestionId,
-                questionText: currentQuestionText,
-                isAnswered,
-                canAdvanceWithinSection,
-                canAdvanceAcrossSection,
-                isLastQuestion,
-                shouldSubmit,
-                visibleTotal,
-                currentPos
-              });
+
               nextBtn.disabled = !canAdvance;
 
               if (!canAdvance) {
@@ -4176,7 +4158,7 @@ if (s > 1){
           const q1Val = (q1 && q1.value || '').trim().toLowerCase();
           const q2Val = (q2 && q2.value || '').trim();
           const shouldShow = q1Val === 'yes' || q2Val.length > 0;
-          console.log('[LOGIC DEBUG] Q3 visibility check', { q1Val, q2ValLength: q2Val.length, shouldShow });
+
           if (shouldShow) {
             q3Container.classList.remove('hidden');
           } else {
@@ -4552,14 +4534,20 @@ if (s > 1){
       if (!linkedCheckbox) {
         return;
       }
+      // Special-case override: for linkedCheckboxId "6b" only respect the FIRST listed checkbox.
+      // (User expectation: 6b is on for "rental agreement" but off when switching to "defendant lives".)
+      const effectiveCheckboxIds = linkedCheckboxId === '6b' && checkboxIds.length > 0
+        ? [checkboxIds[0]]
+        : checkboxIds;
       let anyChecked = false;
-      checkboxIds.forEach(checkboxId => {
+      effectiveCheckboxIds.forEach(checkboxId => {
         const sourceCheckbox = document.getElementById(checkboxId);
         if (sourceCheckbox && sourceCheckbox.checked) {
           anyChecked = true;
         }
       });
       linkedCheckbox.checked = anyChecked;
+      console.log('[LINKED][UPDATE]', { linkedCheckboxId, effectiveCheckboxIds, anyChecked });
     }
     linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
       const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
@@ -4599,14 +4587,19 @@ if (s > 1){
         if (!linkedCheckbox) {
           return;
         }
+        // Special-case override: for linkedCheckboxId "6b" only respect the FIRST listed checkbox.
+        const effectiveCheckboxIds = linkedCheckboxId === '6b' && checkboxIds.length > 0
+          ? [checkboxIds[0]]
+          : checkboxIds;
         let anyChecked = false;
-        checkboxIds.forEach(checkboxId => {
+        effectiveCheckboxIds.forEach(checkboxId => {
           const sourceCheckbox = document.getElementById(checkboxId);
           if (sourceCheckbox && sourceCheckbox.checked) {
             anyChecked = true;
           }
         });
         linkedCheckbox.checked = anyChecked;
+        console.log('[LINKED][REFRESH]', { linkedCheckboxId, effectiveCheckboxIds, anyChecked });
       });
     };
   });
@@ -6512,6 +6505,13 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
     updateCheckboxStyle(selectedInput);
     // Create hidden checkbox for the selected input
     createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+    // Recompute linked checkbox mirrors (so linked boxes uncheck when all sources are off)
+    if (typeof updateAllLinkedCheckboxes === 'function') {
+        setTimeout(() => {
+            console.log('[LINKED][TRIGGER] markOnlyOneSelection', { questionId, selectedId: selectedInput.id, selectedValue: selectedInput.value });
+            updateAllLinkedCheckboxes();
+        }, 0);
+    }
 }
 /*──────────────────────────────────────────────────────────────*
  * Create hidden checkbox for radio button selection
@@ -12425,10 +12425,6 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
       const actualCheckbox = document.getElementById(checkboxId);
       // Also check if the dropdown value matches this option (for autofilled dropdowns)
       const isChecked = actualCheckbox ? actualCheckbox.checked : (dropdown.value === optionValue);
-      // If the virtual checkbox should be checked, create the actual hidden checkbox in the DOM
-      if (isChecked && !actualCheckbox) {
-        createHiddenCheckbox(checkboxId, checkboxName, baseName);
-      }
       // Add virtual checkbox entry
       inputData.push({
         id: checkboxId,
@@ -12549,31 +12545,6 @@ function populateDebugContent() {
   });
   // Add virtual checkbox entries for dropdown questions
   addVirtualDropdownCheckboxes(inputData);
-  // After potentially creating real checkboxes from virtual ones, re-scan the DOM to include them
-  const updatedInputs = document.querySelectorAll('input, select, textarea');
-  updatedInputs.forEach(input => {
-    // Include all inputs that have either an ID or a name (or both)
-    // Exclude debug menu's own input fields (debugSearch, debugTypeFilter, and debugTypeFilter_* fields)
-    const isDebugField = input.id === 'debugSearch' || input.id === 'debugTypeFilter' || input.id.startsWith('debugTypeFilter_');
-    if ((input.id || input.name) && !isDebugField) {
-      // Check if this input is already in inputData
-      const exists = inputData.some(item => item.id === input.id && item.name === input.name);
-      if (!exists) {
-        const value = input.type === 'checkbox' ? input.checked : input.value;
-        const type = input.tagName.toLowerCase();
-        const inputType = input.type || 'text';
-        inputData.push({
-          id: input.id || '',
-          name: input.name || '',
-          value: value,
-          type: type,
-          inputType: inputType,
-          placeholder: input.placeholder || '',
-          required: input.required
-        });
-      }
-    }
-  });
   // Filter by search term and type
   const filteredData = inputData.filter(item => {
     // First check type filter
@@ -12920,10 +12891,18 @@ function exportNamesAndIds() {
     button.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
   }, 2000);
 }
-// Search functionality
-document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
+// Search/Filter functionality (debounced to avoid heavy rescans)
+function debounce(fn, delay = 150) {
+  let t;
+  return function(...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+const debouncedPopulateDebugContent = debounce(populateDebugContent, 150);
+document.getElementById('debugSearch').addEventListener('input', debouncedPopulateDebugContent);
 // Type filter functionality
-document.getElementById('debugTypeFilter').addEventListener('change', populateDebugContent);
+document.getElementById('debugTypeFilter').addEventListener('change', debouncedPopulateDebugContent);
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
 // Function to create Form Name input field (to be called from the form editor interface)

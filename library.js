@@ -1292,8 +1292,13 @@ window.exportGuiJson = function(download = true) {
           const optionText = opt.text.trim();
           // Check if this option has amount properties
           const hasAmount = opt.amount && typeof opt.amount === 'object';
+          // Sanitize option text for nodeId: remove commas and non-alphanumerics, collapse to underscores
+          const sanitizedOption = optionText
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
           // Always use the base nameId prefix for checkbox options
-          const nameId = `${baseNameId}_${optionText.toLowerCase().replace(/\s+/g, '_')}`;
+          const nameId = `${baseNameId}_${sanitizedOption}`;
           return {
             label: optionText,
             nameId: nameId,
@@ -3597,13 +3602,18 @@ window.resetPdfInheritance = function(cell) {
     }
   }
   // Clear all PDF properties from the node since no PDF connection exists
+  console.log('[PDF RESET] Clearing PDF inheritance for node', cell.id, {
+    existingPdfName: cell._pdfName,
+    existingCharacterLimit: cell._characterLimit
+  });
   cell._pdfName = '';
   cell._pdfFilename = '';
   cell._pdfFile = '';
   cell._pdfUrl = '';
   cell._pdfPrice = '';
   cell._priceId = '';
-  cell._characterLimit = '';
+  // Do NOT clear _characterLimit here; it belongs to the question (e.g., big paragraph) and must persist
+  console.log('[PDF RESET] Preserved _characterLimit for node', cell.id, 'value:', cell._characterLimit);
   // Refresh the properties popup to remove PDF fields
   if (window.__propertiesPopupOpen) {
     // Close and reopen the properties popup to refresh the display
