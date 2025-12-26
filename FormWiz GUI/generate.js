@@ -6488,6 +6488,10 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
             updateCheckboxStyle(input);
             // Remove hidden checkbox for unchecked inputs
             removeHiddenCheckbox(input.id);
+            // Ensure linked checkbox state refreshes after programmatic uncheck
+            if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                setTimeout(() => window.updateAllLinkedCheckboxes(), 0);
+            }
         }
     });
     // Update styling for the selected input
@@ -6529,11 +6533,16 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
 function removeHiddenCheckbox(radioId) {
     const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
     const nodes = document.querySelectorAll(selector);
+    console.log('[RADIO] removeHiddenCheckbox start', { radioId, matches: nodes.length });
     nodes.forEach(node => {
         if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
             node.remove();
         }
     });
+    if (typeof window.updateAllLinkedCheckboxes === 'function') {
+        console.log('[RADIO] removeHiddenCheckbox -> updateAllLinkedCheckboxes', { radioId });
+        window.updateAllLinkedCheckboxes();
+    }
 }
 `;
   // Add alert functions (always available for validation popups)
@@ -7492,11 +7501,16 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
 function removeHiddenCheckbox(radioId) {
     const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
     const nodes = document.querySelectorAll(selector);
+    console.log('[RADIO] removeHiddenCheckbox start', { radioId, matches: nodes.length });
     nodes.forEach(node => {
         if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
             node.remove();
         }
     });
+    if (typeof window.updateAllLinkedCheckboxes === 'function') {
+        console.log('[RADIO] removeHiddenCheckbox -> updateAllLinkedCheckboxes', { radioId });
+        window.updateAllLinkedCheckboxes();
+    }
 }
 /*──────────────────────────────────────────────────────────────*
  * Handle "None of the above" checkbox functionality
@@ -13106,11 +13120,16 @@ document.addEventListener('DOMContentLoaded', function() {
   function removeHiddenCheckbox(radioId) {
     const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
     const nodes = document.querySelectorAll(selector);
+    console.log('[RADIO] removeHiddenCheckbox start', { radioId, matches: nodes.length });
     nodes.forEach(node => {
       if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
         node.remove();
       }
     });
+    if (typeof window.updateAllLinkedCheckboxes === 'function') {
+      console.log('[RADIO] removeHiddenCheckbox -> updateAllLinkedCheckboxes', { radioId });
+      window.updateAllLinkedCheckboxes();
+    }
   }
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>`;

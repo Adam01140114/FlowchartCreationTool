@@ -3158,6 +3158,10 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
             updateCheckboxStyle(input);
             // Remove hidden checkbox for unchecked inputs
             removeHiddenCheckbox(input.id);
+            // Ensure linked checkbox state refreshes after programmatic uncheck
+            if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                setTimeout(() => window.updateAllLinkedCheckboxes(), 0);
+            }
         }
     });
     // Update styling for the selected input
