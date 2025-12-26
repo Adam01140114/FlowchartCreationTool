@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener('DOMContentLoaded', function() {
       console.groupCollapsed('[NAV DEBUG] form boot');
       const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
-      console.log('[NAV DEBUG] initial questionTypesMap', JSON.parse(JSON.stringify(qtMap)));
+
       console.groupEnd();
       const sectionNodeList = document.querySelectorAll('[id^="section"]');
       const sectionElements = Array.from(sectionNodeList);
@@ -487,15 +487,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
           }
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
-          console.log('[NAV DEBUG] isQuestionAnswered', {
-            questionId,
-            questionText,
-            answered,
-            allStandardSatisfied,
-            radiosSatisfied,
-            checkboxesSatisfied,
-            debugElements
-          });
+
           return answered;
         }
         function answerTriggersEnd(container) {
@@ -641,17 +633,7 @@ document.addEventListener("DOMContentLoaded", function() {
               nextBtn.classList.remove('submit-mode');
               // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
-              console.log('[NAV DEBUG] updateButtons', {
-                questionId: currentQuestionId,
-                questionText: currentQuestionText,
-                isAnswered,
-                canAdvanceWithinSection,
-                canAdvanceAcrossSection,
-                isLastQuestion,
-                shouldSubmit,
-                visibleTotal,
-                currentPos
-              });
+
               nextBtn.disabled = !canAdvance;
 
               if (!canAdvance) {
@@ -936,7 +918,7 @@ document.addEventListener("DOMContentLoaded", function() {
           const q1Val = (q1 && q1.value || '').trim().toLowerCase();
           const q2Val = (q2 && q2.value || '').trim();
           const shouldShow = q1Val === 'yes' || q2Val.length > 0;
-          console.log('[LOGIC DEBUG] Q3 visibility check', { q1Val, q2ValLength: q2Val.length, shouldShow });
+
           if (shouldShow) {
             q3Container.classList.remove('hidden');
           } else {
@@ -3182,10 +3164,6 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
     updateCheckboxStyle(selectedInput);
     // Create hidden checkbox for the selected input
     createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
-    // Recompute linked checkbox mirrors (so linked boxes uncheck when all sources are off)
-    if (typeof updateAllLinkedCheckboxes === 'function') {
-        setTimeout(() => updateAllLinkedCheckboxes(), 0);
-    }
 }
 /*──────────────────────────────────────────────────────────────*
  * Create hidden checkbox for radio button selection
@@ -3219,10 +3197,13 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
  * Remove hidden checkbox for radio button
  *──────────────────────────────────────────────────────────────*/
 function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId);
-    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
-        hiddenCheckbox.remove();
-    }
+    const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach(node => {
+        if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
+            node.remove();
+        }
+    });
 }
 
 // Alert Logic Functions
@@ -4018,10 +3999,13 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
  * Remove hidden checkbox for radio button
  *──────────────────────────────────────────────────────────────*/
 function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId);
-    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
-        hiddenCheckbox.remove();
-    }
+    const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach(node => {
+        if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
+            node.remove();
+        }
+    });
 }
 /*──────────────────────────────────────────────────────────────*
  * Handle "None of the above" checkbox functionality
@@ -9626,10 +9610,13 @@ document.addEventListener('DOMContentLoaded', function() {
     hiddenContainer.appendChild(hiddenCheckbox);
   }
   function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId);
-    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
-      hiddenCheckbox.remove();
-    }
+    const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach(node => {
+      if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
+        node.remove();
+      }
+    });
   }
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>

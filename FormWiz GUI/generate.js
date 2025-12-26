@@ -4534,20 +4534,14 @@ if (s > 1){
       if (!linkedCheckbox) {
         return;
       }
-      // Special-case override: for linkedCheckboxId "6b" only respect the FIRST listed checkbox.
-      // (User expectation: 6b is on for "rental agreement" but off when switching to "defendant lives".)
-      const effectiveCheckboxIds = linkedCheckboxId === '6b' && checkboxIds.length > 0
-        ? [checkboxIds[0]]
-        : checkboxIds;
       let anyChecked = false;
-      effectiveCheckboxIds.forEach(checkboxId => {
+      checkboxIds.forEach(checkboxId => {
         const sourceCheckbox = document.getElementById(checkboxId);
         if (sourceCheckbox && sourceCheckbox.checked) {
           anyChecked = true;
         }
       });
       linkedCheckbox.checked = anyChecked;
-      console.log('[LINKED][UPDATE]', { linkedCheckboxId, effectiveCheckboxIds, anyChecked });
     }
     linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
       const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
@@ -4587,19 +4581,14 @@ if (s > 1){
         if (!linkedCheckbox) {
           return;
         }
-        // Special-case override: for linkedCheckboxId "6b" only respect the FIRST listed checkbox.
-        const effectiveCheckboxIds = linkedCheckboxId === '6b' && checkboxIds.length > 0
-          ? [checkboxIds[0]]
-          : checkboxIds;
         let anyChecked = false;
-        effectiveCheckboxIds.forEach(checkboxId => {
+        checkboxIds.forEach(checkboxId => {
           const sourceCheckbox = document.getElementById(checkboxId);
           if (sourceCheckbox && sourceCheckbox.checked) {
             anyChecked = true;
           }
         });
         linkedCheckbox.checked = anyChecked;
-        console.log('[LINKED][REFRESH]', { linkedCheckboxId, effectiveCheckboxIds, anyChecked });
       });
     };
   });
@@ -6505,13 +6494,6 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
     updateCheckboxStyle(selectedInput);
     // Create hidden checkbox for the selected input
     createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
-    // Recompute linked checkbox mirrors (so linked boxes uncheck when all sources are off)
-    if (typeof updateAllLinkedCheckboxes === 'function') {
-        setTimeout(() => {
-            console.log('[LINKED][TRIGGER] markOnlyOneSelection', { questionId, selectedId: selectedInput.id, selectedValue: selectedInput.value });
-            updateAllLinkedCheckboxes();
-        }, 0);
-    }
 }
 /*──────────────────────────────────────────────────────────────*
  * Create hidden checkbox for radio button selection
@@ -6545,10 +6527,13 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
  * Remove hidden checkbox for radio button
  *──────────────────────────────────────────────────────────────*/
 function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId);
-    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
-        hiddenCheckbox.remove();
-    }
+    const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach(node => {
+        if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
+            node.remove();
+        }
+    });
 }
 `;
   // Add alert functions (always available for validation popups)
@@ -7505,10 +7490,13 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
  * Remove hidden checkbox for radio button
  *──────────────────────────────────────────────────────────────*/
 function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId);
-    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
-        hiddenCheckbox.remove();
-    }
+    const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach(node => {
+        if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
+            node.remove();
+        }
+    });
 }
 /*──────────────────────────────────────────────────────────────*
  * Handle "None of the above" checkbox functionality
@@ -13116,10 +13104,13 @@ document.addEventListener('DOMContentLoaded', function() {
     hiddenContainer.appendChild(hiddenCheckbox);
   }
   function removeHiddenCheckbox(radioId) {
-    const hiddenCheckbox = document.getElementById(radioId);
-    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
-      hiddenCheckbox.remove();
-    }
+    const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
+    const nodes = document.querySelectorAll(selector);
+    nodes.forEach(node => {
+      if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
+        node.remove();
+      }
+    });
   }
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>`;
