@@ -165,6 +165,23 @@ window.exportFlowchartJson = function(download = true) {
     console.error('[EXPORT] Graph is null!');
     return null;
   }
+  // Respect "Add PDF name to node ID" setting (default OFF unless explicitly enabled)
+  const shouldAddPdfName = !!(window.userSettings && window.userSettings.addPdfNameToNodeId);
+  const stripPdfPrefix = (val, pdfName) => {
+    if (shouldAddPdfName) return val;
+    if (!val) return val;
+    const sanitized = (pdfName && typeof window.sanitizePdfName === 'function')
+      ? window.sanitizePdfName(pdfName)
+      : '';
+    if (sanitized && val.startsWith(sanitized + '_')) {
+      return val.substring(sanitized.length + 1);
+    }
+    const firstSeg = val.split('_')[0] || '';
+    if (/^sc[a-z0-9]+$/i.test(firstSeg)) {
+      return val.substring(firstSeg.length + 1);
+    }
+    return val;
+  };
   // Automatically reset PDF inheritance and Node IDs before export
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
   // Reset PDF inheritance for all nodes FIRST
@@ -246,6 +263,40 @@ window.exportFlowchartJson = function(download = true) {
         }
         if (cell._dropdowns) {
           cellData._dropdowns = JSON.parse(JSON.stringify(cell._dropdowns));
+          if (!shouldAddPdfName) {
+            const pdfHint = cell._pdfFile || cell._pdfName || '';
+            cellData._dropdowns.forEach(dd => {
+              if (dd.triggerSequences && Array.isArray(dd.triggerSequences)) {
+                dd.triggerSequences.forEach(seq => {
+                  if (seq.labels && Array.isArray(seq.labels)) {
+                    seq.labels.forEach(lbl => {
+                      if (lbl.nodeId) lbl.nodeId = stripPdfPrefix(lbl.nodeId, pdfHint);
+                    });
+                  }
+                  if (seq.times && Array.isArray(seq.times)) {
+                    seq.times.forEach(t => {
+                      if (t.nodeId) t.nodeId = stripPdfPrefix(t.nodeId, pdfHint);
+                    });
+                  }
+                  if (seq.checkboxes && Array.isArray(seq.checkboxes)) {
+                    seq.checkboxes.forEach(cb => {
+                      if (cb.options && Array.isArray(cb.options)) {
+                        cb.options.forEach(opt => {
+                          if (opt.nodeId) opt.nodeId = stripPdfPrefix(opt.nodeId, pdfHint);
+                          if (opt.linkedFields && Array.isArray(opt.linkedFields)) {
+                            opt.linkedFields.forEach(lf => {
+                              if (lf.nodeId) lf.nodeId = stripPdfPrefix(lf.nodeId, pdfHint);
+                              if (lf.selectedNodeId) lf.selectedNodeId = stripPdfPrefix(lf.selectedNodeId, pdfHint);
+                            });
+                          }
+                        });
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
         }
     if (cell._amountName) cellData._amountName = cell._amountName;
     if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
@@ -384,3 +435,93 @@ document.addEventListener('DOMContentLoaded', function() {
 window.generateShareableUrl = generateShareableUrl;
 window.closeShareUrlModal = closeShareUrlModal;
 window.copyShareUrl = copyShareUrl;
+
+/**
+ * Wrapper to sanitize GUI JSON after export (remove PDF prefixes when setting is off)
+ * This avoids touching library.js; we post-process the JSON string here.
+ */
+(function(){
+  const originalExportGuiJson = window.exportGuiJson;
+  if (!originalExportGuiJson) return;
+
+  function shouldKeepPdfPrefix() {
+    return (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId === true);
+  }
+
+  function stripPdfPrefix(str) {
+    if (shouldKeepPdfPrefix()) return str;
+    if (typeof str !== 'string') return str;
+    // remove leading sc..._ prefix if present
+    return str.replace(/^sc[a-z0-9]+_/i, '');
+  }
+
+  // Normalize condition/node ids by stripping PDF prefix and redundant leading question slugs
+  function normalizeId(str) {
+    if (typeof str !== 'string') return str;
+    let s = stripPdfPrefix(str);
+    // Special case: move instance number before the answer for business checkbox links
+    // "is_this_plaintiff_a_business_yes_2" -> "is_this_plaintiff_a_business_2_yes"
+    const bizMatch = s.match(/^is_this_plaintiff_a_business_yes_(\d+)$/);
+    if (bizMatch) {
+      s = `is_this_plaintiff_a_business_${bizMatch[1]}_yes`;
+    }
+    // If the ID contains a more specific anchor, trim everything before it
+    const anchors = [
+      'are_they_a_business_or_public_entity_',
+      'are_they_a_public_entity_',
+      'have_you_filed_a_written_claim_against_them_',
+      'when_did_you_file_the_written_claim'
+    ];
+    for (const anchor of anchors) {
+      const idx = s.lastIndexOf(anchor);
+      if (idx >= 0) {
+        s = s.substring(idx);
+        break;
+      }
+    }
+    return s;
+  }
+
+  function sanitizeValue(val) {
+    if (Array.isArray(val)) {
+      return val.map(sanitizeValue);
+    }
+    if (val && typeof val === 'object') {
+      Object.keys(val).forEach(k => {
+        val[k] = sanitizeValue(val[k]);
+      });
+      return val;
+    }
+    if (typeof val === 'string') {
+      return normalizeId(val);
+    }
+    return val;
+  }
+
+  window.exportGuiJson = function(download = true) {
+    // call original without download to avoid double downloads
+    const raw = originalExportGuiJson(false);
+    try {
+      const parsed = JSON.parse(raw);
+      const sanitized = sanitizeValue(parsed);
+      const outStr = JSON.stringify(sanitized, null, 2);
+      if (download) {
+        // download gui.json and copy to clipboard
+        const blob = new Blob([outStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'gui.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        navigator.clipboard.writeText(outStr).catch(() => {});
+      }
+      return outStr;
+    } catch (e) {
+      console.error('[EXPORT GUI] Sanitize failed, returning original', e);
+      return raw;
+    }
+  };
+})();

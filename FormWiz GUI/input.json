@@ -6,8 +6,8 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Please explain why you are suing at this location",
-          "type": "checkbox",
+          "text": "How many extra plaintiffs are there",
+          "type": "numberedDropdown",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -19,7 +19,7 @@
           "conditionalPDF": {
             "enabled": false,
             "pdfName": "",
-            "answer": "The defendant lives here or runs a business here."
+            "answer": "Yes"
           },
           "hiddenLogic": {
             "enabled": false,
@@ -59,43 +59,144 @@
             "title": "",
             "file": ""
           },
-          "options": [
-            {
-              "label": "The defendant lives here or runs a business here.",
-              "nameId": "please_explain_why_you_are_suing_at_this_location_the_defendant_lives_here_or_runs_a_business_here",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "The rental agreement or contract was made, signed, carried out, or broken here",
-              "nameId": "please_explain_why_you_are_suing_at_this_location_the_rental_agreement_or_contract_was_made_signed_carried_out_or_broken_here",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "The defendant lived or did business here when the agreement was made",
-              "nameId": "please_explain_why_you_are_suing_at_this_location_the_defendant_lived_or_did_business_here_when_the_agreement_was_made",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            },
-            {
-              "label": "Other",
-              "nameId": "please_explain_why_you_are_suing_at_this_location_other",
-              "value": "",
-              "hasAmount": false,
-              "amountName": "",
-              "amountPlaceholder": ""
-            }
-          ],
+          "options": [],
           "labels": [],
-          "required": true,
-          "markOnlyOne": true
+          "nodeId": "how_many_extra_plaintiffs_are_there",
+          "min": "1",
+          "max": "5",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_extra_plaintiffs_are_there_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "phone",
+              "label": "Phone Number",
+              "nodeId": "how_many_extra_plaintiffs_are_there_phone_number",
+              "order": 2
+            },
+            {
+              "type": "location",
+              "fieldName": "Please enter their address",
+              "nodeId": "location_data",
+              "order": 3
+            },
+            {
+              "type": "dropdown",
+              "fieldName": "Is this plaintiff a business?",
+              "options": [
+                {
+                  "text": "Yes",
+                  "nodeId": "is_this_plaintiff_a_business_yes"
+                },
+                {
+                  "text": "No",
+                  "nodeId": "is_this_plaintiff_a_business_no"
+                }
+              ],
+              "triggerSequences": [
+                {
+                  "condition": "Yes",
+                  "title": "Additional Information",
+                  "fields": [
+                    {
+                      "type": "location",
+                      "fieldName": "Where did they file their fictitious business name?",
+                      "nodeId": "location_data"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Business Name",
+                      "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Business Name Statement Number",
+                      "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number",
+                      "isAmountOption": true
+                    },
+                    {
+                      "type": "checkbox",
+                      "fieldName": "What do they do business as?",
+                      "selectionType": "single",
+                      "options": [
+                        {
+                          "text": "An Individual",
+                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
+                        },
+                        {
+                          "text": "An Association",
+                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"
+                        },
+                        {
+                          "text": "A Partnership",
+                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"
+                        },
+                        {
+                          "text": "A Corporation",
+                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"
+                        },
+                        {
+                          "text": "A Limited Liability Company",
+                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "date",
+                      "label": "When does their business statement expire?",
+                      "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire",
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": [
+                          "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "1",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 1",
+                      "pdfName": "sc103(1).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "2",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 2",
+                      "pdfName": "sc103(2).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "3",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 3",
+                      "pdfName": "sc103(3).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "4",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 4",
+                      "pdfName": "sc103(4).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "5",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 5",
+                      "pdfName": "sc103(5).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    }
+                  ]
+                }
+              ],
+              "order": 4
+            }
+          ]
         }
       ]
     }
@@ -106,7 +207,7 @@
   "questionCounter": 2,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
-  "formName": "Example Form",
+  "formName": "New SC-100",
   "defaultPDFName": "",
   "pdfOutputName": "",
   "stripePriceId": "",
@@ -116,10 +217,10 @@
   "linkedCheckboxes": [
     {
       "id": "linkedCheckbox0",
-      "linkedCheckboxId": "6b",
+      "linkedCheckboxId": "biz_check",
       "checkboxes": [
-        "please_explain_why_you_are_suing_at_this_location_the_rental_agreement_or_contract_was_made_signed_carried_out_or_broken_here",
-        "please_explain_why_you_are_suing_at_this_location_the_defendant_lived_or_did_business_here_when_the_agreement_was_made"
+        "is_this_plaintiff_a_business_1_yes",
+        "is_this_plaintiff_a_business_2_yes"
       ]
     }
   ],

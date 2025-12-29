@@ -418,9 +418,9 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
       '</div>'
     ]),
     "<header>",
-    '    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href=\'../index.html\';">',
+    '    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href=\'../../index.html\';">',
     "    <nav>",
-    '        <a href="../index.html">Home',
+    '        <a href="../../index.html">Home',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
     '        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">',
@@ -428,27 +428,27 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     '                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "            </a>",
     '            <div class="dropdown-menu" id="forms-dropdown-menu">',
-    '                <a href="../Pages/forms.html">My Forms</a>',
-    '                <a href="../Pages/FreeForm.html">Free Form</a>',
-    '                <a href="../Pages/Family.html">Family</a>',
-    '                <a href="../Pages/Property.html">Property</a>',
-    '                <a href="../Pages/Immigration.html">Immigration</a>',
-    '                <a href="../Pages/smallclaims.html">Small Claims</a>',
-    '                <a href="../Pages/Other.html">Other</a>',
+    '                <a href="../../Pages/forms.html">My Forms</a>',
+    '                <a href="../../Pages/FreeForm.html">Free Form</a>',
+    '                <a href="../../Pages/Family.html">Family</a>',
+    '                <a href="../../Pages/Property.html">Property</a>',
+    '                <a href="../../Pages/Immigration.html">Immigration</a>',
+    '                <a href="../../Pages/smallclaims.html">Small Claims</a>',
+    '                <a href="../../Pages/Other.html">Other</a>',
     "            </div>",
     "        </div>",
-    '        <a href="../Pages/about.html">About Us',
+    '        <a href="../../Pages/about.html">About Us',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
-    '        <a href="../Pages/contact.html">Contact Us',
+    '        <a href="../../Pages/contact.html">Contact Us',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
-    '        <a href="../Pages/FAQ.html">FAQ',
+    '        <a href="../../Pages/FAQ.html">FAQ',
     '            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>',
     "        </a>",
     "    </nav>",
     '    <div class="header-actions">',
-    '        <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>',
+    '        <a href="../../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>',
     '        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>',
     '        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">',
     '            <span class="cart-circle">',
@@ -1250,10 +1250,13 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                       });
                       // Send to server
                       const baseName = '${pdfPreviewFile}'.replace(/\\.pdf$/i, '');
-                      const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+                      // Keep extension and include credentials so the backend can locate the file using the current session
+                      const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+                      const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
                       const res = await fetch(endpoint, { 
                         method: 'POST', 
-                        body: fd 
+                        body: fd, 
+                        credentials: 'include' 
                       });
                       if (!res.ok) {
                         throw new Error('Failed to generate PDF preview');
@@ -4529,6 +4532,44 @@ if (s > 1){
     if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
       return;
     }
+    // Helper function to find checkbox by trying multiple ID patterns
+    // Make it globally accessible so it can be used by other functions like updateAllLinkedCheckboxes
+    window.findCheckboxById = function(checkboxId) {
+      // First try exact match
+      let checkbox = document.getElementById(checkboxId);
+      if (checkbox) {
+        return checkbox;
+      }
+      // If not found, try to find by pattern matching
+      // Expected ID format: {fieldName}_{entryNumber}_{optionValue}
+      // Actual ID format (from dropdownMirror): {baseNodeId}_{fieldName}_{optionValue}_{entryNumber}
+      // Example: Expected "is_this_plaintiff_a_business_1_yes" 
+      //          Actual: "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_1"
+      const parts = checkboxId.split('_');
+      if (parts.length >= 3) {
+        // Parse expected ID: {fieldName}_{entryNumber}_{optionValue}
+        const optionValue = parts[parts.length - 1]; // last part: "yes"
+        const entryNumber = parts[parts.length - 2]; // second last: "1"
+        const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
+        
+        // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
+        // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
+        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (let cb of allCheckboxes) {
+          if (!cb.id) continue;
+          // Match if ID ends with: _{fieldName}_{optionValue}_{entryNumber} or just _{optionValue}_{entryNumber}
+          // and contains the field name somewhere
+          const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
+          const containsFieldName = cb.id.includes(fieldName);
+          
+          if (endsWithPattern && containsFieldName) {
+            return cb;
+          }
+        }
+      }
+      return null;
+    };
+    const findCheckboxById = window.findCheckboxById;
     function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
       const linkedCheckbox = document.getElementById(linkedCheckboxId);
       if (!linkedCheckbox) {
@@ -4536,7 +4577,7 @@ if (s > 1){
       }
       let anyChecked = false;
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        const sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox && sourceCheckbox.checked) {
           anyChecked = true;
         }
@@ -4550,7 +4591,8 @@ if (s > 1){
         return;
       }
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        // Try to find existing checkbox
+        let sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox) {
           sourceCheckbox.addEventListener('change', function() {
             updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
@@ -4560,6 +4602,28 @@ if (s > 1){
               updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
             }, 0);
           });
+        } else {
+          // Checkbox doesn't exist yet (might be created dynamically), set up a watcher
+          const observer = new MutationObserver(function(mutations) {
+            const foundCheckbox = findCheckboxById(checkboxId);
+            if (foundCheckbox) {
+              foundCheckbox.addEventListener('change', function() {
+                updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+              });
+              foundCheckbox.addEventListener('click', function() {
+                setTimeout(() => {
+                  updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+                }, 0);
+              });
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+          // Stop observing after 30 seconds to avoid memory leaks
+          setTimeout(() => observer.disconnect(), 30000);
         }
       });
       setTimeout(() => {
@@ -4583,7 +4647,7 @@ if (s > 1){
         }
         let anyChecked = false;
         checkboxIds.forEach(checkboxId => {
-          const sourceCheckbox = document.getElementById(checkboxId);
+          const sourceCheckbox = findCheckboxById(checkboxId);
           if (sourceCheckbox && sourceCheckbox.checked) {
             anyChecked = true;
           }
@@ -5342,6 +5406,8 @@ if (s > 1){
             let anyMatch = false;
             // Use the parent dropdown's nodeId (same as the select.id base)
             const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            const sanitizedDropdownName = sanitizeForId(dropdownFieldName || '');
+            const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
             conditionalConditions.forEach((conditionNodeId) => {
               if (!conditionNodeId) return;
               let checkboxId;
@@ -5357,8 +5423,10 @@ if (s > 1){
                 // For numberedDropdown, use the standard format
                 const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
                 const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
                 checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
                 radioId = conditionNodeId + "_" + entryNumber + "_radio";
+                // We'll try fallbacks (simple/no-entry) below
               }
               // First try to find a radio button (for "Mark only one")
               const radio = document.getElementById(radioId);
@@ -5378,10 +5446,12 @@ if (s > 1){
               }
               // Try to find a regular checkbox or hidden checkbox
               let checkbox = document.getElementById(checkboxId);
-              // For numberedDropdown, also try simple pattern as fallback
+              // For numberedDropdown, also try simple and no-entry fallbacks
               if (!checkbox && !isMultipleTextboxes) {
                 const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
                 checkbox = document.getElementById(simpleCheckboxId);
+                if (!checkbox) checkbox = document.getElementById(noEntryCheckboxId);
               }
               if (checkbox && checkbox.type === 'checkbox') {
                 if (checkbox.checked === true) {
@@ -5567,17 +5637,28 @@ if (s > 1){
           // Function to check if any condition is met
           const checkConditionalLogic = () => {
             let anyMatch = false;
-            // Get the question nodeId for this numbered dropdown
-            const questionNodeId = questionNameIds[questionId] || ('answer' + questionId);
+            // Prefer the parent dropdown's nodeId; fall back to question nodeId
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            const sanitizedDropdownName = sanitizeForId(dropdownFieldName || '');
+            const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
             conditionalConditions.forEach((conditionNodeId) => {
               if (!conditionNodeId) return;
-              // For dropdown hidden checkboxes, the condition might be just the field name and option (e.g., "bruh_what")
-              // but the actual checkbox ID includes the question nodeId: {questionNodeId}_{condition}_{entryNumber}
-              // Try both patterns: the simple one first (for regular checkboxes), then the full one (for dropdown hidden checkboxes)
-              const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
-              const fullCheckboxId = questionNodeId + "_" + conditionNodeId + "_" + entryNumber;
-              const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
-              const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+              // Hidden checkboxes created by dropdownMirror in trigger sequences can be:
+              // 1) For numberedDropdown: questionNodeId_condition_entryNumber (full), condition_entryNumber (simple), condition (no entry)
+              // 2) For multipleTextboxes trigger dropdowns: dropdownName_triggerCondition_condition
+              let checkboxId;
+              let radioId;
+              if (isMultipleTextboxes) {
+                checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + conditionNodeId;
+                radioId = checkboxId + '_radio';
+              } else {
+                const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+                const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
+                checkboxId = fullCheckboxId; // primary
+                radioId = conditionNodeId + "_" + entryNumber + "_radio";
+                // We'll try full → simple → no-entry below
+              }
               // First try to find a radio button (for "Mark only one")
               const radio = document.getElementById(radioId);
               if (radio && radio.type === 'radio') {
@@ -5601,11 +5682,13 @@ if (s > 1){
                 }
               }
               // Try to find a regular checkbox or hidden checkbox
-              // First try the full pattern (for dropdown hidden checkboxes), then the simple pattern (for regular checkboxes)
               let checkbox = document.getElementById(checkboxId);
-              // If not found with full pattern, try simple pattern
-              if (!checkbox) {
-                checkbox = document.getElementById(simpleCheckboxId);
+              if (!isMultipleTextboxes) {
+                // For numberedDropdown, also try simple and no-entry fallbacks
+                const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
+                if (!checkbox) checkbox = document.getElementById(simpleCheckboxId);
+                if (!checkbox) checkbox = document.getElementById(noEntryCheckboxId);
               }
               if (checkbox && checkbox.type === 'checkbox') {
                 // For hidden checkboxes, verify they're actually checked
@@ -5669,11 +5752,11 @@ if (s > 1){
           // Set up event listeners for each condition
           conditionalConditions.forEach((conditionNodeId) => {
             if (!conditionNodeId) return;
-            // Get the question nodeId for this numbered dropdown
-            const questionNodeId = questionNameIds[questionId] || ('answer' + questionId);
+            // Prefer the parent dropdown's nodeId; fall back to question nodeId
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
             // Try both patterns: full (for dropdown hidden checkboxes) and simple (for regular checkboxes)
             const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
-            const fullCheckboxId = questionNodeId + "_" + conditionNodeId + "_" + entryNumber;
+            const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
             const checkboxId = fullCheckboxId; // Use full pattern for dropdown hidden checkboxes
             const radioId = conditionNodeId + "_" + entryNumber + "_radio";
             // Function to attach listener when element is created
@@ -6533,14 +6616,14 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
 function removeHiddenCheckbox(radioId) {
     const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
     const nodes = document.querySelectorAll(selector);
-    console.log('[RADIO] removeHiddenCheckbox start', { radioId, matches: nodes.length });
+
     nodes.forEach(node => {
         if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
             node.remove();
         }
     });
     if (typeof window.updateAllLinkedCheckboxes === 'function') {
-        console.log('[RADIO] removeHiddenCheckbox -> updateAllLinkedCheckboxes', { radioId });
+
         window.updateAllLinkedCheckboxes();
     }
 }
@@ -6906,7 +6989,7 @@ window.showCartModal = function () {
     \`;
     document.body.appendChild(modal);
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '/Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(mainFormPriceId);
       modal.remove();
@@ -7239,7 +7322,7 @@ window.addFormToCart = function (priceId) {
             return itemInfo;
           }).join('\\n');
           // Navigate to cart page
-          window.location.href = '../Pages/cart.html';
+          window.location.href = '/Pages/cart.html';
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -7291,7 +7374,7 @@ window.addFormToCart = function (priceId) {
     return itemInfo;
   }).join('\\n');
   // Navigate to cart page
-  window.location.href = '../Pages/cart.html';
+  window.location.href = '/Pages/cart.html';
 };
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -7501,14 +7584,14 @@ function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
 function removeHiddenCheckbox(radioId) {
     const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
     const nodes = document.querySelectorAll(selector);
-    console.log('[RADIO] removeHiddenCheckbox start', { radioId, matches: nodes.length });
+
     nodes.forEach(node => {
         if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
             node.remove();
         }
     });
     if (typeof window.updateAllLinkedCheckboxes === 'function') {
-        console.log('[RADIO] removeHiddenCheckbox -> updateAllLinkedCheckboxes', { radioId });
+
         window.updateAllLinkedCheckboxes();
     }
 }
@@ -8817,7 +8900,7 @@ function showTextboxLabels(questionId, count){
             setTimeout(() => {
                 if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
                     if (typeof saveAnswers === 'function') {
-                        saveAnswers();
+                        saveAnswers(true); // Save immediately on change
                     }
                 } else {
                     if (typeof saveAnswersToLocalStorage === 'function') {
@@ -9396,13 +9479,43 @@ function updateLinkedFields() {
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
-            hiddenField.value = textboxesWithContent[0].value;
+            const val = textboxesWithContent[0].value.trim();
+            hiddenField.value = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
         } else {
-            // Multiple textboxes have content, use the one with the longest text
-            const longestTextbox = textboxesWithContent.reduce((longest, current) => 
-                current.value.length > longest.value.length ? current : longest
-            );
-            hiddenField.value = longestTextbox.value;
+            // Multiple textboxes have content
+            const allAreDates = textboxesWithContent.every(tb => tb.type === 'date' || /^\d{2}[-/]\d{2}[-/]\d{4}$/.test(tb.value.trim()) || /^\d{4}-\d{2}-\d{2}$/.test(tb.value.trim()));
+            if (allAreDates) {
+                // Choose the latest date
+                const parseDate = (val) => {
+                    const trimmed = val.trim();
+                    // If yyyy-mm-dd, convert to mm-dd-yyyy for comparison consistency
+                    const normalized = /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? formatDateForServer(trimmed) : trimmed;
+                    const parts = normalized.split(/[-/]/);
+                    if (parts.length === 3) {
+                        return new Date(parts[2], parseInt(parts[0],10)-1, parseInt(parts[1],10));
+                    }
+                    return null;
+                };
+                let latest = textboxesWithContent[0];
+                let latestDate = parseDate(latest.value);
+                textboxesWithContent.slice(1).forEach(tb => {
+                    const d = parseDate(tb.value);
+                    if (d && (!latestDate || d > latestDate)) {
+                        latest = tb;
+                        latestDate = d;
+                    }
+                });
+                const chosenVal = latest.value.trim();
+                hiddenField.value = latest.type === 'date'
+                    ? formatDateForServer(chosenVal)
+                    : (/^\d{4}-\d{2}-\d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
+            } else {
+                // Fall back to longest text
+                const longestTextbox = textboxesWithContent.reduce((longest, current) => 
+                    current.value.length > longest.value.length ? current : longest
+                );
+                hiddenField.value = longestTextbox.value.trim();
+            }
         }
     });
 }
@@ -9647,18 +9760,27 @@ function setCurrentDate () {
     const year = t.getFullYear();
     const currentDateElement = document.getElementById('current_date');
     if (currentDateElement) {
-        // Format as mm/dd/yyyy for server
-        currentDateElement.value = month + '/' + day + '/' + year;
+        // Format as mm-dd-yyyy for server
+        currentDateElement.value = month + '-' + day + '-' + year;
         // Mark this field as protected from autofill
         currentDateElement.setAttribute('data-protected', 'true');
     }
 }
-// Helper function to format date from yyyy-mm-dd to mm/dd/yyyy
+// Helper function to format date from yyyy-mm-dd to mm-dd-yyyy
 function formatDateForServer(dateString) {
     if (!dateString) return '';
     const parts = dateString.split('-');
     if (parts.length === 3) {
-        return parts[1] + '/' + parts[2] + '/' + parts[0];
+        return parts[1] + '-' + parts[2] + '-' + parts[0];
+    }
+    return dateString;
+}
+// Helper for displaying dates in the debug menu (yyyy-mm-dd → mm-dd-yyyy)
+function formatDateForDisplay(dateString) {
+    const parts = (dateString || '').split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+        // Avoid template literal to prevent parsing issues in generated output
+        return parts[1] + '-' + parts[2] + '-' + parts[0];
     }
     return dateString;
 }
@@ -10217,11 +10339,13 @@ async function previewPdf(baseName) {
             }
         });
 
-        // Fetch the filled PDF
-        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
+        const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
         const res = await fetch(endpoint, { 
             method: 'POST', 
-            body: fd 
+            body: fd, 
+            credentials: 'include' 
         });
 
         if (!res.ok) {
@@ -10343,13 +10467,15 @@ async function editAndDownloadPDF (pdfName) {
             } else {
             }
         });
-        // Use the /edit_pdf endpoint with the PDF name as a query parameter
-        // Remove the .pdf extension if present since server adds it automatically
+        // Use the /edit_pdf endpoint with the PDF name as a query parameter.
+        // Keep the extension and include credentials so the backend can find the file and respect the current session.
         const baseName = pdfName.replace(/\.pdf$/i, '');
-        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
         const res = await fetch(endpoint, { 
             method: 'POST', 
-            body: fd 
+            body: fd, 
+            credentials: 'include' 
         });
         if (!res.ok) {
             const errorText = await res.text();
@@ -10828,29 +10954,119 @@ if (typeof handleNext === 'function') {
             );
             return fields;
         }
-        // Helper: save answers
-        async function saveAnswers() {
+        // Helper: quick visibility check for logging
+        function isElementActuallyVisible(el) {
+            return !!(el && (el.offsetParent || el.getClientRects().length));
+        }
+        // Debounce and queue management for saveAnswers
+        let saveAnswersTimeout = null;
+        let isSaving = false;
+        let pendingSave = false;
+        let saveRetryCount = 0;
+        const MAX_RETRIES = 3;
+        const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
+        
+        // Helper: save answers (with debouncing, error handling, and visibility prioritization)
+        async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) return;
+            
+            // If immediate save requested, clear any pending debounced save
+            if (immediate && saveAnswersTimeout) {
+                clearTimeout(saveAnswersTimeout);
+                saveAnswersTimeout = null;
+            }
+            
+            // If already saving, mark that we need to save again after current save completes
+            if (isSaving) {
+                pendingSave = true;
+                return;
+            }
+            
+            // Debounce: wait for user to stop typing
+            if (!immediate) {
+                clearTimeout(saveAnswersTimeout);
+                saveAnswersTimeout = setTimeout(() => {
+                    saveAnswers(true);
+                }, DEBOUNCE_DELAY);
+                return;
+            }
+            
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
                 return;
             }
-            const fields = getFormFields();
-            const answers = {};
-            fields.forEach(el => {
-                if (el.type === 'checkbox') {
-                    // For checkboxes, save true/false
-                    answers[el.name] = el.checked;
-                } else if (el.type === 'radio') {
-                    // For radio buttons, save the selected value or null if none selected
-                    const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
-                    answers[el.name] = selectedRadio ? selectedRadio.value : null;
+            
+            isSaving = true;
+            try {
+                const fields = getFormFields();
+                const answers = {};
+                const fieldVisibility = {}; // Track which fields are visible
+                
+                fields.forEach(el => {
+                    const isVisible = isElementActuallyVisible(el);
+                    const fieldName = el.name;
+                    
+                    // Skip if we already have a visible field's value and this field is hidden
+                    if (fieldVisibility[fieldName] === true && !isVisible) {
+                        return; // Skip this hidden field, we already have a visible one
+                    }
+                    
+                    // Store the value
+                    if (el.type === 'checkbox') {
+                        // For checkboxes, save true/false
+                        answers[fieldName] = el.checked;
+                    } else if (el.type === 'radio') {
+                        // For radio buttons, save the selected value or null if none selected
+                        const selectedRadio = document.querySelector('input[name="' + fieldName + '"]:checked');
+                        answers[fieldName] = selectedRadio ? selectedRadio.value : null;
+                    } else {
+                        // For other fields, save the value
+                        answers[fieldName] = el.value;
+                    }
+                    
+                    // Track visibility for this field name
+                    fieldVisibility[fieldName] = isVisible;
+                });
+                
+                // Write to Firestore with error handling and retry logic
+                await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+                saveRetryCount = 0; // Reset retry count on success
+            } catch (error) {
+                console.error('[AUTOSAVE] error saving to Firestore:', error);
+                
+                // Handle resource-exhausted error specifically
+                if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
+                    console.warn('[AUTOSAVE] Firestore write queue exhausted, will retry with backoff');
+                    
+                    // Retry with exponential backoff
+                    if (saveRetryCount < MAX_RETRIES) {
+                        saveRetryCount++;
+                        const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
+                        console.log('[AUTOSAVE] retrying in ' + backoffDelay + 'ms (attempt ' + saveRetryCount + '/' + MAX_RETRIES + ')');
+                        
+                        setTimeout(() => {
+                            saveAnswers(true); // Retry immediately
+                        }, backoffDelay);
+                    } else {
+                        console.error('[AUTOSAVE] max retries reached, giving up');
+                        saveRetryCount = 0;
+                    }
                 } else {
-                    // For other fields, save the value
-                    answers[el.name] = el.value;
+                    // For other errors, just log and reset
+                    console.error('[AUTOSAVE] non-retryable error:', error);
+                    saveRetryCount = 0;
                 }
-            });
-            await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+            } finally {
+                isSaving = false;
+                
+                // If there's a pending save, trigger it after a short delay
+                if (pendingSave) {
+                    pendingSave = false;
+                    setTimeout(() => {
+                        saveAnswers(true);
+                    }, 500);
+                }
+            }
         }
         // Helper function to check paragraph limits for autofilled textareas
         function triggerParagraphLimitCheckForAutofilledTextareas() {
@@ -10962,7 +11178,19 @@ if (typeof handleNext === 'function') {
             window.preventBlankSaves = false;
         }, 3000);
                     const fields = getFormFields();
+                    // First pass: identify which field names have visible fields
+                    const visibleFieldNames = new Set();
                     fields.forEach(el => {
+                        if (isElementActuallyVisible(el) && el.name) {
+                            visibleFieldNames.add(el.name);
+                        }
+                    });
+                    fields.forEach(el => {
+                    // Skip hidden fields if there's a visible field with the same name
+                    const isVisible = isElementActuallyVisible(el);
+                    if (!isVisible && el.name && visibleFieldNames.has(el.name)) {
+                        return; // Skip this hidden field, there's a visible one
+                    }
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -11544,7 +11772,7 @@ if (typeof handleNext === 'function') {
             fields.forEach(el => {
                 el.addEventListener('input', function() {
                     if (isUserLoggedIn) {
-                        saveAnswers();
+                        saveAnswers(); // This is now debounced
                     } else {
                         saveAnswersToLocalStorage();
                     }
@@ -11563,7 +11791,7 @@ if (typeof handleNext === 'function') {
                 });
                 el.addEventListener('change', function() {
                     if (isUserLoggedIn) {
-                        saveAnswers();
+                        saveAnswers(true); // Save immediately on change (dropdowns, checkboxes, etc.)
                     } else {
                         saveAnswersToLocalStorage();
                     }
@@ -11581,14 +11809,8 @@ if (typeof handleNext === 'function') {
                     }
                 });
             });
-            // Set up periodic autosave every 1 second
-            setInterval(() => {
-                if (isUserLoggedIn) {
-                    saveAnswers();
-                } else {
-                    saveAnswersToLocalStorage();
-                }
-            }, 1000);
+            // 🔧 REMOVED: Periodic autosave interval - now using debounced saves on input/change events
+            // This prevents overwhelming Firestore with too many write requests
         }
         // Cart Modal Logic - now handled by global functions outside Firebase IIFE
         // Helper: save answers to localStorage for non-logged-in users
@@ -12195,7 +12417,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = '../Pages/cart.html';
+                            window.location.href = '/Pages/cart.html';
                         };
                     }
                 } catch (error) {
@@ -12531,7 +12753,14 @@ function populateDebugContent() {
     // Exclude debug menu's own input fields (debugSearch, debugTypeFilter, and debugTypeFilter_* fields)
     const isDebugField = input.id === 'debugSearch' || input.id === 'debugTypeFilter' || input.id.startsWith('debugTypeFilter_');
     if ((input.id || input.name) && !isDebugField) {
-      const value = input.type === 'checkbox' ? input.checked : input.value;
+      let value;
+      if (input.type === 'checkbox') {
+        value = input.checked;
+      } else if (input.type === 'date') {
+        value = formatDateForDisplay(input.value);
+      } else {
+        value = input.value;
+      }
       const type = input.tagName.toLowerCase();
       const inputType = input.type || 'text';
       inputData.push({
@@ -13120,14 +13349,14 @@ document.addEventListener('DOMContentLoaded', function() {
   function removeHiddenCheckbox(radioId) {
     const selector = '#' + ((window.CSS && CSS.escape) ? CSS.escape(radioId) : radioId);
     const nodes = document.querySelectorAll(selector);
-    console.log('[RADIO] removeHiddenCheckbox start', { radioId, matches: nodes.length });
+
     nodes.forEach(node => {
       if (node.type === 'checkbox' && node.style && node.style.display === 'none') {
         node.remove();
       }
     });
     if (typeof window.updateAllLinkedCheckboxes === 'function') {
-      console.log('[RADIO] removeHiddenCheckbox -> updateAllLinkedCheckboxes', { radioId });
+
       window.updateAllLinkedCheckboxes();
     }
   }

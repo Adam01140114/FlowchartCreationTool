@@ -101,6 +101,43 @@ window.exportGuiJson = function(download = true) {
   const optionCellMap = new Map();
   const vertices = graph.getChildVertices(graph.getDefaultParent());
   const questions = vertices.filter(cell => isQuestion(cell));
+  // Collect sanitized PDF prefixes from all PDF nodes to help strip prefixes when setting is off
+  const pdfPrefixes = new Set();
+  vertices.forEach(cell => {
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+      const pdfNameRaw = cell._pdfFile || cell._pdfUrl || cell._pdfName || '';
+      if (pdfNameRaw && typeof window.sanitizePdfName === 'function') {
+        const sanitized = window.sanitizePdfName(pdfNameRaw);
+        if (sanitized) pdfPrefixes.add(sanitized);
+      }
+    }
+  });
+  // Helper: remove PDF prefix from nodeId when setting is off
+  const stripPdfPrefixIfDisabled = (nodeId, cell) => {
+    // Default to NOT adding PDF names unless explicitly enabled
+    const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId === true);
+    if (shouldAddPdfName) return nodeId;
+    if (!nodeId) return nodeId;
+    const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
+    if (pdfName && typeof window.sanitizePdfName === 'function') {
+      const sanitizedPdfName = window.sanitizePdfName(pdfName);
+      if (sanitizedPdfName && nodeId.startsWith(sanitizedPdfName + '_')) {
+        return nodeId.substring(sanitizedPdfName.length + 1);
+      }
+    }
+    // Fallback: strip any known pdf prefixes collected from pdf nodes
+    for (const prefix of pdfPrefixes) {
+      if (nodeId.startsWith(prefix + '_')) {
+        return nodeId.substring(prefix.length + 1);
+      }
+    }
+    // Aggressive fallback: if first segment looks like a PDF code (e.g., sc100a2, sc500a)
+    const firstSeg = nodeId.split('_')[0] || '';
+    if (/^sc[a-z0-9]+$/i.test(firstSeg)) {
+      return nodeId.substring(firstSeg.length + 1);
+    }
+    return nodeId;
+  };
   // Create sections array structure and get top level data
   const sectionMap = {};
   // Get current section preferences using the proper function
@@ -460,7 +497,7 @@ window.exportGuiJson = function(download = true) {
                       const label = labelMap.get(orderItem.identifier);
                       if (label) {
                         // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
-                        let nodeId = label.nodeId || "";
+                      let nodeId = stripPdfPrefixIfDisabled(label.nodeId || "", cell);
                         if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
                           // Regenerate using generateNodeIdForDropdownField if available
                           if (typeof window.generateNodeIdForDropdownField === 'function') {
@@ -483,7 +520,7 @@ window.exportGuiJson = function(download = true) {
                         const checkboxOptions = checkbox.options ? checkbox.options.map(option => {
                           const optionObj = {
                             text: option.checkboxText || "",
-                            nodeId: option.nodeId || ""
+                          nodeId: stripPdfPrefixIfDisabled(option.nodeId || "", cell)
                           };
                           // Add linked fields if they exist
                           if (option.linkedFields && Array.isArray(option.linkedFields) && option.linkedFields.length > 0) {
@@ -506,7 +543,7 @@ window.exportGuiJson = function(download = true) {
                       const time = timeMap.get(orderItem.identifier);
                       if (time) {
                         // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
-                        let nodeId = time.nodeId || "";
+                      let nodeId = stripPdfPrefixIfDisabled(time.nodeId || "", cell);
                         if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
                           // Regenerate using generateNodeIdForDropdownField if available
                           if (typeof window.generateNodeIdForDropdownField === 'function') {
@@ -624,7 +661,7 @@ window.exportGuiJson = function(download = true) {
                         const existingField = fields.find(f => f.type === 'label' && f.label === label.fieldName);
                         if (!existingField) {
                           // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
-                          let nodeId = label.nodeId || "";
+                        let nodeId = stripPdfPrefixIfDisabled(label.nodeId || "", cell);
                           if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
                             if (typeof window.generateNodeIdForDropdownField === 'function') {
                               nodeId = window.generateNodeIdForDropdownField(label.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');
@@ -1684,7 +1721,7 @@ window.exportGuiJson = function(download = true) {
                           if (!existingField) {
                             const checkboxOptions = checkbox.options ? checkbox.options.map(option => ({
                               text: option.checkboxText || "",
-                              nodeId: option.nodeId || ""
+                              nodeId: stripPdfPrefixIfDisabled(option.nodeId || "", cell)
                             })) : [];
                             fields.push({
                               type: "checkbox",
@@ -1702,7 +1739,7 @@ window.exportGuiJson = function(download = true) {
                           const existingField = fields.find(f => f.type === 'date' && f.label === time.fieldName);
                           if (!existingField) {
                             // Regenerate nodeId if dropdown name contains forward slash but nodeId doesn't
-                            let nodeId = time.nodeId || "";
+                            let nodeId = stripPdfPrefixIfDisabled(time.nodeId || "", cell);
                             if (dropdown.name && dropdown.name.includes('/') && !nodeId.includes('/')) {
                               if (typeof window.generateNodeIdForDropdownField === 'function') {
                                 nodeId = window.generateNodeIdForDropdownField(time.fieldName || '', dropdown.name || '', cell, trigger.triggerOption || '');

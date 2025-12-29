@@ -4163,6 +4163,114 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
   // Get all cells in the graph
   const graph = window.graph;
   if (!graph) return;
+  // Respect settings: default OFF unless explicitly enabled
+  const shouldAddPdfName = !!(window.userSettings && window.userSettings.addPdfNameToNodeId);
+  const stripPdfPrefix = (node, val) => {
+    if (shouldAddPdfName) return val;
+    if (!val) return val;
+    const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(node) : null;
+    if (pdfName && typeof window.sanitizePdfName === 'function') {
+      const sanitized = window.sanitizePdfName(pdfName);
+      if (sanitized && val.startsWith(sanitized + '_')) {
+        return val.substring(sanitized.length + 1);
+      }
+    }
+    const firstSeg = val.split('_')[0] || '';
+    if (/^sc[a-z0-9]+$/i.test(firstSeg)) {
+      return val.substring(firstSeg.length + 1);
+    }
+    return val;
+  };
+  // Mutate trigger sequence nodeIds in-place to strip PDF prefixes when setting is OFF
+  const sanitizeTriggerSequences = (node) => {
+    if (!node || !node._dropdowns || !Array.isArray(node._dropdowns)) return;
+    node._dropdowns.forEach(dd => {
+      if (!dd || !dd.triggerSequences || !Array.isArray(dd.triggerSequences)) return;
+      dd.triggerSequences.forEach(seq => {
+        if (seq.labels && Array.isArray(seq.labels)) {
+          seq.labels.forEach(lbl => {
+            if (lbl.nodeId) {
+              const cleaned = stripPdfPrefix(node, lbl.nodeId);
+              if (cleaned !== lbl.nodeId) {
+                console.log('[LINKED LOGIC CUSTOM DROPDOWN] strip label nodeId', { before: lbl.nodeId, after: cleaned, shouldAddPdfName });
+                lbl.nodeId = cleaned;
+              }
+            }
+          });
+        }
+        if (seq.times && Array.isArray(seq.times)) {
+          seq.times.forEach(t => {
+            if (t.nodeId) {
+              const cleaned = stripPdfPrefix(node, t.nodeId);
+              if (cleaned !== t.nodeId) {
+                console.log('[LINKED LOGIC CUSTOM DROPDOWN] strip time nodeId', { before: t.nodeId, after: cleaned, shouldAddPdfName });
+                t.nodeId = cleaned;
+              }
+            }
+          });
+        }
+        if (seq.checkboxes && Array.isArray(seq.checkboxes)) {
+          seq.checkboxes.forEach(cb => {
+            if (cb.options && Array.isArray(cb.options)) {
+              cb.options.forEach(opt => {
+                if (opt.nodeId) {
+                  const cleaned = stripPdfPrefix(node, opt.nodeId);
+                  if (cleaned !== opt.nodeId) {
+                    console.log('[LINKED LOGIC CUSTOM DROPDOWN] strip checkbox option nodeId', { before: opt.nodeId, after: cleaned, shouldAddPdfName });
+                    opt.nodeId = cleaned;
+                  }
+                }
+                if (opt.linkedFields && Array.isArray(opt.linkedFields)) {
+                  opt.linkedFields.forEach(lf => {
+                    if (lf.nodeId) {
+                      const cleaned = stripPdfPrefix(node, lf.nodeId);
+                      if (cleaned !== lf.nodeId) {
+                        console.log('[LINKED LOGIC CUSTOM DROPDOWN] strip linkedField nodeId', { before: lf.nodeId, after: cleaned, shouldAddPdfName });
+                        lf.nodeId = cleaned;
+                      }
+                    }
+                    if (lf.selectedNodeId) {
+                      const cleanedSel = stripPdfPrefix(node, lf.selectedNodeId);
+                      if (cleanedSel !== lf.selectedNodeId) {
+                        console.log('[LINKED LOGIC CUSTOM DROPDOWN] strip linkedField selectedNodeId', { before: lf.selectedNodeId, after: cleanedSel, shouldAddPdfName });
+                        lf.selectedNodeId = cleanedSel;
+                      }
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+  };
+  console.log('[LINKED LOGIC CUSTOM DROPDOWN] populate start', {
+    shouldAddPdfName,
+    userSettings: window.userSettings || null,
+    cells: window.graph ? window.graph.getChildVertices(window.graph.getDefaultParent()).length : 'n/a'
+  });
+  console.log('[LINKED LOGIC CUSTOM DROPDOWN] populate start', { shouldAddPdfName });
+  const addOptionIfNotExists = (val) => {
+    if (!val) return;
+    const existingOption = Array.from(optionsContainer.children).find(
+      opt => opt.getAttribute('data-value') === val
+    );
+    if (existingOption) return;
+    const option = document.createElement('div');
+    option.textContent = val;
+    option.style.cssText = `
+      padding: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    `;
+    option.setAttribute('data-value', val);
+    optionsContainer.appendChild(option);
+    const selectOption = document.createElement('option');
+    selectOption.value = val;
+    selectOption.textContent = val;
+    hiddenSelect.appendChild(selectOption);
+  };
   const allCells = graph.getChildVertices(graph.getDefaultParent());
   // Find all textbox question nodes and multiple dropdown question labels
   const textboxNodes = allCells.filter(cell => {
@@ -4192,13 +4300,13 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
     if (node.style && node.style.includes('questionType=multipleTextboxes') && 
         node._textboxes && Array.isArray(node._textboxes)) {
       // Add individual textbox entries
-      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      const baseNodeId = stripPdfPrefix(node, (window.getNodeId ? window.getNodeId(node) : node.id));
       node._textboxes.forEach((textbox, index) => {
         if (textbox.nameId) {
           const option = document.createElement('div');
           // Convert nameId to lowercase to match the Copy ID format
           const lowercaseNameId = textbox.nameId.toLowerCase();
-          const labelId = `${baseNodeId}_${lowercaseNameId}`;
+          const labelId = stripPdfPrefix(node, `${baseNodeId}_${lowercaseNameId}`);
           option.textContent = labelId;
           option.style.cssText = `
             padding: 8px;
@@ -4264,7 +4372,7 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
     } else {
       // Regular textbox question - add the base node ID
       const option = document.createElement('div');
-      const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      const nodeId = stripPdfPrefix(node, (window.getNodeId ? window.getNodeId(node) : node.id));
       option.textContent = nodeId || `Node ${node.id}`;
       option.style.cssText = `
         padding: 8px;
@@ -4281,8 +4389,9 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
   });
   // Add options for each multiple dropdown question label
   multipleDropdownNodes.forEach(node => {
+    sanitizeTriggerSequences(node);
     if (node._textboxes && Array.isArray(node._textboxes)) {
-      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      const baseNodeId = stripPdfPrefix(node, (window.getNodeId ? window.getNodeId(node) : node.id));
       // Get the number range from _twoNumbers
       const firstNumber = parseInt(node._twoNumbers?.first) || 1;
       const secondNumber = parseInt(node._twoNumbers?.second) || 1;
@@ -4292,7 +4401,7 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
           // Generate options for each number in the range
           for (let num = firstNumber; num <= secondNumber; num++) {
             const option = document.createElement('div');
-            const labelId = `${baseNodeId}_${lowercaseNameId}_${num}`;
+            const labelId = stripPdfPrefix(node, `${baseNodeId}_${lowercaseNameId}_${num}`);
             option.textContent = labelId;
             option.style.cssText = `
               padding: 8px;
@@ -4326,7 +4435,7 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
           // Generate options for each number in the range for each location field
           for (let num = firstNumber; num <= secondNumber; num++) {
             const option = document.createElement('div');
-            const labelId = `${locationPrefix}_${locationField}_${num}`;
+            const labelId = stripPdfPrefix(node, `${locationPrefix}_${locationField}_${num}`);
             option.textContent = labelId;
             option.style.cssText = `
               padding: 8px;
@@ -4342,7 +4451,7 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
             // Add short state field for state location field
             if (locationField === 'state') {
               const shortOption = document.createElement('div');
-              const shortLabelId = `${locationPrefix}_${locationField}_short_${num}`;
+              const shortLabelId = stripPdfPrefix(node, `${locationPrefix}_${locationField}_short_${num}`);
               shortOption.textContent = shortLabelId;
               shortOption.style.cssText = `
                 padding: 8px;
@@ -4359,6 +4468,39 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
           }
         });
       }
+      // Include trigger sequence labels/times for linked logic (sanitized)
+      if (node._dropdowns && Array.isArray(node._dropdowns)) {
+        node._dropdowns.forEach(dd => {
+          if (dd.triggerSequences && Array.isArray(dd.triggerSequences)) {
+            dd.triggerSequences.forEach(seq => {
+              // Labels
+              if (seq.labels && Array.isArray(seq.labels)) {
+                seq.labels.forEach(lbl => {
+                  const baseId = stripPdfPrefix(node, lbl.nodeId || '');
+                  if (baseId) {
+                    addOptionIfNotExists(baseId);
+                    for (let num = firstNumber; num <= secondNumber; num++) {
+                      addOptionIfNotExists(`${baseId}_${num}`);
+                    }
+                  }
+                });
+              }
+              // Times (date fields)
+              if (seq.times && Array.isArray(seq.times)) {
+                seq.times.forEach(t => {
+                  const baseId = stripPdfPrefix(node, t.nodeId || '');
+                  if (baseId) {
+                    addOptionIfNotExists(baseId);
+                    for (let num = firstNumber; num <= secondNumber; num++) {
+                      addOptionIfNotExists(`${baseId}_${num}`);
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
     }
   });
   // Find all numbered dropdown and multiple textbox questions to extract linked fields from checkbox options
@@ -4367,28 +4509,41 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
            (cell.style.includes('questionType=multipleDropdownType') ||
             cell.style.includes('questionType=multipleTextboxes'));
   });
-  // Helper function to add option if not already present
-  const addOptionIfNotExists = (nodeId) => {
-    // Check if option already exists
-    const existingOption = Array.from(optionsContainer.children).find(
-      opt => opt.getAttribute('data-value') === nodeId
-    );
-    if (!existingOption) {
-      const option = document.createElement('div');
-      option.textContent = nodeId;
-      option.style.cssText = `
-        padding: 8px;
-        cursor: pointer;
-        border-bottom: 1px solid #eee;
-      `;
-      option.setAttribute('data-value', nodeId);
-      optionsContainer.appendChild(option);
-      const selectOption = document.createElement('option');
-      selectOption.value = nodeId;
-      selectOption.textContent = nodeId;
-      hiddenSelect.appendChild(selectOption);
+  // Include trigger sequence label/time nodeIds (with numbering) for multiple dropdown questions
+  multipleDropdownNodes.forEach(node => {
+    if (node._dropdowns && Array.isArray(node._dropdowns) && node._twoNumbers) {
+      const firstNumber = parseInt(node._twoNumbers.first) || 1;
+      const secondNumber = parseInt(node._twoNumbers.second) || 1;
+      node._dropdowns.forEach(dd => {
+        if (dd.triggerSequences && Array.isArray(dd.triggerSequences)) {
+          dd.triggerSequences.forEach(seq => {
+            if (seq.labels && Array.isArray(seq.labels)) {
+              seq.labels.forEach(lbl => {
+                const baseId = lbl.nodeId || '';
+                if (baseId) {
+                  addOptionIfNotExists(baseId);
+                  for (let num = firstNumber; num <= secondNumber; num++) {
+                    addOptionIfNotExists(`${baseId}_${num}`);
+                  }
+                }
+              });
+            }
+            if (seq.times && Array.isArray(seq.times)) {
+              seq.times.forEach(t => {
+                const baseId = t.nodeId || '';
+                if (baseId) {
+                  addOptionIfNotExists(baseId);
+                  for (let num = firstNumber; num <= secondNumber; num++) {
+                    addOptionIfNotExists(`${baseId}_${num}`);
+                  }
+                }
+              });
+            }
+          });
+        }
+      });
     }
-  };
+  });
   // Extract linked fields from checkbox options in numbered dropdown/multiple textbox questions
   numberedDropdownNodes.forEach(node => {
     if (node._checkboxes && Array.isArray(node._checkboxes)) {
@@ -5249,6 +5404,106 @@ function populateLinkedLogicDropdown(dropdown, cell) {
   defaultOption.value = '';
   defaultOption.textContent = 'Select a textbox question...';
   dropdown.appendChild(defaultOption);
+  // Dedup helper
+  const seenOptions = new Set();
+  const addOptionIfNotExists = (val) => {
+    if (!val) return;
+    if (seenOptions.has(val)) return;
+    seenOptions.add(val);
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = val;
+    dropdown.appendChild(opt);
+  };
+  // PDF prefix handling for linked logic dropdowns
+  // Respect settings: default OFF unless explicitly enabled
+  const shouldAddPdfName = !!(window.userSettings && window.userSettings.addPdfNameToNodeId);
+  const stripPdfPrefix = (node, val) => {
+    if (shouldAddPdfName) return val;
+    if (!val) return val;
+    const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(node) : null;
+    if (pdfName && typeof window.sanitizePdfName === 'function') {
+      const sanitized = window.sanitizePdfName(pdfName);
+      if (sanitized && val.startsWith(sanitized + '_')) {
+        return val.substring(sanitized.length + 1);
+      }
+    }
+    const firstSeg = val.split('_')[0] || '';
+    if (/^sc[a-z0-9]+$/i.test(firstSeg)) {
+      return val.substring(firstSeg.length + 1);
+    }
+    return val;
+  };
+  // Mutate trigger sequence nodeIds in-place to strip PDF prefixes when setting is OFF
+  const sanitizeTriggerSequences = (node) => {
+    if (!node || !node._dropdowns || !Array.isArray(node._dropdowns)) return;
+    node._dropdowns.forEach(dd => {
+      if (!dd || !dd.triggerSequences || !Array.isArray(dd.triggerSequences)) return;
+      dd.triggerSequences.forEach(seq => {
+        if (seq.labels && Array.isArray(seq.labels)) {
+          seq.labels.forEach(lbl => {
+            if (lbl.nodeId) {
+              const cleaned = stripPdfPrefix(node, lbl.nodeId);
+              if (cleaned !== lbl.nodeId) {
+                console.log('[LINKED LOGIC DROPDOWN] strip label nodeId', { before: lbl.nodeId, after: cleaned, shouldAddPdfName });
+                lbl.nodeId = cleaned;
+              }
+            }
+          });
+        }
+        if (seq.times && Array.isArray(seq.times)) {
+          seq.times.forEach(t => {
+            if (t.nodeId) {
+              const cleaned = stripPdfPrefix(node, t.nodeId);
+              if (cleaned !== t.nodeId) {
+                console.log('[LINKED LOGIC DROPDOWN] strip time nodeId', { before: t.nodeId, after: cleaned, shouldAddPdfName });
+                t.nodeId = cleaned;
+              }
+            }
+          });
+        }
+        if (seq.checkboxes && Array.isArray(seq.checkboxes)) {
+          seq.checkboxes.forEach(cb => {
+            if (cb.options && Array.isArray(cb.options)) {
+              cb.options.forEach(opt => {
+                if (opt.nodeId) {
+                  const cleaned = stripPdfPrefix(node, opt.nodeId);
+                  if (cleaned !== opt.nodeId) {
+                    console.log('[LINKED LOGIC DROPDOWN] strip checkbox option nodeId', { before: opt.nodeId, after: cleaned, shouldAddPdfName });
+                    opt.nodeId = cleaned;
+                  }
+                }
+                if (opt.linkedFields && Array.isArray(opt.linkedFields)) {
+                  opt.linkedFields.forEach(lf => {
+                    if (lf.nodeId) {
+                      const cleaned = stripPdfPrefix(node, lf.nodeId);
+                      if (cleaned !== lf.nodeId) {
+                        console.log('[LINKED LOGIC DROPDOWN] strip linkedField nodeId', { before: lf.nodeId, after: cleaned, shouldAddPdfName });
+                        lf.nodeId = cleaned;
+                      }
+                    }
+                    if (lf.selectedNodeId) {
+                      const cleanedSel = stripPdfPrefix(node, lf.selectedNodeId);
+                      if (cleanedSel !== lf.selectedNodeId) {
+                        console.log('[LINKED LOGIC DROPDOWN] strip linkedField selectedNodeId', { before: lf.selectedNodeId, after: cleanedSel, shouldAddPdfName });
+                        lf.selectedNodeId = cleanedSel;
+                      }
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+  };
+  console.log('[LINKED LOGIC DROPDOWN] populate start', {
+    shouldAddPdfName,
+    userSettings: window.userSettings || null,
+    cells: window.graph ? window.graph.getChildVertices(window.graph.getDefaultParent()).length : 'n/a'
+  });
+  const addOptionSanitized = (node, val) => addOptionIfNotExists(stripPdfPrefix(node, val));
   // Get all cells in the graph
   const graph = window.graph;
   if (!graph) return;
@@ -5281,16 +5536,13 @@ function populateLinkedLogicDropdown(dropdown, cell) {
     if (node.style && node.style.includes('questionType=multipleTextboxes') && 
         node._textboxes && Array.isArray(node._textboxes)) {
       // Add individual textbox entries
-      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      const baseNodeId = stripPdfPrefix(node, (window.getNodeId ? window.getNodeId(node) : node.id));
       node._textboxes.forEach((textbox, index) => {
         if (textbox.nameId) {
-          const option = document.createElement('option');
           // Convert nameId to lowercase to match the Copy ID format
           const lowercaseNameId = textbox.nameId.toLowerCase();
           const labelId = `${baseNodeId}_${lowercaseNameId}`;
-          option.value = labelId;
-          option.textContent = labelId;
-          dropdown.appendChild(option);
+          addOptionSanitized(node, labelId);
         }
       });
       // Add location data options if location index is set
@@ -5308,34 +5560,26 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           locationPrefix = `${baseNodeId}_${sanitizedLocationTitle}`;
         }
         locationFields.forEach(locationField => {
-          const option = document.createElement('option');
           const labelId = `${locationPrefix}_${locationField}`;
-          option.value = labelId;
-          option.textContent = labelId;
-          dropdown.appendChild(option);
+          addOptionSanitized(node, labelId);
           // Add short state field for state location field
           if (locationField === 'state') {
-            const shortOption = document.createElement('option');
             const shortLabelId = `${locationPrefix}_${locationField}_short`;
-            shortOption.value = shortLabelId;
-            shortOption.textContent = shortLabelId;
-            dropdown.appendChild(shortOption);
+            addOptionSanitized(node, shortLabelId);
           }
         });
       }
     } else {
       // Regular textbox question - add the base node ID
-      const option = document.createElement('option');
-      const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
-      option.value = nodeId;
-      option.textContent = nodeId || `Node ${node.id}`;
-      dropdown.appendChild(option);
+      const nodeId = stripPdfPrefix(node, (window.getNodeId ? window.getNodeId(node) : node.id));
+      addOptionSanitized(node, nodeId || `Node ${node.id}`);
     }
   });
   // Add options for each multiple dropdown question label
   multipleDropdownNodes.forEach(node => {
+    sanitizeTriggerSequences(node);
     if (node._textboxes && Array.isArray(node._textboxes)) {
-      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      const baseNodeId = stripPdfPrefix(node, (window.getNodeId ? window.getNodeId(node) : node.id));
       // Get the number range from _twoNumbers
       const firstNumber = parseInt(node._twoNumbers?.first) || 1;
       const secondNumber = parseInt(node._twoNumbers?.second) || 1;
@@ -5344,11 +5588,8 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           const lowercaseNameId = textbox.nameId.toLowerCase();
           // Generate options for each number in the range
           for (let num = firstNumber; num <= secondNumber; num++) {
-            const option = document.createElement('option');
             const labelId = `${baseNodeId}_${lowercaseNameId}_${num}`;
-            option.value = labelId;
-            option.textContent = labelId;
-            dropdown.appendChild(option);
+            addOptionSanitized(node, labelId);
           }
         }
       });
@@ -5369,19 +5610,42 @@ function populateLinkedLogicDropdown(dropdown, cell) {
         locationFields.forEach(locationField => {
           // Generate options for each number in the range for each location field
           for (let num = firstNumber; num <= secondNumber; num++) {
-            const option = document.createElement('option');
             const labelId = `${locationPrefix}_${locationField}_${num}`;
-            option.value = labelId;
-            option.textContent = labelId;
-            dropdown.appendChild(option);
+            addOptionSanitized(node, labelId);
             // Add short state field for state location field
             if (locationField === 'state') {
-              const shortOption = document.createElement('option');
               const shortLabelId = `${locationPrefix}_${locationField}_short_${num}`;
-              shortOption.value = shortLabelId;
-              shortOption.textContent = shortLabelId;
-              dropdown.appendChild(shortOption);
+              addOptionSanitized(node, shortLabelId);
             }
+          }
+        });
+      }
+      // Include trigger sequence labels/times/dropdowns nodeIds so linked logic can target them
+      if (node._dropdowns && Array.isArray(node._dropdowns)) {
+        node._dropdowns.forEach(dd => {
+          if (dd.triggerSequences && Array.isArray(dd.triggerSequences)) {
+            dd.triggerSequences.forEach(seq => {
+              // Labels
+              if (seq.labels && Array.isArray(seq.labels)) {
+                seq.labels.forEach(lbl => {
+                  const baseId = stripPdfPrefix(node, lbl.nodeId || '');
+                addOptionIfNotExists(baseId);
+                  for (let num = firstNumber; num <= secondNumber; num++) {
+                  addOptionIfNotExists(`${baseId}_${num}`);
+                  }
+                });
+              }
+              // Times (date fields)
+              if (seq.times && Array.isArray(seq.times)) {
+                seq.times.forEach(t => {
+                  const timeId = stripPdfPrefix(node, t.nodeId || '');
+                addOptionIfNotExists(timeId);
+                  for (let num = firstNumber; num <= secondNumber; num++) {
+                  addOptionIfNotExists(`${timeId}_${num}`);
+                  }
+                });
+              }
+            });
           }
         });
       }
@@ -5395,6 +5659,12 @@ function populateLinkedLogicDropdown(dropdown, cell) {
     noOptions.disabled = true;
     dropdown.appendChild(noOptions);
   }
+  // Debug dump: sample of options added
+  const sampleOptions = Array.from(dropdown.options).slice(0, 25).map(o => o.value);
+  console.log('[LINKED LOGIC DROPDOWN] done', {
+    totalOptions: dropdown.options.length,
+    sampleOptions
+  });
 }
 /**
  * Populate dropdown with checkbox option Node IDs from flowchart

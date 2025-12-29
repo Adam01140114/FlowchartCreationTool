@@ -16,8 +16,8 @@ function isQuestion(cell) {
 window.generateNodeIdForDropdownField = function generateNodeIdForDropdownField(fieldName, dropdownName, cell, triggerOption = '') {
   // Get PDF name if available
   const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-  // Check if PDF name should be added to node ID based on user setting
-  const shouldAddPdfName = (typeof window.userSettings !== 'undefined' && window.userSettings.addPdfNameToNodeId !== false) ? true : false;
+  // Respect setting: default OFF unless explicitly enabled
+  const shouldAddPdfName = !!(window.userSettings && window.userSettings.addPdfNameToNodeId);
   const sanitizedPdfName = (pdfName && window.sanitizePdfName && shouldAddPdfName) ? window.sanitizePdfName(pdfName) : '';
   // Build base name components - use window.sanitizeNameId to preserve forward slashes
   const sanitizeFn = typeof window.sanitizeNameId === 'function' ? window.sanitizeNameId : 
@@ -29,17 +29,25 @@ window.generateNodeIdForDropdownField = function generateNodeIdForDropdownField(
   const sanitizedFieldName = sanitizeFn(fieldName);
   const sanitizedDropdownName = sanitizeFn(dropdownName);
   const sanitizedTriggerOption = sanitizeFn(triggerOption);
-  // Format: dropdownName_triggerOption_fieldName (or with PDF prefix if available)
+  let finalId;
   if (sanitizedTriggerOption) {
-    return sanitizedPdfName ? 
+    finalId = sanitizedPdfName ? 
       `${nodeId}_${sanitizedDropdownName}_${sanitizedTriggerOption}_${sanitizedFieldName}` : 
       `${sanitizedDropdownName}_${sanitizedTriggerOption}_${sanitizedFieldName}`;
   } else {
-    // Fallback to old format if no trigger option
-    return sanitizedPdfName ? 
+    finalId = sanitizedPdfName ? 
       `${nodeId}_${sanitizedDropdownName}_${sanitizedFieldName}` : 
       `${sanitizedDropdownName}_${sanitizedFieldName}`;
   }
+  console.log('[NODEID][generateNodeIdForDropdownField]', {
+    fieldName,
+    dropdownName,
+    triggerOption,
+    pdfName,
+    shouldAddPdfName,
+    finalId
+  });
+  return finalId;
 }
 // Helper function to create uneditable node ID input with double-click copy
 function createUneditableNodeIdInput(placeholder, value, onDoubleClick) {
