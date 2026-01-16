@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New SC-100</title>
+    <title>Example Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -272,13 +272,27 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many extra plaintiffs are there</h3></label><select id="how_many_extra_plaintiffs_are_there" name="how_many_extra_plaintiffs_are_there" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_extra_plaintiffs_are_there', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer1"></div></div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Hunger</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Thirst</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Hunger</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Whats your favorite food</h3></label><div id="labelContainer2"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="whats_your_favorite_food_best_food_1" name="whats_your_favorite_food_best_food_1" placeholder="Best food" class="address-input"></div></div><br></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Thirst</h1><div id="question-container-3" data-question-id="3" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Are you thirsty?</h3></label><select id="are_you_thirsty" name="are_you_thirsty" data-question-id="3"
+                      onchange="dropdownMirror(this, 'are_you_thirsty'); updateHiddenLogic('are_you_thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_you_thirsty"></div>
+              <input type="text" id="are_you_thirsty_dropdown" name="are_you_thirsty_dropdown"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="2">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       console.groupCollapsed('[NAV DEBUG] form boot');
@@ -326,18 +340,39 @@ document.addEventListener("DOMContentLoaded", function() {
           return { indices, items };
         }
         function findNextSectionWithVisibleQuestions() {
+          console.log('[NAV DEBUG] findNextSectionWithVisibleQuestions called for section:', sectionId, 'index:', sectionIdx);
           for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
             const candidateSection = sectionElements[nextIdx];
+            console.log('[NAV DEBUG] Checking candidate section:', candidateSection.id, 'at index:', nextIdx);
             const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            console.log('[NAV DEBUG] Visible indices for', candidateSection.id, ':', visibleInfo.indices);
+            // If we find visible questions, return immediately
             if (visibleInfo.indices.length) {
-              return {
+              const result = {
                 sectionEl: candidateSection,
                 sectionId: candidateSection.id,
                 sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
                 firstVisibleIndex: visibleInfo.indices[0]
               };
+              console.log('[NAV DEBUG] Found next section:', result);
+              return result;
+            }
+            // If no visible questions found, check if section has any questions at all
+            // This handles cases where questions might be hidden initially but should become visible
+            const allQuestions = candidateSection.querySelectorAll('.question-container.question-item');
+            if (allQuestions.length > 0) {
+              console.log('[NAV DEBUG] Section', candidateSection.id, 'has', allQuestions.length, 'questions but none are currently visible. Allowing navigation anyway.');
+              const result = {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: 0  // Will be recalculated when section becomes active
+              };
+              console.log('[NAV DEBUG] Found next section (with hidden questions):', result);
+              return result;
             }
           }
+          console.log('[NAV DEBUG] No next section with visible questions found');
           return null;
         }
         function findPrevSectionWithVisibleQuestions() {
@@ -378,13 +413,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         function isQuestionAnswered(container) {
           if (!container) {
+            console.log('[NAV DEBUG] isQuestionAnswered: container is null/undefined');
             return false;
           }
-          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
-          const eligibleElements = elements.filter(isElementEligible);
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
           const questionTextEl = container.querySelector('.question-text');
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+          console.log('[NAV DEBUG] isQuestionAnswered: Checking question', questionId, '-', questionText);
+          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
+          const eligibleElements = elements.filter(isElementEligible);
           const debugElements = eligibleElements.map(el => ({
             id: el.id || null,
             tag: el.tagName,
@@ -392,9 +429,10 @@ document.addEventListener("DOMContentLoaded", function() {
             value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
             display: el.style && el.style.display ? el.style.display : null
           }));
+          console.log('[NAV DEBUG] isQuestionAnswered: Found', eligibleElements.length, 'eligible elements for question', questionId, ':', debugElements);
 
           if (!eligibleElements.length) {
-
+            console.log('[NAV DEBUG] isQuestionAnswered: No eligible elements, returning true (question', questionId, ')');
             return true;
           }
           let allStandardSatisfied = true;
@@ -460,6 +498,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
           }
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
+          console.log('[NAV DEBUG] isQuestionAnswered: Question', questionId, '- allStandardSatisfied:', allStandardSatisfied, 'radiosSatisfied:', radiosSatisfied, 'checkboxesSatisfied:', checkboxesSatisfied, 'FINAL ANSWERED:', answered);
 
           return answered;
         }
@@ -679,14 +718,17 @@ document.addEventListener("DOMContentLoaded", function() {
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
+          console.log('[NAV DEBUG] activateIndex: Question', activeQuestionId, '- isAnswered:', isAnswered, 'currentPos:', currentPos, 'visibleTotal:', visibleTotal);
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+          console.log('[NAV DEBUG] activateIndex: cachedNextSectionInfo:', cachedNextSectionInfo, 'cachedPrevSectionInfo:', cachedPrevSectionInfo);
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
           // Allow advancing within section if there's a next question in the current section
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          console.log('[NAV DEBUG] activateIndex: canAdvanceWithinSection:', canAdvanceWithinSection, 'canAdvanceAcrossSection:', canAdvanceAcrossSection);
           // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
           if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
-
+            console.log('[NAV DEBUG] activateIndex: On last question, can advance across section:', canAdvanceAcrossSection);
           }
 
           updateButtons(
@@ -701,24 +743,48 @@ document.addEventListener("DOMContentLoaded", function() {
           isUpdating = false;
         }
         function goToNextSection() {
+          console.log('[NAV DEBUG] goToNextSection called');
+          console.log('[NAV DEBUG] cachedNextSectionInfo:', cachedNextSectionInfo);
           if (!cachedNextSectionInfo) {
+            console.log('[NAV DEBUG] goToNextSection: No cached next section info, returning');
             return;
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          console.log('[NAV DEBUG] goToNextSection: Target section ID:', targetSectionId, 'Target section number:', targetSectionNumber, 'Current section number:', currentSectionNumber);
           const triggerNavigation = () => {
+            console.log('[NAV DEBUG] goToNextSection: triggerNavigation called');
             if (typeof validateAndProceed === 'function') {
-              validateAndProceed(currentSectionNumber);
+              console.log('[NAV DEBUG] goToNextSection: Calling validateAndProceed with section:', currentSectionNumber);
+              const validationResult = validateAndProceed(currentSectionNumber);
+              console.log('[NAV DEBUG] goToNextSection: validateAndProceed returned:', validationResult);
+              // If validation fails, still try to navigate directly
+              if (!validationResult) {
+                console.log('[NAV DEBUG] goToNextSection: Validation failed, attempting direct navigation to section:', targetSectionNumber);
+                if (typeof navigateSection === 'function') {
+                  navigateSection(targetSectionNumber);
+                }
+              }
             } else if (typeof navigateSection === 'function') {
+              console.log('[NAV DEBUG] goToNextSection: Calling navigateSection directly with section:', targetSectionNumber);
               navigateSection(targetSectionNumber);
+            } else {
+              console.log('[NAV DEBUG] goToNextSection: Neither validateAndProceed nor navigateSection function found!');
             }
           };
           const updateTargetNav = () => {
+            console.log('[NAV DEBUG] goToNextSection: updateTargetNav called');
             const activeSection = document.querySelector('.section.active');
+            console.log('[NAV DEBUG] goToNextSection: Active section:', activeSection ? activeSection.id : 'none', 'Target section ID:', targetSectionId);
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                console.log('[NAV DEBUG] goToNextSection: Calling questionNavController for', targetSectionId);
                 window.questionNavControllers[targetSectionId]();
+              } else {
+                console.log('[NAV DEBUG] goToNextSection: No questionNavController found for', targetSectionId);
               }
+            } else {
+              console.log('[NAV DEBUG] goToNextSection: Active section does not match target section');
             }
           };
           triggerNavigation();
@@ -769,31 +835,77 @@ document.addEventListener("DOMContentLoaded", function() {
           triggerNavigation();
         }
         function shiftQuestion(direction) {
+          console.log('[NAV DEBUG] shiftQuestion called with direction:', direction, 'for section:', sectionId);
           const visibleIndices = getVisibleIndices();
+          console.log('[NAV DEBUG] shiftQuestion: visibleIndices:', visibleIndices, 'activeIndex:', activeIndex);
           if (!visibleIndices.length || activeIndex === -1) {
+            console.log('[NAV DEBUG] shiftQuestion: No visible indices or activeIndex is -1');
             if (direction > 0 && cachedNextSectionInfo) {
+              console.log('[NAV DEBUG] shiftQuestion: Going to next section (no visible questions in current section)');
               goToNextSection();
             } else if (direction < 0 && cachedPrevSectionInfo) {
+              console.log('[NAV DEBUG] shiftQuestion: Going to previous section');
               goToPrevSection();
+            } else {
+              console.log('[NAV DEBUG] shiftQuestion: No next/prev section info available');
             }
             return;
           }
           const currentPos = visibleIndices.indexOf(activeIndex);
+          console.log('[NAV DEBUG] shiftQuestion: currentPos:', currentPos, 'visibleIndices.length:', visibleIndices.length);
           if (direction > 0) {
             const activeContainer = questionItems[activeIndex];
-            if (activeContainer && !isQuestionAnswered(activeContainer)) {
+            const isAnswered = activeContainer ? isQuestionAnswered(activeContainer) : false;
+            console.log('[NAV DEBUG] shiftQuestion: Checking if current question is answered:', isAnswered);
+            if (activeContainer && !isAnswered) {
+              console.log('[NAV DEBUG] shiftQuestion: Current question not answered, blocking navigation');
               return;
             }
           }
           const nextPos = currentPos + direction;
+          console.log('[NAV DEBUG] shiftQuestion: nextPos:', nextPos);
           if (nextPos < 0 || nextPos >= visibleIndices.length) {
-            if (direction > 0 && cachedNextSectionInfo) {
-              goToNextSection();
+            console.log('[NAV DEBUG] shiftQuestion: nextPos out of bounds, checking for section navigation');
+            if (direction > 0) {
+              // If we're going forward and at the end, try to find next section
+              if (cachedNextSectionInfo) {
+                console.log('[NAV DEBUG] shiftQuestion: At end of section, going to next section');
+                goToNextSection();
+              } else {
+                // Re-check for next section in case cache is stale
+                console.log('[NAV DEBUG] shiftQuestion: No cached next section, re-checking...');
+                const freshNextSectionInfo = findNextSectionWithVisibleQuestions();
+                if (freshNextSectionInfo) {
+                  console.log('[NAV DEBUG] shiftQuestion: Found next section on re-check, navigating');
+                  cachedNextSectionInfo = freshNextSectionInfo;
+                  goToNextSection();
+                } else {
+                  // Last resort: if there's a next section element, navigate to it anyway
+                  const nextSectionIdx = sectionIdx + 1;
+                  if (nextSectionIdx < sectionElements.length) {
+                    const nextSection = sectionElements[nextSectionIdx];
+                    console.log('[NAV DEBUG] shiftQuestion: Last resort - navigating to next section element:', nextSection.id);
+                    cachedNextSectionInfo = {
+                      sectionEl: nextSection,
+                      sectionId: nextSection.id,
+                      sectionNumber: sectionNumbers[nextSectionIdx] || (nextSectionIdx + 1),
+                      firstVisibleIndex: 0
+                    };
+                    goToNextSection();
+                  } else {
+                    console.log('[NAV DEBUG] shiftQuestion: No next section available');
+                  }
+                }
+              }
             } else if (direction < 0 && cachedPrevSectionInfo) {
+              console.log('[NAV DEBUG] shiftQuestion: At start of section, going to previous section');
               goToPrevSection();
+            } else {
+              console.log('[NAV DEBUG] shiftQuestion: No next/prev section info available');
             }
             return;
           }
+          console.log('[NAV DEBUG] shiftQuestion: Activating index:', visibleIndices[nextPos]);
           activateIndex(visibleIndices[nextPos]);
         }
         function refreshNav(targetIdx) {
@@ -827,7 +939,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
+            console.log('[NAV DEBUG] Next button clicked for section:', sectionId);
+            console.log('[NAV DEBUG] Next button advanceMode:', nextBtn.dataset.advanceMode);
+            console.log('[NAV DEBUG] Next button disabled:', nextBtn.disabled);
             if (nextBtn.dataset.advanceMode === 'submit') {
+              console.log('[NAV DEBUG] Next button: Submit mode, submitting form');
               const formEl = document.getElementById('customForm');
               if (formEl) {
                 if (typeof formEl.requestSubmit === 'function') {
@@ -838,6 +954,7 @@ document.addEventListener("DOMContentLoaded", function() {
               }
               return;
             }
+            console.log('[NAV DEBUG] Next button: Calling shiftQuestion(1)');
             shiftQuestion(1);
           });
         }
@@ -942,8 +1059,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<div style="display:none;"><input type="checkbox" id="biz_check" name="biz_check"></div>
-<input type="checkbox" id="new_sc_100_default_checkbox" name="new_sc_100_default_checkbox" checked style="display: none;">
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div>
   <script>
     window.showLoginRequiredModal = function() {
@@ -1086,12 +1202,12 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"how_many_extra_plaintiffs_are_there"};
-var questionNameIds = {"1":"how_many_extra_plaintiffs_are_there"};
-var linkedCheckboxes = [{"linkedCheckboxId":"biz_check","checkboxes":["is_this_plaintiff_a_business_1_yes","is_this_plaintiff_a_business_2_yes"]}];
+var questionSlugMap = {"1":"hungry","2":"whats_your_favorite_food","3":"are_you_thirsty"};
+var questionNameIds = {"1":"hungry","2":"whats_your_favorite_food","3":"are_you_thirsty"};
+var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Best food","nodeId":"whats_your_favorite_food_best_food","order":1,"prefill":""}]};
 var entryTitleMap = {};
 
   // Address helper functions (must exist before conditional logic runs)
@@ -1243,6 +1359,44 @@ var entryTitleMap = {};
     if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
       return;
     }
+    // Helper function to find checkbox by trying multiple ID patterns
+    // Make it globally accessible so it can be used by other functions like updateAllLinkedCheckboxes
+    window.findCheckboxById = function(checkboxId) {
+      // First try exact match
+      let checkbox = document.getElementById(checkboxId);
+      if (checkbox) {
+        return checkbox;
+      }
+      // If not found, try to find by pattern matching
+      // Expected ID format: {fieldName}_{entryNumber}_{optionValue}
+      // Actual ID format (from dropdownMirror): {baseNodeId}_{fieldName}_{optionValue}_{entryNumber}
+      // Example: Expected "is_this_plaintiff_a_business_1_yes" 
+      //          Actual: "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_1"
+      const parts = checkboxId.split('_');
+      if (parts.length >= 3) {
+        // Parse expected ID: {fieldName}_{entryNumber}_{optionValue}
+        const optionValue = parts[parts.length - 1]; // last part: "yes"
+        const entryNumber = parts[parts.length - 2]; // second last: "1"
+        const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
+        
+        // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
+        // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
+        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (let cb of allCheckboxes) {
+          if (!cb.id) continue;
+          // Match if ID ends with: _{fieldName}_{optionValue}_{entryNumber} or just _{optionValue}_{entryNumber}
+          // and contains the field name somewhere
+          const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
+          const containsFieldName = cb.id.includes(fieldName);
+          
+          if (endsWithPattern && containsFieldName) {
+            return cb;
+          }
+        }
+      }
+      return null;
+    };
+    const findCheckboxById = window.findCheckboxById;
     function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
       const linkedCheckbox = document.getElementById(linkedCheckboxId);
       if (!linkedCheckbox) {
@@ -1250,7 +1404,7 @@ var entryTitleMap = {};
       }
       let anyChecked = false;
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        const sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox && sourceCheckbox.checked) {
           anyChecked = true;
         }
@@ -1264,7 +1418,8 @@ var entryTitleMap = {};
         return;
       }
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        // Try to find existing checkbox
+        let sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox) {
           sourceCheckbox.addEventListener('change', function() {
             updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
@@ -1274,6 +1429,28 @@ var entryTitleMap = {};
               updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
             }, 0);
           });
+        } else {
+          // Checkbox doesn't exist yet (might be created dynamically), set up a watcher
+          const observer = new MutationObserver(function(mutations) {
+            const foundCheckbox = findCheckboxById(checkboxId);
+            if (foundCheckbox) {
+              foundCheckbox.addEventListener('change', function() {
+                updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+              });
+              foundCheckbox.addEventListener('click', function() {
+                setTimeout(() => {
+                  updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+                }, 0);
+              });
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+          // Stop observing after 30 seconds to avoid memory leaks
+          setTimeout(() => observer.disconnect(), 30000);
         }
       });
       setTimeout(() => {
@@ -1297,7 +1474,7 @@ var entryTitleMap = {};
         }
         let anyChecked = false;
         checkboxIds.forEach(checkboxId => {
-          const sourceCheckbox = document.getElementById(checkboxId);
+          const sourceCheckbox = findCheckboxById(checkboxId);
           if (sourceCheckbox && sourceCheckbox.checked) {
             anyChecked = true;
           }
@@ -2837,15 +3014,15 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const formId = urlParams.get("formId") || window.formId || 'default';
     var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"1","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"}];
+var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name"],"length":0};
-var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["how_many_extra_plaintiffs_are_there_name"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -3131,6 +3308,81 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -4064,11 +4316,18 @@ function updateCheckboxStyle(checkbox) {
  * Form validation functions
  *──────────────────────────────────────────────────────────────*/
 function validateAndProceed(sectionNumber) {
-    if (validateCurrentSection(sectionNumber)) {
+    console.log('[NAV DEBUG] validateAndProceed called for section:', sectionNumber);
+    const isValid = validateCurrentSection(sectionNumber);
+    console.log('[NAV DEBUG] validateAndProceed: Validation result for section', sectionNumber, ':', isValid);
+    if (isValid) {
+        console.log('[NAV DEBUG] validateAndProceed: Validation passed, calling handleNext');
         handleNext(sectionNumber);
+        return true;
     } else {
+        console.log('[NAV DEBUG] validateAndProceed: Validation failed, showing popup');
         // Show validation popup when validation fails
         showValidationPopup();
+        return false;
     }
 }
 // Show validation popup when user tries to proceed without answering all questions
@@ -4219,13 +4478,37 @@ function validateDropdownQuestion(questionContainer) {
     return isValid;
 }
 function validateTextQuestion(questionContainer) {
+    const questionId = questionContainer.id.replace('question-container-', '');
+    console.log('[NAV DEBUG] validateTextQuestion: Validating question', questionId);
     const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-    if (inputs.length === 0) return true;
-    for (let input of inputs) {
-        if (!input.value || input.value.trim() === '') {
+    console.log('[NAV DEBUG] validateTextQuestion: Found', inputs.length, 'text inputs for question', questionId);
+    if (inputs.length === 0) {
+        console.log('[NAV DEBUG] validateTextQuestion: No inputs found, returning true');
+        return true;
+    }
+    // Filter out hidden inputs and inputs that are not eligible
+    const eligibleInputs = Array.from(inputs).filter(input => {
+        const style = window.getComputedStyle(input);
+        const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+        const isNotDisabled = !input.disabled;
+        const isNotHiddenType = input.type !== 'hidden';
+        const hasOffsetParent = input.offsetParent !== null || input.type === 'hidden';
+        return isVisible && isNotDisabled && isNotHiddenType && (hasOffsetParent || input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || input.type === 'date');
+    });
+    console.log('[NAV DEBUG] validateTextQuestion: Eligible inputs:', eligibleInputs.length, 'for question', questionId);
+    if (eligibleInputs.length === 0) {
+        console.log('[NAV DEBUG] validateTextQuestion: No eligible inputs, returning true');
+        return true;
+    }
+    for (let input of eligibleInputs) {
+        const value = input.value ? input.value.trim() : '';
+        console.log('[NAV DEBUG] validateTextQuestion: Input', input.id, 'has value:', value);
+        if (!value) {
+            console.log('[NAV DEBUG] validateTextQuestion: Input', input.id, 'is empty, validation failed');
             return false;
         }
     }
+    console.log('[NAV DEBUG] validateTextQuestion: All inputs have values, validation passed');
     return true;
 }
 function showValidationError(container, message) {

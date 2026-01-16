@@ -762,6 +762,7 @@ questionSlugMap[questionId] = slug;
       // logic
       const logicCheckbox = qBlock.querySelector("#logic" + questionId);
       const logicEnabled = logicCheckbox && logicCheckbox.checked;
+      console.log('[GEN DEBUG] Question', questionId, 'logic checkbox found:', !!logicCheckbox, 'checked:', logicCheckbox ? logicCheckbox.checked : 'N/A', 'logicEnabled:', logicEnabled);
       // jump logic (multi-condition version)
       const jumpEnabledEl = qBlock.querySelector("#enableJump" + questionId);
       const jumpEnabled = jumpEnabledEl && jumpEnabledEl.checked;
@@ -830,9 +831,13 @@ questionSlugMap[questionId] = slug;
       // Start the question container
       // Add data-question-type attribute for numbered dropdown questions
       const questionTypeAttr = questionType === "numberedDropdown" ? ' data-question-type="numberedDropdown"' : '';
-      formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${
-        logicEnabled ? ' hidden' : ""
-      }${qIdx === 0 ? "" : " question-step-hidden"}" data-section="${s}" data-question-index="${qIdx + 1}"${questionTypeAttr}>`;
+      // First question in a section should never be hidden, even if logic is enabled
+      // This ensures the section always has at least one visible question
+      const shouldBeHidden = logicEnabled && qIdx !== 0;
+      const hiddenClass = shouldBeHidden ? ' hidden' : "";
+      const stepHiddenClass = qIdx === 0 ? "" : " question-step-hidden";
+      console.log('[GEN DEBUG] Generating question container', questionId, 'section', s, 'index', qIdx, 'logicEnabled:', logicEnabled, 'isFirstQuestion:', qIdx === 0, 'shouldBeHidden:', shouldBeHidden, 'hiddenClass:', hiddenClass, 'stepHiddenClass:', stepHiddenClass);
+      formHTML += `<div id="question-container-${questionId}" data-question-id="${questionId}" class="question-container question-item${hiddenClass}${stepHiddenClass}" data-section="${s}" data-question-index="${qIdx + 1}"${questionTypeAttr}>`;
       // Check if info box is enabled
       const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
       let infoBoxText = "";
@@ -1178,16 +1183,20 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           }
         }
         // 2) The <select> itself
-        formHTML += `<select id="${ddNm}" name="${ddNm}"
+        // Add console logging to track dropdown generation
+        console.log('[GEN DEBUG] Generating dropdown for question', questionId, 'nameId:', ddNm);
+        formHTML += `<select id="${ddNm}" name="${ddNm}" data-question-id="${questionId}"
                       onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
         );
+        console.log('[GEN DEBUG] Found', ddOps.length, 'dropdown options for question', questionId);
         for (let i = 0; i < ddOps.length; i++) {
           const val = ddOps[i].value.trim();
           if (val) {
             formHTML += `<option value="${val}">${val}</option>`;
+            console.log('[GEN DEBUG] Added option:', val, 'for question', questionId);
           }
         }
         formHTML += `</select><br>
@@ -3589,25 +3598,54 @@ if (s > 1){
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
           const indices = [];
           items.forEach(function(item, idx) {
-            if (!item.classList.contains('hidden')) {
+            // Only exclude questions that have the 'hidden' class
+            // Questions without the 'hidden' class should be considered visible
+            // even if their parent section is not active (they'll become visible when section activates)
+            const hasHiddenClass = item.classList.contains('hidden');
+            if (!hasHiddenClass) {
               indices.push(idx);
+              console.log('[NAV DEBUG] getVisibleIndicesForSectionElement: Question at index', idx, 'in', targetSectionEl.id, 'is visible (no hidden class)');
+            } else {
+              console.log('[NAV DEBUG] getVisibleIndicesForSectionElement: Question at index', idx, 'in', targetSectionEl.id, 'is hidden (has hidden class)');
             }
           });
+          console.log('[NAV DEBUG] getVisibleIndicesForSectionElement: Found', indices.length, 'visible questions in', targetSectionEl.id, 'out of', items.length, 'total. Indices:', indices);
           return { indices, items };
         }
         function findNextSectionWithVisibleQuestions() {
+          console.log('[NAV DEBUG] findNextSectionWithVisibleQuestions called for section:', sectionId, 'index:', sectionIdx);
           for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
             const candidateSection = sectionElements[nextIdx];
+            console.log('[NAV DEBUG] Checking candidate section:', candidateSection.id, 'at index:', nextIdx);
             const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            console.log('[NAV DEBUG] Visible indices for', candidateSection.id, ':', visibleInfo.indices);
+            // If we find visible questions, return immediately
             if (visibleInfo.indices.length) {
-              return {
+              const result = {
                 sectionEl: candidateSection,
                 sectionId: candidateSection.id,
                 sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
                 firstVisibleIndex: visibleInfo.indices[0]
               };
+              console.log('[NAV DEBUG] Found next section:', result);
+              return result;
+            }
+            // If no visible questions found, check if section has any questions at all
+            // This handles cases where questions might be hidden initially but should become visible
+            const allQuestions = candidateSection.querySelectorAll('.question-container.question-item');
+            if (allQuestions.length > 0) {
+              console.log('[NAV DEBUG] Section', candidateSection.id, 'has', allQuestions.length, 'questions but none are currently visible. Allowing navigation anyway.');
+              const result = {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: 0  // Will be recalculated when section becomes active
+              };
+              console.log('[NAV DEBUG] Found next section (with hidden questions):', result);
+              return result;
             }
           }
+          console.log('[NAV DEBUG] No next section with visible questions found');
           return null;
         }
         function findPrevSectionWithVisibleQuestions() {
@@ -3648,13 +3686,15 @@ if (s > 1){
         }
         function isQuestionAnswered(container) {
           if (!container) {
+            console.log('[NAV DEBUG] isQuestionAnswered: container is null/undefined');
             return false;
           }
-          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
-          const eligibleElements = elements.filter(isElementEligible);
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
           const questionTextEl = container.querySelector('.question-text');
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+          console.log('[NAV DEBUG] isQuestionAnswered: Checking question', questionId, '-', questionText);
+          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
+          const eligibleElements = elements.filter(isElementEligible);
           const debugElements = eligibleElements.map(el => ({
             id: el.id || null,
             tag: el.tagName,
@@ -3662,9 +3702,10 @@ if (s > 1){
             value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
             display: el.style && el.style.display ? el.style.display : null
           }));
+          console.log('[NAV DEBUG] isQuestionAnswered: Found', eligibleElements.length, 'eligible elements for question', questionId, ':', debugElements);
 
           if (!eligibleElements.length) {
-
+            console.log('[NAV DEBUG] isQuestionAnswered: No eligible elements, returning true (question', questionId, ')');
             return true;
           }
           let allStandardSatisfied = true;
@@ -3730,6 +3771,7 @@ if (s > 1){
             });
           }
           const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
+          console.log('[NAV DEBUG] isQuestionAnswered: Question', questionId, '- allStandardSatisfied:', allStandardSatisfied, 'radiosSatisfied:', radiosSatisfied, 'checkboxesSatisfied:', checkboxesSatisfied, 'FINAL ANSWERED:', answered);
 
           return answered;
         }
@@ -3949,14 +3991,17 @@ if (s > 1){
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
+          console.log('[NAV DEBUG] activateIndex: Question', activeQuestionId, '- isAnswered:', isAnswered, 'currentPos:', currentPos, 'visibleTotal:', visibleTotal);
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+          console.log('[NAV DEBUG] activateIndex: cachedNextSectionInfo:', cachedNextSectionInfo, 'cachedPrevSectionInfo:', cachedPrevSectionInfo);
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
           // Allow advancing within section if there's a next question in the current section
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          console.log('[NAV DEBUG] activateIndex: canAdvanceWithinSection:', canAdvanceWithinSection, 'canAdvanceAcrossSection:', canAdvanceAcrossSection);
           // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
           if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
-
+            console.log('[NAV DEBUG] activateIndex: On last question, can advance across section:', canAdvanceAcrossSection);
           }
 
           updateButtons(
@@ -3971,24 +4016,48 @@ if (s > 1){
           isUpdating = false;
         }
         function goToNextSection() {
+          console.log('[NAV DEBUG] goToNextSection called');
+          console.log('[NAV DEBUG] cachedNextSectionInfo:', cachedNextSectionInfo);
           if (!cachedNextSectionInfo) {
+            console.log('[NAV DEBUG] goToNextSection: No cached next section info, returning');
             return;
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          console.log('[NAV DEBUG] goToNextSection: Target section ID:', targetSectionId, 'Target section number:', targetSectionNumber, 'Current section number:', currentSectionNumber);
           const triggerNavigation = () => {
+            console.log('[NAV DEBUG] goToNextSection: triggerNavigation called');
             if (typeof validateAndProceed === 'function') {
-              validateAndProceed(currentSectionNumber);
+              console.log('[NAV DEBUG] goToNextSection: Calling validateAndProceed with section:', currentSectionNumber);
+              const validationResult = validateAndProceed(currentSectionNumber);
+              console.log('[NAV DEBUG] goToNextSection: validateAndProceed returned:', validationResult);
+              // If validation fails, still try to navigate directly
+              if (!validationResult) {
+                console.log('[NAV DEBUG] goToNextSection: Validation failed, attempting direct navigation to section:', targetSectionNumber);
+                if (typeof navigateSection === 'function') {
+                  navigateSection(targetSectionNumber);
+                }
+              }
             } else if (typeof navigateSection === 'function') {
+              console.log('[NAV DEBUG] goToNextSection: Calling navigateSection directly with section:', targetSectionNumber);
               navigateSection(targetSectionNumber);
+            } else {
+              console.log('[NAV DEBUG] goToNextSection: Neither validateAndProceed nor navigateSection function found!');
             }
           };
           const updateTargetNav = () => {
+            console.log('[NAV DEBUG] goToNextSection: updateTargetNav called');
             const activeSection = document.querySelector('.section.active');
+            console.log('[NAV DEBUG] goToNextSection: Active section:', activeSection ? activeSection.id : 'none', 'Target section ID:', targetSectionId);
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                console.log('[NAV DEBUG] goToNextSection: Calling questionNavController for', targetSectionId);
                 window.questionNavControllers[targetSectionId]();
+              } else {
+                console.log('[NAV DEBUG] goToNextSection: No questionNavController found for', targetSectionId);
               }
+            } else {
+              console.log('[NAV DEBUG] goToNextSection: Active section does not match target section');
             }
           };
           triggerNavigation();
@@ -4039,39 +4108,98 @@ if (s > 1){
           triggerNavigation();
         }
         function shiftQuestion(direction) {
+          console.log('[NAV DEBUG] shiftQuestion called with direction:', direction, 'for section:', sectionId);
           const visibleIndices = getVisibleIndices();
+          console.log('[NAV DEBUG] shiftQuestion: visibleIndices:', visibleIndices, 'activeIndex:', activeIndex);
           if (!visibleIndices.length || activeIndex === -1) {
+            console.log('[NAV DEBUG] shiftQuestion: No visible indices or activeIndex is -1');
             if (direction > 0 && cachedNextSectionInfo) {
+              console.log('[NAV DEBUG] shiftQuestion: Going to next section (no visible questions in current section)');
               goToNextSection();
             } else if (direction < 0 && cachedPrevSectionInfo) {
+              console.log('[NAV DEBUG] shiftQuestion: Going to previous section');
               goToPrevSection();
+            } else {
+              console.log('[NAV DEBUG] shiftQuestion: No next/prev section info available');
             }
             return;
           }
           const currentPos = visibleIndices.indexOf(activeIndex);
+          console.log('[NAV DEBUG] shiftQuestion: currentPos:', currentPos, 'visibleIndices.length:', visibleIndices.length);
           if (direction > 0) {
             const activeContainer = questionItems[activeIndex];
-            if (activeContainer && !isQuestionAnswered(activeContainer)) {
+            const isAnswered = activeContainer ? isQuestionAnswered(activeContainer) : false;
+            console.log('[NAV DEBUG] shiftQuestion: Checking if current question is answered:', isAnswered);
+            if (activeContainer && !isAnswered) {
+              console.log('[NAV DEBUG] shiftQuestion: Current question not answered, blocking navigation');
               return;
             }
           }
           const nextPos = currentPos + direction;
+          console.log('[NAV DEBUG] shiftQuestion: nextPos:', nextPos);
           if (nextPos < 0 || nextPos >= visibleIndices.length) {
-            if (direction > 0 && cachedNextSectionInfo) {
-              goToNextSection();
+            console.log('[NAV DEBUG] shiftQuestion: nextPos out of bounds, checking for section navigation');
+            if (direction > 0) {
+              // If we're going forward and at the end, try to find next section
+              if (cachedNextSectionInfo) {
+                console.log('[NAV DEBUG] shiftQuestion: At end of section, going to next section');
+                goToNextSection();
+              } else {
+                // Re-check for next section in case cache is stale
+                console.log('[NAV DEBUG] shiftQuestion: No cached next section, re-checking...');
+                const freshNextSectionInfo = findNextSectionWithVisibleQuestions();
+                if (freshNextSectionInfo) {
+                  console.log('[NAV DEBUG] shiftQuestion: Found next section on re-check, navigating');
+                  cachedNextSectionInfo = freshNextSectionInfo;
+                  goToNextSection();
+                } else {
+                  // Last resort: if there's a next section element, navigate to it anyway
+                  const nextSectionIdx = sectionIdx + 1;
+                  if (nextSectionIdx < sectionElements.length) {
+                    const nextSection = sectionElements[nextSectionIdx];
+                    console.log('[NAV DEBUG] shiftQuestion: Last resort - navigating to next section element:', nextSection.id);
+                    cachedNextSectionInfo = {
+                      sectionEl: nextSection,
+                      sectionId: nextSection.id,
+                      sectionNumber: sectionNumbers[nextSectionIdx] || (nextSectionIdx + 1),
+                      firstVisibleIndex: 0
+                    };
+                    goToNextSection();
+                  } else {
+                    console.log('[NAV DEBUG] shiftQuestion: No next section available');
+                  }
+                }
+              }
             } else if (direction < 0 && cachedPrevSectionInfo) {
+              console.log('[NAV DEBUG] shiftQuestion: At start of section, going to previous section');
               goToPrevSection();
+            } else {
+              console.log('[NAV DEBUG] shiftQuestion: No next/prev section info available');
             }
             return;
           }
+          console.log('[NAV DEBUG] shiftQuestion: Activating index:', visibleIndices[nextPos]);
           activateIndex(visibleIndices[nextPos]);
         }
         function refreshNav(targetIdx) {
-
+          console.log('[NAV DEBUG] refreshNav called for section', sectionId, 'with targetIdx:', targetIdx);
           const visibleIndices = getVisibleIndices();
+          console.log('[NAV DEBUG] refreshNav: visibleIndices for section', sectionId, ':', visibleIndices, 'total questions:', questionItems.length);
 
           if (!visibleIndices.length) {
-
+            // If no visible questions found, try to show the first question anyway
+            // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
+            console.log('[NAV DEBUG] refreshNav: No visible indices found, attempting to activate first question (index 0)');
+            if (questionItems.length > 0) {
+              const firstQuestion = questionItems[0];
+              if (firstQuestion) {
+                // Remove both question-step-hidden AND hidden classes to ensure question is visible
+                firstQuestion.classList.remove('question-step-hidden');
+                firstQuestion.classList.remove('hidden');
+                console.log('[NAV DEBUG] refreshNav: Removed question-step-hidden and hidden classes from first question, attempting to activate');
+                console.log('[NAV DEBUG] refreshNav: First question classes after removal:', firstQuestion.className);
+              }
+            }
             activateIndex(0);
             return;
           }
@@ -4097,7 +4225,11 @@ if (s > 1){
         }
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
+            console.log('[NAV DEBUG] Next button clicked for section:', sectionId);
+            console.log('[NAV DEBUG] Next button advanceMode:', nextBtn.dataset.advanceMode);
+            console.log('[NAV DEBUG] Next button disabled:', nextBtn.disabled);
             if (nextBtn.dataset.advanceMode === 'submit') {
+              console.log('[NAV DEBUG] Next button: Submit mode, submitting form');
               const formEl = document.getElementById('customForm');
               if (formEl) {
                 if (typeof formEl.requestSubmit === 'function') {
@@ -4108,6 +4240,7 @@ if (s > 1){
               }
               return;
             }
+            console.log('[NAV DEBUG] Next button: Calling shiftQuestion(1)');
             shiftQuestion(1);
           });
         }
@@ -7647,11 +7780,18 @@ function updateCheckboxStyle(checkbox) {
  * Form validation functions
  *──────────────────────────────────────────────────────────────*/
 function validateAndProceed(sectionNumber) {
-    if (validateCurrentSection(sectionNumber)) {
+    console.log('[NAV DEBUG] validateAndProceed called for section:', sectionNumber);
+    const isValid = validateCurrentSection(sectionNumber);
+    console.log('[NAV DEBUG] validateAndProceed: Validation result for section', sectionNumber, ':', isValid);
+    if (isValid) {
+        console.log('[NAV DEBUG] validateAndProceed: Validation passed, calling handleNext');
         handleNext(sectionNumber);
+        return true;
     } else {
+        console.log('[NAV DEBUG] validateAndProceed: Validation failed, showing popup');
         // Show validation popup when validation fails
         showValidationPopup();
+        return false;
     }
 }
 // Show validation popup when user tries to proceed without answering all questions
@@ -7802,13 +7942,37 @@ function validateDropdownQuestion(questionContainer) {
     return isValid;
 }
 function validateTextQuestion(questionContainer) {
+    const questionId = questionContainer.id.replace('question-container-', '');
+    console.log('[NAV DEBUG] validateTextQuestion: Validating question', questionId);
     const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-    if (inputs.length === 0) return true;
-    for (let input of inputs) {
-        if (!input.value || input.value.trim() === '') {
+    console.log('[NAV DEBUG] validateTextQuestion: Found', inputs.length, 'text inputs for question', questionId);
+    if (inputs.length === 0) {
+        console.log('[NAV DEBUG] validateTextQuestion: No inputs found, returning true');
+        return true;
+    }
+    // Filter out hidden inputs and inputs that are not eligible
+    const eligibleInputs = Array.from(inputs).filter(input => {
+        const style = window.getComputedStyle(input);
+        const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+        const isNotDisabled = !input.disabled;
+        const isNotHiddenType = input.type !== 'hidden';
+        const hasOffsetParent = input.offsetParent !== null || input.type === 'hidden';
+        return isVisible && isNotDisabled && isNotHiddenType && (hasOffsetParent || input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || input.type === 'date');
+    });
+    console.log('[NAV DEBUG] validateTextQuestion: Eligible inputs:', eligibleInputs.length, 'for question', questionId);
+    if (eligibleInputs.length === 0) {
+        console.log('[NAV DEBUG] validateTextQuestion: No eligible inputs, returning true');
+        return true;
+    }
+    for (let input of eligibleInputs) {
+        const value = input.value ? input.value.trim() : '';
+        console.log('[NAV DEBUG] validateTextQuestion: Input', input.id, 'has value:', value);
+        if (!value) {
+            console.log('[NAV DEBUG] validateTextQuestion: Input', input.id, 'is empty, validation failed');
             return false;
         }
     }
+    console.log('[NAV DEBUG] validateTextQuestion: All inputs have values, validation passed');
     return true;
 }
 function showValidationError(container, message) {

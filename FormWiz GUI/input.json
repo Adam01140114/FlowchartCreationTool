@@ -2,12 +2,12 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Introduction",
+      "sectionName": "Hunger",
       "questions": [
         {
           "questionId": 1,
-          "text": "How many extra plaintiffs are there",
-          "type": "numberedDropdown",
+          "text": "Hungry?",
+          "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -59,170 +59,190 @@
             "title": "",
             "file": ""
           },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "hungry",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "Whats your favorite food",
+          "type": "multipleTextboxes",
+          "logic": {
+            "enabled": true,
+            "conditions": [
+              {
+                "prevQuestion": "1",
+                "prevAnswer": "Yes"
+              }
+            ]
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
           "options": [],
           "labels": [],
-          "nodeId": "how_many_extra_plaintiffs_are_there",
-          "min": "1",
-          "max": "5",
+          "nodeId": "whats_your_favorite_food",
           "allFieldsInOrder": [
             {
               "type": "label",
-              "label": "Name",
-              "nodeId": "how_many_extra_plaintiffs_are_there_name",
+              "label": "Best food",
+              "nodeId": "whats_your_favorite_food_best_food",
               "order": 1,
               "prefill": ""
-            },
-            {
-              "type": "phone",
-              "label": "Phone Number",
-              "nodeId": "how_many_extra_plaintiffs_are_there_phone_number",
-              "order": 2
-            },
-            {
-              "type": "location",
-              "fieldName": "Please enter their address",
-              "nodeId": "location_data",
-              "order": 3
-            },
-            {
-              "type": "dropdown",
-              "fieldName": "Is this plaintiff a business?",
-              "options": [
-                {
-                  "text": "Yes",
-                  "nodeId": "is_this_plaintiff_a_business_yes"
-                },
-                {
-                  "text": "No",
-                  "nodeId": "is_this_plaintiff_a_business_no"
-                }
-              ],
-              "triggerSequences": [
-                {
-                  "condition": "Yes",
-                  "title": "Additional Information",
-                  "fields": [
-                    {
-                      "type": "location",
-                      "fieldName": "Where did they file their fictitious business name?",
-                      "nodeId": "location_data"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Business Name",
-                      "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"
-                    },
-                    {
-                      "type": "label",
-                      "label": "Business Name Statement Number",
-                      "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number",
-                      "isAmountOption": true
-                    },
-                    {
-                      "type": "checkbox",
-                      "fieldName": "What do they do business as?",
-                      "selectionType": "single",
-                      "options": [
-                        {
-                          "text": "An Individual",
-                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
-                        },
-                        {
-                          "text": "An Association",
-                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"
-                        },
-                        {
-                          "text": "A Partnership",
-                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"
-                        },
-                        {
-                          "text": "A Corporation",
-                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"
-                        },
-                        {
-                          "text": "A Limited Liability Company",
-                          "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "date",
-                      "label": "When does their business statement expire?",
-                      "nodeId": "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire",
-                      "conditionalLogic": {
-                        "enabled": true,
-                        "conditions": [
-                          "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"
-                        ]
-                      }
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "1",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 1",
-                      "pdfName": "sc103(1).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "2",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 2",
-                      "pdfName": "sc103(2).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "3",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 3",
-                      "pdfName": "sc103(3).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "4",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 4",
-                      "pdfName": "sc103(4).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    },
-                    {
-                      "type": "pdf",
-                      "number": "5",
-                      "pdfTitle": "SC-103 For Extra Plaintiff 5",
-                      "pdfName": "sc103(5).pdf",
-                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
-                    }
-                  ]
-                }
-              ],
-              "order": 4
             }
           ]
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Thirst",
+      "questions": [
+        {
+          "questionId": 3,
+          "text": "Are you thirsty?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": [],
+          "nameId": "are_you_thirsty",
+          "placeholder": "",
+          "linking": {
+            "enabled": false,
+            "targetId": ""
+          },
+          "image": {
+            "url": "",
+            "width": 0,
+            "height": 0
+          }
         }
       ]
     }
   ],
   "groups": [],
   "hiddenFields": [],
-  "sectionCounter": 2,
-  "questionCounter": 2,
+  "sectionCounter": 3,
+  "questionCounter": 4,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
-  "formName": "New SC-100",
+  "formName": "Example Form",
   "defaultPDFName": "",
   "pdfOutputName": "",
   "stripePriceId": "",
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],
-  "linkedCheckboxes": [
-    {
-      "id": "linkedCheckbox0",
-      "linkedCheckboxId": "biz_check",
-      "checkboxes": [
-        "is_this_plaintiff_a_business_1_yes",
-        "is_this_plaintiff_a_business_2_yes"
-      ]
-    }
-  ],
+  "linkedCheckboxes": [],
   "inverseCheckboxes": []
 }
