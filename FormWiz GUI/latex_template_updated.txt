@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+
+\begin{document}
+
+% Sender Information (Top Left)
+\begin{flushleft}
+[user_fullname]\\
+[user_full_address]\\
+Email: [user_email]\\
+Phone: [user_phone]\\[1em]
+Date: [current_date]
+\end{flushleft}
+
+\vspace{1em}
+
+% Recipient Information
+[how_many_people_are_you_counter_suing_name_1]\\
+[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]
+
+\vspace{1em}
+
+\textbf{Re: Demand for Payment}
+
+\vspace{1em}
+
+Dear [how_many_people_are_you_counter_suing_name_1],
+
+\vspace{1em}
+
+I am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:
+
+[explain_why_they_owe_you_that_money]
+
+\vspace{1em}
+
+This amount remains unpaid despite previous attempts to resolve this matter amicably.
+
+\vspace{1em}
+
+Please remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.
+
+\vspace{1em}
+
+If payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.
+
+\vspace{1em}
+
+I hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.
+
+\vspace{1em}
+
+Thank you for your immediate attention to this matter.
+
+\vspace{1em}
+
+Sincerely,\\[2em]
+[user_fullname]
+
+\end{document}

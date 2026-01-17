@@ -247,6 +247,7 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._questionText) cellData._questionText = cell._questionText;
     if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
     if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
+    if (cell._fileName) cellData._fileName = cell._fileName;
     if (cell._nameId) cellData._nameId = cell._nameId;
     if (cell._placeholder) cellData._placeholder = cell._placeholder;
     if (cell._questionId) cellData._questionId = cell._questionId;
@@ -305,8 +306,9 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
     if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
     if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
-    // PDF preview node properties - always include if the node is a PDF preview node
-    if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+    // PDF preview node properties - always include if the node is a PDF preview node or Latex PDF preview node
+    if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+        (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
       cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
       cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
     } else if (cell._pdfPreviewTitle !== undefined) {

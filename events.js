@@ -479,6 +479,15 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
+    // d1) PDF Preview node double-click = show properties popup
+    if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+        (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
     // e) Hidden checkbox node double-click = show properties popup
     if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {
@@ -564,6 +573,13 @@ function setupDraggableShapes(graph) {
         } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(newVertex)) {
           // Initialize PDF preview node properties
           newVertex._pdfPreviewTitle = "PDF Preview";
+          newVertex._pdfPreviewFile = "";
+          if (typeof window.updatePdfPreviewNodeCell === 'function') {
+            window.updatePdfPreviewNodeCell(newVertex);
+          }
+        } else if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(newVertex)) {
+          // Initialize Latex PDF preview node properties
+          newVertex._pdfPreviewTitle = "Latex PDF Preview";
           newVertex._pdfPreviewFile = "";
           if (typeof window.updatePdfPreviewNodeCell === 'function') {
             window.updatePdfPreviewNodeCell(newVertex);

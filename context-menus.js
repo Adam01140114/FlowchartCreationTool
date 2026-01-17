@@ -1510,6 +1510,8 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
         <option value="info">Info Node</option>
         <option value="imageOption">Image Node</option>
         <option value="pdfNode">PDF Node</option>
+        <option value="pdfPreview">PDF Preview Node</option>
+        <option value="latexPdfPreview">Latex PDF Preview Node</option>
         <option value="amountOption">Amount Option Node</option>
         <option value="end">End Node</option>
         <option value="hiddenCheckbox">Hidden Checkbox Node</option>
@@ -1615,6 +1617,16 @@ window.convertMiscellaneousNode = function(selectElement) {
       label = "PDF document";
       width = 200;
       height = 100;
+    } else if (selectedType === 'pdfPreview') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfPreview;spacing=6;fontSize=16;";
+      label = "PDF Preview";
+      width = 200;
+      height = 100;
+    } else if (selectedType === 'latexPdfPreview') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=latexPdfPreview;spacing=6;fontSize=16;";
+      label = "Latex PDF Preview";
+      width = 200;
+      height = 100;
     } else if (selectedType === 'amountOption') {
       style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=amountOption;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
       label = "Amount option";
@@ -1696,6 +1708,18 @@ window.convertMiscellaneousNode = function(selectElement) {
       targetCell._pdfUrl = "";
       if (typeof window.updatePdfNodeCell === 'function') {
         window.updatePdfNodeCell(targetCell);
+      }
+    } else if (selectedType === 'pdfPreview') {
+      targetCell._pdfPreviewTitle = "PDF Preview";
+      targetCell._pdfPreviewFile = "";
+      if (typeof window.updatePdfPreviewNodeCell === 'function') {
+        window.updatePdfPreviewNodeCell(targetCell);
+      }
+    } else if (selectedType === 'latexPdfPreview') {
+      targetCell._pdfPreviewTitle = "Latex PDF Preview";
+      targetCell._pdfPreviewFile = "";
+      if (typeof window.updatePdfPreviewNodeCell === 'function') {
+        window.updatePdfPreviewNodeCell(targetCell);
       }
     } else if (selectedType === 'amountOption') {
       targetCell._amountText = "Amount option";

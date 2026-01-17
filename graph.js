@@ -275,7 +275,8 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         // Show properties popup for PDF preview nodes
-        if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+        if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+            (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
           if (typeof window.showPropertiesPopup === 'function') {
             window.showPropertiesPopup(cell);
           }
@@ -468,6 +469,8 @@ function showPropertiesPopup(cell) {
     title.textContent = 'PDF Node Properties';
   } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
     title.textContent = 'PDF Preview Node Properties';
+  } else if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
+    title.textContent = 'Latex PDF Preview Node Properties';
   } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
     title.textContent = 'Hidden Checkbox Properties';
   } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
@@ -765,8 +768,9 @@ function showPropertiesPopup(cell) {
       { label: 'PDF File', value: pdfFileValue, id: 'propPdfFile', editable: true },
       { label: 'PDF Price', value: pdfPriceValue, id: 'propPdfPrice', editable: true }
     ];
-  } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
-    const pdfPreviewTitleValue = cell._pdfPreviewTitle || 'PDF Preview';
+  } else if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+             (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
+    const pdfPreviewTitleValue = cell._pdfPreviewTitle || (window.isLatexPdfPreviewNode && window.isLatexPdfPreviewNode(cell) ? 'Latex PDF Preview' : 'PDF Preview');
     const pdfPreviewFileValue = cell._pdfPreviewFile || '';
     properties = [
       { label: 'Preview Title', value: pdfPreviewTitleValue, id: 'propPdfPreviewTitle', editable: true },
@@ -847,6 +851,16 @@ function showPropertiesPopup(cell) {
       id: 'propCheckboxAvailability',
       editable: false,
       isCheckboxAvailabilityDropdown: true
+    });
+  }
+  // Add File Name field for file upload questions
+  if (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
+      typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'fileUpload') {
+    properties.push({
+      label: 'File Name',
+      value: cell._fileName || '',
+      id: 'propFileName',
+      editable: true
     });
   }
   // Add Max Line Limit and Max Character Limit for big paragraph questions
@@ -2015,7 +2029,8 @@ function showPropertiesPopup(cell) {
         { value: 'multipleDropdownType', label: 'Multiple Dropdown' },
         { value: 'dateRange', label: 'Date Range' },
         { value: 'email', label: 'Email' },
-        { value: 'phone', label: 'Phone' }
+        { value: 'phone', label: 'Phone' },
+        { value: 'fileUpload', label: 'File Upload' }
       ];
       // Add options to dropdown
       questionTypes.forEach(type => {
@@ -2113,7 +2128,8 @@ function showPropertiesPopup(cell) {
       // Checkbox availability options
       const availabilityOptions = [
         { value: 'markAll', text: 'Mark all that apply' },
-        { value: 'markOne', text: 'Mark only one' }
+        { value: 'markOne', text: 'Mark only one' },
+        { value: 'allRequired', text: 'All Required' }
       ];
       // Add options to dropdown
       availabilityOptions.forEach(option => {
@@ -2151,6 +2167,10 @@ function showPropertiesPopup(cell) {
       valueSpan = document.createElement('span');
       valueSpan.id = prop.id;
       valueSpan.textContent = prop.value;
+      // For LaTeX Preview File, preserve whitespace including newlines
+      const isLatexPreviewFile = prop.id === 'propPdfPreviewFile' && 
+                                 typeof window.isLatexPdfPreviewNode === 'function' && 
+                                 window.isLatexPdfPreviewNode(cell);
       valueSpan.style.cssText = `
         flex: 1;
         padding: 8px 12px;
@@ -2161,6 +2181,7 @@ function showPropertiesPopup(cell) {
         cursor: ${prop.editable ? 'text' : 'default'};
         transition: all 0.2s ease;
         ${prop.isInherited ? 'border-left: 4px solid #4caf50; font-style: italic;' : ''}
+        ${isLatexPreviewFile ? 'white-space: pre-wrap;' : ''}
       `;
     }
     if (prop.isDropdown) {
@@ -2468,8 +2489,13 @@ function showPropertiesPopup(cell) {
         valueSpan.addEventListener('click', () => {
           // For Node Text field, use textarea to maintain size
           const isNodeText = prop.id === 'propNodeText';
-          const input = document.createElement(isNodeText ? 'textarea' : 'input');
-          if (!isNodeText) {
+          // For Latex PDF Preview File field, use textarea to preserve newlines (LaTeX requires proper line breaks)
+          const isLatexPreviewFile = prop.id === 'propPdfPreviewFile' && 
+                                     typeof window.isLatexPdfPreviewNode === 'function' && 
+                                     window.isLatexPdfPreviewNode(cell);
+          const useTextarea = isNodeText || isLatexPreviewFile;
+          const input = document.createElement(useTextarea ? 'textarea' : 'input');
+          if (!useTextarea) {
             input.type = prop.inputType || 'text';
           }
           input.value = prop.value;
@@ -2481,7 +2507,7 @@ function showPropertiesPopup(cell) {
           // Special debugging for PDF preview properties
           if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile') {
           }
-          if (isNodeText) {
+          if (useTextarea) {
             input.style.cssText = `
               width: 100%;
               min-height: 80px;
@@ -2493,6 +2519,7 @@ function showPropertiesPopup(cell) {
               resize: vertical;
               font-family: inherit;
               line-height: 1.4;
+              white-space: pre-wrap;
             `;
           } else {
             input.style.cssText = `
@@ -2529,9 +2556,20 @@ function showPropertiesPopup(cell) {
           }
           
           const saveValue = () => {
-            const newValue = input.value.trim();
+            // For LaTeX Preview File, preserve all whitespace including newlines (don't trim)
+            // For other fields, trim leading/trailing whitespace
+            const isLatexPreviewFile = prop.id === 'propPdfPreviewFile' && 
+                                       typeof window.isLatexPdfPreviewNode === 'function' && 
+                                       window.isLatexPdfPreviewNode(cell);
+            const newValue = isLatexPreviewFile ? input.value : input.value.trim();
             console.log('[PROPERTIES] saveValue called for:', prop.id, 'New value:', newValue, 'Input element exists:', !!input, 'Input parent exists:', !!(input && input.parentNode));
             valueSpan.textContent = newValue;
+            // For LaTeX Preview File, preserve whitespace in display
+            if (isLatexPreviewFile) {
+              valueSpan.style.whiteSpace = 'pre-wrap';
+            } else {
+              valueSpan.style.whiteSpace = 'normal';
+            }
             valueSpan.style.display = 'block';
             // Special debugging for PDF properties
             if (prop.id === 'propPdfName' || prop.id === 'propPdfFile' || prop.id === 'propPdfPrice') {
@@ -2630,6 +2668,9 @@ function showPropertiesPopup(cell) {
                 console.log('[PROPERTIES] Saving propParagraphLimit, old value:', cell._paragraphLimit, 'new value:', newValue);
                 cell._paragraphLimit = newValue;
                 console.log('[PROPERTIES] propParagraphLimit saved, cell._paragraphLimit now:', cell._paragraphLimit);
+                break;
+              case 'propFileName':
+                cell._fileName = newValue;
                 break;
               case 'propNodeId':
                 // Update the _nameId property
@@ -3086,7 +3127,11 @@ function showPropertiesPopup(cell) {
       // Check for Preview File input
       const pdfPreviewFileInput = document.getElementById('propPdfPreviewFile_input');
       if (pdfPreviewFileInput) {
-        const pdfPreviewFileValue = pdfPreviewFileInput.value.trim();
+        // For LaTeX Preview File, preserve all whitespace including newlines (don't trim)
+        // For regular PDF Preview File, trim leading/trailing whitespace
+        const isLatexPreviewFile = typeof window.isLatexPdfPreviewNode === 'function' && 
+                                   window.isLatexPdfPreviewNode(cell);
+        const pdfPreviewFileValue = isLatexPreviewFile ? pdfPreviewFileInput.value : pdfPreviewFileInput.value.trim();
         if (pdfPreviewFileValue !== cell._pdfPreviewFile) {
           cell._pdfPreviewFile = pdfPreviewFileValue;
           if (typeof window.updatePdfPreviewNodeCell === 'function') {

@@ -249,6 +249,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   <option value="dateRange">Date Range</option>
                   <option value="email">Email</option>
                   <option value="phone">Phone</option>
+                  <option value="fileUpload">File Upload</option>
                 </select>
               </div>`;
           }
@@ -1202,6 +1203,12 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         if (typeof window.updatePdfPreviewNodeCell === 'function') {
           window.updatePdfPreviewNodeCell(cell);
         }
+      } else if (nodeType === 'latexPdfPreview') {
+        cell._pdfPreviewTitle = "Latex PDF Preview";
+        cell._pdfPreviewFile = "";
+        if (typeof window.updatePdfPreviewNodeCell === 'function') {
+          window.updatePdfPreviewNodeCell(cell);
+        }
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
       }
@@ -1718,8 +1725,10 @@ function updateInfoNodeCell(cell) {
   colorCell(cell);
 }
 function updatePdfPreviewNodeCell(cell) {
-  if (!cell || !(typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell))) return;
-  cell._pdfPreviewTitle = cell._pdfPreviewTitle || "PDF Preview";
+  if (!cell || !((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+                 (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)))) return;
+  const defaultTitle = (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) ? "Latex PDF Preview" : "PDF Preview";
+  cell._pdfPreviewTitle = cell._pdfPreviewTitle || defaultTitle;
   cell.value = escapeHtml(cell._pdfPreviewTitle);
   colorCell(cell);
 }
@@ -4656,18 +4665,33 @@ function previewForm() {
     }
   }
   if (guiJsonStr) {
-      // Encode the JSON for URL transmission
-      const encodedJson = encodeURIComponent(guiJsonStr);
-      const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
+      // Store JSON in localStorage to avoid URL length limits
+      // Generate a unique key for this preview session
+      const previewKey = 'flowchart_preview_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      try {
+        localStorage.setItem(previewKey, guiJsonStr);
+        // Set expiration time (1 hour from now) to prevent localStorage from filling up
+        localStorage.setItem(previewKey + '_expires', (Date.now() + 3600000).toString());
+      } catch (e) {
+        console.error('Error storing preview data in localStorage:', e);
+        // Fallback to URL method if localStorage fails (though it may still have size limits)
+        const encodedJson = encodeURIComponent(guiJsonStr);
+        const guiUrl = `FormWiz GUI/gui.html?preview=${encodedJson}`;
+        window.open(guiUrl, '_blank');
+        return;
+      }
+      
       // Still copy to clipboard for manual use if needed
-    navigator.clipboard.writeText(guiJsonStr).then(() => {
-      // Optionally, show a message: copied!
-    });
-      // Open the GUI preview in a new tab with the JSON in the URL
+      navigator.clipboard.writeText(guiJsonStr).then(() => {
+        // Optionally, show a message: copied!
+      });
+      
+      // Open the GUI preview in a new tab with the preview key in the URL
+      const guiUrl = `FormWiz GUI/gui.html?previewKey=${encodeURIComponent(previewKey)}`;
       window.open(guiUrl, '_blank');
     } else {
       // Fallback to regular GUI if no JSON generated
-  window.open('FormWiz%20GUI/gui.html', '_blank');
+      window.open('FormWiz GUI/gui.html', '_blank');
     }
 }
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE
@@ -4735,6 +4759,7 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._questionText) cellData._questionText = cell._questionText;
       if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
       if (cell._dropdownTitle) cellData._dropdownTitle = cell._dropdownTitle;
+      if (cell._fileName) cellData._fileName = cell._fileName;
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
@@ -5469,7 +5494,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.vertex = true;
         newCell.id = nodeData.newId;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit"].forEach(k => {
           // For limit properties, also copy empty strings and null values
           const isLimitProperty = k === '_lineLimit' || k === '_characterLimit' || k === '_paragraphLimit';
           if (isLimitProperty) {
@@ -5611,7 +5636,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section

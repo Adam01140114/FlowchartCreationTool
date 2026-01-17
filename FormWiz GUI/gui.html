@@ -397,16 +397,52 @@
             var textarea = document.getElementById('pasteJsonTextarea');
             var confirmBtn = document.getElementById('confirmPasteJsonBtn');
             
-            // Check for preview JSON in URL parameters
+            // Check for preview JSON in URL parameters or localStorage
             function checkForPreviewJson() {
                 const urlParams = new URLSearchParams(window.location.search);
-                const previewJson = urlParams.get('preview');
+                const previewKey = urlParams.get('previewKey');
+                const previewJson = urlParams.get('preview'); // Fallback for old URL format
                 
-                if (previewJson) {
+                let jsonData = null;
+                
+                // First, try to get from localStorage using previewKey
+                if (previewKey) {
+                    try {
+                        // Check if the data has expired
+                        const expires = localStorage.getItem(previewKey + '_expires');
+                        if (expires && Date.now() > parseInt(expires)) {
+                            // Data has expired, clean it up
+                            localStorage.removeItem(previewKey);
+                            localStorage.removeItem(previewKey + '_expires');
+                            console.warn('Preview data has expired');
+                        } else {
+                            // Get the JSON from localStorage
+                            const storedJson = localStorage.getItem(previewKey);
+                            if (storedJson) {
+                                jsonData = JSON.parse(storedJson);
+                                // Clean up the localStorage entry after reading
+                                localStorage.removeItem(previewKey);
+                                localStorage.removeItem(previewKey + '_expires');
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error loading preview JSON from localStorage:', e);
+                    }
+                }
+                
+                // Fallback: try to get from URL parameter (old method, may have size limits)
+                if (!jsonData && previewJson) {
                     try {
                         const decodedJson = decodeURIComponent(previewJson);
-                        const jsonData = JSON.parse(decodedJson);
-                        
+                        jsonData = JSON.parse(decodedJson);
+                    } catch (e) {
+                        console.error('Error loading preview JSON from URL:', e);
+                        return false; // Failed to load from URL
+                    }
+                }
+                
+                if (jsonData) {
+                    try {
                         // Load the form data automatically
                         loadFormData(jsonData);
                         setTimeout(updateFormAfterImport, 300);
@@ -420,12 +456,13 @@
                         const newUrl = window.location.pathname;
                         window.history.replaceState({}, document.title, newUrl);
                         
-                        return true; // Successfully loaded from URL
+                        return true; // Successfully loaded
                     } catch (e) {
-                        console.error('Error loading preview JSON from URL:', e);
-                        return false; // Failed to load from URL
+                        console.error('Error loading form data:', e);
+                        return false;
                     }
                 }
+                
                 return false; // No preview parameter found
             }
             

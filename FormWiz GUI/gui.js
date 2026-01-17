@@ -185,6 +185,13 @@ function updateChecklistLogicAnswersForRow(questionId, conditionIndex, callback)
             }
         });
         if (callback) callback();
+    } else if (questionType === 'fileUpload') {
+        // For file upload questions, add "uploaded a file" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'uploaded a file';
+        optionEl.textContent = 'uploaded a file';
+        answerSelect.appendChild(optionEl);
+        if (callback) callback();
     } else if (questionType === 'checkbox') {
         const checkOpts = targetQuestionBlock.querySelectorAll(`#checkboxOptions${prevQNum} [id^="checkboxOptionText"]`);
         checkOpts.forEach(optInput => {
@@ -521,6 +528,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="phone">Phone</option>
             <option value="bigParagraph">Big Paragraph</option>
             <option value="location">Location</option>
+            <option value="fileUpload">File Upload</option>
         </select><br><br>
         <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
@@ -594,6 +602,9 @@ function addQuestion(sectionId, questionId = null) {
             <div id="markOnlyOneContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
                 <label><input type="checkbox" id="markOnlyOne${currentQuestionId}">Mark only one</label>
             </div>
+            <div id="allAreRequiredContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
+                <label><input type="checkbox" id="allAreRequired${currentQuestionId}">All are required</label>
+            </div>
         </div><br>
         <!-- Multiple Textboxes Options -->
         <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
@@ -610,6 +621,13 @@ function addQuestion(sectionId, questionId = null) {
             <!-- Hidden containers for backward compatibility -->
             <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
             <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
+        </div><br>
+        <!-- File Upload Options -->
+        <div id="fileUploadOptionsBlock${currentQuestionId}" class="file-upload-options" style="display: none;">
+            <label>Upload Title: </label>
+            <input type="text" id="fileUploadTitle${currentQuestionId}" placeholder="e.g., Please upload a picture of your ID"><br><br>
+            <label>File Title: </label>
+            <input type="text" id="fileUploadFileTitle${currentQuestionId}" placeholder="e.g., Personal_ID">
         </div><br>
         <!-- Linking Logic for Dropdown -->
         <div id="linkingLogicBlock${currentQuestionId}" class="linking-options" style="display: none;">
@@ -648,6 +666,26 @@ function addQuestion(sectionId, questionId = null) {
             <input type="text" id="pdfPreviewTitle${currentQuestionId}" placeholder="Enter PDF preview title"><br><br>
             <label>PDF Preview File:</label>
             <input type="text" id="pdfPreviewFile${currentQuestionId}" placeholder="Enter PDF file name or URL">
+        </div><br>
+        <!-- LaTeX Preview Feature -->
+        <label>Enable Latex Preview: </label>
+        <input type="checkbox" id="enableLatexPreview${currentQuestionId}" onchange="toggleLatexPreview(${currentQuestionId})">
+        <div id="latexPreviewBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Latex Preview Trigger:</label>
+            <select id="latexPreviewTrigger${currentQuestionId}">
+                <option value="">Select an option...</option>
+            </select><br><br>
+            <label>Latex Preview Title:</label>
+            <input type="text" id="latexPreviewTitle${currentQuestionId}" placeholder="Enter LaTeX preview title"><br><br>
+            <label>Latex Content:</label>
+            <textarea id="latexPreviewContent${currentQuestionId}" placeholder="Paste LaTeX code here" rows="8" style="width: 100%; font-family: monospace;"></textarea><br><br>
+            <label>Latex Price ID:</label>
+            <input type="text" id="latexPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1..."><br><br>
+            <label>Latex Attachment:</label>
+            <select id="latexPreviewAttachment${currentQuestionId}">
+                <option value="Preview Only">Preview Only</option>
+                <option value="Attach to packet">Attach to packet</option>
+            </select><br><br>
         </div><br>
         <!-- Conditional Logic -->
         <label>Enable Conditional Logic: </label>
@@ -972,6 +1010,7 @@ function toggleOptions(questionId) {
     const lineLimitOptionsBlock = document.getElementById(`lineLimitOptions${questionId}`);
     const dropdownImageBlock = document.getElementById(`dropdownImageBlock${questionId}`);
     const linkingLogicBlock = document.getElementById(`linkingLogicBlock${questionId}`);
+    const fileUploadOptionsBlock = document.getElementById(`fileUploadOptionsBlock${questionId}`);
     // Reset all blocks
     textboxOptionsBlock.style.display = 'none';
     lineLimitOptionsBlock.style.display = 'none';
@@ -981,6 +1020,7 @@ function toggleOptions(questionId) {
     multipleTextboxesBlock.style.display = 'none';
     dropdownImageBlock.style.display = 'none';
     linkingLogicBlock.style.display = 'none';
+    if (fileUploadOptionsBlock) fileUploadOptionsBlock.style.display = 'none';
     // Handle location type: auto-populate as multipleTextboxes
     if (questionType === 'location') {
         // Switch to multipleTextboxes visually and in data
@@ -1077,6 +1117,11 @@ function toggleOptions(questionId) {
             if (pdfLogicEnabled) {
                 updatePdfLogicTriggerOptions(questionId);
             }
+            break;
+        case 'fileUpload':
+            if (fileUploadOptionsBlock) fileUploadOptionsBlock.style.display = 'block';
+            // Update existing jump conditions to use simplified format for file upload questions
+            updateJumpConditionsForTextbox(questionId);
             break;
         case 'money':
         case 'currency':
@@ -1176,8 +1221,10 @@ function addLogicCondition(questionId) {
         <span>Condition ${numConditions}:</span><br>
         <input type="number" placeholder="Previous question number"
                id="prevQuestion${questionId}_${numConditions}"
-               onchange="updateLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-        <select id="prevAnswer${questionId}_${numConditions}" style="display: block;">
+               onchange="console.log('[CONDITIONAL LOGIC DEBUG] Question number input changed:', this.value); updateLogicAnswersForRow(${questionId}, ${numConditions})"><br>
+        <select id="prevAnswer${questionId}_${numConditions}" style="display: block;" 
+                onfocus="console.log('[CONDITIONAL LOGIC DEBUG] Answer dropdown focused for question ${questionId}, condition ${numConditions}');"
+                onclick="console.log('[CONDITIONAL LOGIC DEBUG] Answer dropdown clicked for question ${questionId}, condition ${numConditions}'); const prevQInput = document.getElementById('prevQuestion${questionId}_${numConditions}'); console.log('[CONDITIONAL LOGIC DEBUG] Previous question value:', prevQInput?.value);">
             <option value="">-- Select an answer --</option>
         </select><br>
         <button type="button" onclick="removeLogicCondition(${questionId}, ${numConditions})">Remove</button>
@@ -1236,6 +1283,12 @@ function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
             <option value="Yes">Yes</option>
             <option value="No">No</option>
         `;
+    } else if (questionType === 'fileUpload') {
+        // For file upload questions, add "uploaded a file" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'uploaded a file';
+        optionEl.textContent = 'uploaded a file';
+        answerSelect.appendChild(optionEl);
     } else if (questionType === 'dropdown') {
         const dropOpts = targetQuestionBlock.querySelectorAll(`#dropdownOptions${prevQNum} input`);
         dropOpts.forEach(opt => {
@@ -1429,30 +1482,60 @@ function updatePdfLogicAnswersForRow(questionId, conditionIndex) {
 }
 /** On picking a "previous question" for logic, populate possible answers. */
 function updateLogicAnswersForRow(questionId, conditionIndex) {
+    console.log('[CONDITIONAL LOGIC DEBUG] updateLogicAnswersForRow called', { questionId, conditionIndex });
     const questionNumberInput = document.getElementById(`prevQuestion${questionId}_${conditionIndex}`);
     const answerSelect = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
-    if (!questionNumberInput || !answerSelect) return;
+    console.log('[CONDITIONAL LOGIC DEBUG] Elements found:', { 
+        questionNumberInput: !!questionNumberInput, 
+        answerSelect: !!answerSelect,
+        questionNumberInputValue: questionNumberInput?.value 
+    });
+    if (!questionNumberInput || !answerSelect) {
+        console.log('[CONDITIONAL LOGIC DEBUG] Missing required elements, returning');
+        return;
+    }
     const prevQNum = parseInt(questionNumberInput.value);
+    console.log('[CONDITIONAL LOGIC DEBUG] Previous question number:', prevQNum);
     if (!prevQNum) {
+        console.log('[CONDITIONAL LOGIC DEBUG] No question number, resetting dropdown');
         answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
         return;
     }
     const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
+    console.log('[CONDITIONAL LOGIC DEBUG] Target question block found:', !!targetQuestionBlock);
     if (!targetQuestionBlock) {
+        console.log('[CONDITIONAL LOGIC DEBUG] Invalid question block, showing error');
         answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
         return;
     }
-    const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
-    if (!questionType) return;
+    const questionTypeSelector = targetQuestionBlock.querySelector(`#questionType${prevQNum}`);
+    console.log('[CONDITIONAL LOGIC DEBUG] Question type selector found:', !!questionTypeSelector);
+    console.log('[CONDITIONAL LOGIC DEBUG] Question type selector element:', questionTypeSelector);
+    if (questionTypeSelector) {
+        console.log('[CONDITIONAL LOGIC DEBUG] Question type selector value:', questionTypeSelector.value);
+        console.log('[CONDITIONAL LOGIC DEBUG] Question type selector options:', Array.from(questionTypeSelector.options || []).map(opt => ({ value: opt.value, text: opt.textContent, selected: opt.selected })));
+        console.log('[CONDITIONAL LOGIC DEBUG] All question type options:', questionTypeSelector.innerHTML);
+    }
+    const questionType = questionTypeSelector?.value;
+    console.log('[CONDITIONAL LOGIC DEBUG] Extracted question type:', questionType);
+    console.log('[CONDITIONAL LOGIC DEBUG] Is questionType === "fileUpload"?', questionType === 'fileUpload');
+    console.log('[CONDITIONAL LOGIC DEBUG] Question type comparison (strict):', questionType === 'fileUpload');
+    console.log('[CONDITIONAL LOGIC DEBUG] Question type comparison (loose):', questionType == 'fileUpload');
+    if (!questionType) {
+        console.log('[CONDITIONAL LOGIC DEBUG] No question type found, returning');
+        return;
+    }
     // Reset the answer select to show it again (in case it was hidden for text questions)
     answerSelect.style.display = 'block';
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+    console.log('[CONDITIONAL LOGIC DEBUG] Dropdown reset, checking question type:', questionType);
     // Remove any existing condition labels and hidden inputs for text questions
     const existingLabel = document.getElementById(`conditionLabel${questionId}_${conditionIndex}`);
     const existingHiddenInput = document.getElementById(`hiddenAnswer${questionId}_${conditionIndex}`);
     if (existingLabel) existingLabel.remove();
     if (existingHiddenInput) existingHiddenInput.remove();
     if (questionType === 'radio') {
+        console.log('[CONDITIONAL LOGIC DEBUG] Adding radio options');
         answerSelect.innerHTML += `
             <option value="Yes">Yes</option>
             <option value="No">No</option>
@@ -1501,7 +1584,33 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
                 answerSelect.appendChild(optionEl);
             }
         }
+    } else if (questionType === 'fileUpload') {
+        console.log('[CONDITIONAL LOGIC DEBUG] ========== FILE UPLOAD DETECTED ==========');
+        console.log('[CONDITIONAL LOGIC DEBUG] Question ID:', questionId);
+        console.log('[CONDITIONAL LOGIC DEBUG] Condition Index:', conditionIndex);
+        console.log('[CONDITIONAL LOGIC DEBUG] Previous Question Number:', prevQNum);
+        console.log('[CONDITIONAL LOGIC DEBUG] Question Type:', questionType);
+        console.log('[CONDITIONAL LOGIC DEBUG] Answer Select Element:', answerSelect);
+        console.log('[CONDITIONAL LOGIC DEBUG] Answer Select ID:', answerSelect.id);
+        console.log('[CONDITIONAL LOGIC DEBUG] Current dropdown options before adding:', Array.from(answerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent })));
+        console.log('[CONDITIONAL LOGIC DEBUG] Current dropdown innerHTML before:', answerSelect.innerHTML);
+        // For file upload questions, add "uploaded a file" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'uploaded a file';
+        optionEl.textContent = 'uploaded a file';
+        console.log('[CONDITIONAL LOGIC DEBUG] Created option element:', optionEl);
+        console.log('[CONDITIONAL LOGIC DEBUG] Option value:', optionEl.value);
+        console.log('[CONDITIONAL LOGIC DEBUG] Option textContent:', optionEl.textContent);
+        answerSelect.appendChild(optionEl);
+        console.log('[CONDITIONAL LOGIC DEBUG] Option appended. Current dropdown options after adding:', Array.from(answerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent })));
+        console.log('[CONDITIONAL LOGIC DEBUG] Current dropdown innerHTML after:', answerSelect.innerHTML);
+        console.log('[CONDITIONAL LOGIC DEBUG] Dropdown innerHTML length:', answerSelect.innerHTML.length);
+        console.log('[CONDITIONAL LOGIC DEBUG] Dropdown children count:', answerSelect.children.length);
+        console.log('[CONDITIONAL LOGIC DEBUG] Dropdown options count:', answerSelect.options.length);
+        console.log('[CONDITIONAL LOGIC DEBUG] ========== END FILE UPLOAD HANDLING ==========');
     } else if (questionType === 'text' || questionType === 'bigParagraph' || questionType === 'money' || questionType === 'currency' || questionType === 'date' || questionType === 'dateRange') {
+        console.log('[CONDITIONAL LOGIC DEBUG] Text-based question, hiding dropdown');
+        console.log('[CONDITIONAL LOGIC DEBUG] Text-based question, hiding dropdown');
         // For textbox, money, and date questions, hide the answer dropdown since they don't have predefined options
         answerSelect.style.display = 'none';
         // Add a hidden input to store the condition value
@@ -1523,6 +1632,11 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
             answerSelect.parentNode.insertBefore(conditionLabel, answerSelect);
         }
     }
+    console.log('[CONDITIONAL LOGIC DEBUG] ========== FINAL STATE ==========');
+    console.log('[CONDITIONAL LOGIC DEBUG] Final dropdown options:', Array.from(answerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent })));
+    console.log('[CONDITIONAL LOGIC DEBUG] Final dropdown innerHTML:', answerSelect.innerHTML);
+    console.log('[CONDITIONAL LOGIC DEBUG] Final dropdown options count:', answerSelect.options.length);
+    console.log('[CONDITIONAL LOGIC DEBUG] ========== END updateLogicAnswersForRow ==========');
 }
 // Jump logic toggling
 function toggleJumpLogic(questionId) {
@@ -2015,6 +2129,8 @@ function addDropdownOption(questionId) {
     optionInput.addEventListener('input', () => {
         // Update PDF preview trigger options
         updatePdfPreviewTriggerOptions(questionId);
+        // Update LaTeX preview trigger options
+        updateLatexPreviewTriggerOptions(questionId);
         // Update all jump conditions for this question
         const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
         jumpConditions.forEach(condition => {
@@ -2050,6 +2166,10 @@ function removeDropdownOption(questionId, optionNumber) {
     updateAllChecklistLogicDropdowns();
     // Update hidden logic trigger options
     updateHiddenLogicTriggerOptions(questionId);
+    // Update PDF preview trigger options
+    updatePdfPreviewTriggerOptions(questionId);
+    // Update LaTeX preview trigger options
+    updateLatexPreviewTriggerOptions(questionId);
 }
 function addCheckboxOption(questionId) {
     const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
@@ -4199,6 +4319,43 @@ function togglePdfPreview(questionId) {
     // Populate the preview trigger dropdown with options
     if (pdfPreviewEnabled) {
         updatePdfPreviewTriggerOptions(questionId);
+    }
+}
+// New function for LaTeX Preview feature
+function toggleLatexPreview(questionId) {
+    const latexPreviewEnabled = document.getElementById(`enableLatexPreview${questionId}`).checked;
+    const latexPreviewBlock = document.getElementById(`latexPreviewBlock${questionId}`);
+    latexPreviewBlock.style.display = latexPreviewEnabled ? 'block' : 'none';
+    // Populate the preview trigger dropdown with options
+    if (latexPreviewEnabled) {
+        updateLatexPreviewTriggerOptions(questionId);
+    }
+}
+// Function to populate LaTeX preview trigger dropdown with question options
+function updateLatexPreviewTriggerOptions(questionId) {
+    const triggerSelect = document.getElementById(`latexPreviewTrigger${questionId}`);
+    if (!triggerSelect) return;
+    // Save the currently selected value
+    const currentValue = triggerSelect.value;
+    // Clear existing options (except the placeholder)
+    triggerSelect.innerHTML = '<option value="">Select an option...</option>';
+    // Get all dropdown options for this question
+    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+    if (dropdownOptionsDiv) {
+        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+        optionInputs.forEach((input) => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                triggerSelect.appendChild(option);
+            }
+        });
+    }
+    // Restore the previously selected value if it still exists
+    if (currentValue) {
+        triggerSelect.value = currentValue;
     }
 }
 // Function to populate PDF preview trigger dropdown with question options

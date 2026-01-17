@@ -357,27 +357,72 @@ function loadFormData(formData) {
                                 checkboxOptionsDiv.parentNode.appendChild(noneContainer);
                             }
                         }
-                        // Add the "Mark only one" checkbox if it exists in the data
-                        if (question.markOnlyOne) {
-                            // Find the container for the "Mark only one" option
-                            let markOnlyOneContainer = document.createElement('div');
-                            markOnlyOneContainer.id = `markOnlyOneContainer${question.questionId}`;
-                            markOnlyOneContainer.style.marginTop = '10px';
-                            markOnlyOneContainer.style.marginBottom = '10px';
-                            markOnlyOneContainer.innerHTML = `
-                                <label>
-                                    <input type="checkbox" id="markOnlyOne${question.questionId}" checked>
-                                    Mark only one
-                                </label>
-                            `;
-                            // Add it right after the options div (or after the "None of the above" container if it exists)
-                            const insertAfter = hasNoneOption ? 
-                                document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
-                                checkboxOptionsDiv;
-                            if (insertAfter.nextSibling) {
-                                insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
-                            } else {
-                                insertAfter.parentNode.appendChild(markOnlyOneContainer);
+                        // Set the "Mark only one" checkbox state
+                        // First check if the container already exists (created by addQuestion)
+                        let markOnlyOneContainer = document.getElementById(`markOnlyOneContainer${question.questionId}`);
+                        if (markOnlyOneContainer) {
+                            // Container exists, just set the checkbox state
+                            const markOnlyOneCheckbox = markOnlyOneContainer.querySelector(`#markOnlyOne${question.questionId}`);
+                            if (markOnlyOneCheckbox) {
+                                markOnlyOneCheckbox.checked = question.markOnlyOne || false;
+                            }
+                        } else {
+                            // Container doesn't exist, create it
+                            if (question.markOnlyOne) {
+                                markOnlyOneContainer = document.createElement('div');
+                                markOnlyOneContainer.id = `markOnlyOneContainer${question.questionId}`;
+                                markOnlyOneContainer.style.marginTop = '10px';
+                                markOnlyOneContainer.style.marginBottom = '10px';
+                                markOnlyOneContainer.innerHTML = `
+                                    <label>
+                                        <input type="checkbox" id="markOnlyOne${question.questionId}" checked>
+                                        Mark only one
+                                    </label>
+                                `;
+                                // Add it right after the options div (or after the "None of the above" container if it exists)
+                                const insertAfter = hasNoneOption ? 
+                                    document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
+                                    checkboxOptionsDiv;
+                                if (insertAfter && insertAfter.nextSibling) {
+                                    insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
+                                } else if (insertAfter) {
+                                    insertAfter.parentNode.appendChild(markOnlyOneContainer);
+                                }
+                            }
+                        }
+                        // Set the "All are required" checkbox state
+                        // First check if the container already exists (created by addQuestion)
+                        let allAreRequiredContainer = document.getElementById(`allAreRequiredContainer${question.questionId}`);
+                        if (allAreRequiredContainer) {
+                            // Container exists, just set the checkbox state
+                            const allAreRequiredCheckbox = allAreRequiredContainer.querySelector(`#allAreRequired${question.questionId}`);
+                            if (allAreRequiredCheckbox) {
+                                allAreRequiredCheckbox.checked = question.allAreRequired || false;
+                            }
+                        } else {
+                            // Container doesn't exist, create it
+                            if (question.allAreRequired) {
+                                allAreRequiredContainer = document.createElement('div');
+                                allAreRequiredContainer.id = `allAreRequiredContainer${question.questionId}`;
+                                allAreRequiredContainer.style.marginTop = '10px';
+                                allAreRequiredContainer.style.marginBottom = '10px';
+                                allAreRequiredContainer.innerHTML = `
+                                    <label>
+                                        <input type="checkbox" id="allAreRequired${question.questionId}" checked>
+                                        All are required
+                                    </label>
+                                `;
+                                // Add it right after the "Mark only one" container (or after the "None of the above" container if it exists)
+                                const insertAfter = question.markOnlyOne ? 
+                                    document.getElementById(`markOnlyOneContainer${question.questionId}`) :
+                                    (hasNoneOption ? 
+                                        document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
+                                        checkboxOptionsDiv);
+                                if (insertAfter && insertAfter.nextSibling) {
+                                    insertAfter.parentNode.insertBefore(allAreRequiredContainer, insertAfter.nextSibling);
+                                } else if (insertAfter) {
+                                    insertAfter.parentNode.appendChild(allAreRequiredContainer);
+                                }
                             }
                         }
                         // Update conditional PDF answers for checkbox
@@ -433,6 +478,35 @@ function loadFormData(formData) {
                                 }
                             }
                         }
+                        // -- Restore LaTeX preview if present (AFTER options are added to DOM) --
+                        if (question.latexPreview && question.latexPreview.enabled) {
+                            const latexPreviewCheckbox = questionBlock.querySelector(`#enableLatexPreview${question.questionId}`);
+                            const latexPreviewTriggerSelect = questionBlock.querySelector(`#latexPreviewTrigger${question.questionId}`);
+                            const latexPreviewTitleInput = questionBlock.querySelector(`#latexPreviewTitle${question.questionId}`);
+                            const latexPreviewContentInput = questionBlock.querySelector(`#latexPreviewContent${question.questionId}`);
+                            const latexPreviewPriceIdInput = questionBlock.querySelector(`#latexPreviewPriceId${question.questionId}`);
+                            const latexPreviewAttachmentSelect = questionBlock.querySelector(`#latexPreviewAttachment${question.questionId}`);
+                            if (latexPreviewCheckbox) {
+                                latexPreviewCheckbox.checked = true;
+                                toggleLatexPreview(question.questionId); // This populates the trigger dropdown with options from DOM
+                                // Set the trigger value after the dropdown is populated
+                                if (latexPreviewTriggerSelect && question.latexPreview.trigger) {
+                                    latexPreviewTriggerSelect.value = question.latexPreview.trigger;
+                                }
+                                if (latexPreviewTitleInput && question.latexPreview.title) {
+                                    latexPreviewTitleInput.value = question.latexPreview.title;
+                                }
+                                if (latexPreviewContentInput && question.latexPreview.content) {
+                                    latexPreviewContentInput.value = question.latexPreview.content;
+                                }
+                                if (latexPreviewPriceIdInput && question.latexPreview.priceId) {
+                                    latexPreviewPriceIdInput.value = question.latexPreview.priceId;
+                                }
+                                if (latexPreviewAttachmentSelect && question.latexPreview.attachment) {
+                                    latexPreviewAttachmentSelect.value = question.latexPreview.attachment;
+                                }
+                            }
+                        }
                     }
                     // Also restore Name/ID and Placeholder
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
@@ -442,6 +516,17 @@ function loadFormData(formData) {
                     }
                     if (placeholderInput) {
                         placeholderInput.value = question.placeholder || '';
+                    }
+                }
+                else if (question.type === 'fileUpload') {
+                    // Set the upload title and file title
+                    const uploadTitleEl = questionBlock.querySelector(`#fileUploadTitle${question.questionId}`);
+                    if (uploadTitleEl && question.uploadTitle) {
+                        uploadTitleEl.value = question.uploadTitle;
+                    }
+                    const fileTitleEl = questionBlock.querySelector(`#fileUploadFileTitle${question.questionId}`);
+                    if (fileTitleEl && question.fileTitle) {
+                        fileTitleEl.value = question.fileTitle;
                     }
                     // ********** Restore Image Data ********** 
                     if (question.image) {
@@ -2794,6 +2879,14 @@ function exportForm() {
                     title: questionBlock.querySelector(`#pdfPreviewTitle${questionId}`)?.value || "",
                     file: questionBlock.querySelector(`#pdfPreviewFile${questionId}`)?.value || ""
                 },
+                latexPreview: {
+                    enabled: questionBlock.querySelector(`#enableLatexPreview${questionId}`)?.checked || false,
+                    trigger: questionBlock.querySelector(`#latexPreviewTrigger${questionId}`)?.value || "",
+                    title: questionBlock.querySelector(`#latexPreviewTitle${questionId}`)?.value || "",
+                    content: questionBlock.querySelector(`#latexPreviewContent${questionId}`)?.value || "",
+                    priceId: questionBlock.querySelector(`#latexPreviewPriceId${questionId}`)?.value || "",
+                    attachment: questionBlock.querySelector(`#latexPreviewAttachment${questionId}`)?.value || "Preview Only"
+                },
                 options: [],
                 labels: []
             };
@@ -2845,6 +2938,9 @@ function exportForm() {
                 // Check if user enabled "Mark only one"
                 const markOnlyOneCheckbox = questionBlock.querySelector(`#markOnlyOne${questionId}`);
                 questionData.markOnlyOne = markOnlyOneCheckbox ? markOnlyOneCheckbox.checked : false;
+                // Check if user enabled "All are required"
+                const allAreRequiredCheckbox = questionBlock.querySelector(`#allAreRequired${questionId}`);
+                questionData.allAreRequired = allAreRequiredCheckbox ? allAreRequiredCheckbox.checked : false;
             }
             else if (questionType === 'dropdown') {
                 const dropdownOptionEls = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
@@ -2857,6 +2953,13 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
+            }
+            else if (questionType === 'fileUpload') {
+                // Get the upload title and file title
+                const uploadTitleEl = questionBlock.querySelector(`#fileUploadTitle${questionId}`);
+                questionData.uploadTitle = uploadTitleEl ? uploadTitleEl.value.trim() : '';
+                const fileTitleEl = questionBlock.querySelector(`#fileUploadFileTitle${questionId}`);
+                questionData.fileTitle = fileTitleEl ? fileTitleEl.value.trim() : '';
                 // Include linking logic data
                 const linkingEnabledEl = questionBlock.querySelector(`#enableLinking${questionId}`);
                 const linkingEnabled = linkingEnabledEl?.checked || false;

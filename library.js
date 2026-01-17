@@ -232,6 +232,10 @@ window.exportGuiJson = function(download = true) {
         pdfName: "",
         answer: "Yes"
       },
+      hiddenLogic: {
+        enabled: false,
+        configs: []
+      },
       pdfLogic: {
         enabled: false,
         conditions: [],
@@ -266,6 +270,14 @@ window.exportGuiJson = function(download = true) {
         title: "",
         file: ""
       },
+      latexPreview: {
+        enabled: false,
+        trigger: "",
+        title: "",
+        content: "",
+        priceId: "",
+        attachment: "Preview Only"
+      },
       options: [],
       labels: [],
       linking: {
@@ -278,10 +290,15 @@ window.exportGuiJson = function(download = true) {
         height: 0
       }
     };
-    // Add nameId and placeholder for non-multiple textboxes questions
-    if (questionType !== "multipleTextboxes") {
+    // Add nameId and placeholder for non-multiple textboxes questions and non-fileUpload questions
+    if (questionType !== "multipleTextboxes" && questionType !== "fileUpload") {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
+    }
+    // Add uploadTitle and fileTitle for fileUpload questions
+    if (questionType === "fileUpload") {
+      question.uploadTitle = question.text;
+      question.fileTitle = cell._fileName || "";
     }
       // Add line limit and character limit for big paragraph questions
       if (questionType === "bigParagraph") {
@@ -1043,18 +1060,21 @@ window.exportGuiJson = function(download = true) {
         if (targetCell && isEndNode(targetCell)) {
           // This question connects directly to an END node
           // For text-based questions, add "Any Text" jump condition
-          if (exportType === "text" || exportType === "bigParagraph" || exportType === "money" || exportType === "date" || exportType === "dateRange") {
+          // For fileUpload questions, use "uploaded a file" instead
+          if (exportType === "text" || exportType === "bigParagraph" || exportType === "money" || exportType === "date" || exportType === "dateRange" || exportType === "fileUpload") {
+            const jumpOption = exportType === "fileUpload" ? "uploaded a file" : "Any Text";
             jumpConditions.push({
-              option: "Any Text",
+              option: jumpOption,
               to: "end"
             });
-            endOption = "Any Text";
+            endOption = jumpOption;
           }
         } else if (targetCell && isQuestion(targetCell)) {
           // This question connects directly to another question
           // For text-based questions, add "Any Text" jump condition to the target question
           // but only if the target is in a different section that meets the jump criteria
-          if (exportType === "text" || exportType === "bigParagraph" || exportType === "money" || exportType === "date" || exportType === "dateRange") {
+          // For fileUpload questions, use "uploaded a file" instead
+          if (exportType === "text" || exportType === "bigParagraph" || exportType === "money" || exportType === "date" || exportType === "dateRange" || exportType === "fileUpload") {
             const targetQuestionId = targetCell._questionId || "";
             if (targetQuestionId) {
               // Get the target question's section using the same logic as section assignment
@@ -1072,8 +1092,9 @@ window.exportGuiJson = function(download = true) {
               // 2. Target is more than 1 section above current section
               const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
               if (shouldAddJump) {
+                const jumpOption = exportType === "fileUpload" ? "uploaded a file" : "Any Text";
                 jumpConditions.push({
-                  option: "Any Text",
+                  option: jumpOption,
                   to: targetSection.toString()
                 });
               }
@@ -1120,50 +1141,36 @@ window.exportGuiJson = function(download = true) {
               } else if (optionTarget && isQuestion(optionTarget)) {
                 // Check if this question leads to an end node
                 const questionType = getQuestionType(optionTarget);
-                if (questionType === "multipleDropdownType" || questionType === "multipleTextboxes") {
-                  // For multipleDropdownType/multipleTextboxes, check if they lead to an end node
-                  const questionOutgoingEdges = graph.getOutgoingEdges(optionTarget);
-                  if (questionOutgoingEdges) {
-                    for (const questionEdge of questionOutgoingEdges) {
-                      const questionTarget = questionEdge.target;
-                      if (questionTarget && isEndNode(questionTarget)) {
-                        // This option leads to a multipleDropdownType/multipleTextboxes that leads to an end node
+                // Don't add jump conditions for options leading to numberedDropdown/multipleTextboxes
+                // Those questions will handle their own jump conditions based on their min/max values
+                if (questionType !== "multipleDropdownType" && questionType !== "multipleTextboxes") {
+                  // Check for jumps to other questions - only add jump logic if target is in a different section
+                  // that is either before the current section or more than 1 section above
+                  const targetQuestionId = optionTarget._questionId || "";
+                  if (targetQuestionId) {
+                    // Get the target question's section using the same logic as section assignment
+                    let targetSection = parseInt(getSection(optionTarget) || "1", 10);
+                    // Apply the same section assignment logic for the target question
+                    const targetIsFirstQuestion = questions.every(otherCell => 
+                      otherCell === optionTarget || optionTarget.geometry.y <= otherCell.geometry.y
+                    );
+                    if (targetIsFirstQuestion && targetSection !== 1) {
+                      targetSection = 1;
+                    }
+                    const currentSection = parseInt(section || "1", 10);
+                    // Only add jump logic if:
+                    // 1. Target is in a section before current section, OR
+                    // 2. Target is more than 1 section above current section
+                    const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
+                    if (shouldAddJump) {
+                      // Check if this jump already exists
+                      const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
+                      if (!exists) {
                         jumpConditions.push({
                           option: optionText.trim(),
-                          to: "end"
+                          to: targetSection.toString()
                         });
-                        endOption = optionText.trim();
-                        break;
                       }
-                    }
-                  }
-                }
-                // Check for jumps to other questions - only add jump logic if target is in a different section
-                // that is either before the current section or more than 1 section above
-                const targetQuestionId = optionTarget._questionId || "";
-                if (targetQuestionId) {
-                  // Get the target question's section using the same logic as section assignment
-                  let targetSection = parseInt(getSection(optionTarget) || "1", 10);
-                  // Apply the same section assignment logic for the target question
-                  const targetIsFirstQuestion = questions.every(otherCell => 
-                    otherCell === optionTarget || optionTarget.geometry.y <= otherCell.geometry.y
-                  );
-                  if (targetIsFirstQuestion && targetSection !== 1) {
-                    targetSection = 1;
-                  }
-                  const currentSection = parseInt(section || "1", 10);
-                  // Only add jump logic if:
-                  // 1. Target is in a section before current section, OR
-                  // 2. Target is more than 1 section above current section
-                  const shouldAddJump = targetSection < currentSection || targetSection > currentSection + 1;
-                  if (shouldAddJump) {
-                    // Check if this jump already exists
-                    const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
-                    if (!exists) {
-                      jumpConditions.push({
-                        option: optionText.trim(),
-                        to: targetSection.toString()
-                      });
                     }
                   }
                 }
@@ -1271,16 +1278,31 @@ window.exportGuiJson = function(download = true) {
       });
     }
     // Set hidden logic if any hidden nodes are connected to options
+    // Update hiddenLogic (already initialized in question object)
     if (hiddenLogicConfigs.length > 0) {
-      question.hiddenLogic = {
-        enabled: true,
-        configs: hiddenLogicConfigs
-      };
-    } else {
-      question.hiddenLogic = {
-        enabled: false,
-        configs: []
-      };
+      question.hiddenLogic.enabled = true;
+      question.hiddenLogic.configs = hiddenLogicConfigs;
+    }
+    // Check if numberedDropdown connects directly to end node and add jump conditions for each option
+    if (exportType === "multipleDropdownType") {
+      const questionOutgoingEdges = graph.getOutgoingEdges(cell);
+      if (questionOutgoingEdges) {
+        for (const edge of questionOutgoingEdges) {
+          const targetCell = edge.target;
+          if (targetCell && isEndNode(targetCell)) {
+            // This numberedDropdown connects to an end node, add jump conditions for each option
+            const min = cell._twoNumbers?.first ? parseInt(cell._twoNumbers.first) : 1;
+            const max = cell._twoNumbers?.second ? parseInt(cell._twoNumbers.second) : min;
+            for (let i = min; i <= max; i++) {
+              jumpConditions.push({
+                option: i.toString(),
+                to: "end"
+              });
+            }
+            break; // Only need to process once
+          }
+        }
+      }
     }
     // Set jump logic if any options lead to end nodes or section jumps
     if (jumpConditions.length > 0) {
@@ -1306,9 +1328,15 @@ window.exportGuiJson = function(download = true) {
         }
         return "";
       }).filter(opt => opt !== null); // Remove null entries (image options)
-      // Update image field if imageData is found
+      // Update image field if imageData is found, otherwise remove it
       if (imageData) {
         question.image = imageData;
+      } else {
+        delete question.image;
+      }
+      // Remove linking field if not enabled
+      if (!question.linking || !question.linking.enabled) {
+        delete question.linking;
       }
     }
     // --- PATCH: For checkboxes, convert options to proper checkbox format ---
@@ -1357,6 +1385,7 @@ window.exportGuiJson = function(download = true) {
       // Default required/markOnlyOne flags for checkboxes
       question.required = checkboxAvailability !== 'optional';
       question.markOnlyOne = checkboxAvailability === 'markOne';
+      question.allAreRequired = checkboxAvailability === 'allRequired';
       // Set conditionalPDF answer to first option label if we only had the generic "Yes" default
       if (question.conditionalPDF.answer === "Yes" && question.options.length > 0 && question.options[0].label) {
         question.conditionalPDF.answer = question.options[0].label;
@@ -1400,8 +1429,7 @@ window.exportGuiJson = function(download = true) {
                 label: labelName,
                 nodeId: fieldNodeId,
                 order: orderIndex + 1,
-                prefill: tb.prefill || '',
-                conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
+                prefill: tb.prefill || ''
               });
             } else if (item.type === 'location') {
               // Only include location if it still exists (locationIndex present)
@@ -2039,6 +2067,9 @@ window.exportGuiJson = function(download = true) {
       // Remove nameId and placeholder fields that shouldn't be in numberedDropdown
       delete question.nameId;
       delete question.placeholder;
+      // Remove linking and image fields that shouldn't be in numberedDropdown
+      delete question.linking;
+      delete question.image;
     }
     // --- PATCH: For number type questions, convert to money type ---
     if (exportType === "number") {
@@ -2110,9 +2141,12 @@ window.exportGuiJson = function(download = true) {
               }
             } else {
               // Generic question-to-question connection means any answer from the source question
+              // For fileUpload questions, use "uploaded a file" instead of "Any Text"
+              const sourceQuestionType = getQuestionType(sourceCell);
+              const answerText = sourceQuestionType === "fileUpload" ? "uploaded a file" : "Any Text";
               conditions.push({
                 prevQuestion: String(sourceCell._questionId || ""),
-                prevAnswer: "Any Text"
+                prevAnswer: answerText
               });
             }
           }
@@ -2255,12 +2289,33 @@ window.exportGuiJson = function(download = true) {
                 question.pdfPreview.file = previewFile;
                 // Only one PDF preview per question, so break after finding one
                 break;
+              } else if (pdfPreviewCell && typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(pdfPreviewCell)) {
+                // This question's option leads to a Latex PDF preview node
+                // Extract the option text
+                let optionText = optionCell.value || "";
+                // Clean HTML from option text
+                if (optionText) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = optionText;
+                  optionText = temp.textContent || temp.innerText || optionText;
+                  optionText = optionText.trim();
+                }
+                // Get Latex PDF preview properties
+                const previewTitle = pdfPreviewCell._pdfPreviewTitle || "";
+                const previewContent = pdfPreviewCell._pdfPreviewFile || "";
+                // Set Latex PDF preview properties
+                question.latexPreview.enabled = true;
+                question.latexPreview.trigger = optionText;
+                question.latexPreview.title = previewTitle;
+                question.latexPreview.content = previewContent;
+                // Only one Latex preview per question, so break after finding one
+                break;
               }
             }
           }
         }
-        // Break outer loop if PDF preview was found
-        if (question.pdfPreview.enabled) {
+        // Break outer loop if PDF preview or Latex preview was found
+        if (question.pdfPreview.enabled || question.latexPreview.enabled) {
           break;
         }
       }
@@ -2708,7 +2763,8 @@ window.exportBothJson = function() {
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
       // PDF preview node properties - always include if the node is a PDF preview node
-      if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+      if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+          (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
         cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
       } else if (cell._pdfPreviewTitle !== undefined) {
@@ -2926,7 +2982,7 @@ window.saveFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _nameId: cell._nameId||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -3066,7 +3122,7 @@ window.saveAsFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _nameId: cell._nameId||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -4053,6 +4109,7 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         }
         if (item._twoNumbers) newCell._twoNumbers = item._twoNumbers;
         if (item._dropdownTitle) newCell._dropdownTitle = item._dropdownTitle;
+        if (item._fileName) newCell._fileName = item._fileName;
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;
         if (item._questionId) newCell._questionId = item._questionId;
@@ -4252,11 +4309,13 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
           updateAlertNodeCell(cell);
         } else if (isPdfNode(cell)) {
           updatePdfNodeCell(cell);
-        } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
+        } else if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+                   (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
           // Use the _pdfPreviewTitle property if available, otherwise use default
           if (!cell._pdfPreviewTitle && cell.value) {
             const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-            cell._pdfPreviewTitle = cleanValue || "PDF Preview";
+            const defaultTitle = (window.isLatexPdfPreviewNode && window.isLatexPdfPreviewNode(cell)) ? "Latex PDF Preview" : "PDF Preview";
+            cell._pdfPreviewTitle = cleanValue || defaultTitle;
           }
           if (typeof window.updatePdfPreviewNodeCell === 'function') {
             window.updatePdfPreviewNodeCell(cell);

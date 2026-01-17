@@ -42,6 +42,9 @@ window.createNode = function(nodeType, x, y) {
       case 'pdfPreview':
         vertex = createPdfPreviewNode(x, y);
         break;
+      case 'latexPdfPreview':
+        vertex = createLatexPdfPreviewNode(x, y);
+        break;
       case 'amountOption':
         vertex = createAmountNode(x, y);
         break;
@@ -212,6 +215,22 @@ function createPdfPreviewNode(x, y) {
   return vertex;
 }
 /**
+ * Create a Latex PDF preview node
+ */
+function createLatexPdfPreviewNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 200, 100, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=latexPdfPreview;section=1;');
+  // Set default properties (same as PDF Preview)
+  vertex._pdfPreviewTitle = "Latex PDF Preview";
+  vertex._pdfPreviewFile = "";
+  // Update the display to show the preview title (use same function as PDF Preview)
+  if (typeof window.updatePdfPreviewNodeCell === 'function') {
+    window.updatePdfPreviewNodeCell(vertex);
+  }
+  return vertex;
+}
+/**
  * Create an amount node
  */
 function createAmountNode(x, y) {
@@ -336,6 +355,9 @@ window.isHiddenTextbox = function(cell) {
 };
 window.isPdfPreviewNode = function(cell) {
   return cell && cell.style && cell.style.includes("nodeType=pdfPreview");
+};
+window.isLatexPdfPreviewNode = function(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=latexPdfPreview");
 };
 /**
  * Check if a cell is a linked logic node

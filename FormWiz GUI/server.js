@@ -45,6 +45,10 @@ const { PDFDocument, StandardFonts } = require('pdf-lib');
 const cors          = require('cors');
 const fs            = require('fs');
 const nodemailer    = require('nodemailer');
+const { exec }      = require('child_process');
+const { promisify }  = require('util');
+const os            = require('os');
+const execAsync      = promisify(exec);
 
 dotenv.config();
 
@@ -71,11 +75,25 @@ const serviceAccount = {
   client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.FIREBASE_CLIENT_EMAIL}`
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
-});
-const db = admin.firestore();
+// Initialize Firebase Admin (handle case where app might already be initialized)
+let db;
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
+  });
+  db = admin.firestore();
+  console.log('Firebase Admin initialized successfully');
+} catch (error) {
+  // If app already exists, use the existing app
+  if (error.code === 'app/already-exists') {
+    console.log('Firebase Admin app already initialized, using existing instance');
+    db = admin.firestore();
+  } else {
+    console.error('Error initializing Firebase Admin:', error);
+    throw error;
+  }
+}
 
 // ────────────────────────────────────────────────────────────
 // Static files
@@ -165,6 +183,11 @@ app.get('/api/admin-forms', async (req, res) => {
   try {
     console.log('Loading forms for admin console...');
     
+    // Check if db is initialized
+    if (!db) {
+      throw new Error('Firebase Firestore database is not initialized');
+    }
+    
     const formsRef = db.collection('forms');
     const snapshot = await formsRef.get();
     
@@ -185,9 +208,17 @@ app.get('/api/admin-forms', async (req, res) => {
 
   } catch (error) {
     console.error('Error loading admin forms:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      name: error.name
+    });
     res.status(500).json({ 
       success: false, 
-      error: 'Failed to load forms data' 
+      error: 'Failed to load forms data',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      code: error.code || undefined
     });
   }
 });
@@ -582,22 +613,12 @@ Always end responses with a reminder to consult with a qualified attorney for sp
 
 /* ————— helper ————— */
 function shouldCheck(v) {
-  // treat ANY present, non‑false value as "checked"
-  if (v === undefined)               return false;
+  // Only check if explicitly set to "on" or "true" or "yes" or "1" or "checked"
+  if (v === undefined || v === null || v === '')  return false;
   if (Array.isArray(v))              return v.length > 0;
   const s = String(v).trim().toLowerCase();
-  return s !== '' && s !== 'false' && s !== 'off' && s !== 'no';
-}
-
-// Normalize ISO date strings (yyyy-mm-dd) into mm/dd/yyyy for PDFs
-function normalizeDateValue(value) {
-  if (typeof value === 'string') {
-    const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (isoMatch) {
-      return `${isoMatch[2]}/${isoMatch[3]}/${isoMatch[1]}`;
-    }
-  }
-  return value;
+  // Only check for explicitly truthy values
+  return s === 'on' || s === 'true' || s === 'yes' || s === '1' || s === 'checked';
 }
 
 /**
@@ -689,13 +710,30 @@ app.post('/edit_pdf', async (req, res) => {
     const normalizedBase = path.basename(pdfName).replace(/\.pdf$/i, '');
     const sanitized = normalizedBase + '.pdf';
 
-    // Helper: find the PDF in /public/Forms (including subfolders) case-insensitively
-    function findPdfInForms(targetFile) {
+    // Helper: find the PDF in /public/Forms (including subfolders) case-insensitively,
+    // preferring the form's own subfolder (derived from the Referer URL).
+    function findPdfInForms(targetFile, preferredFolder) {
       const formsRoot = path.join(__dirname, 'public', 'Forms');
-      const stack = [formsRoot];
       const targetLower = targetFile.toLowerCase();
-      while (stack.length) {
-        const current = stack.pop();
+
+      // If we know the calling form folder, search ONLY that folder.
+      if (preferredFolder) {
+        const preferredPath = path.join(formsRoot, preferredFolder);
+        if (fs.existsSync(preferredPath) && fs.lstatSync(preferredPath).isDirectory()) {
+          const entries = fs.readdirSync(preferredPath, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.isFile() && entry.name.toLowerCase() === targetLower) {
+              return path.join(preferredPath, entry.name);
+            }
+          }
+          return null; // strictly scoped: do NOT fall back to other forms if caller folder is known
+        }
+      }
+
+      // If no preferred folder inferred, search the whole tree (original behavior).
+      const stack = [formsRoot];
+      while (stack.length) { 
+        const current = stack.shift();
         const entries = fs.readdirSync(current, { withFileTypes: true });
         for (const entry of entries) {
           const fullPath = path.join(current, entry.name);
@@ -711,7 +749,18 @@ app.post('/edit_pdf', async (req, res) => {
       return null;
     }
 
-    const pdfPath = findPdfInForms(sanitized);
+    // Try to infer the form folder from the Referer so we pull PDFs from the same form directory.
+    let preferredFolder = null;
+    try {
+      const ref = req.headers.referer || '';
+      // Example referer: https://site.com/Forms/SC-120/sc-120.html
+      const match = ref.match(/\/Forms\/([^/]+)\//i);
+      if (match && match[1]) preferredFolder = match[1];
+    } catch (e) {
+      // ignore parsing errors and fall back to global search
+    }
+
+    const pdfPath = findPdfInForms(sanitized, preferredFolder);
     if (!pdfPath) {
       return res.status(400).send('Requested PDF does not exist on the server.');
     }
@@ -739,7 +788,7 @@ app.post('/edit_pdf', async (req, res) => {
 
   form.getFields().forEach(field => {
     const key   = field.getName();
-    const value = normalizeDateValue(req.body[key]);
+    const value = req.body[key];
 
     if (value === undefined) {
       console.log(`No data for field: ${key}`);
@@ -806,16 +855,357 @@ app.post('/edit_pdf', async (req, res) => {
     .send(Buffer.from(edited));
 });
 
+// LaTeX to PDF conversion endpoint
+app.post('/latex_to_pdf', async (req, res) => {
+  try {
+    console.log('[LATEX SERVER] ========================================');
+    console.log('[LATEX SERVER] Request received at /latex_to_pdf');
+    console.log('[LATEX SERVER] Request body keys:', Object.keys(req.body));
+    
+    let latexContent = req.body.latex || req.body.latexContent;
+    console.log('[LATEX SERVER] Raw LaTeX content type:', typeof latexContent);
+    console.log('[LATEX SERVER] Raw LaTeX content length:', latexContent ? latexContent.length : 0, 'characters');
+    console.log('[LATEX SERVER] Raw LaTeX content (first 300 chars):', latexContent ? latexContent.substring(0, 300) : 'NULL');
+    console.log('[LATEX SERVER] Raw LaTeX content (last 300 chars):', latexContent ? latexContent.substring(Math.max(0, latexContent.length - 300)) : 'NULL');
+    console.log('[LATEX SERVER] Raw LaTeX content contains \\begin{document}:', latexContent ? latexContent.includes('\\begin{document}') : false);
+    console.log('[LATEX SERVER] Raw LaTeX content contains \\end{document}:', latexContent ? latexContent.includes('\\end{document}') : false);
+    console.log('[LATEX SERVER] Raw LaTeX content contains \\begin{flushleft}:', latexContent ? latexContent.includes('\\begin{flushleft}') : false);
+    console.log('[LATEX SERVER] Raw LaTeX content contains \\end{flushleft}:', latexContent ? latexContent.includes('\\end{flushleft}') : false);
+    
+    if (!latexContent) {
+      console.error('[LATEX SERVER] ERROR: No LaTeX content found in request body');
+      console.log('[LATEX SERVER] Available request body keys:', Object.keys(req.body));
+      return res.status(400).json({ error: 'LaTeX content is required' });
+    }
+
+    // Log the full LaTeX content as received (for debugging)
+    console.log('[LATEX SERVER] ========== FULL RAW LATEX CONTENT ==========');
+    console.log(latexContent);
+    console.log('[LATEX SERVER] ============================================');
+
+    // Replace placeholders in LaTeX content with form field values
+    // Placeholders are in the format [field_name]
+    // Example: "Hello [user_fullname]" becomes "Hello John Doe"
+    // IMPORTANT: Only replace placeholders that exist in formData to avoid breaking LaTeX syntax
+    let processedLatex = latexContent;
+    
+    // Get all form field values from request body
+    const formData = { ...req.body };
+    delete formData.latex; // Remove latex field itself
+    delete formData.latexContent; // Remove latexContent field if present
+    
+    console.log('[LATEX SERVER] Form data after removing latex fields:');
+    console.log('[LATEX SERVER]   Keys:', Object.keys(formData));
+    console.log('[LATEX SERVER]   Values:', JSON.stringify(formData, null, 2).substring(0, 1000));
+    console.log('[LATEX SERVER]   Checking for user_fullname:', 'user_fullname' in formData);
+    if (formData['user_fullname']) {
+      console.log('[LATEX SERVER]   user_fullname value:', formData['user_fullname']);
+    } else {
+      console.warn('[LATEX SERVER]   WARNING: user_fullname not found in formData!');
+    }
+    
+    // Create a regex pattern that matches all form field names as placeholders
+    // Only replace [field_name] if field_name exists in formData
+    // This prevents replacing LaTeX syntax like [utf8], [margin=1in], [1em], etc.
+    const formFieldNames = Object.keys(formData);
+    console.log('[LATEX SERVER] Available form field names for replacement:', formFieldNames.length, 'fields');
+    
+    // Replace each known form field placeholder
+    // Only replace placeholders that are actual form field names to avoid breaking LaTeX syntax
+    for (const fieldName of formFieldNames) {
+      // Escape special regex characters in field name
+      const escapedFieldName = fieldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // Match [field_name] - use word boundaries or ensure it's not part of LaTeX package options
+      // Simple approach: just match [field_name] - since we're only iterating known field names,
+      // we won't accidentally match LaTeX syntax
+      const fieldRegex = new RegExp(`\\[${escapedFieldName}\\]`, 'g');
+      
+      processedLatex = processedLatex.replace(fieldRegex, (match) => {
+        const fieldValue = formData[fieldName];
+        console.log('[LATEX SERVER]   Replacing placeholder [', fieldName, '] with:', fieldValue);
+        
+        if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
+          // If field not found or empty, return empty string
+          console.warn('[LATEX SERVER]     WARNING: Field value is undefined/null/empty, replacing with empty string');
+          return '';
+        }
+        
+        // Convert value to string and escape LaTeX special characters
+        let value = String(fieldValue);
+        console.log('[LATEX SERVER]     Original value:', value);
+        
+        // Escape LaTeX special characters
+        // & % $ # _ { } ~ ^ \
+        value = value
+          .replace(/\\/g, '\\textbackslash{}')
+          .replace(/\{/g, '\\{')
+          .replace(/\}/g, '\\}')
+          .replace(/\$/g, '\\$')
+          .replace(/&/g, '\\&')
+          .replace(/%/g, '\\%')
+          .replace(/#/g, '\\#')
+          .replace(/_/g, '\\_')
+          .replace(/\^/g, '\\textasciicircum{}')
+          .replace(/~/g, '\\textasciitilde{}');
+        
+        console.log('[LATEX SERVER]     Escaped value:', value);
+        return value;
+      });
+    }
+    
+    // After replacing known placeholders, remove any remaining placeholder patterns
+    // that weren't replaced. Placeholders typically contain underscores (like [field_name_1])
+    // or descriptive text with spaces (like [preferred payment method, ...]).
+    // We must NOT remove LaTeX package options like [utf8] or [margin=1in] which are valid LaTeX.
+    // IMPORTANT: Also remove trailing line breaks (\\\) that follow placeholders to avoid LaTeX errors.
+    
+    // Step 1: Remove placeholders with underscores AND any trailing line breaks
+    // Pattern: [field_name] followed by optional whitespace and \\
+    processedLatex = processedLatex.replace(/\[([a-zA-Z0-9_]+)\]\s*\\\\/g, (match, content) => {
+      // If it contains underscores, it's a form field placeholder - remove placeholder AND line break
+      if (content.includes('_')) {
+        console.log('[LATEX SERVER]   Removing unmatched placeholder with underscores and trailing line break:', match);
+        return ''; // Remove both placeholder and \\
+      }
+      // Otherwise, it might be a LaTeX option (like [utf8]), keep it
+      return match;
+    });
+    
+    // Step 1b: Remove any remaining placeholders with underscores that weren't followed by \\
+    processedLatex = processedLatex.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, content) => {
+      if (content.includes('_')) {
+        console.log('[LATEX SERVER]   Removing unmatched placeholder with underscores:', match);
+        return '';
+      }
+      return match;
+    });
+    
+    // Step 2: Remove placeholders with spaces or descriptive text (like [preferred payment method, ...])
+    // These are clearly placeholders, not LaTeX options. Also handle trailing line breaks.
+    processedLatex = processedLatex.replace(/\[([^\]]*\s[^\]]*)\]\s*\\\\/g, (match, content) => {
+      // Skip if it's a LaTeX option like [margin=1in] (has = and no spaces before it)
+      if (match.match(/\[[a-zA-Z0-9]+=/)) {
+        return match;
+      }
+      console.log('[LATEX SERVER]   Removing unmatched placeholder with spaces and trailing line break:', match);
+      return ''; // Remove both placeholder and \\
+    });
+    
+    // Step 2b: Remove any remaining placeholders with spaces that weren't followed by \\
+    processedLatex = processedLatex.replace(/\[([^\]]*\s[^\]]*)\]/g, (match, content) => {
+      // Skip if it's a LaTeX option like [margin=1in] (has = and no spaces before it)
+      if (match.match(/\[[a-zA-Z0-9]+=/)) {
+        return match;
+      }
+      console.log('[LATEX SERVER]   Removing unmatched placeholder with spaces:', match);
+      return '';
+    });
+    
+    // Log final result
+    console.log('[LATEX SERVER] Processed LaTeX content (first 500 chars):', processedLatex.substring(0, 500));
+    console.log('[LATEX SERVER] Processed LaTeX content (last 200 chars):', processedLatex.substring(Math.max(0, processedLatex.length - 200)));
+    console.log('[LATEX SERVER] Processed LaTeX content length:', processedLatex.length, 'characters');
+    
+    // Ensure the document has proper structure
+    const hasBeginDocument = processedLatex.includes('\\begin{document}');
+    const hasEndDocument = processedLatex.includes('\\end{document}');
+    
+    console.log('[LATEX SERVER] Document structure check:');
+    console.log('[LATEX SERVER]   Has \\begin{document}:', hasBeginDocument);
+    console.log('[LATEX SERVER]   Has \\end{document}:', hasEndDocument);
+    
+    if (!hasBeginDocument) {
+      console.warn('[LATEX SERVER] WARNING: LaTeX content missing \\begin{document}');
+    }
+    
+    if (!hasEndDocument) {
+      console.warn('[LATEX SERVER] WARNING: LaTeX content missing \\end{document}, adding it automatically');
+      processedLatex = processedLatex.trim() + '\n\\end{document}\n';
+      console.log('[LATEX SERVER] Added \\end{document}, new length:', processedLatex.length, 'characters');
+    } else {
+      console.log('[LATEX SERVER] LaTeX content already contains \\end{document}');
+    }
+
+    // Create a temporary directory for this compilation
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'latex-'));
+    const texFile = path.join(tempDir, 'document.tex');
+    const pdfFile = path.join(tempDir, 'document.pdf');
+    
+    // Write processed LaTeX content to file
+    fs.writeFileSync(texFile, processedLatex, 'utf8');
+    console.log('[LATEX SERVER] Wrote LaTeX file to:', texFile);
+    console.log('[LATEX SERVER] Full processed LaTeX content length:', processedLatex.length, 'characters');
+    
+    // Read the file back to verify it was written correctly
+    const writtenContent = fs.readFileSync(texFile, 'utf8');
+    console.log('[LATEX SERVER] ========== FILE VERIFICATION ==========');
+    console.log('[LATEX SERVER] Read back file length:', writtenContent.length, 'characters');
+    console.log('[LATEX SERVER] File starts with (first 200 chars):', writtenContent.substring(0, 200));
+    console.log('[LATEX SERVER] File ends with (last 200 chars):', writtenContent.substring(Math.max(0, writtenContent.length - 200)));
+    console.log('[LATEX SERVER] File contains \\begin{document}:', writtenContent.includes('\\begin{document}'));
+    console.log('[LATEX SERVER] File contains \\end{document}:', writtenContent.includes('\\end{document}'));
+    console.log('[LATEX SERVER] File contains \\begin{flushleft}:', writtenContent.includes('\\begin{flushleft}'));
+    console.log('[LATEX SERVER] File contains \\end{flushleft}:', writtenContent.includes('\\end{flushleft}'));
+    console.log('[LATEX SERVER] ========================================');
+    
+    // Check for unmatched environments
+    const beginCount = (writtenContent.match(/\\begin\{([^}]+)\}/g) || []).length;
+    const endCount = (writtenContent.match(/\\end\{([^}]+)\}/g) || []).length;
+    console.log('[LATEX SERVER] Environment counts - \\begin{}:', beginCount, '\\end{}:', endCount);
+    
+    // Extract all begin/end environment names
+    const beginEnvs = (writtenContent.match(/\\begin\{([^}]+)\}/g) || []).map(m => m.match(/\\begin\{([^}]+)\}/)[1]);
+    const endEnvs = (writtenContent.match(/\\end\{([^}]+)\}/g) || []).map(m => m.match(/\\end\{([^}]+)\}/)[1]);
+    console.log('[LATEX SERVER] Begin environments:', beginEnvs);
+    console.log('[LATEX SERVER] End environments:', endEnvs);
+    
+    // Check for unmatched environments (excluding document which should have 1 begin and 1 end)
+    const beginWithoutDocument = beginEnvs.filter(e => e !== 'document');
+    const endWithoutDocument = endEnvs.filter(e => e !== 'document');
+    
+    // Check for mismatched environments
+    const envStack = [];
+    for (let i = 0; i < beginEnvs.length; i++) {
+      envStack.push(beginEnvs[i]);
+    }
+    for (let i = 0; i < endEnvs.length; i++) {
+      const lastBegin = envStack.pop();
+      if (lastBegin !== endEnvs[i]) {
+        console.warn(`[LATEX SERVER] WARNING: Environment mismatch! Expected \\end{${lastBegin}} but found \\end{${endEnvs[i]}}`);
+      }
+    }
+    if (envStack.length > 0) {
+      console.warn(`[LATEX SERVER] WARNING: Unclosed environments:`, envStack);
+    }
+    
+    // Compile LaTeX to PDF using pdflatex
+    // -interaction=nonstopmode: don't stop for errors
+    // -output-directory: specify output directory
+    // -halt-on-error: stop on first error
+    const compileCommand = `pdflatex -interaction=nonstopmode -output-directory="${tempDir}" -halt-on-error "${texFile}"`;
+    
+    try {
+      console.log('[LATEX SERVER] Executing compilation command:', compileCommand);
+      const { stdout, stderr } = await execAsync(compileCommand, {
+        timeout: 30000, // 30 second timeout
+        maxBuffer: 1024 * 1024 * 10 // 10MB buffer
+      });
+      
+      console.log('[LATEX SERVER] Compilation stdout (first 1000 chars):', stdout.substring(0, 1000));
+      console.log('[LATEX SERVER] Compilation stderr (first 1000 chars):', stderr.substring(0, 1000));
+      console.log('[LATEX SERVER] Checking if PDF exists at:', pdfFile);
+      console.log('[LATEX SERVER] PDF exists:', fs.existsSync(pdfFile));
+      
+      // Check if PDF was generated
+      if (!fs.existsSync(pdfFile)) {
+        // Try to read the log file for error details
+        const logFile = path.join(tempDir, 'document.log');
+        let errorDetails = 'LaTeX compilation failed. PDF was not generated.';
+        if (fs.existsSync(logFile)) {
+          const logContent = fs.readFileSync(logFile, 'utf8');
+          console.log('[LATEX SERVER] LaTeX log file content (last 2000 chars):', logContent.substring(Math.max(0, logContent.length - 2000)));
+          // Extract error messages from log
+          const errorMatch = logContent.match(/! (.+?)\n/g);
+          if (errorMatch) {
+            errorDetails = 'LaTeX errors: ' + errorMatch.join('; ');
+          }
+        } else {
+          console.warn('[LATEX SERVER] Log file does not exist at:', logFile);
+        }
+        
+        // Clean up
+        fs.rmSync(tempDir, { recursive: true, force: true });
+        
+        console.error('[LATEX SERVER] Compilation failed - PDF not generated');
+        return res.status(400).json({ 
+          error: 'Failed to compile LaTeX to PDF',
+          details: errorDetails,
+          stdout: stdout.substring(0, 1000), // First 1000 chars of output
+          stderr: stderr.substring(0, 1000)  // First 1000 chars of errors
+        });
+      }
+      
+      // Read the generated PDF
+      const pdfBuffer = fs.readFileSync(pdfFile);
+      console.log('[LATEX SERVER] PDF generated successfully, size:', pdfBuffer.length, 'bytes');
+      
+      // Clean up temporary files
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      
+      // Return the PDF
+      res
+        .set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'inline; filename="latex_preview.pdf"'
+        })
+        .send(pdfBuffer);
+        
+    } catch (execError) {
+      console.error('[LATEX SERVER] Execution error caught:', execError);
+      console.error('[LATEX SERVER] Error message:', execError.message);
+      console.error('[LATEX SERVER] Error stack:', execError.stack);
+      
+      // Try to read log file even on error
+      try {
+        const logFile = path.join(tempDir, 'document.log');
+        if (fs.existsSync(logFile)) {
+          const logContent = fs.readFileSync(logFile, 'utf8');
+          console.error('[LATEX SERVER] LaTeX log file (last 2000 chars):', logContent.substring(Math.max(0, logContent.length - 2000)));
+        }
+      } catch (logError) {
+        console.error('[LATEX SERVER] Could not read log file:', logError);
+      }
+      
+      // Clean up on error
+      try {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      } catch (cleanupError) {
+        console.error('[LATEX SERVER] Cleanup error:', cleanupError);
+      }
+      
+      // Check if pdflatex is installed
+      if (execError.message && (execError.message.includes('pdflatex') || execError.code === 'ENOENT')) {
+        return res.status(500).json({ 
+          error: 'LaTeX compiler (pdflatex) is not installed or not in PATH',
+          details: 'Please install a LaTeX distribution (e.g., TeX Live, MiKTeX) and ensure pdflatex is in your system PATH',
+          execError: execError.message
+        });
+      }
+      
+      // Re-throw with more context
+      console.error('[LATEX SERVER] Re-throwing execution error');
+      throw execError;
+    }
+    
+  } catch (error) {
+    console.error('[LATEX SERVER] ========== TOP LEVEL ERROR ==========');
+    console.error('[LATEX SERVER] Error type:', error.constructor.name);
+    console.error('[LATEX SERVER] Error message:', error.message);
+    console.error('[LATEX SERVER] Error stack:', error.stack);
+    if (error.code) {
+      console.error('[LATEX SERVER] Error code:', error.code);
+    }
+    if (error.signal) {
+      console.error('[LATEX SERVER] Error signal:', error.signal);
+    }
+    console.error('[LATEX SERVER] =====================================');
+    
+    res.status(500).json({ 
+      error: 'Failed to convert LaTeX to PDF',
+      details: error.message,
+      code: error.code || undefined,
+      signal: error.signal || undefined
+    });
+  }
+});
+
 // Add a new route for creating a Stripe Checkout Session
 app.post('/create-checkout-session', async (req, res) => {
     const { priceId, formId } = req.body;
-    
     // Get the domain dynamically from the request
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
     const YOUR_DOMAIN = `${protocol}://${host}`;
-    
-    console.log('Using domain for Stripe redirect:', YOUR_DOMAIN);
 
     if (!priceId || !formId) {
         return res.status(400).send({ error: 'Price ID and Form ID are required.' });
@@ -845,13 +1235,10 @@ app.post('/create-cart-checkout-session', async (req, res) => {
     console.log('Request body:', req.body);
     
     const { cartItems, totalAmount } = req.body;
-    
     // Get the domain dynamically from the request
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
     const YOUR_DOMAIN = `${protocol}://${host}`;
-    
-    console.log('Using domain for Stripe redirect:', YOUR_DOMAIN);
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
         console.log('Error: No cart items provided');

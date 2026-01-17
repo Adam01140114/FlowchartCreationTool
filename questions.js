@@ -342,7 +342,7 @@ function getQuestionType(cell) {
 function isSimpleHtmlQuestion(cell) {
   if (!cell || !cell.style) return false;
   const qt = getQuestionType(cell);
-  return qt === 'text' || qt === 'number' || qt === 'currency' || qt === 'date' || qt === 'email' || qt === 'phone' || qt === 'bigParagraph';
+  return qt === 'text' || qt === 'number' || qt === 'currency' || qt === 'date' || qt === 'email' || qt === 'phone' || qt === 'bigParagraph' || qt === 'fileUpload';
 }
 // Question Type Switching
 function setQuestionType(cell, newType) {
@@ -365,7 +365,7 @@ function setQuestionType(cell, newType) {
   try {
     switch (newType) {
       case 'text': case 'date': case 'number': case 'currency': case 'bigParagraph':
-      case 'dateRange': case 'email': case 'phone':
+      case 'dateRange': case 'email': case 'phone': case 'fileUpload':
         // Preserve the text content
         cell._questionText = preservedText || '';
         updateSimpleQuestionCell(cell);
@@ -497,6 +497,7 @@ function updateSimpleQuestionCell(cell) {
           <option value="dateRange">Date Range</option>
           <option value="email">Email</option>
           <option value="phone">Phone</option>
+          <option value="fileUpload">File Upload</option>
         </select>
       </div>`;
     graph.getModel().setValue(cell, html);

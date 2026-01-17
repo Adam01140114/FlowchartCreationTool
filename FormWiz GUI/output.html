@@ -36,6 +36,28 @@
         .address-field:first-child { margin-top: 2px; }
         .address-field:last-child { margin-bottom: 2px; }
         .hidden { display: none !important; }
+        .file-upload-container { margin: 20px 0; }
+        .file-upload-dropzone { border: 2px dashed #2f7bff; border-radius: 12px; padding: 40px 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; }
+        .file-upload-dropzone:hover { background-color: #e9ecef; border-color: #0d4ed8; }
+        .file-upload-dropzone.file-upload-dragover { background-color: #e3f2fd; border-color: #0d4ed8; border-style: solid; }
+        .file-upload-content { pointer-events: none; }
+        .file-upload-text { margin: 8px 0; color: #2c3e50; font-size: 16px; font-weight: 500; }
+        .file-upload-link { color: #2f7bff; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+        .file-upload-link:hover { color: #0d4ed8; }
+        .file-upload-hint { margin: 4px 0 0 0; color: #6c757d; font-size: 14px; }
+        .file-upload-preview { margin-top: 20px; border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; padding: 16px; }
+        .file-upload-preview-body { margin-bottom: 12px; }
+        .file-upload-cancel { background: #dc3545; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; display: block; margin: 0 auto; transition: background 0.2s ease; }
+        .file-upload-cancel:hover { background: #c82333; }
+        .file-upload-preview-body img { max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .file-upload-preview-body iframe { width: 100%; height: 500px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .signin-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .signin-modal { background-color: #ffffff; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); text-align: center; position: relative; }
+        .signin-modal h2 { margin: 0 0 16px 0; color: #2c3e50; font-size: 24px; font-weight: 700; }
+        .signin-modal p { margin: 0 0 24px 0; color: #5a6c7d; font-size: 16px; line-height: 1.5; }
+        .signin-modal-button { background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(47, 123, 255, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .signin-modal-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(47, 123, 255, 0.4); }
+        .signin-modal-button:active { transform: translateY(0); }
     </style>
     <script>
       // Phone formatter: Phone Number
@@ -272,28 +294,195 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Hunger</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Thirst</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Hunger</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="1"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview1(this.value)">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Whats your favorite food</h3></label><div id="labelContainer2"></div><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="whats_your_favorite_food_best_food_1" name="whats_your_favorite_food_best_food_1" placeholder="Best food" class="address-input"></div></div><br></div>
+                   readonly style="display:none;">
+              <div id="latexPreview1" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Latex PDF Preview</h4>
+                <div id="latexPreviewLoading1" style="text-align: center; padding: 20px; display: none;">
+                  <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
+                </div>
+                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
+                  <iframe id="latexPreviewIframe1" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                </div>
+              </div>
+              <script>
+                async function handleLatexPreview1(value) {
+                  console.log('[LATEX PREVIEW] handleLatexPreview1 called with value:', value);
+                  const previewDiv = document.getElementById('latexPreview1');
+                  const iframe = document.getElementById('latexPreviewIframe1');
+                  const loadingDiv = document.getElementById('latexPreviewLoading1');
+                  const latexContent = `\\documentclass{article}\n\n\\begin{document}\n\nHello, world!\n\n\\end{document}\n`;
+                  console.log('[LATEX PREVIEW] Original LaTeX content:', latexContent);
+                  console.log('[LATEX PREVIEW] Trigger value:', 'No');
+                  
+                  if (value === 'No') {
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    // Convert LaTeX to PDF
+                    try {
+                      // Collect all form data for placeholder replacement
+                      console.log('[LATEX PREVIEW] Starting form data collection...');
+                      const form = document.getElementById('customForm');
+                      if (!form) {
+                        console.error('[LATEX PREVIEW] ERROR: customForm element not found!');
+                        throw new Error('Form element not found');
+                      }
+                      console.log('[LATEX PREVIEW] Form element found:', form);
+                      
+                      const fd = new FormData();
+                      fd.append('latex', latexContent);
+                      console.log('[LATEX PREVIEW] Added LaTeX content to FormData');
+                      
+                      // Collect all form data
+                      const formElements = form.querySelectorAll('input, textarea, select');
+                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                      const allFormElements = [...formElements, ...externalFormElements];
+                      console.log('[LATEX PREVIEW] Found', allFormElements.length, 'total form elements');
+                      
+                      let collectedFields = {};
+                      allFormElements.forEach(element => {
+                        if (element.name && !element.disabled) {
+                          if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                              fd.append(element.name, 'on');
+                              collectedFields[element.name] = 'on';
+                            }
+                          } else {
+                            let value = element.value;
+                            if (element.type === 'date' && value) {
+                              value = formatDateForServer(value);
+                            }
+                            if (value && value.trim() !== '') {
+                              fd.append(element.name, value);
+                              collectedFields[element.name] = value;
+                            }
+                          }
+                        }
+                      });
+                      
+                      console.log('[LATEX PREVIEW] Collected form fields:', collectedFields);
+                      console.log('[LATEX PREVIEW] Checking for user_fullname in collected fields:', 'user_fullname' in collectedFields);
+                      if (collectedFields['user_fullname']) {
+                        console.log('[LATEX PREVIEW] user_fullname value:', collectedFields['user_fullname']);
+                      } else {
+                        console.warn('[LATEX PREVIEW] WARNING: user_fullname not found in collected fields!');
+                        console.log('[LATEX PREVIEW] Available field names:', Object.keys(collectedFields));
+                      }
+                      
+                      // Log FormData contents (for debugging)
+                      console.log('[LATEX PREVIEW] FormData entries:');
+                      for (const [key, val] of fd.entries()) {
+                        console.log('[LATEX PREVIEW]   ', key, ':', val.substring ? val.substring(0, 100) : val);
+                      }
+                      
+                      // Send LaTeX content and form data to server endpoint to generate PDF
+                      console.log('[LATEX PREVIEW] Sending request to /latex_to_pdf...');
+                      const res = await fetch('/latex_to_pdf', { 
+                        method: 'POST', 
+                        body: fd, 
+                        credentials: 'include' 
+                      });
+                      console.log('[LATEX PREVIEW] Response status:', res.status, res.statusText);
+                      if (!res.ok) {
+                        throw new Error('Failed to generate PDF from LaTeX');
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      // Display in iframe
+                      iframe.src = url;
+                      loadingDiv.style.display = 'none';
+                      iframe.style.display = 'block';
+                      // Store URL for cleanup
+                      iframe.dataset.blobUrl = url;
+                      
+                      // Store PDF blob if "Attach to packet" is selected
+                      const attachment = 'Attach to packet';
+                      if (attachment === 'Attach to packet') {
+                        // Initialize window.latexPdfs if it doesn't exist
+                        if (!window.latexPdfs) {
+                          window.latexPdfs = {};
+                        }
+                        // Store the blob for this question
+                        window.latexPdfs[1] = blob;
+                        console.log('[LATEX PREVIEW] Stored PDF blob for question 1 (Attach to packet)');
+                      }
+                    } catch (error) {
+                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
+                      iframe.style.display = 'none';
+                    }
+                  } else {
+                    previewDiv.style.display = 'none';
+                    // Clean up blob URL and remove stored PDF if exists
+                    if (iframe.dataset.blobUrl) {
+                      URL.revokeObjectURL(iframe.dataset.blobUrl);
+                      iframe.dataset.blobUrl = '';
+                      iframe.src = '';
+                    }
+                    // Remove stored PDF blob if user changes away from trigger
+                    if (window.latexPdfs && window.latexPdfs[1]) {
+                      delete window.latexPdfs[1];
+                    }
+                  }
+                }
+              </script>
+            </div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Thirsty?</h3></label><select id="thirsty" name="thirsty" data-question-id="2"
+                      onchange="dropdownMirror(this, 'thirsty'); updateHiddenLogic('thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_thirsty"></div>
+              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
+                   readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">Thirst</h1><div id="question-container-3" data-question-id="3" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Are you thirsty?</h3></label><select id="are_you_thirsty" name="are_you_thirsty" data-question-id="3"
-                      onchange="dropdownMirror(this, 'are_you_thirsty'); updateHiddenLogic('are_you_thirsty', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_are_you_thirsty"></div>
-              <input type="text" id="are_you_thirsty_dropdown" name="are_you_thirsty_dropdown"
-                   readonly style="display:none;"></div>
-      <div class="question-nav" data-section-index="2">
-        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
-        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
-      </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
   <script>
+    // Function to show sign-in required modal
+    function showSignInRequiredModal() {
+      const modal = document.getElementById('signinRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    // Function to hide sign-in required modal
+    function hideSignInRequiredModal() {
+      const modal = document.getElementById('signinRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Function to check if user is logged in before navigation
+    function checkAuthBeforeNavigate(callback) {
+      // Check if isUserLoggedIn is defined (Firebase auth might not be loaded yet)
+      if (typeof isUserLoggedIn === 'undefined') {
+        // Wait a bit for Firebase auth to initialize
+        setTimeout(function() {
+          if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+            if (callback) callback();
+          } else {
+            showSignInRequiredModal();
+          }
+        }, 500);
+      } else if (isUserLoggedIn) {
+        if (callback) callback();
+      } else {
+        showSignInRequiredModal();
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       console.groupCollapsed('[NAV DEBUG] form boot');
       const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
@@ -333,19 +522,27 @@ document.addEventListener("DOMContentLoaded", function() {
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
           const indices = [];
           items.forEach(function(item, idx) {
-            if (!item.classList.contains('hidden')) {
+            // Only exclude questions that have the 'hidden' class
+            // Questions without the 'hidden' class should be considered visible
+            // even if their parent section is not active (they'll become visible when section activates)
+            const hasHiddenClass = item.classList.contains('hidden');
+            if (!hasHiddenClass) {
               indices.push(idx);
+
+            } else {
+
             }
           });
+
           return { indices, items };
         }
         function findNextSectionWithVisibleQuestions() {
-          console.log('[NAV DEBUG] findNextSectionWithVisibleQuestions called for section:', sectionId, 'index:', sectionIdx);
+
           for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
             const candidateSection = sectionElements[nextIdx];
-            console.log('[NAV DEBUG] Checking candidate section:', candidateSection.id, 'at index:', nextIdx);
+
             const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
-            console.log('[NAV DEBUG] Visible indices for', candidateSection.id, ':', visibleInfo.indices);
+
             // If we find visible questions, return immediately
             if (visibleInfo.indices.length) {
               const result = {
@@ -354,25 +551,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
                 firstVisibleIndex: visibleInfo.indices[0]
               };
-              console.log('[NAV DEBUG] Found next section:', result);
+
               return result;
             }
             // If no visible questions found, check if section has any questions at all
             // This handles cases where questions might be hidden initially but should become visible
             const allQuestions = candidateSection.querySelectorAll('.question-container.question-item');
             if (allQuestions.length > 0) {
-              console.log('[NAV DEBUG] Section', candidateSection.id, 'has', allQuestions.length, 'questions but none are currently visible. Allowing navigation anyway.');
+
               const result = {
                 sectionEl: candidateSection,
                 sectionId: candidateSection.id,
                 sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
                 firstVisibleIndex: 0  // Will be recalculated when section becomes active
               };
-              console.log('[NAV DEBUG] Found next section (with hidden questions):', result);
+
               return result;
             }
           }
-          console.log('[NAV DEBUG] No next section with visible questions found');
+
           return null;
         }
         function findPrevSectionWithVisibleQuestions() {
@@ -413,13 +610,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         function isQuestionAnswered(container) {
           if (!container) {
-            console.log('[NAV DEBUG] isQuestionAnswered: container is null/undefined');
+
             return false;
           }
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
           const questionTextEl = container.querySelector('.question-text');
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
-          console.log('[NAV DEBUG] isQuestionAnswered: Checking question', questionId, '-', questionText);
+
           const elements = Array.from(container.querySelectorAll('select, textarea, input'));
           const eligibleElements = elements.filter(isElementEligible);
           const debugElements = eligibleElements.map(el => ({
@@ -429,10 +626,15 @@ document.addEventListener("DOMContentLoaded", function() {
             value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : (el.value || '').trim(),
             display: el.style && el.style.display ? el.style.display : null
           }));
-          console.log('[NAV DEBUG] isQuestionAnswered: Found', eligibleElements.length, 'eligible elements for question', questionId, ':', debugElements);
 
-          if (!eligibleElements.length) {
-            console.log('[NAV DEBUG] isQuestionAnswered: No eligible elements, returning true (question', questionId, ')');
+          // Check for file upload questions BEFORE early return (file inputs are hidden, so they won't be in eligibleElements)
+          const fileUploadInput = container.querySelector('input[type="file"][id^="fileUpload_"]');
+
+          if (fileUploadInput) {
+
+            // This is a file upload question - don't return early, continue to file upload validation below
+          } else if (!eligibleElements.length) {
+
             return true;
           }
           let allStandardSatisfied = true;
@@ -466,7 +668,56 @@ document.addEventListener("DOMContentLoaded", function() {
           const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMap, questionId)
             ? checkboxRequiredMap[questionId]
             : false;
-          const checkboxesSatisfied = !hasCheckbox || !checkboxRequired || checkboxAnyChecked;
+          // Check if "all are required" is enabled
+          const allAreRequired = Object.prototype.hasOwnProperty.call(allAreRequiredMap, questionId)
+            ? allAreRequiredMap[questionId]
+            : false;
+
+          let checkboxesSatisfied = true;
+          if (hasCheckbox && checkboxRequired) {
+            if (allAreRequired) {
+              // When "all are required" is enabled, all main checkbox options must be checked
+              // Get all checkboxes that are part of the main question (not in trigger containers)
+              // Look for checkboxes in the checkbox-group class for this question
+              const checkboxGroup = container.querySelector('.checkbox-group-' + questionId);
+              if (checkboxGroup) {
+                // Get all checkboxes in the main checkbox group (excluding "None of the above")
+                const mainCheckboxes = Array.from(checkboxGroup.querySelectorAll('input[type="checkbox"]')).filter(cb => {
+                  const cbId = cb.id || '';
+                  const cbName = cb.name || '';
+                  // Exclude "None of the above" checkbox and hidden checkboxes
+                  return !cbId.includes('none_of_the_above') && 
+                         !cbId.includes('_hidden') &&
+                         cb.style.display !== 'none' &&
+                         isElementEligible(cb);
+                });
+                // Check if all main checkboxes are checked
+                const allChecked = mainCheckboxes.length > 0 && mainCheckboxes.every(cb => cb.checked);
+                checkboxesSatisfied = allChecked;
+              } else {
+                // Fallback: use eligibleElements that are checkboxes
+                const mainCheckboxes = eligibleElements.filter(el => {
+                  const type = (el.type || '').toLowerCase();
+                  if (type !== 'checkbox') return false;
+                  const cbId = el.id || '';
+                  // Exclude "None of the above" and checkboxes in trigger containers
+                  const isInTriggerContainer = el.closest('[id^="triggerFields_"]') !== null;
+                  return !cbId.includes('none_of_the_above') && !isInTriggerContainer;
+                });
+                const allChecked = mainCheckboxes.length > 0 && mainCheckboxes.every(cb => cb.checked);
+                checkboxesSatisfied = allChecked;
+              }
+            } else {
+              // Standard behavior: at least one checkbox must be checked
+              checkboxesSatisfied = checkboxAnyChecked;
+            }
+          } else if (hasCheckbox && !checkboxRequired) {
+            // Optional checkbox question - always satisfied
+            checkboxesSatisfied = true;
+          } else if (!hasCheckbox) {
+            // No checkboxes - always satisfied
+            checkboxesSatisfied = true;
+          }
 
           // Additional check: if any trigger sequence container is visible, its fields become required
           const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
@@ -497,8 +748,38 @@ document.addEventListener("DOMContentLoaded", function() {
               });
             });
           }
-          const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
-          console.log('[NAV DEBUG] isQuestionAnswered: Question', questionId, '- allStandardSatisfied:', allStandardSatisfied, 'radiosSatisfied:', radiosSatisfied, 'checkboxesSatisfied:', checkboxesSatisfied, 'FINAL ANSWERED:', answered);
+
+          // Check for file upload questions - verify a file has been uploaded (fileUploadInput already found above)
+          let fileUploadSatisfied = true;
+
+          if (fileUploadInput) {
+            const fileInputId = fileUploadInput.id;
+
+            // Extract questionId from the file input ID (format: "fileUpload_123")
+            // Use [0-9] instead of \d to avoid template literal escaping issues
+            const fileQuestionIdMatch = fileInputId.match(/fileUpload_([0-9]+)/);
+
+            if (fileQuestionIdMatch) {
+              const fileQuestionId = fileQuestionIdMatch[1];
+
+              // Check if a file has been uploaded for this question
+              const hasUploadedFile = window.uploadedFiles && window.uploadedFiles[fileQuestionId];
+
+              fileUploadSatisfied = !!hasUploadedFile;
+
+              if (!fileUploadSatisfied) {
+
+              } else {
+
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+
+          const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied && fileUploadSatisfied;
 
           return answered;
         }
@@ -634,8 +915,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           }
           if (nextBtn) {
+
             if (shouldSubmit) {
-              nextBtn.disabled = !isAnswered;
+              // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
+              if (isAnswered) {
+                nextBtn.removeAttribute('disabled');
+              } else {
+                nextBtn.setAttribute('disabled', 'disabled');
+              }
+
               nextBtn.dataset.advanceMode = 'submit';
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
@@ -646,7 +934,12 @@ document.addEventListener("DOMContentLoaded", function() {
               // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
 
-              nextBtn.disabled = !canAdvance;
+              // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
+              if (canAdvance) {
+                nextBtn.removeAttribute('disabled');
+              } else {
+                nextBtn.setAttribute('disabled', 'disabled');
+              }
 
               if (!canAdvance) {
                 nextBtn.dataset.advanceMode = '';
@@ -664,6 +957,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             }
+
           }
         }
         function activateIndex(targetIdx) {
@@ -718,17 +1012,17 @@ document.addEventListener("DOMContentLoaded", function() {
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
-          console.log('[NAV DEBUG] activateIndex: Question', activeQuestionId, '- isAnswered:', isAnswered, 'currentPos:', currentPos, 'visibleTotal:', visibleTotal);
+
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
-          console.log('[NAV DEBUG] activateIndex: cachedNextSectionInfo:', cachedNextSectionInfo, 'cachedPrevSectionInfo:', cachedPrevSectionInfo);
+
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
           // Allow advancing within section if there's a next question in the current section
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
-          console.log('[NAV DEBUG] activateIndex: canAdvanceWithinSection:', canAdvanceWithinSection, 'canAdvanceAcrossSection:', canAdvanceAcrossSection);
+
           // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
           if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
-            console.log('[NAV DEBUG] activateIndex: On last question, can advance across section:', canAdvanceAcrossSection);
+
           }
 
           updateButtons(
@@ -743,48 +1037,56 @@ document.addEventListener("DOMContentLoaded", function() {
           isUpdating = false;
         }
         function goToNextSection() {
-          console.log('[NAV DEBUG] goToNextSection called');
-          console.log('[NAV DEBUG] cachedNextSectionInfo:', cachedNextSectionInfo);
+
+          // Check authentication before moving to next section
+          if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+
+            if (typeof showSignInRequiredModal === 'function') {
+              showSignInRequiredModal();
+            }
+            return;
+          }
+
           if (!cachedNextSectionInfo) {
-            console.log('[NAV DEBUG] goToNextSection: No cached next section info, returning');
+
             return;
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
-          console.log('[NAV DEBUG] goToNextSection: Target section ID:', targetSectionId, 'Target section number:', targetSectionNumber, 'Current section number:', currentSectionNumber);
+
           const triggerNavigation = () => {
-            console.log('[NAV DEBUG] goToNextSection: triggerNavigation called');
+
             if (typeof validateAndProceed === 'function') {
-              console.log('[NAV DEBUG] goToNextSection: Calling validateAndProceed with section:', currentSectionNumber);
+
               const validationResult = validateAndProceed(currentSectionNumber);
-              console.log('[NAV DEBUG] goToNextSection: validateAndProceed returned:', validationResult);
+
               // If validation fails, still try to navigate directly
               if (!validationResult) {
-                console.log('[NAV DEBUG] goToNextSection: Validation failed, attempting direct navigation to section:', targetSectionNumber);
+
                 if (typeof navigateSection === 'function') {
                   navigateSection(targetSectionNumber);
                 }
               }
             } else if (typeof navigateSection === 'function') {
-              console.log('[NAV DEBUG] goToNextSection: Calling navigateSection directly with section:', targetSectionNumber);
+
               navigateSection(targetSectionNumber);
             } else {
-              console.log('[NAV DEBUG] goToNextSection: Neither validateAndProceed nor navigateSection function found!');
+
             }
           };
           const updateTargetNav = () => {
-            console.log('[NAV DEBUG] goToNextSection: updateTargetNav called');
+
             const activeSection = document.querySelector('.section.active');
-            console.log('[NAV DEBUG] goToNextSection: Active section:', activeSection ? activeSection.id : 'none', 'Target section ID:', targetSectionId);
+
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
-                console.log('[NAV DEBUG] goToNextSection: Calling questionNavController for', targetSectionId);
+
                 window.questionNavControllers[targetSectionId]();
               } else {
-                console.log('[NAV DEBUG] goToNextSection: No questionNavController found for', targetSectionId);
+
               }
             } else {
-              console.log('[NAV DEBUG] goToNextSection: Active section does not match target section');
+
             }
           };
           triggerNavigation();
@@ -835,48 +1137,56 @@ document.addEventListener("DOMContentLoaded", function() {
           triggerNavigation();
         }
         function shiftQuestion(direction) {
-          console.log('[NAV DEBUG] shiftQuestion called with direction:', direction, 'for section:', sectionId);
+
           const visibleIndices = getVisibleIndices();
-          console.log('[NAV DEBUG] shiftQuestion: visibleIndices:', visibleIndices, 'activeIndex:', activeIndex);
+
           if (!visibleIndices.length || activeIndex === -1) {
-            console.log('[NAV DEBUG] shiftQuestion: No visible indices or activeIndex is -1');
+
             if (direction > 0 && cachedNextSectionInfo) {
-              console.log('[NAV DEBUG] shiftQuestion: Going to next section (no visible questions in current section)');
+
               goToNextSection();
             } else if (direction < 0 && cachedPrevSectionInfo) {
-              console.log('[NAV DEBUG] shiftQuestion: Going to previous section');
+
               goToPrevSection();
             } else {
-              console.log('[NAV DEBUG] shiftQuestion: No next/prev section info available');
+
             }
             return;
           }
           const currentPos = visibleIndices.indexOf(activeIndex);
-          console.log('[NAV DEBUG] shiftQuestion: currentPos:', currentPos, 'visibleIndices.length:', visibleIndices.length);
+
           if (direction > 0) {
+            // Check authentication before moving forward
+            if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+
+              if (typeof showSignInRequiredModal === 'function') {
+                showSignInRequiredModal();
+              }
+              return;
+            }
             const activeContainer = questionItems[activeIndex];
             const isAnswered = activeContainer ? isQuestionAnswered(activeContainer) : false;
-            console.log('[NAV DEBUG] shiftQuestion: Checking if current question is answered:', isAnswered);
+
             if (activeContainer && !isAnswered) {
-              console.log('[NAV DEBUG] shiftQuestion: Current question not answered, blocking navigation');
+
               return;
             }
           }
           const nextPos = currentPos + direction;
-          console.log('[NAV DEBUG] shiftQuestion: nextPos:', nextPos);
+
           if (nextPos < 0 || nextPos >= visibleIndices.length) {
-            console.log('[NAV DEBUG] shiftQuestion: nextPos out of bounds, checking for section navigation');
+
             if (direction > 0) {
               // If we're going forward and at the end, try to find next section
               if (cachedNextSectionInfo) {
-                console.log('[NAV DEBUG] shiftQuestion: At end of section, going to next section');
+
                 goToNextSection();
               } else {
                 // Re-check for next section in case cache is stale
-                console.log('[NAV DEBUG] shiftQuestion: No cached next section, re-checking...');
+
                 const freshNextSectionInfo = findNextSectionWithVisibleQuestions();
                 if (freshNextSectionInfo) {
-                  console.log('[NAV DEBUG] shiftQuestion: Found next section on re-check, navigating');
+
                   cachedNextSectionInfo = freshNextSectionInfo;
                   goToNextSection();
                 } else {
@@ -884,7 +1194,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   const nextSectionIdx = sectionIdx + 1;
                   if (nextSectionIdx < sectionElements.length) {
                     const nextSection = sectionElements[nextSectionIdx];
-                    console.log('[NAV DEBUG] shiftQuestion: Last resort - navigating to next section element:', nextSection.id);
+
                     cachedNextSectionInfo = {
                       sectionEl: nextSection,
                       sectionId: nextSection.id,
@@ -893,19 +1203,19 @@ document.addEventListener("DOMContentLoaded", function() {
                     };
                     goToNextSection();
                   } else {
-                    console.log('[NAV DEBUG] shiftQuestion: No next section available');
+
                   }
                 }
               }
             } else if (direction < 0 && cachedPrevSectionInfo) {
-              console.log('[NAV DEBUG] shiftQuestion: At start of section, going to previous section');
+
               goToPrevSection();
             } else {
-              console.log('[NAV DEBUG] shiftQuestion: No next/prev section info available');
+
             }
             return;
           }
-          console.log('[NAV DEBUG] shiftQuestion: Activating index:', visibleIndices[nextPos]);
+
           activateIndex(visibleIndices[nextPos]);
         }
         function refreshNav(targetIdx) {
@@ -913,7 +1223,18 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+            // If no visible questions found, try to show the first question anyway
+            // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
 
+            if (questionItems.length > 0) {
+              const firstQuestion = questionItems[0];
+              if (firstQuestion) {
+                // Remove both question-step-hidden AND hidden classes to ensure question is visible
+                firstQuestion.classList.remove('question-step-hidden');
+                firstQuestion.classList.remove('hidden');
+
+              }
+            }
             activateIndex(0);
             return;
           }
@@ -939,23 +1260,29 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
-            console.log('[NAV DEBUG] Next button clicked for section:', sectionId);
-            console.log('[NAV DEBUG] Next button advanceMode:', nextBtn.dataset.advanceMode);
-            console.log('[NAV DEBUG] Next button disabled:', nextBtn.disabled);
+
             if (nextBtn.dataset.advanceMode === 'submit') {
-              console.log('[NAV DEBUG] Next button: Submit mode, submitting form');
-              const formEl = document.getElementById('customForm');
-              if (formEl) {
-                if (typeof formEl.requestSubmit === 'function') {
-                  formEl.requestSubmit();
-                } else {
-                  formEl.submit();
+
+              // Check authentication before submitting
+              checkAuthBeforeNavigate(function() {
+
+                const formEl = document.getElementById('customForm');
+                if (formEl) {
+                  if (typeof formEl.requestSubmit === 'function') {
+                    formEl.requestSubmit();
+                  } else {
+                    formEl.submit();
+                  }
                 }
-              }
+              });
               return;
             }
-            console.log('[NAV DEBUG] Next button: Calling shiftQuestion(1)');
-            shiftQuestion(1);
+
+            // Check authentication before navigating
+            checkAuthBeforeNavigate(function() {
+
+              shiftQuestion(1);
+            });
           });
         }
         const observer = new MutationObserver(function(mutations) {
@@ -1201,14 +1528,17 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
-var questionSlugMap = {"1":"hungry","2":"whats_your_favorite_food","3":"are_you_thirsty"};
-var questionNameIds = {"1":"hungry","2":"whats_your_favorite_food","3":"are_you_thirsty"};
+window.formId = 'SC-100';
+var questionSlugMap = {"1":"hungry","2":"thirsty"};
+var questionNameIds = {"1":"hungry","2":"thirsty"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Best food","nodeId":"whats_your_favorite_food_best_food","order":1,"prefill":""}]};
+var allAreRequiredMap = {};
+var unifiedFieldsMap = {};
 var entryTitleMap = {};
+window.fileUploadQuestions = [];
+window.latexPreviewQuestions = [{"questionId":"1","title":"Latex PDF Preview","priceId":"price_1SqS2XFJeSRMFQ8XXlBzhcqW","trigger":"No"}];
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -1378,7 +1708,7 @@ var entryTitleMap = {};
         const optionValue = parts[parts.length - 1]; // last part: "yes"
         const entryNumber = parts[parts.length - 2]; // second last: "1"
         const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
-        
+
         // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
         // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
         const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -1388,7 +1718,7 @@ var entryTitleMap = {};
           // and contains the field name somewhere
           const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
           const containsFieldName = cb.id.includes(fieldName);
-          
+
           if (endsWithPattern && containsFieldName) {
             return cb;
           }
@@ -3012,7 +3342,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"2","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"2","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -3300,11 +3630,11 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "SC-100";
+var pdfOutputFileName = "sc100.pdf";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc100", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -3315,22 +3645,17 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
     var cPrevAns="yes";
     var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-    }
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
   })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
@@ -3376,6 +3701,11 @@ var hiddenTextCalculations = [];
     document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
   }
 }
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "1";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -3690,6 +4020,22 @@ window.showCartModal = function () {
       }
     }
   } else {
+  }
+  // Add file upload items to cart preview
+  if (window.fileUploadQuestions && window.fileUploadQuestions.length > 0 && window.uploadedFiles) {
+    for (const fileUpload of window.fileUploadQuestions) {
+      const uploadedFile = window.uploadedFiles[fileUpload.questionId];
+      if (uploadedFile && fileUpload.fileTitle) {
+        // Convert file title to PDF name (add .pdf extension if not present)
+        const pdfName = fileUpload.fileTitle.endsWith('.pdf') ? fileUpload.fileTitle : (fileUpload.fileTitle + '.pdf');
+        allPdfsToAdd.push({
+          formId: fileUpload.fileTitle.replace(/.pdf$/i, '').toLowerCase(),
+          title: fileUpload.fileTitle,
+          priceId: fileUpload.priceId,
+          pdfName: pdfName
+        });
+      }
+    }
   }
   // Deduplicate PDFs to prevent multiple requests for the same PDF
   const originalCount = allPdfsToAdd.length;
@@ -4046,6 +4392,28 @@ window.addFormToCart = function (priceId) {
       }
     } else {
     }
+    // Add file upload items
+    if (window.fileUploadQuestions && window.fileUploadQuestions.length > 0 && window.uploadedFiles) {
+      for (const fileUpload of window.fileUploadQuestions) {
+        const uploadedFile = window.uploadedFiles[fileUpload.questionId];
+        if (uploadedFile && fileUpload.fileTitle) {
+          // Convert file title to PDF name (add .pdf extension if not present)
+          const pdfName = fileUpload.fileTitle.endsWith('.pdf') ? fileUpload.fileTitle : (fileUpload.fileTitle + '.pdf');
+          const pdfItem = {
+            formId: fileUpload.fileTitle.replace(/.pdf$/i, '').toLowerCase(),
+            title: fileUpload.fileTitle,
+            priceId: fileUpload.priceId,
+            formData: { ...formData, originalFormId: originalFormId, portfolioId: portfolioId, pdfName: pdfName, uploadedFile: uploadedFile },
+            countyName: countyName,
+            defendantName: defendantName,
+            pdfName: pdfName,
+            isFileUpload: true,
+            uploadedFile: uploadedFile
+          };
+          allItems.push(pdfItem);
+        }
+      }
+    }
     // Add all items to cart with a small delay between each to prevent race conditions
     let addedCount = 0;
     allItems.forEach((item, index) => {
@@ -4109,6 +4477,57 @@ window.addFormToCart = function (priceId) {
         timestamp: nowTs
       };
       cart.push(cartItem);
+    }
+  }
+  // Add file upload items to cart
+  if (window.fileUploadQuestions && window.fileUploadQuestions.length > 0 && window.uploadedFiles) {
+    for (const fileUpload of window.fileUploadQuestions) {
+      const uploadedFile = window.uploadedFiles[fileUpload.questionId];
+      if (uploadedFile && fileUpload.fileTitle) {
+        // Convert file title to PDF name (add .pdf extension if not present)
+        const pdfName = fileUpload.fileTitle.endsWith('.pdf') ? fileUpload.fileTitle : (fileUpload.fileTitle + '.pdf');
+        const cartItem = {
+          formId: fileUpload.fileTitle.replace(/.pdf$/i, '').toLowerCase(),
+          title: fileUpload.fileTitle,
+          priceId: fileUpload.priceId,
+          pdfName: pdfName,
+          originalFormId: originalFormId,
+          portfolioId: portfolioId,
+          formData: formData,
+          countyName: countyName,
+          defendantName: defendantName,
+          timestamp: nowTs,
+          isFileUpload: true,
+          uploadedFile: uploadedFile
+        };
+        cart.push(cartItem);
+      }
+    }
+  }
+
+  // Add LaTeX preview PDFs to cart (if "Attach to packet" is selected)
+  if (window.latexPreviewQuestions && window.latexPreviewQuestions.length > 0 && window.latexPdfs) {
+    for (const latexPreviewQ of window.latexPreviewQuestions) {
+      const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+      if (latexPdf && latexPreviewQ.title && latexPreviewQ.priceId) {
+        // Use title as the PDF name
+        const pdfName = latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf');
+        const cartItem = {
+          formId: latexPreviewQ.title.replace(/.pdf$/i, '').toLowerCase(),
+          title: latexPreviewQ.title,
+          priceId: latexPreviewQ.priceId,
+          pdfName: pdfName,
+          originalFormId: originalFormId,
+          portfolioId: portfolioId,
+          formData: formData,
+          countyName: countyName,
+          defendantName: defendantName,
+          timestamp: nowTs,
+          isLatexPreview: true,
+          latexPdf: latexPdf
+        };
+        cart.push(cartItem);
+      }
     }
   }
   // Final deduplication of the entire cart to prevent any duplicates
@@ -4316,15 +4735,15 @@ function updateCheckboxStyle(checkbox) {
  * Form validation functions
  *──────────────────────────────────────────────────────────────*/
 function validateAndProceed(sectionNumber) {
-    console.log('[NAV DEBUG] validateAndProceed called for section:', sectionNumber);
+
     const isValid = validateCurrentSection(sectionNumber);
-    console.log('[NAV DEBUG] validateAndProceed: Validation result for section', sectionNumber, ':', isValid);
+
     if (isValid) {
-        console.log('[NAV DEBUG] validateAndProceed: Validation passed, calling handleNext');
+
         handleNext(sectionNumber);
         return true;
     } else {
-        console.log('[NAV DEBUG] validateAndProceed: Validation failed, showing popup');
+
         // Show validation popup when validation fails
         showValidationPopup();
         return false;
@@ -4479,11 +4898,11 @@ function validateDropdownQuestion(questionContainer) {
 }
 function validateTextQuestion(questionContainer) {
     const questionId = questionContainer.id.replace('question-container-', '');
-    console.log('[NAV DEBUG] validateTextQuestion: Validating question', questionId);
+
     const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-    console.log('[NAV DEBUG] validateTextQuestion: Found', inputs.length, 'text inputs for question', questionId);
+
     if (inputs.length === 0) {
-        console.log('[NAV DEBUG] validateTextQuestion: No inputs found, returning true');
+
         return true;
     }
     // Filter out hidden inputs and inputs that are not eligible
@@ -4495,20 +4914,20 @@ function validateTextQuestion(questionContainer) {
         const hasOffsetParent = input.offsetParent !== null || input.type === 'hidden';
         return isVisible && isNotDisabled && isNotHiddenType && (hasOffsetParent || input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || input.type === 'date');
     });
-    console.log('[NAV DEBUG] validateTextQuestion: Eligible inputs:', eligibleInputs.length, 'for question', questionId);
+
     if (eligibleInputs.length === 0) {
-        console.log('[NAV DEBUG] validateTextQuestion: No eligible inputs, returning true');
+
         return true;
     }
     for (let input of eligibleInputs) {
         const value = input.value ? input.value.trim() : '';
-        console.log('[NAV DEBUG] validateTextQuestion: Input', input.id, 'has value:', value);
+
         if (!value) {
-            console.log('[NAV DEBUG] validateTextQuestion: Input', input.id, 'is empty, validation failed');
+
             return false;
         }
     }
-    console.log('[NAV DEBUG] validateTextQuestion: All inputs have values, validation passed');
+
     return true;
 }
 function showValidationError(container, message) {
@@ -6518,6 +6937,13 @@ function showThankYouMessage (event) {
     if (event && typeof event.preventDefault === 'function') {
         event.preventDefault();
     }
+    // Check authentication before submitting form
+    if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+        if (typeof showSignInRequiredModal === 'function') {
+            showSignInRequiredModal();
+        }
+        return false;
+    }
     // Show thank you message immediately (no PDF processing)
     document.getElementById('customForm').style.display = 'none';
     document.getElementById('thankYouMessage').style.display = 'block';
@@ -6741,6 +7167,55 @@ async function processAllPdfs() {
         }
     } else {
     }
+    // Process Uploaded File PDFs
+    if (window.uploadedFiles && typeof window.uploadedFiles === 'object' && window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
+        for (const fileUploadQ of window.fileUploadQuestions) {
+            const uploadedFile = window.uploadedFiles[fileUploadQ.questionId];
+            if (uploadedFile && uploadedFile.type === 'application/pdf') {
+                // Use fileTitle as the base name for the PDF
+                const baseName = fileUploadQ.fileTitle || ('uploaded_' + fileUploadQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    // Download the uploaded file directly (it's already a PDF, no server processing needed)
+                    const url = URL.createObjectURL(uploadedFile);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (fileUploadQ.fileTitle.endsWith('.pdf') ? fileUploadQ.fileTitle : (fileUploadQ.fileTitle + '.pdf'));
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    // Small delay to prevent browser from blocking multiple downloads
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+        }
+    }
+
+    // Process LaTeX Preview PDFs (if "Attach to packet" is selected)
+    if (window.latexPdfs && typeof window.latexPdfs === 'object' && window.latexPreviewQuestions && Array.isArray(window.latexPreviewQuestions)) {
+        for (const latexPreviewQ of window.latexPreviewQuestions) {
+            const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+            if (latexPdf && latexPdf instanceof Blob) {
+                // Use title as the base name for the PDF
+                const baseName = latexPreviewQ.title || ('latex_preview_' + latexPreviewQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    // Download the LaTeX PDF directly (it's already a PDF blob)
+                    const url = URL.createObjectURL(latexPdf);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf'));
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    // Small delay to prevent browser from blocking multiple downloads
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+        }
+    }
 }
 // Function to collect all PDFs that would be downloaded (for preview)
 async function getAllPdfsList() {
@@ -6931,6 +7406,48 @@ async function getAllPdfsList() {
         }
     }
 
+    // Process Uploaded File PDFs
+    if (window.uploadedFiles && typeof window.uploadedFiles === 'object' && window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
+        for (const fileUploadQ of window.fileUploadQuestions) {
+            const uploadedFile = window.uploadedFiles[fileUploadQ.questionId];
+            if (uploadedFile && uploadedFile.type === 'application/pdf') {
+                // Use fileTitle as the base name for the PDF
+                const baseName = fileUploadQ.fileTitle || ('uploaded_' + fileUploadQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    pdfsList.push({
+                        baseName: baseName,
+                        displayName: fileUploadQ.fileTitle || uploadedFile.name.replace(/.pdf$/i, ''),
+                        type: 'uploaded',
+                        questionId: fileUploadQ.questionId,
+                        file: uploadedFile
+                    });
+                }
+            }
+        }
+    }
+
+    // Process LaTeX Preview PDFs (if "Attach to packet" is selected)
+    if (window.latexPdfs && typeof window.latexPdfs === 'object' && window.latexPreviewQuestions && Array.isArray(window.latexPreviewQuestions)) {
+        for (const latexPreviewQ of window.latexPreviewQuestions) {
+            const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+            if (latexPdf && latexPdf instanceof Blob) {
+                // Use title as the base name for the PDF
+                const baseName = latexPreviewQ.title || ('latex_preview_' + latexPreviewQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    pdfsList.push({
+                        baseName: baseName,
+                        displayName: latexPreviewQ.title || ('LaTeX Preview ' + latexPreviewQ.questionId),
+                        type: 'latex',
+                        questionId: latexPreviewQ.questionId,
+                        file: latexPdf
+                    });
+                }
+            }
+        }
+    }
+
     return pdfsList;
 }
 
@@ -6963,8 +7480,11 @@ async function showPreviewPdfsModal() {
         pdfsList.forEach((pdf, index) => {
             const escapedBaseName = pdf.baseName.replace(/'/g, "\'").replace(/"/g, '&quot;');
             const escapedDisplayName = pdf.displayName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-            // Use data attribute and addEventListener to avoid quote escaping issues
-            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '">' +
+            // Use data attributes to store PDF info (including type and file object for uploaded/LaTeX PDFs)
+            const isUploaded = pdf.type === 'uploaded' ? 'true' : 'false';
+            const isLatex = pdf.type === 'latex' ? 'true' : 'false';
+            const questionId = pdf.questionId || '';
+            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '" data-is-uploaded="' + isUploaded + '" data-is-latex="' + isLatex + '" data-question-id="' + questionId + '">' +
                     '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
                     '<span style="color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px;">Click to preview</span>' +
                 '</div>';
@@ -6977,8 +7497,11 @@ async function showPreviewPdfsModal() {
         pdfItems.forEach(item => {
             item.addEventListener('click', function() {
                 const pdfName = this.getAttribute('data-pdf-name');
+                const isUploaded = this.getAttribute('data-is-uploaded') === 'true';
+                const isLatex = this.getAttribute('data-is-latex') === 'true';
+                const questionId = this.getAttribute('data-question-id');
                 if (pdfName) {
-                    previewPdf(pdfName);
+                    previewPdf(pdfName, isUploaded, isLatex, questionId);
                 }
             });
         });
@@ -6997,7 +7520,7 @@ function closePreviewPdfsListModal() {
 }
 
 // Function to preview a PDF in full screen
-async function previewPdf(baseName) {
+async function previewPdf(baseName, isUploaded, isLatex, questionId) {
     const modal = document.getElementById('previewPdfFullscreenModal');
     const iframe = document.getElementById('previewPdfIframe');
 
@@ -7014,50 +7537,65 @@ async function previewPdf(baseName) {
     iframe.style.display = 'none';
 
     try {
-        // Collect form data
-        const form = document.getElementById('customForm');
-        const fd = new FormData();
-        const formElements = form.querySelectorAll('input, textarea, select');
-        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
-        const allFormElements = [...formElements, ...externalFormElements];
+        let url;
+        
+        // Check if this is a LaTeX PDF
+        if (isLatex && questionId && window.latexPdfs && window.latexPdfs[questionId]) {
+            // For LaTeX PDFs, use the Blob directly
+            const latexPdf = window.latexPdfs[questionId];
+            url = URL.createObjectURL(latexPdf);
+        } else if (isUploaded && questionId && window.uploadedFiles && window.uploadedFiles[questionId]) {
+            // For uploaded files, use the File object directly
+            const uploadedFile = window.uploadedFiles[questionId];
+            url = URL.createObjectURL(uploadedFile);
+        } else {
+            // For server-side PDFs, fetch from server
+            // Collect form data
+            const form = document.getElementById('customForm');
+            const fd = new FormData();
+            const formElements = form.querySelectorAll('input, textarea, select');
+            const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+            const allFormElements = [...formElements, ...externalFormElements];
 
-        allFormElements.forEach(element => {
-            if (element.name && !element.disabled) {
-                if (element.type === 'checkbox' || element.type === 'radio') {
-                    if (element.checked) {
-                        fd.append(element.name, 'on');
-                    }
-                } else {
-                    let value = element.value;
-                    if (element.type === 'date' && value) {
-                        value = formatDateForServer(value);
-                    }
-                    if (value && value.trim() !== '') {
-                        fd.append(element.name, value);
+            allFormElements.forEach(element => {
+                if (element.name && !element.disabled) {
+                    if (element.type === 'checkbox' || element.type === 'radio') {
+                        if (element.checked) {
+                            fd.append(element.name, 'on');
+                        }
+                    } else {
+                        let value = element.value;
+                        if (element.type === 'date' && value) {
+                            value = formatDateForServer(value);
+                        }
+                        if (value && value.trim() !== '') {
+                            fd.append(element.name, value);
+                        }
                     }
                 }
+            });
+
+            // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
+            const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+            const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
+            const res = await fetch(endpoint, { 
+                method: 'POST', 
+                body: fd, 
+                credentials: 'include' 
+            });
+
+            if (!res.ok) {
+                throw new Error("HTTP error! status: " + res.status);
             }
-        });
 
-        // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
-        const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
-        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
-        const res = await fetch(endpoint, { 
-            method: 'POST', 
-            body: fd, 
-            credentials: 'include' 
-        });
+            const blob = await res.blob();
+            if (blob.size === 0) {
+                throw new Error("Received empty PDF blob from server");
+            }
 
-        if (!res.ok) {
-            throw new Error("HTTP error! status: " + res.status);
+            url = URL.createObjectURL(blob);
         }
 
-        const blob = await res.blob();
-        if (blob.size === 0) {
-            throw new Error("Received empty PDF blob from server");
-        }
-
-        const url = URL.createObjectURL(blob);
         iframe.src = url;
         iframe.style.display = 'block';
 
@@ -7665,23 +8203,23 @@ if (typeof handleNext === 'function') {
         let saveRetryCount = 0;
         const MAX_RETRIES = 3;
         const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
-        
+
         // Helper: save answers (with debouncing, error handling, and visibility prioritization)
         async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) return;
-            
+
             // If immediate save requested, clear any pending debounced save
             if (immediate && saveAnswersTimeout) {
                 clearTimeout(saveAnswersTimeout);
                 saveAnswersTimeout = null;
             }
-            
+
             // If already saving, mark that we need to save again after current save completes
             if (isSaving) {
                 pendingSave = true;
                 return;
             }
-            
+
             // Debounce: wait for user to stop typing
             if (!immediate) {
                 clearTimeout(saveAnswersTimeout);
@@ -7690,27 +8228,27 @@ if (typeof handleNext === 'function') {
                 }, DEBOUNCE_DELAY);
                 return;
             }
-            
+
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
                 return;
             }
-            
+
             isSaving = true;
             try {
                 const fields = getFormFields();
                 const answers = {};
                 const fieldVisibility = {}; // Track which fields are visible
-                
+
                 fields.forEach(el => {
                     const isVisible = isElementActuallyVisible(el);
                     const fieldName = el.name;
-                    
+
                     // Skip if we already have a visible field's value and this field is hidden
                     if (fieldVisibility[fieldName] === true && !isVisible) {
                         return; // Skip this hidden field, we already have a visible one
                     }
-                    
+
                     // Store the value
                     if (el.type === 'checkbox') {
                         // For checkboxes, save true/false
@@ -7723,42 +8261,39 @@ if (typeof handleNext === 'function') {
                         // For other fields, save the value
                         answers[fieldName] = el.value;
                     }
-                    
+
                     // Track visibility for this field name
                     fieldVisibility[fieldName] = isVisible;
                 });
-                
+
                 // Write to Firestore with error handling and retry logic
                 await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
                 saveRetryCount = 0; // Reset retry count on success
             } catch (error) {
-                console.error('[AUTOSAVE] error saving to Firestore:', error);
-                
+
                 // Handle resource-exhausted error specifically
                 if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
-                    console.warn('[AUTOSAVE] Firestore write queue exhausted, will retry with backoff');
-                    
+
                     // Retry with exponential backoff
                     if (saveRetryCount < MAX_RETRIES) {
                         saveRetryCount++;
                         const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
-                        console.log('[AUTOSAVE] retrying in ' + backoffDelay + 'ms (attempt ' + saveRetryCount + '/' + MAX_RETRIES + ')');
-                        
+
                         setTimeout(() => {
                             saveAnswers(true); // Retry immediately
                         }, backoffDelay);
                     } else {
-                        console.error('[AUTOSAVE] max retries reached, giving up');
+
                         saveRetryCount = 0;
                     }
                 } else {
                     // For other errors, just log and reset
-                    console.error('[AUTOSAVE] non-retryable error:', error);
+
                     saveRetryCount = 0;
                 }
             } finally {
                 isSaving = false;
-                
+
                 // If there's a pending save, trigger it after a short delay
                 if (pendingSave) {
                     pendingSave = false;
@@ -9943,6 +10478,120 @@ function updateUserFullName() {
   } else {
   }
 }
+// Store uploaded files for cart processing
+if (!window.uploadedFiles) {
+  window.uploadedFiles = {}; // questionId -> file object
+}
+
+// File upload handler functions
+function handleFileUpload(questionId, input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const dropzone = document.getElementById('fileUploadDropzone' + questionId);
+  const preview = document.getElementById('fileUploadPreview' + questionId);
+  const previewBody = document.getElementById('fileUploadPreviewBody' + questionId);
+
+  if (!dropzone || !preview || !previewBody) return;
+
+  // Store the uploaded file for cart processing
+  if (!window.uploadedFiles) {
+    window.uploadedFiles = {};
+  }
+  window.uploadedFiles[questionId] = file;
+
+  // Hide dropzone and show preview
+  dropzone.style.display = 'none';
+  preview.style.display = 'block';
+
+  // Clear previous preview
+  previewBody.innerHTML = '';
+
+  // PDF preview only (PDFs only)
+  if (file.type === 'application/pdf') {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const iframe = document.createElement('iframe');
+      iframe.src = e.target.result;
+      iframe.title = file.name;
+      previewBody.appendChild(iframe);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // Fallback for non-PDF files (shouldn't happen with accept=".pdf")
+    const p = document.createElement('p');
+    p.textContent = 'File uploaded: ' + file.name;
+    p.style.color = '#6c757d';
+    previewBody.appendChild(p);
+  }
+
+  // Refresh navigation to update button states
+
+  if (typeof refreshNavForQ3 === 'function') {
+
+    refreshNavForQ3();
+  } else if (window.questionNavControllers) {
+    const activeSection = document.querySelector('.section.active');
+
+    if (activeSection && window.questionNavControllers[activeSection.id]) {
+      const controller = window.questionNavControllers[activeSection.id];
+
+      if (typeof controller === 'function') {
+        controller();
+      } else {
+
+      }
+    } else {
+
+      // Fallback: try to find the section containing this question
+      const questionContainer = document.getElementById('question-container-' + questionId);
+      if (questionContainer) {
+        const sectionEl = questionContainer.closest('[id^="section"]');
+        if (sectionEl && window.questionNavControllers[sectionEl.id]) {
+
+          const controller = window.questionNavControllers[sectionEl.id];
+          if (typeof controller === 'function') {
+            controller();
+          }
+        }
+      }
+    }
+  } else {
+
+  }
+}
+
+function removeFileUpload(questionId) {
+  const dropzone = document.getElementById('fileUploadDropzone' + questionId);
+  const preview = document.getElementById('fileUploadPreview' + questionId);
+  const fileInput = document.getElementById('fileUpload_' + questionId);
+
+  // Remove the file from stored uploads
+  if (window.uploadedFiles && window.uploadedFiles[questionId]) {
+    delete window.uploadedFiles[questionId];
+  }
+
+  if (dropzone) dropzone.style.display = 'block';
+  if (preview) preview.style.display = 'none';
+  if (fileInput) {
+    fileInput.value = '';
+    fileInput.files = null;
+  }
+
+  // Refresh navigation to update button states
+  if (typeof refreshNavForQ3 === 'function') {
+    refreshNavForQ3();
+  } else if (window.questionNavControllers) {
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection && window.questionNavControllers[activeSection.id]) {
+      const controller = window.questionNavControllers[activeSection.id];
+      if (typeof controller === 'function') {
+        controller();
+      }
+    }
+  }
+}
+
 // Function to update user address fields
 function updateUserAddressFields() {
   const street = document.getElementById('user_street')?.value || '';
@@ -10059,5 +10708,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>
+  <!-- Sign-in Required Modal -->
+  <div id="signinRequiredModal" class="signin-modal-overlay">
+    <div class="signin-modal">
+      <h2>Sign In Required</h2>
+      <p>You need to sign up before you can finish filling out the form. Please sign in to continue.</p>
+      <button type="button" class="signin-modal-button" onclick="window.location.href='https://www.form-star.com/Pages/account.html'">Sign In</button>
+    </div>
+  </div>
 </body>
 </html>
