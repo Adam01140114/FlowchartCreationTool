@@ -504,6 +504,22 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
+    // f1) Linked logic node double-click = show properties popup
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    // f2) Linked checkbox node double-click = show properties popup
+    if (typeof window.isLinkedCheckboxNode === 'function' && window.isLinkedCheckboxNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
     // g) Edge double-click = reset geometry
     if (cell && cell.edge) {
       const geo = new mxGeometry();

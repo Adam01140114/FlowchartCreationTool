@@ -693,9 +693,11 @@ if (!window.flowchartKeyboardInitialized) {
   window.flowchartKeyboardInitialized = true;
 } else {
 }
-/* Ctrl + Shift – reset all PDF and node IDs */
+/* Ctrl/Cmd + Shift – reset all PDF and node IDs */
 document.addEventListener('keydown', function(event) {
-  if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey) {
+  // Support both Ctrl+Shift (Windows/Linux) and Cmd+Shift (Mac)
+  const ctrlOrCmd = event.ctrlKey || event.metaKey;
+  if (ctrlOrCmd && event.shiftKey && !event.altKey && !(event.ctrlKey && event.metaKey)) {
     // Only trigger on the initial keydown, not on key repeats
     if (event.repeat) return;
     if (isUserTyping()) return; // Don't trigger if user is typing
@@ -3988,10 +3990,39 @@ document.addEventListener("DOMContentLoaded", function() {
         // This is a click on empty canvas - check for double left-click
         const currentTime = Date.now();
         const timeSinceLastClick = currentTime - lastLeftClickTime;
-        // If we're currently in square creation mode, cancel it
+        // If we're currently in square creation mode, only cancel on double-click
         if (rightClickDragging) {
-        resetSquareCreationState();
-          return;
+          // Check if this is a double-click (within 500ms of the last click while drawing)
+          if (timeSinceLastClick < 500 && leftClickCount >= 1) {
+            // This is a double-click while drawing - cancel the selection box
+            resetSquareCreationState();
+            // Reset click tracking
+            leftClickCount = 0;
+            lastLeftClickTime = 0;
+            if (leftClickTimeout) {
+              clearTimeout(leftClickTimeout);
+              leftClickTimeout = null;
+            }
+            // Prevent default and return early since we canceled
+            e.preventDefault();
+            return false;
+          } else {
+            // Single click while drawing - don't cancel, just track for potential double-click
+            // Increment the click count and update the timestamp
+            leftClickCount = (leftClickCount || 0) + 1;
+            lastLeftClickTime = currentTime;
+            // Set a timeout to reset the counter if no second click comes
+            if (leftClickTimeout) {
+              clearTimeout(leftClickTimeout);
+            }
+            leftClickTimeout = setTimeout(() => {
+              leftClickCount = 0;
+              lastLeftClickTime = 0;
+            }, 500);
+          }
+          // Always return to prevent normal click handling while drawing
+          e.preventDefault();
+          return false;
         }
         // Check if this is a double left-click (within 500ms)
         if (timeSinceLastClick < 500) {
@@ -5390,15 +5421,33 @@ function copySelectedNodeAsJson() {
     // Collect section preferences from the copied nodes
     const copiedSectionPrefs = {};
     const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
-    nodes.forEach(cell => {
-      const section = cell.section || "1";
-      if (currentSectionPrefs[section]) {
-        copiedSectionPrefs[section] = {
-          name: currentSectionPrefs[section].name,
-          borderColor: currentSectionPrefs[section].borderColor
-        };
-      }
-    });
+    
+    // Check if we're copying all nodes (entire flowchart)
+    const allVertices = graph.getChildVertices(graph.getDefaultParent());
+    const isCopyingEntireFlowchart = nodes.length === allVertices.length;
+    
+    if (isCopyingEntireFlowchart) {
+      // Copy ALL section preferences when copying entire flowchart
+      Object.keys(currentSectionPrefs).forEach(sectionNum => {
+        if (currentSectionPrefs[sectionNum]) {
+          copiedSectionPrefs[sectionNum] = {
+            name: currentSectionPrefs[sectionNum].name,
+            borderColor: currentSectionPrefs[sectionNum].borderColor
+          };
+        }
+      });
+    } else {
+      // Only copy section preferences for sections referenced by selected nodes
+      nodes.forEach(cell => {
+        const section = cell.section || "1";
+        if (currentSectionPrefs[section]) {
+          copiedSectionPrefs[section] = {
+            name: currentSectionPrefs[section].name,
+            borderColor: currentSectionPrefs[section].borderColor
+          };
+        }
+      });
+    }
     // Create the complete clipboard data
     const clipboardData = {
       nodes: nodeData,
@@ -5720,12 +5769,16 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
   }
   // Clear the paste flag
   window._isPasting = false;
-  // Correct Node IDs for pasted nodes to follow proper naming scheme
+  // Automatically reset node IDs after paste to handle duplicates and ensure consistency
+  // This is necessary because:
+  // 1. Pasted nodes might have duplicate node IDs with existing nodes
+  // 2. renumberQuestionIds() (called by refreshAllCells) changes _questionId values which can affect node ID generation
+  // 3. Node IDs need to be properly formatted according to the naming convention
   setTimeout(() => {
-    if (typeof window.correctNodeIdsAfterImport === 'function') {
-      window.correctNodeIdsAfterImport();
+    if (typeof resetAllNodeIds === 'function') {
+      resetAllNodeIds();
     }
-  }, 100);
+  }, 100); // Small delay to ensure all paste operations and refreshes are complete
   refreshAllCells();
 }
 // Add visual feedback for copy/paste operations
@@ -6136,7 +6189,11 @@ function resetAllNodeIds() {
   const parent = graph.getDefaultParent();
   const cells = graph.getChildVertices(parent);
   let resetCount = 0;
-  // Process each cell
+  
+  // First pass: generate all node IDs and group by node ID
+  const nodeIdMap = new Map(); // Maps nodeId -> array of cells with that nodeId
+  const cellsToProcess = [];
+  
   cells.forEach(cell => {
     // Skip hidden nodes - they should keep their custom Node IDs
     if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
@@ -6148,19 +6205,64 @@ function resetAllNodeIds() {
     if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
       return; // Skip linked logic nodes
     }
+    
     if (typeof window.generateCorrectNodeId === 'function') {
       const correctNodeId = window.generateCorrectNodeId(cell);
       if (correctNodeId) {
-        // Clear the manually edited flag since we're resetting to automatic generation
-        cell._manuallyEditedNodeId = false;
-        // Update the cell's Node ID
-        if (typeof window.setNodeId === 'function') {
-          window.setNodeId(cell, correctNodeId);
-          resetCount++;
+        // Group cells by their generated node ID
+        if (!nodeIdMap.has(correctNodeId)) {
+          nodeIdMap.set(correctNodeId, []);
         }
+        nodeIdMap.get(correctNodeId).push(cell);
+        cellsToProcess.push({ cell, correctNodeId });
       }
     }
   });
+  
+  // Second pass: handle duplicates by adding "_dup2", "_dup3", etc. to higher question IDs
+  const finalNodeIds = new Map(); // Maps cell -> final node ID
+  
+  nodeIdMap.forEach((cellsWithSameId, baseNodeId) => {
+    if (cellsWithSameId.length === 1) {
+      // No duplicates, use the base node ID
+      finalNodeIds.set(cellsWithSameId[0], baseNodeId);
+    } else {
+      // Multiple cells with the same node ID - sort by question ID (lowest first)
+      const sortedCells = cellsWithSameId.sort((a, b) => {
+        const aQuestionId = a._questionId || 0;
+        const bQuestionId = b._questionId || 0;
+        return aQuestionId - bQuestionId; // Lower question ID first
+      });
+      
+      // The first one (lowest question ID) keeps the original node ID
+      // The second one gets "_dup2", third gets "_dup3", etc.
+      sortedCells.forEach((cell, index) => {
+        if (index === 0) {
+          // First one (lowest question ID) keeps the original
+          finalNodeIds.set(cell, baseNodeId);
+        } else {
+          // Others get "_dup2", "_dup3", etc.
+          const dupNumber = index + 1;
+          finalNodeIds.set(cell, `${baseNodeId}_dup${dupNumber}`);
+        }
+      });
+    }
+  });
+  
+  // Third pass: apply the final node IDs
+  cellsToProcess.forEach(({ cell, correctNodeId }) => {
+    const finalNodeId = finalNodeIds.get(cell);
+    if (finalNodeId) {
+      // Clear the manually edited flag since we're resetting to automatic generation
+      cell._manuallyEditedNodeId = false;
+      // Update the cell's Node ID
+      if (typeof window.setNodeId === 'function') {
+        window.setNodeId(cell, finalNodeId);
+        resetCount++;
+      }
+    }
+  });
+  
   // Refresh all cells to update the display
   if (typeof window.refreshAllCells === 'function') {
     window.refreshAllCells();

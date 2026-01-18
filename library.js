@@ -355,8 +355,16 @@ window.exportGuiJson = function(download = true) {
       const sanitizedPdfName = (pdfName && shouldAddPdfName) ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
-      // Create nodeId with PDF prefix if available
-      const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
+      // Get the actual nodeId from the cell (which may include _dup2, _dup3, etc.)
+      const actualNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || baseQuestionName;
+      // Create nodeId with PDF prefix if available (but preserve the actual nodeId including _dup suffix)
+      let nodeId = actualNodeId;
+      if (sanitizedPdfName && !actualNodeId.startsWith(sanitizedPdfName + '_')) {
+        // Only add PDF prefix if it's not already there
+        nodeId = `${sanitizedPdfName}_${actualNodeId}`;
+      } else {
+        nodeId = actualNodeId;
+      }
       // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
       const allFieldsInOrder = [];
       // If _itemOrder exists, use it to determine the correct order
@@ -366,18 +374,26 @@ window.exportGuiJson = function(download = true) {
           if ((item.type === 'option' || item.type === 'textbox') && cell._textboxes && cell._textboxes[item.index]) {
             const tb = cell._textboxes[item.index];
             const labelName = tb.nameId || "";
-            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+            // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
+            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
             const fieldType = tb.type === 'phone'
               ? 'phone'
               : (tb.isAmountOption ? "amount" : "label");
-            allFieldsInOrder.push({
+            const fieldEntry = {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
-              order: orderIndex + 1,
-              prefill: tb.prefill || '',
-              conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
-            });
+              order: orderIndex + 1
+            };
+            // Only add prefill for non-amount fields
+            if (fieldType !== "amount") {
+              fieldEntry.prefill = tb.prefill || '';
+            }
+            // Only add prefill for non-amount fields
+            if (fieldType !== "amount") {
+              fieldEntry.prefill = tb.prefill || '';
+            }
+            allFieldsInOrder.push(fieldEntry);
           } else if (item.type === 'location') {
             // Create a single location entry instead of expanding into individual fields
               allFieldsInOrder.push({
@@ -926,14 +942,17 @@ window.exportGuiJson = function(download = true) {
             const fieldType = tb.type === 'phone'
               ? 'phone'
               : (tb.isAmountOption ? "amount" : "label");
-            allFieldsInOrder.push({
+            const fieldEntry = {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
-              order: index + 1,
-              prefill: tb.prefill || '',
-              conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
-            });
+              order: index + 1
+            };
+            // Only add prefill for non-amount fields
+            if (fieldType !== "amount") {
+              fieldEntry.prefill = tb.prefill || '';
+            }
+            allFieldsInOrder.push(fieldEntry);
           });
         }
         // Insert location entry at the correct position if locationIndex is set
@@ -1357,38 +1376,67 @@ window.exportGuiJson = function(download = true) {
           const optionText = opt.text.trim();
           // Check if this option has amount properties
           const hasAmount = opt.amount && typeof opt.amount === 'object';
+          // Special handling for "None of the above" option
+          const isNoneOfTheAbove = optionText.toLowerCase() === "none of the above";
           // Sanitize option text for nodeId: remove commas and non-alphanumerics, collapse to underscores
-          const sanitizedOption = optionText
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '_')
-            .replace(/^_+|_+$/g, '');
+          // For "None of the above", use "_none" instead of "_none_of_the_above"
+          let sanitizedOption;
+          if (isNoneOfTheAbove) {
+            sanitizedOption = "none";
+          } else {
+            sanitizedOption = optionText
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '_')
+              .replace(/^_+|_+$/g, '');
+          }
           // Always use the base nameId prefix for checkbox options
           const nameId = `${baseNameId}_${sanitizedOption}`;
-          return {
+          const optionObj = {
             label: optionText,
             nameId: nameId,
-            value: "",
-            hasAmount: hasAmount || false,
-            amountName: hasAmount ? (opt.amount.name || optionText) : "",
-            amountPlaceholder: hasAmount ? (opt.amount.placeholder || "") : ""
+            value: isNoneOfTheAbove ? optionText : "", // Set value for "None of the above"
+            hasAmount: hasAmount || false
           };
+          // Always include amountName and amountPlaceholder (empty strings if hasAmount is false)
+          if (hasAmount) {
+            optionObj.amountName = opt.amount.name || optionText;
+            optionObj.amountPlaceholder = opt.amount.placeholder || "";
+          } else {
+            optionObj.amountName = "";
+            optionObj.amountPlaceholder = "";
+          }
+          return optionObj;
         }
         return {
           label: "",
           nameId: "",
           value: "",
-          hasAmount: false,
-          amountName: "",
-          amountPlaceholder: ""
+          hasAmount: false
         };
       });
       // Default required/markOnlyOne flags for checkboxes
       question.required = checkboxAvailability !== 'optional';
       question.markOnlyOne = checkboxAvailability === 'markOne';
       question.allAreRequired = checkboxAvailability === 'allRequired';
-      // Set conditionalPDF answer to first option label if we only had the generic "Yes" default
-      if (question.conditionalPDF.answer === "Yes" && question.options.length > 0 && question.options[0].label) {
+      // Set conditionalPDF answer to the first option that leads to end (if endOption was set)
+      // Otherwise, use the first option label if we only had the generic "Yes" default
+      if (endOption && question.options.length > 0) {
+        // Find the option that matches endOption
+        const matchingOption = question.options.find(opt => opt.label === endOption);
+        if (matchingOption) {
+          question.conditionalPDF.answer = matchingOption.label;
+        } else if (question.options[0].label) {
+          question.conditionalPDF.answer = question.options[0].label;
+        }
+      } else if (question.conditionalPDF.answer === "Yes" && question.options.length > 0 && question.options[0].label) {
         question.conditionalPDF.answer = question.options[0].label;
+      }
+      // Remove linking and image fields from checkbox questions (they're not used)
+      if (question.linking) {
+        delete question.linking;
+      }
+      if (question.image) {
+        delete question.image;
       }
       // For "mark only one" checkboxes, remove nameId/placeholder
       if (question.markOnlyOne) {
@@ -1408,8 +1456,16 @@ window.exportGuiJson = function(download = true) {
       const sanitizedPdfName = (pdfName && shouldAddPdfName) ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
-      // Create nodeId with PDF prefix if available
-      const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
+      // Get the actual nodeId from the cell (which may include _dup2, _dup3, etc.)
+      const actualNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || baseQuestionName;
+      // Create nodeId with PDF prefix if available (but preserve the actual nodeId including _dup suffix)
+      let nodeId = actualNodeId;
+      if (sanitizedPdfName && !actualNodeId.startsWith(sanitizedPdfName + '_')) {
+        // Only add PDF prefix if it's not already there
+        nodeId = `${sanitizedPdfName}_${actualNodeId}`;
+      } else {
+        nodeId = actualNodeId;
+      }
       // Extract labels and amounts from textboxes with location data support
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
         // Create allFieldsInOrder array using _itemOrder if available, otherwise use default logic
@@ -1423,14 +1479,19 @@ window.exportGuiJson = function(download = true) {
               const fieldType = tb.type === 'phone'
                 ? 'phone'
                 : (tb.isAmountOption === true ? "amount" : "label");
-              const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-              allFieldsInOrder.push({
+              // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
+              const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
+              const fieldEntry = {
                 type: fieldType,
                 label: labelName,
                 nodeId: fieldNodeId,
-                order: orderIndex + 1,
-                prefill: tb.prefill || ''
-              });
+                order: orderIndex + 1
+              };
+              // Only add prefill for non-amount fields
+              if (fieldType !== "amount") {
+                fieldEntry.prefill = tb.prefill || '';
+              }
+              allFieldsInOrder.push(fieldEntry);
             } else if (item.type === 'location') {
               // Only include location if it still exists (locationIndex present)
               if (cell._locationIndex !== undefined && cell._locationIndex >= 0) {
@@ -1963,15 +2024,19 @@ window.exportGuiJson = function(download = true) {
             const fieldType = tb.type === 'phone'
               ? 'phone'
               : (tb.isAmountOption === true ? "amount" : "label");
-            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            allFieldsInOrder.push({
+            // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
+            const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
+            const fieldEntry = {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
-              order: index + 1,
-              prefill: tb.prefill || '',
-              conditionalPrefills: (tb.conditionalPrefills && Array.isArray(tb.conditionalPrefills)) ? tb.conditionalPrefills : []
-            });
+              order: index + 1
+            };
+            // Only add prefill for non-amount fields
+            if (fieldType !== "amount") {
+              fieldEntry.prefill = tb.prefill || '';
+            }
+            allFieldsInOrder.push(fieldEntry);
           });
           // Insert location fields at the correct position if locationIndex is set
           const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
@@ -2096,9 +2161,10 @@ window.exportGuiJson = function(download = true) {
             const parentQ = optEdge.source;
             if (parentQ && isQuestion(parentQ)) {
               const sourceSection = parseInt(getSection(parentQ) || "1", 10);
-              // Only add conditional logic if the source section is the same as current section
-              // Cross-section connections should be handled by jump logic
-              if (sourceSection === currentSection) {
+              // Add conditional logic if the source section is the same or earlier than current section
+              // Forward connections (earlier -> later) should use logic conditions
+              // Backward connections (later -> earlier) should use jump logic
+              if (sourceSection <= currentSection) {
                 const prevQuestionId = parentQ._questionId || "";
                 let optionLabel = sourceCell.value || "";
                 // Clean HTML entities and tags from option text
@@ -2125,8 +2191,8 @@ window.exportGuiJson = function(download = true) {
         } else if (sourceCell && isQuestion(sourceCell)) {
           // This is a direct question-to-question connection
           const sourceSection = parseInt(getSection(sourceCell) || "1", 10);
-          // Only add conditional logic if the source section is the same as current section
-          if (sourceSection === currentSection) {
+          // Add conditional logic if the source section is the same or earlier than current section
+          if (sourceSection <= currentSection) {
             // Check if the source is a multiple textbox/dropdown question or number question
             const sourceQuestionType = getQuestionType(sourceCell);
             if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType" || sourceQuestionType === "number") {
@@ -2485,29 +2551,100 @@ window.exportGuiJson = function(download = true) {
       fillValue: cell._calcFinalText || ""
     };
     // Process each calculation term
-    for (const term of cell._calcTerms) {
+    console.log('[GUI JSON] Processing calculation terms for cell:', cell._calcTitle);
+    for (let termIndex = 0; termIndex < cell._calcTerms.length; termIndex++) {
+      const term = cell._calcTerms[termIndex];
       if (term.amountLabel) {
-        // Extract the question name from the amount label
-        let cleanQuestionName = term.amountLabel;
-        // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
-        if (term.amountLabel.startsWith('question_value:')) {
+        console.log('[GUI JSON] Processing term', termIndex, ':', term.amountLabel, 'mathOperator:', term.mathOperator);
+        let questionNameId = term.amountLabel;
+        
+        // Handle numbered_dropdown format: numbered_dropdown:questionName_amountName_#N:displayName
+        if (term.amountLabel.startsWith('numbered_dropdown:')) {
           const parts = term.amountLabel.split(':');
           if (parts.length >= 3) {
-            // Extract the clean question name from the display part
-            // Format: "question_value:answer1:how_much (answer1)"
-            // We want "how_much" from the third part
+            const storedValue = parts[1]; // e.g., "how_many_sources_of_income_do_you_have_amount_1"
+            console.log('[GUI JSON] Found numbered_dropdown, storedValue:', storedValue);
+            
+            // Extract question ID, entry number, and amount name from storedValue
+            // Format: questionName_amountName_#N
+            // Need to find the question that matches this
+            const storedParts = storedValue.split('_');
+            // Find the question by matching the beginning of storedValue
+            let matchedQuestion = null;
+            let entryNumber = null;
+            let amountName = null;
+            
+            // Search through questions to find the matching numberedDropdown
+            for (const questionCell of questions) {
+              const qType = getQuestionType(questionCell);
+              if (qType === "multipleDropdownType") {
+                const questionText = questionCell._questionText || questionCell.value || "";
+                const cleanQuestionName = sanitizeNameId(questionText);
+                // Check if storedValue starts with this question name
+                if (storedValue.startsWith(cleanQuestionName + '_')) {
+                  matchedQuestion = questionCell;
+                  // Extract entry number and amount name
+                  // storedValue format: cleanQuestionName_amountName_#N
+                  const remainder = storedValue.substring(cleanQuestionName.length + 1); // Remove question name and _
+                  // Find the last underscore which separates amount name from number
+                  const lastUnderscoreIndex = remainder.lastIndexOf('_');
+                  if (lastUnderscoreIndex !== -1) {
+                    amountName = remainder.substring(0, lastUnderscoreIndex); // e.g., "amount"
+                    entryNumber = remainder.substring(lastUnderscoreIndex + 1); // e.g., "1"
+                    console.log('[GUI JSON] Extracted from storedValue:', { remainder, amountName, entryNumber, questionId: matchedQuestion._questionId });
+                  }
+                  break;
+                }
+              }
+            }
+            
+            if (matchedQuestion && entryNumber && amountName) {
+              // Get the actual nodeId from the matched question (includes _dupN suffixes)
+              const actualNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(matchedQuestion) : '') || 
+                                   matchedQuestion._nameId || 
+                                   sanitizeNameId(matchedQuestion._questionText || matchedQuestion.value || "");
+              // Format: {nodeId}_{amountName}_{entryNumber}
+              // e.g., "how_many_sources_of_income_do_you_have_income_value_1"
+              // or "how_many_sources_of_income_do_you_have_dup2_income_value_1"
+              questionNameId = `${actualNodeId}_${amountName}_${entryNumber}`;
+              console.log('[GUI JSON] Converted numbered_dropdown to questionNameId:', questionNameId);
+            } else {
+              console.warn('[GUI JSON] Could not match numbered_dropdown storedValue:', storedValue);
+              // Fallback: try to extract from storedValue directly
+              // Look for pattern: ..._amountName_#N at the end
+              const match = storedValue.match(/^(.+?)_([^_]+)_(\d+)$/);
+              if (match) {
+                const questionId = matchedQuestion ? (matchedQuestion._questionId || "") : "";
+                if (questionId) {
+                  questionNameId = `amount${questionId}_${match[3]}_${match[2]}`;
+                  console.log('[GUI JSON] Fallback extraction:', questionNameId);
+                }
+              }
+            }
+          }
+        } else if (term.amountLabel.startsWith('question_value:')) {
+          // Handle question_value format: question_value:answer1:how_much (answer1)
+          const parts = term.amountLabel.split(':');
+          if (parts.length >= 3) {
             const displayPart = parts[2];
             // Remove the "(answer1)" part if it exists
-            cleanQuestionName = displayPart.replace(/\s*\([^)]*\)$/, '');
+            const cleanQuestionName = displayPart.replace(/\s*\([^)]*\)$/, '');
+            questionNameId = parts[1]; // Use the actual answer ID (e.g., "answer1")
           }
         } else {
           // For regular labels, use as-is
-          cleanQuestionName = term.amountLabel;
+          questionNameId = term.amountLabel;
         }
-        // Look up the actual nodeId from the question name map
-        const questionNameId = questionNameMap.get(cleanQuestionName.toLowerCase().trim()) || cleanQuestionName;
+        
+        // Determine operator: first term should have empty operator, others should default to "+" if not set
+        let operator = term.mathOperator || "";
+        if (termIndex > 0 && !operator) {
+          operator = "+"; // Default to "+" for terms after the first
+        }
+        
+        console.log('[GUI JSON] Final term:', { operator, questionNameId });
         calculation.terms.push({
-          operator: term.mathOperator || "",
+          operator: operator,
           questionNameId: questionNameId
         });
       }
@@ -2557,10 +2694,31 @@ window.exportGuiJson = function(download = true) {
   linkedLogicNodes.forEach((cell, index) => {
     if (cell._linkedLogicNodeId && cell._linkedFields && cell._linkedFields.length > 0) {
       // Process linked fields to convert spaces to underscores while preserving PDF prefix
-      const processedFields = cell._linkedFields.map(field => {
+      let processedFields = cell._linkedFields.map(field => {
         // Convert all spaces to underscores in the field name
         return field.replace(/\s+/g, '_');
       });
+      
+      // Extract the entry number from linkedFieldId (e.g., "income_value_1" -> "1", "income_value_2" -> "2")
+      const linkedFieldId = cell._linkedLogicNodeId;
+      const entryNumberMatch = linkedFieldId.match(/_(\d+)$/);
+      if (entryNumberMatch) {
+        const expectedEntryNumber = entryNumberMatch[1];
+        // Correct any fields that have the wrong entry number
+        processedFields = processedFields.map(field => {
+          // Check if field ends with a number that doesn't match the expected entry number
+          const fieldNumberMatch = field.match(/_(\d+)$/);
+          if (fieldNumberMatch) {
+            const fieldEntryNumber = fieldNumberMatch[1];
+            // If the entry number doesn't match, replace it with the correct one
+            if (fieldEntryNumber !== expectedEntryNumber) {
+              return field.replace(/_(\d+)$/, `_${expectedEntryNumber}`);
+            }
+          }
+          return field;
+        });
+      }
+      
       const linkedFieldEntry = {
         id: `linkedField${index}`,
         linkedFieldId: cell._linkedLogicNodeId,

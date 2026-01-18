@@ -125,12 +125,15 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
     const styleAttr = ' style="text-align: center;"';
+    // Add event listeners to call updateLinkedFields() when input changes
+    // This ensures linked fields are updated when user types in amount/income fields
+    const eventHandlers = ' oninput="if(typeof updateLinkedFields === \'function\') { updateLinkedFields(); }" onchange="if(typeof updateLinkedFields === \'function\') { updateLinkedFields(); }"';
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + styleAttr + valueAttr + '>' +
+           'class="address-input"' + styleAttr + valueAttr + eventHandlers + '>' +
            '</div>';
 }
 // Generate hidden address textboxes for numbered dropdown questions with location fields
@@ -1355,7 +1358,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           const latexPreviewContent = latexPreviewContentEl ? latexPreviewContentEl.value : "";
           const latexPreviewPriceId = latexPreviewPriceIdEl ? latexPreviewPriceIdEl.value : "";
           const latexPreviewAttachment = latexPreviewAttachmentEl ? latexPreviewAttachmentEl.value : "Preview Only";
-          
+
           // Store metadata if "Attach to packet" is selected
           if (latexPreviewTrigger && latexPreviewContent && latexPreviewAttachment === "Attach to packet") {
             latexPreviewQuestions.push({
@@ -1365,7 +1368,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
               trigger: latexPreviewTrigger
             });
           }
-          
+
           if (latexPreviewTrigger && latexPreviewContent) {
             // Escape LaTeX content for JavaScript string (escape backslashes and quotes)
             const escapedLatexContent = latexPreviewContent
@@ -1387,14 +1390,12 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
               </div>
               <script>
                 async function handleLatexPreview${questionId}(value) {
-                  console.log('[LATEX PREVIEW] handleLatexPreview${questionId} called with value:', value);
+
                   const previewDiv = document.getElementById('latexPreview${questionId}');
                   const iframe = document.getElementById('latexPreviewIframe${questionId}');
                   const loadingDiv = document.getElementById('latexPreviewLoading${questionId}');
                   const latexContent = \`${escapedLatexContent}\`;
-                  console.log('[LATEX PREVIEW] Original LaTeX content:', latexContent);
-                  console.log('[LATEX PREVIEW] Trigger value:', '${latexPreviewTrigger}');
-                  
+
                   if (value === '${latexPreviewTrigger}') {
                     previewDiv.style.display = 'block';
                     loadingDiv.style.display = 'block';
@@ -1402,24 +1403,21 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                     // Convert LaTeX to PDF
                     try {
                       // Collect all form data for placeholder replacement
-                      console.log('[LATEX PREVIEW] Starting form data collection...');
+
                       const form = document.getElementById('customForm');
                       if (!form) {
-                        console.error('[LATEX PREVIEW] ERROR: customForm element not found!');
+
                         throw new Error('Form element not found');
                       }
-                      console.log('[LATEX PREVIEW] Form element found:', form);
-                      
+
                       const fd = new FormData();
                       fd.append('latex', latexContent);
-                      console.log('[LATEX PREVIEW] Added LaTeX content to FormData');
-                      
+
                       // Collect all form data
                       const formElements = form.querySelectorAll('input, textarea, select');
                       const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
                       const allFormElements = [...formElements, ...externalFormElements];
-                      console.log('[LATEX PREVIEW] Found', allFormElements.length, 'total form elements');
-                      
+
                       let collectedFields = {};
                       allFormElements.forEach(element => {
                         if (element.name && !element.disabled) {
@@ -1440,30 +1438,27 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                           }
                         }
                       });
-                      
-                      console.log('[LATEX PREVIEW] Collected form fields:', collectedFields);
-                      console.log('[LATEX PREVIEW] Checking for user_fullname in collected fields:', 'user_fullname' in collectedFields);
+
                       if (collectedFields['user_fullname']) {
-                        console.log('[LATEX PREVIEW] user_fullname value:', collectedFields['user_fullname']);
+
                       } else {
-                        console.warn('[LATEX PREVIEW] WARNING: user_fullname not found in collected fields!');
-                        console.log('[LATEX PREVIEW] Available field names:', Object.keys(collectedFields));
+
                       }
-                      
+
                       // Log FormData contents (for debugging)
-                      console.log('[LATEX PREVIEW] FormData entries:');
+
                       for (const [key, val] of fd.entries()) {
-                        console.log('[LATEX PREVIEW]   ', key, ':', val.substring ? val.substring(0, 100) : val);
+
                       }
-                      
+
                       // Send LaTeX content and form data to server endpoint to generate PDF
-                      console.log('[LATEX PREVIEW] Sending request to /latex_to_pdf...');
+
                       const res = await fetch('/latex_to_pdf', { 
                         method: 'POST', 
                         body: fd, 
                         credentials: 'include' 
                       });
-                      console.log('[LATEX PREVIEW] Response status:', res.status, res.statusText);
+
                       if (!res.ok) {
                         throw new Error('Failed to generate PDF from LaTeX');
                       }
@@ -1475,7 +1470,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                       iframe.style.display = 'block';
                       // Store URL for cleanup
                       iframe.dataset.blobUrl = url;
-                      
+
                       // Store PDF blob if "Attach to packet" is selected
                       const attachment = '${latexPreviewAttachment}';
                       if (attachment === 'Attach to packet') {
@@ -1485,7 +1480,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                         }
                         // Store the blob for this question
                         window.latexPdfs[${questionId}] = blob;
-                        console.log('[LATEX PREVIEW] Stored PDF blob for question ${questionId} (Attach to packet)');
+
                       }
                     } catch (error) {
                       loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
@@ -1609,11 +1604,16 @@ for (let co = 0; co < cOptsDivs.length; co++){
       </span>`;
     /* optional amount field */
     if (hasAmount){
+        // CRITICAL FIX: Use the field ID as the name attribute to ensure unique field names
+        // The amountName from JSON is often "value" which causes all fields to have the same name
+        const amountFieldName = optionNameId + '_amount';
         formHTML += `
           <input type="number" id="${optionNameId}_amount"
-                 name="${amountName || optionNameId + '_amount'}"
+                 name="${amountFieldName}"
                  placeholder="${amountPlaceholder}"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">`;
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">`;
     }
 }
 /* ── optional "None of the above" ─────────────────────────── */
@@ -2288,12 +2288,12 @@ formHTML += `</div><br></div>`;
             } else if (field.type === 'phone') {
               const fieldId = field.nodeId;
               const inputDiv = document.createElement('div');
+              const phoneLabel = field.label || 'Phone';
               const inputHTML = `
-                <label for="${fieldId}" style="display:block;margin-bottom:4px;font-weight:600;color:#333;">${field.label || 'Phone'}</label>
-                <input type="tel" id="${fieldId}" name="${fieldId}" placeholder="Phone Number" class="address-input" style="margin: 4px auto; max-width: 400px;" oninput="formatPhoneInput(this)">
+                <input type="tel" id="${fieldId}" name="${fieldId}" placeholder="${phoneLabel}" class="address-input" style="margin: 4px auto; max-width: 400px;" oninput="formatPhoneInput(this)">
               `;
               inputDiv.innerHTML = inputHTML;
-              // Append all children (label + input) to ensure input renders
+              // Append all children (input only, no label) to ensure input renders
               Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
               } else if (field.type === 'dropdown') {
                 // Add line break above dropdown field
@@ -3972,14 +3972,28 @@ if (s > 1){
           return indices;
         }
         function getVisibleIndicesForSectionElement(targetSectionEl) {
+
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+
           const indices = [];
           items.forEach(function(item, idx) {
-            // Only exclude questions that have the 'hidden' class
-            // Questions without the 'hidden' class should be considered visible
-            // even if their parent section is not active (they'll become visible when section activates)
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
             const hasHiddenClass = item.classList.contains('hidden');
+            const hasQuestionStepHidden = item.classList.contains('question-step-hidden');
+            const computedStyle = window.getComputedStyle(item);
+            const isActuallyVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+
+            // CRITICAL FIX: Check both conditional visibility (hidden class) AND navigation state (question-step-hidden)
+            // A question is visible if:
+            // 1. It doesn't have the 'hidden' class (conditional logic allows it)
+            // 2. It doesn't have 'question-step-hidden' OR if it does, we should still consider it if it's conditionally visible
+            // The key insight: question-step-hidden is a navigation state, but we should prioritize questions that are conditionally visible
+            // However, if a question has both 'hidden' and 'question-step-hidden', it's definitely not visible
+
             if (!hasHiddenClass) {
+              // Question is conditionally visible (no 'hidden' class)
+              // Even if it has 'question-step-hidden', we should include it in the indices
+              // because the navigation system will handle activating it when we navigate to this section
               indices.push(idx);
 
             } else {
@@ -4414,10 +4428,16 @@ if (s > 1){
           }
         }
         function activateIndex(targetIdx) {
-          if (isUpdating) return;
+
+          if (isUpdating) {
+
+            return;
+          }
           isUpdating = true;
           const visibleIndices = getVisibleIndices();
+
           if (!visibleIndices.length) {
+
             questionItems.forEach(function(item) {
               item.classList.add('question-step-hidden');
             });
@@ -4438,12 +4458,20 @@ if (s > 1){
             return;
           }
           if (visibleIndices.indexOf(targetIdx) === -1) {
+
             targetIdx = visibleIndices[0];
           }
+
           questionItems.forEach(function(item, idx) {
-            if (idx === targetIdx && !item.classList.contains('hidden')) {
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
+            const hasHiddenClass = item.classList.contains('hidden');
+            if (idx === targetIdx && !hasHiddenClass) {
+
               item.classList.remove('question-step-hidden');
             } else {
+              if (idx === targetIdx && hasHiddenClass) {
+
+              }
               item.classList.add('question-step-hidden');
             }
           });
@@ -4506,6 +4534,7 @@ if (s > 1){
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const targetFirstVisibleIndex = cachedNextSectionInfo.firstVisibleIndex;
 
           const triggerNavigation = () => {
 
@@ -4517,6 +4546,7 @@ if (s > 1){
               if (!validationResult) {
 
                 if (typeof navigateSection === 'function') {
+
                   navigateSection(targetSectionNumber);
                 }
               }
@@ -4534,7 +4564,8 @@ if (s > 1){
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
 
-                window.questionNavControllers[targetSectionId]();
+                // Pass the firstVisibleIndex to the navigation controller
+                window.questionNavControllers[targetSectionId](targetFirstVisibleIndex);
               } else {
 
               }
@@ -4676,12 +4707,15 @@ if (s > 1){
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+
             // If no visible questions found, try to show the first question anyway
             // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
 
             if (questionItems.length > 0) {
               const firstQuestion = questionItems[0];
               if (firstQuestion) {
+                const questionId = firstQuestion.getAttribute('data-question-id') || firstQuestion.id || 'unknown';
+
                 // Remove both question-step-hidden AND hidden classes to ensure question is visible
                 firstQuestion.classList.remove('question-step-hidden');
                 firstQuestion.classList.remove('hidden');
@@ -4692,6 +4726,7 @@ if (s > 1){
             return;
           }
           if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+
             const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
 
             if (currentVisibleIdx === -1) {
@@ -4813,15 +4848,61 @@ if (s > 1){
           }
         }
       });
-      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
+      // Global shortcut: Ctrl+CapsLock (Windows/Linux) or Command+CapsLock (Mac) → click the visible "previous" arrow
+      // CRITICAL FIX: Use a flag to prevent double-firing and add extensive logging
+      let capsLockHandlerExecuting = false;
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'CapsLock' && e.ctrlKey) {
+        console.log('[CAPSLOCK DEBUG] keydown event:', {
+          code: e.code,
+          key: e.key,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          target: e.target ? e.target.tagName + (e.target.id ? '#' + e.target.id : '') : 'null',
+          handlerExecuting: capsLockHandlerExecuting
+        });
+        
+        // Use e.code for more reliable CapsLock detection (works even when CapsLock is toggled)
+        const isCapsLock = (e.code === 'CapsLock' || e.key === 'CapsLock');
+        const hasModifier = (e.ctrlKey || e.metaKey);
+        
+        if (isCapsLock && hasModifier) {
+          console.log('[CAPSLOCK DEBUG] CapsLock + modifier detected');
+          
+          // Prevent double-firing: if handler is already executing, skip
+          if (capsLockHandlerExecuting) {
+            console.log('[CAPSLOCK DEBUG] Handler already executing, skipping');
+            return;
+          }
+          
           e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('[CAPSLOCK DEBUG] Finding active section and previous button');
           const activeSection = document.querySelector('.section.active');
+          console.log('[CAPSLOCK DEBUG] Active section:', activeSection ? activeSection.id : 'null');
+          
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
+          console.log('[CAPSLOCK DEBUG] Previous button:', prevBtn ? 'FOUND' : 'NOT FOUND', prevBtn ? {
+            id: prevBtn.id,
+            disabled: prevBtn.disabled,
+            className: prevBtn.className
+          } : {});
 
-          if (prevBtn) {
+          if (prevBtn && !prevBtn.disabled) {
+            console.log('[CAPSLOCK DEBUG] Clicking previous button');
+            // Set flag to prevent double-firing
+            capsLockHandlerExecuting = true;
+            
+            // Reset flag after a short delay to allow the click to process
+            setTimeout(() => {
+              capsLockHandlerExecuting = false;
+              console.log('[CAPSLOCK DEBUG] Handler flag reset');
+            }, 100);
+            
             prevBtn.click();
+            console.log('[CAPSLOCK DEBUG] Previous button clicked');
+          } else {
+            console.log('[CAPSLOCK DEBUG] Previous button not available or disabled');
           }
         }
       });
@@ -6877,13 +6958,20 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     `;
   }
   // Collect linked fields data from GUI
+
   if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {
-    window.linkedFieldsConfig.forEach(config => {
+
+    window.linkedFieldsConfig.forEach((config, index) => {
+
       linkedFields.push({
         linkedFieldId: config.linkedFieldId,
         fields: config.fields
       });
+
     });
+
+  } else {
+
   }
   // 2) Our global objects (some already defined above, only define the rest here)
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics || [])};\n`;
@@ -8410,26 +8498,52 @@ function showValidationPopup() {
 }
 // Global function to trigger visibility updates for dependent questions
 function triggerVisibilityUpdates() {
-    // Find all question containers and trigger their visibility logic
-    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    questionContainers.forEach(container => {
-        const questionId = container.id.replace('question-container-', '');
-        // Try to find and call the updateVisibility function for this question
-        // The conditional logic creates functions in the global scope, so we need to call them
-        try {
-            // Look for the updateVisibility function that was created for this question
-            // The function is created in a closure, so we need to trigger it via the event listeners
-        const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                              document.getElementById('answer' + questionId);
-        if (questionElement) {
-            // Trigger change event to update visibility
-            const event = new Event('change', { bubbles: true });
-            questionElement.dispatchEvent(event);
-            } else {
+    // Avoid blocking the main thread by batching visibility updates
+    if (window._visibilityUpdateRunning) {
+        window._visibilityUpdateQueued = true;
+        return;
+    }
+    window._visibilityUpdateRunning = true;
+    const questionContainers = Array.from(document.querySelectorAll('[id^="question-container-"]'));
+    let idx = 0;
+    const total = questionContainers.length;
+    const processBatch = (deadline) => {
+        let processed = 0;
+        const hasDeadline = deadline && typeof deadline.timeRemaining === 'function';
+        while (idx < total && (hasDeadline ? deadline.timeRemaining() > 5 : processed < 10)) {
+            const container = questionContainers[idx];
+            const questionId = container.id.replace('question-container-', '');
+            try {
+                const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                                      document.getElementById('answer' + questionId);
+                if (questionElement) {
+                    const event = new Event('change', { bubbles: true });
+                    questionElement.dispatchEvent(event);
+                }
+            } catch (error) {
             }
-        } catch (error) {
+            idx += 1;
+            processed += 1;
         }
-    });
+        if (idx < total) {
+            if (typeof requestIdleCallback !== 'undefined') {
+                requestIdleCallback(processBatch, { timeout: 1000 });
+            } else {
+                setTimeout(() => processBatch(null), 0);
+            }
+            return;
+        }
+        window._visibilityUpdateRunning = false;
+        if (window._visibilityUpdateQueued) {
+            window._visibilityUpdateQueued = false;
+            triggerVisibilityUpdates();
+        }
+    };
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(processBatch, { timeout: 1000 });
+    } else {
+        setTimeout(() => processBatch(null), 0);
+    }
 }
 // Fallback function to manually check and update visibility without relying on generated scripts
 function triggerVisibilityUpdatesFallback() {
@@ -10213,12 +10327,20 @@ function handleBusinessTypeSelection() {
 }
 // Function to handle linked fields synchronization
 function updateLinkedFields() {
-    if (!linkedFields || linkedFields.length === 0) return;
-    linkedFields.forEach(linkedField => {
+
+    if (!linkedFields || linkedFields.length === 0) {
+
+        return;
+    }
+
+    linkedFields.forEach((linkedField, index) => {
+
         const { linkedFieldId, fields } = linkedField;
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
+
         if (!hiddenField) {
+
             // Create the hidden textbox if it doesn't exist
             hiddenField = document.createElement('input');
             hiddenField.type = 'text';
@@ -10229,30 +10351,49 @@ function updateLinkedFields() {
             const form = document.getElementById('customForm');
             if (form) {
                 form.appendChild(hiddenField);
+
             } else {
                 document.body.appendChild(hiddenField);
+
             }
         }
         // Get all the linked textboxes (filter out null/undefined - textboxes that have been removed)
-        const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+
+        const linkedTextboxes = fields.map(fieldId => {
+            const field = document.getElementById(fieldId);
+
+            return field;
+        }).filter(el => el);
+
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
+
             hiddenField.value = '';
             return;
         }
         // Find which textbox has content
-        const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+        const textboxesWithContent = linkedTextboxes.filter(tb => {
+            const hasContent = tb.value.trim() !== '';
+
+            return hasContent;
+        });
+
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
+
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
-            hiddenField.value = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+            const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+
+            hiddenField.value = finalValue;
         } else {
             // Multiple textboxes have content
+
             const allAreDates = textboxesWithContent.every(tb => tb.type === 'date' || /^\d{2}[-/]\d{2}[-/]\d{4}$/.test(tb.value.trim()) || /^\d{4}-\d{2}-\d{2}$/.test(tb.value.trim()));
             if (allAreDates) {
+
                 // Choose the latest date
                 const parseDate = (val) => {
                     const trimmed = val.trim();
@@ -10277,15 +10418,20 @@ function updateLinkedFields() {
                 hiddenField.value = latest.type === 'date'
                     ? formatDateForServer(chosenVal)
                     : (/^\d{4}-\d{2}-\d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
+
             } else {
                 // Fall back to longest text
+
                 const longestTextbox = textboxesWithContent.reduce((longest, current) => 
                     current.value.length > longest.value.length ? current : longest
                 );
                 hiddenField.value = longestTextbox.value.trim();
+
             }
         }
+
     });
+
 }
 // Function to clear inactive linked textboxes (with delay to avoid interfering with typing)
 function clearInactiveLinkedFields() {
@@ -10355,8 +10501,12 @@ function setupLinkedFields() {
             }
         }
     });
-    // Initial update
-    updateLinkedFields();
+    // Initial update (deferred to avoid blocking load)
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => updateLinkedFields(), { timeout: 1000 });
+    } else {
+        setTimeout(() => updateLinkedFields(), 100);
+    }
 }
 function getQuestionInputs (questionId, type = null) {
   /* 1️⃣ First look inside the question container, if it exists */
@@ -10554,7 +10704,12 @@ function formatDateForDisplay(dateString) {
 }
 window.onload=function(){
     setCurrentDate();
-    attachCalculationListeners();
+    // 🔧 PERFORMANCE FIX: Defer heavy listener attachment until idle time
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => attachCalculationListeners(), { timeout: 500 });
+    } else {
+        setTimeout(() => attachCalculationListeners(), 0);
+    }
     // Trigger visibility updates on page load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -11187,7 +11342,7 @@ async function previewPdf(baseName, isUploaded, isLatex, questionId) {
 
     try {
         let url;
-        
+
         // Check if this is a LaTeX PDF
         if (isLatex && questionId && window.latexPdfs && window.latexPdfs[questionId]) {
             // For LaTeX PDFs, use the Blob directly
@@ -11326,16 +11481,21 @@ async function editAndDownloadPDF (pdfName) {
         const formElements = form.querySelectorAll('input, textarea, select');
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
+
         // Log all elements we're about to process
         allFormElements.forEach((element, index) => {
+
         });
+
         allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     if (element.checked) {
                         fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+
                     } else {
+
                     }
                     // Skip unchecked checkboxes entirely - don't send them to server
                 } else {
@@ -11344,16 +11504,28 @@ async function editAndDownloadPDF (pdfName) {
                     if (element.type === 'date' && value) {
                         const originalValue = value;
                         value = formatDateForServer(value);
+
                     }
                     // Include ALL fields with values, including hidden ones
                     if (value && value.trim() !== '') {
                         fd.append(element.name, value);
+
                     } else {
+
                     }
                 }
             } else {
+                if (!element.name) {
+
+                } else if (element.disabled) {
+
+                }
             }
         });
+
+        for (const [key, val] of fd.entries()) {
+
+        }
         // Use the /edit_pdf endpoint with the PDF name as a query parameter.
         // Keep the extension and include credentials so the backend can find the file and respect the current session.
         const baseName = pdfName.replace(/\.pdf$/i, '');
@@ -11474,29 +11646,52 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
+    console.log('[CALCULATION DEBUG] runSingleHiddenTextCalculation called for:', calcObj.hiddenFieldName);
     const textField = document.getElementById(calcObj.hiddenFieldName);
-    if (!textField) return;
+    if (!textField) {
+        console.log('[CALCULATION DEBUG] Text field not found:', calcObj.hiddenFieldName);
+        return;
+    }
+    console.log('[CALCULATION DEBUG] Text field found:', calcObj.hiddenFieldName);
+    
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
-    calcObj.calculations.forEach(function(oneCalc) {
+    calcObj.calculations.forEach(function(oneCalc, calcIndex) {
+        console.log('[CALCULATION DEBUG] Processing calculation ' + (calcIndex + 1) + ':', {
+            terms: oneCalc.terms,
+            compareOperator: oneCalc.compareOperator,
+            threshold: oneCalc.threshold,
+            fillValue: oneCalc.fillValue
+        });
+        
         let val = 0;
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
+            console.log('[CALCULATION DEBUG] First term:', firstTerm.questionNameId);
             val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            console.log('[CALCULATION DEBUG] First term value:', val);
+
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
+                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ':', term.questionNameId, 'operator:', term.operator);
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
+                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ' value:', termVal);
+
                 switch(term.operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
+                console.log('[CALCULATION DEBUG] Running total after term ' + (t + 1) + ':', val);
             }
         }
+        
+        console.log('[CALCULATION DEBUG] Final calculated value:', val);
+        
         // Compare to threshold
         const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
@@ -11505,17 +11700,30 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '<': matched = val < threshold; break;
             case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
+        
+        console.log('[CALCULATION DEBUG] Comparison:', {
+            value: val,
+            operator: oneCalc.compareOperator,
+            threshold: threshold,
+            matched: matched
+        });
+
         if (matched) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
+                console.log('[CALCULATION DEBUG] Using calculated value as finalValue:', finalValue);
             } else {
                 finalValue = oneCalc.fillValue;
+                console.log('[CALCULATION DEBUG] Using fillValue as finalValue:', finalValue);
             }
         }
     });
+    
+    console.log('[CALCULATION DEBUG] Setting text field value to:', finalValue);
     // Update the text field
     textField.value = finalValue;
+    console.log('[CALCULATION DEBUG] Text field value after setting:', textField.value);
 }
 function replacePlaceholderTokens (str){
     /* note the doubled back-slashes in the delimiters \$\$ */
@@ -11552,29 +11760,66 @@ function parseTokenValue(token){
  *       (note the escaped \\d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
+    console.log('[CALCULATION DEBUG] getMoneyValue called with:', qId);
+    
     /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
+        console.log('[CALCULATION DEBUG] Found direct element:', el.id, 'value:', el.value);
         if (el.type === "checkbox") {
             const amt = document.getElementById(el.id + "_amount");
-            if (amt && el.checked) return parseFloat(amt.value) || 0;
-            return el.checked ? 1 : 0;
+            if (amt && el.checked) {
+                const value = parseFloat(amt.value) || 0;
+                console.log('[CALCULATION DEBUG] Checkbox with amount field, returning:', value);
+                return value;
+            }
+            const value = el.checked ? 1 : 0;
+            console.log('[CALCULATION DEBUG] Checkbox without amount, returning:', value);
+            return value;
         }
-        return parseFloat(el.value) || 0;
+        const value = parseFloat(el.value) || 0;
+        console.log('[CALCULATION DEBUG] Direct element value, returning:', value);
+        return value;
     }
+    
     /* legacy builder‑shorthand amountX_Y_Z */
     if (/^amount\d+_\d+_.+/.test(qId)) {
-        const el2 = document.getElementById(normaliseDesignerFieldRef(qId));
-        if (el2) return parseFloat(el2.value) || 0;
+        const normalized = normaliseDesignerFieldRef(qId);
+        console.log('[CALCULATION DEBUG] Normalized shorthand:', qId, '->', normalized);
+        const el2 = document.getElementById(normalized);
+        if (el2) {
+            const value = parseFloat(el2.value) || 0;
+            console.log('[CALCULATION DEBUG] Found normalized element, returning:', value);
+            return value;
+        } else {
+            console.log('[CALCULATION DEBUG] Normalized element not found:', normalized);
+        }
     }
+    
     /* name‑attribute fallback */
     const byName = document.getElementsByName(qId);
-    if (byName.length) return parseFloat(byName[0].value) || 0;
+    if (byName.length) {
+        const value = parseFloat(byName[0].value) || 0;
+        console.log('[CALCULATION DEBUG] Found by name, returning:', value);
+        return value;
+    }
+    
+    console.log('[CALCULATION DEBUG] No element found, returning 0');
     return 0;
 }
 function attachCalculationListeners() {
     // Universal function to attach listeners in a consistent way
     function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
+        // 🔧 PERFORMANCE FIX: Cache DOM queries and name lookups once
+        const allInputs = Array.from(document.querySelectorAll('input, select, textarea'));
+        const nameMap = new Map();
+        allInputs.forEach(input => {
+            if (!input.name) return;
+            if (!nameMap.has(input.name)) {
+                nameMap.set(input.name, []);
+            }
+            nameMap.get(input.name).push(input);
+        });
         for (let i = 0; i < calculations.length; i++) {
             const calcObj = calculations[i];
             for (let c = 0; c < calcObj.calculations.length; c++) {
@@ -11597,7 +11842,7 @@ function attachCalculationListeners() {
                         continue; // Found and attached, go to next term
                     }
                     // 2. Try elements with this name
-                    const namedElements = document.getElementsByName(qNameId);
+                    const namedElements = nameMap.get(qNameId) || [];
                     if (namedElements.length > 0) {
                         for (let n = 0; n < namedElements.length; n++) {
                             namedElements[n].addEventListener('change', runCalculationFunction);
@@ -11607,7 +11852,6 @@ function attachCalculationListeners() {
                     }
                     // 3. Look for prefixed IDs like "answerX_qId"
                     const prefixPattern = new RegExp('.*_' + qNameId + '$');
-                    const allInputs = document.querySelectorAll('input, select, textarea');
                     for (let inp = 0; inp < allInputs.length; inp++) {
                         const input = allInputs[inp];
                         if (prefixPattern.test(input.id)) {
@@ -11623,7 +11867,7 @@ function attachCalculationListeners() {
                         }
                     }
                     // 4. Look specifically for amount fields with this name
-                    const amountElements = document.querySelectorAll('input[name="' + qNameId + '"]');
+                    const amountElements = nameMap.get(qNameId) || [];
                     for (let a = 0; a < amountElements.length; a++) {
                         amountElements[a].addEventListener('input', runCalculationFunction);
                         // Also find and attach to the controlling checkbox
@@ -11664,9 +11908,20 @@ function attachCalculationListeners() {
         };
         attachListenersToCalculationTerms(hiddenTextCalculations, runAllTextCalcs);
     }
-    // Run calculations once on page load to set initial values
-    runAllHiddenCheckboxCalculations();
-    runAllHiddenTextCalculations();
+    // 🔧 PERFORMANCE FIX: Defer initial calculations to avoid blocking page load
+    // Run calculations asynchronously after page is interactive
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => {
+            runAllHiddenCheckboxCalculations();
+            runAllHiddenTextCalculations();
+        }, { timeout: 1000 });
+    } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+            runAllHiddenCheckboxCalculations();
+            runAllHiddenTextCalculations();
+        }, 100);
+    }
 }
 // Progress Bar Logic
 function updateProgressBar() {
@@ -13375,9 +13630,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
 <script>
 // Debug Menu Functionality
 let debugMenuVisible = false;
-// Show debug menu on Ctrl+Shift
+// Show debug menu on Ctrl+Shift (Windows/Linux) or Command+Shift (Mac)
 document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !debugMenuVisible) {
     e.preventDefault();
     showDebugMenu();
   }
@@ -14385,12 +14640,21 @@ document.addEventListener('DOMContentLoaded', function() {
  *───────────────────────────────────────────────────────────────*/
 function normaliseDesignerFieldRef(raw) {
     raw = String(raw || "").trim();
+    console.log('[CALCULATION DEBUG] normaliseDesignerFieldRef called with:', raw);
+    
     /* ① already a real element in the live DOM? */
-    if (document.getElementById(raw)) return raw;
+    if (document.getElementById(raw)) {
+        console.log('[CALCULATION DEBUG] Found direct element, returning:', raw);
+        return raw;
+    }
+    
     /* ② looks like a finished slug already? */
     const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
-    if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1]))
+    if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1])) {
+        console.log('[CALCULATION DEBUG] Looks like finished slug, returning:', raw);
         return raw;
+    }
+    
     /* ③ builder shorthand (amountX_Y_field  OR  answerX_Y_field) */
     const mShort =
         raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
@@ -14398,15 +14662,40 @@ function normaliseDesignerFieldRef(raw) {
     if (mShort) {
         const [, qId, idx, field] = mShort;
         const slug = questionSlugMap[qId] || ("answer" + qId);
-        // 🔧 FIX: Don't sanitize field names that are already properly formatted
-        return `${slug}_${idx}_${field}`;
+        // 🔧 CRITICAL FIX: For numbered dropdown fields, the actual field ID pattern is:
+        // baseName_fieldName_entryNumber (NOT baseName_entryNumber_fieldName)
+        // So amount2_1_income_value should become how_many_sources_of_income_do_you_have_income_value_1
+        const normalized = `${slug}_${field}_${idx}`;
+        console.log('[CALCULATION DEBUG] Normalized shorthand:', {
+            input: raw,
+            questionId: qId,
+            entryNumber: idx,
+            fieldName: field,
+            slug: slug,
+            normalized: normalized
+        });
+        return normalized;
     }
+    
     /* ④ catch‑all fallback */
     const mGeneric = raw.match(/^(.*)_(\d+)_(.+)$/);
-    if (!mGeneric) return sanitizeQuestionText(raw);
+    if (!mGeneric) {
+        const sanitized = sanitizeQuestionText(raw);
+        console.log('[CALCULATION DEBUG] No pattern match, sanitized:', sanitized);
+        return sanitized;
+    }
     const [, qText, idx, field] = mGeneric;
-    // 🔧 FIX: Don't sanitize field names that are already properly formatted
-    return `${sanitizeQuestionText(qText)}_${idx}_${field}`;
+    // 🔧 CRITICAL FIX: For numbered dropdown fields, the actual field ID pattern is:
+    // baseName_fieldName_entryNumber (NOT baseName_entryNumber_fieldName)
+    const normalized = `${sanitizeQuestionText(qText)}_${field}_${idx}`;
+    console.log('[CALCULATION DEBUG] Normalized generic pattern:', {
+        input: raw,
+        questionText: qText,
+        entryNumber: idx,
+        fieldName: field,
+        normalized: normalized
+    });
+    return normalized;
 }
 /*───────────────────────────────────────────────────────────────*
  * 2.  generateHiddenPDFFields()

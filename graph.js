@@ -1435,6 +1435,24 @@ function showPropertiesPopup(cell) {
         setTimeout(() => {
           saveBtn.textContent = originalText;
           saveBtn.style.backgroundColor = '#4CAF50';
+          // Close the properties popup after showing success message
+          // Find the popup element (it should be accessible via closure)
+          const popupElement = popup;
+          if (popupElement && typeof newClosePopup === 'function') {
+            newClosePopup();
+          } else if (popupElement) {
+            // Fallback: close the popup directly if newClosePopup is not accessible
+            popupElement.style.display = 'none';
+            popupElement.style.pointerEvents = 'none';
+            popupElement.style.opacity = '0';
+            setTimeout(() => {
+              if (popupElement.parentNode) {
+                popupElement.parentNode.removeChild(popupElement);
+              }
+              window.__propertiesPopupOpen = false;
+              window.__propertiesPopupClosing = false;
+            }, 100);
+          }
         }, 1000);
         // Verify the properties were actually set on the cell
       };
@@ -1791,6 +1809,24 @@ function showPropertiesPopup(cell) {
         setTimeout(() => {
           saveBtn.textContent = originalText;
           saveBtn.style.backgroundColor = '#4CAF50';
+          // Close the properties popup after showing success message
+          // Find the popup element (it should be accessible via closure)
+          const popupElement = popup;
+          if (popupElement && typeof newClosePopup === 'function') {
+            newClosePopup();
+          } else if (popupElement) {
+            // Fallback: close the popup directly if newClosePopup is not accessible
+            popupElement.style.display = 'none';
+            popupElement.style.pointerEvents = 'none';
+            popupElement.style.opacity = '0';
+            setTimeout(() => {
+              if (popupElement.parentNode) {
+                popupElement.parentNode.removeChild(popupElement);
+              }
+              window.__propertiesPopupOpen = false;
+              window.__propertiesPopupClosing = false;
+            }, 100);
+          }
         }, 1000);
         // Verify the properties were actually set on the cell
       };

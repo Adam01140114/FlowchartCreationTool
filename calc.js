@@ -209,14 +209,48 @@ function gatherAllAmountLabels() {
       const qType = getQuestionType(cell);
       if (qType === "multipleDropdownType") {
         // We'll rename it "numberedDropdown" in final JSON
-        // If it has amounts, push them
+        // If it has amounts, push numbered variants (#1, #2, #3, etc.)
         if (cell._textboxes) {
-          const cleanQuestionName = sanitizeNameId(cell.value || cell._questionText || "unnamed_question");
-          cell._textboxes.forEach(tb => {
+          const questionText = cell._questionText || cell.value || "unnamed_question";
+          // Use the actual nodeId instead of sanitized question text to handle duplicates (_dup2, etc.)
+          const actualNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || 
+                               cell._nameId || 
+                               sanitizeNameId(questionText);
+          // Get min and max from _twoNumbers
+          const min = cell._twoNumbers?.first ? parseInt(cell._twoNumbers.first) : 1;
+          const max = cell._twoNumbers?.second ? parseInt(cell._twoNumbers.second) : min;
+          console.log('[CALC gatherAllAmountLabels] Processing numberedDropdown:', {
+            questionText,
+            actualNodeId,
+            min,
+            max,
+            textboxesCount: cell._textboxes.length
+          });
+          cell._textboxes.forEach((tb, tbIndex) => {
             if (tb.isAmountOption) {
-              let amountName = sanitizeNameId(tb.nameId || "");
-              let label = cleanQuestionName + "_" + amountName;
-              labels.push(label);
+              const amountName = tb.nameId || "";
+              const sanitizedAmountName = sanitizeNameId(amountName);
+              console.log('[CALC gatherAllAmountLabels] Processing amount option:', {
+                tbIndex,
+                amountName,
+                sanitizedAmountName
+              });
+              // Generate numbered variants from min to max
+              for (let i = min; i <= max; i++) {
+                // Store value: nodeId_amountName_#N (for identification)
+                // This uses the actual nodeId which includes _dup2 suffixes
+                const storedValue = `${actualNodeId}_${sanitizedAmountName}_${i}`;
+                // Display name: "Question Text - Amount Label #N"
+                const displayName = `${questionText} - ${amountName} #${i}`;
+                // Store with special prefix to identify it's a numbered dropdown amount
+                labels.push(`numbered_dropdown:${storedValue}:${displayName}`);
+                console.log('[CALC gatherAllAmountLabels] Added numbered variant:', {
+                  i,
+                  storedValue,
+                  displayName,
+                  fullLabel: `numbered_dropdown:${storedValue}:${displayName}`
+                });
+              }
             }
           });
         }
@@ -277,11 +311,19 @@ function updateCalculationNodeCell(cell) {
     // Build dropdown of amount labels for this term
     let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
     allAmountLabels.forEach(lbl => {
-      // Check if this is a direct question value (number/money type)
+      // Check if this is a numbered dropdown amount or direct question value
+      const isNumberedDropdown = lbl.startsWith('numbered_dropdown:');
       const isQuestionValue = lbl.startsWith('question_value:');
       let value = lbl;
       let displayName = lbl;
-      if (isQuestionValue) {
+      if (isNumberedDropdown) {
+        // Format: numbered_dropdown:storedValue:displayName
+        const parts = lbl.split(':');
+        if (parts.length >= 3) {
+          value = parts[1]; // The stored value (questionName_amountName_#N)
+          displayName = parts[2]; // The display name (Question Text - Amount Label #N)
+        }
+      } else if (isQuestionValue) {
         // Format: question_value:label:displayName
         const parts = lbl.split(':');
         if (parts.length >= 3) {
@@ -304,15 +346,18 @@ function updateCalculationNodeCell(cell) {
       }
       // Check if this option should be selected
       let selected = "";
-      if (isQuestionValue) {
-        // For question values, check if the stored value matches
-        if (term.amountLabel === value) {
-          selected = "selected";
-        }
-      } else {
-        // For regular values, check direct match
-        if (lbl === term.amountLabel) {
-          selected = "selected";
+      if (term.amountLabel) {
+        if (isNumberedDropdown || isQuestionValue) {
+          // For numbered_dropdown or question_value, check if the stored value matches
+          // Also check if the full label format matches
+          if (term.amountLabel === lbl || term.amountLabel === value) {
+            selected = "selected";
+          }
+        } else {
+          // For regular values, check direct match
+          if (lbl === term.amountLabel) {
+            selected = "selected";
+          }
         }
       }
       amountOptionsHtml += `<option value="${escapeAttr(value)}" ${selected}>${displayName}</option>`;
@@ -526,9 +571,11 @@ window.updateCalcNodeFinalCheckboxChecked = (cellId, checked) => {
 };
 /**
  * Show calculation node properties popup
+ * @param {mxCell} cell - The calculation node cell
+ * @param {number} scrollPosition - Optional scroll position to restore (default: 0)
  */
-window.showCalculationNodeProperties = function(cell) {
-  console.log('[CALC PROPERTIES] showCalculationNodeProperties called', cell);
+window.showCalculationNodeProperties = function(cell, scrollPosition = 0) {
+  console.log('[CALC PROPERTIES] showCalculationNodeProperties called', cell, 'scrollPosition:', scrollPosition);
   if (!cell || !isCalculationNode(cell)) {
     console.warn('[CALC PROPERTIES] Invalid cell or not a calculation node', cell);
     return;
@@ -657,11 +704,13 @@ window.showCalculationNodeProperties = function(cell) {
   calcTypeSelect.onchange = () => {
     cell._calcFinalOutputType = calcTypeSelect.value;
     updateCalculationNodeCell(cell);
+    // Save scroll position before refreshing
+    const scrollPosition = popup.scrollTop;
     // Refresh the popup to show the appropriate output field
     setTimeout(() => {
       popup.remove();
       window.__calcPropertiesPopupOpen = false;
-      showCalculationNodeProperties(cell);
+      showCalculationNodeProperties(cell, scrollPosition);
     }, 100);
   };
   calcTypeContainer.appendChild(calcTypeSelect);
@@ -757,11 +806,13 @@ window.showCalculationNodeProperties = function(cell) {
   const outputTypeField = createDropdownField('Final Output Type', cell._calcFinalOutputType || 'textbox', ['textbox', 'checkbox'], (value) => {
     cell._calcFinalOutputType = value;
     updateCalculationNodeCell(cell);
+    // Save scroll position before refreshing
+    const scrollPosition = popup.scrollTop;
     // Refresh the popup to show/hide the appropriate field
     setTimeout(() => {
       popup.remove();
       window.__calcPropertiesPopupOpen = false;
-      showCalculationNodeProperties(cell);
+      showCalculationNodeProperties(cell, scrollPosition);
     }, 100);
   });
   // Conditional Final Output Field
@@ -839,6 +890,13 @@ window.showCalculationNodeProperties = function(cell) {
   console.log('[CALC PROPERTIES] Popup HTML structure (first 1000 chars):', popup.innerHTML.substring(0, 1000));
   document.body.appendChild(popup);
   console.log('[CALC PROPERTIES] Popup appended to document.body');
+  // Restore scroll position if provided
+  if (scrollPosition > 0) {
+    setTimeout(() => {
+      popup.scrollTop = scrollPosition;
+      console.log('[CALC PROPERTIES] Restored scroll position to:', scrollPosition);
+    }, 50);
+  }
   // Check for any "New Dropdown" inputs after appending
   setTimeout(() => {
     const allNewDropdowns = popup.querySelectorAll('input[placeholder*="Dropdown"], input[value*="New Dropdown"], .dropdown-field, [data-type="dropdown"], [data-dropdown-index], input[name*="dropdown"]');
@@ -962,13 +1020,15 @@ function createCalculationTermsContainer(cell) {
     if (!cell._calcTerms) cell._calcTerms = [];
     cell._calcTerms.push({amountLabel: "", mathOperator: ""});
     updateCalculationNodeCell(cell);
+    // Save scroll position before refreshing
+    const popup = document.querySelector('.calc-properties-modal');
+    const scrollPosition = popup ? popup.scrollTop : 0;
     // Refresh the popup
     setTimeout(() => {
-      const popup = document.querySelector('.calc-properties-modal');
       if (popup) {
         popup.remove();
         window.__calcPropertiesPopupOpen = false;
-        showCalculationNodeProperties(cell);
+        showCalculationNodeProperties(cell, scrollPosition);
       }
     }, 100);
   };
@@ -1009,20 +1069,6 @@ function createCalculationTermField(cell, term, index) {
     background: white;
   `;
 
-  // Get current display value
-  let currentDisplayValue = '';
-  if (term.amountLabel) {
-    if (term.amountLabel.startsWith('question_value:')) {
-      const parts = term.amountLabel.split(':');
-      if (parts.length >= 3) {
-        currentDisplayValue = parts[2];
-      }
-    } else {
-      currentDisplayValue = term.amountLabel;
-    }
-  }
-  searchInput.value = currentDisplayValue;
-
   // Options container (dropdown)
   const optionsContainer = document.createElement('div');
   optionsContainer.style.cssText = `
@@ -1041,22 +1087,65 @@ function createCalculationTermField(cell, term, index) {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   `;
 
-  // Function to get all options with display names
+  // Function to get all options with display names (defined before use)
   const getAllOptions = () => {
+    console.log('[CALC createCalculationTermField] getAllOptions called');
     const allAmountLabels = gatherAllAmountLabels();
+    console.log('[CALC createCalculationTermField] Gathered labels:', allAmountLabels);
     return allAmountLabels.map(lbl => {
       let displayName = lbl;
       let value = lbl;
-      if (lbl.startsWith('question_value:')) {
+      // Handle numbered_dropdown format: numbered_dropdown:storedValue:displayName
+      if (lbl.startsWith('numbered_dropdown:')) {
+        console.log('[CALC createCalculationTermField] Processing numbered_dropdown label:', lbl);
         const parts = lbl.split(':');
         if (parts.length >= 3) {
-          displayName = parts[2];
-          value = lbl;
+          value = parts[1]; // The stored value (questionName_amountName_#N) - this is the actual node ID
+          displayName = parts[1]; // Use the actual node ID as the display name instead of the friendly display name
+          console.log('[CALC createCalculationTermField] Parsed numbered_dropdown:', { value, displayName });
+        }
+      } else if (lbl.startsWith('question_value:')) {
+        const parts = lbl.split(':');
+        if (parts.length >= 3) {
+          value = parts[1]; // The actual value (answer1, etc.)
+          displayName = parts[1]; // Use the actual node ID as the display name
         }
       }
       return { value, displayName };
     });
   };
+
+  // Get current display value (after getAllOptions is defined)
+  let currentDisplayValue = '';
+  console.log('[CALC createCalculationTermField] Getting current display value for term:', term);
+  if (term.amountLabel) {
+    // Handle numbered_dropdown format
+    if (term.amountLabel.startsWith('numbered_dropdown:')) {
+      const parts = term.amountLabel.split(':');
+      if (parts.length >= 3) {
+        currentDisplayValue = parts[1]; // Use the actual node ID instead of the display name
+        console.log('[CALC createCalculationTermField] Found numbered_dropdown, using node ID:', currentDisplayValue);
+      }
+    } else if (term.amountLabel.startsWith('question_value:')) {
+      const parts = term.amountLabel.split(':');
+      if (parts.length >= 3) {
+        currentDisplayValue = parts[1]; // Use the actual node ID instead of the display name
+      }
+    } else {
+      // Try to find matching display name from available options
+      const options = getAllOptions();
+      const matchingOption = options.find(opt => opt.value === term.amountLabel);
+      if (matchingOption) {
+        currentDisplayValue = matchingOption.displayName; // displayName is now the actual node ID
+        console.log('[CALC createCalculationTermField] Found matching option for stored value:', term.amountLabel, '->', currentDisplayValue);
+      } else {
+        currentDisplayValue = term.amountLabel;
+        console.log('[CALC createCalculationTermField] No matching option found, using raw value:', currentDisplayValue);
+      }
+    }
+  }
+  searchInput.value = currentDisplayValue;
+  console.log('[CALC createCalculationTermField] Set searchInput value to:', currentDisplayValue);
 
   // Function to render options
   const renderOptions = (searchTerm = '') => {
@@ -1092,10 +1181,31 @@ function createCalculationTermField(cell, term, index) {
         e.preventDefault(); // Prevent blur
       });
       optionRow.addEventListener('click', () => {
-        term.amountLabel = opt.value;
+        console.log('[CALC createCalculationTermField] Option clicked:', opt);
+        // Store the full label format (numbered_dropdown:value:display or question_value:... or plain value)
+        // First, find the original label from gatherAllAmountLabels
+        const allAmountLabels = gatherAllAmountLabels();
+        const matchingLabel = allAmountLabels.find(lbl => {
+          if (lbl.startsWith('numbered_dropdown:') || lbl.startsWith('question_value:')) {
+            const parts = lbl.split(':');
+            return parts.length >= 3 && parts[1] === opt.value;
+          }
+          return lbl === opt.value;
+        });
+        const valueToStore = matchingLabel || opt.value;
+        console.log('[CALC createCalculationTermField] Storing value:', {
+          optValue: opt.value,
+          optDisplayName: opt.displayName,
+          valueToStore,
+          matchingLabel
+        });
+        term.amountLabel = valueToStore;
         searchInput.value = opt.displayName;
         optionsContainer.style.display = 'none';
         updateCalculationNodeCell(cell);
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
       });
       optionsContainer.appendChild(optionRow);
     });
@@ -1172,13 +1282,15 @@ function createCalculationTermField(cell, term, index) {
     removeBtn.onclick = () => {
       cell._calcTerms.splice(index, 1);
       updateCalculationNodeCell(cell);
+      // Save scroll position before refreshing
+      const popup = document.querySelector('.calc-properties-modal');
+      const scrollPosition = popup ? popup.scrollTop : 0;
       // Refresh the popup
       setTimeout(() => {
-        const popup = document.querySelector('.calc-properties-modal');
         if (popup) {
           popup.remove();
           window.__calcPropertiesPopupOpen = false;
-          showCalculationNodeProperties(cell);
+          showCalculationNodeProperties(cell, scrollPosition);
         }
       }, 100);
     };
