@@ -1059,6 +1059,98 @@ function loadFormData(formData) {
                                                                     }
                                                                 }, 200);
                                                             }
+                                                            // Restore alert if enabled (after options are added)
+                                                            if (triggerField.alert && triggerField.alert.enabled) {
+                                                                // Initialize the data structure first (use actualFieldCount)
+                                                                const alertKey = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
+                                                                if (!window.triggerDropdownAlert) {
+                                                                    window.triggerDropdownAlert = {};
+                                                                }
+                                                                window.triggerDropdownAlert[alertKey] = {
+                                                                    enabled: true,
+                                                                    condition: triggerField.alert.condition || '',
+                                                                    title: triggerField.alert.title || ''
+                                                                };
+                                                                
+                                                                // Wait for options to be added before restoring alert
+                                                                setTimeout(() => {
+                                                                    const enableAlertCheckbox = document.getElementById(`enableAlertDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                    if (enableAlertCheckbox) {
+                                                                        enableAlertCheckbox.checked = true;
+                                                                        // Manually trigger the change event to update the UI
+                                                                        const event = new Event('change');
+                                                                        enableAlertCheckbox.dispatchEvent(event);
+                                                                        // Set the alert values after a delay to ensure UI is ready
+                                                                        setTimeout(() => {
+                                                                            if (typeof updateTriggerDropdownAlertUI === 'function') {
+                                                                                updateTriggerDropdownAlertUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
+                                                                                // Set the alert values after UI is updated
+                                                                                setTimeout(() => {
+                                                                                    const alertContainer = document.getElementById(`alertUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                                    if (alertContainer) {
+                                                                                        const conditionDropdown = alertContainer.querySelector('select');
+                                                                                        const titleInput = alertContainer.querySelector('input[type="text"]');
+                                                                                        if (conditionDropdown && triggerField.alert.condition) {
+                                                                                            conditionDropdown.value = triggerField.alert.condition;
+                                                                                            conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                        }
+                                                                                        if (titleInput && triggerField.alert.title) {
+                                                                                            titleInput.value = triggerField.alert.title;
+                                                                                            titleInput.dispatchEvent(new Event('blur'));
+                                                                                        }
+                                                                                    }
+                                                                                }, 300);
+                                                                            }
+                                                                        }, 400);
+                                                                    }
+                                                                }, 200);
+                                                            }
+                                                            // Restore hard alert if enabled (after options are added)
+                                                            if (triggerField.hardAlert && triggerField.hardAlert.enabled) {
+                                                                // Initialize the data structure first (use actualFieldCount)
+                                                                const hardAlertKey = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
+                                                                if (!window.triggerDropdownHardAlert) {
+                                                                    window.triggerDropdownHardAlert = {};
+                                                                }
+                                                                window.triggerDropdownHardAlert[hardAlertKey] = {
+                                                                    enabled: true,
+                                                                    condition: triggerField.hardAlert.condition || '',
+                                                                    title: triggerField.hardAlert.title || ''
+                                                                };
+                                                                
+                                                                // Wait for options to be added before restoring hard alert
+                                                                setTimeout(() => {
+                                                                    const enableHardAlertCheckbox = document.getElementById(`enableHardAlertDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                    if (enableHardAlertCheckbox) {
+                                                                        enableHardAlertCheckbox.checked = true;
+                                                                        // Manually trigger the change event to update the UI
+                                                                        const event = new Event('change');
+                                                                        enableHardAlertCheckbox.dispatchEvent(event);
+                                                                        // Set the hard alert values after a delay to ensure UI is ready
+                                                                        setTimeout(() => {
+                                                                            if (typeof updateTriggerDropdownHardAlertUI === 'function') {
+                                                                                updateTriggerDropdownHardAlertUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
+                                                                                // Set the hard alert values after UI is updated
+                                                                                setTimeout(() => {
+                                                                                    const hardAlertContainer = document.getElementById(`hardAlertUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                                    if (hardAlertContainer) {
+                                                                                        const conditionDropdown = hardAlertContainer.querySelector('select');
+                                                                                        const titleInput = hardAlertContainer.querySelector('input[type="text"]');
+                                                                                        if (conditionDropdown && triggerField.hardAlert.condition) {
+                                                                                            conditionDropdown.value = triggerField.hardAlert.condition;
+                                                                                            conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                        }
+                                                                                        if (titleInput && triggerField.hardAlert.title) {
+                                                                                            titleInput.value = triggerField.hardAlert.title;
+                                                                                            titleInput.dispatchEvent(new Event('blur'));
+                                                                                        }
+                                                                                    }
+                                                                                }, 300);
+                                                                            }
+                                                                        }, 400);
+                                                                    }
+                                                                }, 200);
+                                                            }
                                                         } else if (triggerField.type === 'date') {
                                                             if (typeof addTriggerDate !== 'function') {
 
@@ -1780,6 +1872,98 @@ function loadFormData(formData) {
                                                                     }, 400);
                                                                 } else {
 
+                                                                }
+                                                            }, 200);
+                                                        }
+                                                        // Restore alert if enabled (after options are added)
+                                                        if (triggerField.alert && triggerField.alert.enabled) {
+                                                            // Initialize the data structure first (use actualFieldCount)
+                                                            const alertKey = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
+                                                            if (!window.triggerDropdownAlert) {
+                                                                window.triggerDropdownAlert = {};
+                                                            }
+                                                            window.triggerDropdownAlert[alertKey] = {
+                                                                enabled: true,
+                                                                condition: triggerField.alert.condition || '',
+                                                                title: triggerField.alert.title || ''
+                                                            };
+                                                            
+                                                            // Wait for options to be added before restoring alert
+                                                            setTimeout(() => {
+                                                                const enableAlertCheckbox = document.getElementById(`enableAlertDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                if (enableAlertCheckbox) {
+                                                                    enableAlertCheckbox.checked = true;
+                                                                    // Manually trigger the change event to update the UI
+                                                                    const event = new Event('change');
+                                                                    enableAlertCheckbox.dispatchEvent(event);
+                                                                    // Set the alert values after a delay to ensure UI is ready
+                                                                    setTimeout(() => {
+                                                                        if (typeof updateTriggerDropdownAlertUI === 'function') {
+                                                                            updateTriggerDropdownAlertUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
+                                                                            // Set the alert values after UI is updated
+                                                                            setTimeout(() => {
+                                                                                const alertContainer = document.getElementById(`alertUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                                if (alertContainer) {
+                                                                                    const conditionDropdown = alertContainer.querySelector('select');
+                                                                                    const titleInput = alertContainer.querySelector('input[type="text"]');
+                                                                                    if (conditionDropdown && triggerField.alert.condition) {
+                                                                                        conditionDropdown.value = triggerField.alert.condition;
+                                                                                        conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                    }
+                                                                                    if (titleInput && triggerField.alert.title) {
+                                                                                        titleInput.value = triggerField.alert.title;
+                                                                                        titleInput.dispatchEvent(new Event('blur'));
+                                                                                    }
+                                                                                }
+                                                                            }, 300);
+                                                                        }
+                                                                    }, 400);
+                                                                }
+                                                            }, 200);
+                                                        }
+                                                        // Restore hard alert if enabled (after options are added) - location 2
+                                                        if (triggerField.hardAlert && triggerField.hardAlert.enabled) {
+                                                            // Initialize the data structure first (use actualFieldCount)
+                                                            const hardAlertKey = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
+                                                            if (!window.triggerDropdownHardAlert) {
+                                                                window.triggerDropdownHardAlert = {};
+                                                            }
+                                                            window.triggerDropdownHardAlert[hardAlertKey] = {
+                                                                enabled: true,
+                                                                condition: triggerField.hardAlert.condition || '',
+                                                                title: triggerField.hardAlert.title || ''
+                                                            };
+                                                            
+                                                            // Wait for options to be added before restoring hard alert
+                                                            setTimeout(() => {
+                                                                const enableHardAlertCheckbox = document.getElementById(`enableHardAlertDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                if (enableHardAlertCheckbox) {
+                                                                    enableHardAlertCheckbox.checked = true;
+                                                                    // Manually trigger the change event to update the UI
+                                                                    const event = new Event('change');
+                                                                    enableHardAlertCheckbox.dispatchEvent(event);
+                                                                    // Set the hard alert values after a delay to ensure UI is ready
+                                                                    setTimeout(() => {
+                                                                        if (typeof updateTriggerDropdownHardAlertUI === 'function') {
+                                                                            updateTriggerDropdownHardAlertUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
+                                                                            // Set the hard alert values after UI is updated
+                                                                            setTimeout(() => {
+                                                                                const hardAlertContainer = document.getElementById(`hardAlertUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                                                                                if (hardAlertContainer) {
+                                                                                    const conditionDropdown = hardAlertContainer.querySelector('select');
+                                                                                    const titleInput = hardAlertContainer.querySelector('input[type="text"]');
+                                                                                    if (conditionDropdown && triggerField.hardAlert.condition) {
+                                                                                        conditionDropdown.value = triggerField.hardAlert.condition;
+                                                                                        conditionDropdown.dispatchEvent(new Event('change'));
+                                                                                    }
+                                                                                    if (titleInput && triggerField.hardAlert.title) {
+                                                                                        titleInput.value = triggerField.hardAlert.title;
+                                                                                        titleInput.dispatchEvent(new Event('blur'));
+                                                                                    }
+                                                                                }
+                                                                            }, 300);
+                                                                        }
+                                                                    }, 400);
                                                                 }
                                                             }, 200);
                                                         }
@@ -3330,6 +3514,95 @@ function exportForm() {
                                                             enabled: true,
                                                             conditions: conditions
                                                         };
+                                                    }
+                                                }
+                                                // Check for alert - check window object first (most reliable)
+                                                const alertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`;
+                                                let alertEnabled = false;
+                                                let storedAlertData = null;
+                                                if (window.triggerDropdownAlert && window.triggerDropdownAlert[alertKey]) {
+                                                    const storedAlert = window.triggerDropdownAlert[alertKey];
+                                                    alertEnabled = storedAlert.enabled || false;
+                                                    if (alertEnabled && (storedAlert.condition || storedAlert.title)) {
+                                                        storedAlertData = {
+                                                            condition: storedAlert.condition || '',
+                                                            title: storedAlert.title || ''
+                                                        };
+                                                    }
+                                                }
+                                                // Also check checkbox state as fallback
+                                                if (!alertEnabled) {
+                                                    const enableAlertCheckbox = fieldEl.querySelector(`#enableAlertDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    alertEnabled = enableAlertCheckbox && enableAlertCheckbox.checked;
+                                                }
+                                                // Include alert if enabled
+                                                if (alertEnabled && storedAlertData) {
+                                                    dropdownField.alert = {
+                                                        enabled: true,
+                                                        condition: storedAlertData.condition,
+                                                        title: storedAlertData.title
+                                                    };
+                                                } else if (alertEnabled) {
+                                                    // Fallback: try to get from UI elements
+                                                    const alertContainer = fieldEl.querySelector(`#alertUIDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    if (alertContainer) {
+                                                        const conditionDropdown = alertContainer.querySelector('select');
+                                                        const titleInput = alertContainer.querySelector('input[type="text"]');
+                                                        if (conditionDropdown && titleInput) {
+                                                            const condition = conditionDropdown.value.trim();
+                                                            const title = titleInput.value.trim();
+                                                            if (condition || title) {
+                                                                dropdownField.alert = {
+                                                                    enabled: true,
+                                                                    condition: condition,
+                                                                    title: title
+                                                                };
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                // Check for hard alert - check window object first (most reliable)
+                                                let hardAlertEnabled = false;
+                                                let storedHardAlertData = null;
+                                                if (window.triggerDropdownHardAlert && window.triggerDropdownHardAlert[alertKey]) {
+                                                    const storedHardAlert = window.triggerDropdownHardAlert[alertKey];
+                                                    hardAlertEnabled = storedHardAlert.enabled || false;
+                                                    if (hardAlertEnabled && (storedHardAlert.condition || storedHardAlert.title)) {
+                                                        storedHardAlertData = {
+                                                            condition: storedHardAlert.condition || '',
+                                                            title: storedHardAlert.title || ''
+                                                        };
+                                                    }
+                                                }
+                                                // Also check checkbox state as fallback
+                                                if (!hardAlertEnabled) {
+                                                    const enableHardAlertCheckbox = fieldEl.querySelector(`#enableHardAlertDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    hardAlertEnabled = enableHardAlertCheckbox && enableHardAlertCheckbox.checked;
+                                                }
+                                                // Include hard alert if enabled
+                                                if (hardAlertEnabled && storedHardAlertData) {
+                                                    dropdownField.hardAlert = {
+                                                        enabled: true,
+                                                        condition: storedHardAlertData.condition,
+                                                        title: storedHardAlertData.title
+                                                    };
+                                                } else if (hardAlertEnabled) {
+                                                    // Fallback: try to get from UI elements
+                                                    const hardAlertContainer = fieldEl.querySelector(`#hardAlertUIDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${fieldIndex + 1}`);
+                                                    if (hardAlertContainer) {
+                                                        const conditionDropdown = hardAlertContainer.querySelector('select');
+                                                        const titleInput = hardAlertContainer.querySelector('input[type="text"]');
+                                                        if (conditionDropdown && titleInput) {
+                                                            const condition = conditionDropdown.value.trim();
+                                                            const title = titleInput.value.trim();
+                                                            if (condition || title) {
+                                                                dropdownField.hardAlert = {
+                                                                    enabled: true,
+                                                                    condition: condition,
+                                                                    title: title
+                                                                };
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 triggerFields.push(dropdownField);

@@ -590,30 +590,122 @@ window.exportGuiJson = function(download = true) {
                         };
                         // Include conditional logic if it exists
                         if (time.conditionalLogic && time.conditionalLogic.enabled) {
-                          // Regenerate conditions if they're missing forward slashes
+                          // Process conditions to remove parent question prefix
                           let conditions = time.conditionalLogic.conditions || [];
+                          
+                          // Get time field label (sanitized) to identify the field-specific part
+                          const sanitizeFn = typeof window.sanitizeNameId === 'function' ? window.sanitizeNameId : 
+                            (name) => (name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
+                          const timeFieldName = sanitizeFn(time.fieldName || '');
+                          
                           if (dropdown.name && dropdown.name.includes('/')) {
                             conditions = conditions.map(condition => {
+                              if (!condition || !condition.trim()) return condition;
+                              
                               // If condition doesn't have forward slash but should, regenerate it
-                              if (condition && !condition.includes('/')) {
+                              if (!condition.includes('/')) {
                                 // Try to regenerate using getCheckboxOptionNodeIdsFromTriggerSequence
                                 if (typeof window.getCheckboxOptionNodeIdsFromTriggerSequence === 'function') {
                                   const availableNodeIds = window.getCheckboxOptionNodeIdsFromTriggerSequence(trigger, dropdown, cell);
                                   // Find matching nodeId that has the forward slash
                                   const matchingNodeId = availableNodeIds.find(nodeId => {
                                     // Normalize both strings by removing slashes and underscores for comparison
-                                    // This handles cases where old conditions had underscores instead of slashes
                                     const normalize = (str) => str.replace(/[\/_]/g, '').toLowerCase();
                                     return normalize(condition) === normalize(nodeId);
                                   });
                                   if (matchingNodeId) {
-                                    return matchingNodeId;
+                                    condition = matchingNodeId;
                                   }
                                 }
                               }
+                              
+                              // Extract field-specific part from condition
+                              // Conditions may include full path: parentQuestion_parentDropdown_option_fieldName_option
+                              // We want only: fieldName_option (or just the dropdown/option reference)
+                              // For date fields, conditions typically reference dropdown options
+                              // Find where the referenced dropdown name starts in the condition
+                              if (condition && !condition.includes('/')) {
+                                // Try to find a dropdown name pattern in the condition
+                                // Look for common patterns like "have_you_filed" or "are_they_a_public_entity"
+                                // We'll extract just the dropdown name and option part
+                                // This is a heuristic approach - extract the last meaningful part
+                                const parts = condition.split('_');
+                                // If condition has many parts, it likely includes parent prefix
+                                // For now, return condition as-is and let the UI handle it
+                                // The main fix is for nested dropdowns which have a clearer pattern
+                              }
+                              
+                              return condition;
+                            });
+                          } else {
+                            // For conditions without slashes, extract field-specific part
+                            // Conditions reference dropdown options in the same trigger sequence
+                            // Pattern: parentQuestion_parentDropdown_option_referencedDropdown_option
+                            // We want: referencedDropdown_option
+                            
+                            const sanitizeFn = typeof window.sanitizeNameId === 'function' ? window.sanitizeNameId : 
+                              (name) => (name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
+                            const parentDropdownName = sanitizeFn(dropdown.name || '');
+                            
+                            // Build a map of dropdown field names in this trigger sequence
+                            const triggerDropdownNames = new Set();
+                            dropdownMap.forEach((nestedDropdown, fieldName) => {
+                              if (fieldName) {
+                                triggerDropdownNames.add(sanitizeFn(fieldName));
+                              }
+                            });
+                            
+                            conditions = conditions.map(condition => {
+                              if (!condition || !condition.trim()) return condition;
+                              
+                              // Check if condition includes parent dropdown name pattern
+                              if (parentDropdownName && condition.includes(parentDropdownName)) {
+                                // Remove parent dropdown prefix pattern
+                                const parentDropdownPattern = parentDropdownName + '_';
+                                
+                                // Find where parent dropdown appears in condition
+                                let cleaned = condition;
+                                if (condition.startsWith(parentDropdownPattern)) {
+                                  // Remove parent dropdown prefix
+                                  cleaned = condition.substring(parentDropdownPattern.length);
+                                  // Remove option (typically one word after parent dropdown name)
+                                  const parts = cleaned.split('_');
+                                  if (parts.length > 1) {
+                                    cleaned = parts.slice(1).join('_');
+                                  }
+                                } else if (condition.includes('_' + parentDropdownPattern)) {
+                                  // Parent dropdown pattern is in middle (after parent question prefix)
+                                  const parentIndex = condition.indexOf('_' + parentDropdownPattern);
+                                  cleaned = condition.substring(parentIndex + 1 + parentDropdownPattern.length);
+                                  // Remove option (typically one word after parent dropdown name)
+                                  const parts = cleaned.split('_');
+                                  if (parts.length > 1) {
+                                    cleaned = parts.slice(1).join('_');
+                                  }
+                                }
+                                
+                                // Try to match cleaned condition to a dropdown in the trigger sequence
+                                // Look for dropdown field names that appear in the cleaned condition
+                                for (const dropdownName of triggerDropdownNames) {
+                                  if (cleaned.includes(dropdownName)) {
+                                    // Found a match - extract from this dropdown name onwards
+                                    const dropdownIndex = cleaned.indexOf(dropdownName);
+                                    if (dropdownIndex >= 0) {
+                                      return cleaned.substring(dropdownIndex);
+                                    }
+                                  }
+                                }
+                                
+                                // If no match found, return cleaned version anyway
+                                if (cleaned && cleaned !== condition && cleaned.length > 0) {
+                                  return cleaned;
+                                }
+                              }
+                              
                               return condition;
                             });
                           }
+                          
                           dateField.conditionalLogic = {
                             enabled: time.conditionalLogic.enabled,
                             conditions: conditions.filter(c => c && c.trim() !== '')
@@ -634,30 +726,51 @@ window.exportGuiJson = function(download = true) {
                         };
                         // Include conditional logic if it exists
                         if (nestedDropdown.conditionalLogic && nestedDropdown.conditionalLogic.enabled) {
-                          // Regenerate conditions if they're missing forward slashes
+                          // Process conditions to remove parent question prefix
                           let conditions = nestedDropdown.conditionalLogic.conditions || [];
-                          if (dropdown.name && dropdown.name.includes('/')) {
-                            conditions = conditions.map(condition => {
-                              // If condition doesn't have forward slash but should, regenerate it
-                              if (condition && !condition.includes('/')) {
+                          
+                          // Get nested dropdown field name (sanitized) to identify the nested dropdown part
+                          const sanitizeFn = typeof window.sanitizeNameId === 'function' ? window.sanitizeNameId : 
+                            (name) => (name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
+                          const nestedDropdownName = sanitizeFn(nestedDropdown.fieldName || '');
+                          
+                          conditions = conditions.map(condition => {
+                            if (!condition || !condition.trim()) return condition;
+                            
+                            // First, handle forward slash case (if dropdown name has slash)
+                            if (dropdown.name && dropdown.name.includes('/')) {
+                              if (!condition.includes('/')) {
                                 // Try to regenerate using getCheckboxOptionNodeIdsFromTriggerSequence
                                 if (typeof window.getCheckboxOptionNodeIdsFromTriggerSequence === 'function') {
                                   const availableNodeIds = window.getCheckboxOptionNodeIdsFromTriggerSequence(trigger, dropdown, cell);
                                   // Find matching nodeId that has the forward slash
                                   const matchingNodeId = availableNodeIds.find(nodeId => {
                                     // Normalize both strings by removing slashes and underscores for comparison
-                                    // This handles cases where old conditions had underscores instead of slashes
                                     const normalize = (str) => str.replace(/[\/_]/g, '').toLowerCase();
                                     return normalize(condition) === normalize(nodeId);
                                   });
                                   if (matchingNodeId) {
-                                    return matchingNodeId;
+                                    condition = matchingNodeId;
                                   }
                                 }
                               }
-                              return condition;
-                            });
-                          }
+                            }
+                            
+                            // Extract nested dropdown-specific part from condition
+                            // Conditions may include full path: parentQuestion_parentDropdown_option_nestedDropdown_option
+                            // We want only: nestedDropdown_option
+                            if (nestedDropdownName && condition.includes(nestedDropdownName)) {
+                              // Find where nested dropdown name starts
+                              const nestedIndex = condition.indexOf(nestedDropdownName);
+                              if (nestedIndex > 0) {
+                                // Extract from nested dropdown name onwards
+                                return condition.substring(nestedIndex);
+                              }
+                            }
+                            
+                            return condition;
+                          });
+                          
                           dropdownField.conditionalLogic = {
                             enabled: nestedDropdown.conditionalLogic.enabled,
                             conditions: conditions.filter(c => c && c.trim() !== '')
@@ -4626,4 +4739,5 @@ function resolveDuplicateNodeIds(cells) {
   });
 }
 // Export the generateCorrectNodeId function to window for use by other modules
+window.generateCorrectNodeId = generateCorrectNodeId;
 window.generateCorrectNodeId = generateCorrectNodeId;

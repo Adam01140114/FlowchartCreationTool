@@ -91,10 +91,6 @@ window.getCheckboxOptionNodeIdsFromTriggerSequence = function getCheckboxOptionN
   }
   // Get dropdown option node IDs from dropdowns inside the trigger sequence
   if (triggerSequence && triggerSequence.dropdowns && parentDropdown && cell) {
-    // Get the parent dropdown's nodeId - use sanitizeNameId for consistency
-    const parentDropdownNodeId = typeof window.sanitizeNameId === 'function' 
-      ? window.sanitizeNameId(parentDropdown.name || '')
-      : (parentDropdown.name || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
     triggerSequence.dropdowns.forEach((dropdown, dropdownIndex) => {
       if (dropdown.fieldName && dropdown.options && Array.isArray(dropdown.options)) {
         dropdown.options.forEach((option, optionIndex) => {
@@ -107,8 +103,9 @@ window.getCheckboxOptionNodeIdsFromTriggerSequence = function getCheckboxOptionN
             const sanitizedOptionValue = typeof window.sanitizeNameId === 'function'
               ? window.sanitizeNameId(option.text || '')
               : (option.text || '').toLowerCase().replace(/[?]/g, '').replace(/[^a-z0-9\s\/]+/g, '').replace(/\s+/g, '_').replace(/^_+|_+$/g, '');
-            // Generate the hidden checkbox ID: {parentDropdownNodeId}_{dropdownFieldName}_{optionValue}
-            const checkboxId = `${parentDropdownNodeId}_${sanitizedFieldName}_${sanitizedOptionValue}`;
+            // Generate just the dropdown-specific node ID (without parent dropdown prefix)
+            // Format: {dropdownFieldName}_{optionValue}
+            const checkboxId = `${sanitizedFieldName}_${sanitizedOptionValue}`;
             if (!nodeIds.includes(checkboxId)) {
               nodeIds.push(checkboxId);
             }

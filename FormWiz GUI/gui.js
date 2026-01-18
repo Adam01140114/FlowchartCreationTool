@@ -3233,6 +3233,24 @@ function addTriggerDropdown(questionId, fieldCount, sequenceCount) {
                 <!-- Conditional logic UI will be populated here -->
             </div>
         </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label for="enableAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Enable Alert</label>
+            <div style="display: flex; justify-content: center;">
+                <input type="checkbox" id="enableAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" onchange="toggleTriggerDropdownAlert(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="cursor: pointer;">
+            </div>
+            <div id="alertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="margin-top: 8px; display: none;">
+                <!-- Alert UI will be populated here -->
+            </div>
+        </div>
+        <div style="margin-bottom: 8px; text-align: center;">
+            <label for="enableHardAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="display: block; font-weight: bold; color: #333; font-size: 12px; margin-bottom: 8px; cursor: pointer;">Enable Hard Alert</label>
+            <div style="display: flex; justify-content: center;">
+                <input type="checkbox" id="enableHardAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" onchange="toggleTriggerDropdownHardAlert(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="cursor: pointer;">
+            </div>
+            <div id="hardAlertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}" style="margin-top: 8px; display: none;">
+                <!-- Hard Alert UI will be populated here (reuses same structure as regular alert) -->
+            </div>
+        </div>
         <div style="text-align: center; margin-top: 8px;">
             <button type="button" onclick="removeTriggerField(${questionId}, ${fieldCount}, ${sequenceCount}, ${triggerFieldCount})" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
         </div>
@@ -3812,6 +3830,288 @@ function updateTriggerDropdownConditionalLogicUI(questionId, fieldCount, sequenc
     };
     container.appendChild(addConditionBtn);
 
+}
+// Function to toggle alert UI for dropdown fields and update it
+function toggleTriggerDropdownAlert(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const checkbox = document.getElementById(`enableAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`alertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!checkbox || !container) {
+        return;
+    }
+
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    // Initialize or update the data structure
+    if (!window.triggerDropdownAlert) {
+        window.triggerDropdownAlert = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownAlert[key]) {
+        window.triggerDropdownAlert[key] = { enabled: false, condition: '', title: '' };
+    }
+    // Update enabled state
+    window.triggerDropdownAlert[key].enabled = checkbox.checked;
+    if (checkbox.checked) {
+        updateTriggerDropdownAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        // Clear alert data when disabled
+        window.triggerDropdownAlert[key].condition = '';
+        window.triggerDropdownAlert[key].title = '';
+    }
+    // Trigger autosave to persist the changes
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+// Function to update the alert UI for dropdown fields
+function updateTriggerDropdownAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const container = document.getElementById(`alertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) {
+        return;
+    }
+    
+    // Get dropdown options from the trigger dropdown field
+    const optionsContainer = document.getElementById(`triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const options = [];
+    if (optionsContainer) {
+        const optionInputs = optionsContainer.querySelectorAll('input[type="text"]');
+        optionInputs.forEach(input => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                options.push(optionText);
+            }
+        });
+    }
+    
+    // Initialize alert data structure
+    if (!window.triggerDropdownAlert) {
+        window.triggerDropdownAlert = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownAlert[key]) {
+        window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+    }
+    
+    // Clear existing UI
+    container.innerHTML = '';
+    
+    // Create Alert Condition dropdown
+    const conditionRow = document.createElement('div');
+    conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+    const conditionLabel = document.createElement('label');
+    conditionLabel.textContent = 'Alert Condition:';
+    conditionLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+    conditionRow.appendChild(conditionLabel);
+    
+    const conditionDropdown = document.createElement('select');
+    conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+    
+    // Add placeholder option
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Select option...';
+    conditionDropdown.appendChild(placeholderOption);
+    
+    // Add dropdown options
+    options.forEach(optionText => {
+        const option = document.createElement('option');
+        option.value = optionText;
+        option.textContent = optionText;
+        if (window.triggerDropdownAlert[key].condition === optionText) {
+            option.selected = true;
+        }
+        conditionDropdown.appendChild(option);
+    });
+    
+    conditionDropdown.value = window.triggerDropdownAlert[key].condition || '';
+    conditionDropdown.onchange = () => {
+        if (!window.triggerDropdownAlert[key]) {
+            window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerDropdownAlert[key].condition = conditionDropdown.value;
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    conditionRow.appendChild(conditionDropdown);
+    container.appendChild(conditionRow);
+    
+    // Create Alert Title input
+    const titleRow = document.createElement('div');
+    titleRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Alert Title:';
+    titleLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+    titleRow.appendChild(titleLabel);
+    
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.placeholder = 'Enter alert message...';
+    titleInput.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+    titleInput.value = window.triggerDropdownAlert[key].title || '';
+    titleInput.onchange = () => {
+        if (!window.triggerDropdownAlert[key]) {
+            window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerDropdownAlert[key].title = titleInput.value.trim();
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    titleInput.onblur = () => {
+        if (!window.triggerDropdownAlert[key]) {
+            window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerDropdownAlert[key].title = titleInput.value.trim();
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    titleRow.appendChild(titleInput);
+    container.appendChild(titleRow);
+}
+// Function to toggle hard alert UI for dropdown fields and update it
+function toggleTriggerDropdownHardAlert(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const checkbox = document.getElementById(`enableHardAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`hardAlertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!checkbox || !container) {
+        return;
+    }
+
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    // Initialize or update the data structure
+    if (!window.triggerDropdownHardAlert) {
+        window.triggerDropdownHardAlert = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownHardAlert[key]) {
+        window.triggerDropdownHardAlert[key] = { enabled: false, condition: '', title: '' };
+    }
+    // Update enabled state
+    window.triggerDropdownHardAlert[key].enabled = checkbox.checked;
+    if (checkbox.checked) {
+        updateTriggerDropdownHardAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        // Clear hard alert data when disabled
+        window.triggerDropdownHardAlert[key].condition = '';
+        window.triggerDropdownHardAlert[key].title = '';
+    }
+    // Trigger autosave to persist the changes
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+// Function to update the hard alert UI for dropdown fields
+function updateTriggerDropdownHardAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const container = document.getElementById(`hardAlertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) {
+        return;
+    }
+    
+    // Get dropdown options from the trigger dropdown field
+    const optionsContainer = document.getElementById(`triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const options = [];
+    if (optionsContainer) {
+        const optionInputs = optionsContainer.querySelectorAll('input[type="text"]');
+        optionInputs.forEach(input => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                options.push(optionText);
+            }
+        });
+    }
+    
+    // Initialize hard alert data structure
+    if (!window.triggerDropdownHardAlert) {
+        window.triggerDropdownHardAlert = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerDropdownHardAlert[key]) {
+        window.triggerDropdownHardAlert[key] = { enabled: true, condition: '', title: '' };
+    }
+    
+    // Clear existing UI
+    container.innerHTML = '';
+    
+    // Create Alert Condition dropdown
+    const conditionRow = document.createElement('div');
+    conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+    const conditionLabel = document.createElement('label');
+    conditionLabel.textContent = 'Alert Condition:';
+    conditionLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+    conditionRow.appendChild(conditionLabel);
+    
+    const conditionDropdown = document.createElement('select');
+    conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+    
+    // Add placeholder option
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Select option...';
+    conditionDropdown.appendChild(placeholderOption);
+    
+    // Add dropdown options
+    options.forEach(optionText => {
+        const option = document.createElement('option');
+        option.value = optionText;
+        option.textContent = optionText;
+        if (window.triggerDropdownHardAlert[key].condition === optionText) {
+            option.selected = true;
+        }
+        conditionDropdown.appendChild(option);
+    });
+    
+    conditionDropdown.value = window.triggerDropdownHardAlert[key].condition || '';
+    conditionDropdown.onchange = () => {
+        if (!window.triggerDropdownHardAlert[key]) {
+            window.triggerDropdownHardAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerDropdownHardAlert[key].condition = conditionDropdown.value;
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    conditionRow.appendChild(conditionDropdown);
+    container.appendChild(conditionRow);
+    
+    // Create Alert Title input
+    const titleRow = document.createElement('div');
+    titleRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Alert Title:';
+    titleLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+    titleRow.appendChild(titleLabel);
+    
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.placeholder = 'Enter alert message...';
+    titleInput.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+    titleInput.value = window.triggerDropdownHardAlert[key].title || '';
+    titleInput.onchange = () => {
+        if (!window.triggerDropdownHardAlert[key]) {
+            window.triggerDropdownHardAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerDropdownHardAlert[key].title = titleInput.value.trim();
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    titleInput.onblur = () => {
+        if (!window.triggerDropdownHardAlert[key]) {
+            window.triggerDropdownHardAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerDropdownHardAlert[key].title = titleInput.value.trim();
+        // Trigger autosave to persist the changes
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    titleRow.appendChild(titleInput);
+    container.appendChild(titleRow);
 }
 // Function to toggle conditional logic UI for label fields and update it
 function toggleTriggerLabelConditionalLogic(questionId, fieldCount, sequenceCount, triggerFieldCount) {

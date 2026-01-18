@@ -2,12 +2,12 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Employment Info",
+      "sectionName": "Introduction",
       "questions": [
         {
           "questionId": 1,
-          "text": "Is your household monthly income less than the amount below?",
-          "type": "dropdown",
+          "text": "How many people are you suing?",
+          "type": "numberedDropdown",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -67,18 +67,243 @@
             "priceId": "",
             "attachment": "Preview Only"
           },
+          "options": [],
+          "labels": [],
+          "nodeId": "how_many_people_are_you_suing",
+          "min": "1",
+          "max": "3",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Name",
+              "nodeId": "how_many_people_are_you_suing_name",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "phone",
+              "label": "Phone",
+              "nodeId": "how_many_people_are_you_suing_phone",
+              "order": 2
+            },
+            {
+              "type": "location",
+              "fieldName": "Please enter their address",
+              "nodeId": "location_data",
+              "order": 3
+            },
+            {
+              "type": "checkbox",
+              "fieldName": "Military Status",
+              "selectionType": "multiple",
+              "required": "optional",
+              "options": [
+                {
+                  "text": "Check here if the defendant is on military duty",
+                  "nodeId": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty",
+                  "linkedFields": [
+                    {
+                      "nodeId": "how_many_people_are_you_suing_name",
+                      "title": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"
+                    }
+                  ],
+                  "pdfEntries": [
+                    {
+                      "triggerNumber": "2",
+                      "pdfName": "MC-031 (Military)",
+                      "pdfFile": "mc031-military.pdf",
+                      "priceId": "price_1SHdb4FJeSRMFQ8XEsxSKU7E"
+                    },
+                    {
+                      "triggerNumber": "3",
+                      "pdfName": "MC-031 (Military)",
+                      "pdfFile": "mc031-military.pdf",
+                      "priceId": "price_1SHdb4FJeSRMFQ8XEsxSKU7E"
+                    }
+                  ]
+                }
+              ],
+              "order": 4
+            },
+            {
+              "type": "dropdown",
+              "fieldName": "Are they a business or public entity?",
+              "options": [
+                {
+                  "text": "Yes",
+                  "nodeId": "are_they_a_business_or_public_entity_yes"
+                },
+                {
+                  "text": "No",
+                  "nodeId": "are_they_a_business_or_public_entity_no"
+                }
+              ],
+              "triggerSequences": [
+                {
+                  "condition": "Yes",
+                  "title": "Additional Information",
+                  "fields": [
+                    {
+                      "type": "label",
+                      "label": "Name",
+                      "nodeId": "are_they_a_business_or_public_entity_yes_name"
+                    },
+                    {
+                      "type": "label",
+                      "label": "Job Title",
+                      "nodeId": "are_they_a_business_or_public_entity_yes_job_title"
+                    },
+                    {
+                      "type": "location",
+                      "fieldName": "Work Address",
+                      "nodeId": "location_data"
+                    },
+                    {
+                      "type": "dropdown",
+                      "fieldName": "Are they a public entity?",
+                      "options": [
+                        {
+                          "text": "Yes"
+                        },
+                        {
+                          "text": "No"
+                        }
+                      ],
+                      "hardAlert": {
+                        "enabled": true,
+                        "condition": "No",
+                        "title": "123"
+                      }
+                    },
+                    {
+                      "type": "dropdown",
+                      "fieldName": "Have you filed a written claim against them?",
+                      "options": [
+                        {
+                          "text": "Yes"
+                        },
+                        {
+                          "text": "No"
+                        }
+                      ],
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": [
+                          "are_they_a_public_entity_yes"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "date",
+                      "label": "When did you file the written claim?",
+                      "nodeId": "are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim",
+                      "conditionalLogic": {
+                        "enabled": true,
+                        "conditions": [
+                          "have_you_filed_a_written_claim_against_them_yes"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "2",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 2",
+                      "pdfName": "sc103(2).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    },
+                    {
+                      "type": "pdf",
+                      "number": "4",
+                      "pdfTitle": "SC-103 For Extra Plaintiff 4",
+                      "pdfName": "sc103(4).pdf",
+                      "priceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2"
+                    }
+                  ]
+                }
+              ],
+              "order": 5
+            }
+          ]
+        },
+        {
+          "questionId": 2,
+          "text": "Hungry?",
+          "type": "dropdown",
+          "logic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "jump": {
+            "enabled": true,
+            "conditions": [
+              {
+                "option": "Yes",
+                "to": "end"
+              },
+              {
+                "option": "No",
+                "to": "end"
+              }
+            ]
+          },
+          "conditionalPDF": {
+            "enabled": false,
+            "pdfName": "",
+            "answer": "Yes"
+          },
+          "hiddenLogic": {
+            "enabled": false,
+            "configs": []
+          },
+          "pdfLogic": {
+            "enabled": false,
+            "conditions": [],
+            "pdfs": []
+          },
+          "alertLogic": {
+            "enabled": false,
+            "message": "",
+            "conditions": []
+          },
+          "checklistLogic": {
+            "enabled": false,
+            "conditions": []
+          },
+          "conditionalAlert": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": "",
+            "text": ""
+          },
+          "subtitle": {
+            "enabled": false,
+            "text": ""
+          },
+          "infoBox": {
+            "enabled": false,
+            "text": ""
+          },
+          "pdfPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "file": ""
+          },
+          "latexPreview": {
+            "enabled": false,
+            "trigger": "",
+            "title": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
+          },
           "options": [
             "Yes",
             "No"
           ],
           "labels": [],
-          "nameId": "is_your_household_monthly_income_less_than_the_amount_below",
-          "placeholder": "",
-          "image": {
-            "url": "income.png",
-            "width": 800,
-            "height": 90
-          }
+          "nameId": "hungry",
+          "placeholder": ""
         }
       ]
     }
@@ -86,13 +311,13 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 2,
+  "questionCounter": 3,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
-  "defaultPDFName": "",
-  "pdfOutputName": "",
-  "stripePriceId": "",
+  "defaultPDFName": "SC-100",
+  "pdfOutputName": "sc100.pdf",
+  "stripePriceId": "price_1SB7CbFJeSRMFQ8X2afGFckf",
   "additionalPDFs": [],
   "checklistItems": [],
   "linkedFields": [],

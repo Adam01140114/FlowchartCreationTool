@@ -1,758 +1,977 @@
-# FormWiz GUI Features Documentation
-# =====================================
-
-This document provides a comprehensive overview of all features implemented in the FormWiz GUI system, including their implementation details and usage.
-
-## Table of Contents
-1. [Hidden Checkbox Features](#hidden-checkbox-features)
-2. [Hidden Address Textbox Features](#hidden-address-textbox-features)
-3. [Numbered Dropdown Autofill Features](#numbered-dropdown-autofill-features)
-4. [Multiple Textboxes Features](#multiple-textboxes-features)
-5. [Radio Button Features](#radio-button-features)
-6. [State Management Features](#state-management-features)
-7. [Autofill System Features](#autofill-system-features)
-
----
-
-## Hidden Checkbox Features
-
-### Feature: Hidden Checkbox Creation for Radio Buttons
-**Purpose**: Creates hidden checkboxes that mirror radio button selections for PDF generation and data collection.
-
-**Implementation**:
-- **Location**: `generate.js` lines 687-710, 712-750
-- **Function**: `handleMarkOnlyOneSelection()`, `createHiddenCheckboxForRadio()`, `removeHiddenCheckbox()`
-- **Trigger**: When radio buttons are selected in "Mark only one" mode
-
-**How it works**:
-1. When a radio button is selected, `handleMarkOnlyOneSelection()` is called
-2. Unchecks all other radio buttons in the same group
-3. Creates a hidden checkbox with the same ID as the selected radio button
-4. Removes hidden checkboxes for unselected radio buttons
-
-**Code Example**:
-```javascript
-function handleMarkOnlyOneSelection(selectedInput, questionId) {
-    // Uncheck other radio buttons
-    const allInputs = container.querySelectorAll('input[type="radio"]');
-    allInputs.forEach(input => {
-        if (input !== selectedInput) {
-            input.checked = false;
-            removeHiddenCheckbox(input.id);
-        }
-    });
-    
-    // Create hidden checkbox for selected input
-    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
-}
-```
-
-### Feature: Hidden Checkbox Generation for Numbered Dropdowns
-**Purpose**: Creates hidden checkboxes for numbered dropdown questions to track which entries are selected.
-
-**Implementation**:
-- **Location**: `generate.js` lines 1917-1953
-- **Function**: `generateHiddenCheckboxes()`
-- **Trigger**: When numbered dropdown values change
-
-**How it works**:
-1. Finds the maximum range from dropdown options
-2. Creates hidden checkboxes for the full range (1 to max)
-3. Checks checkboxes for entries within the selected count
-4. Unchecks checkboxes for entries beyond the selected count
-
-**Code Example**:
-```javascript
-function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
-    // Generate hidden checkboxes for the full range
-    for (let i = 1; i <= maxRange; i++) {
-        const checkboxId = questionSafe + "_" + i;
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = checkboxId;
-        checkbox.checked = i <= selectedCount; // Check if within selected range
-    }
-}
-```
-
----
-
-## Hidden Address Textbox Features
-
-### Feature: Hidden Address Textbox Creation
-**Purpose**: Creates hidden textboxes that automatically combine address components (street, city, state, zip) into a single address field.
-
-**Implementation**:
-- **Location**: `generate.js` lines 136-188, 7394-5527
-- **Function**: `generateHiddenAddressTextboxes()`, `setupAddressUpdateListeners()`
-- **Trigger**: For questions with location fields (Street, City, State, Zip)
-
-**How it works**:
-1. Detects if a question has location fields
-2. Creates hidden address textbox with ID pattern: `{baseFieldName}_address`
-3. Sets up event listeners on all location fields
-4. Automatically updates the hidden address field when any location field changes
-5. Combines fields in format: "Street, City, State, Zip"
-
-**Code Example**:
-```javascript
-function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
-    const hasLocationFields = allFieldsInOrder.some(field => 
-        ['Street', 'City', 'State', 'Zip'].includes(field.label)
-    );
-    
-    if (hasLocationFields) {
-        const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-        const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
-        
-        // Create hidden address input
-        const addressInput = document.createElement('input');
-        addressInput.type = 'text';
-        addressInput.id = addressId;
-        addressInput.style.display = 'none';
-    }
-}
-```
-
-### Feature: Address Field Auto-Update
-**Purpose**: Automatically updates hidden address fields when location fields change.
-
-**Implementation**:
-- **Location**: `generate.js` lines 190-259, 5529-5598
-- **Function**: `setupAddressUpdateListeners()`
-- **Trigger**: On input/change events for location fields
-
-**How it works**:
-1. Sets up event listeners for street, city, state, zip, and state_short fields
-2. When any field changes, combines all values into a single address
-3. Updates the hidden address field with the combined value
-4. Uses state_short field if available, otherwise falls back to state field
-
-**Code Example**:
-```javascript
-const updateAddress = () => {
-    const street = streetField ? streetField.value.trim() : '';
-    const city = cityField ? cityField.value.trim() : '';
-    const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
-    const zip = zipField ? zipField.value.trim() : '';
-    
-    const addressParts = [street, city, state, zip].filter(part => part !== '');
-    const fullAddress = addressParts.join(', ');
-    
-    addressInput.value = fullAddress;
-};
-```
-
----
-
-## Numbered Dropdown Autofill Features
-
-### Feature: Dynamic Field Generation
-**Purpose**: Dynamically generates input fields based on dropdown selection count.
-
-**Implementation**:
-- **Location**: `generate.js` lines 1695-1915
-- **Function**: `showTextboxLabels()`
-- **Trigger**: When numbered dropdown value changes
-
-**How it works**:
-1. Parses the selected count from dropdown
-2. Clears existing fields in the container
-3. Generates new fields based on the count and field configuration
-4. Creates entry containers with proper styling
-5. Sets up event listeners for all generated fields
-
-**Code Example**:
-```javascript
-function showTextboxLabels(questionId, count) {
-    const container = document.getElementById("labelContainer" + questionId);
-    container.innerHTML = "";
-    
-    for(let j = 1; j <= count; j++){
-        const entryContainer = document.createElement('div');
-        entryContainer.className = 'entry-container';
-        
-        // Generate fields for this entry
-        allFieldsInOrder.forEach(field => {
-            // Create appropriate input based on field type
-        });
-    }
-}
-```
-
-### Feature: Autofill Integration
-**Purpose**: Integrates with the autofill system to populate dynamically generated fields.
-
-**Implementation**:
-- **Location**: `generate.js` lines 3810-3844
-- **Function**: Fallback autofill logic in `loadAnswers()`
-- **Trigger**: After autofill completes
-
-**How it works**:
-1. Detects numbered dropdowns with values
-2. Triggers `showTextboxLabels()` to generate fields
-3. Sets up additional autofill logic for numbered fields
-4. Uses setTimeout to ensure fields are created before autofilling
-
-**Code Example**:
-```javascript
-setTimeout(() => {
-    const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
-    numberedDropdowns.forEach(dropdown => {
-        if (dropdown.value && parseInt(dropdown.value) > 0) {
-            const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
-            showTextboxLabels(questionId, dropdown.value);
-        }
-    });
-}, 2000);
-```
-
----
-
-## Multiple Textboxes Features
-
-### Feature: Multiple Textboxes Support
-**Purpose**: Supports multiple textbox questions with location fields and hidden address generation.
-
-**Implementation**:
-- **Location**: `generate.js` lines 1331-1470
-- **Function**: `multipleTextboxes` case in `getFormHTML()`
-- **Trigger**: During HTML generation for multipleTextboxes questions
-
-**How it works**:
-1. Extracts field configuration from unified fields
-2. Sets `questionNameIds[questionId]` for proper field naming
-3. Creates hidden address input in HTML string
-4. Generates location fields with proper styling
-5. Sets up event listeners after DOM loads
-
-**Code Example**:
-```javascript
-} else if (questionType === "multipleTextboxes") {
-    const questionNodeId = nodeIdEl ? nodeIdEl.value.trim() : "test";
-    questionNameIds[questionId] = questionNodeId;
-    
-    if (hasLocationFields) {
-        const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-        const addressId = baseFieldName + '_address';
-        formHTML += `<input type="text" id="${addressId}" name="${addressId}" style="display: none;">`;
-    }
-}
-```
-
-### Feature: Runtime Event Listener Setup
-**Purpose**: Sets up event listeners for multipleTextboxes questions after DOM loads.
-
-**Implementation**:
-- **Location**: `generate.js` lines 5600-5674
-- **Function**: DOMContentLoaded event listener
-- **Trigger**: After page loads
-
-**How it works**:
-1. Finds all multipleTextboxes questions with location fields
-2. Sets up event listeners for each location field
-3. Creates update functions that combine address components
-4. Performs initial address update after 1 second delay
-
-**Code Example**:
-```javascript
-document.addEventListener('DOMContentLoaded', function() {
-    const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
-    multipleTextboxesQuestions.forEach(container => {
-        const questionId = container.id.replace('labelContainer', '');
-        const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
-        const addressField = document.getElementById(baseFieldName + '_address');
-        
-        if (addressField) {
-            // Set up listeners for location fields
-            const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
-            locationFields.forEach(fieldType => {
-                const fieldId = baseFieldName + '_' + fieldType;
-                const field = document.getElementById(fieldId);
-                
-                if (field) {
-                    field.addEventListener('input', updateAddress);
-                    field.addEventListener('change', updateAddress);
-                }
-            });
-        }
-    });
-});
-```
-
----
-
-## Radio Button Features
-
-### Feature: Mark Only One Selection
-**Purpose**: Ensures only one radio button can be selected in a group and manages hidden checkboxes.
-
-**Implementation**:
-- **Location**: `generate.js` lines 687-710
-- **Function**: `handleMarkOnlyOneSelection()`
-- **Trigger**: On radio button change events
-
-**How it works**:
-1. Finds all radio buttons in the same group
-2. Unchecks all other radio buttons
-3. Updates styling for all buttons
-4. Manages hidden checkbox creation/removal
-
-**Code Example**:
-```javascript
-function handleMarkOnlyOneSelection(selectedInput, questionId) {
-    const container = document.querySelector('.checkbox-group-' + questionId);
-    const allInputs = container.querySelectorAll('input[type="radio"]');
-    
-    allInputs.forEach(input => {
-        if (input !== selectedInput) {
-            input.checked = false;
-            updateCheckboxStyle(input);
-            removeHiddenCheckbox(input.id);
-        }
-    });
-    
-    updateCheckboxStyle(selectedInput);
-    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
-}
-```
-
-### Feature: Checkbox Style Management
-**Purpose**: Updates visual styling of radio buttons based on selection state.
-
-**Implementation**:
-- **Location**: `generate.js` lines 712-750
-- **Function**: `updateCheckboxStyle()`
-- **Trigger**: When radio button selection changes
-
-**How it works**:
-1. Updates container styling based on checked state
-2. Adds/removes visual indicators for selection
-3. Maintains consistent styling across all radio buttons
-
----
-
-## State Management Features
-
-### Feature: State Field Management
-**Purpose**: Manages state dropdown fields and their hidden counterparts.
-
-**Implementation**:
-- **Location**: `generate.js` lines 5400-5433
-- **Function**: `updateStateHiddenFields()`
-- **Trigger**: When state dropdown selection changes
-
-**How it works**:
-1. Maps full state names to abbreviations
-2. Updates both full state name and abbreviation hidden fields
-3. Handles empty selections by clearing both fields
-
-**Code Example**:
-```javascript
-function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
-    const selectedState = dropdown.value;
-    const stateAbbreviations = {
-        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', // ... etc
-    };
-    
-    if (fullField && shortField) {
-        if (selectedState) {
-            const abbreviation = stateAbbreviations[selectedState] || '';
-            fullField.value = selectedState;
-            shortField.value = abbreviation;
-        } else {
-            fullField.value = '';
-            shortField.value = '';
-        }
-    }
-}
-```
-
----
-
-## Autofill System Features
-
-### Feature: Comprehensive Autofill System
-**Purpose**: Provides robust autofill functionality for all field types with multiple fallback mechanisms.
-
-**Implementation**:
-- **Location**: `generate.js` lines 3498-3844
-- **Function**: `loadAnswers()`
-- **Trigger**: On page load and user authentication
-
-**How it works**:
-1. **Primary Autofill**: Attempts to fill fields by name matching
-2. **Secondary Autofill**: Fills fields by ID matching
-3. **Fallback Autofill**: Additional passes for numbered dropdowns
-4. **State Field Updates**: Triggers state hidden field updates
-5. **Hidden Checkbox Creation**: Creates checkboxes for autofilled dropdowns
-
-**Key Features**:
-- **Timing Management**: Uses multiple setTimeout delays to ensure proper field creation
-- **Field Type Handling**: Different logic for checkboxes, radio buttons, and text inputs
-- **Error Handling**: Graceful handling of missing fields or data
-- **Debug Logging**: Comprehensive logging for troubleshooting
-
-**Code Example**:
-```javascript
-async function loadAnswers() {
-    // Primary autofill pass
-    fields.forEach(el => {
-        if (mappedData.hasOwnProperty(el.name)) {
-            if (el.type === 'checkbox') {
-                el.checked = !!mappedData[el.name];
-            } else if (el.type === 'radio') {
-                if (el.value === mappedData[el.name]) {
-                    el.checked = true;
-                } else {
-                    el.checked = false;
-                }
-            } else {
-                el.value = mappedData[el.name];
-            }
-        }
-    });
-    
-    // Fallback autofill for numbered dropdowns
-    setTimeout(() => {
-        const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
-        numberedDropdowns.forEach(dropdown => {
-            if (dropdown.value && parseInt(dropdown.value) > 0) {
-                const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
-                showTextboxLabels(questionId, dropdown.value);
-            }
-        });
-    }, 2000);
-}
-```
-
-### Feature: Autofill Flag Management
-**Purpose**: Prevents conflicts between autofill and user interactions.
-
-**Implementation**:
-- **Location**: Throughout autofill functions
-- **Variable**: `window.isInitialAutofill`
-- **Usage**: Prevents certain operations during autofill
-
-**How it works**:
-1. Sets flag to true during autofill operations
-2. Prevents field regeneration during autofill
-3. Clears flag after autofill completes
-4. Allows normal operation after autofill
-
----
-
-## Technical Implementation Notes
-
-### Function Definition Order
-**Issue**: Functions called before being defined
-**Solution**: Moved function definitions to top of file before `getFormHTML()`
-
-### Runtime Function Availability
-**Issue**: Functions not available in generated HTML
-**Solution**: Added function definitions to generated HTML script section
-
-### Timing Issues
-**Issue**: Functions called before DOM elements exist
-**Solution**: Used setTimeout delays and DOMContentLoaded events
-
-### Field Name Consistency
-**Issue**: Inconsistent field naming between question types
-**Solution**: Properly set `questionNameIds[questionId]` for all question types
-
-### Event Listener Management
-**Issue**: Event listeners not properly set up for dynamically generated fields
-**Solution**: Comprehensive event listener setup with proper timing and error handling
-
----
-
-## Usage Examples
-
-### Creating a Hidden Address Field
-```javascript
-// For a question with location fields, the system automatically:
-// 1. Detects location fields (Street, City, State, Zip)
-// 2. Creates hidden address field: {questionName}_address
-// 3. Sets up event listeners to update the address
-// 4. Combines fields into format: "123 Main St, Anytown, CA, 12345"
-```
-
-### Managing Radio Button Selections
-```javascript
-// When a radio button is selected:
-// 1. Unchecks all other radio buttons in the group
-// 2. Creates hidden checkbox with same ID as radio button
-// 3. Updates visual styling
-// 4. Removes hidden checkboxes for unselected options
-```
-
-### Dynamic Field Generation
-```javascript
-// For numbered dropdowns:
-// 1. User selects count (e.g., "3")
-// 2. System generates 3 sets of input fields
-// 3. Creates hidden checkboxes for entries 1, 2, 3
-// 4. Sets up event listeners for all generated fields
-// 5. Integrates with autofill system
-```
-
----
-
-## Debugging and Troubleshooting
-
-### Console Logging
-The system includes comprehensive console logging with prefixes:
-- `🔧 [HIDDEN ADDRESS DEBUG]`: Address field operations
-- `🔧 [AUTOFILL DEBUG]`: Autofill operations
-- `🔍 [COUNTY QUESTION DEBUG]`: Conditional logic operations
-
-### Common Issues and Solutions
-1. **Function not defined**: Check function definition order and runtime availability
-2. **Fields not updating**: Check event listener setup and timing
-3. **Wrong field names**: Verify `questionNameIds` is properly set
-4. **Autofill conflicts**: Check `isInitialAutofill` flag usage
-
----
-
-## Future Enhancements
-
-### Potential Improvements
-1. **Performance Optimization**: Reduce setTimeout delays where possible
-2. **Error Handling**: More robust error handling for edge cases
-3. **Code Organization**: Further modularization of functions
-4. **Testing**: Automated testing for all features
-5. **Documentation**: More detailed inline code documentation
-
-### Extensibility
-The system is designed to be easily extensible:
-- New question types can be added by following existing patterns
-- New field types can be supported by extending the field generation logic
-- Additional autofill sources can be integrated by extending the autofill system
-- New hidden field types can be added by following the existing patterns
-
----
-
-## Field Prefill Features
-
-### Feature: Default Value Prefill System
-**Purpose**: Allows fields to have default values that automatically populate when the form loads, with smart Firebase autofill integration.
-
-**Implementation**:
-- **GUI Location**: `gui.js` lines 2597, 5098-5101, 5142-5147
-- **Export Location**: `download.js` lines 3082-3105, 3643-3657
-- **Import Location**: `download.js` lines 1248-1254 (numbered dropdown), 583-588 (multipleTextboxes)
-- **Generation Location**: `generate.js` lines 3082-3116, 7554-7576
-- **Runtime Location**: `generate.js` lines 11106-11138
-- **Trigger**: On field creation and post-Firebase autofill
-
-**How it works**:
-
-**1. GUI Setup (Adding Prefill to Fields)**:
-```javascript
-// In gui.js - When creating a label field
-fieldDiv.setAttribute('data-prefill', ''); // Initialize prefill attribute
-
-// In edit modal - Show prefill input for label fields
-<div id="prefillContainer${questionId}_${fieldOrder}" style="${currentType === 'label' ? '' : 'display: none;'}">
-    <label>Prefill:</label>
-    <input type="text" id="editPrefill${questionId}_${fieldOrder}" 
-           value="${currentPrefill}" 
-           placeholder="Enter default value (e.g., Adam)">
+================================================================================
+GUI FEATURES DOCUMENTATION
+================================================================================
+This document provides detailed, step-by-step documentation for GUI features
+that can be replicated in other contexts. Each feature is documented with:
+- Purpose and behavior
+- UI components and layout
+- Data storage structure
+- Complete implementation details
+- Export/import process
+- Runtime behavior
+- Common patterns and gotchas
+
+================================================================================
+FEATURE #1: ENABLE ALERT FOR TRIGGER DROPDOWN FIELDS
+================================================================================
+
+PURPOSE:
+--------
+Allows form builders to configure conditional alerts on dropdown fields within
+trigger sequences. When a user selects a specific option in the generated form,
+a custom modal alert is displayed with a custom message.
+
+Example: A dropdown "Are they a public entity?" has options "Yes" and "No".
+The form builder can enable an alert so that when users select "Yes", they see
+an alert message like "public entities are cool".
+
+CONTEXT:
+--------
+This feature is implemented for dropdown fields within trigger sequences.
+Trigger sequences are conditional fields that appear when a parent dropdown
+has a specific value. For example, if "Are they a business or public entity?"
+is set to "Yes", a trigger sequence appears with additional fields including
+the "Are they a public entity?" dropdown.
+
+================================================================================
+PART 1: GUI INTERFACE (FormWiz GUI/gui.js)
+================================================================================
+
+1.1 ADDING THE UI CHECKBOX
+---------------------------
+Location: `addTriggerDropdown()` function (around line 3197)
+
+When a dropdown field is added to a trigger sequence, an "Enable Alert" checkbox
+is added right after the "Enable Conditional Logic" checkbox.
+
+UI Structure:
+```html
+<div style="margin-bottom: 8px; text-align: center;">
+    <label for="enableAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}">
+        Enable Alert
+    </label>
+    <div style="display: flex; justify-content: center;">
+        <input type="checkbox" 
+               id="enableAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}"
+               onchange="toggleTriggerDropdownAlert({questionId}, {fieldCount}, {sequenceCount}, {triggerFieldCount})">
+    </div>
+    <div id="alertUIDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}" 
+         style="margin-top: 8px; display: none;">
+        <!-- Alert UI will be populated here -->
+    </div>
 </div>
+```
 
-// When saving field - Store prefill value
-if (newType === 'label') {
-    fieldDiv.setAttribute('data-prefill', newPrefill);
+Key Patterns:
+- Checkbox ID pattern: `enableAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Container ID pattern: `alertUIDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Container is initially hidden (`display: none`)
+- The toggle function is called on checkbox `onchange` event
+
+1.2 TOGGLE FUNCTION
+-------------------
+Location: `toggleTriggerDropdownAlert()` function (around line 3850)
+
+Purpose: Shows/hides the alert configuration UI and manages the data structure.
+
+Function Signature:
+```javascript
+function toggleTriggerDropdownAlert(questionId, fieldCount, sequenceCount, triggerFieldCount)
+```
+
+Implementation Steps:
+
+Step 1: Get DOM Elements
+```javascript
+const checkbox = document.getElementById(`enableAlertDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+const container = document.getElementById(`alertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+```
+
+Step 2: Initialize Data Structure
+```javascript
+if (!window.triggerDropdownAlert) {
+    window.triggerDropdownAlert = {};
+}
+const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+if (!window.triggerDropdownAlert[key]) {
+    window.triggerDropdownAlert[key] = { enabled: false, condition: '', title: '' };
 }
 ```
 
-**2. Export/Import (Preserving Prefill in JSON)**:
+Step 3: Update Enabled State and Show/Hide UI
 ```javascript
-// In download.js - Export prefill value
-const prefillValue = field.getAttribute('data-prefill') || '';
-const fieldData = {
-    type: fieldType,
-    label: labelText,
-    nodeId: nodeIdText,
-    order: parseInt(fieldOrder)
+container.style.display = checkbox.checked ? 'block' : 'none';
+window.triggerDropdownAlert[key].enabled = checkbox.checked;
+```
+
+Step 4: Call Update Function if Enabled
+```javascript
+if (checkbox.checked) {
+    updateTriggerDropdownAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+} else {
+    // Clear alert data when disabled
+    window.triggerDropdownAlert[key].condition = '';
+    window.triggerDropdownAlert[key].title = '';
+}
+```
+
+Step 5: Trigger Autosave
+```javascript
+if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+}
+```
+
+Data Storage Key Pattern:
+- Format: `"{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}"`
+- Example: `"1_5_1_4"` means question 1, field 5, sequence 1, trigger field 4
+- Stored in: `window.triggerDropdownAlert[key]`
+
+1.3 UPDATE UI FUNCTION
+----------------------
+Location: `updateTriggerDropdownAlertUI()` function (around line 3880)
+
+Purpose: Populates the alert configuration UI with:
+1. A dropdown to select which option triggers the alert (populated from the dropdown's options)
+2. A text input for the alert message
+
+Function Signature:
+```javascript
+function updateTriggerDropdownAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount)
+```
+
+Implementation Steps:
+
+Step 1: Get Container and Initialize Data Structure
+```javascript
+const container = document.getElementById(`alertUIDropdown${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+if (!container) return;
+
+if (!window.triggerDropdownAlert) {
+    window.triggerDropdownAlert = {};
+}
+const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+if (!window.triggerDropdownAlert[key]) {
+    window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+}
+```
+
+Step 2: Get Dropdown Options from the Parent Field
+```javascript
+const optionsContainer = document.getElementById(`triggerDropdownOptions${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+const options = [];
+if (optionsContainer) {
+    const optionInputs = optionsContainer.querySelectorAll('input[type="text"]');
+    optionInputs.forEach(input => {
+        const optionText = input.value.trim();
+        if (optionText) {
+            options.push(optionText);
+        }
+    });
+}
+```
+
+Key Pattern: Options are read from the DOM, not from a data structure. This means
+the options container must exist and be populated before calling this function.
+
+Step 3: Clear Container and Create Alert Condition Dropdown
+```javascript
+container.innerHTML = '';
+
+const conditionRow = document.createElement('div');
+conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+
+const conditionLabel = document.createElement('label');
+conditionLabel.textContent = 'Alert Condition:';
+conditionLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+conditionRow.appendChild(conditionLabel);
+
+const conditionDropdown = document.createElement('select');
+conditionDropdown.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+
+// Add placeholder option
+const placeholderOption = document.createElement('option');
+placeholderOption.value = '';
+placeholderOption.textContent = 'Select option...';
+conditionDropdown.appendChild(placeholderOption);
+
+// Add options from the dropdown field
+options.forEach(optionText => {
+    const option = document.createElement('option');
+    option.value = optionText;
+    option.textContent = optionText;
+    if (window.triggerDropdownAlert[key].condition === optionText) {
+        option.selected = true;
+    }
+    conditionDropdown.appendChild(option);
+});
+```
+
+Step 4: Add Change Handler for Condition Dropdown
+```javascript
+conditionDropdown.value = window.triggerDropdownAlert[key].condition || '';
+conditionDropdown.onchange = () => {
+    if (!window.triggerDropdownAlert[key]) {
+        window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+    }
+    window.triggerDropdownAlert[key].condition = conditionDropdown.value;
+    // Trigger autosave
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+};
+conditionRow.appendChild(conditionDropdown);
+container.appendChild(conditionRow);
+```
+
+Step 5: Create Alert Title Input
+```javascript
+const titleRow = document.createElement('div');
+titleRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+
+const titleLabel = document.createElement('label');
+titleLabel.textContent = 'Alert Title:';
+titleLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+titleRow.appendChild(titleLabel);
+
+const titleInput = document.createElement('input');
+titleInput.type = 'text';
+titleInput.placeholder = 'Enter alert message...';
+titleInput.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+titleInput.value = window.triggerDropdownAlert[key].title || '';
+```
+
+Step 6: Add Change/Blur Handlers for Title Input
+```javascript
+titleInput.onchange = () => {
+    if (!window.triggerDropdownAlert[key]) {
+        window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+    }
+    window.triggerDropdownAlert[key].title = titleInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+};
+titleInput.onblur = () => {
+    // Same as onchange - ensures data is saved even if user tabs away
+    if (!window.triggerDropdownAlert[key]) {
+        window.triggerDropdownAlert[key] = { enabled: true, condition: '', title: '' };
+    }
+    window.triggerDropdownAlert[key].title = titleInput.value.trim();
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+};
+titleRow.appendChild(titleInput);
+container.appendChild(titleRow);
+```
+
+Important Patterns:
+- Both `onchange` and `onblur` handlers are used to ensure data is saved
+- Always check if the data structure exists before accessing it
+- Always trigger autosave after data changes
+- The condition dropdown is populated from the actual dropdown options in the DOM
+
+================================================================================
+PART 2: EXPORT/IMPORT (FormWiz GUI/download.js)
+================================================================================
+
+2.1 EXPORT PROCESS
+------------------
+Location: Field collection code in `getFormJSON()` function (around line 1885-1950)
+
+When collecting trigger dropdown field data for JSON export, alert data must be
+collected from `window.triggerDropdownAlert` and added to the `dropdownField` object.
+
+Implementation:
+
+Step 1: Find the Alert Data
+```javascript
+// After collecting dropdown options and conditional logic
+const dropdownField = {
+    type: 'dropdown',
+    fieldName: dropdownFieldNameEl.value.trim(),
+    options: dropdownOptions
 };
 
-// Always include prefill for label type fields (even if empty)
-if (fieldType === 'label') {
-    fieldData.prefill = prefillValue;
-}
+// Check for alert data
+const alertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+let alertEnabled = false;
+let storedAlertData = null;
 
-// In download.js - Import prefill value
-if (field.prefill !== undefined) {
-    lastField.setAttribute('data-prefill', field.prefill || '');
+if (window.triggerDropdownAlert && window.triggerDropdownAlert[alertKey]) {
+    const storedAlert = window.triggerDropdownAlert[alertKey];
+    alertEnabled = storedAlert.enabled || false;
+    if (alertEnabled && (storedAlert.condition || storedAlert.title)) {
+        storedAlertData = {
+            condition: storedAlert.condition || '',
+            title: storedAlert.title || ''
+        };
+    }
 }
 ```
 
-**3. HTML Generation (Building Prefill into Form)**:
+Step 2: Check Checkbox State as Fallback
 ```javascript
-// In generate.js - Read prefill during HTML generation
-const prefillValue = field.getAttribute('data-prefill') || '';
+// Also check checkbox state as fallback
+if (!alertEnabled) {
+    const enableAlertCheckbox = fieldEl.querySelector(`#enableAlertDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+    alertEnabled = enableAlertCheckbox && enableAlertCheckbox.checked;
+}
+```
 
-const fieldData = {
-    type: fieldType,
-    label: labelText,
-    nodeId: nodeIdText,
-    order: parseInt(fieldOrder)
+Step 3: Add Alert Data to Field Object
+```javascript
+// Include alert if enabled
+if (alertEnabled && storedAlertData) {
+    dropdownField.alert = {
+        enabled: true,
+        condition: storedAlertData.condition,
+        title: storedAlertData.title
+    };
+} else if (alertEnabled) {
+    // Fallback: try to get from UI elements
+    const alertContainer = fieldEl.querySelector(`#alertUIDropdown${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`);
+    if (alertContainer) {
+        const conditionDropdown = alertContainer.querySelector('select');
+        const titleInput = alertContainer.querySelector('input[type="text"]');
+        if (conditionDropdown && titleInput) {
+            const condition = conditionDropdown.value.trim();
+            const title = titleInput.value.trim();
+            if (condition || title) {
+                dropdownField.alert = {
+                    enabled: true,
+                    condition: condition,
+                    title: title
+                };
+            }
+        }
+    }
+}
+```
+
+Key Pattern: Export checks both `window.triggerDropdownAlert` (preferred) and
+UI elements (fallback) to ensure data is captured even if the window object
+isn't up to date.
+
+JSON Export Format:
+```json
+{
+    "type": "dropdown",
+    "fieldName": "Are they a public entity?",
+    "options": [
+        {"text": "Yes"},
+        {"text": "No"}
+    ],
+    "alert": {
+        "enabled": true,
+        "condition": "Yes",
+        "title": "public entities are cool"
+    }
+}
+```
+
+2.2 IMPORT PROCESS
+------------------
+Location: `loadFormJson()` function, within the dropdown field restoration block
+(around line 980-1070 and 1713-1831 - there are two locations for different code paths)
+
+When importing a JSON file, alert data must be restored to `window.triggerDropdownAlert`
+and the UI must be updated.
+
+Implementation:
+
+Step 1: Check for Alert Data in Imported JSON
+```javascript
+// After restoring dropdown options
+if (triggerField.alert && triggerField.alert.enabled) {
+    // Initialize the data structure
+    const alertKey = `${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`;
+    if (!window.triggerDropdownAlert) {
+        window.triggerDropdownAlert = {};
+    }
+    window.triggerDropdownAlert[alertKey] = {
+        enabled: true,
+        condition: triggerField.alert.condition || '',
+        title: triggerField.alert.title || ''
+    };
+```
+
+Step 2: Wait for Options to be Added
+```javascript
+    // Wait for options to be added before restoring alert
+    setTimeout(() => {
+        const enableAlertCheckbox = document.getElementById(`enableAlertDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+        if (enableAlertCheckbox) {
+            enableAlertCheckbox.checked = true;
+            // Manually trigger the change event to update the UI
+            const event = new Event('change');
+            enableAlertCheckbox.dispatchEvent(event);
+```
+
+Step 3: Wait for UI to Update, Then Set Values
+```javascript
+            // Set the alert values after a delay to ensure UI is ready
+            setTimeout(() => {
+                if (typeof updateTriggerDropdownAlertUI === 'function') {
+                    updateTriggerDropdownAlertUI(question.questionId, fieldOrder, sequenceIndex + 1, actualFieldCount);
+                    // Set the alert values after UI is updated
+                    setTimeout(() => {
+                        const alertContainer = document.getElementById(`alertUIDropdown${question.questionId}_${fieldOrder}_${sequenceIndex + 1}_${actualFieldCount}`);
+                        if (alertContainer) {
+                            const conditionDropdown = alertContainer.querySelector('select');
+                            const titleInput = alertContainer.querySelector('input[type="text"]');
+                            if (conditionDropdown && triggerField.alert.condition) {
+                                conditionDropdown.value = triggerField.alert.condition;
+                                conditionDropdown.dispatchEvent(new Event('change'));
+                            }
+                            if (titleInput && triggerField.alert.title) {
+                                titleInput.value = triggerField.alert.title;
+                                titleInput.dispatchEvent(new Event('blur'));
+                            }
+                        }
+                    }, 300);
+                }
+            }, 400);
+        }
+    }, 200);
+}
+```
+
+Key Patterns:
+- Multiple nested `setTimeout` calls ensure UI elements exist before accessing them
+- Manually dispatch events to trigger handlers
+- The sequence is: set checkbox -> trigger change -> wait for UI update -> set values
+- Total delay chain: 200ms -> 400ms -> 300ms = 900ms total
+
+================================================================================
+PART 3: FORM GENERATION (FormWiz GUI/generate.js)
+================================================================================
+
+3.1 COLLECTING ALERT DATA DURING FORM GENERATION
+-------------------------------------------------
+Location: Two places where dropdown fields are collected from GUI:
+1. Around line 1885-1950 (first collection point)
+2. Around line 3249-3335 (second collection point)
+
+When building `unifiedFieldsMap` from the GUI, alert data must be included.
+
+Implementation:
+
+```javascript
+// After collecting dropdown options and conditional logic
+const dropdownField = {
+    type: 'dropdown',
+    fieldName: dropdownFieldNameEl.value.trim(),
+    options: dropdownOptions
 };
 
-// Include prefill for label fields
-if (fieldType === 'label') {
-    fieldData.prefill = prefillValue;
-}
+// Check for alert data from window.triggerDropdownAlert
+const alertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+console.log('[ALERT DEBUG] Collecting alert data for key:', alertKey);
 
-// Store in window.unifiedFieldsMap for runtime use
-window.unifiedFieldsMap[questionId] = allFieldsInOrder;
-```
-
-**4. Runtime Rendering (Applying Prefill to Inputs)**:
-```javascript
-// In generate.js - Read from unifiedFieldsMap
-unifiedFields.forEach((el) => {
-    const prefillValue = el.getAttribute('data-prefill') || '';
+if (window.triggerDropdownAlert && window.triggerDropdownAlert[alertKey]) {
+    const storedAlert = window.triggerDropdownAlert[alertKey];
+    console.log('[ALERT DEBUG] Found stored alert data:', storedAlert);
     
-    if (fieldType === 'label') {
-        fieldData.prefill = prefillValue;
+    if (storedAlert.enabled && storedAlert.condition && storedAlert.title) {
+        dropdownField.alert = {
+            enabled: storedAlert.enabled,
+            condition: storedAlert.condition.trim(),
+            title: storedAlert.title.trim()
+        };
+        console.log('[ALERT DEBUG] Added alert to dropdownField:', dropdownField.alert);
+    }
+}
+```
+
+Key Pattern: Alert data is collected from `window.triggerDropdownAlert` using
+the same key pattern used throughout the GUI. This data is then included in
+the `unifiedFieldsMap` which is embedded in the generated HTML.
+
+3.2 RUNTIME FIELD ENRICHMENT
+-----------------------------
+Location: `createTriggerFieldsContainer()` function in generated HTML (around line 5684)
+
+Problem: When `createTriggerFieldsContainer` is called at runtime (when user
+selects a dropdown option), it receives `fields` parameter that may not include
+alert data because it comes from a different source.
+
+Solution: Enrich the fields with data from `unifiedFieldsMap` before processing.
+
+Implementation:
+
+```javascript
+// Helper function to enrich triggerField with data from unifiedFieldsMap
+function enrichTriggerFieldWithUnifiedData(triggerField, fieldIndex) {
+    // Try to find the complete field data from unifiedFieldsMap
+    if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+        const allFields = window.unifiedFieldsMap[questionId];
+        
+        // Find the parent dropdown field that contains trigger sequences
+        const parentDropdownField = allFields.find(f => 
+            f.type === 'dropdown' && 
+            f.triggerSequences && 
+            Array.isArray(f.triggerSequences) &&
+            f.triggerSequences.length > sequenceIndex
+        );
+        
+        if (parentDropdownField) {
+            const sequence = parentDropdownField.triggerSequences[sequenceIndex];
+            if (sequence && sequence.fields && Array.isArray(sequence.fields)) {
+                // Find the matching field by fieldName/label and type, or by index as fallback
+                let matchingField = sequence.fields.find(f => 
+                    f.type === triggerField.type &&
+                    ((f.fieldName && triggerField.fieldName && f.fieldName === triggerField.fieldName) ||
+                     (f.label && triggerField.label && f.label === triggerField.label))
+                );
+                
+                // Fallback: try to match by index if name matching failed
+                if (!matchingField && fieldIndex < sequence.fields.length) {
+                    const fieldByIndex = sequence.fields[fieldIndex];
+                    if (fieldByIndex && fieldByIndex.type === triggerField.type) {
+                        matchingField = fieldByIndex;
+                    }
+                }
+                
+                if (matchingField) {
+                    // Merge alert data and other properties from unifiedFieldsMap
+                    if (matchingField.alert) {
+                        triggerField.alert = matchingField.alert;
+                    }
+                    // Also merge conditionalLogic if it's missing
+                    if (matchingField.conditionalLogic && !triggerField.conditionalLogic) {
+                        triggerField.conditionalLogic = matchingField.conditionalLogic;
+                    }
+                }
+            }
+        }
+    }
+    return triggerField;
+}
+
+// Call enrichment before processing each field
+fields.forEach((triggerField, fieldIndex) => {
+    enrichTriggerFieldWithUnifiedData(triggerField, fieldIndex);
+    // ... rest of field processing
+});
+```
+
+Key Patterns:
+- Look up data from `window.unifiedFieldsMap` at runtime
+- Match fields by both name and type, with index as fallback
+- Merge alert data into the triggerField object before use
+- This ensures alert data is available even when fields come from different sources
+
+3.3 RUNTIME ALERT FUNCTIONALITY
+--------------------------------
+Location: `createTriggerFieldsContainer()` function, within dropdown field creation
+(around line 6066-6250)
+
+When a dropdown field is created at runtime, alert functionality is added to
+the change event handler.
+
+Implementation:
+
+Step 1: Capture Alert Data in Local Variable
+```javascript
+// Capture alert data in local variable to avoid closure issues
+const alertData = triggerField.alert ? {
+    enabled: triggerField.alert.enabled || false,
+    condition: (triggerField.alert.condition || '').trim(),
+    title: (triggerField.alert.title || '').trim()
+} : null;
+```
+
+Key Pattern: Capture data in a local variable before creating event listeners
+to avoid closure issues when iterating through fields.
+
+Step 2: Add Alert Check to Change Handler
+```javascript
+select.addEventListener('change', function() {
+    // Check for alert functionality if enabled
+    if (alertData && alertData.enabled && alertData.condition && alertData.title) {
+        const selectedValue = (this.value || '').trim();
+        const alertCondition = alertData.condition;
+        
+        if (selectedValue === alertCondition) {
+            // Use custom alert modal instead of default browser alert
+            if (typeof showAlert === 'function') {
+                showAlert(alertData.title);
+            } else {
+                // Fallback to default alert if showAlert is not available
+                alert(alertData.title);
+            }
+        }
+    }
+    
+    // ... rest of change handler (dropdownMirror, conditional logic, etc.)
+});
+```
+
+Key Patterns:
+- Check if `showAlert` function exists before using custom modal
+- Trim values for comparison to avoid whitespace issues
+- Alert is shown BEFORE other change handlers run
+- Uses `showAlert()` function which displays a custom modal overlay
+
+Custom Alert Modal:
+The `showAlert()` function is defined in the generated HTML and displays a
+custom modal with:
+- Overlay background with blur effect
+- Centered popup with rounded corners
+- Message displayed in styled div
+- "Continue" button to close
+
+================================================================================
+PART 4: DATA FLOW SUMMARY
+================================================================================
+
+1. USER CONFIGURATION (GUI):
+   - User checks "Enable Alert" checkbox
+   - Toggle function stores data in `window.triggerDropdownAlert[key]`
+   - Update function populates UI and saves condition/title
+
+2. AUTOSAVE:
+   - Data is saved to Firebase/localStorage automatically
+   - Uses `window.requestAutosave()` function
+
+3. EXPORT (Generate JSON):
+   - `download.js` reads from `window.triggerDropdownAlert`
+   - Adds `alert: {enabled, condition, title}` to dropdownField
+   - Exported in JSON format
+
+4. IMPORT (Load JSON):
+   - Reads `alert` property from imported JSON
+   - Restores to `window.triggerDropdownAlert`
+   - Updates UI checkboxes and inputs
+   - Uses nested timeouts to ensure UI is ready
+
+5. FORM GENERATION:
+   - `generate.js` collects alert data from `window.triggerDropdownAlert`
+   - Includes in `unifiedFieldsMap` which is embedded in HTML
+
+6. RUNTIME (Generated Form):
+   - `createTriggerFieldsContainer` enriches fields from `unifiedFieldsMap`
+   - Alert data is merged into triggerField object
+   - Change event handler checks condition and calls `showAlert()`
+   - Custom modal is displayed to user
+
+================================================================================
+PART 5: KEY PATTERNS AND CONVENTIONS
+================================================================================
+
+5.1 NAMING CONVENTIONS
+----------------------
+- Checkbox ID: `enableAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Container ID: `alertUIDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Data key: `"{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}"`
+- Window object: `window.triggerDropdownAlert`
+
+Pattern to replicate for other field types:
+- Replace "Dropdown" with field type (e.g., "Textbox", "Checkbox")
+- Keep the rest of the pattern the same
+
+5.2 DATA STRUCTURE
+------------------
+```javascript
+window.triggerDropdownAlert = {
+    "1_5_1_4": {  // Key: questionId_fieldCount_sequenceCount_triggerFieldCount
+        enabled: true,
+        condition: "Yes",  // The option value that triggers the alert
+        title: "public entities are cool"  // The alert message
+    }
+}
+```
+
+5.3 TOGGLE FUNCTION PATTERN
+----------------------------
+1. Get checkbox and container elements
+2. Initialize window data structure if needed
+3. Show/hide container based on checkbox state
+4. Update enabled state in data structure
+5. Call update function if enabled, clear data if disabled
+6. Trigger autosave
+
+5.4 UPDATE FUNCTION PATTERN
+----------------------------
+1. Get container element
+2. Initialize window data structure
+3. Get dynamic options/data from parent field DOM
+4. Clear container innerHTML
+5. Create UI elements (dropdowns, inputs)
+6. Populate with existing values from data structure
+7. Add event handlers that update data structure and trigger autosave
+8. Append elements to container
+
+5.5 EXPORT PATTERN
+------------------
+1. Check `window.trigger{FieldType}Alert` for stored data
+2. Check checkbox state as fallback
+3. Check UI elements as final fallback
+4. Add alert property to field object if enabled and has data
+5. Include in JSON export
+
+5.6 IMPORT PATTERN
+------------------
+1. Check for alert property in imported JSON
+2. Restore to `window.trigger{FieldType}Alert`
+3. Use setTimeout chain to wait for UI elements
+4. Check checkbox and trigger change event
+5. Call update function to populate UI
+6. Set values in UI inputs/dropdowns
+7. Dispatch events to trigger handlers
+
+5.7 RUNTIME GENERATION PATTERN
+-------------------------------
+1. Collect alert data during form generation
+2. Include in unifiedFieldsMap (or similar data structure)
+3. At runtime, enrich field objects with data from unifiedFieldsMap
+4. Capture alert data in local variable before event handlers
+5. Check condition in change/input handler
+6. Call custom alert function if condition matches
+
+================================================================================
+PART 6: REPLICATING FOR OTHER FIELD TYPES
+================================================================================
+
+To add alert functionality to textbox fields in trigger sequences:
+
+STEP 1: Add UI Checkbox
+-----------------------
+In `addTriggerLabel()` or equivalent function, add:
+```javascript
+<div style="margin-bottom: 8px; text-align: center;">
+    <label for="enableAlertLabel{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}">
+        Enable Alert
+    </label>
+    <div style="display: flex; justify-content: center;">
+        <input type="checkbox" 
+               id="enableAlertLabel{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}"
+               onchange="toggleTriggerLabelAlert({questionId}, {fieldCount}, {sequenceCount}, {triggerFieldCount})">
+    </div>
+    <div id="alertUILabel{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}" 
+         style="margin-top: 8px; display: none;">
+        <!-- Alert UI will be populated here -->
+    </div>
+</div>
+```
+
+STEP 2: Create Toggle Function
+-------------------------------
+```javascript
+function toggleTriggerLabelAlert(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const checkbox = document.getElementById(`enableAlertLabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    const container = document.getElementById(`alertUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!checkbox || !container) return;
+
+    container.style.display = checkbox.checked ? 'block' : 'none';
+    
+    if (!window.triggerLabelAlert) {
+        window.triggerLabelAlert = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerLabelAlert[key]) {
+        window.triggerLabelAlert[key] = { enabled: false, condition: '', title: '' };
+    }
+    
+    window.triggerLabelAlert[key].enabled = checkbox.checked;
+    
+    if (checkbox.checked) {
+        updateTriggerLabelAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount);
+    } else {
+        window.triggerLabelAlert[key].condition = '';
+        window.triggerLabelAlert[key].title = '';
+    }
+    
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+```
+
+STEP 3: Create Update Function
+-------------------------------
+For textboxes, the "condition" might be:
+- An exact text match
+- A pattern match
+- A length check
+- etc.
+
+Adjust the UI accordingly. For exact match, use a text input instead of dropdown:
+```javascript
+function updateTriggerLabelAlertUI(questionId, fieldCount, sequenceCount, triggerFieldCount) {
+    const container = document.getElementById(`alertUILabel${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`);
+    if (!container) return;
+    
+    if (!window.triggerLabelAlert) {
+        window.triggerLabelAlert = {};
+    }
+    const key = `${questionId}_${fieldCount}_${sequenceCount}_${triggerFieldCount}`;
+    if (!window.triggerLabelAlert[key]) {
+        window.triggerLabelAlert[key] = { enabled: true, condition: '', title: '' };
+    }
+    
+    container.innerHTML = '';
+    
+    // Condition input (exact text match example)
+    const conditionRow = document.createElement('div');
+    conditionRow.style.cssText = 'margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;';
+    
+    const conditionLabel = document.createElement('label');
+    conditionLabel.textContent = 'Alert Condition (exact text):';
+    conditionLabel.style.cssText = 'font-weight: bold; color: #333; font-size: 12px;';
+    conditionRow.appendChild(conditionLabel);
+    
+    const conditionInput = document.createElement('input');
+    conditionInput.type = 'text';
+    conditionInput.placeholder = 'Enter text that triggers alert...';
+    conditionInput.style.cssText = 'width: 70%; max-width: 300px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;';
+    conditionInput.value = window.triggerLabelAlert[key].condition || '';
+    conditionInput.onchange = () => {
+        if (!window.triggerLabelAlert[key]) {
+            window.triggerLabelAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerLabelAlert[key].condition = conditionInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    conditionInput.onblur = () => {
+        if (!window.triggerLabelAlert[key]) {
+            window.triggerLabelAlert[key] = { enabled: true, condition: '', title: '' };
+        }
+        window.triggerLabelAlert[key].condition = conditionInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    conditionRow.appendChild(conditionInput);
+    container.appendChild(conditionRow);
+    
+    // Title input (same as dropdown version)
+    // ... (copy from dropdown implementation)
+}
+```
+
+STEP 4: Update Export
+---------------------
+In `download.js`, find where label fields are collected and add:
+```javascript
+// Check for alert data from window.triggerLabelAlert
+const alertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+if (window.triggerLabelAlert && window.triggerLabelAlert[alertKey]) {
+    const storedAlert = window.triggerLabelAlert[alertKey];
+    if (storedAlert.enabled && storedAlert.condition && storedAlert.title) {
+        labelField.alert = {
+            enabled: storedAlert.enabled,
+            condition: storedAlert.condition.trim(),
+            title: storedAlert.title.trim()
+        };
+    }
+}
+```
+
+STEP 5: Update Import
+---------------------
+In `download.js`, find label field restoration and add alert restoration
+(similar to dropdown import, but use "Label" instead of "Dropdown" in IDs).
+
+STEP 6: Update Form Generation
+-------------------------------
+In `generate.js`, find where label fields are collected and add alert collection
+(similar to dropdown collection).
+
+In `createTriggerFieldsContainer`, ensure label fields are enriched with alert
+data (already handled by the enrichTriggerFieldWithUnifiedData function).
+
+STEP 7: Add Runtime Alert Check
+--------------------------------
+In `createTriggerFieldsContainer`, in the label field creation section:
+```javascript
+// Capture alert data
+const alertData = triggerField.alert ? {
+    enabled: triggerField.alert.enabled || false,
+    condition: (triggerField.alert.condition || '').trim(),
+    title: (triggerField.alert.title || '').trim()
+} : null;
+
+// Add to input event handler
+input.addEventListener('input', function() {
+    if (alertData && alertData.enabled && alertData.condition && alertData.title) {
+        const inputValue = (this.value || '').trim();
+        if (inputValue === alertData.condition) {
+            if (typeof showAlert === 'function') {
+                showAlert(alertData.title);
+            } else {
+                alert(alertData.title);
+            }
+        }
     }
 });
-
-// Pass prefill to createAddressInput
-const prefillValue = field.prefill || '';
-inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'text', prefillValue);
-
-// In createAddressInput - Apply prefill to input
-const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
-return '<input type="text" ... class="address-input"' + valueAttr + '>';
 ```
 
-**5. Firebase Autofill Integration (Smart Restoration)**:
+================================================================================
+PART 7: COMMON GOTCHAS AND TROUBLESHOOTING
+================================================================================
+
+GOTCHA 1: Closure Issues
+------------------------
+Problem: When iterating through fields with forEach, event handlers may
+reference the wrong field data due to closure issues.
+
+Solution: Always capture data in local variables before creating event handlers:
 ```javascript
-// In generate.js - Post-Firebase autofill restoration (lines 11106-11138)
-setTimeout(() => {
-    window.isInitialAutofill = false;
-    
-    // Restore prefill values for any blank fields after Firebase autofill
-    if (window.unifiedFieldsMap) {
-        Object.keys(window.unifiedFieldsMap).forEach(questionId => {
-            const fields = window.unifiedFieldsMap[questionId];
-            if (Array.isArray(fields)) {
-                fields.forEach(field => {
-                    if (field.type === 'label' && field.prefill && field.nodeId) {
-                        // Find all input fields that match this nodeId pattern
-                        const inputs = document.querySelectorAll('input[id^="' + field.nodeId + '_"]');
-                        inputs.forEach(input => {
-                            // Only set prefill if the field is empty or blank
-                            if (!input.value || input.value.trim() === '') {
-                                input.value = field.prefill;
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
-}, 3000); // Runs after Firebase autofill completes
+const alertData = triggerField.alert ? { ... } : null;
+select.addEventListener('change', function() {
+    // Use alertData here, not triggerField.alert directly
+});
 ```
 
-**Key Behavior - Firebase Autofill Priority**:
-| Firebase Data | Prefill Value | Result |
-|---------------|---------------|--------|
-| Has value | "Adam" | ✅ Firebase value used |
-| Empty/blank | "Adam" | ✅ Prefill "Adam" applied |
-| No data | "Adam" | ✅ Prefill "Adam" applied |
+GOTCHA 2: Data Not in unifiedFieldsMap
+---------------------------------------
+Problem: Alert data exists in `window.triggerDropdownAlert` but not in
+`unifiedFieldsMap` when form is generated.
 
-**Timing Sequence**:
-1. **T=0ms**: Page loads, HTML rendered with prefill in value attribute
-2. **T=100-2000ms**: Firebase autofill runs, may overwrite with blank
-3. **T=3000ms**: Prefill restoration runs, restores blank fields only
+Solution: Ensure alert data is collected during form generation (around
+lines 1916 and 3280 in generate.js). The enrichTriggerFieldWithUnifiedData
+function will then find it at runtime.
 
-**Supported Question Types**:
-- ✅ Numbered Dropdown (label fields)
-- ✅ Multiple Textboxes (label fields)
-- ❌ Regular Dropdown (not yet implemented)
-- ❌ Text/BigParagraph (not yet implemented)
-- ❌ Date/Time fields (not yet implemented)
+GOTCHA 3: UI Not Populated on Import
+-------------------------------------
+Problem: After importing JSON, alert UI is not shown or values are empty.
 
-**How to Extend to Other Question Types**:
+Solution: Use nested setTimeout calls to ensure DOM elements exist:
+- 200ms: Wait for field to be created
+- 400ms: Wait for update function to populate UI
+- 300ms: Set values in UI elements
 
-1. **Add GUI Support**:
+GOTCHA 4: Options Not Available for Condition Dropdown
+-------------------------------------------------------
+Problem: updateTriggerDropdownAlertUI can't find dropdown options.
+
+Solution: Ensure options are added to the DOM before calling the update
+function. The update function reads options from DOM, not from a data structure.
+
+GOTCHA 5: Alert Shows But Uses Default Browser Alert
+-----------------------------------------------------
+Problem: `showAlert` function not found, falls back to `alert()`.
+
+Solution: Ensure `showAlert` function is defined in generated HTML before
+createTriggerFieldsContainer runs. The function should be in the script block
+generated by generate.js.
+
+GOTCHA 6: Condition Matching Not Working
+-----------------------------------------
+Problem: Alert doesn't show even when condition should match.
+
+Solution: Always trim values before comparison:
 ```javascript
-// In the question's field edit modal, add prefill input
-<input type="text" id="prefill${questionId}" 
-       placeholder="Enter default value">
+const selectedValue = (this.value || '').trim();
+const alertCondition = alertData.condition;
+if (selectedValue === alertCondition) { ... }
 ```
 
-2. **Store in DOM**:
-```javascript
-// When creating/editing field, store as data attribute
-fieldElement.setAttribute('data-prefill', prefillValue);
-```
-
-3. **Export to JSON**:
-```javascript
-// In download.js export function
-const fieldData = {
-    // ... other properties
-    prefill: fieldElement.getAttribute('data-prefill') || ''
-};
-```
-
-4. **Import from JSON**:
-```javascript
-// In download.js import function
-if (field.prefill !== undefined) {
-    fieldElement.setAttribute('data-prefill', field.prefill || '');
-}
-```
-
-5. **Generate HTML with Prefill**:
-```javascript
-// In generate.js during HTML generation
-const prefillValue = field.prefill || '';
-inputHTML += `<input ... value="${prefillValue}">`;
-```
-
-6. **Add to unifiedFieldsMap** (if using runtime rendering):
-```javascript
-// Store prefill in the field data
-fieldData.prefill = prefillValue;
-window.unifiedFieldsMap[questionId].push(fieldData);
-```
-
-7. **Runtime Restoration** (already automatic):
-```javascript
-// The post-Firebase restoration at line 11106 will automatically
-// restore prefill values for any field type in unifiedFieldsMap
-```
-
-**Example Use Cases**:
-- Default names ("Enter defendant name here")
-- Common addresses ("123 Main Street")
-- Standard dates ("01/01/2024")
-- Placeholder phone numbers ("(555) 555-5555")
-- Default amounts ("$0.00")
-
-**Debug Logging**:
-- `🔧 [BUILD TIME DEBUG]`: Prefill read during HTML generation
-- `🔍 [PREFILL DEBUG 0-7]`: Prefill flow through runtime rendering
-- `🔧 [PREFILL RESTORE]`: Post-Firebase restoration
-
-**Common Issues and Solutions**:
-1. **Prefill not showing**: Check that `data-prefill` attribute is set on field element
-2. **Prefill disappearing**: Ensure post-Firebase restoration is running (check console logs)
-3. **Wrong field prefilled**: Verify nodeId pattern matching in restoration logic
-4. **Prefill overrides Firebase**: Check that restoration only applies to blank fields
-
-**Performance Considerations**:
-- Prefill restoration runs once at 3 seconds after page load
-- Uses `querySelectorAll` with nodeId prefix matching (efficient)
-- Only processes fields with prefill values defined
-- Minimal performance impact for forms with <100 fields
-
----
-
-*This documentation is maintained alongside the codebase and should be updated when new features are added or existing features are modified.*
+================================================================================
+END OF FEATURE #1 DOCUMENTATION
+================================================================================

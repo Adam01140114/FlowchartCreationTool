@@ -520,6 +520,14 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
+    // f2a) Inverse checkbox node double-click = show properties popup
+    if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
     // f3) Image node double-click = show properties popup
     if (typeof window.isImageNode === 'function' && window.isImageNode(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {

@@ -1913,6 +1913,49 @@ formHTML += `</div><br></div>`;
                               };
                             }
                           }
+                          // Check for alert data from window.triggerDropdownAlert
+                          const alertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+
+                          if (window.triggerDropdownAlert && window.triggerDropdownAlert[alertKey]) {
+                            const storedAlert = window.triggerDropdownAlert[alertKey];
+
+                            if (storedAlert.enabled && storedAlert.condition && storedAlert.title) {
+                              dropdownField.alert = {
+                                enabled: storedAlert.enabled,
+                                condition: storedAlert.condition.trim(),
+                                title: storedAlert.title.trim()
+                              };
+
+                            } else {
+
+                            }
+                          } else {
+
+                            if (window.triggerDropdownAlert) {
+
+                            }
+                          }
+                          // Check for hard alert data from window.triggerDropdownHardAlert
+                          let hardAlertEnabled = false;
+                          let storedHardAlertData = null;
+                          if (window.triggerDropdownHardAlert && window.triggerDropdownHardAlert[alertKey]) {
+                            const storedHardAlert = window.triggerDropdownHardAlert[alertKey];
+                            hardAlertEnabled = storedHardAlert.enabled || false;
+                            if (hardAlertEnabled && (storedHardAlert.condition || storedHardAlert.title)) {
+                              storedHardAlertData = {
+                                condition: storedHardAlert.condition || '',
+                                title: storedHardAlert.title || ''
+                              };
+                            }
+                          }
+                          // Include hard alert if enabled
+                          if (hardAlertEnabled && storedHardAlertData) {
+                            dropdownField.hardAlert = {
+                              enabled: true,
+                              condition: storedHardAlertData.condition,
+                              title: storedHardAlertData.title
+                            };
+                          }
                           triggerFields.push(dropdownField);
                         } else if (dateLabelEl && dateNodeIdEl) {
                           // Trigger date field
@@ -3250,6 +3293,46 @@ formHTML += `</div><br></div>`;
                             };
                           }
                         }
+                        // Check for alert data from window.triggerDropdownAlert
+                        const alertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+
+                        if (window.triggerDropdownAlert && window.triggerDropdownAlert[alertKey]) {
+                          const storedAlert = window.triggerDropdownAlert[alertKey];
+
+                          if (storedAlert.enabled && storedAlert.condition && storedAlert.title) {
+                            dropdownField.alert = {
+                              enabled: storedAlert.enabled,
+                              condition: storedAlert.condition.trim(),
+                              title: storedAlert.title.trim()
+                            };
+
+                          } else {
+
+                          }
+                          } else {
+
+                          }
+                        // Check for hard alert data from window.triggerDropdownHardAlert
+                        let hardAlertEnabled = false;
+                        let storedHardAlertData = null;
+                        if (window.triggerDropdownHardAlert && window.triggerDropdownHardAlert[alertKey]) {
+                          const storedHardAlert = window.triggerDropdownHardAlert[alertKey];
+                          hardAlertEnabled = storedHardAlert.enabled || false;
+                          if (hardAlertEnabled && (storedHardAlert.condition || storedHardAlert.title)) {
+                            storedHardAlertData = {
+                              condition: storedHardAlert.condition || '',
+                              title: storedHardAlert.title || ''
+                            };
+                          }
+                        }
+                        // Include hard alert if enabled
+                        if (hardAlertEnabled && storedHardAlertData) {
+                          dropdownField.hardAlert = {
+                            enabled: true,
+                            condition: storedHardAlertData.condition,
+                            title: storedHardAlertData.title
+                          };
+                        }
                         triggerFields.push(dropdownField);
                       } else if (dateLabelEl && dateNodeIdEl) {
                         // Trigger date field
@@ -4401,10 +4484,27 @@ if (s > 1){
               // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
 
+              // CRITICAL FIX: Check for hard alerts before enabling the button
+              // Hard alerts should always prevent navigation, regardless of canAdvance state
+              const hasHardAlert = nextBtn.dataset.hardAlertActive === 'true';
+              console.log('[UPDATE BUTTONS] canAdvance:', canAdvance, 'hasHardAlert:', hasHardAlert);
+
               // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
-              if (canAdvance) {
+              // Don't enable if there's an active hard alert
+              if (canAdvance && !hasHardAlert) {
+                console.log('[UPDATE BUTTONS] Enabling next button (canAdvance=true, no hard alert)');
                 nextBtn.removeAttribute('disabled');
+                // Make sure styling is cleared if not disabled by hard alert
+                if (nextBtn.dataset.hardAlertActive !== 'true') {
+                  nextBtn.style.opacity = '';
+                  nextBtn.style.cursor = '';
+                }
               } else {
+                if (hasHardAlert) {
+                  console.log('[UPDATE BUTTONS] Keeping next button disabled due to hard alert');
+                } else {
+                  console.log('[UPDATE BUTTONS] Disabling next button (canAdvance=false)');
+                }
                 nextBtn.setAttribute('disabled', 'disabled');
               }
 
@@ -4805,6 +4905,13 @@ if (s > 1){
         const visibleIndices = getVisibleIndices();
         const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
         activateIndex(initialIndex);
+        // Check hard alerts on initial page load
+        setTimeout(() => {
+
+          if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+            checkAllHardAlertsAndUpdateNavigation();
+          }
+        }, 500);
       });
       // --- Fallback visibility enforcement for Q3 based on JSON logic (Q1 yes OR any text in Q2) ---
       (function attachQ3FallbackLogic(){
@@ -4852,57 +4959,41 @@ if (s > 1){
       // CRITICAL FIX: Use a flag to prevent double-firing and add extensive logging
       let capsLockHandlerExecuting = false;
       document.addEventListener('keydown', function(e) {
-        console.log('[CAPSLOCK DEBUG] keydown event:', {
-          code: e.code,
-          key: e.key,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          target: e.target ? e.target.tagName + (e.target.id ? '#' + e.target.id : '') : 'null',
-          handlerExecuting: capsLockHandlerExecuting
-        });
-        
+
         // Use e.code for more reliable CapsLock detection (works even when CapsLock is toggled)
         const isCapsLock = (e.code === 'CapsLock' || e.key === 'CapsLock');
         const hasModifier = (e.ctrlKey || e.metaKey);
-        
+
         if (isCapsLock && hasModifier) {
-          console.log('[CAPSLOCK DEBUG] CapsLock + modifier detected');
-          
+
           // Prevent double-firing: if handler is already executing, skip
           if (capsLockHandlerExecuting) {
-            console.log('[CAPSLOCK DEBUG] Handler already executing, skipping');
+
             return;
           }
-          
+
           e.preventDefault();
           e.stopPropagation();
-          
-          console.log('[CAPSLOCK DEBUG] Finding active section and previous button');
+
           const activeSection = document.querySelector('.section.active');
-          console.log('[CAPSLOCK DEBUG] Active section:', activeSection ? activeSection.id : 'null');
-          
+
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
-          console.log('[CAPSLOCK DEBUG] Previous button:', prevBtn ? 'FOUND' : 'NOT FOUND', prevBtn ? {
-            id: prevBtn.id,
-            disabled: prevBtn.disabled,
-            className: prevBtn.className
-          } : {});
 
           if (prevBtn && !prevBtn.disabled) {
-            console.log('[CAPSLOCK DEBUG] Clicking previous button');
+
             // Set flag to prevent double-firing
             capsLockHandlerExecuting = true;
-            
+
             // Reset flag after a short delay to allow the click to process
             setTimeout(() => {
               capsLockHandlerExecuting = false;
-              console.log('[CAPSLOCK DEBUG] Handler flag reset');
+
             }, 100);
-            
+
             prevBtn.click();
-            console.log('[CAPSLOCK DEBUG] Previous button clicked');
+
           } else {
-            console.log('[CAPSLOCK DEBUG] Previous button not available or disabled');
+
           }
         }
       });
@@ -5631,7 +5722,80 @@ if (s > 1){
     // Sanitize dropdown name and trigger condition for multipleTextboxes ID format
     const sanitizedDropdownName = sanitizeForId(dropdownFieldName);
     const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
+    // Helper function to enrich triggerField with data from unifiedFieldsMap
+    function enrichTriggerFieldWithUnifiedData(triggerField, fieldIndex) {
+
+      // Try to find the complete field data from unifiedFieldsMap
+      if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+        const allFields = window.unifiedFieldsMap[questionId];
+
+        // Find the parent dropdown field that contains trigger sequences
+        const parentDropdownField = allFields.find(f => 
+          f.type === 'dropdown' && 
+          f.triggerSequences && 
+          Array.isArray(f.triggerSequences) &&
+          f.triggerSequences.length > sequenceIndex
+        );
+        if (parentDropdownField) {
+
+          const sequence = parentDropdownField.triggerSequences[sequenceIndex];
+          if (sequence && sequence.fields && Array.isArray(sequence.fields)) {
+
+            // Find the matching field by fieldName/label and type, or by index as fallback
+            let matchingField = sequence.fields.find(f => 
+              f.type === triggerField.type &&
+              ((f.fieldName && triggerField.fieldName && f.fieldName === triggerField.fieldName) ||
+               (f.label && triggerField.label && f.label === triggerField.label))
+            );
+            // Fallback: try to match by index if name matching failed
+            if (!matchingField && fieldIndex < sequence.fields.length) {
+              const fieldByIndex = sequence.fields[fieldIndex];
+              if (fieldByIndex && fieldByIndex.type === triggerField.type) {
+                matchingField = fieldByIndex;
+
+              }
+            }
+            if (matchingField) {
+
+              if (matchingField.alert) {
+
+              }
+              // Merge alert data and other properties from unifiedFieldsMap
+              if (matchingField.alert) {
+                triggerField.alert = matchingField.alert;
+
+              } else {
+
+              }
+              // Merge hardAlert data if present
+              if (matchingField.hardAlert) {
+                triggerField.hardAlert = matchingField.hardAlert;
+
+              }
+              // Also merge conditionalLogic if it's missing
+              if (matchingField.conditionalLogic && !triggerField.conditionalLogic) {
+                triggerField.conditionalLogic = matchingField.conditionalLogic;
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+        } else {
+
+        }
+      } else {
+
+        if (window.unifiedFieldsMap) {
+
+        }
+      }
+      return triggerField;
+    }
     fields.forEach((triggerField, fieldIndex) => {
+      // Enrich triggerField with data from unifiedFieldsMap (especially alert data)
+      enrichTriggerFieldWithUnifiedData(triggerField, fieldIndex);
       if (triggerField.type === 'label') {
         const fieldDiv = document.createElement('div');
         // Check if conditional logic is enabled
@@ -6014,10 +6178,13 @@ if (s > 1){
           }, 300);
         }
       } else if (triggerField.type === 'dropdown') {
+
         const dropdownFieldDiv = document.createElement('div');
         // Check if conditional logic is enabled
         const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
         const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+        // Log alert data at field processing time
+
         // Initially hide if conditional logic is enabled
         if (hasConditionalLogic) {
           dropdownFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1); display: none;';
@@ -6080,8 +6247,63 @@ if (s > 1){
         hiddenDropdownInput.name = select.id + '_dropdown';
         hiddenDropdownInput.style.display = 'none';
         dropdownWrapper.appendChild(hiddenDropdownInput);
+        // Capture alert data in local variable to avoid closure issues
+        const alertData = triggerField.alert ? {
+          enabled: triggerField.alert.enabled || false,
+          condition: (triggerField.alert.condition || '').trim(),
+          title: (triggerField.alert.title || '').trim()
+        } : null;
+        // Capture hard alert data in local variable to avoid closure issues
+        const hardAlertData = triggerField.hardAlert ? {
+          enabled: triggerField.hardAlert.enabled || false,
+          condition: (triggerField.hardAlert.condition || '').trim(),
+          title: (triggerField.hardAlert.title || '').trim()
+        } : null;
+
         // Add change event listener to call dropdownMirror
         select.addEventListener('change', function() {
+
+          // Check for alert functionality if enabled
+          if (alertData && alertData.enabled && alertData.condition && alertData.title) {
+
+            const selectedValue = (this.value || '').trim();
+            const alertCondition = alertData.condition;
+            if (selectedValue === alertCondition) {
+
+              // Use custom alert modal instead of default browser alert
+              if (typeof showAlert === 'function') {
+                showAlert(alertData.title);
+
+              } else {
+                // Fallback to default alert if showAlert is not available
+
+                alert(alertData.title);
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+          // Check for hard alert functionality if enabled
+          if (hardAlertData && hardAlertData.enabled && hardAlertData.condition && hardAlertData.title) {
+
+            const selectedValue = (this.value || '').trim();
+            const hardAlertCondition = hardAlertData.condition;
+            if (selectedValue === hardAlertCondition) {
+
+              // Use custom alert modal with hard alert flag
+              if (typeof showAlert === 'function') {
+                showAlert(hardAlertData.title, true); // Pass true as second parameter for hard alert
+
+              } else {
+
+                alert(hardAlertData.title);
+              }
+            }
+          }
+          // Check all hard alerts and update navigation button
+          checkAllHardAlertsAndUpdateNavigation();
           if (typeof dropdownMirror === 'function') {
             dropdownMirror(this, this.id);
           }
@@ -7352,7 +7574,106 @@ function removeHiddenCheckbox(radioId) {
 // Track page load time to prevent alerts in first 3 seconds
 const pageLoadTime = Date.now();
 const ALERT_DELAY_MS = 3000; // 3 seconds
-function showAlert(message) {
+// Function to check all hard alerts and disable/enable navigation button
+function checkAllHardAlertsAndUpdateNavigation() {
+    let hasActiveHardAlert = false;
+
+    // Check unifiedFieldsMap for all hard alerts
+    if (window.unifiedFieldsMap) {
+        Object.keys(window.unifiedFieldsMap).forEach(questionId => {
+            const allFields = window.unifiedFieldsMap[questionId];
+            if (!Array.isArray(allFields)) return;
+
+            // Check all dropdown fields in trigger sequences
+            allFields.forEach(field => {
+                if (field.type === 'dropdown' && field.triggerSequences && Array.isArray(field.triggerSequences)) {
+                    field.triggerSequences.forEach((sequence, seqIndex) => {
+                        if (sequence.fields && Array.isArray(sequence.fields)) {
+                            sequence.fields.forEach(triggerField => {
+                                // Check for hard alert
+                                if (triggerField.type === 'dropdown' && triggerField.hardAlert && triggerField.hardAlert.enabled) {
+                                    const hardAlertCondition = (triggerField.hardAlert.condition || '').trim();
+                                    
+                                    if (hardAlertCondition) {
+                                        // CRITICAL FIX: For numbered dropdowns, the baseNodeId comes from parentDropdownNodeId
+                                        // which is passed to createTriggerFieldsContainer. This is typically derived from the
+                                        // parent dropdown field's first option's nodeId, or if that fails, from fieldName.
+                                        // In unifiedFieldsMap, the parent dropdown field has fieldName which we can sanitize.
+                                        // The dropdown ID format is: {parentDropdownFieldName}_{triggerFieldName}_{entryNumber}
+                                        let baseNodeId = '';
+                                        
+                                        // For numbered dropdowns, parentDropdownNodeId is often derived from the field's nodeId
+                                        // or by sanitizing the fieldName. Let's use fieldName (sanitized) as it's most reliable.
+                                        if (field.fieldName) {
+                                            baseNodeId = (field.fieldName || '').toLowerCase()
+                                                .replace(/[?]/g, '')
+                                                .replace(/[^a-z0-9_]+/g, '_')
+                                                .replace(/^_+|_+$/g, '');
+                                        } else if (field.nodeId) {
+                                            baseNodeId = field.nodeId;
+                                        } else {
+                                            // Last resort: use questionNameIds
+                                            baseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
+                                        }
+                                        
+                                        // Sanitize the trigger field name to match how it's done in createTriggerFieldsContainer
+                                        const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase()
+                                            .replace(/[?]/g, '')
+                                            .replace(/[^a-z0-9_]+/g, '_')
+                                            .replace(/^_+|_+$/g, '');
+                                        
+                                        // Check ALL entries (1-10) for this field
+                                        for (let entryNum = 1; entryNum <= 10; entryNum++) {
+                                            const dropdownId = baseNodeId + '_' + sanitizedFieldName + '_' + entryNum;
+                                            const dropdownEl = document.getElementById(dropdownId);
+                                            
+                                            if (dropdownEl) {
+                                                const selectedValue = (dropdownEl.value || '').trim();
+                                                if (selectedValue === hardAlertCondition) {
+                                                    hasActiveHardAlert = true;
+                                                    // Don't return - continue checking all entries to find all active alerts
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    // Update navigation button state
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection) {
+        const nextBtn = activeSection.querySelector('.question-next');
+        if (nextBtn) {
+            // Store hard alert state on button for reference
+            const previousState = nextBtn.dataset.hardAlertActive;
+            nextBtn.dataset.hardAlertActive = hasActiveHardAlert ? 'true' : 'false';
+
+            if (hasActiveHardAlert) {
+                nextBtn.setAttribute('disabled', 'disabled');
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+            } else {
+                // Remove hard alert styling, but don't force enable - let normal logic handle it
+                if (previousState === 'true') {
+                    nextBtn.style.opacity = '';
+                    nextBtn.style.cursor = '';
+                    // Trigger refreshNav to re-evaluate button state normally
+                    const sectionId = activeSection.id;
+                    if (window.questionNavControllers && typeof window.questionNavControllers[sectionId] === 'function') {
+                        window.questionNavControllers[sectionId]();
+                    }
+                }
+            }
+        }
+    }
+}
+function showAlert(message, isHardAlert) {
     // Check if 3 seconds have passed since page load
     const currentTime = Date.now();
     const timeSinceLoad = currentTime - pageLoadTime;
@@ -7369,7 +7690,15 @@ function showAlert(message) {
             alertMessage.innerHTML = message;
         } else {
             // This is a regular text alert
-            alertMessage.textContent = message;
+            if (isHardAlert) {
+                // For hard alerts, add subtitle
+                alertMessage.innerHTML = '<div style="text-align: center;">' +
+                    '<div style="margin-bottom: 10px;">' + message + '</div>' +
+                    '<div style="font-size: 0.9em; color: #666; font-style: italic;">Please change your answer to proceed</div>' +
+                    '</div>';
+            } else {
+                alertMessage.textContent = message;
+            }
         }
         alertOverlay.style.display = 'flex';
     }
@@ -11644,39 +11973,30 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
-    console.log('[CALCULATION DEBUG] runSingleHiddenTextCalculation called for:', calcObj.hiddenFieldName);
+
     const textField = document.getElementById(calcObj.hiddenFieldName);
     if (!textField) {
-        console.log('[CALCULATION DEBUG] Text field not found:', calcObj.hiddenFieldName);
+
         return;
     }
-    console.log('[CALCULATION DEBUG] Text field found:', calcObj.hiddenFieldName);
-    
+
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
     calcObj.calculations.forEach(function(oneCalc, calcIndex) {
-        console.log('[CALCULATION DEBUG] Processing calculation ' + (calcIndex + 1) + ':', {
-            terms: oneCalc.terms,
-            compareOperator: oneCalc.compareOperator,
-            threshold: oneCalc.threshold,
-            fillValue: oneCalc.fillValue
-        });
-        
+
         let val = 0;
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
-            console.log('[CALCULATION DEBUG] First term:', firstTerm.questionNameId);
+
             val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
-            console.log('[CALCULATION DEBUG] First term value:', val);
 
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
-                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ':', term.questionNameId, 'operator:', term.operator);
+
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
-                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ' value:', termVal);
 
                 switch(term.operator) {
                     case '+': val += termVal; break;
@@ -11684,12 +12004,10 @@ function runSingleHiddenTextCalculation(calcObj) {
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
-                console.log('[CALCULATION DEBUG] Running total after term ' + (t + 1) + ':', val);
+
             }
         }
-        
-        console.log('[CALCULATION DEBUG] Final calculated value:', val);
-        
+
         // Compare to threshold
         const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
@@ -11698,30 +12016,22 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '<': matched = val < threshold; break;
             case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
-        
-        console.log('[CALCULATION DEBUG] Comparison:', {
-            value: val,
-            operator: oneCalc.compareOperator,
-            threshold: threshold,
-            matched: matched
-        });
 
         if (matched) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
-                console.log('[CALCULATION DEBUG] Using calculated value as finalValue:', finalValue);
+
             } else {
                 finalValue = oneCalc.fillValue;
-                console.log('[CALCULATION DEBUG] Using fillValue as finalValue:', finalValue);
+
             }
         }
     });
-    
-    console.log('[CALCULATION DEBUG] Setting text field value to:', finalValue);
+
     // Update the text field
     textField.value = finalValue;
-    console.log('[CALCULATION DEBUG] Text field value after setting:', textField.value);
+
 }
 function replacePlaceholderTokens (str){
     /* note the doubled back-slashes in the delimiters \$\$ */
@@ -11758,51 +12068,49 @@ function parseTokenValue(token){
  *       (note the escaped \\d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
-    console.log('[CALCULATION DEBUG] getMoneyValue called with:', qId);
-    
+
     /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
-        console.log('[CALCULATION DEBUG] Found direct element:', el.id, 'value:', el.value);
+
         if (el.type === "checkbox") {
             const amt = document.getElementById(el.id + "_amount");
             if (amt && el.checked) {
                 const value = parseFloat(amt.value) || 0;
-                console.log('[CALCULATION DEBUG] Checkbox with amount field, returning:', value);
+
                 return value;
             }
             const value = el.checked ? 1 : 0;
-            console.log('[CALCULATION DEBUG] Checkbox without amount, returning:', value);
+
             return value;
         }
         const value = parseFloat(el.value) || 0;
-        console.log('[CALCULATION DEBUG] Direct element value, returning:', value);
+
         return value;
     }
-    
+
     /* legacy builder‑shorthand amountX_Y_Z */
     if (/^amount\d+_\d+_.+/.test(qId)) {
         const normalized = normaliseDesignerFieldRef(qId);
-        console.log('[CALCULATION DEBUG] Normalized shorthand:', qId, '->', normalized);
+
         const el2 = document.getElementById(normalized);
         if (el2) {
             const value = parseFloat(el2.value) || 0;
-            console.log('[CALCULATION DEBUG] Found normalized element, returning:', value);
+
             return value;
         } else {
-            console.log('[CALCULATION DEBUG] Normalized element not found:', normalized);
+
         }
     }
-    
+
     /* name‑attribute fallback */
     const byName = document.getElementsByName(qId);
     if (byName.length) {
         const value = parseFloat(byName[0].value) || 0;
-        console.log('[CALCULATION DEBUG] Found by name, returning:', value);
+
         return value;
     }
-    
-    console.log('[CALCULATION DEBUG] No element found, returning 0');
+
     return 0;
 }
 function scheduleCalculationListeners() {
@@ -14663,21 +14971,20 @@ document.addEventListener('DOMContentLoaded', function() {
  *───────────────────────────────────────────────────────────────*/
 function normaliseDesignerFieldRef(raw) {
     raw = String(raw || "").trim();
-    console.log('[CALCULATION DEBUG] normaliseDesignerFieldRef called with:', raw);
-    
+
     /* ① already a real element in the live DOM? */
     if (document.getElementById(raw)) {
-        console.log('[CALCULATION DEBUG] Found direct element, returning:', raw);
+
         return raw;
     }
-    
+
     /* ② looks like a finished slug already? */
     const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
     if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1])) {
-        console.log('[CALCULATION DEBUG] Looks like finished slug, returning:', raw);
+
         return raw;
     }
-    
+
     /* ③ builder shorthand (amountX_Y_field  OR  answerX_Y_field) */
     const mShort =
         raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
@@ -14689,35 +14996,22 @@ function normaliseDesignerFieldRef(raw) {
         // baseName_fieldName_entryNumber (NOT baseName_entryNumber_fieldName)
         // So amount2_1_income_value should become how_many_sources_of_income_do_you_have_income_value_1
         const normalized = `${slug}_${field}_${idx}`;
-        console.log('[CALCULATION DEBUG] Normalized shorthand:', {
-            input: raw,
-            questionId: qId,
-            entryNumber: idx,
-            fieldName: field,
-            slug: slug,
-            normalized: normalized
-        });
+
         return normalized;
     }
-    
+
     /* ④ catch‑all fallback */
     const mGeneric = raw.match(/^(.*)_(\d+)_(.+)$/);
     if (!mGeneric) {
         const sanitized = sanitizeQuestionText(raw);
-        console.log('[CALCULATION DEBUG] No pattern match, sanitized:', sanitized);
+
         return sanitized;
     }
     const [, qText, idx, field] = mGeneric;
     // 🔧 CRITICAL FIX: For numbered dropdown fields, the actual field ID pattern is:
     // baseName_fieldName_entryNumber (NOT baseName_entryNumber_fieldName)
     const normalized = `${sanitizeQuestionText(qText)}_${field}_${idx}`;
-    console.log('[CALCULATION DEBUG] Normalized generic pattern:', {
-        input: raw,
-        questionText: qText,
-        entryNumber: idx,
-        fieldName: field,
-        normalized: normalized
-    });
+
     return normalized;
 }
 /*───────────────────────────────────────────────────────────────*

@@ -1103,11 +1103,11 @@ function generateMoneyQuestionOptions() {
             }
             // Fallback to legacy hidden container labels if unified fields not present
             if (amountFields.length === 0) {
-                const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
-                amtInputs.forEach((inp) => {
-                    const val = inp.value.trim();
+            const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
+            amtInputs.forEach((inp) => {
+                const val = inp.value.trim();
                     if (val) amountFields.push({ nodeId: val, label: val });
-                });
+            });
             }
             // If no amount fields were entered, skip
             if (amountFields.length === 0) return;
