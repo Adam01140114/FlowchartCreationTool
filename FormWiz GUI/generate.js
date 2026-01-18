@@ -1202,7 +1202,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         if (imageUrl) {
           if (!imageWidth || imageWidth < 1) imageWidth = 300;
           if (!imageHeight || imageHeight < 1) imageHeight = 300;
-          formHTML += `<br><img src="${imageUrl}" alt="Dropdown Image" width="${imageWidth}" height="${imageHeight}"><br>`;
+          formHTML += `<br><div class="dropdown-image-container" style="display: flex; justify-content: center; align-items: center; width: 100%; margin: 12px 0; box-sizing: border-box;"><img src="${imageUrl}" alt="Dropdown Image" width="${imageWidth}" height="${imageHeight}" style="max-width: 100%; height: auto; object-fit: contain; display: block;"></div><br>`;
         }
         // Handle PDF Preview - check before generating select
         const pdfPreviewEnabledEl = qBlock.querySelector(`#enablePdfPreview${questionId}`);

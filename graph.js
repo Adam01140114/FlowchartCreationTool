@@ -481,6 +481,8 @@ function showPropertiesPopup(cell) {
     title.textContent = 'Linked Checkbox Properties';
   } else if (typeof window.isInverseCheckboxNode === 'function' && window.isInverseCheckboxNode(cell)) {
     title.textContent = 'Inverse Checkbox Properties';
+  } else if (typeof window.isImageNode === 'function' && window.isImageNode(cell)) {
+    title.textContent = 'Image Node Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -804,6 +806,17 @@ function showPropertiesPopup(cell) {
     properties = [
       { label: 'Node ID', value: cell._inverseCheckboxNodeId || 'inverse_checkbox', id: 'propInverseCheckboxNodeId', editable: true },
       { label: 'Checkbox Option', value: 'inverseCheckboxOption', id: 'propInverseCheckboxOption', editable: false, special: 'inverseCheckboxOption' }
+    ];
+  } else if (typeof window.isImageNode === 'function' && window.isImageNode(cell)) {
+    // For image nodes, show image properties (URL, width, height)
+    // Ensure _image property exists
+    if (!cell._image) {
+      cell._image = { url: "", width: "100", height: "100" };
+    }
+    properties = [
+      { label: 'Image URL', value: cell._image.url || '', id: 'propImageUrl', editable: true, inputType: 'text' },
+      { label: 'Width', value: cell._image.width || '100', id: 'propImageWidth', editable: true, inputType: 'number' },
+      { label: 'Height', value: cell._image.height || '100', id: 'propImageHeight', editable: true, inputType: 'number' }
     ];
   } else {
     // For all other nodes, show the standard properties
@@ -2873,6 +2886,55 @@ function showPropertiesPopup(cell) {
                 // Update PDF preview node display if function exists
                 if (typeof window.updatePdfPreviewNodeCell === 'function') {
                   window.updatePdfPreviewNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propImageUrl':
+                // Ensure _image property exists
+                if (!cell._image) {
+                  cell._image = { url: "", width: "100", height: "100" };
+                }
+                cell._image.url = newValue;
+                // Update image node display if function exists
+                if (typeof window.updateImageOptionCell === 'function') {
+                  window.updateImageOptionCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propImageWidth':
+                // Ensure _image property exists
+                if (!cell._image) {
+                  cell._image = { url: "", width: "100", height: "100" };
+                }
+                // Only allow positive integers
+                const widthValue = String(Math.max(1, parseInt(newValue) || 100));
+                cell._image.width = widthValue;
+                // Update image node display if function exists
+                if (typeof window.updateImageOptionCell === 'function') {
+                  window.updateImageOptionCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propImageHeight':
+                // Ensure _image property exists
+                if (!cell._image) {
+                  cell._image = { url: "", width: "100", height: "100" };
+                }
+                // Only allow positive integers
+                const heightValue = String(Math.max(1, parseInt(newValue) || 100));
+                cell._image.height = heightValue;
+                // Update image node display if function exists
+                if (typeof window.updateImageOptionCell === 'function') {
+                  window.updateImageOptionCell(cell);
                 }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {

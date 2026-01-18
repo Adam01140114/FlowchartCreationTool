@@ -507,6 +507,25 @@ function loadFormData(formData) {
                                 }
                             }
                         }
+                        // ********** Restore Image Data ********** 
+                        if (question.image && question.image.url) {
+                            const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
+                            const wEl = questionBlock.querySelector(`#dropdownImageWidth${question.questionId}`);
+                            const hEl = questionBlock.querySelector(`#dropdownImageHeight${question.questionId}`);
+                            const imageFields = questionBlock.querySelector(`#dropdownImageFields${question.questionId}`);
+                            const toggleButton = questionBlock.querySelector(`#dropdownImageBlock${question.questionId} button`);
+                            if (urlEl) urlEl.value = question.image.url || '';
+                            if (wEl) wEl.value = question.image.width || 0;
+                            if (hEl) hEl.value = question.image.height || 0;
+                            // Automatically display the image fields if there's image data
+                            if (imageFields) {
+                                imageFields.style.display = 'block';
+                            }
+                            // Also ensure the "Add Image" button is toggled to "Delete Image" state
+                            if (toggleButton) {
+                                toggleButton.textContent = 'Delete Image';
+                            }
+                        }
                     }
                     // Also restore Name/ID and Placeholder
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
@@ -527,20 +546,6 @@ function loadFormData(formData) {
                     const fileTitleEl = questionBlock.querySelector(`#fileUploadFileTitle${question.questionId}`);
                     if (fileTitleEl && question.fileTitle) {
                         fileTitleEl.value = question.fileTitle;
-                    }
-                    // ********** Restore Image Data ********** 
-                    if (question.image) {
-                        const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
-                        const wEl = questionBlock.querySelector(`#dropdownImageWidth${question.questionId}`);
-                        const hEl = questionBlock.querySelector(`#dropdownImageHeight${question.questionId}`);
-                        const imageFields = questionBlock.querySelector(`#dropdownImageFields${question.questionId}`);
-                        if (urlEl) urlEl.value = question.image.url || '';
-                        if (wEl) wEl.value = question.image.width || 0;
-                        if (hEl) hEl.value = question.image.height || 0;
-                        // Automatically display the image fields if there's image data
-                        if (imageFields && question.image.url) {
-                            imageFields.style.display = 'block';
-                        }
                     }
                     // Restore linking logic
                     if (question.linking && question.linking.enabled) {
@@ -2953,6 +2958,20 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
+                // ********** Collect Image Data (dropdown only) **********
+                const imgUrlEl = questionBlock.querySelector(`#dropdownImageURL${questionId}`);
+                const imgWidthEl = questionBlock.querySelector(`#dropdownImageWidth${questionId}`);
+                const imgHeightEl = questionBlock.querySelector(`#dropdownImageHeight${questionId}`);
+                const imageUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
+                const imageWidth = imgWidthEl ? parseInt(imgWidthEl.value, 10) || 0 : 0;
+                const imageHeight = imgHeightEl ? parseInt(imgHeightEl.value, 10) || 0 : 0;
+                if (imageUrl || imageWidth || imageHeight) {
+                    questionData.image = {
+                        url: imageUrl,
+                        width: imageWidth,
+                        height: imageHeight
+                    };
+                }
             }
             else if (questionType === 'fileUpload') {
                 // Get the upload title and file title
@@ -2976,18 +2995,6 @@ function exportForm() {
                         targetId: ''
                     };
                 }
-                // ********** Collect Image Data **********
-                const imgUrlEl = questionBlock.querySelector(`#dropdownImageURL${questionId}`);
-                const imgWidthEl = questionBlock.querySelector(`#dropdownImageWidth${questionId}`);
-                const imgHeightEl = questionBlock.querySelector(`#dropdownImageHeight${questionId}`);
-                const imageUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
-                const imageWidth = imgWidthEl ? parseInt(imgWidthEl.value, 10) || 0 : 0;
-                const imageHeight = imgHeightEl ? parseInt(imgHeightEl.value, 10) || 0 : 0;
-                questionData.image = {
-                    url: imageUrl,
-                    width: imageWidth,
-                    height: imageHeight
-                };
             }
             else if (questionType === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`)?.value || '';

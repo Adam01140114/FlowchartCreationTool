@@ -6,8 +6,8 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "How many sources of income do you have?",
-          "type": "numberedDropdown",
+          "text": "Is your household monthly income less than the amount below?",
+          "type": "dropdown",
           "logic": {
             "enabled": false,
             "conditions": []
@@ -67,168 +67,27 @@
             "priceId": "",
             "attachment": "Preview Only"
           },
-          "options": [],
+          "options": [
+            "Yes",
+            "No"
+          ],
           "labels": [],
-          "nodeId": "how_many_sources_of_income_do_you_have",
-          "min": "1",
-          "max": "4",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Description",
-              "nodeId": "how_many_sources_of_income_do_you_have_description",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "amount",
-              "label": "Income Value",
-              "nodeId": "how_many_sources_of_income_do_you_have_income_value",
-              "order": 2
-            }
-          ]
-        },
-        {
-          "questionId": 2,
-          "text": "How many sources of income do you have?",
-          "type": "numberedDropdown",
-          "logic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": false,
-            "message": "",
-            "conditions": []
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "options": [],
-          "labels": [],
-          "nodeId": "how_many_sources_of_income_do_you_have_dup2",
-          "min": "1",
-          "max": "4",
-          "allFieldsInOrder": [
-            {
-              "type": "label",
-              "label": "Description",
-              "nodeId": "how_many_sources_of_income_do_you_have_dup2_description",
-              "order": 1,
-              "prefill": ""
-            },
-            {
-              "type": "amount",
-              "label": "Income Value",
-              "nodeId": "how_many_sources_of_income_do_you_have_dup2_income_value",
-              "order": 2
-            }
-          ]
+          "nameId": "is_your_household_monthly_income_less_than_the_amount_below",
+          "placeholder": "",
+          "image": {
+            "url": "income.png",
+            "width": 800,
+            "height": 90
+          }
         }
       ]
     }
   ],
   "groups": [],
-  "hiddenFields": [
-    {
-      "hiddenFieldId": "1",
-      "type": "text",
-      "name": "total_income_value",
-      "checked": false,
-      "conditions": [],
-      "calculations": [
-        {
-          "terms": [
-            {
-              "operator": "",
-              "questionNameId": "amount2_1_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_2_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_3_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_4_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_1_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_2_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_3_income_value"
-            },
-            {
-              "operator": "+",
-              "questionNameId": "amount2_4_income_value"
-            }
-          ],
-          "compareOperator": ">",
-          "threshold": "0",
-          "fillValue": "##total_income_value##"
-        }
-      ]
-    }
-  ],
+  "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 3,
-  "hiddenFieldCounter": 2,
+  "questionCounter": 2,
+  "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
   "defaultPDFName": "",
@@ -236,40 +95,7 @@
   "stripePriceId": "",
   "additionalPDFs": [],
   "checklistItems": [],
-  "linkedFields": [
-    {
-      "id": "linkedField0",
-      "linkedFieldId": "income_value_1",
-      "fields": [
-        "how_many_sources_of_income_do_you_have_income_value_1",
-        "how_many_sources_of_income_do_you_have_dup2_income_value_1"
-      ]
-    },
-    {
-      "id": "linkedField1",
-      "linkedFieldId": "income_value_2",
-      "fields": [
-        "how_many_sources_of_income_do_you_have_income_value_1",
-        "how_many_sources_of_income_do_you_have_dup2_income_value_1"
-      ]
-    },
-    {
-      "id": "linkedField2",
-      "linkedFieldId": "income_value_3",
-      "fields": [
-        "how_many_sources_of_income_do_you_have_income_value_3",
-        "how_many_sources_of_income_do_you_have_dup2_income_value_3"
-      ]
-    },
-    {
-      "id": "linkedField3",
-      "linkedFieldId": "income_value_4",
-      "fields": [
-        "how_many_sources_of_income_do_you_have_income_value_4",
-        "how_many_sources_of_income_do_you_have_dup2_income_value_4"
-      ]
-    }
-  ],
+  "linkedFields": [],
   "linkedCheckboxes": [],
   "inverseCheckboxes": []
 }

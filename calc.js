@@ -261,8 +261,9 @@ function gatherAllAmountLabels() {
         for (const edge of outgoingEdges) {
           const targetCell = edge.target;
           if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
-            const optionText = sanitizeNameId(targetCell.value || "");
-            const optionLabel = cleanQuestionName + "_" + optionText;
+            let optionText = sanitizeNameId(targetCell.value || "");
+            optionText = optionText.replace(/\//g, "_").replace(/_+/g, "_");
+            const optionLabel = `${cleanQuestionName}_${optionText}_amount`;
             labels.push(optionLabel);
           }
         }
@@ -273,8 +274,8 @@ function gatherAllAmountLabels() {
         // Use answer{questionId} format for consistent JSON export
         const questionId = cell._questionId || nodeId.split('_').pop() || "";
         const label = `answer${questionId}`;
-        // Add the question text as label for better user identification
-        const displayLabel = `${cleanQuestionName} (${label})`;
+        // Prefer the actual nodeId for display (e.g., currency_test)
+        const displayLabel = nodeId || cleanQuestionName;
         // Store with a special prefix to identify it's a direct question value
         labels.push(`question_value:${label}:${displayLabel}`);
       }
@@ -1100,15 +1101,15 @@ function createCalculationTermField(cell, term, index) {
         console.log('[CALC createCalculationTermField] Processing numbered_dropdown label:', lbl);
         const parts = lbl.split(':');
         if (parts.length >= 3) {
-          value = parts[1]; // The stored value (questionName_amountName_#N) - this is the actual node ID
+          value = lbl; // Store the full label to preserve the prefix for export
           displayName = parts[1]; // Use the actual node ID as the display name instead of the friendly display name
           console.log('[CALC createCalculationTermField] Parsed numbered_dropdown:', { value, displayName });
         }
       } else if (lbl.startsWith('question_value:')) {
         const parts = lbl.split(':');
         if (parts.length >= 3) {
-          value = parts[1]; // The actual value (answer1, etc.)
-          displayName = parts[1]; // Use the actual node ID as the display name
+          value = lbl; // Store the full label to preserve the prefix for export
+          displayName = parts[2]; // Use the actual node ID as the display name
         }
       }
       return { value, displayName };
@@ -1129,7 +1130,7 @@ function createCalculationTermField(cell, term, index) {
     } else if (term.amountLabel.startsWith('question_value:')) {
       const parts = term.amountLabel.split(':');
       if (parts.length >= 3) {
-        currentDisplayValue = parts[1]; // Use the actual node ID instead of the display name
+        currentDisplayValue = parts[2]; // Use the actual node ID instead of the display name
       }
     } else {
       // Try to find matching display name from available options
@@ -1415,8 +1416,9 @@ function findCalcNodesDependentOnQuestion(questionCell) {
         for (const edge of outgoingEdges) {
           const targetCell = edge.target;
           if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
-            const optionText = sanitizeNameId(targetCell.value || "");
-            const optionPattern = cleanQuestionName + "_" + optionText;
+            let optionText = sanitizeNameId(targetCell.value || "");
+            optionText = optionText.replace(/\//g, "_").replace(/_+/g, "_");
+            const optionPattern = `${cleanQuestionName}_${optionText}_amount`;
             if (term.amountLabel.toLowerCase().includes(optionPattern.toLowerCase())) {
               isDependentNode = true;
             }

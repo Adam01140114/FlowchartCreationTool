@@ -5854,13 +5854,24 @@ window.addEventListener('storage', function(e) {
     flowchartClipboard = e.newValue;
   }
 });
+// --- CHECK IF IMAGE NODE ---
+function isImageNode(cell) {
+  if (!cell) return false;
+  // Check if it's an image option node
+  if (isOptions(cell) && getQuestionType(cell) === "imageOption") return true;
+  // Check if it's a standalone image node (nodeType=image)
+  if (cell.style && cell.style.includes('nodeType=image')) return true;
+  return false;
+}
+window.isImageNode = isImageNode;
 // --- UPDATE IMAGE OPTION NODE ---
 function updateImageOptionCell(cell) {
-  if (!cell || !isOptions(cell) || getQuestionType(cell) !== "imageOption") return;
-  // Ensure _image property exists
+  if (!cell || !isImageNode(cell)) return;
+  // Ensure _image property exists (prioritize properties menu values)
   if (!cell._image) {
     cell._image = { url: "", width: "100", height: "100" };
   }
+  // Use properties from cell._image (set by properties menu)
   let imgUrl = cell._image.url || "";
   let imgWidth = cell._image.width || "100";
   let imgHeight = cell._image.height || "100";
@@ -5919,10 +5930,10 @@ function updateImageOptionCell(cell) {
     }, 0);
   }
 }
-// Handler for updating image node fields
+// Handler for updating image node fields (for inline editing on the node)
 window.updateImageNodeField = function(cellId, field, value) {
   const cell = graph.getModel().getCell(cellId);
-  if (!cell || getQuestionType(cell) !== "imageOption") return;
+  if (!cell || !isImageNode(cell)) return;
   if (!cell._image) cell._image = { url: "", width: "100", height: "100" };
   if (field === "width" || field === "height") {
     // Only allow positive integers
@@ -5930,6 +5941,10 @@ window.updateImageNodeField = function(cellId, field, value) {
   }
   cell._image[field] = value;
   updateImageOptionCell(cell);
+  // Trigger autosave
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
 };
 // PDF Node functions
 function isPdfNode(cell) {
