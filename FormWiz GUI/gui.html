@@ -420,6 +420,8 @@
                             const storedJson = localStorage.getItem(previewKey);
                             if (storedJson) {
                                 jsonData = JSON.parse(storedJson);
+                                // Mark as preview import to skip heavy GUI-only updates
+                                window.__isPreviewImport = true;
                                 // Clean up the localStorage entry after reading
                                 localStorage.removeItem(previewKey);
                                 localStorage.removeItem(previewKey + '_expires');
@@ -435,6 +437,8 @@
                     try {
                         const decodedJson = decodeURIComponent(previewJson);
                         jsonData = JSON.parse(decodedJson);
+                        // Mark as preview import to skip heavy GUI-only updates
+                        window.__isPreviewImport = true;
                     } catch (e) {
                         console.error('Error loading preview JSON from URL:', e);
                         return false; // Failed to load from URL

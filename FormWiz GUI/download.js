@@ -4573,6 +4573,10 @@ function updateTriggerConditionOptions(questionId, fieldCount, sequenceCount) {
     });
 }
 function updateFormAfterImport() {
+    // If we're in preview-import mode, skip heavy GUI-only updates
+    if (window.__isPreviewImport) {
+        return;
+    }
     // Update autofill options in hidden fields
     if (typeof updateAutofillOptions === 'function') {
         updateAutofillOptions();

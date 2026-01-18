@@ -1062,7 +1062,7 @@ function generateAllQuestionOptions() {
 }
 /**
  * UPDATED to include ALL hidden fields as numeric references
- * And use question text instead of just ID in the display
+ * Display node IDs (not question text) in calculation dropdowns
  * Now also includes checkbox amount fields for calculations
  */
 function generateMoneyQuestionOptions() {
@@ -1074,14 +1074,11 @@ function generateMoneyQuestionOptions() {
         if (!selEl) return;
         // e.g. 'numberedDropdown', 'money', etc.
         const qType = selEl.value;
-        // Get the question text for display
-        const txtEl = qBlock.querySelector(`#question${qId}`);
-        const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
         if (qType === 'money') {
             // If it's a money question, we can reference it directly
             const nmEl = qBlock.querySelector('#textboxName' + qId);
             const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
-            optionsHTML += `<option value="${fieldName}">${qTxt} (money)</option>`;
+            optionsHTML += `<option value="${fieldName}">${fieldName}</option>`;
         }
         else if (qType === 'numberedDropdown') {
             // 2) Grab min & max
@@ -1089,21 +1086,37 @@ function generateMoneyQuestionOptions() {
             const enEl = qBlock.querySelector('#numberRangeEnd' + qId);
             const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
             const ddMax = enEl ? parseInt(enEl.value, 10) : ddMin;
-            // 3) Gather the "amount labels" from #textboxAmounts. 
-            const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
-            const amountLabels = [];
-            amtInputs.forEach((inp) => {
-                const val = inp.value.trim();
-                if (val) amountLabels.push(val);
-            });
-            // If no labels were entered, skip
-            if (amountLabels.length === 0) return;
-            // 4) For each label, produce a line for i in [ddMin..ddMax].
-            amountLabels.forEach((rawLabel) => {
-                const sanitized = rawLabel.replace(/\s+/g, "_").toLowerCase();
+            // 3) Gather the amount fields from unified container (preferred)
+            const unifiedFieldsContainer = document.getElementById(`unifiedFields${qId}`);
+            const amountFields = [];
+            if (unifiedFieldsContainer) {
+                unifiedFieldsContainer.querySelectorAll('[data-type="amount"]').forEach(fieldEl => {
+                    const fieldOrder = fieldEl.getAttribute('data-order');
+                    const nodeIdTextEl = document.getElementById(`nodeIdText${qId}_${fieldOrder}`);
+                    const labelTextEl = document.getElementById(`labelText${qId}_${fieldOrder}`);
+                    const nodeId = nodeIdTextEl ? nodeIdTextEl.textContent.trim() : '';
+                    const label = labelTextEl ? labelTextEl.textContent.trim() : '';
+                    if (nodeId) {
+                        amountFields.push({ nodeId, label });
+                    }
+                });
+            }
+            // Fallback to legacy hidden container labels if unified fields not present
+            if (amountFields.length === 0) {
+                const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
+                amtInputs.forEach((inp) => {
+                    const val = inp.value.trim();
+                    if (val) amountFields.push({ nodeId: val, label: val });
+                });
+            }
+            // If no amount fields were entered, skip
+            if (amountFields.length === 0) return;
+            // 4) For each amount field, produce a line for i in [ddMin..ddMax].
+            amountFields.forEach(({ nodeId }) => {
                 for (let i = ddMin; i <= ddMax; i++) {
-                    const moneyId = `amount${qId}_${i}_${sanitized}`;
-                    optionsHTML += `<option value="${moneyId}">${qTxt} - ${rawLabel} #${i}</option>`;
+                    const entryNodeId = `${nodeId}_${i}`;
+                    // Value should be the real DOM node ID so JSON exports the correct IDs
+                    optionsHTML += `<option value="${entryNodeId}">${entryNodeId}</option>`;
                 }
             });
         }
@@ -1133,8 +1146,9 @@ function generateMoneyQuestionOptions() {
                         // For amount fields, we need to use the base part of the label without special characters
                         const baseLabel = optionText.toLowerCase().replace(/[^a-z0-9]+/g, '_');
                         const amountId = `amount_${baseLabel}_${qId}_${index + 1}`;
-                        // Add the amount field to the dropdown (value is the nameId, not amountId)
-                        optionsHTML += `<option value="${nameId}">${qTxt} - ${optionText} (amount)</option>`;
+                        // Use the real amount field ID for calculations
+                        const amountFieldId = `${nameId}_amount`;
+                        optionsHTML += `<option value="${amountFieldId}">${amountFieldId}</option>`;
                     }
                 });
             }
@@ -1151,7 +1165,7 @@ function generateMoneyQuestionOptions() {
         if (!fNameEl) return;
         const fName = fNameEl.value.trim();
         if (!fName) return;
-        optionsHTML += `<option value="${fName}">(Hidden ${fType}) ${fName}</option>`;
+        optionsHTML += `<option value="${fName}">${fName}</option>`;
     });
     return optionsHTML;
 }

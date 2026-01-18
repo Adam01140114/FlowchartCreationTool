@@ -9668,7 +9668,8 @@ function showTextboxLabels(questionId, count){
         const br = document.createElement('br');
         container.appendChild(br);
     }
-    attachCalculationListeners();   // keep this
+    window.__calcListenersNeedRefresh = true;
+    scheduleCalculationListeners();
     // Update linked fields after creating new textboxes
     updateLinkedFields();
     // 🔧 NEW: Trigger navigation refresh after fields are created so Next button updates
@@ -10705,11 +10706,8 @@ function formatDateForDisplay(dateString) {
 window.onload=function(){
     setCurrentDate();
     // 🔧 PERFORMANCE FIX: Defer heavy listener attachment until idle time
-    if (typeof requestIdleCallback !== 'undefined') {
-        requestIdleCallback(() => attachCalculationListeners(), { timeout: 500 });
-    } else {
-        setTimeout(() => attachCalculationListeners(), 0);
-    }
+    window.__calcListenersNeedRefresh = true;
+    scheduleCalculationListeners();
     // Trigger visibility updates on page load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -11807,7 +11805,31 @@ function getMoneyValue(qId) {
     console.log('[CALCULATION DEBUG] No element found, returning 0');
     return 0;
 }
+function scheduleCalculationListeners() {
+    // Debounce heavy listener attachment to avoid blocking during bulk DOM updates
+    if (window.__calcAttachTimer) {
+        clearTimeout(window.__calcAttachTimer);
+    }
+    window.__calcAttachTimer = setTimeout(() => {
+        if (typeof requestIdleCallback !== 'undefined') {
+            requestIdleCallback(() => attachCalculationListeners(), { timeout: 500 });
+        } else {
+            attachCalculationListeners();
+        }
+    }, 50);
+}
 function attachCalculationListeners() {
+    // Skip if there are no calculations at all
+    const hasCheckboxCalcs = hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0;
+    const hasTextCalcs = hiddenTextCalculations && hiddenTextCalculations.length > 0;
+    if (!hasCheckboxCalcs && !hasTextCalcs) {
+        return;
+    }
+    // Avoid repeated full scans unless we explicitly need a refresh
+    if (window.__calcListenersAttached && !window.__calcListenersNeedRefresh) {
+        return;
+    }
+    window.__calcListenersNeedRefresh = false;
     // Universal function to attach listeners in a consistent way
     function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
         // 🔧 PERFORMANCE FIX: Cache DOM queries and name lookups once
@@ -11895,14 +11917,14 @@ function attachCalculationListeners() {
         }
     }
     // For hidden checkbox calculations
-    if (hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0) {
+    if (hasCheckboxCalcs) {
         const runAllCheckboxCalcs = function() {
             runAllHiddenCheckboxCalculations();
         };
         attachListenersToCalculationTerms(hiddenCheckboxCalculations, runAllCheckboxCalcs);
     }
     // For hidden text calculations
-    if (hiddenTextCalculations && hiddenTextCalculations.length > 0) {
+    if (hasTextCalcs) {
         const runAllTextCalcs = function() {
             runAllHiddenTextCalculations();
         };
@@ -11922,6 +11944,7 @@ function attachCalculationListeners() {
             runAllHiddenTextCalculations();
         }, 100);
     }
+    window.__calcListenersAttached = true;
 }
 // Progress Bar Logic
 function updateProgressBar() {
