@@ -4848,9 +4848,9 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
           : locationTitle.toLowerCase()
               .replace(/<[^>]+>/g, '') // Remove HTML tags
               .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-              .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
               .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-              .trim();
+          .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {
@@ -4949,9 +4949,9 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
           : locationTitle.toLowerCase()
               .replace(/<[^>]+>/g, '') // Remove HTML tags
               .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-              .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
               .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-              .trim();
+          .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {
@@ -6082,9 +6082,9 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           : locationTitle.toLowerCase()
               .replace(/<[^>]+>/g, '') // Remove HTML tags
               .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-              .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
               .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-              .trim();
+          .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {
@@ -6135,9 +6135,9 @@ function populateLinkedLogicDropdown(dropdown, cell) {
           : locationTitle.toLowerCase()
               .replace(/<[^>]+>/g, '') // Remove HTML tags
               .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-              .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
               .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-              .trim();
+          .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {

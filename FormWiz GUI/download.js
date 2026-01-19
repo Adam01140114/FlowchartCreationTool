@@ -368,25 +368,25 @@ function loadFormData(formData) {
                             }
                         } else {
                             // Container doesn't exist, create it
-                            if (question.markOnlyOne) {
+                        if (question.markOnlyOne) {
                                 markOnlyOneContainer = document.createElement('div');
-                                markOnlyOneContainer.id = `markOnlyOneContainer${question.questionId}`;
-                                markOnlyOneContainer.style.marginTop = '10px';
-                                markOnlyOneContainer.style.marginBottom = '10px';
-                                markOnlyOneContainer.innerHTML = `
-                                    <label>
-                                        <input type="checkbox" id="markOnlyOne${question.questionId}" checked>
-                                        Mark only one
-                                    </label>
-                                `;
-                                // Add it right after the options div (or after the "None of the above" container if it exists)
-                                const insertAfter = hasNoneOption ? 
-                                    document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
-                                    checkboxOptionsDiv;
+                            markOnlyOneContainer.id = `markOnlyOneContainer${question.questionId}`;
+                            markOnlyOneContainer.style.marginTop = '10px';
+                            markOnlyOneContainer.style.marginBottom = '10px';
+                            markOnlyOneContainer.innerHTML = `
+                                <label>
+                                    <input type="checkbox" id="markOnlyOne${question.questionId}" checked>
+                                    Mark only one
+                                </label>
+                            `;
+                            // Add it right after the options div (or after the "None of the above" container if it exists)
+                            const insertAfter = hasNoneOption ? 
+                                document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
+                                checkboxOptionsDiv;
                                 if (insertAfter && insertAfter.nextSibling) {
-                                    insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
+                                insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
                                 } else if (insertAfter) {
-                                    insertAfter.parentNode.appendChild(markOnlyOneContainer);
+                                insertAfter.parentNode.appendChild(markOnlyOneContainer);
                                 }
                             }
                         }
@@ -498,7 +498,7 @@ function loadFormData(formData) {
                                 }
                                 if (latexPreviewContentInput && question.latexPreview.content) {
                                     latexPreviewContentInput.value = question.latexPreview.content;
-                                }
+                    }
                                 if (latexPreviewPriceIdInput && question.latexPreview.priceId) {
                                     latexPreviewPriceIdInput.value = question.latexPreview.priceId;
                                 }
@@ -529,21 +529,54 @@ function loadFormData(formData) {
                                     }, 100);
                                 }
                             }, 200);
-                        }
-                        // ********** Restore Image Data ********** 
-                        if (question.image && question.image.url) {
-                            const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
-                            const wEl = questionBlock.querySelector(`#dropdownImageWidth${question.questionId}`);
-                            const hEl = questionBlock.querySelector(`#dropdownImageHeight${question.questionId}`);
-                            const imageFields = questionBlock.querySelector(`#dropdownImageFields${question.questionId}`);
-                            const toggleButton = questionBlock.querySelector(`#dropdownImageBlock${question.questionId} button`);
-                            if (urlEl) urlEl.value = question.image.url || '';
-                            if (wEl) wEl.value = question.image.width || 0;
-                            if (hEl) hEl.value = question.image.height || 0;
-                            // Automatically display the image fields if there's image data
-                            if (imageFields) {
-                                imageFields.style.display = 'block';
+                    }
+                    // ********** Restore Hard Alert Data **********
+                    if (question.hardAlert && question.hardAlert.enabled) {
+                        setTimeout(() => {
+                            const hardAlertCheckbox = questionBlock.querySelector(`#enableHardAlert${question.questionId}`);
+                            const hardAlertTriggerSelect = questionBlock.querySelector(`#hardAlertTrigger${question.questionId}`);
+                            const hardAlertTitleInput = questionBlock.querySelector(`#hardAlertTitle${question.questionId}`);
+                            if (hardAlertCheckbox) {
+                                hardAlertCheckbox.checked = true;
+                                toggleHardAlert(question.questionId); // This populates the trigger dropdown with options from DOM
+                                // Set the trigger value after the dropdown is populated
+                                setTimeout(() => {
+                                    if (hardAlertTriggerSelect && question.hardAlert.trigger) {
+                                        hardAlertTriggerSelect.value = question.hardAlert.trigger;
+                                        hardAlertTriggerSelect.dispatchEvent(new Event('change'));
+                                    }
+                                    if (hardAlertTitleInput && question.hardAlert.title) {
+                                        hardAlertTitleInput.value = question.hardAlert.title;
+                                        hardAlertTitleInput.dispatchEvent(new Event('blur'));
+                                    }
+                                }, 100);
                             }
+                            
+                            // Also restore to window.questionHardAlert
+                            if (!window.questionHardAlert) {
+                                window.questionHardAlert = {};
+                            }
+                            window.questionHardAlert[question.questionId] = {
+                                enabled: true,
+                                trigger: question.hardAlert.trigger || '',
+                                title: question.hardAlert.title || ''
+                            };
+                        }, 250);
+                    }
+                    // ********** Restore Image Data ********** 
+                        if (question.image && question.image.url) {
+                        const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
+                        const wEl = questionBlock.querySelector(`#dropdownImageWidth${question.questionId}`);
+                        const hEl = questionBlock.querySelector(`#dropdownImageHeight${question.questionId}`);
+                        const imageFields = questionBlock.querySelector(`#dropdownImageFields${question.questionId}`);
+                            const toggleButton = questionBlock.querySelector(`#dropdownImageBlock${question.questionId} button`);
+                        if (urlEl) urlEl.value = question.image.url || '';
+                        if (wEl) wEl.value = question.image.width || 0;
+                        if (hEl) hEl.value = question.image.height || 0;
+                        // Automatically display the image fields if there's image data
+                            if (imageFields) {
+                            imageFields.style.display = 'block';
+                        }
                             // Also ensure the "Add Image" button is toggled to "Delete Image" state
                             if (toggleButton) {
                                 toggleButton.textContent = 'Delete Image';
@@ -2678,7 +2711,7 @@ function loadFormData(formData) {
                                 } else if (prevAnswerSelect && condition.prevAnswer) {
                                     // Regular condition - set answer
                                     setTimeout(() => {
-                                        prevAnswerSelect.value = condition.prevAnswer;
+                                prevAnswerSelect.value = condition.prevAnswer;
                                     }, 100);
                                 }
                             }
@@ -3292,11 +3325,16 @@ function exportForm() {
                     priceId: questionBlock.querySelector(`#latexPreviewPriceId${questionId}`)?.value || "",
                     attachment: questionBlock.querySelector(`#latexPreviewAttachment${questionId}`)?.value || "Preview Only"
                 },
-                status: {
-                    enabled: questionBlock.querySelector(`#enableStatus${questionId}`)?.checked || false,
-                    trigger: questionBlock.querySelector(`#statusTrigger${questionId}`)?.value || "",
-                    title: questionBlock.querySelector(`#statusTitle${questionId}`)?.value || ""
-                },
+            status: {
+                enabled: questionBlock.querySelector(`#enableStatus${questionId}`)?.checked || false,
+                trigger: questionBlock.querySelector(`#statusTrigger${questionId}`)?.value || "",
+                title: questionBlock.querySelector(`#statusTitle${questionId}`)?.value || ""
+            },
+            hardAlert: {
+                enabled: questionBlock.querySelector(`#enableHardAlert${questionId}`)?.checked || false,
+                trigger: questionBlock.querySelector(`#hardAlertTrigger${questionId}`)?.value || "",
+                title: questionBlock.querySelector(`#hardAlertTitle${questionId}`)?.value || ""
+            },
                 options: [],
                 labels: []
             };

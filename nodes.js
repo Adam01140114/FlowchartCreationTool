@@ -668,12 +668,12 @@ window.getNodeId = function(cell) {
       if (typeof window.sanitizeNameId === 'function') {
         baseNodeId = window.sanitizeNameId(nodeText);
       } else {
-        baseNodeId = nodeText.toLowerCase()
+      baseNodeId = nodeText.toLowerCase()
           .replace(/<[^>]+>/g, '') // Remove HTML tags
           .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-          ; // No length limit
+        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+        ; // No length limit
       }
       if (DEBUG_NODE_ID) {
       }

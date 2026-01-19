@@ -481,7 +481,7 @@ if (window.triggerDropdownAlert && window.triggerDropdownAlert[alertKey]) {
             title: storedAlert.title.trim()
         };
         console.log('[ALERT DEBUG] Added alert to dropdownField:', dropdownField.alert);
-    }
+        }
 }
 ```
 
@@ -593,7 +593,7 @@ select.addEventListener('change', function() {
     if (alertData && alertData.enabled && alertData.condition && alertData.title) {
         const selectedValue = (this.value || '').trim();
         const alertCondition = alertData.condition;
-        
+                
         if (selectedValue === alertCondition) {
             // Use custom alert modal instead of default browser alert
             if (typeof showAlert === 'function') {
@@ -601,9 +601,9 @@ select.addEventListener('change', function() {
             } else {
                 // Fallback to default alert if showAlert is not available
                 alert(alertData.title);
-            }
+                }
         }
-    }
+        }
     
     // ... rest of change handler (dropdownMirror, conditional logic, etc.)
 });
@@ -903,11 +903,11 @@ input.addEventListener('input', function() {
         if (inputValue === alertData.condition) {
             if (typeof showAlert === 'function') {
                 showAlert(alertData.title);
-            } else {
+        } else {
                 alert(alertData.title);
-            }
         }
     }
+}
 });
 ```
 
@@ -1149,6 +1149,49 @@ if (window.triggerDropdownHardAlert && window.triggerDropdownHardAlert[hardAlert
 }
 ```
 
+**For Regular Dropdown Questions (not trigger sequences):**
+
+When collecting hard alert data for regular dropdown questions, store it in `window.hardAlertData`:
+
+```javascript
+// Handle Hard Alert - check before generating select
+const hardAlertEnabledEl = qBlock.querySelector(`#enableHardAlert${questionId}`);
+const hardAlertEnabled = hardAlertEnabledEl && hardAlertEnabledEl.checked;
+let hardAlertHandlerCall = '';
+if (hardAlertEnabled) {
+  const hardAlertTriggerEl = qBlock.querySelector(`#hardAlertTrigger${questionId}`);
+  const hardAlertTitleEl = qBlock.querySelector(`#hardAlertTitle${questionId}`);
+  const hardAlertTrigger = hardAlertTriggerEl ? hardAlertTriggerEl.value.trim() : "";
+  const hardAlertTitle = hardAlertTitleEl ? hardAlertTitleEl.value.trim() : "";
+  // Only include handler call if both trigger and title are set
+  if (hardAlertTrigger && hardAlertTitle) {
+    hardAlertHandlerCall = ` handleHardAlert${questionId}(this.value)`;
+    // CRITICAL: Store hard alert data for runtime - MUST include enabled: true
+    if (!window.hardAlertData) {
+      window.hardAlertData = {};
+    }
+    window.hardAlertData[questionId] = {
+      enabled: true,  // CRITICAL: Must include enabled property
+      trigger: hardAlertTrigger,
+      title: hardAlertTitle,
+      dropdownId: ddNm  // The dropdown element ID
+    };
+  }
+}
+```
+
+**CRITICAL: Embedding `window.hardAlertData` in Generated HTML**
+
+The `window.hardAlertData` object MUST be embedded in the generated HTML so it's available
+at runtime. Add this line where other global variables are embedded (around line 5372):
+
+```javascript
+formHTML += `window.hardAlertData = ${JSON.stringify(window.hardAlertData || {})};\n`;
+```
+
+Without this, `checkAllHardAlertsAndUpdateNavigation()` won't be able to find hard alert
+data for regular dropdowns, and the navigation button won't be disabled.
+
 3.2 RUNTIME FIELD ENRICHMENT
 -----------------------------
 Location: `enrichTriggerFieldWithUnifiedData()` function in `createTriggerFieldsContainer()`
@@ -1227,7 +1270,7 @@ function showAlert(message, isHardAlert) {
         } else {
             // Regular alert - just text
             alertMessage.textContent = message;
-        }
+            }
         alertOverlay.style.display = 'flex';
     }
 }
@@ -1246,6 +1289,10 @@ CRITICAL IMPLEMENTATION DETAILS:
 2. Must use correct baseNodeId (parent dropdown's fieldName, not questionNameId)
 3. Must not use early returns - check all entries even after finding one match
 4. Must update button's `hardAlertActive` data attribute
+5. **MUST check regular dropdown questions using `window.hardAlertData`**
+6. **MUST embed `window.hardAlertData` in generated HTML**
+5. **MUST check regular dropdown questions using `window.hardAlertData`**
+6. **MUST embed `window.hardAlertData` in generated HTML**
 
 Implementation:
 
@@ -1253,7 +1300,7 @@ Implementation:
 function checkAllHardAlertsAndUpdateNavigation() {
     let hasActiveHardAlert = false;
 
-    // Check unifiedFieldsMap for all hard alerts
+    // Check unifiedFieldsMap for all hard alerts (trigger sequence dropdowns)
     if (window.unifiedFieldsMap) {
         Object.keys(window.unifiedFieldsMap).forEach(questionId => {
             const allFields = window.unifiedFieldsMap[questionId];
@@ -1310,6 +1357,42 @@ function checkAllHardAlertsAndUpdateNavigation() {
                     });
                 }
             });
+        });
+    }
+
+    // CRITICAL: Check regular dropdown questions for hard alerts
+    // This is required for hard alerts on regular dropdown questions (not trigger sequences)
+    if (window.hardAlertData) {
+        Object.keys(window.hardAlertData).forEach(questionId => {
+            const hardAlertInfo = window.hardAlertData[questionId];
+            // CRITICAL: Must check for enabled property - it must be included when storing data
+            if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && hardAlertInfo.dropdownId) {
+                const dropdownEl = document.getElementById(hardAlertInfo.dropdownId);
+                if (dropdownEl) {
+                    const selectedValue = (dropdownEl.value || '').trim();
+                    if (selectedValue === hardAlertInfo.trigger.trim()) {
+                        hasActiveHardAlert = true;
+                    }
+                }
+            }
+        });
+    }
+
+    // CRITICAL: Check regular dropdown questions for hard alerts
+    // This is required for hard alerts on regular dropdown questions (not trigger sequences)
+    if (window.hardAlertData) {
+        Object.keys(window.hardAlertData).forEach(questionId => {
+            const hardAlertInfo = window.hardAlertData[questionId];
+            // CRITICAL: Must check for enabled property - it must be included when storing data
+            if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && hardAlertInfo.dropdownId) {
+                const dropdownEl = document.getElementById(hardAlertInfo.dropdownId);
+                if (dropdownEl) {
+                    const selectedValue = (dropdownEl.value || '').trim();
+                    if (selectedValue === hardAlertInfo.trigger.trim()) {
+                        hasActiveHardAlert = true;
+                    }
+                }
+            }
         });
     }
 
@@ -1530,6 +1613,34 @@ Problem: Alert modal shows but doesn't have the subtitle.
 
 Solution: Ensure `showAlert(title, true)` is called with `true` as the second
 parameter. Check that `showAlert()` function handles the `isHardAlert` parameter.
+
+GOTCHA 6: Navigation Button Not Disabled for Regular Dropdowns
+----------------------------------------------------------------
+Problem: Hard alert shows correctly, but the right arrow button is not greyed out
+and disabled for regular dropdown questions.
+
+Solution: This is a CRITICAL issue that requires two fixes:
+
+1. **Include `enabled: true` when storing data**: When storing hard alert data in
+   `window.hardAlertData`, you MUST include the `enabled: true` property:
+   ```javascript
+   window.hardAlertData[questionId] = {
+       enabled: true,  // CRITICAL: Must be included
+       trigger: hardAlertTrigger,
+       title: hardAlertTitle,
+       dropdownId: ddNm
+   };
+   ```
+
+2. **Embed `window.hardAlertData` in generated HTML**: The `window.hardAlertData`
+   object must be embedded in the generated HTML so it's available at runtime.
+   Add this line where other global variables are embedded:
+   ```javascript
+   formHTML += `window.hardAlertData = ${JSON.stringify(window.hardAlertData || {})};\n`;
+   ```
+
+Without both of these, `checkAllHardAlertsAndUpdateNavigation()` won't be able to
+find the hard alert data, and the button won't be disabled.
 
 ================================================================================
 END OF FEATURE #2 DOCUMENTATION
@@ -1814,7 +1925,7 @@ const statusTitle = questionBlock.querySelector(`#statusTitle${questionId}`)?.va
 let storedStatusData = null;
 if (window.questionStatus && window.questionStatus[questionId]) {
     storedStatusData = window.questionStatus[questionId];
-}
+    }
 
 // Use stored data if available, otherwise use UI values
 const finalStatusEnabled = storedStatusData ? storedStatusData.enabled : statusEnabled;
@@ -1865,7 +1976,7 @@ if (question.status && question.status.enabled) {
         toggleStatus(question.questionId); // This populates the trigger dropdown with options from DOM
         
         // Set the trigger value after the dropdown is populated
-        setTimeout(() => {
+setTimeout(() => {
             if (statusTriggerSelect && question.status.trigger) {
                 statusTriggerSelect.value = question.status.trigger;
                 statusTriggerSelect.dispatchEvent(new Event('change'));

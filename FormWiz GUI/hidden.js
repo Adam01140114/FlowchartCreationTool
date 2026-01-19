@@ -1086,11 +1086,12 @@ function generateMoneyQuestionOptions() {
             const enEl = qBlock.querySelector('#numberRangeEnd' + qId);
             const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
             const ddMax = enEl ? parseInt(enEl.value, 10) : ddMin;
-            // 3) Gather the amount fields from unified container (preferred)
+            // 3) Gather the amount and currency fields from unified container (preferred)
             const unifiedFieldsContainer = document.getElementById(`unifiedFields${qId}`);
             const amountFields = [];
             if (unifiedFieldsContainer) {
-                unifiedFieldsContainer.querySelectorAll('[data-type="amount"]').forEach(fieldEl => {
+                // Include both amount and currency fields
+                unifiedFieldsContainer.querySelectorAll('[data-type="amount"], [data-type="currency"]').forEach(fieldEl => {
                     const fieldOrder = fieldEl.getAttribute('data-order');
                     const nodeIdTextEl = document.getElementById(`nodeIdText${qId}_${fieldOrder}`);
                     const labelTextEl = document.getElementById(`labelText${qId}_${fieldOrder}`);

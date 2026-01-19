@@ -812,6 +812,17 @@ function addQuestion(sectionId, questionId = null) {
             <label>Status Title:</label>
             <input type="text" id="statusTitle${currentQuestionId}" placeholder="Enter status title (e.g., needs_food)">
         </div><br>
+        <!-- Hard Alert Feature -->
+        <label>Enable Hard Alert: </label>
+        <input type="checkbox" id="enableHardAlert${currentQuestionId}" onchange="toggleHardAlert(${currentQuestionId})">
+        <div id="hardAlertBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Hard Alert Trigger:</label>
+            <select id="hardAlertTrigger${currentQuestionId}">
+                <option value="">Select an option...</option>
+            </select><br><br>
+            <label>Hard Alert Title:</label>
+            <input type="text" id="hardAlertTitle${currentQuestionId}" placeholder="Enter hard alert message">
+        </div><br>
         <!-- Conditional Alert Logic -->
         <div id="conditionalAlertLogic${currentQuestionId}" style="display: none;">
             <label>Enable Conditional Alert: </label>
@@ -1257,8 +1268,8 @@ function addAlertLogicCondition(questionId) {
                id="alertPrevQuestion${questionId}_${numConditions}"
                onchange="updateAlertLogicAnswersForRow(${questionId}, ${numConditions})"><br>
         <div id="alertAnswerContainer${questionId}_${numConditions}" style="display: block;">
-            <select id="alertPrevAnswer${questionId}_${numConditions}" style="display: block;">
-                <option value="">-- Select an answer --</option>
+        <select id="alertPrevAnswer${questionId}_${numConditions}" style="display: block;">
+            <option value="">-- Select an answer --</option>
             </select>
         </div>
         <div id="alertCurrencyContainer${questionId}_${numConditions}" style="display: none;">
@@ -1424,7 +1435,7 @@ function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
     const prevQNum = parseInt(questionNumberInput.value);
     if (!prevQNum) {
         if (answerSelect) {
-            answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
         }
         if (answerContainer) answerContainer.style.display = 'block';
         if (currencyContainer) currencyContainer.style.display = 'none';
@@ -1434,7 +1445,7 @@ function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
     const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
     if (!targetQuestionBlock) {
         if (answerSelect) {
-            answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
         }
         if (answerContainer) answerContainer.style.display = 'block';
         if (currencyContainer) currencyContainer.style.display = 'none';
@@ -2316,6 +2327,10 @@ function addDropdownOption(questionId) {
         if (typeof updateStatusTriggerOptions === 'function') {
             updateStatusTriggerOptions(questionId);
         }
+        // Update hard alert trigger options
+        if (typeof updateHardAlertTriggerOptions === 'function') {
+            updateHardAlertTriggerOptions(questionId);
+        }
         // Update all jump conditions for this question
         const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
         jumpConditions.forEach(condition => {
@@ -2358,6 +2373,10 @@ function removeDropdownOption(questionId, optionNumber) {
     // Update status trigger options
     if (typeof updateStatusTriggerOptions === 'function') {
         updateStatusTriggerOptions(questionId);
+    }
+    // Update hard alert trigger options
+    if (typeof updateHardAlertTriggerOptions === 'function') {
+        updateHardAlertTriggerOptions(questionId);
     }
     // Update LaTeX preview trigger options
     updateLatexPreviewTriggerOptions(questionId);
@@ -4915,6 +4934,108 @@ function updateStatusTriggerOptions(questionId) {
         
         statusTitleInput.onchange = saveStatusTitle;
         statusTitleInput.onblur = saveStatusTitle;
+    }
+    
+    // Restore the previously selected value if it still exists
+    if (currentValue) {
+        triggerSelect.value = currentValue;
+    }
+}
+
+// New function for Hard Alert feature
+function toggleHardAlert(questionId) {
+    const hardAlertEnabled = document.getElementById(`enableHardAlert${questionId}`).checked;
+    const hardAlertBlock = document.getElementById(`hardAlertBlock${questionId}`);
+    if (!hardAlertBlock) return;
+    
+    hardAlertBlock.style.display = hardAlertEnabled ? 'block' : 'none';
+    
+    // Initialize data structure
+    if (!window.questionHardAlert) {
+        window.questionHardAlert = {};
+    }
+    if (!window.questionHardAlert[questionId]) {
+        window.questionHardAlert[questionId] = { enabled: false, trigger: '', title: '' };
+    }
+    
+    window.questionHardAlert[questionId].enabled = hardAlertEnabled;
+    
+    // Populate the hard alert trigger dropdown with options
+    if (hardAlertEnabled) {
+        updateHardAlertTriggerOptions(questionId);
+    } else {
+        // Clear hard alert data when disabled
+        window.questionHardAlert[questionId].trigger = '';
+        window.questionHardAlert[questionId].title = '';
+    }
+    
+    // Trigger autosave
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+
+// Function to populate hard alert trigger dropdown with question options
+function updateHardAlertTriggerOptions(questionId) {
+    const triggerSelect = document.getElementById(`hardAlertTrigger${questionId}`);
+    if (!triggerSelect) return;
+    
+    // Save the currently selected value
+    const currentValue = triggerSelect.value;
+    
+    // Clear existing options (except the placeholder)
+    triggerSelect.innerHTML = '<option value="">Select an option...</option>';
+    
+    // Get all dropdown options for this question
+    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+    if (dropdownOptionsDiv) {
+        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+        optionInputs.forEach((input) => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                if (optionText === currentValue) {
+                    option.selected = true;
+                }
+                triggerSelect.appendChild(option);
+            }
+        });
+    }
+    
+    // Add change handler to save trigger value
+    triggerSelect.onchange = () => {
+        if (!window.questionHardAlert) {
+            window.questionHardAlert = {};
+        }
+        if (!window.questionHardAlert[questionId]) {
+            window.questionHardAlert[questionId] = { enabled: true, trigger: '', title: '' };
+        }
+        window.questionHardAlert[questionId].trigger = triggerSelect.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    
+    // Add change and blur handlers for hard alert title input
+    const hardAlertTitleInput = document.getElementById(`hardAlertTitle${questionId}`);
+    if (hardAlertTitleInput) {
+        const saveHardAlertTitle = () => {
+            if (!window.questionHardAlert) {
+                window.questionHardAlert = {};
+            }
+            if (!window.questionHardAlert[questionId]) {
+                window.questionHardAlert[questionId] = { enabled: true, trigger: '', title: '' };
+            }
+            window.questionHardAlert[questionId].title = hardAlertTitleInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+            }
+        };
+        
+        hardAlertTitleInput.onchange = saveHardAlertTitle;
+        hardAlertTitleInput.onblur = saveHardAlertTitle;
     }
     
     // Restore the previously selected value if it still exists

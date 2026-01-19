@@ -859,9 +859,11 @@ questionSlugMap[questionId] = slug;
       // Start the question container
       // Add data-question-type attribute for numbered dropdown questions
       const questionTypeAttr = questionType === "numberedDropdown" ? ' data-question-type="numberedDropdown"' : '';
-      // First question in a section should never be hidden, even if logic is enabled
-      // This ensures the section always has at least one visible question
-      const shouldBeHidden = logicEnabled && qIdx !== 0;
+      // CRITICAL FIX: If conditional logic is enabled, ALWAYS start the question as hidden initially
+      // The updateVisibility() function will then show it if the conditions are met
+      // This prevents questions from appearing prematurely before their dependencies are resolved
+      // Even if it's the first question in a section, if it has conditional logic, it must wait for conditions
+      const shouldBeHidden = logicEnabled; // Always hide if logic is enabled
       const hiddenClass = shouldBeHidden ? ' hidden' : "";
       const stepHiddenClass = qIdx === 0 ? "" : " question-step-hidden";
 
@@ -1243,7 +1245,7 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           const statusTitle = statusTitleEl ? statusTitleEl.value.trim() : "";
           // Only include handler call if both trigger and title are set
           if (statusTrigger && statusTitle) {
-            statusHandlerCall = ` handleStatus${questionId}(this.value)`;
+            statusHandlerCall = ` handleStatus${questionId}(this.value);`;
             // Store status data for runtime
             if (!window.statusData) {
               window.statusData = {};
@@ -1255,11 +1257,89 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
             };
           }
         }
+        // Handle Hard Alert - check before generating select
+        const hardAlertEnabledEl = qBlock.querySelector(`#enableHardAlert${questionId}`);
+        const hardAlertEnabled = hardAlertEnabledEl && hardAlertEnabledEl.checked;
+        let hardAlertHandlerCall = '';
+        // Store hard alert values in variables accessible later for function generation
+        let hardAlertTrigger = "";
+        let hardAlertTitle = "";
+        if (hardAlertEnabled) {
+          const hardAlertTriggerEl = qBlock.querySelector(`#hardAlertTrigger${questionId}`);
+          const hardAlertTitleEl = qBlock.querySelector(`#hardAlertTitle${questionId}`);
+          hardAlertTrigger = hardAlertTriggerEl ? hardAlertTriggerEl.value.trim() : "";
+          hardAlertTitle = hardAlertTitleEl ? hardAlertTitleEl.value.trim() : "";
+          
+          // Fallback to window.questionHardAlert if DOM values are empty (for JSON imports)
+          if (!hardAlertTrigger || !hardAlertTitle) {
+            if (window.questionHardAlert && window.questionHardAlert[questionId]) {
+              hardAlertTrigger = window.questionHardAlert[questionId].trigger || "";
+              hardAlertTitle = window.questionHardAlert[questionId].title || "";
+            }
+          }
+          
+          // Only include handler call if both trigger and title are set
+          if (hardAlertTrigger && hardAlertTitle) {
+            hardAlertHandlerCall = ` handleHardAlert${questionId}(this.value);`;
+            // Store hard alert data for runtime
+            if (!window.hardAlertData) {
+              window.hardAlertData = {};
+            }
+            window.hardAlertData[questionId] = {
+              enabled: true,
+              trigger: hardAlertTrigger,
+              title: hardAlertTitle,
+              dropdownId: ddNm
+            };
+          }
+        }
+        // CRITICAL: Generate hard alert handler function BEFORE the dropdown element
+        // This ensures the function is available when the dropdown's onchange fires
+        if (hardAlertEnabled && hardAlertTrigger && hardAlertTitle) {
+          // Properly escape JavaScript string values for embedding in HTML
+          const escapeJsString = (str) => {
+            if (!str) return '';
+            return String(str)
+              .replace(/\\/g, '\\\\')  // Escape backslashes first
+              .replace(/'/g, "\\'")    // Escape single quotes
+              .replace(/\n/g, '\\n')   // Escape newlines
+              .replace(/\r/g, '\\r')   // Escape carriage returns
+              .replace(/\t/g, '\\t');  // Escape tabs
+          };
+          
+          const escapedTrigger = escapeJsString(hardAlertTrigger);
+          const escapedTitle = escapeJsString(hardAlertTitle);
+          
+          formHTML += `
+            <script>
+              function handleHardAlert${questionId}(value) {
+                const selectedValue = (value || '').trim();
+                const hardAlertTrigger = '${escapedTrigger}';
+                const hardAlertTitle = '${escapedTitle}';
+                
+                // Check if the selected value matches the trigger
+                if (selectedValue === hardAlertTrigger) {
+                  // Show hard alert with subtitle
+                  if (typeof showAlert === 'function') {
+                    showAlert(hardAlertTitle, true); // true = hard alert
+                  } else {
+                    alert(hardAlertTitle);
+                  }
+                }
+                
+                // CRITICAL: Check all hard alerts and update navigation button state
+                if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+                  checkAllHardAlertsAndUpdateNavigation();
+                }
+              }
+            </script>
+          `;
+        }
         // 2) The <select> itself
         // Add console logging to track dropdown generation
 
         formHTML += `<select id="${ddNm}" name="${ddNm}" data-question-id="${questionId}"
-                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}${latexPreviewHandlerCall}${statusHandlerCall}">
+                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}${latexPreviewHandlerCall}${statusHandlerCall}${hardAlertHandlerCall}">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -1576,6 +1656,8 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
             `;
           }
         }
+        // NOTE: Hard alert handler function is now generated BEFORE the dropdown element
+        // (see code above, before the <select> tag) to ensure it's available when onchange fires
         // handle PDF logic
         if (pdfEnabled) {
           conditionalPDFs.push({
@@ -3686,7 +3768,7 @@ formHTML += `</div><br></div>`;
         if (logicRows.length > 0) {
           logicScriptBuffer += `\n(function(){\n`;
           logicScriptBuffer += ` var thisQ=document.getElementById("question-container-${questionId}");\n`;
-          logicScriptBuffer += ` function updateVisibility(){\n  var anyMatch=false;\n`;
+          logicScriptBuffer += ` function updateVisibility(){\n  console.log('[Visibility Check Q${questionId}] ===== Starting visibility check ====='); var anyMatch=false;\n`;
           for (let lr = 0; lr < logicRows.length; lr++) {
             const row = logicRows[lr];
             const rowIndex = lr + 1;
@@ -3746,16 +3828,21 @@ formHTML += `</div><br></div>`;
               logicScriptBuffer += `    }\n`;
             } else {
               logicScriptBuffer += `    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
+              // CRITICAL FIX: Check if the previous question is actually visible and answered before evaluating its value
+              // This prevents questions from showing prematurely when they depend on questions that haven't been shown yet
+              // IMPORTANT: For dropdowns, also check if it's still on the default placeholder option (empty value or selectedIndex 0)
+              logicScriptBuffer += `    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; console.log('[Visibility Check Q${questionId}] Checking Q' + cPrevQNum + ': visible=' + prevQIsVisible + ', value="' + val2 + '", isPlaceholder=' + isDropdownPlaceholder + ', answered=' + prevQIsAnswered); if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();\n`;
               // Special case for special options that check for presence rather than exact value
               if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
-                logicScriptBuffer += `    if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; } else { } }\n`;
+                logicScriptBuffer += `      if(val2Lower !== ""){ console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' has value, setting anyMatch=true'); anyMatch=true; } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' value is empty'); } }\n`;
               } else {
-                logicScriptBuffer += `    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }\n`;
+                logicScriptBuffer += `      if(val2Lower===cPrevAns){ console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' matches "' + cPrevAns + '", setting anyMatch=true'); anyMatch=true; } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' value "' + val2Lower + '" does not match "' + cPrevAns + '"'); } } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' not answered yet (visible=' + prevQIsVisible + ', value="' + val2 + '", isPlaceholder=' + isDropdownPlaceholder + ')'); }\n`;
               }
+              logicScriptBuffer += `    } else { console.log('[Visibility Check Q${questionId}] Q' + cPrevQNum + ' element not found'); }\n`;
             }
             logicScriptBuffer += `  })();\n`;
           }
-          logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { \n`;
+          logicScriptBuffer += ` console.log('[Visibility Check Q${questionId}] Final result: anyMatch=' + anyMatch); if(anyMatch){ console.log('[Visibility Check Q${questionId}] Showing question'); thisQ.classList.remove("hidden"); } else { console.log('[Visibility Check Q${questionId}] Hiding question'); \n`;
           // Check if this is a numbered dropdown question and reset it before hiding
           // Use fallback check since data-question-type might not be reliable
           logicScriptBuffer += `   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');\n`;
@@ -5074,36 +5161,6 @@ if (s > 1){
           }
         }, 500);
       });
-      // --- Fallback visibility enforcement for Q3 based on JSON logic (Q1 yes OR any text in Q2) ---
-      (function attachQ3FallbackLogic(){
-        const q1 = document.getElementById('have_you_sent_a_demand_letter_to_the_defendant') || document.getElementById('answer1');
-        const q2 = document.getElementById('explain_why_you_have_not_sent_a_demand_letter_yet') || document.getElementById('answer2');
-        const q3Container = document.getElementById('question-container-3');
-        const refreshNavForQ3 = () => {
-          const activeSection = document.querySelector('.section.active');
-          if (activeSection && window.questionNavControllers) {
-            const controller = window.questionNavControllers[activeSection.id];
-            if (typeof controller === 'function') controller();
-          }
-        };
-        const recompute = () => {
-          if (!q3Container) return;
-          const q1Val = (q1 && q1.value || '').trim().toLowerCase();
-          const q2Val = (q2 && q2.value || '').trim();
-          const shouldShow = q1Val === 'yes' || q2Val.length > 0;
-
-          if (shouldShow) {
-            q3Container.classList.remove('hidden');
-          } else {
-            q3Container.classList.add('hidden');
-          }
-          document.dispatchEvent(new CustomEvent('questionVisibilityChanged',{detail:{sectionId: q3Container.closest('[id^="section"]')?.id || null}}));
-          refreshNavForQ3();
-        };
-        if (q1) q1.addEventListener('change', recompute);
-        if (q2) q2.addEventListener('input', recompute);
-        recompute();
-      })();
       // Global shortcut: Shift+Enter → click the visible "next" arrow
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && e.shiftKey) {
@@ -5342,6 +5399,7 @@ if (s > 1){
   formHTML += `var checkboxRequiredMap = ${JSON.stringify(checkboxRequiredMap || {})};\n`;
   formHTML += `var allAreRequiredMap = ${JSON.stringify(allAreRequiredMap || {})};\n`;
   formHTML += `var unifiedFieldsMap = ${JSON.stringify(window.unifiedFieldsMap || {})};\n`;
+  formHTML += `window.hardAlertData = ${JSON.stringify(window.hardAlertData || {})};\n`;
   formHTML += `var entryTitleMap = ${JSON.stringify(window.entryTitleMap || {})};\n`;
   formHTML += `window.fileUploadQuestions = ${JSON.stringify(fileUploadQuestions || [])};\n`;
   formHTML += `window.latexPreviewQuestions = ${JSON.stringify(latexPreviewQuestions || [])};\n`;
@@ -7803,6 +7861,22 @@ function checkAllHardAlertsAndUpdateNavigation() {
                     });
                 }
             });
+        });
+    }
+
+    // Check regular dropdown questions for hard alerts
+    if (window.hardAlertData) {
+        Object.keys(window.hardAlertData).forEach(questionId => {
+            const hardAlertInfo = window.hardAlertData[questionId];
+            if (hardAlertInfo && hardAlertInfo.enabled && hardAlertInfo.trigger && hardAlertInfo.dropdownId) {
+                const dropdownEl = document.getElementById(hardAlertInfo.dropdownId);
+                if (dropdownEl) {
+                    const selectedValue = (dropdownEl.value || '').trim();
+                    if (selectedValue === hardAlertInfo.trigger.trim()) {
+                        hasActiveHardAlert = true;
+                    }
+                }
+            }
         });
     }
 
@@ -12291,7 +12365,9 @@ function parseTokenValue(token){
     if(!token) return 0;
     var el= document.getElementById(token);
     if(!el) return 0;
-    var val= parseFloat(el.value);
+    // Strip currency formatting ($ and commas) before parsing
+    var cleanedValue = String(el.value || '').replace(/[^0-9.]/g, '');
+    var val= parseFloat(cleanedValue);
     return isNaN(val) ? 0 : val;
 }
 /*───────────────────────────────────────────────────────────────*
@@ -12300,6 +12376,13 @@ function parseTokenValue(token){
  *       (note the escaped \\d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
+    // Helper function to strip currency formatting ($ and commas) and parse as float
+    function parseCurrencyValue(str) {
+        if (!str) return 0;
+        // Remove dollar signs, commas, and any other non-numeric characters except decimal point
+        const cleaned = String(str).replace(/[^0-9.]/g, '');
+        return parseFloat(cleaned) || 0;
+    }
 
     /* direct hit first */
     const el = document.getElementById(qId);
@@ -12308,7 +12391,7 @@ function getMoneyValue(qId) {
         if (el.type === "checkbox") {
             const amt = document.getElementById(el.id + "_amount");
             if (amt && el.checked) {
-                const value = parseFloat(amt.value) || 0;
+                const value = parseCurrencyValue(amt.value);
 
                 return value;
             }
@@ -12316,7 +12399,7 @@ function getMoneyValue(qId) {
 
             return value;
         }
-        const value = parseFloat(el.value) || 0;
+        const value = parseCurrencyValue(el.value);
 
         return value;
     }
@@ -12327,7 +12410,7 @@ function getMoneyValue(qId) {
 
         const el2 = document.getElementById(normalized);
         if (el2) {
-            const value = parseFloat(el2.value) || 0;
+            const value = parseCurrencyValue(el2.value);
 
             return value;
         } else {
@@ -12338,7 +12421,7 @@ function getMoneyValue(qId) {
     /* name‑attribute fallback */
     const byName = document.getElementsByName(qId);
     if (byName.length) {
-        const value = parseFloat(byName[0].value) || 0;
+        const value = parseCurrencyValue(byName[0].value);
 
         return value;
     }

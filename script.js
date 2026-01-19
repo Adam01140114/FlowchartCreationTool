@@ -205,6 +205,8 @@ document.addEventListener("DOMContentLoaded", function() {
               if (window.updateChecklistNodeCell) window.updateChecklistNodeCell(cell);
             } else if (questionType === "alertNode") {
               if (window.updateAlertNodeCell) window.updateAlertNodeCell(cell);
+            } else if (questionType === "hardAlertNode") {
+              if (window.updateHardAlertNodeCell) window.updateHardAlertNodeCell(cell);
             } else {
               // Regular option nodes
               if (window.updateOptionNodeCell) window.updateOptionNodeCell(cell);
@@ -349,6 +351,10 @@ graph.isCellEditable = function (cell) {
   }
   // Disable direct editing for alert nodes (they use custom input fields)
   if (isAlertNode(cell)) {
+    return false;
+  }
+  // Disable direct editing for hard alert nodes (they use custom input fields)
+  if (isHardAlertNode(cell)) {
     return false;
   }
   // Allow dropdown to be edited directly with double-click
@@ -584,6 +590,8 @@ graph.isCellEditable = function (cell) {
   const amountOptionTypeBtn = document.getElementById("amountOptionType");
   const notesNodeTypeBtn = document.getElementById("notesNodeType");
   const alertNodeTypeBtn = document.getElementById("alertNodeType");
+  const hardAlertNodeTypeBtn = document.getElementById("hardAlertNodeType");
+  const statusNodeTypeBtn = document.getElementById("statusNodeType");
   const checklistNodeTypeBtn = document.getElementById("checklistNodeType");
   const endNodeTypeBtn = document.getElementById("endNodeType");
   regularOptionTypeBtn.addEventListener("click", () => {
@@ -624,6 +632,20 @@ graph.isCellEditable = function (cell) {
   alertNodeTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
       setOptionType(selectedCell, "alertNode");
+      refreshSpecificCells([selectedCell]);
+    }
+    hideContextMenu();
+  });
+  hardAlertNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "hardAlertNode");
+      refreshSpecificCells([selectedCell]);
+    }
+    hideContextMenu();
+  });
+  statusNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "status");
       refreshSpecificCells([selectedCell]);
     }
     hideContextMenu();
@@ -1142,6 +1164,21 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       } else if (nodeType === 'end') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;";
         label = "END";
+      } else if (nodeType === 'alertNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=alertNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;strokeDasharray=5,5;";
+        label = "Alert";
+        width = 230;
+        height = 110;
+      } else if (nodeType === 'hardAlertNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=hardAlertNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;strokeDasharray=5,5;";
+        label = "Hard Alert";
+        width = 230;
+        height = 110;
+      } else if (nodeType === 'status') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=status;section=1;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+        label = "Status";
+        width = 150;
+        height = 80;
       }
       // Create cell with appropriate width/height based on type
       if (nodeType === 'calculation') {
@@ -1213,6 +1250,21 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         }
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
+      } else if (nodeType === 'alertNode') {
+        cell._alertText = "Alert message";
+        cell._questionText = "Alert message";
+        if (typeof window.updateAlertNodeCell === 'function') {
+          window.updateAlertNodeCell(cell);
+        }
+      } else if (nodeType === 'hardAlertNode') {
+        cell._hardAlertText = "Hard Alert message";
+        cell._questionText = "Hard Alert message";
+        if (typeof window.updateHardAlertNodeCell === 'function') {
+          window.updateHardAlertNodeCell(cell);
+        }
+      } else if (nodeType === 'status') {
+        cell.value = "Status";
+        // Status node initialization already handled by its creation
       }
     } finally {
       graph.getModel().endUpdate();
@@ -2977,6 +3029,18 @@ function setOptionType(cell, newType) {
         graph.getModel().setStyle(cell, st);
         updateAlertNodeCell(cell);
         break;
+      case 'hardAlertNode':
+          // Hard Alert node - preserve text content
+          cell._hardAlertText = preservedText || 'Hard Alert message';
+          cell._questionText = preservedText || 'Hard Alert message';
+        // Add bold black and red checkered border style
+        st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
+        st = (cell.style || '').replace(/strokeDasharray=[^;]+/, '');
+        st += ';strokeWidth=3;strokeColor=#000000;strokeDasharray=5,5;';
+        graph.getModel().setStyle(cell, st);
+        updateHardAlertNodeCell(cell);
+        break;
       case 'end':
         // End node option - convert to end node
         // Change the node type from options to end
@@ -3009,6 +3073,7 @@ function setOptionType(cell, newType) {
   window.updatePdfNodeCell = updatePdfNodeCell;
   window.updateOptionNodeCell = updateOptionNodeCell;
   window.updateAlertNodeCell = updateAlertNodeCell;
+  window.updateHardAlertNodeCell = updateHardAlertNodeCell;
   window.refreshOptionNodeId = refreshOptionNodeId;
   window.refreshAllOptionNodeIds = refreshAllOptionNodeIds;
   window.refreshNodeIdFromLabel = refreshNodeIdFromLabel;
@@ -6224,6 +6289,40 @@ window.updateAlertNodeField = function(cellId, value) {
   cell._questionText = value;
   cell._alertText = value;
   // Don't call updateAlertNodeCell here to avoid re-rendering while typing
+};
+// Hard Alert Node functions
+function isHardAlertNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=hardAlertNode");
+}
+function updateHardAlertNodeCell(cell) {
+  if (!cell || !isHardAlertNode(cell)) return;
+  // Ensure _hardAlertText property exists
+  if (!cell._hardAlertText) {
+    cell._hardAlertText = "Hard Alert message";
+  }
+  // Create the hard alert node display with editable input field
+  // Use _questionText as primary source, fallback to _hardAlertText
+  const alertText = cell._questionText || cell._hardAlertText;
+  let htmlContent = '<div style="padding: 8px; text-align: center; border: 3px solid; border-image: repeating-linear-gradient(45deg, #000000, #000000 5px, #ff0000 5px, #ff0000 10px) 3;">';
+  htmlContent += '<div style="font-weight: bold; color: #d32f2f; margin-bottom: 4px; font-size: 16px;">⚠️ HARD ALERT</div>';
+  htmlContent += `<input type="text" value="${escapeAttr(alertText)}" style="width: 90%; color: #333; font-size: 14px; font-weight: bold; text-align: center; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; background: white; outline: none;" onblur="window.updateHardAlertNodeField('${cell.id}', this.value)" onkeypress="if(event.keyCode===13)this.blur()" />`;
+  htmlContent += '</div>';
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, htmlContent);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+// Handler for updating hard alert node field (called when user finishes editing)
+window.updateHardAlertNodeField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isHardAlertNode(cell)) return;
+  // Update both _questionText (primary) and _hardAlertText (fallback)
+  cell._questionText = value;
+  cell._hardAlertText = value;
+  // Don't call updateHardAlertNodeCell here to avoid re-rendering while typing
 };
   // Groups functionality moved to groups.js module
 /**

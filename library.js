@@ -13,6 +13,10 @@ function isOptions(cell) {
 function isAlertNode(cell) {
   return cell && cell.style && cell.style.includes("questionType=alertNode");
 }
+// Helper function to check if a cell is a hard alert node
+function isHardAlertNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=hardAlertNode");
+}
 function isStatusNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=status");
 }
@@ -282,6 +286,11 @@ window.exportGuiJson = function(download = true) {
         attachment: "Preview Only"
       },
       status: {
+        enabled: false,
+        trigger: "",
+        title: ""
+      },
+      hardAlert: {
         enabled: false,
         trigger: "",
         title: ""
@@ -2720,7 +2729,8 @@ window.exportGuiJson = function(download = true) {
                                     .replace(/&#39;/g, "'")
                                     .trim();
                 }
-                question.alertLogic.message = alertText;
+                // Keep message empty at top level
+                question.alertLogic.message = "";
                 // Extract the option text
                 let optionText = optionCell.value || "";
                 // Clean HTML from option text
@@ -2732,7 +2742,8 @@ window.exportGuiJson = function(download = true) {
                 }
                 question.alertLogic.conditions = [{
                   prevQuestion: String(cell._questionId || ""),
-                  prevAnswer: optionText
+                  prevAnswer: optionText,
+                  message: alertText || ""
                 }];
                 break; // Only process the first alert connection
               }
@@ -2820,6 +2831,106 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Status PATCH ---
+    // --- PATCH: Add Hard Alert detection ---
+    // Helper function to find hard alert nodes directly connected to an option (no traversal through other questions)
+    const findHardAlertFromOption = (optionCell, visited = new Set()) => {
+      if (!optionCell || visited.has(optionCell.id)) {
+        return null;
+      }
+      visited.add(optionCell.id);
+      
+      // Check if this option directly leads to a hard alert node
+      const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+      if (optionOutgoingEdges) {
+        for (const optionEdge of optionOutgoingEdges) {
+          const targetCell = optionEdge.target;
+          if (targetCell) {
+            // If it's directly a hard alert node, return it
+            if (isHardAlertNode(targetCell)) {
+              return targetCell;
+            }
+            // If it's another question, DON'T traverse through it - stop here
+            // We only want hard alerts directly connected to this specific option
+            if (isQuestion(targetCell)) {
+              continue;
+            }
+            // If it's another option (maybe leading to a hard alert), check that
+            // But only go one level deep to avoid false positives
+            if (isOptions(targetCell) && !visited.has(targetCell.id)) {
+              const nextOutgoingEdges = graph.getOutgoingEdges(targetCell);
+              if (nextOutgoingEdges) {
+                for (const nextEdge of nextOutgoingEdges) {
+                  const nextTarget = nextEdge.target;
+                  if (nextTarget && isHardAlertNode(nextTarget)) {
+                    return nextTarget;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      return null;
+    };
+    
+    // Check if this question is connected to a hard alert node through its options
+    // Only check direct connections (option → hard alert or option → option → hard alert)
+    // Don't traverse through other questions to avoid false positives
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const optionCell = edge.target;
+        if (optionCell && isOptions(optionCell)) {
+          // Find hard alert directly connected to this specific option
+          const hardAlertNode = findHardAlertFromOption(optionCell, new Set());
+          if (hardAlertNode) {
+            // This question's option leads directly to a hard alert node
+            question.hardAlert.enabled = true;
+            // Extract hard alert text from the hard alert node's HTML content
+            let hardAlertText = "";
+            // First, try the _questionText property (most current user-entered text)
+            if (hardAlertNode._questionText) {
+              hardAlertText = hardAlertNode._questionText;
+            }
+            // If no _questionText, try _hardAlertText
+            else if (hardAlertNode._hardAlertText) {
+              hardAlertText = hardAlertNode._hardAlertText;
+            }
+            // If no stored properties, try to extract from the HTML input field
+            else if (hardAlertNode.value) {
+              const temp = document.createElement("div");
+              temp.innerHTML = hardAlertNode.value;
+              const input = temp.querySelector('input[type="text"]');
+              if (input) {
+                hardAlertText = input.value || input.getAttribute('value') || "";
+              }
+            }
+            // Clean up the hard alert text (remove any HTML entities or extra whitespace)
+            if (hardAlertText) {
+              hardAlertText = hardAlertText.replace(/&amp;/g, '&')
+                                .replace(/&lt;/g, '<')
+                                .replace(/&gt;/g, '>')
+                                .replace(/&quot;/g, '"')
+                                .replace(/&#39;/g, "'")
+                                .trim();
+            }
+            question.hardAlert.title = hardAlertText || "";
+            // Extract the option text - this is the option that leads to the hard alert
+            let optionText = optionCell.value || "";
+            // Clean HTML from option text
+            if (optionText) {
+              const temp = document.createElement("div");
+              temp.innerHTML = optionText;
+              optionText = temp.textContent || temp.innerText || optionText;
+              optionText = optionText.trim();
+            }
+            question.hardAlert.trigger = optionText || "";
+            break; // Only process the first hard alert connection
+          }
+        }
+      }
+    }
+    // --- END Hard Alert PATCH ---
     // --- PATCH: Add Subtitle detection ---
     // Check if this question is connected to a subtitle node
     if (outgoingEdges) {

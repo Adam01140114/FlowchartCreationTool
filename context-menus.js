@@ -1520,6 +1520,8 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
         <option value="linkedCheckbox">Linked Checkbox Node</option>
         <option value="inverseCheckbox">Inverse Checkbox Node</option>
         <option value="status">Status Node</option>
+        <option value="alertNode">Alert Node</option>
+        <option value="hardAlertNode">Hard Alert Node</option>
       </select>
     </div>`;
     cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, style);
@@ -1663,6 +1665,16 @@ window.convertMiscellaneousNode = function(selectElement) {
       label = "Status";
       width = 150;
       height = 80;
+    } else if (selectedType === 'alertNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=alertNode;spacing=12;fontSize=16;strokeWidth=3;;strokeDasharray=5,5;pointerEvents=1;overflow=fill;";
+      label = "Alert";
+      width = 230;
+      height = 110;
+    } else if (selectedType === 'hardAlertNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=hardAlertNode;spacing=12;fontSize=16;strokeWidth=3;;strokeDasharray=5,5;pointerEvents=1;overflow=fill;";
+      label = "Hard Alert";
+      width = 230;
+      height = 110;
     }
     // Update the cell with new style, label, and dimensions
     targetCell.style = style;
@@ -1759,6 +1771,18 @@ window.convertMiscellaneousNode = function(selectElement) {
     } else if (selectedType === 'status') {
       targetCell.value = "Status";
       // No special initialization needed for now
+    } else if (selectedType === 'alertNode') {
+      targetCell._alertText = "Alert message";
+      targetCell._questionText = "Alert message";
+      if (typeof window.updateAlertNodeCell === 'function') {
+        window.updateAlertNodeCell(targetCell);
+      }
+    } else if (selectedType === 'hardAlertNode') {
+      targetCell._hardAlertText = "Hard Alert message";
+      targetCell._questionText = "Hard Alert message";
+      if (typeof window.updateHardAlertNodeCell === 'function') {
+        window.updateHardAlertNodeCell(targetCell);
+      }
     }
   } finally {
     graph.getModel().endUpdate();
