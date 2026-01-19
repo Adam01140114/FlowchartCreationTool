@@ -66,6 +66,9 @@ window.createNode = function(nodeType, x, y) {
       case 'inverseCheckbox':
         vertex = createInverseCheckboxNode(x, y);
         break;
+      case 'status':
+        vertex = createStatusNode(x, y);
+        break;
       default:
         return null;
     }
@@ -172,6 +175,17 @@ function createInfoNode(x, y) {
     'rounded=1;whiteSpace=wrap;html=1;nodeType=info;section=1;');
   // Set default properties
   vertex.value = "Information";
+  return vertex;
+}
+/**
+ * Create a status node
+ */
+function createStatusNode(x, y) {
+  const parent = graph.getDefaultParent();
+  const vertex = graph.insertVertex(parent, null, '', x, y, 150, 80, 
+    'rounded=1;whiteSpace=wrap;html=1;nodeType=status;section=1;spacing=12;fontSize=14;align=center;verticalAlign=middle;');
+  // Set default properties
+  vertex.value = "Status";
   return vertex;
 }
 /**

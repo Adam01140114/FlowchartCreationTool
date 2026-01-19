@@ -755,9 +755,6 @@ function addQuestion(sectionId, questionId = null) {
             <label>Show alert if ANY of these conditions match:</label><br>
             <div id="alertLogicConditions${currentQuestionId}"></div>
             <button type="button" onclick="addAlertLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
-            <br><br>
-            <label>Alert Message:</label>
-            <textarea id="alertLogicMessage${currentQuestionId}" placeholder="Enter alert message to display" rows="3" style="width: 100%;"></textarea>
         </div><br>
         <!-- Checklist Logic -->
         <label>Enable Checklist Logic: </label>
@@ -803,6 +800,17 @@ function addQuestion(sectionId, questionId = null) {
                 </div>
                 <button type="button" onclick="addHiddenLogicConfig(${currentQuestionId})" style="margin-top: 10px;">+ Add Another</button>
             </div>
+        </div><br>
+        <!-- Status Feature -->
+        <label>Enable Status: </label>
+        <input type="checkbox" id="enableStatus${currentQuestionId}" onchange="toggleStatus(${currentQuestionId})">
+        <div id="statusBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Status Trigger:</label>
+            <select id="statusTrigger${currentQuestionId}">
+                <option value="">Select an option...</option>
+            </select><br><br>
+            <label>Status Title:</label>
+            <input type="text" id="statusTitle${currentQuestionId}" placeholder="Enter status title (e.g., needs_food)">
         </div><br>
         <!-- Conditional Alert Logic -->
         <div id="conditionalAlertLogic${currentQuestionId}" style="display: none;">
@@ -1248,9 +1256,26 @@ function addAlertLogicCondition(questionId) {
         <input type="number" placeholder="Previous question number"
                id="alertPrevQuestion${questionId}_${numConditions}"
                onchange="updateAlertLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-        <select id="alertPrevAnswer${questionId}_${numConditions}" style="display: block;">
-            <option value="">-- Select an answer --</option>
-        </select><br>
+        <div id="alertAnswerContainer${questionId}_${numConditions}" style="display: block;">
+            <select id="alertPrevAnswer${questionId}_${numConditions}" style="display: block;">
+                <option value="">-- Select an answer --</option>
+            </select>
+        </div>
+        <div id="alertCurrencyContainer${questionId}_${numConditions}" style="display: none;">
+            <label>Operator:</label>
+            <select id="alertOperator${questionId}_${numConditions}" style="display: block; margin-bottom: 8px;">
+                <option value="">Select operator</option>
+                <option value=">">Greater than (>)</option>
+                <option value="<">Less than (<)</option>
+                <option value="=">Equal to (=)</option>
+            </select>
+            <label>Alert Amount:</label>
+            <input type="number" id="alertAmount${questionId}_${numConditions}" placeholder="Enter amount" step="0.01" style="display: block;">
+        </div>
+        <br>
+        <label>Alert Message:</label>
+        <textarea id="alertConditionMessage${questionId}_${numConditions}" placeholder="Enter alert message for this condition" rows="3" style="width: 100%;"></textarea>
+        <br>
         <button type="button" onclick="removeAlertLogicCondition(${questionId}, ${numConditions})">Remove</button>
         <hr>
     `;
@@ -1264,20 +1289,49 @@ function removeAlertLogicCondition(questionId, conditionIndex) {
 function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
     const questionNumberInput = document.getElementById(`alertPrevQuestion${questionId}_${conditionIndex}`);
     const answerSelect = document.getElementById(`alertPrevAnswer${questionId}_${conditionIndex}`);
-    if (!questionNumberInput || !answerSelect) return;
+    const answerContainer = document.getElementById(`alertAnswerContainer${questionId}_${conditionIndex}`);
+    const currencyContainer = document.getElementById(`alertCurrencyContainer${questionId}_${conditionIndex}`);
+    
+    if (!questionNumberInput) return;
+    
     const prevQNum = parseInt(questionNumberInput.value);
     if (!prevQNum) {
-        answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        if (answerSelect) {
+            answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+        }
+        if (answerContainer) answerContainer.style.display = 'block';
+        if (currencyContainer) currencyContainer.style.display = 'none';
         return;
     }
+    
     const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
     if (!targetQuestionBlock) {
-        answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        if (answerSelect) {
+            answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
+        }
+        if (answerContainer) answerContainer.style.display = 'block';
+        if (currencyContainer) currencyContainer.style.display = 'none';
         return;
     }
+    
     const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
     if (!questionType) return;
+    
+    // Check if this is a currency/money question
+    if (questionType === 'currency' || questionType === 'money') {
+        // Show currency operator/amount fields, hide answer dropdown
+        if (answerContainer) answerContainer.style.display = 'none';
+        if (currencyContainer) currencyContainer.style.display = 'block';
+        return;
+    }
+    
+    // For non-currency questions, show answer dropdown, hide currency fields
+    if (answerContainer) answerContainer.style.display = 'block';
+    if (currencyContainer) currencyContainer.style.display = 'none';
+    
+    if (!answerSelect) return;
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+    
     if (questionType === 'radio') {
         answerSelect.innerHTML += `
             <option value="Yes">Yes</option>
@@ -2131,6 +2185,10 @@ function addDropdownOption(questionId) {
         updatePdfPreviewTriggerOptions(questionId);
         // Update LaTeX preview trigger options
         updateLatexPreviewTriggerOptions(questionId);
+        // Update status trigger options
+        if (typeof updateStatusTriggerOptions === 'function') {
+            updateStatusTriggerOptions(questionId);
+        }
         // Update all jump conditions for this question
         const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
         jumpConditions.forEach(condition => {
@@ -2168,6 +2226,12 @@ function removeDropdownOption(questionId, optionNumber) {
     updateHiddenLogicTriggerOptions(questionId);
     // Update PDF preview trigger options
     updatePdfPreviewTriggerOptions(questionId);
+    // Update LaTeX preview trigger options
+    updateLatexPreviewTriggerOptions(questionId);
+    // Update status trigger options
+    if (typeof updateStatusTriggerOptions === 'function') {
+        updateStatusTriggerOptions(questionId);
+    }
     // Update LaTeX preview trigger options
     updateLatexPreviewTriggerOptions(questionId);
 }
@@ -4629,6 +4693,106 @@ function toggleLatexPreview(questionId) {
     // Populate the preview trigger dropdown with options
     if (latexPreviewEnabled) {
         updateLatexPreviewTriggerOptions(questionId);
+    }
+}
+// New function for Status feature
+function toggleStatus(questionId) {
+    const statusEnabled = document.getElementById(`enableStatus${questionId}`).checked;
+    const statusBlock = document.getElementById(`statusBlock${questionId}`);
+    if (!statusBlock) return;
+    
+    statusBlock.style.display = statusEnabled ? 'block' : 'none';
+    
+    // Initialize data structure
+    if (!window.questionStatus) {
+        window.questionStatus = {};
+    }
+    if (!window.questionStatus[questionId]) {
+        window.questionStatus[questionId] = { enabled: false, trigger: '', title: '' };
+    }
+    
+    window.questionStatus[questionId].enabled = statusEnabled;
+    
+    // Populate the status trigger dropdown with options
+    if (statusEnabled) {
+        updateStatusTriggerOptions(questionId);
+    } else {
+        // Clear status data when disabled
+        window.questionStatus[questionId].trigger = '';
+        window.questionStatus[questionId].title = '';
+    }
+    
+    // Trigger autosave
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+}
+// Function to populate status trigger dropdown with question options
+function updateStatusTriggerOptions(questionId) {
+    const triggerSelect = document.getElementById(`statusTrigger${questionId}`);
+    if (!triggerSelect) return;
+    
+    // Save the currently selected value
+    const currentValue = triggerSelect.value;
+    
+    // Clear existing options (except the placeholder)
+    triggerSelect.innerHTML = '<option value="">Select an option...</option>';
+    
+    // Get all dropdown options for this question
+    const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+    if (dropdownOptionsDiv) {
+        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+        optionInputs.forEach((input) => {
+            const optionText = input.value.trim();
+            if (optionText) {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                if (optionText === currentValue) {
+                    option.selected = true;
+                }
+                triggerSelect.appendChild(option);
+            }
+        });
+    }
+    
+    // Add change handler to save trigger value
+    triggerSelect.onchange = () => {
+        if (!window.questionStatus) {
+            window.questionStatus = {};
+        }
+        if (!window.questionStatus[questionId]) {
+            window.questionStatus[questionId] = { enabled: true, trigger: '', title: '' };
+        }
+        window.questionStatus[questionId].trigger = triggerSelect.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    
+    // Add change and blur handlers for status title input
+    const statusTitleInput = document.getElementById(`statusTitle${questionId}`);
+    if (statusTitleInput) {
+        const saveStatusTitle = () => {
+            if (!window.questionStatus) {
+                window.questionStatus = {};
+            }
+            if (!window.questionStatus[questionId]) {
+                window.questionStatus[questionId] = { enabled: true, trigger: '', title: '' };
+            }
+            window.questionStatus[questionId].title = statusTitleInput.value.trim();
+            if (typeof window.requestAutosave === 'function') {
+                window.requestAutosave();
+            }
+        };
+        
+        statusTitleInput.onchange = saveStatusTitle;
+        statusTitleInput.onblur = saveStatusTitle;
+    }
+    
+    // Restore the previously selected value if it still exists
+    if (currentValue) {
+        triggerSelect.value = currentValue;
     }
 }
 // Function to populate LaTeX preview trigger dropdown with question options

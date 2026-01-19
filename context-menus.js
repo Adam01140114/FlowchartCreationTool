@@ -1519,6 +1519,7 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
         <option value="linkedLogic">Linked Logic Node</option>
         <option value="linkedCheckbox">Linked Checkbox Node</option>
         <option value="inverseCheckbox">Inverse Checkbox Node</option>
+        <option value="status">Status Node</option>
       </select>
     </div>`;
     cell = graphToUse.insertVertex(parent, null, label, window.emptySpaceClickX, window.emptySpaceClickY, 280, 80, style);
@@ -1657,6 +1658,11 @@ window.convertMiscellaneousNode = function(selectElement) {
       label = "Linked Checkbox";
       width = 150;
       height = 80;
+    } else if (selectedType === 'status') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=status;section=1;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
+      label = "Status";
+      width = 150;
+      height = 80;
     }
     // Update the cell with new style, label, and dimensions
     targetCell.style = style;
@@ -1750,6 +1756,9 @@ window.convertMiscellaneousNode = function(selectElement) {
       if (typeof window.updateLinkedLogicNodeCell === 'function') {
         window.updateLinkedLogicNodeCell(targetCell);
       }
+    } else if (selectedType === 'status') {
+      targetCell.value = "Status";
+      // No special initialization needed for now
     }
   } finally {
     graph.getModel().endUpdate();

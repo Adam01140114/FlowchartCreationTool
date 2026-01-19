@@ -637,6 +637,8 @@ function showPropertiesPopup(cell) {
       return 'Subtitle Node';
     } else if (cell.style.includes('nodeType=info')) {
       return 'Info Node';
+    } else if (cell.style.includes('nodeType=status')) {
+      return 'Status Node';
     } else if (cell.style.includes('nodeType=imageOption')) {
       return 'Image Option';
     }

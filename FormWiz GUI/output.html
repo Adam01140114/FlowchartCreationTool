@@ -294,8 +294,23 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><div id="question-container-2" data-question-id="2" class="question-container question-item question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">How much cash do you have</h3></label><div class="text-input-container"><input type="text" id="how_much_cash_do_you_have" name="how_much_cash_do_you_have" inputmode="decimal" placeholder="Enter amount" oninput="formatCurrencyInput(this)"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
                       onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
@@ -816,12 +831,11 @@ document.addEventListener("DOMContentLoaded", function() {
               // CRITICAL FIX: Check for hard alerts before enabling the button
               // Hard alerts should always prevent navigation, regardless of canAdvance state
               const hasHardAlert = nextBtn.dataset.hardAlertActive === 'true';
-              console.log('[UPDATE BUTTONS] canAdvance:', canAdvance, 'hasHardAlert:', hasHardAlert);
 
               // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
               // Don't enable if there's an active hard alert
               if (canAdvance && !hasHardAlert) {
-                console.log('[UPDATE BUTTONS] Enabling next button (canAdvance=true, no hard alert)');
+
                 nextBtn.removeAttribute('disabled');
                 // Make sure styling is cleared if not disabled by hard alert
                 if (nextBtn.dataset.hardAlertActive !== 'true') {
@@ -830,9 +844,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               } else {
                 if (hasHardAlert) {
-                  console.log('[UPDATE BUTTONS] Keeping next button disabled due to hard alert');
+
                 } else {
-                  console.log('[UPDATE BUTTONS] Disabling next button (canAdvance=false)');
+
                 }
                 nextBtn.setAttribute('disabled', 'disabled');
               }
@@ -1482,14 +1496,14 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'SC-100';
-var questionSlugMap = {"1":"how_many_people_are_you_suing","2":"hungry"};
-var questionNameIds = {"1":"how_many_people_are_you_suing","2":"hungry"};
+window.formId = '';
+var questionSlugMap = {"1":"how_much_cash_do_you_have","2":"hungry"};
+var questionNameIds = {"1":"how_much_cash_do_you_have","2":"hungry"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}],"hardAlert":{"enabled":true,"condition":"No","title":"123"}},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var unifiedFieldsMap = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -3427,17 +3441,17 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"2","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"2","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
+var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
-var alertLogics = [];
+var alertLogics = [{"questionId":"1","message":"you got more than 5 bucks","conditions":[{"prevQuestion":"1","operator":">","amount":5,"isCurrency":true}]}];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name"],"length":0};
-var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["how_many_people_are_you_suing_name"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -3715,14 +3729,77 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "SC-100";
-var pdfOutputFileName = "sc100.pdf";
-var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["sc100", ];
+var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="currency";
+    var cPrevAns="any text";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var textQuestion = "1";
+   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -3821,7 +3898,7 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                 // Check for hard alert
                                 if (triggerField.type === 'dropdown' && triggerField.hardAlert && triggerField.hardAlert.enabled) {
                                     const hardAlertCondition = (triggerField.hardAlert.condition || '').trim();
-                                    
+
                                     if (hardAlertCondition) {
                                         // CRITICAL FIX: For numbered dropdowns, the baseNodeId comes from parentDropdownNodeId
                                         // which is passed to createTriggerFieldsContainer. This is typically derived from the
@@ -3829,7 +3906,7 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                         // In unifiedFieldsMap, the parent dropdown field has fieldName which we can sanitize.
                                         // The dropdown ID format is: {parentDropdownFieldName}_{triggerFieldName}_{entryNumber}
                                         let baseNodeId = '';
-                                        
+
                                         // For numbered dropdowns, parentDropdownNodeId is often derived from the field's nodeId
                                         // or by sanitizing the fieldName. Let's use fieldName (sanitized) as it's most reliable.
                                         if (field.fieldName) {
@@ -3843,18 +3920,18 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                             // Last resort: use questionNameIds
                                             baseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
                                         }
-                                        
+
                                         // Sanitize the trigger field name to match how it's done in createTriggerFieldsContainer
                                         const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase()
                                             .replace(/[?]/g, '')
                                             .replace(/[^a-z0-9_]+/g, '_')
                                             .replace(/^_+|_+$/g, '');
-                                        
+
                                         // Check ALL entries (1-10) for this field
                                         for (let entryNum = 1; entryNum <= 10; entryNum++) {
                                             const dropdownId = baseNodeId + '_' + sanitizedFieldName + '_' + entryNum;
                                             const dropdownEl = document.getElementById(dropdownId);
-                                            
+
                                             if (dropdownEl) {
                                                 const selectedValue = (dropdownEl.value || '').trim();
                                                 if (selectedValue === hardAlertCondition) {
@@ -3947,6 +4024,100 @@ function showValidationPopup() {
         '</div>';
     showAlert(validationMessage);
 }
+
+function checkAlertLogic(changedElement) {
+    if (!alertLogics || alertLogics.length === 0) return;
+    // Get the question ID from the changed element
+    let changedQuestionId = null;
+    if (changedElement) {
+        const elementId = changedElement.id;
+        // Try to extract question ID from element ID
+        for (const [qId, nameId] of Object.entries(questionNameIds)) {
+            if (elementId === nameId || elementId === 'answer' + qId) {
+                changedQuestionId = qId;
+                break;
+            }
+        }
+    }
+    // If we can't determine which question changed, don't check any alerts
+    // This prevents alerts from triggering on unrelated form elements
+    if (!changedQuestionId) return;
+    for (const alertLogic of alertLogics) {
+        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
+        // Only check this alert logic if it's related to the changed element
+        let shouldCheckThisAlert = false;
+        // Check if any condition in this alert logic references the changed question
+        for (const condition of alertLogic.conditions) {
+            if (condition.prevQuestion === changedQuestionId) {
+                shouldCheckThisAlert = true;
+                break;
+            }
+        }
+        if (!shouldCheckThisAlert) continue;
+        let shouldShowAlert = false;
+        // Check if ANY of the conditions match (OR logic)
+        for (const condition of alertLogic.conditions) {
+            const prevQuestionId = condition.prevQuestion;
+            // Get the previous question's value
+            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                      document.getElementById('answer' + prevQuestionId);
+            if (prevQuestionElement) {
+                let prevValue = '';
+                if (prevQuestionElement.type === 'checkbox') {
+                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                } else {
+                    prevValue = prevQuestionElement.value;
+                }
+                
+                // Check if this is a currency condition
+                if (condition.isCurrency && condition.operator && condition.amount !== undefined) {
+                    // Parse the currency value (remove $ and commas, then parse as float)
+                    const currencyValue = parseFloat(prevValue.toString().replace(/[$,]/g, '')) || 0;
+                    const compareAmount = parseFloat(condition.amount) || 0;
+                    let conditionMet = false;
+                    
+                    if (condition.operator === '>') {
+                        conditionMet = currencyValue > compareAmount;
+                    } else if (condition.operator === '<') {
+                        conditionMet = currencyValue < compareAmount;
+                    } else if (condition.operator === '=') {
+                        conditionMet = Math.abs(currencyValue - compareAmount) < 0.01; // Allow small floating point differences
+                    }
+                    
+                    if (conditionMet) {
+                        shouldShowAlert = true;
+                        break; // Found a match, no need to check other conditions
+                    }
+                } else {
+                    // Regular condition (string match)
+                    const prevAnswer = condition.prevAnswer;
+                    if (prevAnswer && prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                        shouldShowAlert = true;
+                        break; // Found a match, no need to check other conditions
+                    }
+                }
+            }
+        }
+        // Show alert if conditions are met
+        if (shouldShowAlert && alertLogic.message) {
+            showAlert(alertLogic.message);
+            return; // Show only the first matching alert
+        }
+    }
+}
+// Add event listeners for alert logic
+document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('change', function() { checkAlertLogic(this); });
+        element.addEventListener('input', function() { checkAlertLogic(this); });
+    });
+    // Initialize checkbox styling for beautiful blue borders
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
+});
 
 // Helper function to deduplicate PDFs based on comprehensive unique key
 function deduplicatePdfs(pdfArray) {

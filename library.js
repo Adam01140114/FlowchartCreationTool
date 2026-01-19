@@ -13,6 +13,9 @@ function isOptions(cell) {
 function isAlertNode(cell) {
   return cell && cell.style && cell.style.includes("questionType=alertNode");
 }
+function isStatusNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=status");
+}
 // Download utility moved to export.js module
 // Export functions moved to export.js module
 // Import a flowchart JSON file
@@ -277,6 +280,11 @@ window.exportGuiJson = function(download = true) {
         content: "",
         priceId: "",
         attachment: "Preview Only"
+      },
+      status: {
+        enabled: false,
+        trigger: "",
+        title: ""
       },
       options: [],
       labels: [],
@@ -2702,6 +2710,56 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Alert Logic PATCH ---
+    // --- PATCH: Add Status detection ---
+    // Check if this question is connected to a status node through its options
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const optionCell = edge.target;
+        if (optionCell && isOptions(optionCell)) {
+          // Check if this option leads to a status node
+          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const targetCell = optionEdge.target;
+              if (targetCell && isStatusNode(targetCell)) {
+                // This question's option leads to a status node
+                question.status.enabled = true;
+                // Extract status text from the status node
+                let statusText = "";
+                // First, try the value property (most common)
+                if (targetCell.value) {
+                  statusText = targetCell.value;
+                  // Clean HTML from status text if it's HTML
+                  if (statusText && statusText.includes('<')) {
+                    const temp = document.createElement("div");
+                    temp.innerHTML = statusText;
+                    statusText = temp.textContent || temp.innerText || statusText;
+                  }
+                  statusText = statusText.trim();
+                }
+                // Clean up the status text (remove any HTML entities or extra whitespace)
+                if (statusText) {
+                  statusText = statusText.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                }
+                question.status.title = statusText || "Status";
+                // Extract the option text
+                let optionText = optionCell.value || "";
+                // Clean HTML from option text
+                if (optionText) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = optionText;
+                  optionText = temp.textContent || temp.innerText || optionText;
+                  optionText = optionText.trim();
+                }
+                question.status.trigger = optionText || "";
+                break; // Only process the first status connection
+              }
+            }
+          }
+        }
+      }
+    }
+    // --- END Status PATCH ---
     // --- PATCH: Add Subtitle detection ---
     // Check if this question is connected to a subtitle node
     if (outgoingEdges) {

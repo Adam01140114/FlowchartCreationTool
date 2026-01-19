@@ -1232,11 +1232,34 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
             latexPreviewHandlerCall = ` handleLatexPreview${questionId}(this.value)`;
           }
         }
+        // Handle Status - check before generating select
+        const statusEnabledEl = qBlock.querySelector(`#enableStatus${questionId}`);
+        const statusEnabled = statusEnabledEl && statusEnabledEl.checked;
+        let statusHandlerCall = '';
+        if (statusEnabled) {
+          const statusTriggerEl = qBlock.querySelector(`#statusTrigger${questionId}`);
+          const statusTitleEl = qBlock.querySelector(`#statusTitle${questionId}`);
+          const statusTrigger = statusTriggerEl ? statusTriggerEl.value.trim() : "";
+          const statusTitle = statusTitleEl ? statusTitleEl.value.trim() : "";
+          // Only include handler call if both trigger and title are set
+          if (statusTrigger && statusTitle) {
+            statusHandlerCall = ` handleStatus${questionId}(this.value)`;
+            // Store status data for runtime
+            if (!window.statusData) {
+              window.statusData = {};
+            }
+            window.statusData[questionId] = {
+              trigger: statusTrigger,
+              title: statusTitle,
+              dropdownId: ddNm
+            };
+          }
+        }
         // 2) The <select> itself
         // Add console logging to track dropdown generation
 
         formHTML += `<select id="${ddNm}" name="${ddNm}" data-question-id="${questionId}"
-                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}${latexPreviewHandlerCall}">
+                      onchange="dropdownMirror(this, '${ddNm}'); updateHiddenLogic('${ddNm}', this.value); updateLinkedFields(); clearInactiveLinkedFields();${pdfPreviewHandlerCall}${latexPreviewHandlerCall}${statusHandlerCall}">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -1497,6 +1520,55 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
                     // Remove stored PDF blob if user changes away from trigger
                     if (window.latexPdfs && window.latexPdfs[${questionId}]) {
                       delete window.latexPdfs[${questionId}];
+                    }
+                  }
+                }
+              </script>
+            `;
+          }
+        }
+        // Handle Status - add status tracking JavaScript
+        if (statusEnabled) {
+          const statusTriggerEl = qBlock.querySelector(`#statusTrigger${questionId}`);
+          const statusTitleEl = qBlock.querySelector(`#statusTitle${questionId}`);
+          const statusTrigger = statusTriggerEl ? statusTriggerEl.value.trim() : "";
+          const statusTitle = statusTitleEl ? statusTitleEl.value.trim() : "";
+          if (statusTrigger && statusTitle) {
+            // Add status tracking script
+            formHTML += `
+              <script>
+                function handleStatus${questionId}(value) {
+                  // Initialize status object if it doesn't exist
+                  if (!window.formStatuses) {
+                    window.formStatuses = {};
+                  }
+                  
+                  const selectedValue = (value || '').trim();
+                  const statusTrigger = '${statusTrigger}';
+                  const statusTitle = '${statusTitle}';
+                  
+                  console.log('[STATUS] Dropdown ${questionId} changed. Selected value:', selectedValue);
+                  console.log('[STATUS] Status trigger:', statusTrigger);
+                  console.log('[STATUS] Status title:', statusTitle);
+                  
+                  // Check if the selected value matches the trigger
+                  if (selectedValue === statusTrigger) {
+                    // Add status
+                    if (!window.formStatuses[statusTitle]) {
+                      window.formStatuses[statusTitle] = true;
+                      console.log('[STATUS] Status added:', statusTitle);
+                      console.log('[STATUS] Current statuses:', window.formStatuses);
+                    } else {
+                      console.log('[STATUS] Status already exists:', statusTitle);
+                    }
+                  } else {
+                    // Remove status if it exists
+                    if (window.formStatuses[statusTitle]) {
+                      delete window.formStatuses[statusTitle];
+                      console.log('[STATUS] Status removed:', statusTitle);
+                      console.log('[STATUS] Current statuses:', window.formStatuses);
+                    } else {
+                      console.log('[STATUS] Status not found to remove:', statusTitle);
                     }
                   }
                 }
@@ -3882,13 +3954,10 @@ formHTML += `</div><br></div>`;
       const alertLogicEnabled = alertLogicCheckbox && alertLogicCheckbox.checked;
       if (alertLogicEnabled) {
         const alertLogicRows = qBlock.querySelectorAll(".alert-logic-condition-row");
-        const alertLogicMessageEl = qBlock.querySelector("#alertLogicMessage" + questionId);
-        const alertLogicMessage = alertLogicMessageEl ? alertLogicMessageEl.value.trim() : "";
-        if (alertLogicRows.length > 0 && alertLogicMessage) {
+        if (alertLogicRows.length > 0) {
           // Add to Alert Logic array for later processing
           alertLogics.push({
             questionId: questionId,
-            message: alertLogicMessage,
             conditions: []
           });
           // Process conditions
@@ -3901,15 +3970,50 @@ formHTML += `</div><br></div>`;
             const paEl = row.querySelector(
               "#alertPrevAnswer" + questionId + "_" + rowIndex
             );
-            if (!pqEl || !paEl) continue;
+            const operatorEl = row.querySelector(
+              "#alertOperator" + questionId + "_" + rowIndex
+            );
+            const amountEl = row.querySelector(
+              "#alertAmount" + questionId + "_" + rowIndex
+            );
+            const messageEl = row.querySelector(
+              "#alertConditionMessage" + questionId + "_" + rowIndex
+            );
+            
+            if (!pqEl) continue;
             const pqVal = pqEl.value.trim();
+            if (!pqVal) continue;
+            
+            const conditionMessage = messageEl ? messageEl.value.trim() : "";
+            
+            // Check if this is a currency condition (has operator and amount)
+            if (operatorEl && amountEl) {
+              const operatorVal = operatorEl.value.trim();
+              const amountVal = amountEl.value.trim();
+              if (operatorVal && amountVal) {
+                // Currency condition
+                const alertLogicIndex = alertLogics.length - 1;
+                alertLogics[alertLogicIndex].conditions.push({
+                  prevQuestion: pqVal,
+                  operator: operatorVal,
+                  amount: parseFloat(amountVal) || 0,
+                  isCurrency: true,
+                  message: conditionMessage
+                });
+                continue;
+              }
+            }
+            
+            // Regular condition (has prevAnswer)
+            if (!paEl) continue;
             const paVal = paEl.value.trim();
-            if (!pqVal || !paVal) continue;
+            if (!paVal) continue;
             // Add condition to the Alert Logic array
             const alertLogicIndex = alertLogics.length - 1;
             alertLogics[alertLogicIndex].conditions.push({
               prevQuestion: pqVal,
-              prevAnswer: paVal
+              prevAnswer: paVal,
+              message: conditionMessage
             });
           }
         }
@@ -4487,12 +4591,11 @@ if (s > 1){
               // CRITICAL FIX: Check for hard alerts before enabling the button
               // Hard alerts should always prevent navigation, regardless of canAdvance state
               const hasHardAlert = nextBtn.dataset.hardAlertActive === 'true';
-              console.log('[UPDATE BUTTONS] canAdvance:', canAdvance, 'hasHardAlert:', hasHardAlert);
 
               // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
               // Don't enable if there's an active hard alert
               if (canAdvance && !hasHardAlert) {
-                console.log('[UPDATE BUTTONS] Enabling next button (canAdvance=true, no hard alert)');
+
                 nextBtn.removeAttribute('disabled');
                 // Make sure styling is cleared if not disabled by hard alert
                 if (nextBtn.dataset.hardAlertActive !== 'true') {
@@ -4501,9 +4604,9 @@ if (s > 1){
                 }
               } else {
                 if (hasHardAlert) {
-                  console.log('[UPDATE BUTTONS] Keeping next button disabled due to hard alert');
+
                 } else {
-                  console.log('[UPDATE BUTTONS] Disabling next button (canAdvance=false)');
+
                 }
                 nextBtn.setAttribute('disabled', 'disabled');
               }
@@ -4754,6 +4857,23 @@ if (s > 1){
             if (activeContainer && !isAnswered) {
 
               return;
+            }
+            
+            // Check alert logic for the current question before navigating
+            if (activeContainer && typeof checkAlertLogic === 'function') {
+              // Get the question ID from the active container
+              const questionId = activeContainer.getAttribute('data-question-id');
+              if (questionId) {
+                // Find the input/select element for this question
+                const questionInput = activeContainer.querySelector('input, select, textarea');
+                if (questionInput) {
+                  const alertShown = checkAlertLogic(questionInput);
+                  // If alert was shown, don't navigate - user must close alert first
+                  if (alertShown) {
+                    return; // Prevent navigation until alert is closed
+                  }
+                }
+              }
             }
           }
           const nextPos = currentPos + direction;
@@ -7593,7 +7713,7 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                 // Check for hard alert
                                 if (triggerField.type === 'dropdown' && triggerField.hardAlert && triggerField.hardAlert.enabled) {
                                     const hardAlertCondition = (triggerField.hardAlert.condition || '').trim();
-                                    
+
                                     if (hardAlertCondition) {
                                         // CRITICAL FIX: For numbered dropdowns, the baseNodeId comes from parentDropdownNodeId
                                         // which is passed to createTriggerFieldsContainer. This is typically derived from the
@@ -7601,7 +7721,7 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                         // In unifiedFieldsMap, the parent dropdown field has fieldName which we can sanitize.
                                         // The dropdown ID format is: {parentDropdownFieldName}_{triggerFieldName}_{entryNumber}
                                         let baseNodeId = '';
-                                        
+
                                         // For numbered dropdowns, parentDropdownNodeId is often derived from the field's nodeId
                                         // or by sanitizing the fieldName. Let's use fieldName (sanitized) as it's most reliable.
                                         if (field.fieldName) {
@@ -7615,18 +7735,18 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                             // Last resort: use questionNameIds
                                             baseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
                                         }
-                                        
+
                                         // Sanitize the trigger field name to match how it's done in createTriggerFieldsContainer
                                         const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase()
                                             .replace(/[?]/g, '')
                                             .replace(/[^a-z0-9_]+/g, '_')
                                             .replace(/^_+|_+$/g, '');
-                                        
+
                                         // Check ALL entries (1-10) for this field
                                         for (let entryNum = 1; entryNum <= 10; entryNum++) {
                                             const dropdownId = baseNodeId + '_' + sanitizedFieldName + '_' + entryNum;
                                             const dropdownEl = document.getElementById(dropdownId);
-                                            
+
                                             if (dropdownEl) {
                                                 const selectedValue = (dropdownEl.value || '').trim();
                                                 if (selectedValue === hardAlertCondition) {
@@ -7724,7 +7844,7 @@ function showValidationPopup() {
   if (alertLogics.length > 0) {
     formHTML += `
 function checkAlertLogic(changedElement) {
-    if (!alertLogics || alertLogics.length === 0) return;
+    if (!alertLogics || alertLogics.length === 0) return false;
     // Get the question ID from the changed element
     let changedQuestionId = null;
     if (changedElement) {
@@ -7739,7 +7859,7 @@ function checkAlertLogic(changedElement) {
     }
     // If we can't determine which question changed, don't check any alerts
     // This prevents alerts from triggering on unrelated form elements
-    if (!changedQuestionId) return;
+    if (!changedQuestionId) return false;
     for (const alertLogic of alertLogics) {
         if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
         // Only check this alert logic if it's related to the changed element
@@ -7752,11 +7872,9 @@ function checkAlertLogic(changedElement) {
             }
         }
         if (!shouldCheckThisAlert) continue;
-        let shouldShowAlert = false;
         // Check if ANY of the conditions match (OR logic)
         for (const condition of alertLogic.conditions) {
             const prevQuestionId = condition.prevQuestion;
-            const prevAnswer = condition.prevAnswer;
             // Get the previous question's value
             const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
                                       document.getElementById('answer' + prevQuestionId);
@@ -7767,27 +7885,45 @@ function checkAlertLogic(changedElement) {
                 } else {
                     prevValue = prevQuestionElement.value;
                 }
-                // Check if the condition matches
-                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                    shouldShowAlert = true;
-                    break; // Found a match, no need to check other conditions
+                
+                let conditionMet = false;
+                let conditionMessage = condition.message || '';
+                
+                // Check if this is a currency condition
+                if (condition.isCurrency && condition.operator && condition.amount !== undefined) {
+                    // Parse the currency value (remove $ and commas, then parse as float)
+                    const currencyValue = parseFloat(prevValue.toString().replace(/[$,]/g, '')) || 0;
+                    const compareAmount = parseFloat(condition.amount) || 0;
+                    
+                    if (condition.operator === '>') {
+                        conditionMet = currencyValue > compareAmount;
+                    } else if (condition.operator === '<') {
+                        conditionMet = currencyValue < compareAmount;
+                    } else if (condition.operator === '=') {
+                        conditionMet = Math.abs(currencyValue - compareAmount) < 0.01; // Allow small floating point differences
+                    }
+                } else {
+                    // Regular condition (string match)
+                    const prevAnswer = condition.prevAnswer;
+                    if (prevAnswer && prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                        conditionMet = true;
+                    }
+                }
+                
+                // If condition is met and has a message, show alert immediately
+                if (conditionMet && conditionMessage) {
+                    showAlert(conditionMessage);
+                    return true; // Return true to indicate alert was shown
                 }
             }
         }
-        // Show alert if conditions are met
-        if (shouldShowAlert && alertLogic.message) {
-            showAlert(alertLogic.message);
-            return; // Show only the first matching alert
-        }
     }
+    return false; // No alert was shown
 }
 // Add event listeners for alert logic
+// NOTE: Alert logic is now checked when user clicks the next button, not on input/change events
+// This prevents alerts from appearing immediately as the user types
 document.addEventListener('DOMContentLoaded', function() {
-    const formElements = document.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('change', function() { checkAlertLogic(this); });
-        element.addEventListener('input', function() { checkAlertLogic(this); });
-    });
     // Initialize checkbox styling for beautiful blue borders
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {

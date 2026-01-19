@@ -507,6 +507,29 @@ function loadFormData(formData) {
                                 }
                             }
                         }
+                        // -- Restore Status if present (AFTER options are added to DOM) --
+                        if (question.status && question.status.enabled) {
+                            setTimeout(() => {
+                                const statusCheckbox = questionBlock.querySelector(`#enableStatus${question.questionId}`);
+                                const statusTriggerSelect = questionBlock.querySelector(`#statusTrigger${question.questionId}`);
+                                const statusTitleInput = questionBlock.querySelector(`#statusTitle${question.questionId}`);
+                                if (statusCheckbox) {
+                                    statusCheckbox.checked = true;
+                                    toggleStatus(question.questionId); // This populates the trigger dropdown with options from DOM
+                                    // Set the trigger value after the dropdown is populated
+                                    setTimeout(() => {
+                                        if (statusTriggerSelect && question.status.trigger) {
+                                            statusTriggerSelect.value = question.status.trigger;
+                                            statusTriggerSelect.dispatchEvent(new Event('change'));
+                                        }
+                                        if (statusTitleInput && question.status.title) {
+                                            statusTitleInput.value = question.status.title;
+                                            statusTitleInput.dispatchEvent(new Event('blur'));
+                                        }
+                                    }, 100);
+                                }
+                            }, 200);
+                        }
                         // ********** Restore Image Data ********** 
                         if (question.image && question.image.url) {
                             const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
@@ -2483,10 +2506,6 @@ function loadFormData(formData) {
                         alertLogicCbox.checked = true;
                         toggleAlertLogic(question.questionId);
                     }
-                    const alertLogicMessageInput = questionBlock.querySelector(`#alertLogicMessage${question.questionId}`);
-                    if (alertLogicMessageInput) {
-                        alertLogicMessageInput.value = question.alertLogic.message;
-                    }
                     // Load Alert Logic conditions
                     if (question.alertLogic.conditions && question.alertLogic.conditions.length > 0) {
                         question.alertLogic.conditions.forEach((condition, index) => {
@@ -2494,12 +2513,36 @@ function loadFormData(formData) {
                             const conditionIndex = index + 1;
                             const prevQuestionInput = questionBlock.querySelector(`#alertPrevQuestion${question.questionId}_${conditionIndex}`);
                             const prevAnswerSelect = questionBlock.querySelector(`#alertPrevAnswer${question.questionId}_${conditionIndex}`);
+                            const operatorSelect = questionBlock.querySelector(`#alertOperator${question.questionId}_${conditionIndex}`);
+                            const amountInput = questionBlock.querySelector(`#alertAmount${question.questionId}_${conditionIndex}`);
+                            const conditionMessageInput = questionBlock.querySelector(`#alertConditionMessage${question.questionId}_${conditionIndex}`);
+                            
                             if (prevQuestionInput) {
                                 prevQuestionInput.value = condition.prevQuestion;
                                 updateAlertLogicAnswersForRow(question.questionId, conditionIndex);
-                            }
-                            if (prevAnswerSelect) {
-                                prevAnswerSelect.value = condition.prevAnswer;
+                                
+                                // Restore condition message if it exists
+                                if (conditionMessageInput && condition.message) {
+                                    conditionMessageInput.value = condition.message;
+                                }
+                                
+                                // Check if this is a currency condition
+                                if (condition.isCurrency || (condition.operator && condition.amount !== undefined)) {
+                                    // Set operator and amount after a delay to ensure UI is updated
+                                    setTimeout(() => {
+                                        if (operatorSelect && condition.operator) {
+                                            operatorSelect.value = condition.operator;
+                                        }
+                                        if (amountInput && condition.amount !== undefined) {
+                                            amountInput.value = condition.amount;
+                                        }
+                                    }, 100);
+                                } else if (prevAnswerSelect && condition.prevAnswer) {
+                                    // Regular condition - set answer
+                                    setTimeout(() => {
+                                        prevAnswerSelect.value = condition.prevAnswer;
+                                    }, 100);
+                                }
                             }
                         });
                     }
@@ -2971,10 +3014,25 @@ function exportForm() {
                         const conditionIndex = index + 1;
                         const prevQuestion = row.querySelector(`#alertPrevQuestion${questionId}_${conditionIndex}`)?.value || "";
                         const prevAnswer = row.querySelector(`#alertPrevAnswer${questionId}_${conditionIndex}`)?.value || "";
-                        if (prevQuestion && prevAnswer) {
+                        const operator = row.querySelector(`#alertOperator${questionId}_${conditionIndex}`)?.value || "";
+                        const amount = row.querySelector(`#alertAmount${questionId}_${conditionIndex}`)?.value || "";
+                        const conditionMessage = row.querySelector(`#alertConditionMessage${questionId}_${conditionIndex}`)?.value || "";
+                        
+                        // Check if this is a currency condition (has operator and amount)
+                        if (prevQuestion && operator && amount) {
                             alertLogicConditionsArray.push({
                                 prevQuestion: prevQuestion,
-                                prevAnswer: prevAnswer
+                                operator: operator,
+                                amount: parseFloat(amount) || 0,
+                                isCurrency: true,
+                                message: conditionMessage
+                            });
+                        } else if (prevQuestion && prevAnswer) {
+                            // Regular condition
+                            alertLogicConditionsArray.push({
+                                prevQuestion: prevQuestion,
+                                prevAnswer: prevAnswer,
+                                message: conditionMessage
                             });
                         }
                     });
@@ -3075,6 +3133,11 @@ function exportForm() {
                     content: questionBlock.querySelector(`#latexPreviewContent${questionId}`)?.value || "",
                     priceId: questionBlock.querySelector(`#latexPreviewPriceId${questionId}`)?.value || "",
                     attachment: questionBlock.querySelector(`#latexPreviewAttachment${questionId}`)?.value || "Preview Only"
+                },
+                status: {
+                    enabled: questionBlock.querySelector(`#enableStatus${questionId}`)?.checked || false,
+                    trigger: questionBlock.querySelector(`#statusTrigger${questionId}`)?.value || "",
+                    title: questionBlock.querySelector(`#statusTitle${questionId}`)?.value || ""
                 },
                 options: [],
                 labels: []
