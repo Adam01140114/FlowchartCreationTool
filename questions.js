@@ -523,6 +523,7 @@ function renderTextboxes(cell) {
     const entryType = tb.type || (tb.isAmountOption ? 'amount' : 'label');
     const isAmountOption = entryType === 'amount';
     const isPhoneOption = entryType === 'phone';
+    const isCurrencyOption = entryType === 'currency';
     html += `
       <div class="textbox-entry" style="margin-bottom:8px;text-align:center; display: flex; align-items: center; gap: 4px;">
         <input type="text" value="${getEscapeAttr()(val)}" data-index="${index}" placeholder="${getEscapeAttr()(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" style="flex: 1;" />
@@ -536,6 +537,10 @@ function renderTextboxes(cell) {
           <label style="display:flex; align-items:center; gap:5px; font-size:13px;">
             <input type="radio" name="mtb_type_${cell.id}_${index}" value="phone" ${isPhoneOption ? 'checked' : ''} onclick="window.setMultipleTextboxType('${cell.id}', ${index}, 'phone')" />
             Phone?
+          </label>
+          <label style="display:flex; align-items:center; gap:5px; font-size:13px;">
+            <input type="radio" name="mtb_type_${cell.id}_${index}" value="currency" ${isCurrencyOption ? 'checked' : ''} onclick="window.setMultipleTextboxType('${cell.id}', ${index}, 'currency')" />
+            Currency?
           </label>
         </div>
       </div>`;
@@ -12142,10 +12147,22 @@ function createTextboxField(textbox, index, cell, parentContainer) {
       window.requestAutosave();
     }
   };
-  // Amount / Phone radios (mutually exclusive)
+  // Amount / Phone / Currency radios (mutually exclusive)
   const entryType = textbox.type || (textbox.isAmountOption ? 'amount' : 'label');
   const isAmount = entryType === 'amount';
   const isPhone = entryType === 'phone';
+  const isCurrency = entryType === 'currency';
+  console.log('[QUESTIONS createTextboxField] Starting textbox field creation', { 
+    cellId: cell.id, 
+    index, 
+    textbox, 
+    textboxType: textbox.type, 
+    isAmountOption: textbox.isAmountOption,
+    entryType,
+    isAmount,
+    isPhone,
+    isCurrency
+  });
   const radioGroup = document.createElement('div');
   radioGroup.style.cssText = `
     display: flex;
@@ -12176,9 +12193,25 @@ function createTextboxField(textbox, index, cell, parentContainer) {
   phoneRadio.checked = isPhone;
   phoneLabel.appendChild(phoneRadio);
   phoneLabel.appendChild(document.createTextNode('Phone?'));
+  const currencyLabel = document.createElement('label');
+  currencyLabel.style.cssText = amountLabel.style.cssText;
+  const currencyRadio = document.createElement('input');
+  currencyRadio.type = 'radio';
+  currencyRadio.name = `mtb_modal_type_${cell.id}_${index}`;
+  currencyRadio.value = 'currency';
+  currencyRadio.checked = isCurrency;
+  currencyLabel.appendChild(currencyRadio);
+  currencyLabel.appendChild(document.createTextNode('Currency?'));
   const syncRadios = (newType) => {
     amountRadio.checked = newType === 'amount';
     phoneRadio.checked = newType === 'phone';
+    currencyRadio.checked = newType === 'currency';
+    console.log('[QUESTIONS createTextboxField] Radios synced', { 
+      newType, 
+      amountChecked: amountRadio.checked, 
+      phoneChecked: phoneRadio.checked, 
+      currencyChecked: currencyRadio.checked 
+    });
   };
   const setType = (newType) => {
     textbox.type = newType;
@@ -12209,8 +12242,16 @@ function createTextboxField(textbox, index, cell, parentContainer) {
     e.stopImmediatePropagation();
     applyToggle('phone');
   };
+  const handleCurrencyPointer = (e) => {
+    console.log('[MTB MODAL] currencyRadio pointer', { cellId: cell.id, index, currentType: textbox.type, radioChecked: currencyRadio.checked });
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    applyToggle('currency');
+  };
   amountRadio.addEventListener('pointerdown', handleAmountPointer, true);
   phoneRadio.addEventListener('pointerdown', handlePhonePointer, true);
+  currencyRadio.addEventListener('pointerdown', handleCurrencyPointer, true);
   // Extra logging hooks to diagnose missing events
   amountRadio.addEventListener('change', () => {
     if (textbox.type === 'label') {
@@ -12224,11 +12265,20 @@ function createTextboxField(textbox, index, cell, parentContainer) {
     }
     console.log('[MTB MODAL] phoneRadio change', { cellId: cell.id, index, checked: phoneRadio.checked, type: textbox.type });
   });
+  currencyRadio.addEventListener('change', () => {
+    if (textbox.type === 'label') {
+      syncRadios('label');
+    }
+    console.log('[MTB MODAL] currencyRadio change', { cellId: cell.id, index, checked: currencyRadio.checked, type: textbox.type });
+  });
   amountLabel.addEventListener('click', (e) => {
     console.log('[MTB MODAL] amountLabel click', { target: e.target.tagName });
   });
   phoneLabel.addEventListener('click', (e) => {
     console.log('[MTB MODAL] phoneLabel click', { target: e.target.tagName });
+  });
+  currencyLabel.addEventListener('click', (e) => {
+    console.log('[MTB MODAL] currencyLabel click', { target: e.target.tagName });
   });
   radioGroup.addEventListener('click', (e) => {
     console.log('[MTB MODAL] radioGroup click', { target: e.target.tagName, value: e.target.value });
@@ -12240,8 +12290,12 @@ function createTextboxField(textbox, index, cell, parentContainer) {
   phoneRadio.addEventListener('pointerdown', () => {
     console.log('[MTB MODAL] phoneRadio pointerdown', { cellId: cell.id, index });
   }, true);
+  currencyRadio.addEventListener('pointerdown', () => {
+    console.log('[MTB MODAL] currencyRadio pointerdown', { cellId: cell.id, index });
+  }, true);
   radioGroup.appendChild(amountLabel);
   radioGroup.appendChild(phoneLabel);
+  radioGroup.appendChild(currencyLabel);
   // Copy ID button
   const copyBtn = document.createElement('button');
   copyBtn.textContent = 'Copy ID';
@@ -13001,10 +13055,10 @@ window.addMultipleTextboxHandler = function(cellId) {
       // If there's a location indicator, add the new option after it
       if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
         // Location is at the end, just add normally
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, type: 'label', prefill: '' });
       } else {
         // Add the new option
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, prefill: '' });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, type: 'label', prefill: '' });
         // If there's a location indicator before the end, shift it down
         if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
           cell._locationIndex++;
@@ -13080,14 +13134,23 @@ window.removeMultipleTextboxLocationHandler = function(cellId) {
     updateMultipleTextboxesCell(cell);
   }
 };
-// Set type for multiple textbox entry: 'label' | 'amount' | 'phone'
+// Set type for multiple textbox entry: 'label' | 'amount' | 'phone' | 'currency'
 window.setMultipleTextboxType = function(cellId, index, type) {
+  console.log('[QUESTIONS setMultipleTextboxType] Called', { cellId, index, type });
   const cell = getGraph()?.getModel().getCell(cellId);
+  console.log('[QUESTIONS setMultipleTextboxType] Cell retrieved', { 
+    cellExists: !!cell, 
+    questionType: cell ? getQuestionType(cell) : 'N/A',
+    hasTextboxes: cell && !!cell._textboxes,
+    textboxExists: cell && cell._textboxes && !!cell._textboxes[index]
+  });
   if (!(cell && getQuestionType(cell) === "multipleTextboxes" && cell._textboxes && cell._textboxes[index])) {
+    console.warn('[QUESTIONS setMultipleTextboxType] Conditions not met, returning early');
     return;
   }
-  const allowed = ['label','amount','phone'];
+  const allowed = ['label','amount','phone','currency'];
   const requested = allowed.includes(type) ? type : 'label';
+  console.log('[QUESTIONS setMultipleTextboxType] Type validation', { type, allowed, requested });
   // Toggle off if the same type is clicked again
   const current = cell._textboxes[index].type || (cell._textboxes[index].isAmountOption ? 'amount' : 'label');
   console.log('[MTB TYPE] setMultipleTextboxType called', { cellId, index, requested, current });
@@ -13235,14 +13298,23 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
     }
   }
 };
-// Set type for multiple dropdown option: 'label' | 'amount' | 'phone' with toggle-off
+// Set type for multiple dropdown option: 'label' | 'amount' | 'phone' | 'currency' with toggle-off
 window.setMultipleDropdownType = function(cellId, index, type) {
+  console.log('[QUESTIONS setMultipleDropdownType] Called', { cellId, index, type });
   const cell = getGraph()?.getModel().getCell(cellId);
+  console.log('[QUESTIONS setMultipleDropdownType] Cell retrieved', { 
+    cellExists: !!cell, 
+    questionType: cell ? getQuestionType(cell) : 'N/A',
+    hasTextboxes: cell && !!cell._textboxes,
+    textboxExists: cell && cell._textboxes && !!cell._textboxes[index]
+  });
   if (!(cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes && cell._textboxes[index])) {
+    console.warn('[QUESTIONS setMultipleDropdownType] Conditions not met, returning early');
     return;
   }
-  const allowed = ['label', 'amount', 'phone'];
+  const allowed = ['label', 'amount', 'phone', 'currency'];
   const requested = allowed.includes(type) ? type : 'label';
+  console.log('[QUESTIONS setMultipleDropdownType] Type validation', { type, allowed, requested });
   const current = cell._textboxes[index].type || (cell._textboxes[index].isAmountOption ? 'amount' : 'label');
   const finalType = current === requested ? 'label' : requested;
   getGraph().getModel().beginUpdate();

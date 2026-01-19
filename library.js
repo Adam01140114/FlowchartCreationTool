@@ -4627,7 +4627,22 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
         newCell.vertex = true;
         newCell.id = item.id;
         // Transfer all custom properties
-        if (item._textboxes) newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
+        if (item._textboxes) {
+          newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
+          // Initialize type property for old flowcharts that don't have it
+          newCell._textboxes.forEach((tb, index) => {
+            if (!tb.type) {
+              // If type is missing, infer it from isAmountOption for backward compatibility
+              tb.type = tb.isAmountOption ? 'amount' : 'label';
+              console.log('[LIBRARY loadFlowchartData] Initialized missing type property', { 
+                cellId: newCell.id, 
+                index, 
+                inferredType: tb.type, 
+                isAmountOption: tb.isAmountOption 
+              });
+            }
+          });
+        }
         if (item._checkboxes) {
           newCell._checkboxes = JSON.parse(JSON.stringify(item._checkboxes));
         }
