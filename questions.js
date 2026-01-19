@@ -2269,14 +2269,21 @@ function createOptionsContainer(cell) {
     margin-top: 10px;
   `;
   addBtn.onclick = () => {
-    const newOption = { nameId: '', placeholder: 'Enter value', isAmountOption: false, prefill: '', conditionalPrefills: [] };
+    console.log('[QUESTIONS createOptionsContainer] Add button clicked, creating new option');
+    const newOption = { nameId: '', placeholder: 'Enter value', isAmountOption: false, type: 'label', prefill: '', conditionalPrefills: [] };
+    console.log('[QUESTIONS createOptionsContainer] New option created', { newOption });
     if (!cell._textboxes) cell._textboxes = [];
     cell._textboxes.push(newOption);
+    console.log('[QUESTIONS createOptionsContainer] Option added to _textboxes array', { 
+      totalOptions: cell._textboxes.length 
+    });
     const optionContainer = createOptionField(newOption, cell._textboxes.length - 1, cell, container);
+    console.log('[QUESTIONS createOptionsContainer] Option container created, inserting into DOM');
     container.insertBefore(optionContainer, addBtn);
     if (typeof window.requestAutosave === 'function') {
       window.requestAutosave();
     }
+    console.log('[QUESTIONS createOptionsContainer] New option added successfully');
   };
   // Add location button
   const addLocationBtn = document.createElement('button');
@@ -9702,10 +9709,24 @@ function createOptionField(option, index, cell, parentContainer) {
       window.requestAutosave();
     }
   };
+  console.log('[QUESTIONS createOptionField] Starting option field creation', { 
+    cellId: cell.id, 
+    index, 
+    option, 
+    optionType: option.type, 
+    isAmountOption: option.isAmountOption 
+  });
   const entryType = option.type || (option.isAmountOption ? 'amount' : 'label');
   const isAmount = entryType === 'amount';
   const isPhone = entryType === 'phone';
-  // Amount / Phone radios
+  const isCurrency = entryType === 'currency';
+  console.log('[QUESTIONS createOptionField] Entry type determined', { 
+    entryType, 
+    isAmount, 
+    isPhone, 
+    isCurrency 
+  });
+  // Amount / Phone / Currency radios
   const amountLabel = document.createElement('label');
   amountLabel.style.cssText = `
     display: flex;
@@ -9719,6 +9740,10 @@ function createOptionField(option, index, cell, parentContainer) {
   amountRadio.value = 'amount';
   amountRadio.name = `mdd_type_${cell.id}_${index}`;
   amountRadio.checked = isAmount;
+  console.log('[QUESTIONS createOptionField] Amount radio created', { 
+    checked: isAmount, 
+    name: amountRadio.name 
+  });
   amountLabel.appendChild(amountRadio);
   amountLabel.appendChild(document.createTextNode('Amount?'));
   const phoneLabel = document.createElement('label');
@@ -9728,18 +9753,53 @@ function createOptionField(option, index, cell, parentContainer) {
   phoneRadio.value = 'phone';
   phoneRadio.name = `mdd_type_${cell.id}_${index}`;
   phoneRadio.checked = isPhone;
+  console.log('[QUESTIONS createOptionField] Phone radio created', { 
+    checked: isPhone, 
+    name: phoneRadio.name 
+  });
+  const currencyLabel = document.createElement('label');
+  currencyLabel.style.cssText = amountLabel.style.cssText;
+  const currencyRadio = document.createElement('input');
+  currencyRadio.type = 'radio';
+  currencyRadio.value = 'currency';
+  currencyRadio.name = `mdd_type_${cell.id}_${index}`;
+  currencyRadio.checked = isCurrency;
+  console.log('[QUESTIONS createOptionField] Currency radio created', { 
+    checked: isCurrency, 
+    name: currencyRadio.name 
+  });
   // Sync helper keeps DOM in step with data
   const syncRadios = (nextType) => {
     const typeToSync = nextType || option.type || (option.isAmountOption ? 'amount' : 'label');
     amountRadio.checked = typeToSync === 'amount';
     phoneRadio.checked = typeToSync === 'phone';
+    currencyRadio.checked = typeToSync === 'currency';
+    console.log('[QUESTIONS createOptionField] Radios synced', { 
+      typeToSync, 
+      amountChecked: amountRadio.checked, 
+      phoneChecked: phoneRadio.checked, 
+      currencyChecked: currencyRadio.checked 
+    });
   };
   const applyToggle = (newType) => {
     const current = option.type || (option.isAmountOption ? 'amount' : 'label');
     const finalType = current === newType ? 'label' : newType;
+    console.log('[QUESTIONS createOptionField] Applying toggle', { 
+      current, 
+      newType, 
+      finalType 
+    });
     if (typeof window.setMultipleDropdownType === 'function') {
+      console.log('[QUESTIONS createOptionField] Calling setMultipleDropdownType', { 
+        cellId: cell.id, 
+        index, 
+        finalType 
+      });
       window.setMultipleDropdownType(cell.id, index, finalType);
     } else {
+      console.log('[QUESTIONS createOptionField] setMultipleDropdownType not available, setting directly', { 
+        finalType 
+      });
       option.type = finalType;
       option.isAmountOption = finalType === 'amount';
       if (typeof window.requestAutosave === 'function') {
@@ -9748,9 +9808,17 @@ function createOptionField(option, index, cell, parentContainer) {
     }
     option.type = finalType;
     option.isAmountOption = finalType === 'amount';
+    console.log('[QUESTIONS createOptionField] Option updated', { 
+      optionType: option.type, 
+      isAmountOption: option.isAmountOption 
+    });
     syncRadios(finalType);
   };
   const handlePointer = (newType) => (e) => {
+    console.log('[QUESTIONS createOptionField] Pointer event', { 
+      newType, 
+      target: e.target.value 
+    });
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
@@ -9758,11 +9826,25 @@ function createOptionField(option, index, cell, parentContainer) {
   };
   amountRadio.addEventListener('pointerdown', handlePointer('amount'), true);
   phoneRadio.addEventListener('pointerdown', handlePointer('phone'), true);
+  currencyRadio.addEventListener('pointerdown', handlePointer('currency'), true);
   // Change events help keep visual state aligned if native events fire after toggle
-  amountRadio.addEventListener('change', () => syncRadios());
-  phoneRadio.addEventListener('change', () => syncRadios());
+  amountRadio.addEventListener('change', () => {
+    console.log('[QUESTIONS createOptionField] Amount radio change event');
+    syncRadios();
+  });
+  phoneRadio.addEventListener('change', () => {
+    console.log('[QUESTIONS createOptionField] Phone radio change event');
+    syncRadios();
+  });
+  currencyRadio.addEventListener('change', () => {
+    console.log('[QUESTIONS createOptionField] Currency radio change event');
+    syncRadios();
+  });
   phoneLabel.appendChild(phoneRadio);
   phoneLabel.appendChild(document.createTextNode('Phone?'));
+  currencyLabel.appendChild(currencyRadio);
+  currencyLabel.appendChild(document.createTextNode('Currency?'));
+  console.log('[QUESTIONS createOptionField] All radio buttons created and configured');
   // Copy ID button
   const copyBtn = document.createElement('button');
   copyBtn.textContent = 'Copy ID';
@@ -9885,8 +9967,10 @@ function createOptionField(option, index, cell, parentContainer) {
   topRow.appendChild(textInput);
   topRow.appendChild(amountLabel);
   topRow.appendChild(phoneLabel);
+  topRow.appendChild(currencyLabel);
   topRow.appendChild(copyBtn);
   topRow.appendChild(deleteBtn);
+  console.log('[QUESTIONS createOptionField] Top row assembled with all radio buttons');
   // Assemble prefill row
   prefillRow.appendChild(prefillLabel);
   prefillRow.appendChild(prefillInput);

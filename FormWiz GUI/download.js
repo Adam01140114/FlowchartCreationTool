@@ -646,6 +646,35 @@ function loadFormData(formData) {
 
                                         }
                                     }
+                                } else if (field.type === 'currency') {
+                                    // Add a currency field (reuse amount structure but mark as currency)
+                                    addTextboxAmount(question.questionId);
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        // Mark the unified field as currency
+                                        lastField.setAttribute('data-type', 'currency');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        const typeTextEl = lastField.querySelector('#typeText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                        if (typeTextEl) typeTextEl.textContent = 'currency';
+                                        // Update the display text to show "Currency:" instead of "Amount:"
+                                        const displayDiv = lastField.querySelector('div');
+                                        if (displayDiv) {
+                                            const firstChild = displayDiv.querySelector('div:first-child');
+                                            if (firstChild) {
+                                                firstChild.innerHTML = 'Currency: <span id="labelText' + question.questionId + '_' + fieldOrder + '">' + field.label + '</span>';
+                                            }
+                                        }
+                                        // Set conditional prefills if they exist
+                                        if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                            lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+
+                                        }
+                                    }
                                 } else if (field.type === 'phone') {
                                     // Add a phone field (reuse label UI and mark as phone)
                                     addTextboxLabel(question.questionId);
@@ -1447,6 +1476,35 @@ function loadFormData(formData) {
                                     const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
                                     if (labelTextEl) labelTextEl.textContent = field.label;
                                     if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    // Set conditional prefills if they exist
+                                    if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
+                                        lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
+
+                                    }
+                                }
+                            } else if (field.type === 'currency') {
+                                // Add a currency field (reuse amount structure but mark as currency)
+                                addTextboxAmount(question.questionId);
+                                // Set the field values
+                                const lastField = unifiedFieldsDiv.lastElementChild;
+                                if (lastField) {
+                                    const fieldOrder = lastField.getAttribute('data-order');
+                                    // Mark the unified field as currency
+                                    lastField.setAttribute('data-type', 'currency');
+                                    const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                    const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                    const typeTextEl = lastField.querySelector('#typeText' + question.questionId + '_' + fieldOrder);
+                                    if (labelTextEl) labelTextEl.textContent = field.label;
+                                    if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    if (typeTextEl) typeTextEl.textContent = 'currency';
+                                    // Update the display text to show "Currency:" instead of "Amount:"
+                                    const displayDiv = lastField.querySelector('div');
+                                    if (displayDiv) {
+                                        const firstChild = displayDiv.querySelector('div:first-child');
+                                        if (firstChild) {
+                                            firstChild.innerHTML = 'Currency: <span id="labelText' + question.questionId + '_' + fieldOrder + '">' + field.label + '</span>';
+                                        }
+                                    }
                                     // Set conditional prefills if they exist
                                     if (field.conditionalPrefills && field.conditionalPrefills.length > 0) {
                                         lastField.setAttribute('data-conditional-prefills', JSON.stringify(field.conditionalPrefills));
@@ -2516,6 +2574,9 @@ function loadFormData(formData) {
                             const operatorSelect = questionBlock.querySelector(`#alertOperator${question.questionId}_${conditionIndex}`);
                             const amountInput = questionBlock.querySelector(`#alertAmount${question.questionId}_${conditionIndex}`);
                             const conditionMessageInput = questionBlock.querySelector(`#alertConditionMessage${question.questionId}_${conditionIndex}`);
+                            const statusRequirementSelect = questionBlock.querySelector(`#statusRequirement${question.questionId}_${conditionIndex}`);
+                            const statusRequirementContainer = questionBlock.querySelector(`#statusRequirementContainer${question.questionId}_${conditionIndex}`);
+                            const statusRequirementBtn = questionBlock.querySelector(`#statusRequirementBtn${question.questionId}_${conditionIndex}`);
                             
                             if (prevQuestionInput) {
                                 prevQuestionInput.value = condition.prevQuestion;
@@ -2524,6 +2585,83 @@ function loadFormData(formData) {
                                 // Restore condition message if it exists
                                 if (conditionMessageInput && condition.message) {
                                     conditionMessageInput.value = condition.message;
+                                }
+                                
+                                // Restore status requirements if they exist (support both old single and new array format)
+                                const statusRequirements = condition.statusRequirements || (condition.statusRequirement ? [condition.statusRequirement] : []);
+                                if (statusRequirements.length > 0) {
+                                    const statusRequirementList = questionBlock.querySelector(`#statusRequirementList${question.questionId}_${conditionIndex}`);
+                                    if (statusRequirementContainer) {
+                                        statusRequirementContainer.style.display = 'block';
+                                    }
+                                    if (statusRequirementBtn) {
+                                        statusRequirementBtn.textContent = '- Remove Status Requirement';
+                                    }
+                                    
+                                    // Collect all status titles from the JSON data
+                                    const allStatusTitles = new Set();
+                                    if (formData && formData.sections) {
+                                        formData.sections.forEach(section => {
+                                            (section.questions || []).forEach(q => {
+                                                if (q.status && q.status.enabled && q.status.title && q.status.title.trim()) {
+                                                    allStatusTitles.add(q.status.title.trim());
+                                                }
+                                            });
+                                        });
+                                    }
+                                    
+                                    // Also check DOM as fallback (in case some statuses were added manually)
+                                    const allQuestionBlocks = document.querySelectorAll('[id^="questionBlock"]');
+                                    allQuestionBlocks.forEach(block => {
+                                        const blockId = block.id;
+                                        const qId = blockId.replace('questionBlock', '');
+                                        const statusCheckbox = block.querySelector(`#enableStatus${qId}`);
+                                        const statusTitleInput = block.querySelector(`#statusTitle${qId}`);
+                                        
+                                        if (statusCheckbox && statusCheckbox.checked && statusTitleInput && statusTitleInput.value.trim()) {
+                                            allStatusTitles.add(statusTitleInput.value.trim());
+                                        }
+                                    });
+                                    
+                                    // Add each status requirement
+                                    statusRequirements.forEach((statusReq, reqIndex) => {
+                                        const reqNum = reqIndex + 1;
+                                        // Add status requirement item
+                                        if (statusRequirementList) {
+                                            const requirementDiv = document.createElement('div');
+                                            requirementDiv.className = 'status-requirement-item';
+                                            requirementDiv.style.cssText = 'margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;';
+                                            requirementDiv.innerHTML = `
+                                                <label>Status Requirement ${reqNum}:</label>
+                                                <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                                    <select id="statusRequirement${question.questionId}_${conditionIndex}_${reqNum}" style="flex: 1; padding: 5px;">
+                                                        <option value="">-- Select a status --</option>
+                                                    </select>
+                                                    <button type="button" onclick="removeStatusRequirement(${question.questionId}, ${conditionIndex}, ${reqNum})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>
+                                                </div>
+                                            `;
+                                            statusRequirementList.appendChild(requirementDiv);
+                                            
+                                            // Populate and set value
+                                            const select = document.getElementById(`statusRequirement${question.questionId}_${conditionIndex}_${reqNum}`);
+                                            if (select) {
+                                                // Populate dropdown
+                                                allStatusTitles.forEach(statusTitle => {
+                                                    const option = document.createElement('option');
+                                                    option.value = statusTitle;
+                                                    option.textContent = statusTitle;
+                                                    select.appendChild(option);
+                                                });
+                                                
+                                                // Set value after a small delay
+                                                setTimeout(() => {
+                                                    if (select && statusReq) {
+                                                        select.value = statusReq;
+                                                    }
+                                                }, 50);
+                                            }
+                                        }
+                                    });
                                 }
                                 
                                 // Check if this is a currency condition
@@ -3017,23 +3155,43 @@ function exportForm() {
                         const operator = row.querySelector(`#alertOperator${questionId}_${conditionIndex}`)?.value || "";
                         const amount = row.querySelector(`#alertAmount${questionId}_${conditionIndex}`)?.value || "";
                         const conditionMessage = row.querySelector(`#alertConditionMessage${questionId}_${conditionIndex}`)?.value || "";
+                        // Collect all status requirements for this condition
+                        const statusRequirementList = row.querySelector(`#statusRequirementList${questionId}_${conditionIndex}`);
+                        const statusRequirements = [];
+                        if (statusRequirementList) {
+                            const statusSelects = statusRequirementList.querySelectorAll('select');
+                            statusSelects.forEach(select => {
+                                const value = select.value?.trim();
+                                if (value) {
+                                    statusRequirements.push(value);
+                                }
+                            });
+                        }
                         
                         // Check if this is a currency condition (has operator and amount)
                         if (prevQuestion && operator && amount) {
-                            alertLogicConditionsArray.push({
+                            const conditionObj = {
                                 prevQuestion: prevQuestion,
                                 operator: operator,
                                 amount: parseFloat(amount) || 0,
                                 isCurrency: true,
                                 message: conditionMessage
-                            });
+                            };
+                            if (statusRequirements.length > 0) {
+                                conditionObj.statusRequirements = statusRequirements;
+                            }
+                            alertLogicConditionsArray.push(conditionObj);
                         } else if (prevQuestion && prevAnswer) {
                             // Regular condition
-                            alertLogicConditionsArray.push({
+                            const conditionObj = {
                                 prevQuestion: prevQuestion,
                                 prevAnswer: prevAnswer,
                                 message: conditionMessage
-                            });
+                            };
+                            if (statusRequirements.length > 0) {
+                                conditionObj.statusRequirements = statusRequirements;
+                            }
+                            alertLogicConditionsArray.push(conditionObj);
                         }
                     });
                 }
@@ -3869,8 +4027,8 @@ function exportForm() {
                         if (fieldType === 'label') {
                             fieldData.prefill = prefillValue;
                         }
-                        // Export conditional prefills for both label and amount fields
-                        if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone') {
+                        // Export conditional prefills for label, amount, currency, and phone fields
+                        if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'currency' || fieldType === 'phone') {
                             const conditionalPrefillsData = field.getAttribute('data-conditional-prefills');
 
                             if (conditionalPrefillsData) {

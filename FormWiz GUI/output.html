@@ -294,28 +294,8 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">How much cash do you have</h3></label><div class="text-input-container"><input type="text" id="how_much_cash_do_you_have" name="how_much_cash_do_you_have" inputmode="decimal" placeholder="Enter amount" oninput="formatCurrencyInput(this)"></div><script>
-          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
-            if (!input) return;
-            // Remove all non-numeric characters except decimal point, including dollar sign
-            let val = (input.value || '').replace(/[^0-9.]/g, '');
-            if (!val) {
-              input.value = '';
-              return;
-            }
-            const parts = val.split('.');
-            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
-            // Add dollar sign prefix
-            input.value = '$' + parts[0] + decimal;
-          };
-        </script></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many sources of income do you have?</h3></label><select id="how_many_sources_of_income_do_you_have" name="how_many_sources_of_income_do_you_have" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_sources_of_income_do_you_have', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer1"></div></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
@@ -1098,6 +1078,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
               return;
             }
+            
+            // Check alert logic for the current question before navigating
+            if (activeContainer && typeof checkAlertLogic === 'function') {
+              // Get the question ID from the active container
+              const questionId = activeContainer.getAttribute('data-question-id');
+              if (questionId) {
+                // Find the input/select element for this question
+                const questionInput = activeContainer.querySelector('input, select, textarea');
+                if (questionInput) {
+                  const alertShown = checkAlertLogic(questionInput);
+                  // If alert was shown, don't navigate - user must close alert first
+                  if (alertShown) {
+                    return; // Prevent navigation until alert is closed
+                  }
+                }
+              }
+            }
           }
           const nextPos = currentPos + direction;
 
@@ -1497,13 +1494,13 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"how_much_cash_do_you_have","2":"hungry"};
-var questionNameIds = {"1":"how_much_cash_do_you_have","2":"hungry"};
+var questionSlugMap = {"1":"how_many_sources_of_income_do_you_have"};
+var questionNameIds = {"1":"how_many_sources_of_income_do_you_have"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_income_source","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_income_value","order":2}]};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -3445,13 +3442,13 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
-var alertLogics = [{"questionId":"1","message":"you got more than 5 bucks","conditions":[{"prevQuestion":"1","operator":">","amount":5,"isCurrency":true}]}];
+var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"1":["Income Source"],"length":0};
+var amountMap = {"1":["Income Value"],"length":0};
+var labelNodeIdsMap = {"1":["how_many_sources_of_income_do_you_have_income_source"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -3738,69 +3735,6 @@ var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="currency";
-    var cPrevAns="any text";
-    var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; } else { } }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var textQuestion = "1";
-   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
-   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
 
 /*──────────────────────────────────────────────────────────────*
  * Handle "Mark only one" selection functionality
@@ -4024,100 +3958,6 @@ function showValidationPopup() {
         '</div>';
     showAlert(validationMessage);
 }
-
-function checkAlertLogic(changedElement) {
-    if (!alertLogics || alertLogics.length === 0) return;
-    // Get the question ID from the changed element
-    let changedQuestionId = null;
-    if (changedElement) {
-        const elementId = changedElement.id;
-        // Try to extract question ID from element ID
-        for (const [qId, nameId] of Object.entries(questionNameIds)) {
-            if (elementId === nameId || elementId === 'answer' + qId) {
-                changedQuestionId = qId;
-                break;
-            }
-        }
-    }
-    // If we can't determine which question changed, don't check any alerts
-    // This prevents alerts from triggering on unrelated form elements
-    if (!changedQuestionId) return;
-    for (const alertLogic of alertLogics) {
-        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
-        // Only check this alert logic if it's related to the changed element
-        let shouldCheckThisAlert = false;
-        // Check if any condition in this alert logic references the changed question
-        for (const condition of alertLogic.conditions) {
-            if (condition.prevQuestion === changedQuestionId) {
-                shouldCheckThisAlert = true;
-                break;
-            }
-        }
-        if (!shouldCheckThisAlert) continue;
-        let shouldShowAlert = false;
-        // Check if ANY of the conditions match (OR logic)
-        for (const condition of alertLogic.conditions) {
-            const prevQuestionId = condition.prevQuestion;
-            // Get the previous question's value
-            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                      document.getElementById('answer' + prevQuestionId);
-            if (prevQuestionElement) {
-                let prevValue = '';
-                if (prevQuestionElement.type === 'checkbox') {
-                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                } else {
-                    prevValue = prevQuestionElement.value;
-                }
-                
-                // Check if this is a currency condition
-                if (condition.isCurrency && condition.operator && condition.amount !== undefined) {
-                    // Parse the currency value (remove $ and commas, then parse as float)
-                    const currencyValue = parseFloat(prevValue.toString().replace(/[$,]/g, '')) || 0;
-                    const compareAmount = parseFloat(condition.amount) || 0;
-                    let conditionMet = false;
-                    
-                    if (condition.operator === '>') {
-                        conditionMet = currencyValue > compareAmount;
-                    } else if (condition.operator === '<') {
-                        conditionMet = currencyValue < compareAmount;
-                    } else if (condition.operator === '=') {
-                        conditionMet = Math.abs(currencyValue - compareAmount) < 0.01; // Allow small floating point differences
-                    }
-                    
-                    if (conditionMet) {
-                        shouldShowAlert = true;
-                        break; // Found a match, no need to check other conditions
-                    }
-                } else {
-                    // Regular condition (string match)
-                    const prevAnswer = condition.prevAnswer;
-                    if (prevAnswer && prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                        shouldShowAlert = true;
-                        break; // Found a match, no need to check other conditions
-                    }
-                }
-            }
-        }
-        // Show alert if conditions are met
-        if (shouldShowAlert && alertLogic.message) {
-            showAlert(alertLogic.message);
-            return; // Show only the first matching alert
-        }
-    }
-}
-// Add event listeners for alert logic
-document.addEventListener('DOMContentLoaded', function() {
-    const formElements = document.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('change', function() { checkAlertLogic(this); });
-        element.addEventListener('input', function() { checkAlertLogic(this); });
-    });
-    // Initialize checkbox styling for beautiful blue borders
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        updateCheckboxStyle(checkbox);
-    });
-});
 
 // Helper function to deduplicate PDFs based on comprehensive unique key
 function deduplicatePdfs(pdfArray) {

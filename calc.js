@@ -352,12 +352,12 @@ function updateCalculationNodeCell(cell) {
           // For numbered_dropdown or question_value, check if the stored value matches
           // Also check if the full label format matches
           if (term.amountLabel === lbl || term.amountLabel === value) {
-            selected = "selected";
-          }
-        } else {
-          // For regular values, check direct match
-          if (lbl === term.amountLabel) {
-            selected = "selected";
+          selected = "selected";
+        }
+      } else {
+        // For regular values, check direct match
+        if (lbl === term.amountLabel) {
+          selected = "selected";
           }
         }
       }

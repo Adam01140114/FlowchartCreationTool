@@ -1430,10 +1430,10 @@ window.addmultipleDropdownTypeHandler = function(cellId) {
       // If there's a location indicator, add the new option after it
       if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
         // Location is at the end, just add normally
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, type: 'label' });
       } else {
         // Add the new option
-        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false, type: 'label' });
         // If there's a location indicator before the end, shift it down
         if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
           cell._locationIndex++;
@@ -1468,28 +1468,55 @@ window.deletemultipleDropdownTypeHandler = function(cellId, index) {
     updatemultipleDropdownTypeCell(cell);
   }
 };
-window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
+// Set type for multiple dropdown type (replaces toggleMultipleDropdownAmount)
+window.setMultipleDropdownType = function(cellId, index, type) {
+  console.log('[SCRIPT setMultipleDropdownType] Called', { cellId, index, type });
   const cell = graph.getModel().getCell(cellId);
-  if (cell) {
-    const questionType = getQuestionType(cell);
-    if (cell._textboxes && cell._textboxes[index]) {
-    }
-  }
-  if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes) {
+  console.log('[SCRIPT setMultipleDropdownType] Cell retrieved', { 
+    cellExists: !!cell, 
+    questionType: cell ? getQuestionType(cell) : 'N/A',
+    hasTextboxes: cell && !!cell._textboxes,
+    textboxExists: cell && cell._textboxes && !!cell._textboxes[index]
+  });
+  if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes && cell._textboxes[index]) {
+    console.log('[SCRIPT setMultipleDropdownType] Conditions met, updating', { 
+      currentType: cell._textboxes[index].type,
+      currentIsAmountOption: cell._textboxes[index].isAmountOption,
+      newType: type
+    });
     graph.getModel().beginUpdate();
     try {
-      const oldValue = cell._textboxes[index].isAmountOption;
-      cell._textboxes[index].isAmountOption = checked;
+      // Set the type property
+      cell._textboxes[index].type = type;
+      // Update isAmountOption for backward compatibility
+      cell._textboxes[index].isAmountOption = type === 'amount';
+      console.log('[SCRIPT setMultipleDropdownType] Textbox updated', { 
+        newType: cell._textboxes[index].type,
+        newIsAmountOption: cell._textboxes[index].isAmountOption
+      });
     } finally {
       graph.getModel().endUpdate();
     }
+    console.log('[SCRIPT setMultipleDropdownType] Calling updatemultipleDropdownTypeCell');
     updatemultipleDropdownTypeCell(cell);
     // Trigger autosave to ensure the change is persisted
     if (typeof window.requestAutosave === 'function') {
+      console.log('[SCRIPT setMultipleDropdownType] Triggering autosave');
       window.requestAutosave();
-    } else {
     }
+    console.log('[SCRIPT setMultipleDropdownType] Complete');
   } else {
+    console.warn('[SCRIPT setMultipleDropdownType] Conditions not met, skipping update');
+  }
+};
+// Legacy function for backward compatibility
+window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType" && cell._textboxes && cell._textboxes[index]) {
+    // Convert checkbox toggle to type setting
+    const currentType = cell._textboxes[index].type || (cell._textboxes[index].isAmountOption ? 'amount' : 'label');
+    const newType = checked ? 'amount' : 'label';
+    window.setMultipleDropdownType(cellId, index, newType);
   }
 };
 // Toggle amount option for multiple textboxes
@@ -1886,7 +1913,7 @@ window.pickTypeForCell = function(cellId, val) {
     } else if (val === "multipleDropdownType") {
       c._questionText = "Enter question text";
       c._twoNumbers = { first: "0", second: "0" };
-      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false, type: 'label' }];
       updatemultipleDropdownTypeCell(c);
     }
     // For all other types, setQuestionType handles rendering
@@ -4594,7 +4621,7 @@ window.pickTypeForCell = function(cellId, val) {
     } else if (val === "multipleDropdownType") {
       c._questionText = "Enter question text";
       c._twoNumbers = { first: "0", second: "0" };
-      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false, type: 'label' }];
       updatemultipleDropdownTypeCell(c);
     }
     // For all other types, setQuestionType handles rendering
@@ -4738,14 +4765,23 @@ function autosaveFlowchartToLocalStorage() {
     }
     const parent = graph.getDefaultParent();
     const cells = graph.getChildCells(parent, true, true);
+    const libraryFlowchartName = window.currentFlowchartName || null;
+    console.log('[AUTOSAVE] Starting autosave', {
+      cellCount: cells.length,
+      libraryFlowchartName
+    });
     // Quick check if data has actually changed
     const currentHash = JSON.stringify({
       cellCount: cells.length,
       sectionPrefs: sectionPrefs,
-      groups: groups
+      groups: groups,
+      libraryFlowchartName
     });
     if (currentHash === autosaveDataHash && lastAutosaveData) {
       // Data hasn't changed, skip autosave
+      console.log('[AUTOSAVE] Skipped (no changes detected)', {
+        libraryFlowchartName
+      });
       return;
     }
     const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
@@ -4830,6 +4866,10 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._checklistText !== undefined) cellData._checklistText = cell._checklistText;
       // Alert node properties
       if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
+      // Currency node alert properties
+      if (cell._currencyAlerts) {
+        cellData._currencyAlerts = JSON.parse(JSON.stringify(cell._currencyAlerts));
+      }
       // Hidden node properties - always save these if they exist on the cell
       if (cell.hasOwnProperty('_hiddenNodeId')) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
@@ -4893,7 +4933,7 @@ function autosaveFlowchartToLocalStorage() {
     // Get form name
     const formName = document.getElementById('formNameInput')?.value || '';
     // Get current library flowchart name (if any)
-    const libraryFlowchartName = window.currentFlowchartName || null;
+    // (reused above for hashing and logging)
     // Get current camera/viewport position
     const view = graph.getView();
     const translate = view.getTranslate();
@@ -4918,8 +4958,12 @@ function autosaveFlowchartToLocalStorage() {
     autosaveDataHash = currentHash;
     const json = JSON.stringify(data);
     localStorage.setItem(AUTOSAVE_KEY, json);
+    console.log('[AUTOSAVE] Saved to localStorage', {
+      libraryFlowchartName
+    });
   } catch (e) {
     // Silently handle errors to avoid performance impact
+    console.warn('[AUTOSAVE] Failed', e);
   }
 }
 function clearAutosaveLocalStorage() {
@@ -5204,9 +5248,13 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
+      console.log('[AUTOSAVE RESTORE] Found autosave data', {
+        libraryFlowchartName: data.libraryFlowchartName || null
+      });
       // Check if this was a library flowchart and handle it specially
       if (data.libraryFlowchartName && typeof window.openSavedFlowchart === 'function') {
         // Show alert to user
+        console.log('[AUTOSAVE RESTORE] Opening from library', data.libraryFlowchartName);
         alert(`Opening ${data.libraryFlowchartName} from library`);
         // Set the current flowchart name first
         window.currentFlowchartName = data.libraryFlowchartName;
@@ -5543,7 +5591,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.vertex = true;
         newCell.id = nodeData.newId;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_dropdownTitle","_fileName","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_pdfPreviewTitle","_pdfPreviewFile","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_linkedCheckboxNodeId","_linkedCheckboxOptions","_inverseCheckboxNodeId","_inverseCheckboxOption","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice","_locationIndex","_locationTitle","_checkboxes","_itemOrder","_times","_dropdowns","_lineLimit","_characterLimit","_paragraphLimit","_currencyAlerts"].forEach(k => {
           // For limit properties, also copy empty strings and null values
           const isLimitProperty = k === '_lineLimit' || k === '_characterLimit' || k === '_paragraphLimit';
           if (isLimitProperty) {

@@ -2,100 +2,15 @@
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Section 1",
+      "sectionName": "Employment Info",
       "questions": [
         {
           "questionId": 1,
-          "text": "How much cash do you have",
-          "type": "currency",
+          "text": "How many sources of income do you have?",
+          "type": "numberedDropdown",
           "logic": {
             "enabled": false,
             "conditions": []
-          },
-          "jump": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalPDF": {
-            "enabled": false,
-            "pdfName": "",
-            "answer": "Yes"
-          },
-          "hiddenLogic": {
-            "enabled": false,
-            "configs": []
-          },
-          "pdfLogic": {
-            "enabled": false,
-            "conditions": [],
-            "pdfs": []
-          },
-          "alertLogic": {
-            "enabled": true,
-            "message": "you got more than 5 bucks",
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "operator": ">",
-                "amount": 5,
-                "isCurrency": true
-              }
-            ]
-          },
-          "checklistLogic": {
-            "enabled": false,
-            "conditions": []
-          },
-          "conditionalAlert": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": "",
-            "text": ""
-          },
-          "subtitle": {
-            "enabled": false,
-            "text": ""
-          },
-          "infoBox": {
-            "enabled": false,
-            "text": ""
-          },
-          "pdfPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "file": ""
-          },
-          "latexPreview": {
-            "enabled": false,
-            "trigger": "",
-            "title": "",
-            "content": "",
-            "priceId": "",
-            "attachment": "Preview Only"
-          },
-          "status": {
-            "enabled": false,
-            "trigger": "",
-            "title": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "how_much_cash_do_you_have",
-          "placeholder": ""
-        },
-        {
-          "questionId": 2,
-          "text": "Hungry?",
-          "type": "dropdown",
-          "logic": {
-            "enabled": true,
-            "conditions": [
-              {
-                "prevQuestion": "1",
-                "prevAnswer": "Any Text"
-              }
-            ]
           },
           "jump": {
             "enabled": false,
@@ -157,13 +72,26 @@
             "trigger": "",
             "title": ""
           },
-          "options": [
-            "Yes",
-            "No"
-          ],
+          "options": [],
           "labels": [],
-          "nameId": "hungry",
-          "placeholder": ""
+          "nodeId": "how_many_sources_of_income_do_you_have",
+          "min": "1",
+          "max": "4",
+          "allFieldsInOrder": [
+            {
+              "type": "label",
+              "label": "Income Source",
+              "nodeId": "how_many_sources_of_income_do_you_have_income_source",
+              "order": 1,
+              "prefill": ""
+            },
+            {
+              "type": "amount",
+              "label": "Income Value",
+              "nodeId": "how_many_sources_of_income_do_you_have_income_value",
+              "order": 2
+            }
+          ]
         }
       ]
     }
@@ -171,7 +99,7 @@
   "groups": [],
   "hiddenFields": [],
   "sectionCounter": 2,
-  "questionCounter": 3,
+  "questionCounter": 2,
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",

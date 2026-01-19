@@ -483,6 +483,8 @@ function showPropertiesPopup(cell) {
     title.textContent = 'Inverse Checkbox Properties';
   } else if (typeof window.isImageNode === 'function' && window.isImageNode(cell)) {
     title.textContent = 'Image Node Properties';
+  } else if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'currency') {
+    title.textContent = 'Currency Node Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -552,9 +554,14 @@ function showPropertiesPopup(cell) {
   // Generate default Node ID based on question text if _nameId is not set
   const generateDefaultNodeId = (text) => {
     if (!text) return 'N/A';
+    // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+    if (typeof window.sanitizeNameId === 'function') {
+      return window.sanitizeNameId(text);
+    }
     return text
       .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
+      .replace(/<[^>]+>/g, '') // Remove HTML tags
+      .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
       .replace(/\s+/g, '_') // Replace spaces with underscores
       .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
   };
@@ -1120,7 +1127,325 @@ function showPropertiesPopup(cell) {
       }
     }
   }
+  // Special handling for currency nodes - custom properties menu
+  const isCurrencyNode = typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'currency';
+  if (isCurrencyNode) {
+    // Clear existing properties and create custom currency properties
+    properties = [];
+    
+    // Question Text input
+    properties.push({
+      label: 'Question Text',
+      value: nodeText,
+      id: 'propCurrencyQuestionText',
+      editable: true
+    });
+    
+    // Initialize currency alert properties if they don't exist
+    // Change structure to support multiple alerts
+    if (!cell._currencyAlerts) {
+      cell._currencyAlerts = [];
+    }
+    // For backward compatibility, migrate old _currencyAlert to _currencyAlerts array
+    if (cell._currencyAlert && !cell._currencyAlerts.length) {
+      cell._currencyAlerts = [{
+        enabled: cell._currencyAlert.enabled || false,
+        operator: cell._currencyAlert.operator || '>',
+        amount: cell._currencyAlert.amount || '',
+        title: cell._currencyAlert.title || '',
+        statusRequirements: cell._currencyAlert.statusRequirements || []
+      }];
+      // Clear old property
+      delete cell._currencyAlert;
+    }
+    
+    // Enable Alert checkbox (controls visibility of all alerts)
+    const enableAlertCheckbox = document.createElement('input');
+    enableAlertCheckbox.type = 'checkbox';
+    enableAlertCheckbox.checked = cell._currencyAlerts.length > 0 && cell._currencyAlerts.some(alert => alert.enabled);
+    enableAlertCheckbox.id = 'propCurrencyEnableAlert';
+    enableAlertCheckbox.style.cssText = 'margin-right: 8px;';
+    
+    const enableAlertLabel = document.createElement('label');
+    enableAlertLabel.htmlFor = 'propCurrencyEnableAlert';
+    enableAlertLabel.textContent = 'Enable Alert';
+    enableAlertLabel.style.cssText = 'font-weight: 600; color: #333; cursor: pointer; display: flex; align-items: center; margin-bottom: 12px;';
+    enableAlertLabel.insertBefore(enableAlertCheckbox, enableAlertLabel.firstChild);
+    
+    // Alerts container (holds all alert modules)
+    const alertsContainer = document.createElement('div');
+    alertsContainer.id = 'propCurrencyAlertsContainer';
+    alertsContainer.style.display = enableAlertCheckbox.checked ? 'block' : 'none';
+    alertsContainer.style.cssText = 'margin-left: 20px; margin-bottom: 16px;';
+    
+    // Function to get all status node IDs
+    const getAllStatusNodeIds = () => {
+      const statusNodeIds = [];
+      if (window.graph) {
+        const vertices = window.graph.getChildVertices(window.graph.getDefaultParent());
+        vertices.forEach(vertex => {
+          // Check if this is a status node by checking the style
+          if (vertex && vertex.style && vertex.style.includes("nodeType=status")) {
+            const statusNodeId = typeof window.getNodeId === 'function' ? window.getNodeId(vertex) : (vertex.value || '');
+            if (statusNodeId && statusNodeId.trim()) {
+              statusNodeIds.push(statusNodeId.trim());
+            }
+          }
+        });
+      }
+      return statusNodeIds;
+    };
+    
+    // Function to render a single alert module
+    const renderAlertModule = (alert, alertIndex) => {
+      const alertModule = document.createElement('div');
+      alertModule.dataset.currencyAlertIndex = String(alertIndex);
+      alertModule.style.cssText = 'border: 2px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #f9f9f9;';
+      
+      // Operator dropdown
+      const operatorLabel = document.createElement('label');
+      operatorLabel.textContent = 'Operator:';
+      operatorLabel.style.cssText = 'display: block; font-size: 12px; margin-bottom: 4px; color: #666;';
+      const operatorDropdown = document.createElement('select');
+      operatorDropdown.id = `propCurrencyOperator_${alertIndex}`;
+      operatorDropdown.value = alert.operator || '>';
+      operatorDropdown.style.cssText = 'width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 12px;';
+      const operatorOptions = ['>', '<', '='];
+      operatorOptions.forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent = op;
+        operatorDropdown.appendChild(option);
+      });
+      operatorDropdown.onchange = () => {
+        alert.operator = operatorDropdown.value;
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      
+      // Amount input
+      const amountLabel = document.createElement('label');
+      amountLabel.textContent = 'Amount:';
+      amountLabel.style.cssText = 'display: block; font-size: 12px; margin-bottom: 4px; color: #666;';
+      const amountInput = document.createElement('input');
+      amountInput.type = 'number';
+      amountInput.id = `propCurrencyAmount_${alertIndex}`;
+      amountInput.value = alert.amount || '';
+      amountInput.placeholder = 'Enter amount...';
+      amountInput.style.cssText = 'width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 12px;';
+      amountInput.onblur = () => {
+        alert.amount = amountInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      
+      // Alert Title input
+      const alertTitleLabel = document.createElement('label');
+      alertTitleLabel.textContent = 'Alert Title:';
+      alertTitleLabel.style.cssText = 'display: block; font-size: 12px; margin-bottom: 4px; color: #666;';
+      const alertTitleInput = document.createElement('input');
+      alertTitleInput.type = 'text';
+      alertTitleInput.id = `propCurrencyAlertTitle_${alertIndex}`;
+      alertTitleInput.value = alert.title || '';
+      alertTitleInput.placeholder = 'Enter alert title...';
+      alertTitleInput.style.cssText = 'width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 12px;';
+      alertTitleInput.onblur = () => {
+        alert.title = alertTitleInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      
+      // Status Requirements container
+      const statusRequirementsContainer = document.createElement('div');
+      statusRequirementsContainer.id = `propCurrencyStatusRequirements_${alertIndex}`;
+      statusRequirementsContainer.style.cssText = 'margin-top: 12px;';
+      
+      // Function to render status requirements for this alert
+      const renderStatusRequirements = () => {
+        statusRequirementsContainer.innerHTML = '';
+        const statusRequirements = alert.statusRequirements || [];
+        
+        statusRequirements.forEach((statusReq, reqIndex) => {
+          const reqDiv = document.createElement('div');
+          reqDiv.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 8px;';
+          
+          const statusDropdown = document.createElement('select');
+          statusDropdown.dataset.currencyStatusRequirement = "true";
+          statusDropdown.style.cssText = 'flex: 1; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;';
+          const statusNodeIds = getAllStatusNodeIds();
+          
+          // Add placeholder option
+          const placeholderOption = document.createElement('option');
+          placeholderOption.value = '';
+          placeholderOption.textContent = 'Select status node...';
+          statusDropdown.appendChild(placeholderOption);
+          
+          // Add status node IDs
+          statusNodeIds.forEach(nodeId => {
+            const option = document.createElement('option');
+            option.value = nodeId;
+            option.textContent = nodeId;
+            if (statusReq === nodeId) {
+              option.selected = true;
+            }
+            statusDropdown.appendChild(option);
+          });
+          
+          statusDropdown.value = statusReq || '';
+          statusDropdown.onchange = () => {
+            alert.statusRequirements[reqIndex] = statusDropdown.value;
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '×';
+          removeBtn.style.cssText = 'background: #f44336; color: white; border: none; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 16px; flex-shrink: 0;';
+          removeBtn.onclick = () => {
+            alert.statusRequirements.splice(reqIndex, 1);
+            renderStatusRequirements();
+            if (typeof window.requestAutosave === 'function') {
+              window.requestAutosave();
+            }
+          };
+          
+          reqDiv.appendChild(statusDropdown);
+          reqDiv.appendChild(removeBtn);
+          statusRequirementsContainer.appendChild(reqDiv);
+        });
+      };
+      
+      // Add Status Requirement button
+      const addStatusReqBtn = document.createElement('button');
+      addStatusReqBtn.textContent = 'Add Status Requirement';
+      addStatusReqBtn.style.cssText = 'background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 8px;';
+      addStatusReqBtn.onclick = () => {
+        if (!alert.statusRequirements) {
+          alert.statusRequirements = [];
+        }
+        alert.statusRequirements.push('');
+        renderStatusRequirements();
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      
+      // Assemble alert module
+      alertModule.appendChild(operatorLabel);
+      alertModule.appendChild(operatorDropdown);
+      alertModule.appendChild(amountLabel);
+      alertModule.appendChild(amountInput);
+      alertModule.appendChild(alertTitleLabel);
+      alertModule.appendChild(alertTitleInput);
+      alertModule.appendChild(statusRequirementsContainer);
+      alertModule.appendChild(addStatusReqBtn);
+      
+      // Initial render of status requirements
+      renderStatusRequirements();
+      
+      return alertModule;
+    };
+    
+    // Function to render all alerts
+    const renderAllAlerts = () => {
+      alertsContainer.innerHTML = '';
+      if (cell._currencyAlerts && cell._currencyAlerts.length > 0) {
+        cell._currencyAlerts.forEach((alert, index) => {
+          const alertModule = renderAlertModule(alert, index);
+          alertsContainer.appendChild(alertModule);
+        });
+      }
+      
+      // Add "Add Another Alert" button at the end
+      const addAnotherAlertBtn = document.createElement('button');
+      addAnotherAlertBtn.textContent = 'Add Another Alert';
+      addAnotherAlertBtn.style.cssText = 'background: #2196F3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 8px;';
+      addAnotherAlertBtn.onclick = () => {
+        if (!cell._currencyAlerts) {
+          cell._currencyAlerts = [];
+        }
+        cell._currencyAlerts.push({
+          enabled: true,
+          operator: '>',
+          amount: '',
+          title: '',
+          statusRequirements: []
+        });
+        renderAllAlerts();
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      };
+      alertsContainer.appendChild(addAnotherAlertBtn);
+    };
+    
+    // Initial render of all alerts
+    renderAllAlerts();
+    
+    // Enable Alert checkbox change handler
+    enableAlertCheckbox.onchange = () => {
+      const isEnabled = enableAlertCheckbox.checked;
+      alertsContainer.style.display = isEnabled ? 'block' : 'none';
+      
+      // If enabling and no alerts exist, create the first one
+      if (isEnabled && (!cell._currencyAlerts || cell._currencyAlerts.length === 0)) {
+        if (!cell._currencyAlerts) {
+          cell._currencyAlerts = [];
+        }
+        cell._currencyAlerts.push({
+          enabled: true,
+          operator: '>',
+          amount: '',
+          title: '',
+          statusRequirements: []
+        });
+        renderAllAlerts();
+      }
+      
+      // Update enabled state for all alerts
+      if (cell._currencyAlerts) {
+        cell._currencyAlerts.forEach(alert => {
+          alert.enabled = isEnabled;
+        });
+      }
+      
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    };
+    
+    // Create a special property entry for the currency alert UI
+    properties.push({
+      label: '',
+      value: '',
+      id: 'propCurrencyAlert',
+      editable: false,
+      isCustomCurrencyUI: true,
+      customUI: {
+        enableAlertCheckbox: enableAlertLabel,
+        alertsContainer: alertsContainer
+      }
+    });
+  }
   properties.forEach((prop, index) => {
+    // Special handling for custom currency UI
+    if (prop.isCustomCurrencyUI && prop.customUI) {
+      const fieldDiv = document.createElement('div');
+      fieldDiv.style.cssText = 'margin-bottom: 16px;';
+      
+      // Add Enable Alert checkbox
+      fieldDiv.appendChild(prop.customUI.enableAlertCheckbox);
+      
+      // Add Alerts container
+      fieldDiv.appendChild(prop.customUI.alertsContainer);
+      
+      content.appendChild(fieldDiv);
+      return; // Skip normal property rendering
+    }
     // Special handling for linked logic fields
     if (prop.special === 'linkedFields') {
       const fieldDiv = document.createElement('div');
@@ -2643,6 +2968,7 @@ function showPropertiesPopup(cell) {
             // Update cell property
             switch(prop.id) {
               case 'propNodeText':
+              case 'propCurrencyQuestionText':
                 cell._questionText = newValue;
                 cell.value = newValue;
                 // DO NOT auto-update node ID when editing node text
@@ -3241,6 +3567,51 @@ function showPropertiesPopup(cell) {
       } else {
       }
       // Trigger autosave after saving PDF preview properties
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    }
+    // Save any Currency node properties that might be in input fields but not yet saved
+    if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'currency') {
+      // Check for Question Text input
+      const currencyQuestionTextInput = document.getElementById('propCurrencyQuestionText_input');
+      if (currencyQuestionTextInput) {
+        const currencyQuestionTextValue = currencyQuestionTextInput.value.trim();
+        if (currencyQuestionTextValue !== cell._questionText) {
+          cell._questionText = currencyQuestionTextValue;
+          cell.value = currencyQuestionTextValue;
+          if (typeof window.updateSimpleQuestionCell === 'function') {
+            window.updateSimpleQuestionCell(cell);
+          }
+        }
+      }
+      // Currency alert properties are saved via event handlers, but ensure they're persisted
+      const enableAlertCheckbox = document.getElementById('propCurrencyEnableAlert');
+      const alertsContainer = document.getElementById('propCurrencyAlertsContainer');
+      if (alertsContainer) {
+        const alertModules = Array.from(alertsContainer.querySelectorAll('[data-currency-alert-index]'));
+        const newAlerts = [];
+        alertModules.forEach(module => {
+          const idx = module.dataset.currencyAlertIndex;
+          const operatorEl = module.querySelector(`#propCurrencyOperator_${idx}`);
+          const amountEl = module.querySelector(`#propCurrencyAmount_${idx}`);
+          const titleEl = module.querySelector(`#propCurrencyAlertTitle_${idx}`);
+          const statusSelects = module.querySelectorAll('select[data-currency-status-requirement="true"]');
+          const statusRequirements = Array.from(statusSelects)
+            .map(select => select.value)
+            .filter(Boolean);
+          newAlerts.push({
+            enabled: enableAlertCheckbox ? !!enableAlertCheckbox.checked : true,
+            operator: operatorEl ? operatorEl.value : '>',
+            amount: amountEl ? amountEl.value : '',
+            title: titleEl ? titleEl.value : '',
+            statusRequirements
+          });
+        });
+        if (newAlerts.length > 0) {
+          cell._currencyAlerts = newAlerts;
+        }
+      }
       if (typeof window.requestAutosave === 'function') {
         window.requestAutosave();
       }
@@ -4471,10 +4842,15 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
         const locationFields = ['street', 'city', 'state', 'zip'];
         // Get location title and sanitize it
         const locationTitle = node._locationTitle || '';
-        const sanitizedLocationTitle = locationTitle.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .trim();
+        // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+        const sanitizedLocationTitle = typeof window.sanitizeNameId === 'function' 
+          ? window.sanitizeNameId(locationTitle)
+          : locationTitle.toLowerCase()
+              .replace(/<[^>]+>/g, '') // Remove HTML tags
+              .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+              .replace(/\s+/g, '_') // Replace spaces with underscores
+              .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+              .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {
@@ -4567,10 +4943,15 @@ function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell)
         const locationFields = ['street', 'city', 'state', 'zip'];
         // Get location title and sanitize it
         const locationTitle = node._locationTitle || '';
-        const sanitizedLocationTitle = locationTitle.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .trim();
+        // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+        const sanitizedLocationTitle = typeof window.sanitizeNameId === 'function' 
+          ? window.sanitizeNameId(locationTitle)
+          : locationTitle.toLowerCase()
+              .replace(/<[^>]+>/g, '') // Remove HTML tags
+              .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+              .replace(/\s+/g, '_') // Replace spaces with underscores
+              .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+              .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {
@@ -5695,10 +6076,15 @@ function populateLinkedLogicDropdown(dropdown, cell) {
         const locationFields = ['street', 'city', 'state', 'zip'];
         // Get location title and sanitize it
         const locationTitle = node._locationTitle || '';
-        const sanitizedLocationTitle = locationTitle.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .trim();
+        // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+        const sanitizedLocationTitle = typeof window.sanitizeNameId === 'function' 
+          ? window.sanitizeNameId(locationTitle)
+          : locationTitle.toLowerCase()
+              .replace(/<[^>]+>/g, '') // Remove HTML tags
+              .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+              .replace(/\s+/g, '_') // Replace spaces with underscores
+              .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+              .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {
@@ -5743,10 +6129,15 @@ function populateLinkedLogicDropdown(dropdown, cell) {
         const locationFields = ['street', 'city', 'state', 'zip'];
         // Get location title and sanitize it
         const locationTitle = node._locationTitle || '';
-        const sanitizedLocationTitle = locationTitle.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-          .replace(/\s+/g, '_') // Replace spaces with underscores
-          .trim();
+        // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+        const sanitizedLocationTitle = typeof window.sanitizeNameId === 'function' 
+          ? window.sanitizeNameId(locationTitle)
+          : locationTitle.toLowerCase()
+              .replace(/<[^>]+>/g, '') // Remove HTML tags
+              .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+              .replace(/\s+/g, '_') // Replace spaces with underscores
+              .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+              .trim();
         // Build the location prefix with location title if available
         let locationPrefix = baseNodeId;
         if (sanitizedLocationTitle) {

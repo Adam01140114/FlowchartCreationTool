@@ -3545,7 +3545,7 @@ formHTML += `</div><br></div>`;
                 order: parseInt(fieldOrder)
             };
             // Include prefill / extras for label-like fields
-            if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'phone') {
+            if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'currency' || fieldType === 'phone') {
                 if (fieldType === 'label') {
                     fieldData.prefill = prefillValue;
                 }
@@ -3633,6 +3633,24 @@ formHTML += `</div><br></div>`;
           formHTML += `<option value="${rnum}">${rnum}</option>`;
         }
         formHTML += `</select><br><div id="labelContainer${questionId}"></div>`;
+        // Ensure formatCurrencyInput function is available for currency fields
+        formHTML += `<script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\\d)/, '');
+            parts[0] = parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script>`;
         // Handle Hidden Logic for numbered dropdown
         const numberedHiddenLogicEnabledEl = qBlock.querySelector(`#enableHiddenLogic${questionId}`);
         const numberedHiddenLogicEnabled = numberedHiddenLogicEnabledEl && numberedHiddenLogicEnabledEl.checked;
@@ -3979,12 +3997,27 @@ formHTML += `</div><br></div>`;
             const messageEl = row.querySelector(
               "#alertConditionMessage" + questionId + "_" + rowIndex
             );
+            const statusRequirementListEl = row.querySelector(
+              "#statusRequirementList" + questionId + "_" + rowIndex
+            );
             
             if (!pqEl) continue;
             const pqVal = pqEl.value.trim();
             if (!pqVal) continue;
             
             const conditionMessage = messageEl ? messageEl.value.trim() : "";
+            
+            // Collect all status requirements for this condition
+            const statusRequirements = [];
+            if (statusRequirementListEl) {
+              const statusSelects = statusRequirementListEl.querySelectorAll('select');
+              statusSelects.forEach(select => {
+                const value = select.value?.trim();
+                if (value) {
+                  statusRequirements.push(value);
+                }
+              });
+            }
             
             // Check if this is a currency condition (has operator and amount)
             if (operatorEl && amountEl) {
@@ -3993,13 +4026,17 @@ formHTML += `</div><br></div>`;
               if (operatorVal && amountVal) {
                 // Currency condition
                 const alertLogicIndex = alertLogics.length - 1;
-                alertLogics[alertLogicIndex].conditions.push({
+                const conditionObj = {
                   prevQuestion: pqVal,
                   operator: operatorVal,
                   amount: parseFloat(amountVal) || 0,
                   isCurrency: true,
                   message: conditionMessage
-                });
+                };
+                if (statusRequirements.length > 0) {
+                  conditionObj.statusRequirements = statusRequirements;
+                }
+                alertLogics[alertLogicIndex].conditions.push(conditionObj);
                 continue;
               }
             }
@@ -4010,11 +4047,15 @@ formHTML += `</div><br></div>`;
             if (!paVal) continue;
             // Add condition to the Alert Logic array
             const alertLogicIndex = alertLogics.length - 1;
-            alertLogics[alertLogicIndex].conditions.push({
+            const conditionObj = {
               prevQuestion: pqVal,
               prevAnswer: paVal,
               message: conditionMessage
-            });
+            };
+            if (statusRequirements.length > 0) {
+              conditionObj.statusRequirements = statusRequirements;
+            }
+            alertLogics[alertLogicIndex].conditions.push(conditionObj);
           }
         }
       }
@@ -7910,10 +7951,32 @@ function checkAlertLogic(changedElement) {
                     }
                 }
                 
-                // If condition is met and has a message, show alert immediately
-                if (conditionMet && conditionMessage) {
-                    showAlert(conditionMessage);
-                    return true; // Return true to indicate alert was shown
+                // If condition is met, check status requirements if specified
+                if (conditionMet) {
+                    // Check status requirements if specified (support both old single and new array format)
+                    const statusRequirements = condition.statusRequirements || (condition.statusRequirement ? [condition.statusRequirement] : []);
+                    if (statusRequirements.length > 0) {
+                        // Check if ALL status requirements are active (AND logic)
+                        let allStatusRequirementsMet = true;
+                        for (const statusReq of statusRequirements) {
+                            if (!window.formStatuses || !window.formStatuses[statusReq]) {
+                                // At least one status requirement not met
+                                allStatusRequirementsMet = false;
+                                break;
+                            }
+                        }
+                        
+                        if (!allStatusRequirementsMet) {
+                            // Not all status requirements are met, skip this condition
+                            continue;
+                        }
+                    }
+                    
+                    // If we get here, condition is met and all status requirements (if any) are satisfied
+                    if (conditionMessage) {
+                        showAlert(conditionMessage);
+                        return true; // Return true to indicate alert was shown
+                    }
                 }
             }
         }
@@ -9285,8 +9348,8 @@ function showTextboxLabels(questionId, count){
                     if (fieldType === 'label') {
                         fieldData.prefill = prefillValue;
                     }
-                    // Include conditional prefills for both label and amount fields
-                    if (fieldType === 'label' || fieldType === 'amount') {
+                    // Include conditional prefills for label, amount, and currency fields
+                    if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'currency') {
                         const conditionalPrefillsData = el.getAttribute('data-conditional-prefills');
                         if (conditionalPrefillsData) {
                             try {
@@ -9556,6 +9619,39 @@ function showTextboxLabels(questionId, count){
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue);
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 // Add a <br> after the Zip input only if there are more fields after it
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
+                if (remainingFields.length > 0) {
+                  const brElement = document.createElement('br');
+                  entryContainer.appendChild(brElement);
+                }
+            } else if (field.type === 'currency') {
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                let prefillValue = '';
+                // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        // Use conditional prefill value (process URL parameters if needed)
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                }
+                const safePrefill = prefillValue ? prefillValue.replace(/"/g, '&quot;') : '';
+                inputDiv.innerHTML =
+                  '<div class="address-field">' +
+                    '<input type="text"' +
+                    ' id="' + fieldId + '"' +
+                    ' name="' + fieldId + '"' +
+                    ' placeholder="' + (field.label || 'Amount') + '"' +
+                    ' inputmode="decimal"' +
+                    ' class="address-input"' +
+                    ' style="margin: 4px auto; max-width: 400px;"' +
+                    ' oninput="formatCurrencyInput(this)"' +
+                    ' value="' + safePrefill + '">' +
+                  '</div>';
+                // Append all children (wrapper + input)
+                Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
+                // Add a <br> after the currency input only if there are more fields after it
                 const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
                 if (remainingFields.length > 0) {
                   const brElement = document.createElement('br');

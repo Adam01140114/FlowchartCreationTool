@@ -1276,6 +1276,14 @@ function addAlertLogicCondition(questionId) {
         <label>Alert Message:</label>
         <textarea id="alertConditionMessage${questionId}_${numConditions}" placeholder="Enter alert message for this condition" rows="3" style="width: 100%;"></textarea>
         <br>
+        <button type="button" onclick="toggleStatusRequirement(${questionId}, ${numConditions})" id="statusRequirementBtn${questionId}_${numConditions}">+ Add Status Requirement</button>
+        <div id="statusRequirementContainer${questionId}_${numConditions}" style="display: none; margin-top: 10px;">
+            <div id="statusRequirementList${questionId}_${numConditions}">
+                <!-- Status requirements will be added here -->
+            </div>
+            <button type="button" onclick="addStatusRequirement(${questionId}, ${numConditions})" style="margin-top: 10px;">+ Add Another Status Requirement</button>
+        </div>
+        <br>
         <button type="button" onclick="removeAlertLogicCondition(${questionId}, ${numConditions})">Remove</button>
         <hr>
     `;
@@ -1284,6 +1292,125 @@ function addAlertLogicCondition(questionId) {
 function removeAlertLogicCondition(questionId, conditionIndex) {
     const row = document.getElementById(`alertLogicConditionRow${questionId}_${conditionIndex}`);
     if (row) row.remove();
+}
+function toggleStatusRequirement(questionId, conditionIndex) {
+    const container = document.getElementById(`statusRequirementContainer${questionId}_${conditionIndex}`);
+    const button = document.getElementById(`statusRequirementBtn${questionId}_${conditionIndex}`);
+    if (!container || !button) return;
+    
+    if (container.style.display === 'none') {
+        container.style.display = 'block';
+        button.textContent = '- Remove Status Requirement';
+        // Add first status requirement if list is empty
+        const list = document.getElementById(`statusRequirementList${questionId}_${conditionIndex}`);
+        if (list && list.children.length === 0) {
+            addStatusRequirement(questionId, conditionIndex);
+        }
+    } else {
+        container.style.display = 'none';
+        button.textContent = '+ Add Status Requirement';
+        // Clear all status requirements
+        const list = document.getElementById(`statusRequirementList${questionId}_${conditionIndex}`);
+        if (list) list.innerHTML = '';
+    }
+}
+function addStatusRequirement(questionId, conditionIndex) {
+    const list = document.getElementById(`statusRequirementList${questionId}_${conditionIndex}`);
+    if (!list) return;
+    
+    const requirementIndex = list.children.length + 1;
+    const requirementDiv = document.createElement('div');
+    requirementDiv.className = 'status-requirement-item';
+    requirementDiv.style.cssText = 'margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;';
+    requirementDiv.innerHTML = `
+        <label>Status Requirement ${requirementIndex}:</label>
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+            <select id="statusRequirement${questionId}_${conditionIndex}_${requirementIndex}" style="flex: 1; padding: 5px;">
+                <option value="">-- Select a status --</option>
+            </select>
+            <button type="button" onclick="removeStatusRequirement(${questionId}, ${conditionIndex}, ${requirementIndex})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>
+        </div>
+    `;
+    list.appendChild(requirementDiv);
+    
+    // Populate the dropdown
+    populateStatusRequirementDropdown(questionId, conditionIndex, requirementIndex);
+}
+function removeStatusRequirement(questionId, conditionIndex, requirementIndex) {
+    const list = document.getElementById(`statusRequirementList${questionId}_${conditionIndex}`);
+    if (!list) return;
+    
+    const items = list.querySelectorAll('.status-requirement-item');
+    items.forEach((item, index) => {
+        const select = item.querySelector('select');
+        if (select && select.id === `statusRequirement${questionId}_${conditionIndex}_${requirementIndex}`) {
+            item.remove();
+            // Renumber remaining items
+            updateStatusRequirementNumbers(questionId, conditionIndex);
+        }
+    });
+}
+function updateStatusRequirementNumbers(questionId, conditionIndex) {
+    const list = document.getElementById(`statusRequirementList${questionId}_${conditionIndex}`);
+    if (!list) return;
+    
+    const items = list.querySelectorAll('.status-requirement-item');
+    items.forEach((item, index) => {
+        const label = item.querySelector('label');
+        if (label) {
+            label.textContent = `Status Requirement ${index + 1}:`;
+        }
+    });
+}
+function populateStatusRequirementDropdown(questionId, conditionIndex, requirementIndex = null) {
+    // If requirementIndex is provided, populate that specific dropdown
+    // Otherwise, populate all dropdowns in the list
+    const list = document.getElementById(`statusRequirementList${questionId}_${conditionIndex}`);
+    if (!list) return;
+    
+    const selects = requirementIndex 
+        ? [document.getElementById(`statusRequirement${questionId}_${conditionIndex}_${requirementIndex}`)]
+        : list.querySelectorAll('select');
+    
+    if (selects.length === 0) return;
+    
+    // Collect all status titles from all questions
+    const allStatusTitles = new Set();
+    const allQuestionBlocks = document.querySelectorAll('[id^="questionBlock"]');
+    allQuestionBlocks.forEach(block => {
+        const blockId = block.id;
+        const qId = blockId.replace('questionBlock', '');
+        const statusCheckbox = block.querySelector(`#enableStatus${qId}`);
+        const statusTitleInput = block.querySelector(`#statusTitle${qId}`);
+        
+        if (statusCheckbox && statusCheckbox.checked && statusTitleInput && statusTitleInput.value.trim()) {
+            allStatusTitles.add(statusTitleInput.value.trim());
+        }
+    });
+    
+    // Populate each select
+    selects.forEach(select => {
+        if (!select) return;
+        
+        // Save current value
+        const currentValue = select.value;
+        
+        // Clear and repopulate
+        select.innerHTML = '<option value="">-- Select a status --</option>';
+        
+        // Add each status as an option
+        allStatusTitles.forEach(statusTitle => {
+            const option = document.createElement('option');
+            option.value = statusTitle;
+            option.textContent = statusTitle;
+            select.appendChild(option);
+        });
+        
+        // Restore value if it still exists
+        if (currentValue) {
+            select.value = currentValue;
+        }
+    });
 }
 /** On picking a "previous question" for alert logic, populate possible answers. */
 function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
@@ -5098,6 +5225,7 @@ function editUnifiedField(questionId, fieldOrder) {
             <select id="editType${questionId}_${fieldOrder}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;" onchange="togglePrefillField(${questionId}, ${fieldOrder})">
                 <option value="label" ${currentType === 'label' ? 'selected' : ''}>Label</option>
                 <option value="amount" ${currentType === 'amount' ? 'selected' : ''}>Amount</option>
+                <option value="currency" ${currentType === 'currency' ? 'selected' : ''}>Currency</option>
                 <option value="date" ${currentType === 'date' ? 'selected' : ''}>Date</option>
                 <option value="phone" ${currentType === 'phone' ? 'selected' : ''}>Phone</option>
             </select>
@@ -5255,6 +5383,8 @@ function saveUnifiedField(questionId, fieldOrder) {
         displayDiv.querySelector('div:first-child').innerHTML = 'Label: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
     } else if (newType === 'amount') {
         displayDiv.querySelector('div:first-child').innerHTML = 'Amount: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
+    } else if (newType === 'currency') {
+        displayDiv.querySelector('div:first-child').innerHTML = 'Currency: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
     } else if (newType === 'date') {
         displayDiv.querySelector('div:first-child').innerHTML = 'Date: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
     }

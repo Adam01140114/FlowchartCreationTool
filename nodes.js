@@ -664,11 +664,17 @@ window.getNodeId = function(cell) {
       nodeText = tempDiv.textContent || tempDiv.innerText || '';
     }
     if (nodeText) {
-      baseNodeId = nodeText.toLowerCase()
-        .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-        .replace(/\s+/g, '_') // Replace spaces with underscores
-        .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-        ; // No length limit
+      // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+      if (typeof window.sanitizeNameId === 'function') {
+        baseNodeId = window.sanitizeNameId(nodeText);
+      } else {
+        baseNodeId = nodeText.toLowerCase()
+          .replace(/<[^>]+>/g, '') // Remove HTML tags
+          .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
+          ; // No length limit
+      }
       if (DEBUG_NODE_ID) {
       }
     }
@@ -693,14 +699,16 @@ window.getNodeId = function(cell) {
 };
 /**
  * Sanitize a name ID for use in JSON export
- * Preserves forward slashes "/" in the name
+ * Preserves forward slashes "/" and underscores "_" in the name
  */
 window.sanitizeNameId = function(name) {
   if (!name) return "";
   return name.toString()
     .toLowerCase()
-    .replace(/[^a-z0-9\s\/]/g, '')
-    .replace(/\s+/g, '_')
+    .replace(/<[^>]+>/g, '') // Remove HTML tags
+    .replace(/[^a-z0-9\s\/_]/g, '') // Remove special characters but preserve underscores and forward slashes
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
     .trim();
 };
 /**

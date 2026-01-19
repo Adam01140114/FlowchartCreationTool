@@ -336,6 +336,10 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
     if (cell._bigParagraphPdfFile !== undefined) cellData._bigParagraphPdfFile = cell._bigParagraphPdfFile;
     if (cell._bigParagraphPdfPrice !== undefined) cellData._bigParagraphPdfPrice = cell._bigParagraphPdfPrice;
+    // Currency node alert properties
+    if (cell._currencyAlerts) {
+      cellData._currencyAlerts = JSON.parse(JSON.stringify(cell._currencyAlerts));
+    }
     // Final verification for PDF preview nodes
     if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
     }

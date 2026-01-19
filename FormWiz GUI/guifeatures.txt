@@ -1534,3 +1534,765 @@ parameter. Check that `showAlert()` function handles the `isHardAlert` parameter
 ================================================================================
 END OF FEATURE #2 DOCUMENTATION
 ================================================================================
+
+================================================================================
+FEATURE #3: ENABLE STATUS FOR DROPDOWN QUESTIONS
+================================================================================
+
+PURPOSE:
+--------
+Allows form builders to configure status tracking for dropdown questions. When a
+user selects a specific option in the generated form, a status is added to
+`window.formStatuses`. If the user changes their selection, the status is removed.
+Statuses can be used by other features (like alert logic status requirements) to
+check if certain conditions are met.
+
+Example: A dropdown "Hungry?" has options "Yes" and "No". The form builder can
+enable status so that when users select "Yes", a status "needs_food" is added.
+This status can then be referenced in alert logic conditions to only show alerts
+when the status is active.
+
+CONTEXT:
+--------
+This feature is implemented for dropdown questions (not trigger sequence dropdowns).
+It's a simple status tracking system that maintains a global `window.formStatuses`
+object where keys are status titles and values are `true` (active) or the status
+is removed (inactive).
+
+KEY CONCEPTS:
+------------
+1. Status Trigger: The dropdown option value that activates the status
+2. Status Title: The unique identifier for the status (e.g., "needs_food")
+3. Status Lifecycle: Status is added when trigger option is selected, removed when changed
+4. Global State: All statuses are stored in `window.formStatuses` object
+5. Console Logging: Status changes are logged to console for debugging
+
+================================================================================
+PART 1: GUI INTERFACE (FormWiz GUI/gui.js)
+================================================================================
+
+1.1 ADDING THE UI CHECKBOX
+---------------------------
+Location: `addQuestion()` function (around line 805)
+
+When a question is added, an "Enable Status" checkbox is added after the
+"Enable Hidden Logic" section.
+
+UI Structure:
+```html
+<label>Enable Status: </label>
+<input type="checkbox" id="enableStatus${currentQuestionId}" onchange="toggleStatus(${currentQuestionId})">
+<div id="statusBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+    <label>Status Trigger:</label>
+    <select id="statusTrigger${currentQuestionId}">
+        <option value="">Select an option...</option>
+    </select><br><br>
+    <label>Status Title:</label>
+    <input type="text" id="statusTitle${currentQuestionId}" placeholder="Enter status title (e.g., needs_food)">
+</div><br>
+```
+
+Key Patterns:
+- Checkbox ID pattern: `enableStatus{questionId}`
+- Container ID pattern: `statusBlock{questionId}`
+- Trigger dropdown ID: `statusTrigger{questionId}`
+- Title input ID: `statusTitle{questionId}`
+- Container is initially hidden (`display: none`)
+
+1.2 TOGGLE FUNCTION
+-------------------
+Location: `toggleStatus()` function (around line 4826)
+
+Purpose: Shows/hides the status configuration UI and manages the data structure.
+
+Function Signature:
+```javascript
+function toggleStatus(questionId)
+```
+
+Implementation Steps:
+
+Step 1: Get DOM Elements
+```javascript
+const statusEnabled = document.getElementById(`enableStatus${questionId}`).checked;
+const statusBlock = document.getElementById(`statusBlock${questionId}`);
+if (!statusBlock) return;
+```
+
+Step 2: Show/Hide UI
+```javascript
+statusBlock.style.display = statusEnabled ? 'block' : 'none';
+```
+
+Step 3: Initialize Data Structure
+```javascript
+if (!window.questionStatus) {
+    window.questionStatus = {};
+}
+if (!window.questionStatus[questionId]) {
+    window.questionStatus[questionId] = { enabled: false, trigger: '', title: '' };
+}
+window.questionStatus[questionId].enabled = statusEnabled;
+```
+
+Step 4: Populate Trigger Options or Clear Data
+```javascript
+if (statusEnabled) {
+    updateStatusTriggerOptions(questionId);
+} else {
+    // Clear status data when disabled
+    window.questionStatus[questionId].trigger = '';
+    window.questionStatus[questionId].title = '';
+}
+```
+
+Step 5: Trigger Autosave
+```javascript
+if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+}
+```
+
+Data Storage:
+- Stored in: `window.questionStatus[questionId]`
+- Structure: `{ enabled: boolean, trigger: string, title: string }`
+
+1.3 UPDATE TRIGGER OPTIONS FUNCTION
+------------------------------------
+Location: `updateStatusTriggerOptions()` function (around line 4858)
+
+Purpose: Populates the "Status Trigger" dropdown with options from the current
+dropdown question. This ensures the trigger dropdown always reflects the current
+options of the parent dropdown.
+
+Function Signature:
+```javascript
+function updateStatusTriggerOptions(questionId)
+```
+
+Implementation Steps:
+
+Step 1: Get Trigger Select and Save Current Value
+```javascript
+const triggerSelect = document.getElementById(`statusTrigger${questionId}`);
+if (!triggerSelect) return;
+
+// Save the currently selected value
+const currentValue = triggerSelect.value;
+```
+
+Step 2: Clear and Repopulate Options
+```javascript
+// Clear existing options (except the placeholder)
+triggerSelect.innerHTML = '<option value="">Select an option...</option>';
+
+// Get all dropdown options for this question
+const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+if (dropdownOptionsDiv) {
+    const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+    optionInputs.forEach((input) => {
+        const optionText = input.value.trim();
+        if (optionText) {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            if (optionText === currentValue) {
+                option.selected = true;
+            }
+            triggerSelect.appendChild(option);
+        }
+    });
+}
+```
+
+Step 3: Add Change Handler
+```javascript
+triggerSelect.onchange = () => {
+    if (!window.questionStatus) {
+        window.questionStatus = {};
+    }
+    if (!window.questionStatus[questionId]) {
+        window.questionStatus[questionId] = { enabled: false, trigger: '', title: '' };
+    }
+    window.questionStatus[questionId].trigger = triggerSelect.value;
+    if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+    }
+};
+```
+
+Step 4: Add Change Handler for Title Input
+```javascript
+const titleInput = document.getElementById(`statusTitle${questionId}`);
+if (titleInput) {
+    titleInput.onchange = () => {
+        if (!window.questionStatus) {
+            window.questionStatus = {};
+        }
+        if (!window.questionStatus[questionId]) {
+            window.questionStatus[questionId] = { enabled: false, trigger: '', title: '' };
+        }
+        window.questionStatus[questionId].title = titleInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+    titleInput.onblur = () => {
+        // Same as onchange - ensures data is saved
+        if (!window.questionStatus) {
+            window.questionStatus = {};
+        }
+        if (!window.questionStatus[questionId]) {
+            window.questionStatus[questionId] = { enabled: false, trigger: '', title: '' };
+        }
+        window.questionStatus[questionId].title = titleInput.value.trim();
+        if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+        }
+    };
+}
+```
+
+Key Pattern: The trigger dropdown is populated from the DOM (dropdown options
+container), not from a data structure. This means options must exist in the DOM
+before calling this function.
+
+1.4 SYNCING WITH DROPDOWN OPTIONS
+----------------------------------
+Location: `addDropdownOption()` and `removeDropdownOption()` functions
+
+When dropdown options are added or removed, the status trigger dropdown must be
+updated to reflect the changes.
+
+Implementation:
+```javascript
+// In addDropdownOption() function
+function addDropdownOption(questionId, fieldCount) {
+    // ... add option to dropdown ...
+    
+    // Update status trigger options if status is enabled
+    const statusCheckbox = document.getElementById(`enableStatus${questionId}`);
+    if (statusCheckbox && statusCheckbox.checked) {
+        updateStatusTriggerOptions(questionId);
+    }
+}
+
+// In removeDropdownOption() function
+function removeDropdownOption(questionId, fieldCount, optionCount) {
+    // ... remove option from dropdown ...
+    
+    // Update status trigger options if status is enabled
+    const statusCheckbox = document.getElementById(`enableStatus${questionId}`);
+    if (statusCheckbox && statusCheckbox.checked) {
+        updateStatusTriggerOptions(questionId);
+    }
+}
+```
+
+This ensures the status trigger dropdown always matches the current dropdown options.
+
+================================================================================
+PART 2: EXPORT/IMPORT (FormWiz GUI/download.js)
+================================================================================
+
+2.1 EXPORT PROCESS
+------------------
+Location: Question data collection in `getFormJSON()` function (around line 3095)
+
+When collecting question data for JSON export, status data must be read from
+`window.questionStatus` and added to the question object.
+
+Implementation:
+
+```javascript
+// Collect Status data
+const statusEnabled = questionBlock.querySelector(`#enableStatus${questionId}`)?.checked || false;
+const statusTrigger = questionBlock.querySelector(`#statusTrigger${questionId}`)?.value || "";
+const statusTitle = questionBlock.querySelector(`#statusTitle${questionId}`)?.value || "";
+
+// Also check window.questionStatus as fallback
+let storedStatusData = null;
+if (window.questionStatus && window.questionStatus[questionId]) {
+    storedStatusData = window.questionStatus[questionId];
+}
+
+// Use stored data if available, otherwise use UI values
+const finalStatusEnabled = storedStatusData ? storedStatusData.enabled : statusEnabled;
+const finalStatusTrigger = storedStatusData ? storedStatusData.trigger : statusTrigger;
+const finalStatusTitle = storedStatusData ? storedStatusData.title : statusTitle;
+
+// Add to question object
+questionData.status = {
+    enabled: finalStatusEnabled,
+    trigger: finalStatusTrigger,
+    title: finalStatusTitle
+};
+```
+
+JSON Export Format:
+```json
+{
+    "questionId": 1,
+    "text": "Hungry?",
+    "type": "dropdown",
+    "status": {
+        "enabled": true,
+        "trigger": "Yes",
+        "title": "needs_food"
+    },
+    "options": ["Yes", "No"]
+}
+```
+
+2.2 IMPORT PROCESS
+------------------
+Location: `loadFormJson()` function, within question restoration block (around line 514)
+
+When importing a JSON file, status data must be restored to `window.questionStatus`
+and the UI must be updated.
+
+Implementation:
+
+```javascript
+// Restore Status
+if (question.status && question.status.enabled) {
+    const statusCheckbox = questionBlock.querySelector(`#enableStatus${question.questionId}`);
+    const statusTriggerSelect = questionBlock.querySelector(`#statusTrigger${question.questionId}`);
+    const statusTitleInput = questionBlock.querySelector(`#statusTitle${question.questionId}`);
+    
+    if (statusCheckbox) {
+        statusCheckbox.checked = true;
+        toggleStatus(question.questionId); // This populates the trigger dropdown with options from DOM
+        
+        // Set the trigger value after the dropdown is populated
+        setTimeout(() => {
+            if (statusTriggerSelect && question.status.trigger) {
+                statusTriggerSelect.value = question.status.trigger;
+                statusTriggerSelect.dispatchEvent(new Event('change'));
+            }
+            if (statusTitleInput && question.status.title) {
+                statusTitleInput.value = question.status.title;
+                statusTitleInput.dispatchEvent(new Event('blur'));
+            }
+        }, 100);
+    }
+    
+    // Also restore to window.questionStatus
+    if (!window.questionStatus) {
+        window.questionStatus = {};
+    }
+    window.questionStatus[question.questionId] = {
+        enabled: true,
+        trigger: question.status.trigger || '',
+        title: question.status.title || ''
+    };
+}
+```
+
+Key Patterns:
+- Must call `toggleStatus()` to populate the trigger dropdown
+- Use `setTimeout` to ensure dropdown is populated before setting value
+- Dispatch events to trigger handlers
+- Restore to both UI and `window.questionStatus`
+
+================================================================================
+PART 3: FORM GENERATION (FormWiz GUI/generate.js)
+================================================================================
+
+3.1 COLLECTING STATUS DATA DURING FORM GENERATION
+-------------------------------------------------
+Location: Question processing loop in `getFormHTML()` function (around line 1200-1300)
+
+When building the form HTML, status data must be collected and embedded in the
+generated HTML for runtime use.
+
+Implementation:
+
+```javascript
+// Check if Status is enabled
+const statusCheckbox = qBlock.querySelector("#enableStatus" + questionId);
+const statusEnabled = statusCheckbox && statusCheckbox.checked;
+
+let statusTrigger = '';
+let statusTitle = '';
+
+if (statusEnabled) {
+    // Get from window.questionStatus first (preferred)
+    if (window.questionStatus && window.questionStatus[questionId]) {
+        statusTrigger = window.questionStatus[questionId].trigger || '';
+        statusTitle = window.questionStatus[questionId].title || '';
+    } else {
+        // Fallback to UI elements
+        const statusTriggerEl = qBlock.querySelector("#statusTrigger" + questionId);
+        const statusTitleEl = qBlock.querySelector("#statusTitle" + questionId);
+        statusTrigger = statusTriggerEl ? statusTriggerEl.value.trim() : '';
+        statusTitle = statusTitleEl ? statusTitleEl.value.trim() : '';
+    }
+}
+
+// Store for runtime
+if (!window.statusData) {
+    window.statusData = {};
+}
+window.statusData[questionId] = {
+    enabled: statusEnabled,
+    trigger: statusTrigger,
+    title: statusTitle
+};
+```
+
+3.2 ADDING STATUS HANDLER TO DROPDOWN
+--------------------------------------
+Location: Dropdown generation in `getFormHTML()` function (around line 1246)
+
+When a dropdown is generated, if status is enabled, a status handler function
+call must be added to the dropdown's `onchange` attribute.
+
+Implementation:
+
+```javascript
+// Build onchange attribute
+let onchangeAttr = 'dropdownMirror(this, \'' + questionNameId + '\'); updateHiddenLogic(\'' + questionNameId + '\', this.value); updateLinkedFields(); clearInactiveLinkedFields();';
+
+// Add status handler if enabled
+if (statusEnabled && statusTrigger && statusTitle) {
+    statusHandlerCall = ` handleStatus${questionId}(this.value)`;
+    onchangeAttr += statusHandlerCall;
+}
+
+// Add to select element
+select.setAttribute('onchange', onchangeAttr);
+```
+
+3.3 GENERATING STATUS HANDLER FUNCTION
+---------------------------------------
+Location: Status handler generation in `getFormHTML()` function (around line 1540)
+
+A handler function is generated for each question with status enabled. This function
+manages the `window.formStatuses` object.
+
+Implementation:
+
+```javascript
+if (statusEnabled && statusTrigger && statusTitle) {
+    formHTML += `
+        function handleStatus${questionId}(value) {
+            // Initialize status object if it doesn't exist
+            if (!window.formStatuses) {
+                window.formStatuses = {};
+            }
+            
+            const selectedValue = (value || '').trim();
+            const statusTrigger = '${statusTrigger}';
+            const statusTitle = '${statusTitle}';
+            
+            // Check if selected value matches the trigger
+            if (selectedValue === statusTrigger) {
+                // Add status if it doesn't exist
+                if (!window.formStatuses[statusTitle]) {
+                    window.formStatuses[statusTitle] = true;
+                    console.log('[STATUS] Status added:', statusTitle);
+                    console.log('[STATUS] Current statuses:', window.formStatuses);
+                } else {
+                    console.log('[STATUS] Status already exists:', statusTitle);
+                }
+            } else {
+                // Remove status if it exists
+                if (window.formStatuses[statusTitle]) {
+                    delete window.formStatuses[statusTitle];
+                    console.log('[STATUS] Status removed:', statusTitle);
+                    console.log('[STATUS] Current statuses:', window.formStatuses);
+                }
+            }
+        }
+    `;
+}
+```
+
+Key Patterns:
+- Function name: `handleStatus{questionId}`
+- Compares selected value to trigger (exact match, trimmed)
+- Adds status to `window.formStatuses[statusTitle] = true` when trigger matches
+- Removes status (deletes key) when trigger doesn't match
+- Console logs for debugging
+
+================================================================================
+PART 4: RUNTIME BEHAVIOR (Generated Form)
+================================================================================
+
+4.1 STATUS ACTIVATION
+---------------------
+When a user selects the trigger option in the dropdown:
+1. The dropdown's `onchange` event fires
+2. `handleStatus{questionId}(this.value)` is called
+3. Function compares value to trigger
+4. If match: `window.formStatuses[statusTitle] = true`
+5. Console log confirms status addition
+
+4.2 STATUS DEACTIVATION
+-----------------------
+When a user changes the dropdown to a different option:
+1. The dropdown's `onchange` event fires
+2. `handleStatus{questionId}(this.value)` is called
+3. Function compares value to trigger
+4. If no match: `delete window.formStatuses[statusTitle]`
+5. Console log confirms status removal
+
+4.3 STATUS USAGE IN OTHER FEATURES
+-----------------------------------
+Statuses can be checked by other features:
+
+Example - Alert Logic Status Requirements:
+```javascript
+// In checkAlertLogic() function
+if (condition.statusRequirements && condition.statusRequirements.length > 0) {
+    let allStatusRequirementsMet = true;
+    for (const statusReq of condition.statusRequirements) {
+        if (!window.formStatuses || !window.formStatuses[statusReq]) {
+            allStatusRequirementsMet = false;
+            break;
+        }
+    }
+    if (!allStatusRequirementsMet) {
+        continue; // Skip this condition
+    }
+}
+```
+
+4.4 STATUS OBJECT STRUCTURE
+----------------------------
+```javascript
+window.formStatuses = {
+    "needs_food": true,
+    "needs_water": true,
+    "needs_shelter": true
+}
+```
+
+- Keys are status titles (e.g., "needs_food")
+- Values are `true` (status is active)
+- If a key doesn't exist, the status is inactive
+- Statuses are global across the entire form
+
+================================================================================
+PART 5: DATA FLOW SUMMARY
+================================================================================
+
+1. USER CONFIGURATION (GUI):
+   - User checks "Enable Status" checkbox
+   - Toggle function stores data in `window.questionStatus[questionId]`
+   - Update function populates trigger dropdown with current options
+   - User selects trigger option and enters status title
+   - Data is saved to `window.questionStatus`
+
+2. AUTOSAVE:
+   - Data is saved to Firebase/localStorage automatically
+   - Uses `window.requestAutosave()` function
+
+3. EXPORT (Generate JSON):
+   - `download.js` reads from `window.questionStatus` (with UI fallback)
+   - Adds `status: {enabled, trigger, title}` to question object
+   - Exported in JSON format
+
+4. IMPORT (Load JSON):
+   - Reads `status` property from imported JSON
+   - Restores to `window.questionStatus`
+   - Updates UI checkboxes and inputs
+   - Calls `toggleStatus()` to populate trigger dropdown
+   - Uses setTimeout to set values after dropdown is populated
+
+5. FORM GENERATION:
+   - `generate.js` collects status data from `window.questionStatus` (with UI fallback)
+   - Stores in `window.statusData` for runtime
+   - Generates `handleStatus{questionId}()` function
+   - Adds function call to dropdown's `onchange` attribute
+
+6. RUNTIME (Generated Form):
+   - User selects dropdown option
+   - `handleStatus{questionId}()` is called
+   - Function checks if value matches trigger
+   - Adds/removes status from `window.formStatuses`
+   - Other features can check `window.formStatuses` for status requirements
+
+================================================================================
+PART 6: KEY PATTERNS AND CONVENTIONS
+================================================================================
+
+6.1 NAMING CONVENTIONS
+----------------------
+- Checkbox ID: `enableStatus{questionId}`
+- Container ID: `statusBlock{questionId}`
+- Trigger dropdown ID: `statusTrigger{questionId}`
+- Title input ID: `statusTitle{questionId}`
+- Handler function: `handleStatus{questionId}(value)`
+- Window object: `window.questionStatus` (GUI) and `window.formStatuses` (runtime)
+
+6.2 DATA STRUCTURE
+------------------
+GUI Storage:
+```javascript
+window.questionStatus = {
+    "1": {  // Key: questionId
+        enabled: true,
+        trigger: "Yes",  // The option value that activates the status
+        title: "needs_food"  // The status identifier
+    }
+}
+```
+
+Runtime Storage:
+```javascript
+window.formStatuses = {
+    "needs_food": true,  // Key: status title, Value: true (active)
+    "needs_water": true
+}
+```
+
+6.3 TOGGLE FUNCTION PATTERN
+---------------------------
+1. Get checkbox and container elements
+2. Show/hide container based on checkbox state
+3. Initialize `window.questionStatus` if needed
+4. Update enabled state in data structure
+5. Call `updateStatusTriggerOptions()` if enabled, clear data if disabled
+6. Trigger autosave
+
+6.4 UPDATE FUNCTION PATTERN
+---------------------------
+1. Get trigger select element
+2. Save current value
+3. Clear and repopulate from DOM (dropdown options container)
+4. Restore saved value if it still exists
+5. Add change handlers to save data and trigger autosave
+
+6.5 EXPORT PATTERN
+------------------
+1. Check `window.questionStatus` for stored data (preferred)
+2. Check UI elements as fallback
+3. Add `status: {enabled, trigger, title}` to question object
+4. Include in JSON export
+
+6.6 IMPORT PATTERN
+------------------
+1. Check for `status` property in imported JSON
+2. Restore to `window.questionStatus`
+3. Check checkbox and call `toggleStatus()` to populate UI
+4. Use setTimeout to set values after dropdown is populated
+5. Dispatch events to trigger handlers
+
+6.7 RUNTIME GENERATION PATTERN
+-------------------------------
+1. Collect status data during form generation
+2. Store in `window.statusData` for reference
+3. Generate `handleStatus{questionId}()` function
+4. Add function call to dropdown's `onchange` attribute
+5. Function manages `window.formStatuses` at runtime
+
+================================================================================
+PART 7: COMMON GOTCHAS AND TROUBLESHOOTING
+================================================================================
+
+GOTCHA 1: Trigger Dropdown Not Populated
+-----------------------------------------
+Problem: Status trigger dropdown is empty when enabling status.
+
+Solution: Ensure `updateStatusTriggerOptions()` is called after enabling status.
+The function reads options from the DOM (`#dropdownOptions{questionId}`), so options
+must exist in the DOM first. Also ensure `addDropdownOption()` and `removeDropdownOption()`
+call `updateStatusTriggerOptions()` to keep it in sync.
+
+GOTCHA 2: Status Not Added at Runtime
+--------------------------------------
+Problem: Status handler function is not called when dropdown value changes.
+
+Solution: Ensure the status handler call is added to the dropdown's `onchange`
+attribute during form generation. Check that `statusHandlerCall` is appended to
+the `onchangeAttr` string before setting it on the select element.
+
+GOTCHA 3: Status Not Removed When Changed
+------------------------------------------
+Problem: Status remains active even after changing dropdown to a different option.
+
+Solution: Ensure the status handler function checks for both match (add) and
+non-match (remove) cases. The function should delete the status when the value
+doesn't match the trigger.
+
+GOTCHA 4: Status Requirements Not Working
+------------------------------------------
+Problem: Alert logic status requirements don't work even though status is active.
+
+Solution: Ensure status requirements check `window.formStatuses[statusTitle]`
+exists (not just truthy). The check should be:
+```javascript
+if (!window.formStatuses || !window.formStatuses[statusReq]) {
+    // Status requirement not met
+}
+```
+
+GOTCHA 5: Import Not Restoring Status
+--------------------------------------
+Problem: After importing JSON, status UI is not shown or values are empty.
+
+Solution: Ensure `toggleStatus()` is called to populate the trigger dropdown
+before setting values. Use setTimeout to ensure dropdown is populated:
+```javascript
+setTimeout(() => {
+    if (statusTriggerSelect && question.status.trigger) {
+        statusTriggerSelect.value = question.status.trigger;
+    }
+}, 100);
+```
+
+GOTCHA 6: Multiple Statuses with Same Title
+--------------------------------------------
+Problem: Multiple questions use the same status title, causing conflicts.
+
+Solution: Status titles should be unique across the form. If two questions use
+the same title, they will share the same status. Consider using descriptive,
+unique titles like "question1_needs_food" vs "question2_needs_food" if needed.
+
+================================================================================
+PART 8: REPLICATING FOR OTHER QUESTION TYPES
+================================================================================
+
+To add status functionality to checkbox questions:
+
+STEP 1: Add UI Checkbox
+-----------------------
+In `addQuestion()`, add status checkbox (same as dropdown).
+
+STEP 2: Create Toggle Function
+-------------------------------
+Same as dropdown, but may need different trigger options (e.g., "checked" vs "unchecked").
+
+STEP 3: Update Form Generation
+-------------------------------
+Generate handler function that checks checkbox state:
+```javascript
+function handleStatus${questionId}(checked) {
+    if (!window.formStatuses) {
+        window.formStatuses = {};
+    }
+    
+    const statusTrigger = '${statusTrigger}'; // e.g., "checked" or "unchecked"
+    const statusTitle = '${statusTitle}';
+    
+    if ((checked && statusTrigger === 'checked') || (!checked && statusTrigger === 'unchecked')) {
+        window.formStatuses[statusTitle] = true;
+    } else {
+        delete window.formStatuses[statusTitle];
+    }
+}
+```
+
+STEP 4: Add Handler to Checkbox
+--------------------------------
+```javascript
+checkbox.addEventListener('change', function() {
+    handleStatus${questionId}(this.checked);
+});
+```
+
+================================================================================
+END OF FEATURE #3 DOCUMENTATION
+================================================================================

@@ -386,19 +386,24 @@ window.exportGuiJson = function(download = true) {
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
             const fieldType = tb.type === 'phone'
               ? 'phone'
-              : (tb.isAmountOption ? "amount" : "label");
+              : (tb.type === 'currency'
+                ? 'currency'
+                : (tb.isAmountOption ? "amount" : "label"));
+            console.log('[LIBRARY exportGuiJson] Field type determined', { 
+              cellId: cell.id, 
+              index: item.index, 
+              tbType: tb.type, 
+              isAmountOption: tb.isAmountOption, 
+              fieldType 
+            });
             const fieldEntry = {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
               order: orderIndex + 1
             };
-            // Only add prefill for non-amount fields
-            if (fieldType !== "amount") {
-              fieldEntry.prefill = tb.prefill || '';
-            }
-            // Only add prefill for non-amount fields
-            if (fieldType !== "amount") {
+            // Only add prefill for non-amount and non-currency fields
+            if (fieldType !== "amount" && fieldType !== "currency") {
               fieldEntry.prefill = tb.prefill || '';
             }
             allFieldsInOrder.push(fieldEntry);
@@ -1161,18 +1166,27 @@ window.exportGuiJson = function(download = true) {
             const effectiveSanitizedPdfName = shouldAddPdfName ? sanitizedPdfName : '';
             const effectiveNodeId = effectiveSanitizedPdfName ? `${effectiveSanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
             const fieldNodeId = effectiveSanitizedPdfName ? `${effectiveNodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            // Check if this textbox is marked as an amount option or phone
+            // Check if this textbox is marked as an amount option, phone, or currency
             const fieldType = tb.type === 'phone'
               ? 'phone'
-              : (tb.isAmountOption ? "amount" : "label");
+              : (tb.type === 'currency'
+                ? 'currency'
+                : (tb.isAmountOption ? "amount" : "label"));
+            console.log('[LIBRARY exportGuiJson] Field type determined (fallback)', { 
+              cellId: cell.id, 
+              index, 
+              tbType: tb.type, 
+              isAmountOption: tb.isAmountOption, 
+              fieldType 
+            });
             const fieldEntry = {
               type: fieldType,
               label: labelName,
               nodeId: fieldNodeId,
               order: index + 1
             };
-            // Only add prefill for non-amount fields
-            if (fieldType !== "amount") {
+            // Only add prefill for non-amount and non-currency fields
+            if (fieldType !== "amount" && fieldType !== "currency") {
               fieldEntry.prefill = tb.prefill || '';
             }
             allFieldsInOrder.push(fieldEntry);
@@ -1701,7 +1715,16 @@ window.exportGuiJson = function(download = true) {
               const labelName = tb.nameId || tb.placeholder || "";
               const fieldType = tb.type === 'phone'
                 ? 'phone'
-                : (tb.isAmountOption === true ? "amount" : "label");
+                : (tb.type === 'currency'
+                  ? 'currency'
+                  : (tb.isAmountOption === true ? "amount" : "label"));
+              console.log('[LIBRARY exportGuiJson multipleDropdownType] Field type determined (_itemOrder path)', { 
+                cellId: cell.id, 
+                index: item.index, 
+                tbType: tb.type, 
+                isAmountOption: tb.isAmountOption, 
+                fieldType 
+              });
               // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
               const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
               const fieldEntry = {
@@ -1710,8 +1733,8 @@ window.exportGuiJson = function(download = true) {
                 nodeId: fieldNodeId,
                 order: orderIndex + 1
               };
-              // Only add prefill for non-amount fields
-              if (fieldType !== "amount") {
+              // Only add prefill for non-amount and non-currency fields
+              if (fieldType !== "amount" && fieldType !== "currency") {
                 fieldEntry.prefill = tb.prefill || '';
               }
               allFieldsInOrder.push(fieldEntry);
@@ -2282,7 +2305,16 @@ window.exportGuiJson = function(download = true) {
             const labelName = tb.nameId || tb.placeholder || "";
             const fieldType = tb.type === 'phone'
               ? 'phone'
-              : (tb.isAmountOption === true ? "amount" : "label");
+              : (tb.type === 'currency'
+                ? 'currency'
+                : (tb.isAmountOption === true ? "amount" : "label"));
+            console.log('[LIBRARY exportGuiJson multipleDropdownType] Field type determined (fallback path)', { 
+              cellId: cell.id, 
+              index, 
+              tbType: tb.type, 
+              isAmountOption: tb.isAmountOption, 
+              fieldType 
+            });
             // Use the actual nodeId (which may include _dup2) as the base for fieldNodeId
             const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${nodeId}_${sanitizeNameId(labelName)}`;
             const fieldEntry = {
@@ -2291,8 +2323,8 @@ window.exportGuiJson = function(download = true) {
               nodeId: fieldNodeId,
               order: index + 1
             };
-            // Only add prefill for non-amount fields
-            if (fieldType !== "amount") {
+            // Only add prefill for non-amount and non-currency fields
+            if (fieldType !== "amount" && fieldType !== "currency") {
               fieldEntry.prefill = tb.prefill || '';
             }
             allFieldsInOrder.push(fieldEntry);
@@ -2710,6 +2742,34 @@ window.exportGuiJson = function(download = true) {
       }
     }
     // --- END Alert Logic PATCH ---
+    // --- PATCH: Add Currency Alert Logic ---
+    if (questionType === "currency" && cell._currencyAlerts && Array.isArray(cell._currencyAlerts)) {
+      const enabledAlerts = cell._currencyAlerts.filter(alert => alert && alert.enabled);
+      if (enabledAlerts.length > 0) {
+        question.alertLogic.enabled = true;
+        if (!question.alertLogic.message) {
+          question.alertLogic.message = "";
+        }
+        const existingConditions = Array.isArray(question.alertLogic.conditions)
+          ? question.alertLogic.conditions
+          : [];
+        enabledAlerts.forEach(alert => {
+          const amountNum = parseFloat(alert.amount);
+          existingConditions.push({
+            prevQuestion: String(cell._questionId || ""),
+            operator: alert.operator || ">",
+            amount: Number.isNaN(amountNum) ? alert.amount : amountNum,
+            isCurrency: true,
+            message: alert.title || "",
+            statusRequirements: Array.isArray(alert.statusRequirements)
+              ? alert.statusRequirements.slice()
+              : []
+          });
+        });
+        question.alertLogic.conditions = existingConditions;
+      }
+    }
+    // --- END Currency Alert Logic PATCH ---
     // --- PATCH: Add Status detection ---
     // Check if this question is connected to a status node through its options
     if (outgoingEdges) {
@@ -3398,6 +3458,7 @@ window.saveFlowchart = function() {
     }
     currentFlowchartName = flowchartName;
     window.currentFlowchartName = flowchartName;
+    console.log('[SAVE FLOWCHART] Set currentFlowchartName', flowchartName);
   }
   console.log('[EXPORT SAVEFLOWCHART] ========== SAVE FLOWCHART STARTED ==========');
   // Gather data and save
@@ -3449,7 +3510,7 @@ window.saveFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null, _currencyAlerts: cell._currencyAlerts||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -3518,6 +3579,7 @@ window.saveFlowchart = function() {
       alert("Flowchart saved as: " + flowchartName);
       // Set the library flowchart name for autosave protocol
       window.currentFlowchartName = flowchartName;
+      console.log('[SAVE FLOWCHART] Updated currentFlowchartName after save', flowchartName);
       // Trigger autosave to update the library flowchart name
       if (typeof autosaveFlowchartToLocalStorage === 'function') {
         autosaveFlowchartToLocalStorage();
@@ -3561,6 +3623,7 @@ window.saveAsFlowchart = function() {
   // Update the current flowchart name to the new name
   currentFlowchartName = flowchartName;
   window.currentFlowchartName = flowchartName;
+  console.log('[SAVE AS] Set currentFlowchartName', flowchartName);
   // Gather data and save (same logic as saveFlowchart)
   const data = { cells: [] };
   const cells = graph.getModel().cells;
@@ -3589,7 +3652,7 @@ window.saveAsFlowchart = function() {
         }))
       } : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
-      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null,
+      _twoNumbers: cell._twoNumbers||null, _dropdownTitle: cell._dropdownTitle||null, _fileName: cell._fileName||null, _nameId: cell._nameId||null, _currencyAlerts: cell._currencyAlerts||null,
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
@@ -3658,6 +3721,7 @@ window.saveAsFlowchart = function() {
       alert("Flowchart saved as: " + flowchartName);
       // Set the library flowchart name for autosave protocol
       window.currentFlowchartName = flowchartName;
+      console.log('[SAVE AS] Updated currentFlowchartName after save', flowchartName);
       // Trigger autosave to update the library flowchart name
       if (typeof autosaveFlowchartToLocalStorage === 'function') {
         autosaveFlowchartToLocalStorage();
@@ -4027,29 +4091,41 @@ function generateCorrectNodeId(cell) {
   let nodeId = '';
   // Add PDF name prefix if present and setting allows it
   if (pdfName && pdfName.trim() && shouldAddPdfName) {
-    const cleanPdfName = pdfName.trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+    const cleanPdfName = typeof window.sanitizeNameId === 'function'
+      ? window.sanitizeNameId(pdfName.trim())
+      : pdfName.trim()
+          .toLowerCase()
+          .replace(/<[^>]+>/g, '') // Remove HTML tags
+          .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanPdfName + '_';
   }
   // Add parent text if present (only for option nodes, not question nodes)
   if (parentText && parentText.trim() && isOptions(cell)) {
-    const cleanParentText = parentText.trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+    const cleanParentText = typeof window.sanitizeNameId === 'function'
+      ? window.sanitizeNameId(parentText.trim())
+      : parentText.trim()
+          .toLowerCase()
+          .replace(/<[^>]+>/g, '') // Remove HTML tags
+          .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanParentText + '_';
   }
   // Add current node text
   if (currentText && currentText.trim()) {
-    const cleanCurrentText = currentText.trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+    // Use sanitizeNameId if available, otherwise use similar logic that preserves underscores
+    const cleanCurrentText = typeof window.sanitizeNameId === 'function'
+      ? window.sanitizeNameId(currentText.trim())
+      : currentText.trim()
+          .toLowerCase()
+          .replace(/<[^>]+>/g, '') // Remove HTML tags
+          .replace(/[^a-z0-9\s_]/g, '') // Remove special characters but preserve underscores
+          .replace(/\s+/g, '_') // Replace spaces with underscores
+          .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
     nodeId += cleanCurrentText;
   }
   // Clean up the final result
@@ -4634,6 +4710,10 @@ window.loadFlowchartData = function(data, libraryFlowchartName, onCompleteCallba
             alertText = tempDiv.textContent || tempDiv.innerText || alertText;
           }
           newCell._alertText = alertText;
+        }
+        // Currency node alert properties
+        if (item._currencyAlerts) {
+          newCell._currencyAlerts = JSON.parse(JSON.stringify(item._currencyAlerts));
         }
         // Hidden node properties
         if (item._hiddenNodeId !== undefined) newCell._hiddenNodeId = item._hiddenNodeId;
