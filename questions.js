@@ -3998,6 +3998,282 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   }
                 }
               };
+              // Initialize alert properties for time fields
+              if (!newTime.alert) {
+                newTime.alert = {
+                  enabled: false,
+                  trigger: '',
+                  title: ''
+                };
+              }
+              if (!newTime.hardAlert) {
+                newTime.hardAlert = {
+                  enabled: false,
+                  trigger: '',
+                  title: ''
+                };
+              }
+              
+              // Enable Alert checkbox
+              const enableAlertCheckbox = document.createElement('input');
+              enableAlertCheckbox.type = 'checkbox';
+              enableAlertCheckbox.checked = newTime.alert.enabled || false;
+              enableAlertCheckbox.style.cssText = `
+                margin-bottom: 8px;
+              `;
+              const enableAlertLabel = document.createElement('label');
+              enableAlertLabel.textContent = 'Enable Alert';
+              enableAlertLabel.style.cssText = `
+                font-size: 12px;
+                margin-left: 4px;
+                cursor: pointer;
+              `;
+              enableAlertLabel.htmlFor = `enableAlertTime_${triggerIndex}_${triggerSequence.times.length - 1}`;
+              enableAlertCheckbox.id = enableAlertLabel.htmlFor;
+              const alertContainer = document.createElement('div');
+              alertContainer.style.cssText = `
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+              `;
+              alertContainer.appendChild(enableAlertCheckbox);
+              alertContainer.appendChild(enableAlertLabel);
+              
+              // Alert UI container
+              const alertUIContainer = document.createElement('div');
+              alertUIContainer.id = `alertUITime_${triggerIndex}_${triggerSequence.times.length - 1}`;
+              alertUIContainer.style.display = newTime.alert.enabled ? 'block' : 'none';
+              alertUIContainer.style.cssText = `
+                margin-bottom: 8px;
+                margin-left: 20px;
+                display: ${newTime.alert.enabled ? 'block' : 'none'};
+              `;
+              
+              // Alert Trigger dropdown - populated with dropdown options from trigger sequence
+              const alertTriggerLabel = document.createElement('label');
+              alertTriggerLabel.textContent = 'Alert Trigger:';
+              alertTriggerLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const alertTriggerDropdown = document.createElement('select');
+              alertTriggerDropdown.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              // Populate with dropdown options from trigger sequence
+              const updateAlertTriggerDropdown = () => {
+                alertTriggerDropdown.innerHTML = '';
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Select option...';
+                alertTriggerDropdown.appendChild(placeholderOption);
+                if (triggerSequence.dropdowns && triggerSequence.dropdowns.length > 0) {
+                  triggerSequence.dropdowns.forEach(dropdown => {
+                    if (dropdown.options && dropdown.options.length > 0) {
+                      dropdown.options.forEach(option => {
+                        if (option.text && option.text.trim()) {
+                          const optionEl = document.createElement('option');
+                          optionEl.value = option.text.trim();
+                          optionEl.textContent = option.text.trim();
+                          if (newTime.alert.trigger === option.text.trim()) {
+                            optionEl.selected = true;
+                          }
+                          alertTriggerDropdown.appendChild(optionEl);
+                        }
+                      });
+                    }
+                  });
+                }
+                alertTriggerDropdown.value = newTime.alert.trigger || '';
+              };
+              updateAlertTriggerDropdown();
+              alertTriggerDropdown.onchange = () => {
+                newTime.alert.trigger = alertTriggerDropdown.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Alert Title input
+              const alertTitleLabel = document.createElement('label');
+              alertTitleLabel.textContent = 'Alert Title:';
+              alertTitleLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const alertTitleInput = document.createElement('input');
+              alertTitleInput.type = 'text';
+              alertTitleInput.placeholder = 'Enter alert title...';
+              alertTitleInput.value = newTime.alert.title || '';
+              alertTitleInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              alertTitleInput.onblur = () => {
+                newTime.alert.title = alertTitleInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              alertUIContainer.appendChild(alertTriggerLabel);
+              alertUIContainer.appendChild(alertTriggerDropdown);
+              alertUIContainer.appendChild(alertTitleLabel);
+              alertUIContainer.appendChild(alertTitleInput);
+              
+              enableAlertCheckbox.onchange = () => {
+                newTime.alert.enabled = enableAlertCheckbox.checked;
+                alertUIContainer.style.display = enableAlertCheckbox.checked ? 'block' : 'none';
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Enable Hard Alert checkbox
+              const enableHardAlertCheckbox = document.createElement('input');
+              enableHardAlertCheckbox.type = 'checkbox';
+              enableHardAlertCheckbox.checked = newTime.hardAlert.enabled || false;
+              enableHardAlertCheckbox.style.cssText = `
+                margin-bottom: 8px;
+              `;
+              const enableHardAlertLabel = document.createElement('label');
+              enableHardAlertLabel.textContent = 'Enable Hard Alert';
+              enableHardAlertLabel.style.cssText = `
+                font-size: 12px;
+                margin-left: 4px;
+                cursor: pointer;
+              `;
+              enableHardAlertLabel.htmlFor = `enableHardAlertTime_${triggerIndex}_${triggerSequence.times.length - 1}`;
+              enableHardAlertCheckbox.id = enableHardAlertLabel.htmlFor;
+              const hardAlertContainer = document.createElement('div');
+              hardAlertContainer.style.cssText = `
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+              `;
+              hardAlertContainer.appendChild(enableHardAlertCheckbox);
+              hardAlertContainer.appendChild(enableHardAlertLabel);
+              
+              // Hard Alert UI container
+              const hardAlertUIContainer = document.createElement('div');
+              hardAlertUIContainer.id = `hardAlertUITime_${triggerIndex}_${triggerSequence.times.length - 1}`;
+              hardAlertUIContainer.style.display = newTime.hardAlert.enabled ? 'block' : 'none';
+              hardAlertUIContainer.style.cssText = `
+                margin-bottom: 8px;
+                margin-left: 20px;
+                display: ${newTime.hardAlert.enabled ? 'block' : 'none'};
+              `;
+              
+              // Hard Alert Trigger dropdown - populated with dropdown options from trigger sequence
+              const hardAlertTriggerLabel = document.createElement('label');
+              hardAlertTriggerLabel.textContent = 'Hard Alert Trigger:';
+              hardAlertTriggerLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const hardAlertTriggerDropdown = document.createElement('select');
+              hardAlertTriggerDropdown.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              // Populate with dropdown options from trigger sequence
+              const updateHardAlertTriggerDropdown = () => {
+                hardAlertTriggerDropdown.innerHTML = '';
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Select option...';
+                hardAlertTriggerDropdown.appendChild(placeholderOption);
+                if (triggerSequence.dropdowns && triggerSequence.dropdowns.length > 0) {
+                  triggerSequence.dropdowns.forEach(dropdown => {
+                    if (dropdown.options && dropdown.options.length > 0) {
+                      dropdown.options.forEach(option => {
+                        if (option.text && option.text.trim()) {
+                          const optionEl = document.createElement('option');
+                          optionEl.value = option.text.trim();
+                          optionEl.textContent = option.text.trim();
+                          if (newTime.hardAlert.trigger === option.text.trim()) {
+                            optionEl.selected = true;
+                          }
+                          hardAlertTriggerDropdown.appendChild(optionEl);
+                        }
+                      });
+                    }
+                  });
+                }
+                hardAlertTriggerDropdown.value = newTime.hardAlert.trigger || '';
+              };
+              updateHardAlertTriggerDropdown();
+              hardAlertTriggerDropdown.onchange = () => {
+                newTime.hardAlert.trigger = hardAlertTriggerDropdown.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Hard Alert Title input
+              const hardAlertTitleLabel = document.createElement('label');
+              hardAlertTitleLabel.textContent = 'Hard Alert Title:';
+              hardAlertTitleLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const hardAlertTitleInput = document.createElement('input');
+              hardAlertTitleInput.type = 'text';
+              hardAlertTitleInput.placeholder = 'Enter hard alert title...';
+              hardAlertTitleInput.value = newTime.hardAlert.title || '';
+              hardAlertTitleInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              hardAlertTitleInput.onblur = () => {
+                newTime.hardAlert.title = hardAlertTitleInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              hardAlertUIContainer.appendChild(hardAlertTriggerLabel);
+              hardAlertUIContainer.appendChild(hardAlertTriggerDropdown);
+              hardAlertUIContainer.appendChild(hardAlertTitleLabel);
+              hardAlertUIContainer.appendChild(hardAlertTitleInput);
+              
+              enableHardAlertCheckbox.onchange = () => {
+                newTime.hardAlert.enabled = enableHardAlertCheckbox.checked;
+                hardAlertUIContainer.style.display = enableHardAlertCheckbox.checked ? 'block' : 'none';
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              contentContainer.appendChild(alertContainer);
+              contentContainer.appendChild(alertUIContainer);
+              contentContainer.appendChild(hardAlertContainer);
+              contentContainer.appendChild(hardAlertUIContainer);
               contentContainer.appendChild(copyTimeIdBtn);
               timeContainer.appendChild(contentContainer);
               // Add drag handlers
@@ -4530,6 +4806,13 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                       }
                     });
                   }
+                  // Update alert dropdowns when options change
+                  if (alertUIContainer._updateAlertDropdowns) {
+                    alertUIContainer._updateAlertDropdowns();
+                  }
+                  if (hardAlertUIContainer._updateAlertDropdowns) {
+                    hardAlertUIContainer._updateAlertDropdowns();
+                  }
                 };
                 const deleteOptionBtn = document.createElement('button');
                 deleteOptionBtn.textContent = '×';
@@ -4733,11 +5016,284 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
               if (newDropdown.conditionalLogic.enabled) {
                 updateConditionalLogicUI();
               }
+              
+              // Initialize alert properties if they don't exist
+              if (!newDropdown.alert) {
+                newDropdown.alert = {
+                  enabled: false,
+                  trigger: '',
+                  title: ''
+                };
+              }
+              if (!newDropdown.hardAlert) {
+                newDropdown.hardAlert = {
+                  enabled: false,
+                  trigger: '',
+                  title: ''
+                };
+              }
+              
+              // Enable Alert checkbox
+              const enableAlertCheckbox = document.createElement('input');
+              enableAlertCheckbox.type = 'checkbox';
+              enableAlertCheckbox.checked = newDropdown.alert.enabled || false;
+              enableAlertCheckbox.style.cssText = `
+                margin-bottom: 8px;
+              `;
+              const enableAlertLabel = document.createElement('label');
+              enableAlertLabel.textContent = 'Enable Alert';
+              enableAlertLabel.style.cssText = `
+                font-size: 12px;
+                margin-left: 4px;
+                cursor: pointer;
+              `;
+              enableAlertLabel.htmlFor = `enableAlert_${triggerIndex}_${triggerSequence.dropdowns.length - 1}`;
+              enableAlertCheckbox.id = enableAlertLabel.htmlFor;
+              const alertContainer = document.createElement('div');
+              alertContainer.style.cssText = `
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+              `;
+              alertContainer.appendChild(enableAlertCheckbox);
+              alertContainer.appendChild(enableAlertLabel);
+              
+              // Alert UI container
+              const alertUIContainer = document.createElement('div');
+              alertUIContainer.id = `alertUI_${triggerIndex}_${triggerSequence.dropdowns.length - 1}`;
+              alertUIContainer.style.display = newDropdown.alert.enabled ? 'block' : 'none';
+              alertUIContainer.style.cssText = `
+                margin-bottom: 8px;
+                margin-left: 20px;
+                display: ${newDropdown.alert.enabled ? 'block' : 'none'};
+              `;
+              
+              // Alert Trigger dropdown
+              const alertTriggerLabel = document.createElement('label');
+              alertTriggerLabel.textContent = 'Alert Trigger:';
+              alertTriggerLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const alertTriggerDropdown = document.createElement('select');
+              alertTriggerDropdown.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              // Populate with dropdown options
+              const updateAlertTriggerDropdown = () => {
+                alertTriggerDropdown.innerHTML = '';
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Select option...';
+                alertTriggerDropdown.appendChild(placeholderOption);
+                if (newDropdown.options && newDropdown.options.length > 0) {
+                  newDropdown.options.forEach(option => {
+                    if (option.text && option.text.trim()) {
+                      const optionEl = document.createElement('option');
+                      optionEl.value = option.text.trim();
+                      optionEl.textContent = option.text.trim();
+                      if (newDropdown.alert.trigger === option.text.trim()) {
+                        optionEl.selected = true;
+                      }
+                      alertTriggerDropdown.appendChild(optionEl);
+                    }
+                  });
+                }
+                alertTriggerDropdown.value = newDropdown.alert.trigger || '';
+              };
+              updateAlertTriggerDropdown();
+              alertTriggerDropdown.onchange = () => {
+                newDropdown.alert.trigger = alertTriggerDropdown.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Alert Title input
+              const alertTitleLabel = document.createElement('label');
+              alertTitleLabel.textContent = 'Alert Title:';
+              alertTitleLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const alertTitleInput = document.createElement('input');
+              alertTitleInput.type = 'text';
+              alertTitleInput.placeholder = 'Enter alert title...';
+              alertTitleInput.value = newDropdown.alert.title || '';
+              alertTitleInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              alertTitleInput.onblur = () => {
+                newDropdown.alert.title = alertTitleInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              alertUIContainer.appendChild(alertTriggerLabel);
+              alertUIContainer.appendChild(alertTriggerDropdown);
+              alertUIContainer.appendChild(alertTitleLabel);
+              alertUIContainer.appendChild(alertTitleInput);
+              
+              enableAlertCheckbox.onchange = () => {
+                newDropdown.alert.enabled = enableAlertCheckbox.checked;
+                alertUIContainer.style.display = enableAlertCheckbox.checked ? 'block' : 'none';
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Enable Hard Alert checkbox
+              const enableHardAlertCheckbox = document.createElement('input');
+              enableHardAlertCheckbox.type = 'checkbox';
+              enableHardAlertCheckbox.checked = newDropdown.hardAlert.enabled || false;
+              enableHardAlertCheckbox.style.cssText = `
+                margin-bottom: 8px;
+              `;
+              const enableHardAlertLabel = document.createElement('label');
+              enableHardAlertLabel.textContent = 'Enable Hard Alert';
+              enableHardAlertLabel.style.cssText = `
+                font-size: 12px;
+                margin-left: 4px;
+                cursor: pointer;
+              `;
+              enableHardAlertLabel.htmlFor = `enableHardAlert_${triggerIndex}_${triggerSequence.dropdowns.length - 1}`;
+              enableHardAlertCheckbox.id = enableHardAlertLabel.htmlFor;
+              const hardAlertContainer = document.createElement('div');
+              hardAlertContainer.style.cssText = `
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+              `;
+              hardAlertContainer.appendChild(enableHardAlertCheckbox);
+              hardAlertContainer.appendChild(enableHardAlertLabel);
+              
+              // Hard Alert UI container
+              const hardAlertUIContainer = document.createElement('div');
+              hardAlertUIContainer.id = `hardAlertUI_${triggerIndex}_${triggerSequence.dropdowns.length - 1}`;
+              hardAlertUIContainer.style.display = newDropdown.hardAlert.enabled ? 'block' : 'none';
+              hardAlertUIContainer.style.cssText = `
+                margin-bottom: 8px;
+                margin-left: 20px;
+                display: ${newDropdown.hardAlert.enabled ? 'block' : 'none'};
+              `;
+              
+              // Hard Alert Trigger dropdown
+              const hardAlertTriggerLabel = document.createElement('label');
+              hardAlertTriggerLabel.textContent = 'Hard Alert Trigger:';
+              hardAlertTriggerLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const hardAlertTriggerDropdown = document.createElement('select');
+              hardAlertTriggerDropdown.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              // Populate with dropdown options
+              const updateHardAlertTriggerDropdown = () => {
+                hardAlertTriggerDropdown.innerHTML = '';
+                const placeholderOption = document.createElement('option');
+                placeholderOption.value = '';
+                placeholderOption.textContent = 'Select option...';
+                hardAlertTriggerDropdown.appendChild(placeholderOption);
+                if (newDropdown.options && newDropdown.options.length > 0) {
+                  newDropdown.options.forEach(option => {
+                    if (option.text && option.text.trim()) {
+                      const optionEl = document.createElement('option');
+                      optionEl.value = option.text.trim();
+                      optionEl.textContent = option.text.trim();
+                      if (newDropdown.hardAlert.trigger === option.text.trim()) {
+                        optionEl.selected = true;
+                      }
+                      hardAlertTriggerDropdown.appendChild(optionEl);
+                    }
+                  });
+                }
+                hardAlertTriggerDropdown.value = newDropdown.hardAlert.trigger || '';
+              };
+              updateHardAlertTriggerDropdown();
+              hardAlertTriggerDropdown.onchange = () => {
+                newDropdown.hardAlert.trigger = hardAlertTriggerDropdown.value;
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Hard Alert Title input
+              const hardAlertTitleLabel = document.createElement('label');
+              hardAlertTitleLabel.textContent = 'Hard Alert Title:';
+              hardAlertTitleLabel.style.cssText = `
+                font-size: 12px;
+                margin-right: 8px;
+                display: block;
+                margin-bottom: 4px;
+              `;
+              const hardAlertTitleInput = document.createElement('input');
+              hardAlertTitleInput.type = 'text';
+              hardAlertTitleInput.placeholder = 'Enter hard alert title...';
+              hardAlertTitleInput.value = newDropdown.hardAlert.title || '';
+              hardAlertTitleInput.style.cssText = `
+                width: 100%;
+                padding: 4px 8px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                font-size: 12px;
+                margin-bottom: 8px;
+              `;
+              hardAlertTitleInput.onblur = () => {
+                newDropdown.hardAlert.title = hardAlertTitleInput.value.trim();
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              hardAlertUIContainer.appendChild(hardAlertTriggerLabel);
+              hardAlertUIContainer.appendChild(hardAlertTriggerDropdown);
+              hardAlertUIContainer.appendChild(hardAlertTitleLabel);
+              hardAlertUIContainer.appendChild(hardAlertTitleInput);
+              
+              enableHardAlertCheckbox.onchange = () => {
+                newDropdown.hardAlert.enabled = enableHardAlertCheckbox.checked;
+                hardAlertUIContainer.style.display = enableHardAlertCheckbox.checked ? 'block' : 'none';
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+              };
+              
+              // Store references to update functions on containers so they can be called from option inputs
+              alertUIContainer._updateAlertDropdowns = updateAlertTriggerDropdown;
+              hardAlertUIContainer._updateAlertDropdowns = updateHardAlertTriggerDropdown;
+              
               contentContainer.appendChild(fieldNameInput);
               contentContainer.appendChild(addOptionBtn);
               contentContainer.appendChild(optionsContainer);
               contentContainer.appendChild(conditionalLogicContainer);
               contentContainer.appendChild(conditionalLogicUIContainer);
+              contentContainer.appendChild(alertContainer);
+              contentContainer.appendChild(alertUIContainer);
+              contentContainer.appendChild(hardAlertContainer);
+              contentContainer.appendChild(hardAlertUIContainer);
               contentContainer.appendChild(deleteDropdownBtn);
               dropdownContainer.appendChild(contentContainer);
               // Add drag handlers
@@ -7549,6 +8105,282 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
             }
           }
         };
+        // Initialize alert properties for existing time fields
+        if (!time.alert) {
+          time.alert = {
+            enabled: false,
+            trigger: '',
+            title: ''
+          };
+        }
+        if (!time.hardAlert) {
+          time.hardAlert = {
+            enabled: false,
+            trigger: '',
+            title: ''
+          };
+        }
+        
+        // Enable Alert checkbox
+        const enableAlertCheckbox = document.createElement('input');
+        enableAlertCheckbox.type = 'checkbox';
+        enableAlertCheckbox.checked = time.alert.enabled || false;
+        enableAlertCheckbox.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        const enableAlertLabel = document.createElement('label');
+        enableAlertLabel.textContent = 'Enable Alert';
+        enableAlertLabel.style.cssText = `
+          font-size: 12px;
+          margin-left: 4px;
+          cursor: pointer;
+        `;
+        enableAlertLabel.htmlFor = `enableAlertTime_existing_${triggerIndex}_${timeIndex}`;
+        enableAlertCheckbox.id = enableAlertLabel.htmlFor;
+        const alertContainer = document.createElement('div');
+        alertContainer.style.cssText = `
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+        `;
+        alertContainer.appendChild(enableAlertCheckbox);
+        alertContainer.appendChild(enableAlertLabel);
+        
+        // Alert UI container
+        const alertUIContainer = document.createElement('div');
+        alertUIContainer.id = `alertUITime_existing_${triggerIndex}_${timeIndex}`;
+        alertUIContainer.style.display = time.alert.enabled ? 'block' : 'none';
+        alertUIContainer.style.cssText = `
+          margin-bottom: 8px;
+          margin-left: 20px;
+          display: ${time.alert.enabled ? 'block' : 'none'};
+        `;
+        
+        // Alert Trigger dropdown - populated with dropdown options from trigger sequence
+        const alertTriggerLabel = document.createElement('label');
+        alertTriggerLabel.textContent = 'Alert Trigger:';
+        alertTriggerLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const alertTriggerDropdown = document.createElement('select');
+        alertTriggerDropdown.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        // Populate with dropdown options from trigger sequence
+        const updateAlertTriggerDropdown = () => {
+          alertTriggerDropdown.innerHTML = '';
+          const placeholderOption = document.createElement('option');
+          placeholderOption.value = '';
+          placeholderOption.textContent = 'Select option...';
+          alertTriggerDropdown.appendChild(placeholderOption);
+          if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+            trigger.dropdowns.forEach(dropdown => {
+              if (dropdown.options && dropdown.options.length > 0) {
+                dropdown.options.forEach(option => {
+                  if (option.text && option.text.trim()) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = option.text.trim();
+                    optionEl.textContent = option.text.trim();
+                    if (time.alert.trigger === option.text.trim()) {
+                      optionEl.selected = true;
+                    }
+                    alertTriggerDropdown.appendChild(optionEl);
+                  }
+                });
+              }
+            });
+          }
+          alertTriggerDropdown.value = time.alert.trigger || '';
+        };
+        updateAlertTriggerDropdown();
+        alertTriggerDropdown.onchange = () => {
+          time.alert.trigger = alertTriggerDropdown.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Alert Title input
+        const alertTitleLabel = document.createElement('label');
+        alertTitleLabel.textContent = 'Alert Title:';
+        alertTitleLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const alertTitleInput = document.createElement('input');
+        alertTitleInput.type = 'text';
+        alertTitleInput.placeholder = 'Enter alert title...';
+        alertTitleInput.value = time.alert.title || '';
+        alertTitleInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        alertTitleInput.onblur = () => {
+          time.alert.title = alertTitleInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        alertUIContainer.appendChild(alertTriggerLabel);
+        alertUIContainer.appendChild(alertTriggerDropdown);
+        alertUIContainer.appendChild(alertTitleLabel);
+        alertUIContainer.appendChild(alertTitleInput);
+        
+        enableAlertCheckbox.onchange = () => {
+          time.alert.enabled = enableAlertCheckbox.checked;
+          alertUIContainer.style.display = enableAlertCheckbox.checked ? 'block' : 'none';
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Enable Hard Alert checkbox
+        const enableHardAlertCheckbox = document.createElement('input');
+        enableHardAlertCheckbox.type = 'checkbox';
+        enableHardAlertCheckbox.checked = time.hardAlert.enabled || false;
+        enableHardAlertCheckbox.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        const enableHardAlertLabel = document.createElement('label');
+        enableHardAlertLabel.textContent = 'Enable Hard Alert';
+        enableHardAlertLabel.style.cssText = `
+          font-size: 12px;
+          margin-left: 4px;
+          cursor: pointer;
+        `;
+        enableHardAlertLabel.htmlFor = `enableHardAlertTime_existing_${triggerIndex}_${timeIndex}`;
+        enableHardAlertCheckbox.id = enableHardAlertLabel.htmlFor;
+        const hardAlertContainer = document.createElement('div');
+        hardAlertContainer.style.cssText = `
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+        `;
+        hardAlertContainer.appendChild(enableHardAlertCheckbox);
+        hardAlertContainer.appendChild(enableHardAlertLabel);
+        
+        // Hard Alert UI container
+        const hardAlertUIContainer = document.createElement('div');
+        hardAlertUIContainer.id = `hardAlertUITime_existing_${triggerIndex}_${timeIndex}`;
+        hardAlertUIContainer.style.display = time.hardAlert.enabled ? 'block' : 'none';
+        hardAlertUIContainer.style.cssText = `
+          margin-bottom: 8px;
+          margin-left: 20px;
+          display: ${time.hardAlert.enabled ? 'block' : 'none'};
+        `;
+        
+        // Hard Alert Trigger dropdown - populated with dropdown options from trigger sequence
+        const hardAlertTriggerLabel = document.createElement('label');
+        hardAlertTriggerLabel.textContent = 'Hard Alert Trigger:';
+        hardAlertTriggerLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const hardAlertTriggerDropdown = document.createElement('select');
+        hardAlertTriggerDropdown.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        // Populate with dropdown options from trigger sequence
+        const updateHardAlertTriggerDropdown = () => {
+          hardAlertTriggerDropdown.innerHTML = '';
+          const placeholderOption = document.createElement('option');
+          placeholderOption.value = '';
+          placeholderOption.textContent = 'Select option...';
+          hardAlertTriggerDropdown.appendChild(placeholderOption);
+          if (trigger.dropdowns && trigger.dropdowns.length > 0) {
+            trigger.dropdowns.forEach(dropdown => {
+              if (dropdown.options && dropdown.options.length > 0) {
+                dropdown.options.forEach(option => {
+                  if (option.text && option.text.trim()) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = option.text.trim();
+                    optionEl.textContent = option.text.trim();
+                    if (time.hardAlert.trigger === option.text.trim()) {
+                      optionEl.selected = true;
+                    }
+                    hardAlertTriggerDropdown.appendChild(optionEl);
+                  }
+                });
+              }
+            });
+          }
+          hardAlertTriggerDropdown.value = time.hardAlert.trigger || '';
+        };
+        updateHardAlertTriggerDropdown();
+        hardAlertTriggerDropdown.onchange = () => {
+          time.hardAlert.trigger = hardAlertTriggerDropdown.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Hard Alert Title input
+        const hardAlertTitleLabel = document.createElement('label');
+        hardAlertTitleLabel.textContent = 'Hard Alert Title:';
+        hardAlertTitleLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const hardAlertTitleInput = document.createElement('input');
+        hardAlertTitleInput.type = 'text';
+        hardAlertTitleInput.placeholder = 'Enter hard alert title...';
+        hardAlertTitleInput.value = time.hardAlert.title || '';
+        hardAlertTitleInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        hardAlertTitleInput.onblur = () => {
+          time.hardAlert.title = hardAlertTitleInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        hardAlertUIContainer.appendChild(hardAlertTriggerLabel);
+        hardAlertUIContainer.appendChild(hardAlertTriggerDropdown);
+        hardAlertUIContainer.appendChild(hardAlertTitleLabel);
+        hardAlertUIContainer.appendChild(hardAlertTitleInput);
+        
+        enableHardAlertCheckbox.onchange = () => {
+          time.hardAlert.enabled = enableHardAlertCheckbox.checked;
+          hardAlertUIContainer.style.display = enableHardAlertCheckbox.checked ? 'block' : 'none';
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        contentContainer.appendChild(alertContainer);
+        contentContainer.appendChild(alertUIContainer);
+        contentContainer.appendChild(hardAlertContainer);
+        contentContainer.appendChild(hardAlertUIContainer);
         contentContainer.appendChild(copyTimeIdBtn);
         timeContainer.appendChild(contentContainer);
         // Add drag handlers
@@ -7975,6 +8807,13 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                   }
                 });
               }
+              // Update alert dropdowns when options change
+              if (alertUIContainer._updateAlertDropdowns) {
+                alertUIContainer._updateAlertDropdowns();
+              }
+              if (hardAlertUIContainer._updateAlertDropdowns) {
+                hardAlertUIContainer._updateAlertDropdowns();
+              }
             };
             const deleteOptionBtn = document.createElement('button');
             deleteOptionBtn.textContent = '×';
@@ -8178,6 +9017,275 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         if (nestedDropdown.conditionalLogic.enabled) {
           updateConditionalLogicUI();
         }
+        
+        // Initialize alert properties if they don't exist
+        if (!nestedDropdown.alert) {
+          nestedDropdown.alert = {
+            enabled: false,
+            trigger: '',
+            title: ''
+          };
+        }
+        if (!nestedDropdown.hardAlert) {
+          nestedDropdown.hardAlert = {
+            enabled: false,
+            trigger: '',
+            title: ''
+          };
+        }
+        
+        // Enable Alert checkbox
+        const enableAlertCheckbox = document.createElement('input');
+        enableAlertCheckbox.type = 'checkbox';
+        enableAlertCheckbox.checked = nestedDropdown.alert.enabled || false;
+        enableAlertCheckbox.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        const enableAlertLabel = document.createElement('label');
+        enableAlertLabel.textContent = 'Enable Alert';
+        enableAlertLabel.style.cssText = `
+          font-size: 12px;
+          margin-left: 4px;
+          cursor: pointer;
+        `;
+        enableAlertLabel.htmlFor = `enableAlert_existing_${triggerIndex}_${dropdownIndex}`;
+        enableAlertCheckbox.id = enableAlertLabel.htmlFor;
+        const alertContainer = document.createElement('div');
+        alertContainer.style.cssText = `
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+        `;
+        alertContainer.appendChild(enableAlertCheckbox);
+        alertContainer.appendChild(enableAlertLabel);
+        
+        // Alert UI container
+        const alertUIContainer = document.createElement('div');
+        alertUIContainer.id = `alertUI_existing_${triggerIndex}_${dropdownIndex}`;
+        alertUIContainer.style.display = nestedDropdown.alert.enabled ? 'block' : 'none';
+        alertUIContainer.style.cssText = `
+          margin-bottom: 8px;
+          margin-left: 20px;
+          display: ${nestedDropdown.alert.enabled ? 'block' : 'none'};
+        `;
+        
+        // Alert Trigger dropdown
+        const alertTriggerLabel = document.createElement('label');
+        alertTriggerLabel.textContent = 'Alert Trigger:';
+        alertTriggerLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const alertTriggerDropdown = document.createElement('select');
+        alertTriggerDropdown.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        // Populate with dropdown options
+        const updateAlertTriggerDropdown = () => {
+          alertTriggerDropdown.innerHTML = '';
+          const placeholderOption = document.createElement('option');
+          placeholderOption.value = '';
+          placeholderOption.textContent = 'Select option...';
+          alertTriggerDropdown.appendChild(placeholderOption);
+          if (nestedDropdown.options && nestedDropdown.options.length > 0) {
+            nestedDropdown.options.forEach(option => {
+              if (option.text && option.text.trim()) {
+                const optionEl = document.createElement('option');
+                optionEl.value = option.text.trim();
+                optionEl.textContent = option.text.trim();
+                if (nestedDropdown.alert.trigger === option.text.trim()) {
+                  optionEl.selected = true;
+                }
+                alertTriggerDropdown.appendChild(optionEl);
+              }
+            });
+          }
+          alertTriggerDropdown.value = nestedDropdown.alert.trigger || '';
+        };
+        updateAlertTriggerDropdown();
+        alertTriggerDropdown.onchange = () => {
+          nestedDropdown.alert.trigger = alertTriggerDropdown.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Alert Title input
+        const alertTitleLabel = document.createElement('label');
+        alertTitleLabel.textContent = 'Alert Title:';
+        alertTitleLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const alertTitleInput = document.createElement('input');
+        alertTitleInput.type = 'text';
+        alertTitleInput.placeholder = 'Enter alert title...';
+        alertTitleInput.value = nestedDropdown.alert.title || '';
+        alertTitleInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        alertTitleInput.onblur = () => {
+          nestedDropdown.alert.title = alertTitleInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        alertUIContainer.appendChild(alertTriggerLabel);
+        alertUIContainer.appendChild(alertTriggerDropdown);
+        alertUIContainer.appendChild(alertTitleLabel);
+        alertUIContainer.appendChild(alertTitleInput);
+        
+        enableAlertCheckbox.onchange = () => {
+          nestedDropdown.alert.enabled = enableAlertCheckbox.checked;
+          alertUIContainer.style.display = enableAlertCheckbox.checked ? 'block' : 'none';
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Enable Hard Alert checkbox
+        const enableHardAlertCheckbox = document.createElement('input');
+        enableHardAlertCheckbox.type = 'checkbox';
+        enableHardAlertCheckbox.checked = nestedDropdown.hardAlert.enabled || false;
+        enableHardAlertCheckbox.style.cssText = `
+          margin-bottom: 8px;
+        `;
+        const enableHardAlertLabel = document.createElement('label');
+        enableHardAlertLabel.textContent = 'Enable Hard Alert';
+        enableHardAlertLabel.style.cssText = `
+          font-size: 12px;
+          margin-left: 4px;
+          cursor: pointer;
+        `;
+        enableHardAlertLabel.htmlFor = `enableHardAlert_existing_${triggerIndex}_${dropdownIndex}`;
+        enableHardAlertCheckbox.id = enableHardAlertLabel.htmlFor;
+        const hardAlertContainer = document.createElement('div');
+        hardAlertContainer.style.cssText = `
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+        `;
+        hardAlertContainer.appendChild(enableHardAlertCheckbox);
+        hardAlertContainer.appendChild(enableHardAlertLabel);
+        
+        // Hard Alert UI container
+        const hardAlertUIContainer = document.createElement('div');
+        hardAlertUIContainer.id = `hardAlertUI_existing_${triggerIndex}_${dropdownIndex}`;
+        hardAlertUIContainer.style.display = nestedDropdown.hardAlert.enabled ? 'block' : 'none';
+        hardAlertUIContainer.style.cssText = `
+          margin-bottom: 8px;
+          margin-left: 20px;
+          display: ${nestedDropdown.hardAlert.enabled ? 'block' : 'none'};
+        `;
+        
+        // Hard Alert Trigger dropdown
+        const hardAlertTriggerLabel = document.createElement('label');
+        hardAlertTriggerLabel.textContent = 'Hard Alert Trigger:';
+        hardAlertTriggerLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const hardAlertTriggerDropdown = document.createElement('select');
+        hardAlertTriggerDropdown.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        // Populate with dropdown options
+        const updateHardAlertTriggerDropdown = () => {
+          hardAlertTriggerDropdown.innerHTML = '';
+          const placeholderOption = document.createElement('option');
+          placeholderOption.value = '';
+          placeholderOption.textContent = 'Select option...';
+          hardAlertTriggerDropdown.appendChild(placeholderOption);
+          if (nestedDropdown.options && nestedDropdown.options.length > 0) {
+            nestedDropdown.options.forEach(option => {
+              if (option.text && option.text.trim()) {
+                const optionEl = document.createElement('option');
+                optionEl.value = option.text.trim();
+                optionEl.textContent = option.text.trim();
+                if (nestedDropdown.hardAlert.trigger === option.text.trim()) {
+                  optionEl.selected = true;
+                }
+                hardAlertTriggerDropdown.appendChild(optionEl);
+              }
+            });
+          }
+          hardAlertTriggerDropdown.value = nestedDropdown.hardAlert.trigger || '';
+        };
+        updateHardAlertTriggerDropdown();
+        hardAlertTriggerDropdown.onchange = () => {
+          nestedDropdown.hardAlert.trigger = hardAlertTriggerDropdown.value;
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Hard Alert Title input
+        const hardAlertTitleLabel = document.createElement('label');
+        hardAlertTitleLabel.textContent = 'Hard Alert Title:';
+        hardAlertTitleLabel.style.cssText = `
+          font-size: 12px;
+          margin-right: 8px;
+          display: block;
+          margin-bottom: 4px;
+        `;
+        const hardAlertTitleInput = document.createElement('input');
+        hardAlertTitleInput.type = 'text';
+        hardAlertTitleInput.placeholder = 'Enter hard alert title...';
+        hardAlertTitleInput.value = nestedDropdown.hardAlert.title || '';
+        hardAlertTitleInput.style.cssText = `
+          width: 100%;
+          padding: 4px 8px;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        `;
+        hardAlertTitleInput.onblur = () => {
+          nestedDropdown.hardAlert.title = hardAlertTitleInput.value.trim();
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        hardAlertUIContainer.appendChild(hardAlertTriggerLabel);
+        hardAlertUIContainer.appendChild(hardAlertTriggerDropdown);
+        hardAlertUIContainer.appendChild(hardAlertTitleLabel);
+        hardAlertUIContainer.appendChild(hardAlertTitleInput);
+        
+        enableHardAlertCheckbox.onchange = () => {
+          nestedDropdown.hardAlert.enabled = enableHardAlertCheckbox.checked;
+          hardAlertUIContainer.style.display = enableHardAlertCheckbox.checked ? 'block' : 'none';
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+        };
+        
+        // Store references to update functions
+        alertUIContainer._updateAlertDropdowns = updateAlertTriggerDropdown;
+        hardAlertUIContainer._updateAlertDropdowns = updateHardAlertTriggerDropdown;
+        
         // Also refresh when options are added via the "Add option" button
         addOptionBtn.onclick = () => {
           const newOption = { text: '' };
@@ -8228,6 +9336,13 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
                 }
               });
             }
+            // Update alert dropdowns when options change
+            if (alertUIContainer._updateAlertDropdowns) {
+              alertUIContainer._updateAlertDropdowns();
+            }
+            if (hardAlertUIContainer._updateAlertDropdowns) {
+              hardAlertUIContainer._updateAlertDropdowns();
+            }
           };
           const deleteOptionBtn = document.createElement('button');
           deleteOptionBtn.textContent = '×';
@@ -8275,6 +9390,10 @@ function createDropdownField(dropdown, index, cell, parentContainer) {
         contentContainer.appendChild(optionsContainer);
         contentContainer.appendChild(conditionalLogicContainer);
         contentContainer.appendChild(conditionalLogicUIContainer);
+        contentContainer.appendChild(alertContainer);
+        contentContainer.appendChild(alertUIContainer);
+        contentContainer.appendChild(hardAlertContainer);
+        contentContainer.appendChild(hardAlertUIContainer);
         contentContainer.appendChild(deleteDropdownBtn);
         dropdownContainer.appendChild(contentContainer);
         // Add drag handlers

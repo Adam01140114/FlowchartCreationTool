@@ -588,7 +588,7 @@ window.exportGuiJson = function(download = true) {
                           label: time.fieldName || "",
                           nodeId: nodeId
                         };
-                        // Include conditional logic if it exists
+                        // Include conditional logic if it exists and has conditions
                         if (time.conditionalLogic && time.conditionalLogic.enabled) {
                           // Process conditions to remove parent question prefix
                           let conditions = time.conditionalLogic.conditions || [];
@@ -706,9 +706,29 @@ window.exportGuiJson = function(download = true) {
                             });
                           }
                           
-                          dateField.conditionalLogic = {
-                            enabled: time.conditionalLogic.enabled,
-                            conditions: conditions.filter(c => c && c.trim() !== '')
+                          const filteredConditions = conditions.filter(c => c && c.trim() !== '');
+                          // Only include conditionalLogic if there are actual conditions
+                          if (filteredConditions.length > 0) {
+                            dateField.conditionalLogic = {
+                              enabled: time.conditionalLogic.enabled,
+                              conditions: filteredConditions
+                            };
+                          }
+                        }
+                        // Include alert if it exists and is enabled
+                        if (time.alert && time.alert.enabled) {
+                          dateField.alert = {
+                            enabled: true,
+                            condition: time.alert.trigger || '',
+                            title: time.alert.title || ''
+                          };
+                        }
+                        // Include hardAlert if it exists and is enabled
+                        if (time.hardAlert && time.hardAlert.enabled) {
+                          dateField.hardAlert = {
+                            enabled: true,
+                            condition: time.hardAlert.trigger || '',
+                            title: time.hardAlert.title || ''
                           };
                         }
                         fields.push(dateField);
@@ -774,6 +794,22 @@ window.exportGuiJson = function(download = true) {
                           dropdownField.conditionalLogic = {
                             enabled: nestedDropdown.conditionalLogic.enabled,
                             conditions: conditions.filter(c => c && c.trim() !== '')
+                          };
+                        }
+                        // Include alert if it exists and is enabled
+                        if (nestedDropdown.alert && nestedDropdown.alert.enabled) {
+                          dropdownField.alert = {
+                            enabled: true,
+                            condition: nestedDropdown.alert.trigger || '',
+                            title: nestedDropdown.alert.title || ''
+                          };
+                        }
+                        // Include hardAlert if it exists and is enabled
+                        if (nestedDropdown.hardAlert && nestedDropdown.hardAlert.enabled) {
+                          dropdownField.hardAlert = {
+                            enabled: true,
+                            condition: nestedDropdown.hardAlert.trigger || '',
+                            title: nestedDropdown.hardAlert.title || ''
                           };
                         }
                         fields.push(dropdownField);
@@ -870,6 +906,22 @@ window.exportGuiJson = function(download = true) {
                               conditions: time.conditionalLogic.conditions || []
                             };
                           }
+                          // Include alert if it exists and is enabled
+                          if (time.alert && time.alert.enabled) {
+                            dateField.alert = {
+                              enabled: true,
+                              condition: time.alert.trigger || '',
+                              title: time.alert.title || ''
+                            };
+                          }
+                          // Include hardAlert if it exists and is enabled
+                          if (time.hardAlert && time.hardAlert.enabled) {
+                            dateField.hardAlert = {
+                              enabled: true,
+                              condition: time.hardAlert.trigger || '',
+                              title: time.hardAlert.title || ''
+                            };
+                          }
                           fields.push(dateField);
                         }
                       }
@@ -898,11 +950,28 @@ window.exportGuiJson = function(download = true) {
                         const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                           text: option.text || ""
                         })) : [];
-                        fields.push({
+                        const dropdownField = {
                           type: "dropdown",
                           fieldName: nestedDropdown.fieldName || "",
                           options: nestedDropdownOptions
-                        });
+                        };
+                        // Include alert if it exists and is enabled
+                        if (nestedDropdown.alert && nestedDropdown.alert.enabled) {
+                          dropdownField.alert = {
+                            enabled: true,
+                            condition: nestedDropdown.alert.trigger || '',
+                            title: nestedDropdown.alert.title || ''
+                          };
+                        }
+                        // Include hardAlert if it exists and is enabled
+                        if (nestedDropdown.hardAlert && nestedDropdown.hardAlert.enabled) {
+                          dropdownField.hardAlert = {
+                            enabled: true,
+                            condition: nestedDropdown.hardAlert.trigger || '',
+                            title: nestedDropdown.hardAlert.title || ''
+                          };
+                        }
+                        fields.push(dropdownField);
                       }
                     });
                   }
@@ -978,6 +1047,22 @@ window.exportGuiJson = function(download = true) {
                           conditions: time.conditionalLogic.conditions || []
                         };
                       }
+                      // Include alert if it exists and is enabled
+                      if (time.alert && time.alert.enabled) {
+                        dateField.alert = {
+                          enabled: true,
+                          condition: time.alert.trigger || '',
+                          title: time.alert.title || ''
+                        };
+                      }
+                      // Include hardAlert if it exists and is enabled
+                      if (time.hardAlert && time.hardAlert.enabled) {
+                        dateField.hardAlert = {
+                          enabled: true,
+                          condition: time.hardAlert.trigger || '',
+                          title: time.hardAlert.title || ''
+                        };
+                      }
                       fields.push(dateField);
                     });
                   }
@@ -997,11 +1082,28 @@ window.exportGuiJson = function(download = true) {
                       const nestedDropdownOptions = nestedDropdown.options ? nestedDropdown.options.map(option => ({
                         text: option.text || ""
                       })) : [];
-                      fields.push({
+                      const dropdownField = {
                         type: "dropdown",
                         fieldName: nestedDropdown.fieldName || "",
                         options: nestedDropdownOptions
-                      });
+                      };
+                      // Include alert if it exists and is enabled
+                      if (nestedDropdown.alert && nestedDropdown.alert.enabled) {
+                        dropdownField.alert = {
+                          enabled: true,
+                          condition: nestedDropdown.alert.trigger || '',
+                          title: nestedDropdown.alert.title || ''
+                        };
+                      }
+                      // Include hardAlert if it exists and is enabled
+                      if (nestedDropdown.hardAlert && nestedDropdown.hardAlert.enabled) {
+                        dropdownField.hardAlert = {
+                          enabled: true,
+                          condition: nestedDropdown.hardAlert.trigger || '',
+                          title: nestedDropdown.hardAlert.title || ''
+                        };
+                      }
+                      fields.push(dropdownField);
                     });
                   }
                   // Add PDFs
@@ -1817,9 +1919,29 @@ window.exportGuiJson = function(download = true) {
                                 return condition;
                               });
                             }
-                            dateField.conditionalLogic = {
-                              enabled: time.conditionalLogic.enabled,
-                              conditions: conditions.filter(c => c && c.trim() !== '')
+                            const filteredConditions = conditions.filter(c => c && c.trim() !== '');
+                            // Only include conditionalLogic if there are actual conditions
+                            if (filteredConditions.length > 0) {
+                              dateField.conditionalLogic = {
+                                enabled: time.conditionalLogic.enabled,
+                                conditions: filteredConditions
+                              };
+                            }
+                          }
+                          // Include alert if it exists and is enabled
+                          if (time.alert && time.alert.enabled) {
+                            dateField.alert = {
+                              enabled: true,
+                              condition: time.alert.trigger || '',
+                              title: time.alert.title || ''
+                            };
+                          }
+                          // Include hardAlert if it exists and is enabled
+                          if (time.hardAlert && time.hardAlert.enabled) {
+                            dateField.hardAlert = {
+                              enabled: true,
+                              condition: time.hardAlert.trigger || '',
+                              title: time.hardAlert.title || ''
                             };
                           }
                           fields.push(dateField);
@@ -1864,6 +1986,22 @@ window.exportGuiJson = function(download = true) {
                             dropdownField.conditionalLogic = {
                               enabled: nestedDropdown.conditionalLogic.enabled,
                               conditions: conditions.filter(c => c && c.trim() !== '')
+                            };
+                          }
+                          // Include alert if it exists and is enabled
+                          if (nestedDropdown.alert && nestedDropdown.alert.enabled) {
+                            dropdownField.alert = {
+                              enabled: true,
+                              condition: nestedDropdown.alert.trigger || '',
+                              title: nestedDropdown.alert.title || ''
+                            };
+                          }
+                          // Include hardAlert if it exists and is enabled
+                          if (nestedDropdown.hardAlert && nestedDropdown.hardAlert.enabled) {
+                            dropdownField.hardAlert = {
+                              enabled: true,
+                              condition: nestedDropdown.hardAlert.trigger || '',
+                              title: nestedDropdown.hardAlert.title || ''
                             };
                           }
                           fields.push(dropdownField);

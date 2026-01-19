@@ -975,3 +975,562 @@ if (selectedValue === alertCondition) { ... }
 ================================================================================
 END OF FEATURE #1 DOCUMENTATION
 ================================================================================
+
+================================================================================
+FEATURE #2: ENABLE HARD ALERT FOR TRIGGER DROPDOWN FIELDS
+================================================================================
+
+PURPOSE:
+--------
+Allows form builders to configure "hard alerts" on dropdown fields within
+trigger sequences. Hard alerts are similar to regular alerts, but with two
+critical differences:
+1. They disable the right arrow navigation button when the condition is met
+2. They include a subtitle "Please change your answer to proceed" in the alert modal
+3. The user cannot proceed to the next question until ALL hard alert conditions are resolved
+
+Example: A dropdown "Are they a public entity?" has options "Yes" and "No".
+The form builder can enable a hard alert so that when users select "No", they
+see an alert message like "123" with the subtitle, and the right arrow button
+becomes disabled (greyed out) until they change their answer.
+
+CONTEXT:
+--------
+This feature extends the regular alert functionality (Feature #1) with the
+ability to block navigation. It's implemented for dropdown fields within trigger
+sequences, and is particularly useful for numbered dropdowns where multiple
+entries exist (e.g., "How many people are you suing?" creates entries 1, 2, 3...).
+The navigation button must remain disabled if ANY entry has an active hard alert.
+
+KEY DIFFERENCES FROM REGULAR ALERTS:
+------------------------------------
+1. Data storage: Uses `window.triggerDropdownHardAlert` (not `window.triggerDropdownAlert`)
+2. Alert display: Calls `showAlert(title, true)` with second parameter `true`
+3. Navigation blocking: Requires `checkAllHardAlertsAndUpdateNavigation()` function
+4. Button state: `updateButtons()` must check `hardAlertActive` before enabling
+5. Multiple entries: Must check ALL entries (1-10) to see if ANY have active hard alerts
+
+================================================================================
+PART 1: GUI INTERFACE (FormWiz GUI/gui.js)
+================================================================================
+
+1.1 ADDING THE UI CHECKBOX
+---------------------------
+Location: `addTriggerDropdown()` function (around line 3197, after "Enable Alert" checkbox)
+
+When a dropdown field is added to a trigger sequence, an "Enable Hard Alert" checkbox
+is added right after the "Enable Alert" checkbox.
+
+UI Structure:
+```html
+<div style="margin-bottom: 8px; text-align: center;">
+    <label for="enableHardAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}">
+        Enable Hard Alert
+    </label>
+    <div style="display: flex; justify-content: center;">
+        <input type="checkbox" 
+               id="enableHardAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}"
+               onchange="toggleTriggerDropdownHardAlert({questionId}, {fieldCount}, {sequenceCount}, {triggerFieldCount})">
+    </div>
+    <div id="hardAlertUIDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}" 
+         style="margin-top: 8px; display: none;">
+        <!-- Hard Alert UI will be populated here -->
+    </div>
+</div>
+```
+
+Key Patterns:
+- Checkbox ID pattern: `enableHardAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Container ID pattern: `hardAlertUIDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Container is initially hidden (`display: none`)
+- The toggle function is called on checkbox `onchange` event
+
+1.2 TOGGLE FUNCTION
+-------------------
+Location: `toggleTriggerDropdownHardAlert()` function (around line 4000)
+
+Purpose: Shows/hides the hard alert configuration UI and manages the data structure.
+
+Function Signature:
+```javascript
+function toggleTriggerDropdownHardAlert(questionId, fieldCount, sequenceCount, triggerFieldCount)
+```
+
+Implementation is identical to `toggleTriggerDropdownAlert`, but uses:
+- `window.triggerDropdownHardAlert` instead of `window.triggerDropdownAlert`
+- `updateTriggerDropdownHardAlertUI` instead of `updateTriggerDropdownAlertUI`
+- `enableHardAlertDropdown` and `hardAlertUIDropdown` IDs
+
+1.3 UPDATE UI FUNCTION
+----------------------
+Location: `updateTriggerDropdownHardAlertUI()` function (around line 4030)
+
+Implementation is identical to `updateTriggerDropdownAlertUI`, but:
+- Uses `window.triggerDropdownHardAlert` instead of `window.triggerDropdownAlert`
+- Uses `hardAlertUIDropdown` container ID
+- Everything else is the same (condition dropdown, title input)
+
+================================================================================
+PART 2: EXPORT/IMPORT (FormWiz GUI/download.js)
+================================================================================
+
+2.1 EXPORT PROCESS
+------------------
+Location: Field collection code in `getFormJSON()` function (around line 1916 and 3280)
+
+Export process is identical to regular alerts, but uses `window.triggerDropdownHardAlert`:
+
+```javascript
+// Check for hard alert data from window.triggerDropdownHardAlert
+const hardAlertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+if (window.triggerDropdownHardAlert && window.triggerDropdownHardAlert[hardAlertKey]) {
+    const storedHardAlert = window.triggerDropdownHardAlert[hardAlertKey];
+    if (storedHardAlert.enabled && storedHardAlert.condition && storedHardAlert.title) {
+        dropdownField.hardAlert = {
+            enabled: storedHardAlert.enabled,
+            condition: storedHardAlert.condition.trim(),
+            title: storedHardAlert.title.trim()
+        };
+    }
+}
+```
+
+JSON Export Format:
+```json
+{
+    "type": "dropdown",
+    "fieldName": "Are they a public entity?",
+    "options": [
+        {"text": "Yes"},
+        {"text": "No"}
+    ],
+    "hardAlert": {
+        "enabled": true,
+        "condition": "No",
+        "title": "123"
+    }
+}
+```
+
+2.2 IMPORT PROCESS
+------------------
+Location: `loadFormJson()` function, within the dropdown field restoration block
+
+Import process is identical to regular alerts, but uses:
+- `window.triggerDropdownHardAlert` instead of `window.triggerDropdownAlert`
+- `enableHardAlertDropdown` and `hardAlertUIDropdown` IDs
+- `updateTriggerDropdownHardAlertUI` function
+- `hardAlert` property instead of `alert` property
+
+================================================================================
+PART 3: FORM GENERATION (FormWiz GUI/generate.js)
+================================================================================
+
+3.1 COLLECTING HARD ALERT DATA DURING FORM GENERATION
+------------------------------------------------------
+Location: Two places where dropdown fields are collected from GUI:
+1. Around line 1916-1950 (first collection point)
+2. Around line 3280-3335 (second collection point)
+
+Implementation is identical to regular alerts, but collects from `window.triggerDropdownHardAlert`:
+
+```javascript
+// Check for hard alert data from window.triggerDropdownHardAlert
+const hardAlertKey = `${questionId}_${fieldOrder}_${sequenceIndex + 1}_${triggerFieldCount}`;
+if (window.triggerDropdownHardAlert && window.triggerDropdownHardAlert[hardAlertKey]) {
+    const storedHardAlert = window.triggerDropdownHardAlert[hardAlertKey];
+    if (storedHardAlert.enabled && storedHardAlert.condition && storedHardAlert.title) {
+        dropdownField.hardAlert = {
+            enabled: storedHardAlert.enabled,
+            condition: storedHardAlert.condition.trim(),
+            title: storedHardAlert.title.trim()
+        };
+    }
+}
+```
+
+3.2 RUNTIME FIELD ENRICHMENT
+-----------------------------
+Location: `enrichTriggerFieldWithUnifiedData()` function in `createTriggerFieldsContainer()`
+
+The enrichment function must also merge `hardAlert` data:
+
+```javascript
+// Merge hardAlert data if present
+if (matchingField.hardAlert) {
+    triggerField.hardAlert = matchingField.hardAlert;
+}
+```
+
+3.3 RUNTIME HARD ALERT FUNCTIONALITY
+-------------------------------------
+Location: `createTriggerFieldsContainer()` function, within dropdown field creation
+
+Step 1: Capture Hard Alert Data
+```javascript
+// Capture hard alert data in local variable
+const hardAlertData = triggerField.hardAlert ? {
+    enabled: triggerField.hardAlert.enabled || false,
+    condition: (triggerField.hardAlert.condition || '').trim(),
+    title: (triggerField.hardAlert.title || '').trim()
+} : null;
+```
+
+Step 2: Add Hard Alert Check to Change Handler
+```javascript
+select.addEventListener('change', function() {
+    // ... regular alert check ...
+    
+    // Check for hard alert functionality if enabled
+    if (hardAlertData && hardAlertData.enabled && hardAlertData.condition && hardAlertData.title) {
+        const selectedValue = (this.value || '').trim();
+        const hardAlertCondition = hardAlertData.condition;
+        
+        if (selectedValue === hardAlertCondition) {
+            // Use custom alert modal with hard alert flag (second parameter = true)
+            if (typeof showAlert === 'function') {
+                showAlert(hardAlertData.title, true); // true = hard alert
+            } else {
+                alert(hardAlertData.title);
+            }
+        }
+    }
+    
+    // CRITICAL: Check all hard alerts and update navigation button state
+    checkAllHardAlertsAndUpdateNavigation();
+    
+    // ... rest of change handler ...
+});
+```
+
+Key Pattern: `checkAllHardAlertsAndUpdateNavigation()` must be called after
+checking the individual hard alert, so it can evaluate ALL dropdowns and update
+the button state accordingly.
+
+3.4 CUSTOM ALERT MODAL WITH HARD ALERT
+---------------------------------------
+Location: `showAlert()` function in generated HTML
+
+The `showAlert()` function accepts a second parameter `isHardAlert`:
+
+```javascript
+function showAlert(message, isHardAlert) {
+    const alertOverlay = document.getElementById('alertOverlay');
+    const alertMessage = document.getElementById('alertMessage');
+    if (alertOverlay && alertMessage) {
+        if (isHardAlert) {
+            // For hard alerts, add subtitle
+            alertMessage.innerHTML = '<div style="text-align: center;">' +
+                '<div style="margin-bottom: 10px;">' + message + '</div>' +
+                '<div style="font-size: 0.9em; color: #666; font-style: italic;">Please change your answer to proceed</div>' +
+                '</div>';
+        } else {
+            // Regular alert - just text
+            alertMessage.textContent = message;
+        }
+        alertOverlay.style.display = 'flex';
+    }
+}
+```
+
+3.5 CHECK ALL HARD ALERTS FUNCTION
+-----------------------------------
+Location: `checkAllHardAlertsAndUpdateNavigation()` function (around line 7578)
+
+Purpose: Checks ALL dropdowns in ALL entries for active hard alerts and updates
+the navigation button state accordingly.
+
+CRITICAL IMPLEMENTATION DETAILS:
+
+1. Must check ALL entries (1-10) for numbered dropdowns
+2. Must use correct baseNodeId (parent dropdown's fieldName, not questionNameId)
+3. Must not use early returns - check all entries even after finding one match
+4. Must update button's `hardAlertActive` data attribute
+
+Implementation:
+
+```javascript
+function checkAllHardAlertsAndUpdateNavigation() {
+    let hasActiveHardAlert = false;
+
+    // Check unifiedFieldsMap for all hard alerts
+    if (window.unifiedFieldsMap) {
+        Object.keys(window.unifiedFieldsMap).forEach(questionId => {
+            const allFields = window.unifiedFieldsMap[questionId];
+            if (!Array.isArray(allFields)) return;
+
+            // Check all dropdown fields in trigger sequences
+            allFields.forEach(field => {
+                if (field.type === 'dropdown' && field.triggerSequences && Array.isArray(field.triggerSequences)) {
+                    field.triggerSequences.forEach((sequence, seqIndex) => {
+                        if (sequence.fields && Array.isArray(sequence.fields)) {
+                            sequence.fields.forEach(triggerField => {
+                                // Check for hard alert
+                                if (triggerField.type === 'dropdown' && triggerField.hardAlert && triggerField.hardAlert.enabled) {
+                                    const hardAlertCondition = (triggerField.hardAlert.condition || '').trim();
+                                    
+                                    if (hardAlertCondition) {
+                                        // CRITICAL: Use parent dropdown's fieldName (sanitized) as baseNodeId
+                                        // For numbered dropdowns, this matches how createTriggerFieldsContainer creates IDs
+                                        let baseNodeId = '';
+                                        if (field.fieldName) {
+                                            baseNodeId = (field.fieldName || '').toLowerCase()
+                                                .replace(/[?]/g, '')
+                                                .replace(/[^a-z0-9_]+/g, '_')
+                                                .replace(/^_+|_+$/g, '');
+                                        } else if (field.nodeId) {
+                                            baseNodeId = field.nodeId;
+                                        } else {
+                                            baseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
+                                        }
+                                        
+                                        // Sanitize trigger field name
+                                        const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase()
+                                            .replace(/[?]/g, '')
+                                            .replace(/[^a-z0-9_]+/g, '_')
+                                            .replace(/^_+|_+$/g, '');
+                                        
+                                        // Check ALL entries (1-10) - don't return early!
+                                        for (let entryNum = 1; entryNum <= 10; entryNum++) {
+                                            const dropdownId = baseNodeId + '_' + sanitizedFieldName + '_' + entryNum;
+                                            const dropdownEl = document.getElementById(dropdownId);
+                                            
+                                            if (dropdownEl) {
+                                                const selectedValue = (dropdownEl.value || '').trim();
+                                                if (selectedValue === hardAlertCondition) {
+                                                    hasActiveHardAlert = true;
+                                                    // Don't return - continue checking all entries
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    // Update navigation button state
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection) {
+        const nextBtn = activeSection.querySelector('.question-next');
+        if (nextBtn) {
+            const previousState = nextBtn.dataset.hardAlertActive;
+            nextBtn.dataset.hardAlertActive = hasActiveHardAlert ? 'true' : 'false';
+
+            if (hasActiveHardAlert) {
+                nextBtn.setAttribute('disabled', 'disabled');
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+            } else {
+                // Remove hard alert styling if previously disabled
+                if (previousState === 'true') {
+                    nextBtn.style.opacity = '';
+                    nextBtn.style.cursor = '';
+                    // Trigger refreshNav to re-evaluate button state normally
+                    const sectionId = activeSection.id;
+                    if (window.questionNavControllers && typeof window.questionNavControllers[sectionId] === 'function') {
+                        window.questionNavControllers[sectionId]();
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+KEY PATTERNS:
+- Use `field.fieldName` (sanitized) for baseNodeId, NOT `questionNameIds[questionId]`
+- Check ALL entries (1-10) - never return early from the loop
+- Set `hardAlertActive` data attribute on button
+- Call `refreshNav()` if hard alert was just cleared (to re-evaluate normally)
+
+3.6 UPDATE BUTTONS FUNCTION MODIFICATION
+-----------------------------------------
+Location: `updateButtons()` function in navigation code (around line 4485)
+
+The `updateButtons()` function must check for hard alerts BEFORE enabling the button:
+
+```javascript
+// CRITICAL FIX: Check for hard alerts before enabling the button
+// Hard alerts should always prevent navigation, regardless of canAdvance state
+const hasHardAlert = nextBtn.dataset.hardAlertActive === 'true';
+
+// Don't enable if there's an active hard alert
+if (canAdvance && !hasHardAlert) {
+    nextBtn.removeAttribute('disabled');
+    // Make sure styling is cleared if not disabled by hard alert
+    if (nextBtn.dataset.hardAlertActive !== 'true') {
+        nextBtn.style.opacity = '';
+        nextBtn.style.cursor = '';
+    }
+} else {
+    if (hasHardAlert) {
+        // Keep disabled due to hard alert
+    }
+    nextBtn.setAttribute('disabled', 'disabled');
+}
+```
+
+This ensures that even if `refreshNav()` is called and `updateButtons()` runs,
+the button won't be enabled if a hard alert is active.
+
+3.7 CALLING CHECK FUNCTION ON DROPDOWN CHANGES
+-----------------------------------------------
+Location: Dropdown change event handler in `createTriggerFieldsContainer()`
+
+Must call `checkAllHardAlertsAndUpdateNavigation()` whenever a dropdown value changes:
+
+```javascript
+select.addEventListener('change', function() {
+    // ... hard alert check and showAlert() call ...
+    
+    // CRITICAL: Check all hard alerts and update navigation button
+    checkAllHardAlertsAndUpdateNavigation();
+    
+    // ... rest of change handler ...
+});
+```
+
+Also call on initial page load:
+
+```javascript
+// In DOMContentLoaded or window.onload
+setTimeout(() => {
+    if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+        checkAllHardAlertsAndUpdateNavigation();
+    }
+}, 500);
+```
+
+================================================================================
+PART 4: DATA FLOW SUMMARY
+================================================================================
+
+1. USER CONFIGURATION (GUI):
+   - User checks "Enable Hard Alert" checkbox
+   - Toggle function stores data in `window.triggerDropdownHardAlert[key]`
+   - Update function populates UI and saves condition/title
+
+2. AUTOSAVE:
+   - Data is saved to Firebase/localStorage automatically
+   - Uses `window.requestAutosave()` function
+
+3. EXPORT (Generate JSON):
+   - `download.js` reads from `window.triggerDropdownHardAlert`
+   - Adds `hardAlert: {enabled, condition, title}` to dropdownField
+   - Exported in JSON format
+
+4. IMPORT (Load JSON):
+   - Reads `hardAlert` property from imported JSON
+   - Restores to `window.triggerDropdownHardAlert`
+   - Updates UI checkboxes and inputs
+
+5. FORM GENERATION:
+   - `generate.js` collects hard alert data from `window.triggerDropdownHardAlert`
+   - Includes in `unifiedFieldsMap` which is embedded in HTML
+
+6. RUNTIME (Generated Form):
+   - `createTriggerFieldsContainer` enriches fields from `unifiedFieldsMap`
+   - Hard alert data is merged into triggerField object
+   - Change event handler checks condition and calls `showAlert(title, true)`
+   - `checkAllHardAlertsAndUpdateNavigation()` is called to check ALL entries
+   - Navigation button is disabled if ANY entry has active hard alert
+   - `updateButtons()` respects `hardAlertActive` state
+
+================================================================================
+PART 5: KEY PATTERNS AND CONVENTIONS
+================================================================================
+
+5.1 NAMING CONVENTIONS
+----------------------
+- Checkbox ID: `enableHardAlertDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Container ID: `hardAlertUIDropdown{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}`
+- Data key: `"{questionId}_{fieldCount}_{sequenceCount}_{triggerFieldCount}"` (same as regular alerts)
+- Window object: `window.triggerDropdownHardAlert`
+
+5.2 DATA STRUCTURE
+------------------
+```javascript
+window.triggerDropdownHardAlert = {
+    "1_5_1_4": {  // Key: questionId_fieldCount_sequenceCount_triggerFieldCount
+        enabled: true,
+        condition: "No",  // The option value that triggers the hard alert
+        title: "123"  // The alert message
+    }
+}
+```
+
+5.3 CRITICAL IMPLEMENTATION DETAILS
+------------------------------------
+
+1. BASE NODE ID FOR NUMBERED DROPDOWNS:
+   - MUST use parent dropdown's `fieldName` (sanitized), NOT `questionNameIds[questionId]`
+   - Example: `"are_they_a_business_or_public_entity"` not `"how_many_people_are_you_suing"`
+   - This matches how `createTriggerFieldsContainer` constructs dropdown IDs
+
+2. CHECK ALL ENTRIES:
+   - Must check entries 1-10 for numbered dropdowns
+   - Never return early from the check loop
+   - Button must stay disabled if ANY entry has active hard alert
+
+3. BUTTON STATE MANAGEMENT:
+   - `hardAlertActive` data attribute must be set on button
+   - `updateButtons()` must check this before enabling
+   - `checkAllHardAlertsAndUpdateNavigation()` must be called on every dropdown change
+
+4. ALERT MODAL:
+   - Call `showAlert(title, true)` with `true` as second parameter
+   - Modal will automatically add subtitle "Please change your answer to proceed"
+
+================================================================================
+PART 6: COMMON GOTCHAS AND TROUBLESHOOTING
+================================================================================
+
+GOTCHA 1: Wrong baseNodeId Used
+--------------------------------
+Problem: Navigation button enables even when hard alert is active.
+
+Solution: Ensure `checkAllHardAlertsAndUpdateNavigation()` uses `field.fieldName`
+(sanitized) for baseNodeId, NOT `questionNameIds[questionId]`. The dropdown IDs
+are created as `{parentDropdownFieldName}_{triggerFieldName}_{entryNumber}`, not
+`{questionNodeId}_{triggerFieldName}_{entryNumber}`.
+
+GOTCHA 2: Button Enables After Changing One Entry
+--------------------------------------------------
+Problem: With multiple entries, changing one entry to resolve its hard alert
+enables the button even if other entries still have active hard alerts.
+
+Solution: Ensure `checkAllHardAlertsAndUpdateNavigation()` checks ALL entries
+(1-10) and never returns early from the loop. Set `hasActiveHardAlert = true`
+when ANY entry matches, but continue checking all entries.
+
+GOTCHA 3: refreshNav Enables Button
+------------------------------------
+Problem: After clearing a hard alert, `refreshNav()` is called which enables
+the button even though hard alerts might still be active.
+
+Solution: Ensure `updateButtons()` checks `nextBtn.dataset.hardAlertActive === 'true'`
+BEFORE enabling the button. The check must happen AFTER `checkAllHardAlertsAndUpdateNavigation()`
+runs and updates the data attribute.
+
+GOTCHA 4: Hard Alert Check Not Called on Change
+------------------------------------------------
+Problem: Navigation button doesn't update when dropdown value changes.
+
+Solution: Ensure `checkAllHardAlertsAndUpdateNavigation()` is called in the
+dropdown's `change` event handler, AFTER checking for the individual hard alert.
+
+GOTCHA 5: Hard Alert Not Shown
+-------------------------------
+Problem: Alert modal shows but doesn't have the subtitle.
+
+Solution: Ensure `showAlert(title, true)` is called with `true` as the second
+parameter. Check that `showAlert()` function handles the `isHardAlert` parameter.
+
+================================================================================
+END OF FEATURE #2 DOCUMENTATION
+================================================================================
