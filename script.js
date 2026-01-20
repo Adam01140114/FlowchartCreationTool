@@ -1308,13 +1308,20 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
 function renumberQuestionIds() {
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
-  const questions = vertices.filter(cell => isQuestion(cell));
+  // Include both question nodes AND file nodes in the renumbering
+  const questions = vertices.filter(cell => {
+    const isQ = isQuestion(cell);
+    const isF = typeof window.isFileNode === 'function' && window.isFileNode(cell);
+    return isQ || isF;
+  });
   // Sort questions by vertical position (Y coordinate)
   questions.sort((a, b) => {
-    const aY = a.geometry.y;
-    const bY = b.geometry.y;
+    const aY = a.geometry ? a.geometry.y : 0;
+    const bY = b.geometry ? b.geometry.y : 0;
     if (Math.abs(aY - bY) < 10) { // If Y positions are very close, sort by X
-      return a.geometry.x - b.geometry.x;
+      const aX = a.geometry ? a.geometry.x : 0;
+      const bX = b.geometry ? b.geometry.x : 0;
+      return aX - bX;
     }
     return aY - bY;
   });
@@ -1323,8 +1330,11 @@ function renumberQuestionIds() {
     cell._questionId = index + 1;
   });
   // If properties menu is open for a selected question, update displayed ID
-  if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
-    document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
+  if (selectedCell && document.getElementById("propertiesMenu") && document.getElementById("propertiesMenu").style.display === "block") {
+    const propQuestionNumber = document.getElementById("propQuestionNumber");
+    if (propQuestionNumber) {
+      propQuestionNumber.textContent = selectedCell._questionId;
+    }
   }
 }
 /*******************************************************

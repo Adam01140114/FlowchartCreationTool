@@ -488,6 +488,14 @@ function setupCustomClickHandlers(graph) {
       mxEvent.consume(evt);
       return;
     }
+    // d2) File node double-click = show properties popup
+    if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
     // e) Hidden checkbox node double-click = show properties popup
     if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
       if (typeof window.showPropertiesPopup === 'function') {

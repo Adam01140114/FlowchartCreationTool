@@ -2520,6 +2520,17 @@ window.exportGuiJson = function(download = true) {
               });
             }
           }
+        } else if (sourceCell && typeof window.isFileNode === 'function' && window.isFileNode(sourceCell)) {
+          // This is a connection from a file node to a question
+          const sourceSection = parseInt(getSection(sourceCell) || "1", 10);
+          // Add conditional logic if the source section is the same or earlier than current section
+          if (sourceSection <= currentSection) {
+            // File nodes should use "uploaded a file" as the answer text
+            conditions.push({
+              prevQuestion: String(sourceCell._questionId || ""),
+              prevAnswer: "uploaded a file"
+            });
+          }
         }
       }
       // Remove duplicates based on prevQuestion and prevAnswer combination
@@ -3023,6 +3034,179 @@ window.exportGuiJson = function(download = true) {
     // --- END Subtitle PATCH ---
     sectionMap[section].questions.push(question);
   }
+  
+  // --- PATCH: Add File Node detection and export ---
+  // Collect all file nodes that are connected through options
+  const fileNodeMap = new Map(); // Map of fileNode -> { sourceQuestion, sourceOption, fileNode }
+  for (const cell of questions) {
+    const outgoingEdges = graph.getOutgoingEdges(cell);
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const optionCell = edge.target;
+        if (optionCell && isOptions(optionCell)) {
+          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const fileNode = optionEdge.target;
+              if (fileNode && typeof window.isFileNode === 'function' && window.isFileNode(fileNode)) {
+                // Extract option text
+                let optionText = optionCell.value || "";
+                if (optionText) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = optionText;
+                  optionText = temp.textContent || temp.innerText || optionText;
+                  optionText = optionText.trim();
+                }
+                // Store file node info
+                if (!fileNodeMap.has(fileNode.id)) {
+                  fileNodeMap.set(fileNode.id, {
+                    fileNode: fileNode,
+                    sourceQuestion: cell,
+                    sourceOption: optionText
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Export file nodes as fileUpload questions
+  for (const [fileNodeId, fileNodeInfo] of fileNodeMap) {
+    const fileNode = fileNodeInfo.fileNode;
+    const sourceQuestion = fileNodeInfo.sourceQuestion;
+    const sourceOption = fileNodeInfo.sourceOption;
+    
+    // Get the source question's ID
+    const sourceQuestionId = sourceQuestion._questionId || "";
+    
+    // Determine section for file node (use same section as source question, or default to 1)
+    let fileNodeSection = getSection(sourceQuestion) || getSection(fileNode) || "1";
+    const isFirstQuestion = questions.every(otherCell => 
+      otherCell === fileNode || fileNode.geometry.y <= otherCell.geometry.y
+    );
+    if (isFirstQuestion && fileNodeSection !== "1") {
+      fileNodeSection = "1";
+    }
+    
+    // Ensure section exists
+    if (!sectionMap[fileNodeSection]) {
+      let sectionName = `Section ${fileNodeSection}`;
+      if (currentSectionPrefs[fileNodeSection] && currentSectionPrefs[fileNodeSection].name) {
+        sectionName = currentSectionPrefs[fileNodeSection].name;
+        if (sectionName === "Enter section name" || sectionName === "Enter Name") {
+          sectionName = `Section ${fileNodeSection}`;
+        }
+      }
+      sectionMap[fileNodeSection] = {
+        sectionId: parseInt(fileNodeSection),
+        sectionName: sectionName,
+        questions: []
+      };
+    }
+    
+    // Create fileUpload question
+    // Use the file node's _questionId if available, otherwise use and increment questionCounter
+    const fileUploadQuestionId = fileNode._questionId || questionCounter;
+    if (!fileNode._questionId) {
+      questionCounter++;
+    }
+    const fileUploadQuestion = {
+      questionId: fileUploadQuestionId,
+      text: "", // File upload questions have empty text
+      type: "fileUpload",
+      logic: {
+        enabled: sourceQuestionId ? true : false,
+        conditions: sourceQuestionId ? [{
+          prevQuestion: sourceQuestionId.toString(),
+          prevAnswer: sourceOption
+        }] : []
+      },
+      jump: {
+        enabled: false,
+        conditions: []
+      },
+      conditionalPDF: {
+        enabled: false,
+        pdfName: "",
+        answer: "Yes"
+      },
+      hiddenLogic: {
+        enabled: false,
+        configs: []
+      },
+      pdfLogic: {
+        enabled: false,
+        conditions: [],
+        pdfs: []
+      },
+      alertLogic: {
+        enabled: false,
+        message: "",
+        conditions: []
+      },
+      checklistLogic: {
+        enabled: false,
+        conditions: []
+      },
+      conditionalAlert: {
+        enabled: false,
+        prevQuestion: "",
+        prevAnswer: "",
+        text: ""
+      },
+      subtitle: {
+        enabled: false,
+        text: ""
+      },
+      infoBox: {
+        enabled: false,
+        text: ""
+      },
+      pdfPreview: {
+        enabled: false,
+        trigger: "",
+        title: "",
+        file: "",
+        priceId: "",
+        attachment: "Preview Only",
+        filename: ""
+      },
+      latexPreview: {
+        enabled: false,
+        trigger: "",
+        title: "",
+        filename: "",
+        content: "",
+        priceId: "",
+        attachment: "Preview Only"
+      },
+      status: {
+        enabled: false,
+        trigger: "",
+        title: ""
+      },
+      hardAlert: {
+        enabled: false,
+        trigger: "",
+        title: ""
+      },
+      options: [],
+      labels: [],
+      uploadTitle: fileNode._pdfPreviewTitle || "",
+      fileTitle: fileNode._pdfPreviewFilename || "",
+      linking: {
+        enabled: false,
+        targetId: ""
+      }
+    };
+    
+    sectionMap[fileNodeSection].questions.push(fileUploadQuestion);
+  }
+  // --- END File Node PATCH ---
+  
   // Create a map of questions by their clean names for calculation lookups
   const questionNameMap = new Map();
   questions.forEach(questionCell => {

@@ -790,24 +790,44 @@ function setupContextMenuEventListeners(graph) {
   // Properties button event handler
   if (propertiesButton) {
     propertiesButton.addEventListener("click", (event) => {
+      event.stopPropagation(); // Prevent the click from propagating to the document click listener
       if (window.selectedCell) {
-        // Use the new popup instead of the old menu
-        if (window.showPropertiesPopup) {
-          try {
-            window.showPropertiesPopup(window.selectedCell);
-          } catch (error) {
+        const cell = window.selectedCell;
+        // For file nodes, use the regular properties menu (not the custom one)
+        // Double-click uses the custom menu, but right-click → Properties uses the regular menu
+        if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+          // Use showPropertiesPopup with showRegularProperties flag to show regular properties menu
+          if (window.showPropertiesPopup) {
+            try {
+              window.showPropertiesPopup(cell, true); // Pass true to show regular properties
+            } catch (error) {
+              console.error('Error showing properties popup for file node:', error);
+            }
           }
+          // Hide the context menu
+          setTimeout(() => {
+            hideContextMenu();
+          }, 100);
+          return; // Exit early
         } else {
-          // Fallback to old properties menu
-          if (typeof showPropertiesMenu === 'function') {
-            showPropertiesMenu(window.selectedCell, window.currentMouseEvent || { clientX: 0, clientY: 0 });
+          // For all other nodes, use the new popup
+          if (window.showPropertiesPopup) {
+            try {
+              window.showPropertiesPopup(cell);
+            } catch (error) {
+            }
           } else {
-            // Try to wait a bit and check again for showPropertiesPopup
-            setTimeout(() => {
-              if (typeof window.showPropertiesPopup === 'function') {
-                window.showPropertiesPopup(window.selectedCell);
-              }
-            }, 100);
+            // Fallback to old properties menu
+            if (typeof showPropertiesMenu === 'function') {
+              showPropertiesMenu(cell, window.currentMouseEvent || { clientX: 0, clientY: 0 });
+            } else {
+              // Try to wait a bit and check again for showPropertiesPopup
+              setTimeout(() => {
+                if (typeof window.showPropertiesPopup === 'function') {
+                  window.showPropertiesPopup(cell);
+                }
+              }, 100);
+            }
           }
         }
       }
@@ -1110,6 +1130,10 @@ function setupContextMenuEventListeners(graph) {
   document.addEventListener("click", e => {
     // Don't hide context menu if clicking on properties popup
     if (e.target.closest('.properties-modal')) {
+      return;
+    }
+    // Don't hide properties menu if clicking inside it
+    if (propertiesMenu && propertiesMenu.contains(e.target)) {
       return;
     }
     // Hide menus if clicking outside of them

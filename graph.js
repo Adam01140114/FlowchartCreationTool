@@ -257,7 +257,10 @@ function setupCustomDoubleClickBehavior(graph) {
       // Calculate time since last click using PREVIOUS values
       const timeSinceLastClick = previousClickTime > 0 ? currentTime - previousClickTime : Infinity;
       const isSameCell = previousClickedCell === cell;
-      const isDoubleClick = isSameCell && timeSinceLastClick <= DOUBLE_CLICK_DELAY;
+      // Require at least 10ms difference to avoid accidental double-clicks from very fast single clicks
+      // Also require time to be within DOUBLE_CLICK_DELAY
+      const MIN_DOUBLE_CLICK_TIME = 10; // Minimum 10ms between clicks to be considered a double-click
+      const isDoubleClick = isSameCell && timeSinceLastClick >= MIN_DOUBLE_CLICK_TIME && timeSinceLastClick <= DOUBLE_CLICK_DELAY;
       
       console.log("  - currentTime =", currentTime, "previousClickTime =", previousClickTime);
       console.log("  - Time since last click:", timeSinceLastClick, "ms");
@@ -304,6 +307,11 @@ function setupCustomDoubleClickBehavior(graph) {
         if (isFileNodeCheck) {
           console.log("FILE NODE DETECTED - opening properties popup");
           evt.consume(); // Consume the event to prevent other handlers
+          // Also prevent the native double-click handler from firing
+          if (domEvent) {
+            domEvent.stopPropagation();
+            domEvent.preventDefault();
+          }
           if (typeof window.showPropertiesPopup === 'function') {
             console.log("Calling showPropertiesPopup for file node");
             window.showPropertiesPopup(cell);
@@ -447,7 +455,7 @@ window.testNodeIdCopying = function() {
 /**
  * Show the Properties popup for any node
  */
-function showPropertiesPopup(cell) {
+function showPropertiesPopup(cell, showRegularProperties = false) {
   // Prevent multiple popups or opening while closing
   if (window.__propertiesPopupOpen || window.__propertiesPopupClosing) {
     return;
@@ -519,7 +527,7 @@ function showPropertiesPopup(cell) {
   // Use different title for different node types
   if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
     title.textContent = 'PDF Node Properties';
-  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell) && !showRegularProperties) {
     title.textContent = 'File Node Properties Menu';
   } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
     title.textContent = 'PDF Preview Node Properties';
@@ -702,6 +710,16 @@ function showPropertiesPopup(cell) {
       return 'Status Node';
     } else if (cell.style.includes('nodeType=imageOption')) {
       return 'Image Option';
+    } else if (cell.style.includes('nodeType=fileNode')) {
+      return 'File Node';
+    } else if (cell.style.includes('nodeType=pdfPreview')) {
+      return 'PDF Preview Node';
+    } else if (cell.style.includes('nodeType=latexPdfPreview')) {
+      return 'Latex PDF Preview Node';
+    } else if (cell.style.includes('nodeType=alertNode')) {
+      return 'Alert Node';
+    } else if (cell.style.includes('nodeType=hardAlertNode')) {
+      return 'Hard Alert Node';
     }
     // Fallback to first style property
     return cell.style.split(';')[0] || 'Unknown';
@@ -740,20 +758,45 @@ function showPropertiesPopup(cell) {
   })();
   // Get question number - try multiple sources
   const questionNumber = (() => {
-    if (cell._questionId) return cell._questionId;
-    if (cell._questionNumber) return cell._questionNumber;
-    // For question nodes, try to get from the question counter or position
-    if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-      // Try to find the question's position in the graph
+    // For file nodes and question nodes, calculate based on Y position
+    const isQuestionNode = typeof window.isQuestion === 'function' && window.isQuestion(cell);
+    const isFileNode = typeof window.isFileNode === 'function' && window.isFileNode(cell);
+    
+    if (isQuestionNode || isFileNode) {
       const graph = window.graph;
       if (graph) {
-        const questions = graph.getChildVertices(graph.getDefaultParent()).filter(c => 
-          typeof window.isQuestion === 'function' && window.isQuestion(c)
-        );
-        const index = questions.findIndex(c => c.id === cell.id);
-        return index >= 0 ? (index + 1).toString() : 'N/A';
+        // Get all question nodes AND file nodes, sorted by Y position
+        const allQuestions = graph.getChildVertices(graph.getDefaultParent()).filter(c => {
+          const isQ = typeof window.isQuestion === 'function' && window.isQuestion(c);
+          const isF = typeof window.isFileNode === 'function' && window.isFileNode(c);
+          return isQ || isF;
+        });
+        
+        // Sort by Y position (top to bottom)
+        allQuestions.sort((a, b) => {
+          const aY = a.geometry ? a.geometry.y : 0;
+          const bY = b.geometry ? b.geometry.y : 0;
+          // If Y positions are very close (within 10px), sort by X position
+          if (Math.abs(aY - bY) < 10) {
+            const aX = a.geometry ? a.geometry.x : 0;
+            const bX = b.geometry ? b.geometry.x : 0;
+            return aX - bX;
+          }
+          return aY - bY;
+        });
+        
+        // Find the index of this cell
+        const index = allQuestions.findIndex(c => c.id === cell.id);
+        if (index >= 0) {
+          return (index + 1).toString();
+        }
       }
     }
+    
+    // Fallback to stored _questionId if available
+    if (cell._questionId) return cell._questionId.toString();
+    if (cell._questionNumber) return cell._questionNumber.toString();
+    
     return 'N/A';
   })();
   // Get PDF properties for option nodes and cascade through connected nodes
@@ -833,8 +876,8 @@ function showPropertiesPopup(cell) {
       { label: 'PDF File', value: pdfFileValue, id: 'propPdfFile', editable: true },
       { label: 'PDF Price', value: pdfPriceValue, id: 'propPdfPrice', editable: true }
     ];
-  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
-    // File node - only Preview Title and Preview Filename
+  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell) && !showRegularProperties) {
+    // File node - only Preview Title and Preview Filename (when accessed via double-click)
     const fileTitleValue = cell._pdfPreviewTitle || 'File';
     const fileFilenameValue = cell._pdfPreviewFilename || '';
     properties = [
@@ -941,8 +984,16 @@ function showPropertiesPopup(cell) {
       }
     ];
   }
-  // Add Question Number field only for question nodes
+  // Add Question Number field for question nodes and file nodes (file nodes can have question IDs)
   if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+    properties.push({
+      label: 'Question Number', 
+      value: questionNumber, 
+      id: 'propQuestionNumber', 
+      editable: true
+    });
+  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell) && cell._questionId) {
+    // File nodes can have question IDs if they're connected to questions
     properties.push({
       label: 'Question Number', 
       value: questionNumber, 
