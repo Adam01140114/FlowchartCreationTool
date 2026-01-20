@@ -25,6 +25,7 @@ const checkboxRequiredMap = {}; // questionId -> boolean required
 const allAreRequiredMap = {}; // questionId -> boolean (all checkboxes must be checked)
 const fileUploadQuestions = []; // Array of file upload question metadata
 const latexPreviewQuestions = []; // Array of LaTeX preview question metadata (for "Attach to packet")
+const pdfPreviewQuestions = []; // Array of PDF preview question metadata (for "Attach to packet")
 
 // Cart functions are now included in the generated HTML
 /*------------------------------------------------------------------
@@ -445,6 +446,133 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
       '  </div>\n' +
       '</div>'
     ]),
+    '<script>',
+    '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
+    'function dropdownMirror(selectEl, baseName){',
+    '    const wrap = document.getElementById("dropdowntext_"+baseName);',
+    '    if(!wrap) {',
+    '        return;',
+    '    }',
+    '    const val = selectEl.value.trim();',
+    '    if(!val) {',
+    '        // When value is cleared, we need to dispatch events for any checkboxes that were removed',
+    '        const existingCheckboxes = wrap.querySelectorAll(\'input[type="checkbox"]\');',
+    '        const removedCheckboxIds = [];',
+    '        existingCheckboxes.forEach(checkbox => {',
+    '            removedCheckboxIds.push(checkbox.id);',
+    '        });',
+    '        wrap.innerHTML = "";',
+    '        // Dispatch events for removed checkboxes so conditional logic can re-evaluate',
+    '        if (removedCheckboxIds.length > 0) {',
+    '            const lastUnderscoreIndex = baseName.lastIndexOf(\'_\');',
+    '            if (lastUnderscoreIndex !== -1) {',
+    '                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);',
+    '                if (/^[0-9]+$/.test(potentialEntryNumber)) {',
+    '                    const entryNumber = parseInt(potentialEntryNumber);',
+    '                    removedCheckboxIds.forEach(checkboxId => {',
+    '                        const triggerDropdownEvent = new CustomEvent(\'triggerDropdownChanged\', {',
+    '                            detail: {',
+    '                                entryNumber: entryNumber,',
+    '                                checkboxId: checkboxId,',
+    '                                baseName: baseName,',
+    '                                removed: true',
+    '                            }',
+    '                        });',
+    '                        window.dispatchEvent(triggerDropdownEvent);',
+    '                    });',
+    '                }',
+    '            }',
+    '        }',
+    '        return;',
+    '    }',
+    '    const textId = baseName + "_dropdown";',
+    '    const textField = document.getElementById(textId);',
+    '    if(textField) {',
+    '        textField.value = val;',
+    '        textField.style.display = "none";',
+    '    }',
+    '    const existingCheckboxes = wrap.querySelectorAll("div");',
+    '    existingCheckboxes.forEach(div => div.remove());',
+    '    // Sanitize option value: replace all non-word characters (including spaces) with underscores',
+    '    const idSuffix = val.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, \'\');',
+    '    // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)',
+    '    const lastUnderscoreIndex = baseName.lastIndexOf(\'_\');',
+    '    let checkboxId;',
+    '    if (lastUnderscoreIndex !== -1) {',
+    '        const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);',
+    '        if (/^[0-9]+$/.test(potentialEntryNumber)) {',
+    '            const baseWithoutEntry = baseName.substring(0, lastUnderscoreIndex);',
+    '            const underscoreCount = (baseWithoutEntry.match(/_/g) || []).length;',
+    '            if (underscoreCount >= 1) {',
+    '                checkboxId = baseWithoutEntry + "_" + idSuffix + "_" + potentialEntryNumber;',
+    '            } else {',
+    '                const fieldName = baseWithoutEntry;',
+    '                const entryNumber = potentialEntryNumber;',
+    '                checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;',
+    '            }',
+    '        } else {',
+    '            checkboxId = baseName + "_" + idSuffix;',
+    '        }',
+    '    } else {',
+    '        checkboxId = baseName + "_" + idSuffix;',
+    '    }',
+    '    const checkboxDiv = document.createElement("div");',
+    '    checkboxDiv.style.display = "none";',
+    '    checkboxDiv.innerHTML = "<input type=\'checkbox\' id=\'" + checkboxId + "\' name=\'" + checkboxId + "\' checked>" +',
+    '                     "<label for=\'" + checkboxId + "\'> " + baseName + "_" + idSuffix + "</label>";',
+    '    wrap.appendChild(checkboxDiv);',
+    '    const newCheckbox = document.getElementById(checkboxId);',
+    '    if (newCheckbox) {',
+    '        setTimeout(() => {',
+    '            const changeEvent = new Event(\'change\', { bubbles: true });',
+    '            newCheckbox.dispatchEvent(changeEvent);',
+    '            const lastUnderscoreIndex = baseName.lastIndexOf(\'_\');',
+    '            if (lastUnderscoreIndex !== -1) {',
+    '                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);',
+    '                if (/^[0-9]+$/.test(potentialEntryNumber)) {',
+    '                    const entryNumber = parseInt(potentialEntryNumber);',
+    '                    const triggerDropdownEvent = new CustomEvent(\'triggerDropdownChanged\', {',
+    '                        detail: {',
+    '                            entryNumber: entryNumber,',
+    '                            checkboxId: checkboxId,',
+    '                            baseName: baseName',
+    '                        }',
+    '                    });',
+    '                    window.dispatchEvent(triggerDropdownEvent);',
+    '                }',
+    '            }',
+    '        }, 50);',
+    '        const linkedCheckboxesArray = (typeof linkedCheckboxes !== \'undefined\' && linkedCheckboxes) ? linkedCheckboxes : [];',
+    '        if (linkedCheckboxesArray && linkedCheckboxesArray.length > 0) {',
+    '            linkedCheckboxesArray.forEach(linkedCheckboxGroup => {',
+    '                const checkboxIds = linkedCheckboxGroup.checkboxes || [];',
+    '                if (checkboxIds.includes(checkboxId)) {',
+    '                    const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;',
+    '                    newCheckbox.addEventListener(\'change\', function() {',
+    '                        if (typeof window.updateAllLinkedCheckboxes === \'function\') {',
+    '                            window.updateAllLinkedCheckboxes();',
+    '                        }',
+    '                    });',
+    '                }',
+    '            });',
+    '        }',
+    '        if (typeof window.updateAllLinkedCheckboxes === \'function\') {',
+    '            setTimeout(() => {',
+    '                const verifyCheckbox = document.getElementById(checkboxId);',
+    '                if (verifyCheckbox) {',
+    '                    window.updateAllLinkedCheckboxes();',
+    '                    if (typeof window.updateAllInverseCheckboxes === \'function\') {',
+    '                        window.updateAllInverseCheckboxes();',
+    '                    }',
+    '                }',
+    '            }, 200);',
+    '        }',
+    '    }',
+    '    if (typeof handleLinkedDropdowns === \'function\') {',
+    '        handleLinkedDropdowns(baseName, val);',
+    '    }',
+    '}',
+    '</script>',
     "<header>",
     '    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href=\'../../index.html\';">',
     "    <nav>",
@@ -1213,8 +1341,37 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
         if (pdfPreviewEnabled) {
           const pdfPreviewTriggerEl = qBlock.querySelector(`#pdfPreviewTrigger${questionId}`);
           const pdfPreviewFileEl = qBlock.querySelector(`#pdfPreviewFile${questionId}`);
+          const pdfPreviewTitleEl = qBlock.querySelector(`#pdfPreviewTitle${questionId}`);
+          const pdfPreviewFilenameEl = qBlock.querySelector(`#pdfPreviewFilename${questionId}`);
+          const pdfPreviewPriceIdEl = qBlock.querySelector(`#pdfPreviewPriceId${questionId}`);
+          const pdfPreviewAttachmentEl = qBlock.querySelector(`#pdfPreviewAttachment${questionId}`);
           const pdfPreviewTrigger = pdfPreviewTriggerEl ? pdfPreviewTriggerEl.value : "";
           const pdfPreviewFile = pdfPreviewFileEl ? pdfPreviewFileEl.value : "";
+          const pdfPreviewTitle = pdfPreviewTitleEl ? pdfPreviewTitleEl.value : "PDF Preview";
+          const pdfPreviewFilenameRaw = pdfPreviewFilenameEl ? pdfPreviewFilenameEl.value : "";
+          const pdfPreviewFilename = (pdfPreviewFilenameRaw && pdfPreviewFilenameRaw.trim() !== '') 
+            ? pdfPreviewFilenameRaw.trim() 
+            : pdfPreviewTitle;
+          const pdfPreviewPriceId = pdfPreviewPriceIdEl ? pdfPreviewPriceIdEl.value : "";
+          const pdfPreviewAttachment = pdfPreviewAttachmentEl ? pdfPreviewAttachmentEl.value : "Preview Only";
+          
+          // Store metadata if "Attach to packet" is selected
+          if (pdfPreviewTrigger && pdfPreviewFile && pdfPreviewAttachment === "Attach to packet") {
+            // Check if an entry already exists for this questionId and remove it to avoid duplicates
+            const existingIndex = pdfPreviewQuestions.findIndex(q => q.questionId === questionId);
+            if (existingIndex !== -1) {
+              pdfPreviewQuestions.splice(existingIndex, 1);
+            }
+            pdfPreviewQuestions.push({
+              questionId: questionId,
+              title: pdfPreviewTitle,
+              filename: pdfPreviewFilename,
+              priceId: pdfPreviewPriceId,
+              trigger: pdfPreviewTrigger,
+              file: pdfPreviewFile
+            });
+          }
+          
           // Only include handler call if both trigger and file are set (function will be generated)
           if (pdfPreviewTrigger && pdfPreviewFile) {
             pdfPreviewHandlerCall = ` handlePdfPreview${questionId}(this.value)`;
@@ -5410,6 +5567,7 @@ if (s > 1){
   formHTML += `var entryTitleMap = ${JSON.stringify(window.entryTitleMap || {})};\n`;
   formHTML += `window.fileUploadQuestions = ${JSON.stringify(fileUploadQuestions || [])};\n`;
   formHTML += `window.latexPreviewQuestions = ${JSON.stringify(latexPreviewQuestions || [])};\n`;
+  formHTML += `window.pdfPreviewQuestions = ${JSON.stringify(pdfPreviewQuestions || [])};\n`;
   formHTML += `
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -8648,6 +8806,68 @@ window.showCartModal = function () {
     }
   }
 
+  // Add PDF preview PDFs to cart preview (if "Attach to packet" is selected)
+  console.log('🛒 [CART MODAL DEBUG] Checking PDF preview questions:', window.pdfPreviewQuestions);
+  if (window.pdfPreviewQuestions && window.pdfPreviewQuestions.length > 0) {
+    console.log('🛒 [CART MODAL DEBUG] Found', window.pdfPreviewQuestions.length, 'PDF preview question(s)');
+    const processedQuestionIds = new Set(); // Track processed questionIds to avoid duplicates
+    for (const pdfPreviewQ of window.pdfPreviewQuestions) {
+      console.log('🛒 [CART MODAL DEBUG] Processing PDF preview question:', pdfPreviewQ);
+      // Skip if we've already processed this questionId
+      if (processedQuestionIds.has(pdfPreviewQ.questionId)) {
+        console.log('🛒 [CART MODAL DEBUG] Skipping questionId', pdfPreviewQ.questionId, '- already processed');
+        continue;
+      }
+      
+      // Check if trigger condition is met (dropdown value must match trigger)
+      if (pdfPreviewQ.trigger) {
+        console.log('🛒 [CART MODAL DEBUG] Checking trigger condition for questionId', pdfPreviewQ.questionId, '- trigger:', pdfPreviewQ.trigger);
+        const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+        console.log('🛒 [CART MODAL DEBUG] questionNameIdsMap:', questionNameIdsMap);
+        const expectedId1 = questionNameIdsMap[pdfPreviewQ.questionId];
+        const expectedId2 = 'answer' + pdfPreviewQ.questionId;
+        console.log('🛒 [CART MODAL DEBUG] Looking for dropdown with ID:', expectedId1, 'or', expectedId2);
+        const dropdownEl = document.getElementById(expectedId1) || document.getElementById(expectedId2);
+        if (!dropdownEl) {
+          console.log('🛒 [CART MODAL DEBUG] Dropdown not found for questionId', pdfPreviewQ.questionId);
+          continue; // Dropdown not found, skip this PDF preview
+        }
+        console.log('🛒 [CART MODAL DEBUG] Found dropdown:', dropdownEl.id, '- value:', dropdownEl.value);
+        const selectedValue = (dropdownEl.value || '').trim();
+        const triggerValue = (pdfPreviewQ.trigger || '').trim();
+        console.log('🛒 [CART MODAL DEBUG] Comparing selectedValue:', selectedValue, 'vs triggerValue:', triggerValue);
+        if (selectedValue !== triggerValue) {
+          console.log('🛒 [CART MODAL DEBUG] Trigger condition NOT met - skipping PDF preview');
+          continue; // Trigger condition not met, skip this PDF preview
+        }
+        console.log('🛒 [CART MODAL DEBUG] Trigger condition MET - proceeding with PDF preview');
+      } else {
+        console.log('🛒 [CART MODAL DEBUG] No trigger condition - proceeding with PDF preview');
+      }
+      
+      // Use filename if available, otherwise fall back to title
+      const filename = pdfPreviewQ.filename;
+      const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') ? filename.trim() : pdfPreviewQ.title;
+      console.log('🛒 [CART MODAL DEBUG] displayName:', displayName, '- file:', pdfPreviewQ.file, '- priceId:', pdfPreviewQ.priceId);
+      if (pdfPreviewQ.file && displayName && pdfPreviewQ.priceId) {
+        processedQuestionIds.add(pdfPreviewQ.questionId);
+        const pdfName = displayName.endsWith('.pdf') ? displayName : (displayName + '.pdf');
+        console.log('🛒 [CART MODAL DEBUG] Adding PDF preview to cart preview:', pdfName);
+        allPdfsToAdd.push({
+          formId: displayName.replace(/\.pdf$/i, '').toLowerCase(),
+          title: displayName,
+          priceId: pdfPreviewQ.priceId,
+          pdfName: pdfName
+        });
+      } else {
+        console.log('🛒 [CART MODAL DEBUG] Missing required fields - file:', pdfPreviewQ.file, 'displayName:', displayName, 'priceId:', pdfPreviewQ.priceId);
+      }
+    }
+    console.log('🛒 [CART MODAL DEBUG] Total PDFs in cart preview after PDF previews:', allPdfsToAdd.length);
+  } else {
+    console.log('🛒 [CART MODAL DEBUG] No PDF preview questions found or empty array');
+  }
+
   // Deduplicate PDFs to prevent multiple requests for the same PDF
   const originalCount = allPdfsToAdd.length;
   const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
@@ -8718,8 +8938,10 @@ function getUrlParam(name) {
 }
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = async function (priceId) {
+  console.log('🛒 [CONTINUE BUTTON] Continue button clicked - adding form to cart, priceId:', priceId);
   // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
   clearCartState();
+  console.log('🛒 [CONTINUE BUTTON] Cart state cleared');
   // 2) Collect form data
   // First, ensure all dynamic fields are up-to-date
   if (typeof updateUserFullName === 'function') {
@@ -9184,6 +9406,146 @@ window.addFormToCart = async function (priceId) {
       const convertedItems = await Promise.all(conversionPromises);
       cart.push(...convertedItems);
     }
+  }
+
+  // Add PDF preview PDFs to cart (if "Attach to packet" is selected)
+  // Fetch PDFs and convert to base64 before saving to ensure they persist through JSON serialization
+  console.log('🛒 [CART DEBUG] Checking PDF preview questions:', window.pdfPreviewQuestions);
+  if (window.pdfPreviewQuestions && window.pdfPreviewQuestions.length > 0) {
+    console.log('🛒 [CART DEBUG] Found', window.pdfPreviewQuestions.length, 'PDF preview question(s)');
+    const processedQuestionIds = new Set(); // Track processed questionIds to avoid duplicates
+    const pdfCartItems = []; // Collect PDF items separately to fetch and convert
+    
+    for (const pdfPreviewQ of window.pdfPreviewQuestions) {
+      console.log('🛒 [CART DEBUG] Processing PDF preview question:', pdfPreviewQ);
+      // Skip if we've already processed this questionId
+      if (processedQuestionIds.has(pdfPreviewQ.questionId)) {
+        console.log('🛒 [CART DEBUG] Skipping questionId', pdfPreviewQ.questionId, '- already processed');
+        continue;
+      }
+      
+      // Check if trigger condition is met (dropdown value must match trigger)
+      if (pdfPreviewQ.trigger) {
+        console.log('🛒 [CART DEBUG] Checking trigger condition for questionId', pdfPreviewQ.questionId, '- trigger:', pdfPreviewQ.trigger);
+        const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+        console.log('🛒 [CART DEBUG] questionNameIdsMap:', questionNameIdsMap);
+        const expectedId1 = questionNameIdsMap[pdfPreviewQ.questionId];
+        const expectedId2 = 'answer' + pdfPreviewQ.questionId;
+        console.log('🛒 [CART DEBUG] Looking for dropdown with ID:', expectedId1, 'or', expectedId2);
+        const dropdownEl = document.getElementById(expectedId1) || document.getElementById(expectedId2);
+        if (!dropdownEl) {
+          console.log('🛒 [CART DEBUG] Dropdown not found for questionId', pdfPreviewQ.questionId);
+          continue; // Dropdown not found, skip this PDF preview
+        }
+        console.log('🛒 [CART DEBUG] Found dropdown:', dropdownEl.id, '- value:', dropdownEl.value);
+        const selectedValue = (dropdownEl.value || '').trim();
+        const triggerValue = (pdfPreviewQ.trigger || '').trim();
+        console.log('🛒 [CART DEBUG] Comparing selectedValue:', selectedValue, 'vs triggerValue:', triggerValue);
+        if (selectedValue !== triggerValue) {
+          console.log('🛒 [CART DEBUG] Trigger condition NOT met - skipping PDF preview');
+          continue; // Trigger condition not met, skip this PDF preview
+        }
+        console.log('🛒 [CART DEBUG] Trigger condition MET - proceeding with PDF preview');
+      } else {
+        console.log('🛒 [CART DEBUG] No trigger condition - proceeding with PDF preview');
+      }
+      
+      // Use filename if available, otherwise fall back to title
+      const filename = pdfPreviewQ.filename;
+      const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') ? filename.trim() : pdfPreviewQ.title;
+      console.log('🛒 [CART DEBUG] displayName:', displayName, '- file:', pdfPreviewQ.file, '- priceId:', pdfPreviewQ.priceId);
+      if (pdfPreviewQ.file && displayName && pdfPreviewQ.priceId) {
+        processedQuestionIds.add(pdfPreviewQ.questionId);
+        const pdfName = displayName.endsWith('.pdf') ? displayName : (displayName + '.pdf');
+        console.log('🛒 [CART DEBUG] Adding PDF preview to cart items:', pdfName);
+        
+        // Store item with file path for async fetching and conversion
+        pdfCartItems.push({
+          file: pdfPreviewQ.file,
+          cartItem: {
+            formId: displayName.replace(/\.pdf$/i, '').toLowerCase(),
+            title: displayName,
+            priceId: pdfPreviewQ.priceId,
+            pdfName: pdfName,
+            originalFormId: originalFormId,
+            portfolioId: portfolioId,
+            formData: formData,
+            countyName: countyName,
+            defendantName: defendantName,
+            timestamp: nowTs,
+            isPdfPreview: true,
+            pdfPreviewQuestionId: pdfPreviewQ.questionId,
+            pdfPreviewFile: pdfPreviewQ.file
+          }
+        });
+      } else {
+        console.log('🛒 [CART DEBUG] Missing required fields - file:', pdfPreviewQ.file, 'displayName:', displayName, 'priceId:', pdfPreviewQ.priceId);
+      }
+    }
+    console.log('🛒 [CART DEBUG] Total PDF cart items to process:', pdfCartItems.length);
+    
+    // Fetch all PDFs and convert to base64 before adding to cart
+    if (pdfCartItems.length > 0) {
+      const fetchPdfToBase64 = async (filePath) => {
+        try {
+          // If it's a URL, fetch it directly; otherwise use as relative path
+          let url;
+          if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+            url = filePath;
+          } else if (filePath.startsWith('/')) {
+            // Absolute path - use as-is
+            url = filePath;
+          } else {
+            // Relative path - use as-is (relative to current page location)
+            url = filePath;
+          }
+          console.log('🛒 [CART DEBUG] Fetching PDF from URL:', url);
+          const res = await fetch(url);
+          if (!res.ok) {
+            throw new Error('Failed to fetch PDF: HTTP ' + res.status);
+          }
+          const blob = await res.blob();
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const result = reader.result;
+              const base64 = result.includes(',') ? result.split(',')[1] : result;
+              resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error('Error fetching PDF preview:', error);
+          throw error;
+        }
+      };
+      
+      // Fetch all PDFs in parallel
+      const conversionPromises = pdfCartItems.map(async (item) => {
+        const base64 = await fetchPdfToBase64(item.file);
+        return {
+          ...item.cartItem,
+          pdfPreviewBase64: base64
+        };
+      });
+      
+      // Wait for all conversions, then add to cart
+      try {
+        console.log('🛒 [CART DEBUG] Converting', conversionPromises.length, 'PDF previews to base64...');
+        const convertedItems = await Promise.all(conversionPromises);
+        console.log('🛒 [CART DEBUG] Successfully converted', convertedItems.length, 'PDF previews, adding to cart');
+        cart.push(...convertedItems);
+        console.log('🛒 [CART DEBUG] PDF previews added to cart. Total cart items:', cart.length);
+      } catch (error) {
+        console.error('🛒 [CART DEBUG] Error adding PDF previews to cart:', error);
+        // Continue even if some PDFs fail to fetch
+      }
+    } else {
+      console.log('🛒 [CART DEBUG] No PDF cart items to process');
+    }
+  } else {
+    console.log('🛒 [CART DEBUG] No PDF preview questions found or empty array');
   }
   // Final deduplication of the entire cart to prevent any duplicates
   const originalCartCount = cart.length;
@@ -11122,7 +11484,9 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
         isHandlingLink = false;  // Always reset flag when done
     }
 }
+// dropdownMirror function is now defined earlier (right after <body> tag) to ensure it's available when HTML form elements are created
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
+// NOTE: dropdownMirror is defined earlier in the file (after <body> tag) - this is just a comment marker
 function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById("dropdowntext_"+baseName);
     if(!wrap) {
@@ -11805,6 +12169,7 @@ function showThankYouMessage (event) {
 // Form submission is now handled by the inline onsubmit attribute
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
+    console.log('📥 [PROCESS PDFS] processAllPdfs() called');
     // Track processed PDFs to prevent duplicates
     const processedPdfs = new Set();
     // Process main PDFs - use the actual PDF filename, not the form name
@@ -12052,6 +12417,79 @@ async function processAllPdfs() {
             }
         }
     }
+
+    // Process PDF Preview PDFs (if "Attach to packet" is selected and trigger condition is met)
+    if (window.pdfPreviewQuestions && Array.isArray(window.pdfPreviewQuestions)) {
+        for (const pdfPreviewQ of window.pdfPreviewQuestions) {
+            // Check if trigger condition is met
+            if (pdfPreviewQ.trigger) {
+                const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+                const dropdownEl = document.getElementById(questionNameIdsMap[pdfPreviewQ.questionId]) ||
+                                   document.getElementById('answer' + pdfPreviewQ.questionId);
+                if (!dropdownEl) {
+                    continue; // Dropdown not found, skip this PDF preview
+                }
+                const selectedValue = (dropdownEl.value || '').trim();
+                const triggerValue = (pdfPreviewQ.trigger || '').trim();
+                if (selectedValue !== triggerValue) {
+                    continue; // Trigger condition not met, skip this PDF preview
+                }
+            }
+            
+            // Use filename if available, otherwise fall back to title
+            const filename = pdfPreviewQ.filename;
+            const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') ? filename.trim() : pdfPreviewQ.title;
+            const baseName = displayName.replace(/\.pdf$/i, '');
+            console.log('📥 [PROCESS PDFS] displayName:', displayName, '- file:', pdfPreviewQ.file, '- baseName:', baseName, '- already processed:', processedPdfs.has(baseName));
+            
+            if (pdfPreviewQ.file && displayName && !processedPdfs.has(baseName)) {
+                processedPdfs.add(baseName);
+                console.log('📥 [PROCESS PDFS] Starting download for PDF preview:', displayName);
+                try {
+                    // Fetch the PDF from the server/file path
+                    let url;
+                    if (pdfPreviewQ.file.startsWith('http://') || pdfPreviewQ.file.startsWith('https://')) {
+                        url = pdfPreviewQ.file;
+                    } else if (pdfPreviewQ.file.startsWith('/')) {
+                        // Absolute path - use as-is
+                        url = pdfPreviewQ.file;
+                    } else {
+                        // Relative path - use as-is (relative to current page location)
+                        url = pdfPreviewQ.file;
+                    }
+                    console.log('📥 [PROCESS PDFS] Fetching PDF from URL:', url);
+                    const res = await fetch(url);
+                    console.log('📥 [PROCESS PDFS] Fetch response status:', res.status, res.ok ? 'OK' : 'FAILED');
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        console.log('📥 [PROCESS PDFS] PDF blob created, size:', blob.size);
+                        // Download the PDF
+                        const downloadUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = downloadUrl;
+                        const pdfName = displayName.endsWith('.pdf') ? displayName : (displayName + '.pdf');
+                        a.download = pdfName;
+                        console.log('📥 [PROCESS PDFS] Triggering download for:', pdfName);
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(downloadUrl);
+                        console.log('📥 [PROCESS PDFS] PDF preview download completed:', pdfName);
+                        // Small delay to prevent browser from blocking multiple downloads
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } else {
+                        console.error('📥 [PROCESS PDFS] Failed to fetch PDF preview - HTTP', res.status);
+                    }
+                } catch (error) {
+                    console.error('📥 [PROCESS PDFS] Error downloading PDF preview:', error);
+                }
+            } else {
+                console.log('📥 [PROCESS PDFS] Skipping PDF preview - missing file/displayName or already processed');
+            }
+        }
+    } else {
+        console.log('📥 [PROCESS PDFS] No PDF preview questions found or not an array');
+    }
 }
 // Function to collect all PDFs that would be downloaded (for preview)
 async function getAllPdfsList() {
@@ -12284,6 +12722,42 @@ async function getAllPdfsList() {
         }
     }
 
+    // Process PDF Preview PDFs (if "Attach to packet" is selected and trigger condition is met)
+    if (window.pdfPreviewQuestions && Array.isArray(window.pdfPreviewQuestions)) {
+        for (const pdfPreviewQ of window.pdfPreviewQuestions) {
+            // Check if trigger condition is met
+            if (pdfPreviewQ.trigger) {
+                const questionNameIdsMap = (typeof questionNameIds !== 'undefined' && questionNameIds) ? questionNameIds : (window.questionNameIds || {});
+                const dropdownEl = document.getElementById(questionNameIdsMap[pdfPreviewQ.questionId]) ||
+                                   document.getElementById('answer' + pdfPreviewQ.questionId);
+                if (!dropdownEl) {
+                    continue; // Dropdown not found, skip this PDF preview
+                }
+                const selectedValue = (dropdownEl.value || '').trim();
+                const triggerValue = (pdfPreviewQ.trigger || '').trim();
+                if (selectedValue !== triggerValue) {
+                    continue; // Trigger condition not met, skip this PDF preview
+                }
+            }
+            
+            // Use filename if available, otherwise fall back to title
+            const filename = pdfPreviewQ.filename;
+            const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') ? filename.trim() : pdfPreviewQ.title;
+            const baseName = displayName.replace(/\.pdf$/i, '');
+            
+            if (pdfPreviewQ.file && displayName && !processedPdfs.has(baseName)) {
+                processedPdfs.add(baseName);
+                pdfsList.push({
+                    baseName: baseName,
+                    displayName: displayName,
+                    type: 'pdfPreview',
+                    questionId: pdfPreviewQ.questionId,
+                    file: pdfPreviewQ.file
+                });
+            }
+        }
+    }
+
     return pdfsList;
 }
 
@@ -12319,8 +12793,10 @@ async function showPreviewPdfsModal() {
             // Use data attributes to store PDF info (including type and file object for uploaded/LaTeX PDFs)
             const isUploaded = pdf.type === 'uploaded' ? 'true' : 'false';
             const isLatex = pdf.type === 'latex' ? 'true' : 'false';
+            const isPdfPreview = pdf.type === 'pdfPreview' ? 'true' : 'false';
             const questionId = pdf.questionId || '';
-            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '" data-is-uploaded="' + isUploaded + '" data-is-latex="' + isLatex + '" data-question-id="' + questionId + '">' +
+            const pdfFile = pdf.file || '';
+            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '" data-is-uploaded="' + isUploaded + '" data-is-latex="' + isLatex + '" data-is-pdf-preview="' + isPdfPreview + '" data-question-id="' + questionId + '" data-pdf-file="' + (pdfFile ? pdfFile.replace(/"/g, '&quot;') : '') + '">' +
                     '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
                     '<span style="color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px;">Click to preview</span>' +
                 '</div>';
@@ -12335,9 +12811,11 @@ async function showPreviewPdfsModal() {
                 const pdfName = this.getAttribute('data-pdf-name');
                 const isUploaded = this.getAttribute('data-is-uploaded') === 'true';
                 const isLatex = this.getAttribute('data-is-latex') === 'true';
+                const isPdfPreview = this.getAttribute('data-is-pdf-preview') === 'true';
                 const questionId = this.getAttribute('data-question-id');
+                const pdfFile = this.getAttribute('data-pdf-file');
                 if (pdfName) {
-                    previewPdf(pdfName, isUploaded, isLatex, questionId);
+                    previewPdf(pdfName, isUploaded, isLatex, isPdfPreview, questionId, pdfFile);
                 }
             });
         });
@@ -12356,7 +12834,7 @@ function closePreviewPdfsListModal() {
 }
 
 // Function to preview a PDF in full screen
-async function previewPdf(baseName, isUploaded, isLatex, questionId) {
+async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionId, pdfFile) {
     const modal = document.getElementById('previewPdfFullscreenModal');
     const iframe = document.getElementById('previewPdfIframe');
 
@@ -12384,6 +12862,25 @@ async function previewPdf(baseName, isUploaded, isLatex, questionId) {
             // For uploaded files, use the File object directly
             const uploadedFile = window.uploadedFiles[questionId];
             url = URL.createObjectURL(uploadedFile);
+        } else if (isPdfPreview && pdfFile) {
+            // For PDF previews, fetch the PDF from the file path
+            let fileUrl;
+            if (pdfFile.startsWith('http://') || pdfFile.startsWith('https://')) {
+                fileUrl = pdfFile;
+            } else if (pdfFile.startsWith('/')) {
+                // Absolute path - use as-is
+                fileUrl = pdfFile;
+            } else {
+                // Relative path - use as-is (relative to current page location)
+                fileUrl = pdfFile;
+            }
+            const res = await fetch(fileUrl);
+            if (res.ok) {
+                const blob = await res.blob();
+                url = URL.createObjectURL(blob);
+            } else {
+                throw new Error('Failed to fetch PDF preview: HTTP ' + res.status);
+            }
         } else {
             // For server-side PDFs, fetch from server
             // Collect form data
@@ -12479,6 +12976,7 @@ function goBackToForm() {
 }
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
+    console.log('📥 [DOWNLOAD BUTTON] Download PDF button clicked - starting download process');
     try {
         // Show loading state
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
@@ -12486,7 +12984,9 @@ async function downloadAllPdfs() {
             downloadButton.textContent = 'Processing...';
             downloadButton.disabled = true;
         }
+        console.log('📥 [DOWNLOAD BUTTON] Calling processAllPdfs()...');
         await processAllPdfs();
+        console.log('📥 [DOWNLOAD BUTTON] processAllPdfs() completed');
         // Reset button
         if (downloadButton) {
             downloadButton.textContent = 'Download PDF';

@@ -571,6 +571,8 @@ class CartManager {
             for (const item of this.cart) {
                 try {
                     console.log('🎉 [PAYMENT DEBUG] Processing item:', item.title, 'formId:', item.formId, 'portfolioId:', item.portfolioId);
+                    console.log('🔍 [PAYMENT DEBUG] Item flags - isLatexPreview:', item.isLatexPreview, 'isPdfPreview:', item.isPdfPreview);
+                    console.log('🔍 [PAYMENT DEBUG] Item has pdfPreviewBase64:', !!item.pdfPreviewBase64, 'has latexPdfBase64:', !!item.latexPdfBase64);
                     await this.processFormPDF(item); // run unconditionally
                     processedItems.push(item);
                     console.log('✅ [PAYMENT DEBUG] Successfully processed:', item.title);
@@ -719,8 +721,19 @@ class CartManager {
         try {
             let blob;
             
+            // Debug: Log the cart item structure
+            console.log('🔍 [PROCESS PDF DEBUG] Cart item structure:', {
+                title: cartItem.title,
+                formId: cartItem.formId,
+                isLatexPreview: cartItem.isLatexPreview,
+                isPdfPreview: cartItem.isPdfPreview,
+                hasLatexPdfBase64: !!cartItem.latexPdfBase64,
+                hasPdfPreviewBase64: !!cartItem.pdfPreviewBase64,
+                allKeys: Object.keys(cartItem)
+            });
+            
             // Check if this is a LaTeX preview PDF (client-side generated blob)
-            if (cartItem.isLatexPreview) {
+            if (cartItem.isLatexPreview === true || cartItem.isLatexPreview === 'true') {
                 console.log('📄 [LATEX PDF] Processing LaTeX preview PDF:', cartItem.title);
                 
                 // Try to get blob from cart item first (if it wasn't serialized)
@@ -741,9 +754,32 @@ class CartManager {
                 } else {
                     throw new Error('LaTeX PDF blob not found in cart item');
                 }
+            }
+            // Check if this is a PDF preview PDF (fetched from server/file)
+            // Handle both boolean true and string "true" (in case of JSON serialization issues)
+            else if (cartItem.isPdfPreview === true || cartItem.isPdfPreview === 'true' || cartItem.pdfPreviewBase64) {
+                console.log('📄 [PDF PREVIEW] Processing PDF preview:', cartItem.title);
+                
+                // Restore blob from base64
+                if (cartItem.pdfPreviewBase64) {
+                    console.log('📄 [PDF PREVIEW] Restoring blob from base64, length:', cartItem.pdfPreviewBase64.length);
+                    // Convert base64 back to blob
+                    const byteCharacters = atob(cartItem.pdfPreviewBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    blob = new Blob([byteArray], { type: 'application/pdf' });
+                    console.log('📄 [PDF PREVIEW] Blob restored successfully, size:', blob.size);
+                } else {
+                    console.error('📄 [PDF PREVIEW] pdfPreviewBase64 not found in cart item. Available keys:', Object.keys(cartItem));
+                    throw new Error('PDF preview blob not found in cart item');
+                }
             } else {
                 // Regular PDF: fetch from server
                 console.log('📄 [REGULAR PDF] Processing regular PDF:', cartItem.title);
+                console.log('🔍 [REGULAR PDF] Checking if this should be PDF preview - isPdfPreview:', cartItem.isPdfPreview, 'has pdfPreviewBase64:', !!cartItem.pdfPreviewBase64);
                 const formData = new FormData();
                 if (cartItem.formData) {
                     for (const k in cartItem.formData) formData.append(k, cartItem.formData[k]);
@@ -764,8 +800,8 @@ class CartManager {
             a.href = url;
             const safeFormId = cartItem.formId.replace(/\W+/g, '_');
             const docId = `${Date.now()}_${safeFormId}`;
-            // Use the proper filename for LaTeX preview PDFs, otherwise use the formId
-            const downloadFilename = cartItem.isLatexPreview ? (cartItem.pdfName || cartItem.title || cartItem.formId) : `Edited_${cartItem.formId}`;
+            // Use the proper filename for LaTeX preview PDFs and PDF previews, otherwise use the formId
+            const downloadFilename = (cartItem.isLatexPreview || cartItem.isPdfPreview) ? (cartItem.pdfName || cartItem.title || cartItem.formId) : `Edited_${cartItem.formId}`;
             a.download = downloadFilename.endsWith('.pdf') ? downloadFilename : `${downloadFilename}.pdf`;
             document.body.appendChild(a);
             a.click();

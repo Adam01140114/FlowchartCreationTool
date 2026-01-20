@@ -218,6 +218,15 @@ document.addEventListener("DOMContentLoaded", function() {
           if (isPdfNode(cell)) {
             if (window.updatePdfNodeCell) window.updatePdfNodeCell(cell);
           }
+          // Handle PDF preview nodes
+          if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
+              (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
+            if (window.updatePdfPreviewNodeCell) window.updatePdfPreviewNodeCell(cell);
+          }
+          // Handle File nodes
+          if (isFileNode(cell)) {
+            if (window.updateFileNodeCell) window.updateFileNodeCell(cell);
+          }
           // If it's a dropdown node, make sure we update _questionText from value
           if (isQuestion(cell) && getQuestionType(cell) === "dropdown") {
             // Extract text from HTML value if present
@@ -1158,6 +1167,9 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       } else if (nodeType === 'pdfPreview') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=pdfPreview;spacing=6;fontSize=16;";
         label = "PDF Preview";
+      } else if (nodeType === 'fileNode') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=fileNode;spacing=6;fontSize=16;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;fillColor=#ADD8E6;fontColor=#070665;strokeColor=#1976d2;;";
+        label = "File";
       } else if (nodeType === 'amountOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
         label = "Amount Option";
@@ -1239,8 +1251,17 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
       } else if (nodeType === 'pdfPreview') {
         cell._pdfPreviewTitle = "PDF Preview";
         cell._pdfPreviewFile = "";
+        cell._pdfPreviewFilename = "";
+        cell._pdfPreviewPriceId = "";
+        cell._pdfPreviewAttachment = "Preview Only";
         if (typeof window.updatePdfPreviewNodeCell === 'function') {
           window.updatePdfPreviewNodeCell(cell);
+        }
+      } else if (nodeType === 'fileNode') {
+        cell._pdfPreviewTitle = "File";
+        cell._pdfPreviewFilename = "";
+        if (typeof window.updateFileNodeCell === 'function') {
+          window.updateFileNodeCell(cell);
         }
       } else if (nodeType === 'latexPdfPreview') {
         cell._pdfPreviewTitle = "Latex PDF Preview";
@@ -1816,6 +1837,17 @@ function updatePdfPreviewNodeCell(cell) {
   cell.value = escapeHtml(cell._pdfPreviewTitle);
   colorCell(cell);
 }
+function isFileNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=fileNode");
+}
+window.isFileNode = isFileNode;
+function updateFileNodeCell(cell) {
+  if (!cell || !isFileNode(cell)) return;
+  cell._pdfPreviewTitle = cell._pdfPreviewTitle || "File";
+  cell.value = escapeHtml(cell._pdfPreviewTitle);
+  colorCell(cell);
+}
+window.updateFileNodeCell = updateFileNodeCell;
 // The calculation node functions have been moved to calc.js
 /*******************************************************
  ************  HELPER / STYLING / JSON Exports  ********

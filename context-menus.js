@@ -1512,6 +1512,7 @@ function placeMiscellaneousNodeAtClickLocation(graph) {
         <option value="pdfNode">PDF Node</option>
         <option value="pdfPreview">PDF Preview Node</option>
         <option value="latexPdfPreview">Latex PDF Preview Node</option>
+        <option value="fileNode">File Node</option>
         <option value="amountOption">Amount Option Node</option>
         <option value="end">End Node</option>
         <option value="hiddenCheckbox">Hidden Checkbox Node</option>
@@ -1630,6 +1631,11 @@ window.convertMiscellaneousNode = function(selectElement) {
       label = "Latex PDF Preview";
       width = 200;
       height = 100;
+    } else if (selectedType === 'fileNode') {
+      style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=fileNode;spacing=6;fontSize=16;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;fillColor=#ADD8E6;fontColor=#070665;strokeColor=#1976d2;;";
+      label = "File";
+      width = 200;
+      height = 100;
     } else if (selectedType === 'amountOption') {
       style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=amountOption;spacing=12;fontSize=14;align=center;verticalAlign=middle;";
       label = "Amount option";
@@ -1738,6 +1744,12 @@ window.convertMiscellaneousNode = function(selectElement) {
       targetCell._pdfPreviewFile = "";
       if (typeof window.updatePdfPreviewNodeCell === 'function') {
         window.updatePdfPreviewNodeCell(targetCell);
+      }
+    } else if (selectedType === 'fileNode') {
+      targetCell._pdfPreviewTitle = "File";
+      targetCell._pdfPreviewFilename = "";
+      if (typeof window.updateFileNodeCell === 'function') {
+        window.updateFileNodeCell(targetCell);
       }
     } else if (selectedType === 'amountOption') {
       targetCell._amountText = "Amount option";

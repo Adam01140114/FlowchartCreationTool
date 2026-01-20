@@ -199,12 +199,18 @@ function setupCustomGraphEditing(graph) {
  */
 function setupCustomDoubleClickBehavior(graph) {
   // Track clicks to detect double-clicks manually
-  let lastClickTime = 0;
-  let lastClickedCell = null;
+  // Use window object to persist across multiple calls/initializations
+  if (!window._doubleClickTracking) {
+    window._doubleClickTracking = {
+      lastClickTime: 0,
+      lastClickedCell: null,
+      currentlySelectedCell: null,
+      clickOutTimeout: null
+    };
+  }
+  const tracking = window._doubleClickTracking;
   const DOUBLE_CLICK_DELAY = 250; // 250ms = quarter of a second
-  // Track the currently selected cell for click-out detection
-  let currentlySelectedCell = null;
-  let clickOutTimeout = null;
+  
   // Add click listener to detect double-clicks and click-out
   graph.addListener(mxEvent.CLICK, function(sender, evt) {
     const cell = evt.getProperty('cell');
@@ -214,40 +220,65 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     // Clear any pending click-out reset
-    if (clickOutTimeout) {
-      clearTimeout(clickOutTimeout);
-      clickOutTimeout = null;
+    if (tracking.clickOutTimeout) {
+      clearTimeout(tracking.clickOutTimeout);
+      tracking.clickOutTimeout = null;
     }
     // Handle click-out: if we had a selected cell and now clicking on empty space or different cell
-    if (currentlySelectedCell && currentlySelectedCell !== cell) {
+    if (tracking.currentlySelectedCell && tracking.currentlySelectedCell !== cell) {
       // Debounce the reset operations to improve performance on large graphs
-      clickOutTimeout = setTimeout(() => {
+      tracking.clickOutTimeout = setTimeout(() => {
         // Reset PDF and ID for the previously selected cell
-        if (typeof window.resetPdfInheritance === 'function' && currentlySelectedCell) {
-          window.resetPdfInheritance(currentlySelectedCell);
+        if (typeof window.resetPdfInheritance === 'function' && tracking.currentlySelectedCell) {
+          window.resetPdfInheritance(tracking.currentlySelectedCell);
         }
         // Reset node ID by clearing any custom ID properties
-        if (currentlySelectedCell && currentlySelectedCell._nameId) {
-          currentlySelectedCell._nameId = '';
+        if (tracking.currentlySelectedCell && tracking.currentlySelectedCell._nameId) {
+          tracking.currentlySelectedCell._nameId = '';
         }
-        if (currentlySelectedCell && currentlySelectedCell._customId) {
-          currentlySelectedCell._customId = '';
+        if (tracking.currentlySelectedCell && tracking.currentlySelectedCell._customId) {
+          tracking.currentlySelectedCell._customId = '';
         }
-        clickOutTimeout = null;
+        tracking.clickOutTimeout = null;
       }, 100); // Small delay to batch operations
     }
     // Update currently selected cell
-    currentlySelectedCell = cell;
+    tracking.currentlySelectedCell = cell;
     if (cell && cell.vertex) {
+      console.log("CLICK detected on vertex cell:", cell.id, "style:", cell.style ? cell.style.substring(0, 100) : 'no style');
       const currentTime = Date.now();
-      // Check if this is a double-click on the same cell
-      if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
-        //
-        //alert("double click detected");
+      
+      // Save previous values BEFORE updating
+      const previousClickTime = tracking.lastClickTime;
+      const previousClickedCell = tracking.lastClickedCell;
+      
+      console.log("  - BEFORE update: lastClickTime =", tracking.lastClickTime, "lastClickedCell =", tracking.lastClickedCell ? tracking.lastClickedCell.id : 'null');
+      
+      // Calculate time since last click using PREVIOUS values
+      const timeSinceLastClick = previousClickTime > 0 ? currentTime - previousClickTime : Infinity;
+      const isSameCell = previousClickedCell === cell;
+      const isDoubleClick = isSameCell && timeSinceLastClick <= DOUBLE_CLICK_DELAY;
+      
+      console.log("  - currentTime =", currentTime, "previousClickTime =", previousClickTime);
+      console.log("  - Time since last click:", timeSinceLastClick, "ms");
+      console.log("  - Previous clicked cell:", previousClickedCell ? previousClickedCell.id : 'none');
+      console.log("  - Same cell?", isSameCell);
+      console.log("  - Within double-click delay?", timeSinceLastClick <= DOUBLE_CLICK_DELAY);
+      console.log("  - isDoubleClick?", isDoubleClick);
+      
+      // ALWAYS update tracking IMMEDIATELY (before handling double-click)
+      // This ensures the next click will see the updated value
+      const oldLastClickTime = tracking.lastClickTime;
+      tracking.lastClickTime = currentTime;
+      tracking.lastClickedCell = cell;
+      console.log("  - AFTER update: oldLastClickTime =", oldLastClickTime, "new lastClickTime =", tracking.lastClickTime, "lastClickedCell =", tracking.lastClickedCell ? tracking.lastClickedCell.id : 'null');
+      
+      if (isDoubleClick) {
+        console.log("DOUBLE CLICK DETECTED on cell:", cell.id, "style:", cell.style);
         // Clear any pending click-out reset since we're handling a double-click
-        if (clickOutTimeout) {
-          clearTimeout(clickOutTimeout);
-          clickOutTimeout = null;
+        if (tracking.clickOutTimeout) {
+          clearTimeout(tracking.clickOutTimeout);
+          tracking.clickOutTimeout = null;
         }
         // Reset PDF and ID for the node on double-click
         if (typeof window.resetPdfInheritance === 'function') {
@@ -259,6 +290,29 @@ function setupCustomDoubleClickBehavior(graph) {
         }
         if (cell._customId) {
           cell._customId = '';
+        }
+        // Show properties popup for File nodes (check FIRST, before other node types)
+        // Check both via function and direct style check for reliability
+        console.log("Checking for file node...");
+        console.log("  - window.isFileNode available?", typeof window.isFileNode === 'function');
+        console.log("  - window.isFileNode(cell) result:", typeof window.isFileNode === 'function' ? window.isFileNode(cell) : 'N/A');
+        console.log("  - cell.style includes nodeType=fileNode?", cell && cell.style && cell.style.includes("nodeType=fileNode"));
+        console.log("  - Full cell.style:", cell.style);
+        const isFileNodeCheck = (typeof window.isFileNode === 'function' && window.isFileNode(cell)) ||
+                                (cell && cell.style && cell.style.includes("nodeType=fileNode"));
+        console.log("  - isFileNodeCheck result:", isFileNodeCheck);
+        if (isFileNodeCheck) {
+          console.log("FILE NODE DETECTED - opening properties popup");
+          evt.consume(); // Consume the event to prevent other handlers
+          if (typeof window.showPropertiesPopup === 'function') {
+            console.log("Calling showPropertiesPopup for file node");
+            window.showPropertiesPopup(cell);
+          } else {
+            console.error("showPropertiesPopup function not available!");
+          }
+          return;
+        } else {
+          console.log("Not a file node, continuing to check other node types...");
         }
         // Show properties popup for question nodes
         if (typeof isQuestion === 'function' && isQuestion(cell)) {
@@ -325,14 +379,12 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         // For all other nodes, do nothing on double-click
-        // Reset the tracking
-        lastClickTime = 0;
-        lastClickedCell = null;
-      } else {
-        // Update tracking for next potential double-click
-        lastClickTime = currentTime;
-        lastClickedCell = cell;
+        // Reset the tracking after handling double-click (so next click starts fresh)
+        tracking.lastClickTime = 0;
+        tracking.lastClickedCell = null;
+        console.log("  - Reset tracking after double-click handling");
       }
+      // Note: Tracking is updated at the top of this block, before the double-click check
     }
   });
   // Double-click behavior is now handled in events.js module
@@ -467,6 +519,8 @@ function showPropertiesPopup(cell) {
   // Use different title for different node types
   if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
     title.textContent = 'PDF Node Properties';
+  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+    title.textContent = 'File Node Properties Menu';
   } else if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
     title.textContent = 'PDF Preview Node Properties';
   } else if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
@@ -779,22 +833,28 @@ function showPropertiesPopup(cell) {
       { label: 'PDF File', value: pdfFileValue, id: 'propPdfFile', editable: true },
       { label: 'PDF Price', value: pdfPriceValue, id: 'propPdfPrice', editable: true }
     ];
+  } else if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+    // File node - only Preview Title and Preview Filename
+    const fileTitleValue = cell._pdfPreviewTitle || 'File';
+    const fileFilenameValue = cell._pdfPreviewFilename || '';
+    properties = [
+      { label: 'Preview Title', value: fileTitleValue, id: 'propPdfPreviewTitle', editable: true },
+      { label: 'Preview Filename', value: fileFilenameValue, id: 'propPdfPreviewFilename', editable: true }
+    ];
   } else if ((typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) ||
              (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
     const pdfPreviewTitleValue = cell._pdfPreviewTitle || (window.isLatexPdfPreviewNode && window.isLatexPdfPreviewNode(cell) ? 'Latex PDF Preview' : 'PDF Preview');
     const pdfPreviewFileValue = cell._pdfPreviewFile || '';
     const pdfPreviewPriceIdValue = cell._pdfPreviewPriceId || '';
-    const pdfPreviewFilenameValue = cell._pdfPreviewFilename || '';
     properties = [
       { label: 'Preview Title', value: pdfPreviewTitleValue, id: 'propPdfPreviewTitle', editable: true },
       { label: 'Preview File', value: pdfPreviewFileValue, id: 'propPdfPreviewFile', editable: true }
     ];
-    // Add Filename, Price ID, and Attachment dropdown only for LaTeX preview nodes, positioned after Preview Title
+    // Add Price ID and Attachment dropdown only for LaTeX preview nodes, positioned after Preview Title
     if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
       const pdfPreviewAttachmentValue = cell._pdfPreviewAttachment || 'Preview Only';
-      properties.splice(1, 0, { label: 'Preview Filename', value: pdfPreviewFilenameValue, id: 'propPdfPreviewFilename', editable: true });
-      properties.splice(2, 0, { label: 'Price ID', value: pdfPreviewPriceIdValue, id: 'propPdfPreviewPriceId', editable: true });
-      properties.splice(3, 0, { 
+      properties.splice(1, 0, { label: 'Price ID', value: pdfPreviewPriceIdValue, id: 'propPdfPreviewPriceId', editable: true });
+      properties.splice(2, 0, { 
         label: 'Preview', 
         value: pdfPreviewAttachmentValue, 
         id: 'propPdfPreviewAttachment', 
@@ -2907,7 +2967,7 @@ function showPropertiesPopup(cell) {
           if (prop.id === 'propPdfName' || prop.id === 'propPdfFile' || prop.id === 'propPdfPrice') {
           }
             // Special debugging for PDF preview properties
-          if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile' || prop.id === 'propPdfPreviewPriceId' || prop.id === 'propPdfPreviewFilename') {
+          if (prop.id === 'propPdfPreviewTitle' || prop.id === 'propPdfPreviewFile' || prop.id === 'propPdfPreviewPriceId') {
           }
           if (useTextarea) {
             input.style.cssText = `
@@ -3230,16 +3290,9 @@ function showPropertiesPopup(cell) {
                 if (typeof window.updatePdfPreviewNodeCell === 'function') {
                   window.updatePdfPreviewNodeCell(cell);
                 }
-                // Trigger autosave
-                if (typeof window.requestAutosave === 'function') {
-                  window.requestAutosave();
-                }
-                break;
-              case 'propPdfPreviewFile':
-                cell._pdfPreviewFile = newValue;
-                // Update PDF preview node display if function exists
-                if (typeof window.updatePdfPreviewNodeCell === 'function') {
-                  window.updatePdfPreviewNodeCell(cell);
+                // Update File node display if function exists
+                if (typeof window.updateFileNodeCell === 'function' && typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+                  window.updateFileNodeCell(cell);
                 }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
@@ -3248,6 +3301,21 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propPdfPreviewFilename':
                 cell._pdfPreviewFilename = newValue;
+                // Update PDF preview node display if function exists
+                if (typeof window.updatePdfPreviewNodeCell === 'function') {
+                  window.updatePdfPreviewNodeCell(cell);
+                }
+                // Update File node display if function exists
+                if (typeof window.updateFileNodeCell === 'function' && typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+                  window.updateFileNodeCell(cell);
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propPdfPreviewFile':
+                cell._pdfPreviewFile = newValue;
                 // Update PDF preview node display if function exists
                 if (typeof window.updatePdfPreviewNodeCell === 'function') {
                   window.updatePdfPreviewNodeCell(cell);
@@ -3584,6 +3652,35 @@ function showPropertiesPopup(cell) {
         window.requestAutosave();
       }
     }
+    // Save any File node properties that might be in input fields but not yet saved
+    if (typeof window.isFileNode === 'function' && window.isFileNode(cell)) {
+      // Check for Preview Title input
+      const fileTitleInput = document.getElementById('propPdfPreviewTitle_input');
+      if (fileTitleInput) {
+        const fileTitleValue = fileTitleInput.value.trim();
+        if (fileTitleValue !== cell._pdfPreviewTitle) {
+          cell._pdfPreviewTitle = fileTitleValue;
+          if (typeof window.updateFileNodeCell === 'function') {
+            window.updateFileNodeCell(cell);
+          }
+        }
+      }
+      // Check for Preview Filename input
+      const fileFilenameInput = document.getElementById('propPdfPreviewFilename_input');
+      if (fileFilenameInput) {
+        const fileFilenameValue = fileFilenameInput.value.trim();
+        if (fileFilenameValue !== cell._pdfPreviewFilename) {
+          cell._pdfPreviewFilename = fileFilenameValue;
+          if (typeof window.updateFileNodeCell === 'function') {
+            window.updateFileNodeCell(cell);
+          }
+        }
+      }
+      // Trigger autosave after saving File node properties
+      if (typeof window.requestAutosave === 'function') {
+        window.requestAutosave();
+      }
+    }
     // Save any PDF preview properties that might be in input fields but not yet saved
     if (typeof window.isPdfPreviewNode === 'function' && window.isPdfPreviewNode(cell)) {
       // Check for Preview Title input
@@ -3614,18 +3711,8 @@ function showPropertiesPopup(cell) {
         }
       } else {
       }
-      // Check for Preview Filename and Price ID inputs (only for LaTeX preview nodes)
+      // Check for Price ID input (only for LaTeX preview nodes)
       if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
-        const pdfPreviewFilenameInput = document.getElementById('propPdfPreviewFilename_input');
-        if (pdfPreviewFilenameInput) {
-          const pdfPreviewFilenameValue = pdfPreviewFilenameInput.value.trim();
-          if (pdfPreviewFilenameValue !== cell._pdfPreviewFilename) {
-            cell._pdfPreviewFilename = pdfPreviewFilenameValue;
-            if (typeof window.updatePdfPreviewNodeCell === 'function') {
-              window.updatePdfPreviewNodeCell(cell);
-            }
-          }
-        }
         const pdfPreviewPriceIdInput = document.getElementById('propPdfPreviewPriceId_input');
         if (pdfPreviewPriceIdInput) {
           const pdfPreviewPriceIdValue = pdfPreviewPriceIdInput.value.trim();

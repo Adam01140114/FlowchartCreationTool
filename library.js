@@ -275,12 +275,16 @@ window.exportGuiJson = function(download = true) {
         enabled: false,
         trigger: "",
         title: "",
-        file: ""
+        file: "",
+        priceId: "",
+        attachment: "Preview Only",
+        filename: ""
       },
       latexPreview: {
         enabled: false,
         trigger: "",
         title: "",
+        filename: "",
         content: "",
         priceId: "",
         attachment: "Preview Only"
@@ -2648,11 +2652,22 @@ window.exportGuiJson = function(download = true) {
                 // Get PDF preview properties
                 const previewTitle = pdfPreviewCell._pdfPreviewTitle || "";
                 const previewFile = pdfPreviewCell._pdfPreviewFile || "";
-                // Set PDF preview properties
+                // If filename is not set, default to file value
+                const previewFilename = pdfPreviewCell._pdfPreviewFilename || previewFile || "";
+                const previewPriceId = pdfPreviewCell._pdfPreviewPriceId || "";
+                let previewAttachment = pdfPreviewCell._pdfPreviewAttachment || "Preview Only";
+                // Normalize attachment value (handle old "Attach To Packet" format)
+                if (previewAttachment === "Attach To Packet") {
+                  previewAttachment = "Attach to packet";
+                }
+                // Set PDF preview properties (order: priceId, attachment, filename)
                 question.pdfPreview.enabled = true;
                 question.pdfPreview.trigger = optionText;
                 question.pdfPreview.title = previewTitle;
                 question.pdfPreview.file = previewFile;
+                question.pdfPreview.priceId = previewPriceId;
+                question.pdfPreview.attachment = previewAttachment;
+                question.pdfPreview.filename = previewFilename;
                 // Only one PDF preview per question, so break after finding one
                 break;
               } else if (pdfPreviewCell && typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(pdfPreviewCell)) {
@@ -3415,12 +3430,10 @@ window.exportBothJson = function() {
           (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell))) {
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle !== undefined ? cell._pdfPreviewTitle : "";
         cellData._pdfPreviewFile = cell._pdfPreviewFile !== undefined ? cell._pdfPreviewFile : "";
-        // Only include Filename, Price ID and Attachment for LaTeX preview nodes
-        if (typeof window.isLatexPdfPreviewNode === 'function' && window.isLatexPdfPreviewNode(cell)) {
-          cellData._pdfPreviewFilename = cell._pdfPreviewFilename !== undefined ? cell._pdfPreviewFilename : "";
-          cellData._pdfPreviewPriceId = cell._pdfPreviewPriceId !== undefined ? cell._pdfPreviewPriceId : "";
-          cellData._pdfPreviewAttachment = cell._pdfPreviewAttachment !== undefined ? cell._pdfPreviewAttachment : "Preview Only";
-        }
+        // Include Filename, Price ID and Attachment for both PDF Preview and LaTeX Preview nodes
+        cellData._pdfPreviewFilename = cell._pdfPreviewFilename !== undefined ? cell._pdfPreviewFilename : "";
+        cellData._pdfPreviewPriceId = cell._pdfPreviewPriceId !== undefined ? cell._pdfPreviewPriceId : "";
+        cellData._pdfPreviewAttachment = cell._pdfPreviewAttachment !== undefined ? cell._pdfPreviewAttachment : "Preview Only";
       } else if (cell._pdfPreviewTitle !== undefined) {
         // Include even if not a PDF preview node (for backward compatibility)
         cellData._pdfPreviewTitle = cell._pdfPreviewTitle;

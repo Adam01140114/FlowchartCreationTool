@@ -665,7 +665,16 @@ function addQuestion(sectionId, questionId = null) {
             <label>PDF Preview Title:</label>
             <input type="text" id="pdfPreviewTitle${currentQuestionId}" placeholder="Enter PDF preview title"><br><br>
             <label>PDF Preview File:</label>
-            <input type="text" id="pdfPreviewFile${currentQuestionId}" placeholder="Enter PDF file name or URL">
+            <input type="text" id="pdfPreviewFile${currentQuestionId}" placeholder="Enter PDF file name or URL"><br><br>
+            <label>PDF Preview Price ID:</label>
+            <input type="text" id="pdfPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1..."><br><br>
+            <label>PDF Preview Attachment:</label>
+            <select id="pdfPreviewAttachment${currentQuestionId}">
+                <option value="Preview Only">Preview Only</option>
+                <option value="Attach to packet">Attach to packet</option>
+            </select><br><br>
+            <label>PDF Preview Filename (for cart):</label>
+            <input type="text" id="pdfPreviewFilename${currentQuestionId}" placeholder="Enter filename for cart entry"><br><br>
         </div><br>
         <!-- LaTeX Preview Feature -->
         <label>Enable Latex Preview: </label>

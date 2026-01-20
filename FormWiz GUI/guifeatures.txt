@@ -1233,7 +1233,7 @@ select.addEventListener('change', function() {
             // Use custom alert modal with hard alert flag (second parameter = true)
             if (typeof showAlert === 'function') {
                 showAlert(hardAlertData.title, true); // true = hard alert
-            } else {
+        } else {
                 alert(hardAlertData.title);
             }
         }
@@ -1327,7 +1327,7 @@ function checkAllHardAlertsAndUpdateNavigation() {
                                                 .replace(/^_+|_+$/g, '');
                                         } else if (field.nodeId) {
                                             baseNodeId = field.nodeId;
-                                        } else {
+                } else {
                                             baseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
                                         }
                                         
@@ -1482,7 +1482,7 @@ Also call on initial page load:
 
 ```javascript
 // In DOMContentLoaded or window.onload
-setTimeout(() => {
+    setTimeout(() => {
     if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
         checkAllHardAlertsAndUpdateNavigation();
     }
@@ -1623,7 +1623,7 @@ Solution: This is a CRITICAL issue that requires two fixes:
 
 1. **Include `enabled: true` when storing data**: When storing hard alert data in
    `window.hardAlertData`, you MUST include the `enabled: true` property:
-   ```javascript
+```javascript
    window.hardAlertData[questionId] = {
        enabled: true,  // CRITICAL: Must be included
        trigger: hardAlertTrigger,
@@ -1635,7 +1635,7 @@ Solution: This is a CRITICAL issue that requires two fixes:
 2. **Embed `window.hardAlertData` in generated HTML**: The `window.hardAlertData`
    object must be embedded in the generated HTML so it's available at runtime.
    Add this line where other global variables are embedded:
-   ```javascript
+```javascript
    formHTML += `window.hardAlertData = ${JSON.stringify(window.hardAlertData || {})};\n`;
    ```
 
@@ -2406,4 +2406,1000 @@ checkbox.addEventListener('change', function() {
 
 ================================================================================
 END OF FEATURE #3 DOCUMENTATION
+================================================================================
+
+================================================================================
+FEATURE #4: LATEX PREVIEW PDF WITH CART INTEGRATION
+================================================================================
+
+PURPOSE:
+--------
+Allows form builders to configure LaTeX preview PDFs for dropdown questions. When
+a user selects a specific option in the generated form, a PDF is generated from
+LaTeX code and displayed in a preview. If "Attach to packet" is selected, the PDF
+is added to the cart and saved to the user's documents after payment.
+
+Example: A dropdown "Have you sent a demand letter to the defendant?" has options
+"Yes" and "No". The form builder can enable LaTeX preview so that when users select
+"No", a PDF is generated from LaTeX code (e.g., a demand letter template) and shown
+in a preview. If configured to "Attach to packet", the PDF is added to the cart with
+a custom filename (e.g., "Demand Letter") and saved to the user's documents after
+successful payment.
+
+CONTEXT:
+--------
+This feature is implemented for dropdown questions. It generates PDFs client-side
+using a server endpoint (`/latex_to_pdf`), stores them as Blob objects, and handles
+cart integration with proper serialization (base64 encoding) for persistence.
+
+KEY CONCEPTS:
+------------
+1. LaTeX Preview: Client-side PDF generation from LaTeX code with placeholder replacement
+2. Preview Filename: Custom name for the cart entry (separate from preview title)
+3. Cart Integration: PDFs are added to cart and saved to documents after payment
+4. Blob Serialization: PDFs are converted to base64 for JSON serialization
+5. Form Data Replacement: LaTeX placeholders like [user_fullname] are replaced with form values
+
+================================================================================
+PART 1: GUI INTERFACE (FormWiz GUI/gui.js)
+================================================================================
+
+1.1 ADDING THE UI CHECKBOX
+---------------------------
+Location: `addQuestion()` function (around line 671)
+
+When a question is added, an "Enable Latex Preview" checkbox is added after the
+"Enable PDF Preview" section.
+
+UI Structure:
+```html
+<label>Enable Latex Preview: </label>
+<input type="checkbox" id="enableLatexPreview${currentQuestionId}" onchange="toggleLatexPreview(${currentQuestionId})">
+<div id="latexPreviewBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+    <label>Latex Preview Trigger:</label>
+    <select id="latexPreviewTrigger${currentQuestionId}">
+        <option value="">Select an option...</option>
+    </select><br><br>
+    <label>Latex Preview Title:</label>
+    <input type="text" id="latexPreviewTitle${currentQuestionId}" placeholder="Enter LaTeX preview title"><br><br>
+    <label>Preview Filename (for cart):</label>
+    <input type="text" id="latexPreviewFilename${currentQuestionId}" placeholder="Enter filename for cart entry"><br><br>
+    <label>Latex Content:</label>
+    <textarea id="latexPreviewContent${currentQuestionId}" placeholder="Paste LaTeX code here" rows="8" style="width: 100%; font-family: monospace;"></textarea><br><br>
+    <label>Latex Price ID:</label>
+    <input type="text" id="latexPreviewPriceId${currentQuestionId}" placeholder="Enter Stripe price ID (e.g., price_1..."><br><br>
+    <label>Latex Attachment:</label>
+    <select id="latexPreviewAttachment${currentQuestionId}">
+        <option value="Preview Only">Preview Only</option>
+        <option value="Attach to packet">Attach to packet</option>
+    </select><br><br>
+</div><br>
+```
+
+Key Patterns:
+- Checkbox ID pattern: `enableLatexPreview{questionId}`
+- Container ID pattern: `latexPreviewBlock{questionId}`
+- Trigger dropdown ID: `latexPreviewTrigger{questionId}`
+- Title input ID: `latexPreviewTitle{questionId}`
+- Filename input ID: `latexPreviewFilename{questionId}` (NEW - for cart entry name)
+- Content textarea ID: `latexPreviewContent{questionId}`
+- Price ID input ID: `latexPreviewPriceId{questionId}`
+- Attachment dropdown ID: `latexPreviewAttachment{questionId}`
+- Container is initially hidden (`display: none`)
+
+1.2 TOGGLE FUNCTION
+-------------------
+Location: `toggleLatexPreview()` function (around line 4835)
+
+Purpose: Shows/hides the LaTeX preview configuration UI and populates trigger options.
+
+Function Signature:
+```javascript
+function toggleLatexPreview(questionId)
+```
+
+Implementation Steps:
+
+Step 1: Get DOM Elements
+```javascript
+const latexPreviewEnabled = document.getElementById(`enableLatexPreview${questionId}`).checked;
+const latexPreviewBlock = document.getElementById(`latexPreviewBlock${questionId}`);
+latexPreviewBlock.style.display = latexPreviewEnabled ? 'block' : 'none';
+```
+
+Step 2: Populate Trigger Options if Enabled
+```javascript
+if (latexPreviewEnabled) {
+    updateLatexPreviewTriggerOptions(questionId);
+}
+```
+
+1.3 UPDATE TRIGGER OPTIONS FUNCTION
+------------------------------------
+Location: `updateLatexPreviewTriggerOptions()` function (around line 5047)
+
+Purpose: Populates the "Latex Preview Trigger" dropdown with options from the current
+dropdown question.
+
+Implementation is similar to `updateStatusTriggerOptions()`:
+- Reads options from `#dropdownOptions{questionId}` container
+- Populates the trigger dropdown
+- Preserves currently selected value
+
+================================================================================
+PART 2: EXPORT/IMPORT (FormWiz GUI/download.js)
+================================================================================
+
+2.1 EXPORT PROCESS
+------------------
+Location: Question data collection in `getFormJSON()` function (around line 3320)
+
+When collecting question data for JSON export, LaTeX preview data is read from
+UI elements and added to the question object.
+
+Implementation:
+
+```javascript
+latexPreview: {
+    enabled: questionBlock.querySelector(`#enableLatexPreview${questionId}`)?.checked || false,
+    trigger: questionBlock.querySelector(`#latexPreviewTrigger${questionId}`)?.value || "",
+    title: questionBlock.querySelector(`#latexPreviewTitle${questionId}`)?.value || "",
+    filename: questionBlock.querySelector(`#latexPreviewFilename${questionId}`)?.value || "",
+    content: questionBlock.querySelector(`#latexPreviewContent${questionId}`)?.value || "",
+    priceId: questionBlock.querySelector(`#latexPreviewPriceId${questionId}`)?.value || "",
+    attachment: questionBlock.querySelector(`#latexPreviewAttachment${questionId}`)?.value || "Preview Only"
+}
+```
+
+JSON Export Format:
+```json
+{
+    "questionId": 1,
+    "text": "Have you sent a demand letter to the defendant?",
+    "type": "dropdown",
+    "latexPreview": {
+        "enabled": true,
+        "trigger": "No",
+        "title": "Latex PDF Preview",
+        "filename": "Demand Letter",
+        "content": "\\documentclass{article}\n\\begin{document}\n...",
+        "priceId": "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
+        "attachment": "Attach to packet"
+    },
+    "options": ["Yes", "No"]
+}
+```
+
+2.2 IMPORT PROCESS
+------------------
+Location: `loadFormJson()` function, within question restoration block (around line 482)
+
+When importing a JSON file, LaTeX preview data must be restored to UI elements.
+
+Implementation:
+
+```javascript
+// Restore LaTeX preview if present (AFTER options are added to DOM)
+if (question.latexPreview && question.latexPreview.enabled) {
+    const latexPreviewCheckbox = questionBlock.querySelector(`#enableLatexPreview${question.questionId}`);
+    const latexPreviewTriggerSelect = questionBlock.querySelector(`#latexPreviewTrigger${question.questionId}`);
+    const latexPreviewTitleInput = questionBlock.querySelector(`#latexPreviewTitle${question.questionId}`);
+    const latexPreviewFilenameInput = questionBlock.querySelector(`#latexPreviewFilename${question.questionId}`);
+    const latexPreviewContentInput = questionBlock.querySelector(`#latexPreviewContent${question.questionId}`);
+    const latexPreviewPriceIdInput = questionBlock.querySelector(`#latexPreviewPriceId${question.questionId}`);
+    const latexPreviewAttachmentSelect = questionBlock.querySelector(`#latexPreviewAttachment${question.questionId}`);
+    
+    if (latexPreviewCheckbox) {
+        latexPreviewCheckbox.checked = true;
+        toggleLatexPreview(question.questionId); // This populates the trigger dropdown
+        
+        // Set values after dropdown is populated
+        if (latexPreviewTriggerSelect && question.latexPreview.trigger) {
+            latexPreviewTriggerSelect.value = question.latexPreview.trigger;
+        }
+        if (latexPreviewTitleInput && question.latexPreview.title) {
+            latexPreviewTitleInput.value = question.latexPreview.title;
+        }
+        if (latexPreviewFilenameInput && question.latexPreview.filename) {
+            latexPreviewFilenameInput.value = question.latexPreview.filename;
+        }
+        if (latexPreviewContentInput && question.latexPreview.content) {
+            latexPreviewContentInput.value = question.latexPreview.content;
+        }
+        if (latexPreviewPriceIdInput && question.latexPreview.priceId) {
+            latexPreviewPriceIdInput.value = question.latexPreview.priceId;
+        }
+        if (latexPreviewAttachmentSelect && question.latexPreview.attachment) {
+            latexPreviewAttachmentSelect.value = question.latexPreview.attachment;
+        }
+    }
+}
+```
+
+Key Patterns:
+- Must call `toggleLatexPreview()` to populate the trigger dropdown
+- Set values after the dropdown is populated
+- All fields are restored: title, filename, content, priceId, attachment
+
+================================================================================
+PART 3: FORM GENERATION (FormWiz GUI/generate.js)
+================================================================================
+
+3.1 COLLECTING LATEX PREVIEW DATA DURING FORM GENERATION
+---------------------------------------------------------
+Location: Question processing loop in `getFormHTML()` function (around line 1453)
+
+When building the form HTML, LaTeX preview data must be collected and used to generate
+the preview handler function.
+
+Implementation:
+
+```javascript
+// Handle LaTeX Preview
+if (latexPreviewEnabled) {
+    const latexPreviewTriggerEl = qBlock.querySelector(`#latexPreviewTrigger${questionId}`);
+    const latexPreviewTitleEl = qBlock.querySelector(`#latexPreviewTitle${questionId}`);
+    const latexPreviewFilenameEl = qBlock.querySelector(`#latexPreviewFilename${questionId}`);
+    const latexPreviewContentEl = qBlock.querySelector(`#latexPreviewContent${questionId}`);
+    const latexPreviewPriceIdEl = qBlock.querySelector(`#latexPreviewPriceId${questionId}`);
+    const latexPreviewAttachmentEl = qBlock.querySelector(`#latexPreviewAttachment${questionId}`);
+    
+    const latexPreviewTrigger = latexPreviewTriggerEl ? latexPreviewTriggerEl.value : "";
+    const latexPreviewTitle = latexPreviewTitleEl ? latexPreviewTitleEl.value : "LaTeX Preview";
+    const latexPreviewFilenameRaw = latexPreviewFilenameEl ? latexPreviewFilenameEl.value : "";
+    const latexPreviewFilename = (latexPreviewFilenameRaw && latexPreviewFilenameRaw.trim() !== '') 
+        ? latexPreviewFilenameRaw.trim() 
+        : latexPreviewTitle;
+    const latexPreviewContent = latexPreviewContentEl ? latexPreviewContentEl.value : "";
+    const latexPreviewPriceId = latexPreviewPriceIdEl ? latexPreviewPriceIdEl.value : "";
+    const latexPreviewAttachment = latexPreviewAttachmentEl ? latexPreviewAttachmentEl.value : "Preview Only";
+    
+    // Store metadata if "Attach to packet" is selected
+    if (latexPreviewTrigger && latexPreviewContent && latexPreviewAttachment === "Attach to packet") {
+        // Check if an entry already exists for this questionId and remove it to avoid duplicates
+        const existingIndex = latexPreviewQuestions.findIndex(q => q.questionId === questionId);
+        if (existingIndex !== -1) {
+            latexPreviewQuestions.splice(existingIndex, 1);
+        }
+        latexPreviewQuestions.push({
+            questionId: questionId,
+            title: latexPreviewTitle,
+            filename: latexPreviewFilename,
+            priceId: latexPreviewPriceId,
+            trigger: latexPreviewTrigger
+        });
+    }
+}
+```
+
+Key Patterns:
+- Filename defaults to title if not provided
+- Metadata is only stored if "Attach to packet" is selected
+- Duplicate entries for the same questionId are prevented
+
+3.2 GENERATING PREVIEW HANDLER FUNCTION
+----------------------------------------
+Location: LaTeX preview handler generation in `getFormHTML()` function (around line 1495)
+
+A handler function is generated for each question with LaTeX preview enabled. This function
+handles PDF generation and preview display.
+
+Implementation:
+
+```javascript
+if (latexPreviewTrigger && latexPreviewContent) {
+    // Escape LaTeX content for JavaScript string
+    const escapedLatexContent = latexPreviewContent
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
+    
+    formHTML += `
+        <div id="latexPreview${questionId}" style="display: none; ...">
+            <h4>${latexPreviewTitle}</h4>
+            <div id="latexPreviewLoading${questionId}">Generating PDF from LaTeX...</div>
+            <iframe id="latexPreviewIframe${questionId}" width="100%" height="600px"></iframe>
+        </div>
+        <script>
+            async function handleLatexPreview${questionId}(value) {
+                const previewDiv = document.getElementById('latexPreview${questionId}');
+                const iframe = document.getElementById('latexPreviewIframe${questionId}');
+                const loadingDiv = document.getElementById('latexPreviewLoading${questionId}');
+                const latexContent = \`${escapedLatexContent}\`;
+                
+                if (value === '${latexPreviewTrigger}') {
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    
+                    try {
+                        // Collect form data for placeholder replacement
+                        const form = document.getElementById('customForm');
+                        const fd = new FormData();
+                        fd.append('latex', latexContent);
+                        
+                        // Collect all form elements
+                        const formElements = form.querySelectorAll('input, textarea, select');
+                        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                        const allFormElements = [...formElements, ...externalFormElements];
+                        
+                        // Add form data to FormData
+                        allFormElements.forEach(element => {
+                            if (element.name && !element.disabled) {
+                                if (element.type === 'checkbox' || element.type === 'radio') {
+                                    if (element.checked) {
+                                        fd.append(element.name, 'on');
+                                    }
+                                } else {
+                                    let value = element.value;
+                                    if (element.type === 'date' && value) {
+                                        value = formatDateForServer(value);
+                                    }
+                                    if (value && value.trim() !== '') {
+                                        fd.append(element.name, value);
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Send to server to generate PDF
+                        const res = await fetch('/latex_to_pdf', { 
+                            method: 'POST', 
+                            body: fd, 
+                            credentials: 'include' 
+                        });
+                        
+                        if (!res.ok) {
+                            throw new Error('Failed to generate PDF from LaTeX');
+                        }
+                        
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        iframe.src = url;
+                        loadingDiv.style.display = 'none';
+                        iframe.style.display = 'block';
+                        iframe.dataset.blobUrl = url;
+                        
+                        // Store PDF blob if "Attach to packet" is selected
+                        const attachment = '${latexPreviewAttachment}';
+                        if (attachment === 'Attach to packet') {
+                            if (!window.latexPdfs) {
+                                window.latexPdfs = {};
+                            }
+                            window.latexPdfs[${questionId}] = blob;
+                        }
+                    } catch (error) {
+                        loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
+                        iframe.style.display = 'none';
+                    }
+                } else {
+                    // Hide preview if trigger doesn't match
+                    previewDiv.style.display = 'none';
+                    iframe.style.display = 'none';
+                    // Clean up blob URL
+                    if (iframe.dataset.blobUrl) {
+                        URL.revokeObjectURL(iframe.dataset.blobUrl);
+                        iframe.dataset.blobUrl = '';
+                        iframe.src = '';
+                    }
+                    // Remove stored PDF blob if user changes away from trigger
+                    if (window.latexPdfs && window.latexPdfs[${questionId}]) {
+                        delete window.latexPdfs[${questionId}];
+                    }
+                }
+            }
+        </script>
+    `;
+}
+```
+
+Key Patterns:
+- Function name: `handleLatexPreview{questionId}(value)`
+- LaTeX content is escaped for JavaScript string embedding
+- Form data is collected and sent to `/latex_to_pdf` endpoint
+- PDF blob is stored in `window.latexPdfs[questionId]` if "Attach to packet" is selected
+- Blob URLs are cleaned up when preview is hidden
+
+3.3 ADDING HANDLER TO DROPDOWN
+-------------------------------
+Location: Dropdown generation in `getFormHTML()` function (around line 1342)
+
+When a dropdown is generated, if LaTeX preview is enabled, the handler function call
+is added to the dropdown's `onchange` attribute.
+
+Implementation:
+
+```javascript
+// Build onchange attribute
+let latexPreviewHandlerCall = '';
+if (latexPreviewEnabled) {
+    const latexPreviewTriggerEl = qBlock.querySelector(`#latexPreviewTrigger${questionId}`);
+    const latexPreviewContentEl = qBlock.querySelector(`#latexPreviewContent${questionId}`);
+    const latexPreviewTrigger = latexPreviewTriggerEl ? latexPreviewTriggerEl.value : "";
+    const latexPreviewContent = latexPreviewContentEl ? latexPreviewContentEl.value : "";
+    
+    // Only include handler call if both trigger and content are set
+    if (latexPreviewTrigger && latexPreviewContent) {
+        latexPreviewHandlerCall = ` handleLatexPreview${questionId}(this.value)`;
+    }
+}
+
+// Add to select element
+select.setAttribute('onchange', `dropdownMirror(...); ...;${latexPreviewHandlerCall}`);
+```
+
+3.4 EMBEDDING LATEX PREVIEW QUESTIONS METADATA
+----------------------------------------------
+Location: Global variables section in `getFormHTML()` function (around line 5406)
+
+The `latexPreviewQuestions` array must be embedded in the generated HTML for cart
+integration.
+
+Implementation:
+
+```javascript
+formHTML += `window.latexPreviewQuestions = ${JSON.stringify(latexPreviewQuestions || [])};\n`;
+```
+
+This array contains metadata for LaTeX previews that should be added to the cart:
+```javascript
+window.latexPreviewQuestions = [
+    {
+        questionId: 1,
+        title: "Latex PDF Preview",
+        filename: "Demand Letter",
+        priceId: "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
+        trigger: "No"
+    }
+];
+```
+
+================================================================================
+PART 4: CART INTEGRATION (FormWiz GUI/generate.js)
+================================================================================
+
+4.1 ADDING LATEX PDFS TO CART
+------------------------------
+Location: `addFormToCart()` function (around line 9119)
+
+When adding items to the cart, LaTeX preview PDFs are converted to base64 and added
+as cart items.
+
+Implementation:
+
+```javascript
+// Add LaTeX preview PDFs to cart (if "Attach to packet" is selected)
+// Convert blobs to base64 before saving to ensure they persist through JSON serialization
+if (window.latexPreviewQuestions && window.latexPreviewQuestions.length > 0 && window.latexPdfs) {
+    const processedQuestionIds = new Set(); // Track processed questionIds to avoid duplicates
+    const latexCartItems = []; // Collect LaTeX items separately to convert blobs
+    
+    for (const latexPreviewQ of window.latexPreviewQuestions) {
+        // Skip if we've already processed this questionId
+        if (processedQuestionIds.has(latexPreviewQ.questionId)) {
+            continue;
+        }
+        const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+        // Use filename if available, otherwise fall back to title
+        const filename = latexPreviewQ.filename;
+        const displayName = (filename && typeof filename === 'string' && filename.trim() !== '') 
+            ? filename.trim() 
+            : latexPreviewQ.title;
+        
+        if (latexPdf && displayName && latexPreviewQ.priceId) {
+            processedQuestionIds.add(latexPreviewQ.questionId);
+            const pdfName = displayName.endsWith('.pdf') ? displayName : (displayName + '.pdf');
+            
+            // Store item with blob for async conversion
+            latexCartItems.push({
+                blob: latexPdf,
+                cartItem: {
+                    formId: displayName.replace(/\.pdf$/i, '').toLowerCase(),
+                    title: displayName,
+                    priceId: latexPreviewQ.priceId,
+                    pdfName: pdfName,
+                    originalFormId: originalFormId,
+                    portfolioId: portfolioId,
+                    formData: formData,
+                    countyName: countyName,
+                    defendantName: defendantName,
+                    timestamp: nowTs,
+                    isLatexPreview: true,
+                    latexPdfQuestionId: latexPreviewQ.questionId
+                }
+            });
+        }
+    }
+    
+    // Convert all blobs to base64 before adding to cart
+    if (latexCartItems.length > 0) {
+        const blobToBase64 = (blob) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const result = reader.result;
+                    const base64 = result.includes(',') ? result.split(',')[1] : result;
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        };
+        
+        // Convert all blobs in parallel
+        const conversionPromises = latexCartItems.map(async (item) => {
+            const base64 = await blobToBase64(item.blob);
+            return {
+                ...item.cartItem,
+                latexPdfBase64: base64
+            };
+        });
+        
+        // Wait for all conversions, then add to cart
+        const convertedItems = await Promise.all(conversionPromises);
+        cart.push(...convertedItems);
+    }
+}
+```
+
+Key Patterns:
+- Blobs are converted to base64 for JSON serialization
+- Filename is used for cart entry title (falls back to title if filename is empty)
+- `isLatexPreview: true` flag identifies LaTeX PDF items
+- `latexPdfBase64` contains the serialized PDF data
+- Duplicate entries for the same questionId are prevented
+
+4.2 CART SAVING WITH BASE64 CONVERSION
+---------------------------------------
+Location: `saveCart()` function in `cart.js` (around line 75)
+
+When saving the cart, any LaTeX PDF blobs are converted to base64 before serialization.
+
+Implementation:
+
+```javascript
+async saveCart() {
+    // Convert LaTeX PDF blobs to base64 before serialization
+    const cartToSave = await Promise.all(this.cart.map(async (item) => {
+        if (item.isLatexPreview && item._latexPdfBlob && item._latexPdfBlob instanceof Blob) {
+            // Convert blob to base64
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const result = reader.result;
+                    const base64Data = result.includes(',') ? result.split(',')[1] : result;
+                    resolve(base64Data);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(item._latexPdfBlob);
+            });
+            
+            // Create a copy without the blob, but with base64
+            const { _latexPdfBlob, ...itemWithoutBlob } = item;
+            return {
+                ...itemWithoutBlob,
+                latexPdfBase64: base64
+            };
+        }
+        // Remove blob reference if it exists (for items that were already converted)
+        const { _latexPdfBlob, ...itemWithoutBlob } = item;
+        return itemWithoutBlob;
+    }));
+    
+    const cartData = JSON.stringify(cartToSave);
+    // Save to cookies and localStorage
+    this.setCookie(this.cartCookieName, cartData, 30);
+    localStorage.setItem(this.cartCookieName, cartData);
+}
+```
+
+Key Patterns:
+- Function is async to handle blob-to-base64 conversion
+- Temporary `_latexPdfBlob` property is removed before serialization
+- Base64 data is stored in `latexPdfBase64` property
+
+================================================================================
+PART 5: PAYMENT PROCESSING (FormWiz GUI/Pages/cart.js)
+================================================================================
+
+5.1 PROCESSING LATEX PDFS DURING PAYMENT
+-----------------------------------------
+Location: `processFormPDF()` function (around line 691)
+
+When processing payment, LaTeX preview PDFs are restored from base64 and saved to
+Firebase Storage and user documents.
+
+Implementation:
+
+```javascript
+async processFormPDF(cartItem) {
+    try {
+        let blob;
+        
+        // Check if this is a LaTeX preview PDF (client-side generated blob)
+        if (cartItem.isLatexPreview) {
+            console.log('📄 [LATEX PDF] Processing LaTeX preview PDF:', cartItem.title);
+            
+            // Try to get blob from cart item first (if it wasn't serialized)
+            if (cartItem.latexPdf && cartItem.latexPdf instanceof Blob) {
+                blob = cartItem.latexPdf;
+            } 
+            // If blob was lost during serialization, restore from base64
+            else if (cartItem.latexPdfBase64) {
+                console.log('📄 [LATEX PDF] Restoring blob from base64');
+                // Convert base64 back to blob
+                const byteCharacters = atob(cartItem.latexPdfBase64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                blob = new Blob([byteArray], { type: 'application/pdf' });
+            } else {
+                throw new Error('LaTeX PDF blob not found in cart item');
+            }
+        } else {
+            // Regular PDF: fetch from server
+            console.log('📄 [REGULAR PDF] Processing regular PDF:', cartItem.title);
+            const formData = new FormData();
+            if (cartItem.formData) {
+                for (const k in cartItem.formData) formData.append(k, cartItem.formData[k]);
+            }
+            const base = cartItem.formId.replace(/\.pdf$/i, '');
+            const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(base), {
+                method: 'POST',
+                body: formData,
+                mode: 'cors'
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            blob = await res.blob();
+        }
+        
+        // Download the PDF
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safeFormId = cartItem.formId.replace(/\W+/g, '_');
+        const docId = `${Date.now()}_${safeFormId}`;
+        // Use the proper filename for LaTeX preview PDFs
+        const downloadFilename = cartItem.isLatexPreview 
+            ? (cartItem.pdfName || cartItem.title || cartItem.formId) 
+            : `Edited_${cartItem.formId}`;
+        a.download = downloadFilename.endsWith('.pdf') ? downloadFilename : `${downloadFilename}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        // Save to Firebase Storage and documents collection
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore && firebase.storage) {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const storage = firebase.storage();
+                const db = firebase.firestore();
+                const meta = { contentType: 'application/pdf', customMetadata: { uploadedBy: user.uid } };
+                const file = new File([blob], `${docId}.pdf`, { type: 'application/pdf' });
+                const ref = storage.ref().child(`users/${user.uid}/documents/${docId}.pdf`);
+                await ref.put(file, meta);
+                const downloadUrl = await ref.getDownloadURL();
+                
+                // Save document metadata
+                const documentData = {
+                    name: cartItem.title,
+                    formId: cartItem.formId,
+                    originalFormId: cartItem.originalFormId || cartItem.formId,
+                    portfolioId: cartItem.portfolioId || null,
+                    countyName: cartItem.countyName || null,
+                    defendantName: cartItem.defendantName || null,
+                    purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    downloadUrl
+                };
+                
+                await db.collection('users').doc(user.uid)
+                    .collection('documents').doc(docId).set(documentData);
+            }
+        }
+    } catch (e) {
+        console.error(`PDF process error for ${cartItem.formId}`, e);
+    }
+}
+```
+
+Key Patterns:
+- LaTeX PDFs are detected by `isLatexPreview: true` flag
+- Blob is restored from `latexPdfBase64` if not already a Blob
+- Download filename uses `pdfName` or `title` (not `formId`)
+- PDF is saved to Firebase Storage and documents collection
+- Same process as regular PDFs, but blob source is different
+
+================================================================================
+PART 6: DATA FLOW SUMMARY
+================================================================================
+
+1. USER CONFIGURATION (GUI):
+   - User checks "Enable Latex Preview" checkbox
+   - User selects trigger option from dropdown
+   - User enters preview title and filename (for cart)
+   - User pastes LaTeX code
+   - User enters Stripe price ID
+   - User selects "Attach to packet" or "Preview Only"
+   - Data is saved to UI elements
+
+2. AUTOSAVE:
+   - Data is saved to Firebase/localStorage automatically
+   - Uses `window.requestAutosave()` function
+
+3. EXPORT (Generate JSON):
+   - `download.js` reads from UI elements
+   - Adds `latexPreview: {enabled, trigger, title, filename, content, priceId, attachment}` to question object
+   - Exported in JSON format
+
+4. IMPORT (Load JSON):
+   - Reads `latexPreview` property from imported JSON
+   - Restores to UI elements
+   - Calls `toggleLatexPreview()` to populate trigger dropdown
+   - Sets all field values
+
+5. FORM GENERATION:
+   - `generate.js` collects LaTeX preview data from UI elements
+   - Stores metadata in `latexPreviewQuestions` array if "Attach to packet" is selected
+   - Generates `handleLatexPreview{questionId}()` function
+   - Adds function call to dropdown's `onchange` attribute
+   - Embeds `window.latexPreviewQuestions` in generated HTML
+
+6. RUNTIME (Generated Form):
+   - User selects trigger option in dropdown
+   - `handleLatexPreview{questionId}()` is called
+   - Function collects form data and sends to `/latex_to_pdf` endpoint
+   - Server generates PDF from LaTeX with placeholder replacement
+   - PDF blob is returned and displayed in iframe
+   - If "Attach to packet", blob is stored in `window.latexPdfs[questionId]`
+
+7. CART ADDITION:
+   - When form is submitted, `addFormToCart()` is called
+   - LaTeX PDFs are converted to base64 and added to cart
+   - Cart is saved with `latexPdfBase64` property
+   - Filename is used for cart entry title
+
+8. PAYMENT PROCESSING:
+   - Cart is loaded from cookies/localStorage
+   - `processFormPDF()` detects LaTeX PDFs by `isLatexPreview` flag
+   - Blob is restored from `latexPdfBase64`
+   - PDF is downloaded and saved to Firebase Storage
+   - Document metadata is saved to user's documents collection
+
+================================================================================
+PART 7: KEY PATTERNS AND CONVENTIONS
+================================================================================
+
+7.1 NAMING CONVENTIONS
+----------------------
+- Checkbox ID: `enableLatexPreview{questionId}`
+- Container ID: `latexPreviewBlock{questionId}`
+- Trigger dropdown ID: `latexPreviewTrigger{questionId}`
+- Title input ID: `latexPreviewTitle{questionId}`
+- Filename input ID: `latexPreviewFilename{questionId}`
+- Content textarea ID: `latexPreviewContent{questionId}`
+- Price ID input ID: `latexPreviewPriceId{questionId}`
+- Attachment dropdown ID: `latexPreviewAttachment{questionId}`
+- Handler function: `handleLatexPreview{questionId}(value)`
+- Preview div ID: `latexPreview{questionId}`
+- Iframe ID: `latexPreviewIframe{questionId}`
+- Loading div ID: `latexPreviewLoading{questionId}`
+- Window object: `window.latexPdfs` (runtime) and `window.latexPreviewQuestions` (metadata)
+
+7.2 DATA STRUCTURE
+------------------
+GUI Storage (in UI elements):
+- Title: Text input value
+- Filename: Text input value (for cart entry name)
+- Content: Textarea value (LaTeX code)
+- Trigger: Dropdown selected value
+- Price ID: Text input value
+- Attachment: Dropdown selected value ("Preview Only" or "Attach to packet")
+
+Runtime Storage:
+```javascript
+window.latexPdfs = {
+    1: Blob  // Key: questionId, Value: PDF blob
+}
+
+window.latexPreviewQuestions = [
+    {
+        questionId: 1,
+        title: "Latex PDF Preview",
+        filename: "Demand Letter",
+        priceId: "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
+        trigger: "No"
+    }
+]
+```
+
+Cart Item Structure:
+```javascript
+{
+    formId: "demand letter",
+    title: "Demand Letter",
+    priceId: "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
+    pdfName: "Demand Letter.pdf",
+    isLatexPreview: true,
+    latexPdfBase64: "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoK...",
+    latexPdfQuestionId: 1,
+    originalFormId: "sc100",
+    portfolioId: "msZI0AYG41EFiglBoB6b",
+    formData: {...},
+    countyName: "Monterey",
+    defendantName: "123",
+    timestamp: 1768901811569
+}
+```
+
+7.3 BLOB SERIALIZATION PATTERN
+-------------------------------
+Problem: Blob objects cannot be serialized to JSON for cookies/localStorage.
+
+Solution: Convert blobs to base64 strings before serialization, restore from base64
+when needed.
+
+Conversion to Base64:
+```javascript
+const blobToBase64 = (blob) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const result = reader.result;
+            const base64 = result.includes(',') ? result.split(',')[1] : result;
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+};
+```
+
+Restoration from Base64:
+```javascript
+const byteCharacters = atob(cartItem.latexPdfBase64);
+const byteNumbers = new Array(byteCharacters.length);
+for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+}
+const byteArray = new Uint8Array(byteNumbers);
+const blob = new Blob([byteArray], { type: 'application/pdf' });
+```
+
+7.4 FILENAME VS TITLE PATTERN
+------------------------------
+- **Title**: Displayed in the preview header (e.g., "Latex PDF Preview")
+- **Filename**: Used for cart entry name (e.g., "Demand Letter")
+- **Fallback**: If filename is empty, title is used for cart entry
+- **Cart Display**: Cart shows the filename (or title if filename is empty)
+- **Document Name**: Saved document uses the filename/title from cart item
+
+7.5 DUPLICATE PREVENTION PATTERN
+---------------------------------
+- Use `Set` to track processed questionIds
+- Check for existing entries before adding to `latexPreviewQuestions`
+- Remove existing entries before adding new ones if questionId matches
+- Prevents multiple cart entries for the same LaTeX preview
+
+================================================================================
+PART 8: COMMON GOTCHAS AND TROUBLESHOOTING
+================================================================================
+
+GOTCHA 1: Blob Lost During Cart Serialization
+-----------------------------------------------
+Problem: LaTeX PDF blob is lost when cart is saved to cookies/localStorage.
+
+Solution: Convert blob to base64 before saving. The `addFormToCart()` function must
+be async and await the base64 conversion before saving the cart. The `saveCart()`
+function in `cart.js` also converts any remaining blobs to base64.
+
+GOTCHA 2: PDF Not Added to Cart
+--------------------------------
+Problem: LaTeX PDF is generated but not added to cart.
+
+Solution: Ensure "Attach to packet" is selected (not "Preview Only"). Check that
+`window.latexPreviewQuestions` contains the question metadata and `window.latexPdfs`
+contains the blob for the questionId.
+
+GOTCHA 3: PDF Not Downloaded After Payment
+-------------------------------------------
+Problem: Payment succeeds but LaTeX PDF is not downloaded or saved to documents.
+
+Solution: Ensure `processFormPDF()` checks for `isLatexPreview` flag and restores
+blob from `latexPdfBase64`. Check that base64 conversion happened during cart save.
+Verify that the blob restoration code is working correctly.
+
+GOTCHA 4: Wrong Filename in Cart
+---------------------------------
+Problem: Cart shows "Latex PDF Preview" instead of "Demand Letter".
+
+Solution: Ensure filename field is read correctly in `generate.js`. Check that
+filename defaults to title if empty. Verify that `displayName` uses filename
+when creating cart items.
+
+GOTCHA 5: Duplicate Cart Entries
+----------------------------------
+Problem: Multiple entries for the same LaTeX preview appear in cart.
+
+Solution: Ensure duplicate prevention logic is in place. Check that `processedQuestionIds`
+Set is used to track processed questionIds. Verify that existing entries are removed
+before adding new ones in `latexPreviewQuestions.push()`.
+
+GOTCHA 6: Base64 Conversion Fails
+----------------------------------
+Problem: Cart save fails or PDF is not restored from base64.
+
+Solution: Ensure `addFormToCart()` is async and awaits base64 conversion. Check
+that `saveCart()` in `cart.js` is also async and handles blob conversion. Verify
+that FileReader is available and working correctly.
+
+GOTCHA 7: PDF Generation Fails
+-------------------------------
+Problem: Preview shows error message instead of PDF.
+
+Solution: Check that `/latex_to_pdf` endpoint exists and is working. Verify that
+LaTeX code is valid and doesn't contain syntax errors. Check that form data is
+being collected correctly for placeholder replacement. Ensure server can process
+LaTeX and return PDF blob.
+
+GOTCHA 8: Placeholder Replacement Not Working
+----------------------------------------------
+Problem: LaTeX PDF shows [user_fullname] instead of actual name.
+
+Solution: Ensure form data collection includes all form elements (including external
+elements with `form="customForm"` attribute). Verify that placeholder names match
+form field names. Check that date fields are formatted correctly using `formatDateForServer()`.
+
+================================================================================
+PART 9: SERVER ENDPOINT REQUIREMENTS
+================================================================================
+
+The LaTeX preview feature requires a server endpoint `/latex_to_pdf` that:
+
+1. Accepts POST requests with FormData containing:
+   - `latex`: The LaTeX code string
+   - Form field values: All form fields as key-value pairs
+
+2. Processes the LaTeX code:
+   - Replaces placeholders like `[user_fullname]` with actual form values
+   - Compiles LaTeX to PDF using a LaTeX processor (e.g., pdflatex)
+   - Handles errors gracefully
+
+3. Returns:
+   - PDF blob with `Content-Type: application/pdf`
+   - Error response if LaTeX compilation fails
+
+Example endpoint implementation (pseudo-code):
+```javascript
+app.post('/latex_to_pdf', async (req, res) => {
+    try {
+        const latexCode = req.body.latex;
+        const formData = req.body; // All form fields
+        
+        // Replace placeholders in LaTeX code
+        let processedLatex = latexCode;
+        for (const [key, value] of Object.entries(formData)) {
+            if (key !== 'latex') {
+                const placeholder = `[${key}]`;
+                processedLatex = processedLatex.replace(new RegExp(placeholder, 'g'), value || '');
+            }
+        }
+        
+        // Compile LaTeX to PDF (using pdflatex or similar)
+        const pdfBuffer = await compileLatexToPdf(processedLatex);
+        
+        // Return PDF blob
+        res.setHeader('Content-Type', 'application/pdf');
+        res.send(pdfBuffer);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate PDF from LaTeX' });
+    }
+});
+```
+
+================================================================================
+END OF FEATURE #4 DOCUMENTATION
 ================================================================================

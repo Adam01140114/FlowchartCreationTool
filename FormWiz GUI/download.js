@@ -463,6 +463,9 @@ function loadFormData(formData) {
                             const pdfPreviewTriggerSelect = questionBlock.querySelector(`#pdfPreviewTrigger${question.questionId}`);
                             const pdfPreviewTitleInput = questionBlock.querySelector(`#pdfPreviewTitle${question.questionId}`);
                             const pdfPreviewFileInput = questionBlock.querySelector(`#pdfPreviewFile${question.questionId}`);
+                            const pdfPreviewPriceIdInput = questionBlock.querySelector(`#pdfPreviewPriceId${question.questionId}`);
+                            const pdfPreviewAttachmentSelect = questionBlock.querySelector(`#pdfPreviewAttachment${question.questionId}`);
+                            const pdfPreviewFilenameInput = questionBlock.querySelector(`#pdfPreviewFilename${question.questionId}`);
                             if (pdfPreviewCheckbox) {
                                 pdfPreviewCheckbox.checked = true;
                                 togglePdfPreview(question.questionId); // This populates the trigger dropdown with options from DOM
@@ -475,6 +478,15 @@ function loadFormData(formData) {
                                 }
                                 if (pdfPreviewFileInput && question.pdfPreview.file) {
                                     pdfPreviewFileInput.value = question.pdfPreview.file;
+                                }
+                                if (pdfPreviewPriceIdInput && question.pdfPreview.priceId) {
+                                    pdfPreviewPriceIdInput.value = question.pdfPreview.priceId;
+                                }
+                                if (pdfPreviewAttachmentSelect && question.pdfPreview.attachment) {
+                                    pdfPreviewAttachmentSelect.value = question.pdfPreview.attachment;
+                                }
+                                if (pdfPreviewFilenameInput && question.pdfPreview.filename) {
+                                    pdfPreviewFilenameInput.value = question.pdfPreview.filename;
                                 }
                             }
                         }
@@ -3319,7 +3331,10 @@ function exportForm() {
                     enabled: questionBlock.querySelector(`#enablePdfPreview${questionId}`)?.checked || false,
                     trigger: questionBlock.querySelector(`#pdfPreviewTrigger${questionId}`)?.value || "",
                     title: questionBlock.querySelector(`#pdfPreviewTitle${questionId}`)?.value || "",
-                    file: questionBlock.querySelector(`#pdfPreviewFile${questionId}`)?.value || ""
+                    file: questionBlock.querySelector(`#pdfPreviewFile${questionId}`)?.value || "",
+                    priceId: questionBlock.querySelector(`#pdfPreviewPriceId${questionId}`)?.value || "",
+                    attachment: questionBlock.querySelector(`#pdfPreviewAttachment${questionId}`)?.value || "Preview Only",
+                    filename: questionBlock.querySelector(`#pdfPreviewFilename${questionId}`)?.value || ""
                 },
                 latexPreview: {
                     enabled: questionBlock.querySelector(`#enableLatexPreview${questionId}`)?.checked || false,

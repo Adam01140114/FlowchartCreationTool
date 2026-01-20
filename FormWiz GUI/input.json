@@ -54,19 +54,22 @@
             "text": ""
           },
           "pdfPreview": {
+            "enabled": true,
+            "trigger": "No",
+            "title": "PDF Preview",
+            "file": "sc100.pdf",
+            "priceId": "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
+            "attachment": "Attach to packet",
+            "filename": "sc100.pdf"
+          },
+          "latexPreview": {
             "enabled": false,
             "trigger": "",
             "title": "",
-            "file": ""
-          },
-          "latexPreview": {
-            "enabled": true,
-            "trigger": "No",
-            "title": "Latex PDF Preview",
-            "filename": "Demand Letter",
-            "content": "\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_suing_name_1]\\\\\n[how_many_people_are_you_suing_please_enter_]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nAs of the date of this letter, the amount of [how_much_are_you_suing_for] remains unpaid. I demand that you pay this amount in full by 14 days from the date of this letter.\n\n\\vspace{1em}\n\nPayment may be made by cash, check, or bank transfer. Please send payment to the address listed above, or contact me directly at [user_phone] or [user_email] to arrange payment.\n\n\\vspace{1em}\n\nIf payment is not received by the deadline specified above, I will pursue all available legal remedies, including filing a lawsuit in small claims court to recover the amount owed, plus any applicable interest, court costs, and attorneys' fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter amicably without the need for legal action. Please contact me at [user_phone] or [user_email] to discuss payment arrangements.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}",
-            "priceId": "price_1SqS2XFJeSRMFQ8XXlBzhcqW",
-            "attachment": "Attach to packet"
+            "filename": "",
+            "content": "",
+            "priceId": "",
+            "attachment": "Preview Only"
           },
           "status": {
             "enabled": false,
@@ -157,7 +160,10 @@
             "enabled": false,
             "trigger": "",
             "title": "",
-            "file": ""
+            "file": "",
+            "priceId": "",
+            "attachment": "Preview Only",
+            "filename": ""
           },
           "latexPreview": {
             "enabled": false,
@@ -196,8 +202,8 @@
   "hiddenFieldCounter": 1,
   "groupCounter": 1,
   "formName": "Example Form",
-  "defaultPDFName": "SC-100",
-  "pdfOutputName": "sc100.pdf",
+  "defaultPDFName": "Test Form",
+  "pdfOutputName": "sc120.pdf",
   "stripePriceId": "price_1SB7CbFJeSRMFQ8X2afGFckf",
   "additionalPDFs": [],
   "checklistItems": [],
